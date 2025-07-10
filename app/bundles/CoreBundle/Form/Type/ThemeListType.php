@@ -1,47 +1,32 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class ThemeListType.
+ * @extends AbstractType<mixed>
  */
 class ThemeListType extends AbstractType
 {
-    /**
-     * @var ThemeHelper
-     */
-    private $themeHelper;
-
-    /**
-     * ThemeListType constructor.
-     */
-    public function __construct(ThemeHelper $helper)
-    {
-        $this->themeHelper = $helper;
+    public function __construct(
+        private ThemeHelperInterface $themeHelper,
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options) {
-                    $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
-                    $themes['mautic_code_mode'] = 'Code Mode';
+                'choices'           => function (Options $options): array {
+                    $themes = $this->themeHelper->getInstalledThemes($options['feature']);
+                    if ($options['include_code_mode']) {
+                        $themes['mautic_code_mode'] = 'Code Mode';
+                    }
 
                     return array_flip($themes);
                 },
@@ -51,23 +36,14 @@ class ThemeListType extends AbstractType
                 'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => false,
                 'required'          => false,
-                'attr'              => [
-                    'class' => 'form-control',
-                ],
+                'attr'              => ['class' => 'form-control'],
                 'feature'           => 'all',
+                'include_code_mode' => true,
             ]
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'theme_list';
-    }
-
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

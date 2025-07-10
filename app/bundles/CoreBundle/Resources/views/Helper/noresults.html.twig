@@ -1,0 +1,20 @@
+{% set header = header is defined ? header : 'mautic.core.noresults.header' %}
+{% set message = message is defined ? message : 'mautic.core.noresults' %}
+<div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
+    <h4>{{ header|trans }}</h4>
+    <p>{{ message|trans }}</p>
+</div>
+
+{% if tip is defined %}
+    <div class="well well col-md-6 col-md-offset-3">
+        <div class="row">
+            <div class="mautibot-image col-xs-3 text-center">
+                <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
+            </div>
+            <div class="col-xs-9">
+                <h4><i class="ri-double-quotes-l"></i> {% trans %}mautic.core.noresults.tip{% endtrans %} <i class="ri-double-quotes-r"></i></h4>
+                <p class="mt-md">{{ tip|trans }}</p>
+            </div>
+        </div>
+    </div>
+{% endif %}

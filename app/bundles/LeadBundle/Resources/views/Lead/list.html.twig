@@ -1,0 +1,23 @@
+{#
+  Variables
+    - items
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}lead{% endblock %}
+{% block headerTitle %}{{ 'mautic.lead.leads'|trans }}{% endblock %}
+
+{% block content %}
+  {{ include('@MauticLead/Lead/_filter.html.twig') }}
+  {{ include('@MauticLead/Lead/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.contacts.view', 'mautic.protip.contacts.tags', 'mautic.protip.contacts.list'])
+  }) }}
+  {% endif %}
+{% endblock %}

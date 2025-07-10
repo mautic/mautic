@@ -1,23 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic, Na. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class AssetRepository.
+ * @extends CommonRepository<Asset>
  */
 class AssetRepository extends CommonRepository
 {
@@ -53,7 +45,7 @@ class AssetRepository extends CommonRepository
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('a.title', ':search'))
-                ->setParameter('search', "{$search}%");
+                ->setParameter('search', "%{$search}%");
         }
 
         if (!$viewOther) {
@@ -73,11 +65,8 @@ class AssetRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'a.title',
@@ -87,20 +76,17 @@ class AssetRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
         $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         switch ($command) {
             case $this->translator->trans('mautic.asset.asset.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
@@ -109,7 +95,7 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('a.language', ":$unique"),
                     $q->expr()->like('a.language', ":$langUnique")
                 );
@@ -134,9 +120,9 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -151,49 +137,41 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['a.title', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'a';
     }
 
     /**
      * Gets the sum size of assets.
-     *
-     * @return int
      */
-    public function getAssetSize(array $assets)
+    public function getAssetSize(array $assets): int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('sum(a.size) as total_size')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
             ->where('a.id IN (:assetIds)')
-            ->setParameter('assetIds', $assets, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            ->setParameter('assetIds', $assets, \Doctrine\DBAL\ArrayParameterType::INTEGER);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         return (int) $result[0]['total_size'];
     }
 
     /**
-     * @param            $id
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upDownloadCount($id, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($id, $increaseBy = 1, $unique = false): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -205,7 +183,7 @@ class AssetRepository extends CommonRepository
             $q->set('unique_download_count', 'unique_download_count + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -222,7 +200,7 @@ class AssetRepository extends CommonRepository
         $q->where($this->getTableAlias().'.category = :categoryId');
         $q->andWhere($this->getTableAlias().'.isPublished = TRUE');
         $q->setParameter('categoryId', $categoryId);
-        $q->orderBy($this->getTableAlias().'.dateAdded', 'DESC');
+        $q->orderBy($this->getTableAlias().'.dateAdded', Order::Descending->value);
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();

@@ -1,0 +1,269 @@
+{
+    "subtree-splits": [
+        {
+            "name": "core-lib",
+            "directory": "app",
+            "target": "git@github.com:mautic/core-lib.git"
+        },
+        {
+            "name": "GrapesJsBuilderBundle",
+            "directory": "plugins/GrapesJsBuilderBundle",
+            "target": "git@github.com:mautic/plugin-grapesjs-builder.git"
+        },
+        {
+            "name": "MauticClearbitBundle",
+            "directory": "plugins/MauticClearbitBundle",
+            "target": "git@github.com:mautic/plugin-clearbit.git"
+        },
+        {
+            "name": "MauticCloudStorageBundle",
+            "directory": "plugins/MauticCloudStorageBundle",
+            "target": "git@github.com:mautic/plugin-cloudstorage.git"
+        },
+        {
+            "name": "MauticCrmBundle",
+            "directory": "plugins/MauticCrmBundle",
+            "target": "git@github.com:mautic/plugin-crm.git"
+        },
+        {
+            "name": "MauticEmailMarketingBundle",
+            "directory": "plugins/MauticEmailMarketingBundle",
+            "target": "git@github.com:mautic/plugin-emailmarketing.git"
+        },
+        {
+            "name": "MauticFocusBundle",
+            "directory": "plugins/MauticFocusBundle",
+            "target": "git@github.com:mautic/plugin-focus.git"
+        },
+        {
+            "name": "MauticFullContactBundle",
+            "directory": "plugins/MauticFullContactBundle",
+            "target": "git@github.com:mautic/plugin-fullcontact.git"
+        },
+        {
+            "name": "MauticGmailBundle",
+            "directory": "plugins/MauticGmailBundle",
+            "target": "git@github.com:mautic/plugin-gmail.git"
+        },
+        {
+            "name": "MauticOutlookBundle",
+            "directory": "plugins/MauticOutlookBundle",
+            "target": "git@github.com:mautic/plugin-outlook.git"
+        },
+        {
+            "name": "MauticSocialBundle",
+            "directory": "plugins/MauticSocialBundle",
+            "target": "git@github.com:mautic/plugin-social.git"
+        },
+        {
+            "name": "MauticTagManagerBundle",
+            "directory": "plugins/MauticTagManagerBundle",
+            "target": "git@github.com:mautic/plugin-tagmanager.git"
+        },
+        {
+            "name": "MauticZapierBundle",
+            "directory": "plugins/MauticZapierBundle",
+            "target": "git@github.com:mautic/plugin-zapier.git"
+        },
+        {
+            "name": "theme-aurora",
+            "directory": "themes/aurora",
+            "target": "git@github.com:mautic/theme-aurora.git"
+        },
+        {
+            "name": "theme-blank",
+            "directory": "themes/blank",
+            "target": "git@github.com:mautic/theme-blank.git"
+        },
+        {
+            "name": "theme-brienz",
+            "directory": "themes/brienz",
+            "target": "git@github.com:mautic/theme-brienz.git"
+        },
+        {
+            "name": "theme-cards",
+            "directory": "themes/cards",
+            "target": "git@github.com:mautic/theme-cards.git"
+        },
+        {
+            "name": "theme-confirmme",
+            "directory": "themes/confirmme",
+            "target": "git@github.com:mautic/theme-confirmme.git"
+        },
+        {
+            "name": "theme-fresh-center",
+            "directory": "themes/fresh-center",
+            "target": "git@github.com:mautic/theme-fresh-center.git"
+        },
+        {
+            "name": "theme-fresh-fixed",
+            "directory": "themes/fresh-fixed",
+            "target": "git@github.com:mautic/theme-fresh-fixed.git"
+        },
+        {
+            "name": "theme-fresh-left",
+            "directory": "themes/fresh-left",
+            "target": "git@github.com:mautic/theme-fresh-left.git"
+        },
+        {
+            "name": "theme-fresh-wide",
+            "directory": "themes/fresh-wide",
+            "target": "git@github.com:mautic/theme-fresh-wide.git"
+        },
+        {
+            "name": "theme-goldstar",
+            "directory": "themes/goldstar",
+            "target": "git@github.com:mautic/theme-goldstar.git"
+        },
+        {
+            "name": "theme-neopolitan",
+            "directory": "themes/neopolitan",
+            "target": "git@github.com:mautic/theme-neopolitan.git"
+        },
+        {
+            "name": "theme-oxygen",
+            "directory": "themes/oxygen",
+            "target": "git@github.com:mautic/theme-oxygen.git"
+        },
+        {
+            "name": "theme-paprika",
+            "directory": "themes/paprika",
+            "target": "git@github.com:mautic/theme-paprika.git"
+        },
+        {
+            "name": "theme-skyline",
+            "directory": "themes/skyline",
+            "target": "git@github.com:mautic/theme-skyline.git"
+        },
+        {
+            "name": "theme-sparse",
+            "directory": "themes/sparse",
+            "target": "git@github.com:mautic/theme-sparse.git"
+        },
+        {
+            "name": "theme-sunday",
+            "directory": "themes/sunday",
+            "target": "git@github.com:mautic/theme-sunday.git"
+        },
+        {
+            "name": "theme-trulypersonal",
+            "directory": "themes/trulypersonal",
+            "target": "git@github.com:mautic/theme-trulypersonal.git"
+        },
+        {
+            "name": "theme-vibrant",
+            "directory": "themes/vibrant",
+            "target": "git@github.com:mautic/theme-vibrant.git"
+        },
+        {
+            "name": "theme-1-2-1-2-column",
+            "directory": "themes/_1-2-1-2-column",
+            "target": "git@github.com:mautic/theme-1-2-1-2-column.git"
+        },
+        {
+            "name": "theme-1-2-1-column",
+            "directory": "themes/_1-2-1-column",
+            "target": "git@github.com:mautic/theme-1-2-1-column.git"
+        },
+        {
+            "name": "theme-1-2-column",
+            "directory": "themes/_1-2-column",
+            "target": "git@github.com:mautic/theme-1-2-column.git"
+        },
+        {
+            "name": "theme-1-3-1-3-column",
+            "directory": "themes/_1-3-1-3-column",
+            "target": "git@github.com:mautic/theme-1-3-1-3-column.git"
+        },
+        {
+            "name": "theme-1-3-column",
+            "directory": "themes/_1-3-column",
+            "target": "git@github.com:mautic/theme-1-3-column.git"
+        },
+        {
+            "name": "theme-connect-through-content",
+            "directory": "themes/_connect-through-content",
+            "target": "git@github.com:mautic/theme-connect-through-content.git"
+        },
+        {
+            "name": "theme-educate",
+            "directory": "themes/_educate",
+            "target": "git@github.com:mautic/theme-educate.git"
+        },
+        {
+            "name": "theme-gallery",
+            "directory": "themes/_gallery",
+            "target": "git@github.com:mautic/theme-gallery.git"
+        },
+        {
+            "name": "theme-make-announcement",
+            "directory": "themes/_make-announcement",
+            "target": "git@github.com:mautic/theme-make-announcement.git"
+        },
+        {
+            "name": "theme-showcase",
+            "directory": "themes/_showcase",
+            "target": "git@github.com:mautic/theme-showcase.git"
+        },
+        {
+            "name": "theme-simple-text",
+            "directory": "themes/_simple-text",
+            "target": "git@github.com:mautic/theme-simple-text.git"
+        },
+        {
+            "name": "theme-survey",
+            "directory": "themes/_survey",
+            "target": "git@github.com:mautic/theme-survey.git"
+        },
+        {
+            "name": "theme-welcome",
+            "directory": "themes/_welcome",
+            "target": "git@github.com:mautic/theme-welcome.git"
+        },
+        {
+            "name": "theme-attract",
+            "directory": "themes/attract",
+            "target": "git@github.com:mautic/theme-attract.git"
+        },
+        {
+            "name": "theme-creative",
+            "directory": "themes/creative",
+            "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-eclipse",
+            "directory": "themes/eclipse",
+            "target": "git@github.com:mautic/theme-eclipse.git"
+        },
+        {
+            "name": "theme-chord",
+            "directory": "themes/chord",
+            "target": "git@github.com:mautic/theme-chord.git"
+        },
+        {
+            "name": "theme-formscape",
+            "directory": "themes/formscape",
+            "target": "git@github.com:mautic/theme-formscape.git"
+        },
+        {
+            "name": "theme-reachout",
+            "directory": "themes/reachout",
+            "target": "git@github.com:mautic/theme-reachout.git"
+        },
+        {
+            "name": "theme-blend",
+            "directory": "themes/blend",
+            "target": "git@github.com:mautic/theme-blend.git"
+        },
+        {
+            "name": "theme-mono",
+            "directory": "themes/mono",
+            "target": "git@github.com:mautic/theme-mono.git"
+        },
+        {
+            "name": "theme-capture",
+            "directory": "themes/capture",
+            "target": "git@github.com:mautic/theme-capture.git"
+        }
+    ]
+}

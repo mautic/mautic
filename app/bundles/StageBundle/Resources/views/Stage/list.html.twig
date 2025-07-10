@@ -1,0 +1,165 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}stage{% endblock %}
+{% block headerTitle %}
+	{% trans %}mautic.stages.menu.root{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if isIndex %}
+<div id="page-list-wrapper" class="panel panel-default">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'page_actions': {
+            'templateButtons': {
+                'new': permissions['stage:stages:create'],
+            },
+            'routeBase': 'stage',
+        },
+        'bulk_actions': {
+            'routeBase': 'stage',
+            'templateButtons': {
+                'delete': permissions['stage:stages:delete']
+            }
+        },
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.active',
+                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.inactive',
+                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                'icon': 'ri-close-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isuncategorized',
+                'label': 'mautic.core.form.uncategorized',
+                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                'icon': 'ri-folder-unknow-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            }
+        ]
+    }) }}
+
+    <div class="page-list">
+        {{ block('listResults') }}
+    </div>
+</div>
+{% else %}
+    {{ block('listResults') }}
+{% endif %}
+{% endblock %}
+
+{% block listResults %}
+    {% if items is defined and items is not empty %}
+        <div class="table-responsive page-list">
+        <table class="table table-hover stage-list" id="stageTable">
+            <thead>
+            <tr>
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'checkall'        : 'true',
+                        'target'          : '#stageTable'
+                    }) -}}
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : 'stage',
+                        'orderBy'    : 's.name',
+                        'text'       : 'mautic.core.name',
+                        'class'      : 'col-stage-name',
+                        'default'    : true,
+                    }) -}}
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : 'stage',
+                        'orderBy'    : 'c.title',
+                        'text'       : 'mautic.core.category',
+                        'class'      : 'visible-md visible-lg col-stage-category',
+                    }) -}}
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : 'stage',
+                        'orderBy'    : 's.id',
+                        'text'       : 'mautic.core.id',
+                        'class'      : 'visible-md visible-lg col-stage-id',
+                    }) -}}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                    {{- include('@MauticCore/Helper/list_actions.html.twig',
+                            {
+                                'item'            : item,
+                                'templateButtons' : {
+                                    'edit'   : permissions['stage:stages:edit'],
+                                    'clone'  : permissions['stage:stages:create'],
+                                    'delete' : permissions['stage:stages:delete'],
+                                },
+                                'routeBase' : 'stage',
+                            }) -}}
+                    </td>
+                    <td>
+                        <div>
+                            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig',
+                                {'item' : item, 'model' : 'stage'}) -}}
+                            {% if permissions['stage:stages:edit'] %}
+                            <a href="{{ url(
+                                'mautic_stage_action',
+                                {'objectAction' : 'edit', 'objectId' : item.getId()}
+                            ) }}" data-toggle="ajax">
+                                {{ item.getName() }}
+                            </a>
+                            {% else %}
+                                {{ item.getName() }}
+                            {% endif %}
+                            {{ customContent('stage.name', _context) }}
+                        </div>
+                        {% set description = item.getDescription() %}
+                        {% if description %}
+                            <div class="text-secondary mt-4">
+                                <small>{{ description|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.getCategory() %}
+                        {% set catName = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
+                        {% set color = category ? '#' ~ category.getColor() : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{- include('@MauticCore/Helper/pagination.html.twig',
+            {
+                'totalItems' : items|length,
+                'page'       : page,
+                'limit'      : limit,
+                'menuLinkId' : 'mautic_stage_index',
+                'baseUrl'    : url('mautic_stage_index'),
+                'sessionVar' : 'stage',
+            }) -}}
+    </div>
+    {% else %}
+        {{- include('@MauticCore/Helper/noresults.html.twig',
+            {'tip' : 'mautic.stage.action.noresults.tip'}) -}}
+    {% endif %}
+{% endblock %}

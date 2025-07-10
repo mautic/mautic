@@ -1,0 +1,82 @@
+{% set isIndex = tmpl == 'index' %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'email' %}
+
+{% block headerTitle 'mautic.email.emails'|trans %}
+
+{% block content %}
+    {% if isIndex %}
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'filters': filters,
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions['email:emails:create']
+                    },
+                    'routeBase': 'email',
+                },
+                'bulk_actions': {
+                    'routeBase': 'email',
+                    'templateButtons': {
+                        'delete': permissions['email:emails:deleteown'] or permissions['email:emails:deleteother']
+                    },
+                    'customButtons': [
+                        {
+                            'attr': {
+                                'class': 'btn btn-default btn-sm btn-nospin',
+                                'data-toggle': 'ajaxmodal',
+                                'data-target': '#MauticSharedModal',
+                                'href': path('mautic_email_batch_categories_view'),
+                                'data-header': 'mautic.email.batch.categories'|trans,
+                            },
+                            'btnText': 'mautic.email.batch.categories'|trans,
+                            'iconClass': 'ri-folder-line',
+                        },
+                    ]
+                },
+                'quickFilters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.available',
+                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.unavailable',
+                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                        'icon': 'ri-close-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isuncategorized',
+                        'label': 'mautic.core.form.uncategorized',
+                        'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                        'icon': 'ri-folder-unknow-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
+            }) -}}
+
+            <div class="page-list">
+              {{ include('@MauticEmail/Email/_list.html.twig') }}
+            </div>
+        </div>
+
+        {{ include('@MauticCore/Helper/protip.html.twig', {
+            tip: random(['mautic.protip.emails.unsubscribe', 'mautic.protip.emails.test', 'mautic.protip.emails.personalize', 'mautic.protip.emails.spam', 'mautic.protip.emails.cta'])
+        }) }}
+    {% else %}
+
+    {{ include('@MauticEmail/Email/_list.html.twig') }}
+
+    {% endif %}
+{% endblock %}

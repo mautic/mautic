@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\EnvProcessor;
 
 use Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor;
@@ -16,11 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 class IntNullableProcessorTest extends TestCase
 {
-    public function testNullReturnedIfNullValue()
+    public function testNullReturnedIfNullValue(): void
     {
-        $getEnv = function (string $name) {
-            return null;
-        };
+        $getEnv = fn (string $name) => null;
 
         $processor = new IntNullableProcessor();
 
@@ -29,11 +18,9 @@ class IntNullableProcessorTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testIntReturnedIfNotNull()
+    public function testIntReturnedIfNotNull(): void
     {
-        $getEnv = function (string $name) {
-            return '0';
-        };
+        $getEnv = fn (string $name) => '0';
 
         $processor = new IntNullableProcessor();
 
@@ -42,11 +29,9 @@ class IntNullableProcessorTest extends TestCase
         $this->assertSame(0, $value);
     }
 
-    public function testIntReturnedIfEmptyString()
+    public function testIntReturnedIfEmptyString(): void
     {
-        $getEnv = function (string $name) {
-            return '';
-        };
+        $getEnv = fn (string $name) => '';
 
         $processor = new IntNullableProcessor();
 
@@ -55,11 +40,9 @@ class IntNullableProcessorTest extends TestCase
         $this->assertSame(0, $value);
     }
 
-    public function testIntReturnedIfInt()
+    public function testIntReturnedIfInt(): void
     {
-        $getEnv = function (string $name) {
-            return 12;
-        };
+        $getEnv = fn (string $name) => 12;
 
         $processor = new IntNullableProcessor();
 

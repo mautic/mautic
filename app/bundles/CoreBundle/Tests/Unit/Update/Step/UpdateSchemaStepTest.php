@@ -1,68 +1,62 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
-use Doctrine\Bundle\MigrationsBundle\Command\MigrationsMigrateDoctrineCommand;
+use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleEvent;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateSchemaStepTest extends AbstractStepTest
 {
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|KernelInterface
      */
-    private $kernel;
+    private MockObject $kernel;
 
     /**
-     * @var MockObject|MigrationsMigrateDoctrineCommand
+     * @var MockObject|MigrateCommand
      */
-    private $migrateCommand;
+    private MockObject $migrateCommand;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private MockObject $eventDispatcher;
 
     /**
-     * @var UpdateSchemaStep
+     * @var MockObject&HelperSet
      */
-    private $step;
+    private MockObject $helperSet;
+
+    private UpdateSchemaStep $step;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
-
         $this->kernel         = $this->createMock(KernelInterface::class);
+        $this->helperSet      = $this->createMock(HelperSet::class);
         $this->kernel
             ->method('getBundles')
             ->willReturn([]);
 
-        $this->migrateCommand = $this->createMock(MigrationsMigrateDoctrineCommand::class);
+        $this->migrateCommand = $this->createMock(MigrateCommand::class);
         $this->migrateCommand->method('isEnabled')
             ->willReturn(true);
         $this->migrateCommand->method('getName')
@@ -70,7 +64,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn([]);
+            ->willReturn($this->helperSet);
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')
@@ -98,7 +92,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $container->method('hasParameter')
             ->will($this->returnValueMap([
                 ['console.command.ids', true],
-                ['console.laze_command.ids', false],
+                ['console.lazy_command.ids', false],
             ]));
 
         $container->method('getParameter')
@@ -113,7 +107,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step = new UpdateSchemaStep($this->translator, $container);
     }
 
-    public function testUpdateFailedExceptionThrownIfMigrationsFailed()
+    public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void
     {
         $this->expectException(UpdateFailedException::class);
 
@@ -122,12 +116,14 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -138,19 +134,21 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testExceptionNotThrownIfMigrationsWereSuccessful()
+    public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
         $this->migrateCommand->method('run')
             ->willReturn(0);
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -160,8 +158,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
-            $this->assertTrue(true);
-        } catch (UpdateFailedException $exception) {
+            $this->expectNotToPerformAssertions();
+        } catch (UpdateFailedException) {
             $this->fail('UpdateFailedException should not have been thrown');
         }
     }

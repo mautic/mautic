@@ -1,0 +1,192 @@
+<mjml>
+  <!-- MJML Template Brienz v2.0 / last update 25.07.2022 tested with Litmus -->
+  <mj-head>
+	<mj-title>{subject}
+	</mj-title>
+	<mj-preview>Preview Text goes here
+	</mj-preview>
+	<mj-attributes>
+	  <mj-all margin="0">
+	  </mj-all>
+	</mj-attributes>
+	<!-- CSS-STYLE -->
+	<mj-style inline="inline"> p, li {margin:0; padding:0;}
+	</mj-style>
+  </mj-head>
+  <!-- BODY -->
+  <mj-body background-color="#d6dde5">
+	<!-- LOGO HEADER -->
+	<mj-section padding-top="10px" padding-bottom="10px">
+	  <mj-column css-class="column">
+		<mj-image padding="20px" width="200px" src="{{ getAssetUrl('themes/'~template~'/assets/your-logo-purple.png', null, null, true) }}" href="#" alt="Link to Company Website" title="Link to Company Website"/>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION HEADER -->
+	<mj-section padding-bottom="20px" padding-top="5px">
+	  <mj-column width="60%" vertical-align="middle">
+		<mj-text color="#6d6d6d" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="11px" padding-top="5px" padding-bottom="5px">
+		  <p>{subject}
+		  </p>
+		</mj-text>
+	  </mj-column>
+	  <mj-column width="40%" vertical-align="middle">
+		<mj-text color="#6d6d6d" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="11px" padding-top="5px" padding-bottom="5px">
+		  <p><a style="color:#6d6d6d !important;" href="{webview_url}">View this mail in your browser</a>
+		  </p>
+		</mj-text>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION HERO -->
+	<mj-hero  mode="fixed-height" background-height="500px" background-width="600px" background-color="#486AE2" background-url="{{ getAssetUrl('themes/'~template~'/assets/brienzlake.jpeg', null, null, true) }}" padding-bottom="80px" padding-top="80px">
+	  <mj-text align="center" color="#ffffff" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="24px" font-weight="500" padding-top="20px" padding-bottom="0px">
+		<p>Check out our blog:
+		</p>
+	  </mj-text>
+	  <mj-text align="center" color="#ffffff" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="36px" font-weight="700" padding-top="20px" padding-bottom="0px">
+		<p>We are half way there!
+		</p>
+	  </mj-text>
+	  <mj-text align="center" color="#ffffff" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="24px" font-weight="500" padding-top="20px" padding-bottom="0px">
+		<p>See our progress!
+		</p>
+	  </mj-text>
+	  <mj-button background-color="#9E094E" color="#FFFFFF" font-size="15px" href="#" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-top="80px" padding-bottom="0px">MORE UPDATES
+	  </mj-button>
+	</mj-hero>
+	<!-- SECTION TEXT + BUTTON -->
+	<mj-section background-color="#ffffff" padding-top="25px" padding-bottom="0">
+	  <mj-column>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="20px" line-height="1.5" font-weight="500" padding-bottom="0px">
+		  <p>This is an eyecatching headline
+		  </p>
+		</mj-text>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300" align="justify">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus.</p>
+		</mj-text>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300">
+		  <p>Call us from monday to friday:
+			<a title="phone" href="tel:+41 600 00 00">+41 600 00 00</a>
+			<br> Or write a mail:
+			<a title="mail" href="mailto:info@company.com">info@company.com</a>
+		  </p>
+		</mj-text>
+		<mj-button background-color="#486AE2" color="#FFFFFF" href="#" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-top="20px" padding-bottom="40px">READ MORE
+		</mj-button>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION SPACER -->
+	<mj-section padding-top="0px" padding-bottom="0px">
+	  <mj-column>
+		<mj-spacer height="15px"/>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION IMAGE + TEXT + BUTTON -->
+	<mj-section background-color="#ffffff" padding-top="25px" padding-bottom="0">
+	  <mj-column width="100%">
+		<mj-image src="{{ getAssetUrl('themes/'~template~'/assets/brienz.jpeg', null, null, true) }}" alt="Lake of Brienz - Switzerland" padding-top="0" padding-bottom="20px"/>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="20px" line-height="1.5" font-weight="500" padding-bottom="0px">
+		  <p>This is an eyecatching headline
+		  </p>
+		</mj-text>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300" align="justify">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus.
+		  </p>
+		</mj-text>
+		<mj-button background-color="#486AE2" color="#FFFFFF" href="#" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-top="20px" padding-bottom="40px">READ MORE
+		</mj-button>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION SPACER -->
+	<mj-section padding-top="0px" padding-bottom="0px">
+	  <mj-column>
+		<mj-spacer height="15px"/>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION 2-COLUMNS IMAGE + TEXT + BUTTON -->
+	<mj-section background-color="#ffffff" padding-top="25px" padding-bottom="0px">
+	  <mj-column width="50%">
+		<mj-image src="{{ getAssetUrl('themes/'~template~'/assets/sign.jpeg', null, null, true) }}" alt="At the Top Of The Rothorn" padding-top="0" padding-bottom="0px"/>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300" align="justify" padding-top="20px">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus.
+		  </p>
+		</mj-text>
+		<mj-button background-color="#486AE2" color="#FFFFFF" href="#" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-top="20px" padding-bottom="40px">READ MORE
+		</mj-button>
+	  </mj-column>
+	  <mj-column width="50%">
+		<mj-image src="{{ getAssetUrl('themes/'~template~'/assets/jungfrau.jpeg', null, null, true) }}" alt="Snow Covered Jungraujoch" padding-bottom="0px" padding-top="0px"/>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300" align="justify" padding-top="20px">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus.
+		  </p>
+		</mj-text>
+		<mj-button background-color="#486AE2" color="#FFFFFF" href="#" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-top="20px" padding-bottom="40px">READ MORE
+		</mj-button>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION SPACER -->
+	<mj-section padding-top="0px" padding-bottom="0px">
+	  <mj-column>
+		<mj-spacer height="15px"/>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION FOOTER -->
+	<mj-section background-color="#ffffff" padding-top="25px" padding-bottom="0">
+	  <mj-column>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="20px" line-height="1.5" font-weight="500" padding-bottom="0px">
+		  <p>This is an eyecatching headline
+		  </p>
+		</mj-text>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300" align="justify">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus.
+		  </p>
+		</mj-text>
+		<mj-text color="#000000" font-family="Ubuntu, Helvetica, Arial, sans-serif" font-size="16px" line-height="1.5" font-weight="300">
+		  <p>Call us from monday to friday:
+			<a title="phone" href="tel:+41 600 00 00">+41 600 00 00</a>
+			<br> Or write a mail:
+			<a title="mail" href="mailto:info@company.com">info@company.com</a>
+		  </p>
+		</mj-text>
+		<mj-button background-color="#486AE2" color="#FFFFFF" href="#" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-top="20px" padding-bottom="40px">READ MORE
+		</mj-button>
+	  </mj-column>
+	</mj-section>
+	<mj-section padding-top="0px" padding-bottom="0px">
+	  <mj-column>
+		<mj-spacer height="15px"/>
+	  </mj-column>
+	</mj-section>
+	<mj-section background-color="#486AE2" padding-top="20px" padding-bottom="0px">
+	  <mj-column>
+		<mj-social padding-top="20px">
+		  <mj-social-element name="facebook" href="[[SHORT_PERMALINK]]">
+		  </mj-social-element>
+		  <mj-social-element name="twitter" href="[[SHORT_PERMALINK]]">
+		  </mj-social-element>
+		  <mj-social-element name="google" href="[[SHORT_PERMALINK]]">
+		  </mj-social-element>
+		</mj-social>
+	  </mj-column>
+	</mj-section>
+	<mj-section background-color="#486AE2" padding-top="0" padding-bottom="20px">
+	  <mj-column>
+		<mj-text color="#ffffff" font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px">
+		  <p>{brand=name}
+			<br>11111 Beautiful City, 1212 Nice Street
+			<br>Switzerland
+			<br>
+		  </p>
+		</mj-text>
+	  </mj-column>
+	</mj-section>
+	<!-- SECTION POLICY -->
+	<mj-section css-class="graylink" padding-top="20px" padding-bottom="60px">
+	  <mj-column width="100%" vertical-align="middle">
+		<mj-text color="#6d6d6d" font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-bottom="0px" padding-top="0px">
+		  <p style="font-size:11px">{unsubscribe_text}
+		  </p>
+		</mj-text>
+	  </mj-column>
+	</mj-section>
+  </mj-body>
+</mjml>

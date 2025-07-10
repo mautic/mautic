@@ -1,0 +1,89 @@
+{#
+  Variables
+    - updateData
+    - currentVersion
+    - isComposerEnabled (bool)
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'update' %}
+
+{% block headerTitle 'mautic.core.update.index'|trans %}
+
+{% block content %}
+<div class="panel panel-default mnb-5 bdr-t-wdh-0">
+    <div id="update-panel" class="panel-body">
+        <div class="col-sm-offset-2 col-sm-8">
+            {%- if updateData.error or 'mautic.core.updater.running.latest.version' == updateData.message %}
+              <div class="alert alert-info">
+                  {{ updateData.message|trans }}
+              </div>
+              <div class="text-center">
+                {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: [
+                        {
+                            label: 'mautic.core.go_to_dashboard',
+                            variant: 'primary',
+                            href: path('mautic_dashboard_index'),
+                            icon: 'ri-funds-fill',
+                            attributes: {
+                                'data-toggle': 'ajax'
+                            }
+                        }
+                    ]
+                } %}
+              </div>
+            {%- else %}
+              <div class="panel panel-default">
+                  <div class="panel-heading">
+                      <h2 class="panel-title">
+                          {{ 'mautic.core.update.available'|trans }}
+                      </h2>
+                      <div class="panel-body">
+                          <table class="table table-hover addon-list" id="updateTable">
+                              <tbody>
+                              <tr>
+                                  <td>{{ 'mautic.core.update.current.version'|trans }}</td>
+                                  <td>{{ currentVersion }}</td>
+                              </tr>
+                              <tr>
+                                  <td>{{ 'mautic.core.update.upgrade.version'|trans }}</td>
+                                  <td>{{ updateData.version|default('') }}</td>
+                              </tr>
+                              <tr>
+                                  <td>{{ 'mautic.core.update.announcement'|trans }}</td>
+                                  <td class="break-word"><a href="{{ updateData.announcement|default('#') }}" target="_blank">{{ updateData.announcement|default('') }}</a></td>
+                              </tr>
+                              <tr>
+                                  <td colspan="2" class="text-center text-danger">{{ 'mautic.core.update.backup_warning'|trans }}</td>
+                              </tr>
+                              </tbody>
+                          </table>
+                          {%- if isComposerEnabled %}
+                          <div class="alert alert-warning text-center">
+                              <strong>{{ 'mautic.core.update.composer'|trans|purify }}</strong>
+                          </div>
+                          {%- else %}
+                          <div class="alert alert-warning text-center">
+                              <strong>{{ 'mautic.core.update.ui.deprecated'|trans|purify }}</strong>
+                          </div>
+                          <div class="text-right">
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.update.now',
+                                        variant: 'primary',
+                                        onclick: "Mautic.processUpdate('update-panel', 1, '')"
+                                    }
+                                ]
+                            } %}
+                          </div>
+                          {%- endif %}
+                      </div>
+                  </div>
+                {%- endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

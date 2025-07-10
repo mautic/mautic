@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -17,14 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class IntegrationConfigType.
+ * @extends AbstractType<array<mixed>|mixed>
  */
 class IntegrationConfigType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (null != $options['integration']) {
             $options['integration']->appendToForm($builder, $options['data'], 'integration');
@@ -41,28 +29,17 @@ class IntegrationConfigType extends AbstractType
                     'label'             => 'mautic.plugin.integration.campaigns',
                     'placeholder'       => 'mautic.plugin.config.campaign.member.chooseone',
                     'required'          => false,
-                    ]
+                ]
             );
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['integration']);
         $resolver->setDefaults([
             'label'     => false,
             'campaigns' => [],
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'integration_config';
     }
 }

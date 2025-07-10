@@ -1,0 +1,47 @@
+{% set wrap = true %}
+
+<div class="panel-heading pa-0 toolbar--table-toolbar">
+
+    <div class="toolbar--batch-actions d-flex jc-space-between bg-primary fd-column fd-row-sm">
+        <div class="toolbar--batch-summary d-flex">
+            <span class="toolbar--batch-summary__count" data-singular="{{ 'mautic.core.item_selected'|trans|lower }}"
+            data-plural="{{ 'mautic.core.items_selected'|trans|lower }}">0 {{ 'mautic.core.items_selected'|trans|lower }}</span>
+        </div>
+        <div class="toolbar--action-list d-flex fw-wrap fw-nowrap-sm">
+            {{ include('@MauticCore/Helper/toolbar_bulk_actions.html.twig', bulk_actions|default({})) }}
+            <span class="toolbar--batch-summary__divider">|</span>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.core.form.cancel',
+                        variant: 'primary',
+                        size: 'lg',
+                        attributes: {
+                            'type': 'button',
+                            'class': 'bdr-rds-0',
+                            'data-toggle': 'cancel-checkall'
+                        }
+                    }
+                ]
+            } %}
+        </div>
+    </div>
+
+    <div class="d-flex ai-center list-toolbar toolbar--toolbar-content h-48">
+        {% if searchValue is defined %}
+            {{- include('@MauticCore/Helper/search.html.twig', {
+                searchId: searchId|default(null),
+                searchValue: searchValue,
+                action: action|default(''),
+                searchHelp: searchHelp|default(''),
+                target: target|default(null),
+                tmpl: tmpl|default(null),
+                overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
+            }) -}}
+        {% endif %}
+
+        {% include '@MauticCore/Helper/toolbar_actions.html.twig' %}
+        {{ include('@MauticCore/Helper/toolbar_page_actions.html.twig', page_actions|default({})) }}
+    </div>
+
+</div>

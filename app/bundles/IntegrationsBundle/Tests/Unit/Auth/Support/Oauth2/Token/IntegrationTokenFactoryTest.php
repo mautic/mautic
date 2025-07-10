@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
@@ -19,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class IntegrationTokenFactoryTest extends TestCase
 {
-    public function testTokenGeneratedWithExpires(): void
+    public function testTokenGeneratedWithExpiresIn(): void
     {
         $factory = new IntegrationTokenFactory();
         $data    = [
@@ -33,6 +24,7 @@ class IntegrationTokenFactoryTest extends TestCase
         $this->assertEquals($data['access_token'], $token->getAccessToken());
         $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
+        $this->assertEquals(time() + 10, $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithExpiresAt(): void
@@ -41,7 +33,7 @@ class IntegrationTokenFactoryTest extends TestCase
         $data    = [
             'access_token'  => '123',
             'refresh_token' => '456',
-            'expires_at'    => 10,
+            'expires_at'    => time() + 10,
         ];
 
         $token = $factory($data);
@@ -49,6 +41,56 @@ class IntegrationTokenFactoryTest extends TestCase
         $this->assertEquals($data['access_token'], $token->getAccessToken());
         $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
+        $this->assertEquals($data['expires_at'], $token->getExpiresAt());
+    }
+
+    public function testTokenGeneratedWithExpires(): void
+    {
+        $factory = new IntegrationTokenFactory();
+        $data    = [
+            'access_token'  => '123',
+            'refresh_token' => '456',
+            'expires'       => 10,
+        ];
+
+        $token = $factory($data);
+
+        $this->assertEquals($data['access_token'], $token->getAccessToken());
+        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertFalse($token->isExpired());
+        $this->assertEquals(time() + 10, $token->getExpiresAt());
+    }
+
+    public function testTokenGeneratedWithDefaultExpires(): void
+    {
+        $factory = new IntegrationTokenFactory([], 100);
+        $data    = [
+            'access_token'  => '123',
+            'refresh_token' => '456',
+        ];
+
+        $token = $factory($data);
+
+        $this->assertEquals($data['access_token'], $token->getAccessToken());
+        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertFalse($token->isExpired());
+        $this->assertEquals(time() + 100, $token->getExpiresAt());
+    }
+
+    public function testTokenGeneratedWithUnexpiredTokenByDefault(): void
+    {
+        $factory = new IntegrationTokenFactory();
+        $data    = [
+            'access_token'  => '123',
+            'refresh_token' => '456',
+        ];
+
+        $token = $factory($data);
+
+        $this->assertEquals($data['access_token'], $token->getAccessToken());
+        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertFalse($token->isExpired());
+        $this->assertEquals(0, $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithPreviousRefreshToken(): void
@@ -56,7 +98,6 @@ class IntegrationTokenFactoryTest extends TestCase
         $factory = new IntegrationTokenFactory();
         $data    = [
             'access_token' => '123',
-            'expires_at'   => 10,
         ];
 
         $previousToken = new IntegrationToken('789', '456');
@@ -73,7 +114,6 @@ class IntegrationTokenFactoryTest extends TestCase
         $data    = [
             'access_token'  => '123',
             'refresh_token' => '456',
-            'expires_at'    => 10,
             'foo'           => 'bar',
             'bar'           => 'foo',
         ];

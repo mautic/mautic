@@ -1,0 +1,12 @@
+<ul class="twitter-tags tag-cloud">
+    {% for tag, t in activity %}
+        {% if (t.count / 10) < 1 %}
+            {% set fontSize = (t.count / 10) + 1 %}
+        {% elseif (t.count / 10) > 2 %}
+            {% set fontSize = 2 %}
+        {% else %}
+            {% set fontSize = t.count / 10 %}
+        {% endif %}
+        <li style="font-size: {{ fontSize }}em"><a href="{{ t.url }}" target="_new">{{ tag }}</a></li>
+    {% endfor %}
+</ul>

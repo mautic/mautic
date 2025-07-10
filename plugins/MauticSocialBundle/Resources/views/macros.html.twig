@@ -1,0 +1,7 @@
+{% macro profileImage(profile) %}
+  {% if profile.profileImage is defined and profile.profileImage is not empty %}
+    <div class="pull-left thumbnail">
+      <img src="{{ profile.profileImage }}" width="100px" class="media-object img-rounded" />
+    </div>
+  {% endif %}
+{% endmacro %}

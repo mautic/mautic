@@ -1,0 +1,25 @@
+{% if showMore is defined and showMore is not empty %}
+<a href="{{ url('mautic_user_index', {'filter-user' : searchString}) }}" data-toggle="ajax">
+    <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
+</a>
+{% else %}
+<div class="d-flex ai-center">
+    <span class="pull-left mr-sm pt-xs" style="width:36px">
+        <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(item.getEmail(), '100') }}" /></span>
+    </span>
+    <div class="d-flex fd-column">
+        <div>
+            <a class="fw-sb mr-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+                {{ item.getName() }}
+            </a>
+            {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+                'entity': item,
+                'status': 'active',
+                'simplified': 'true'
+            }) -}}
+        </div>
+        <div class="small text-muted">{{ item.getPosition() }}</div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+{% endif %}

@@ -1,0 +1,40 @@
+<!-- Tokens help modal -->
+<div class="modal fade" id="tokenPlaceholdersModal" tabindex="-1" role="dialog" aria-labelledby="tokenPlaceholdersLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <p class="modal-title" id="tokenPlaceholdersLabel">
+          {{ "mautic.placeholder_tokens.placeholder_tokens.header" | trans }}
+        </p>
+      </div>
+      <div class="pa-md">
+        <h3 class="fw-sb mb-sm">{{ 'mautic.placeholder_tokens.introducing_tokens.title'|trans }}</h3>
+        <p>{{ 'mautic.placeholder_tokens.introducing_tokens.description'|trans }}</p>
+      </div>
+
+      <h4 class="pa-md fw-sb">{{'mautic.placeholder_tokens.contact.tokens'|trans}}</h4>
+      <p class="text-secondary pi-md">{{'mautic.placeholder_tokens.placeholder_tokens.channels.explanation'|trans}}</p>
+      <ul id="channelTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
+        {{ include ('@MauticLead/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+      </ul>
+
+      {{ include ('@MauticEmail/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+      {{ include ('@MauticPage/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+      {{ include ('@MauticForm/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+
+      <h4 class="pa-md mt-lg fw-sb">Other tokens</h4>
+      <ul id="otherTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
+        {{ include ('@MauticDynamicContent/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+        {{ include ('@MauticSocial/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+      </ul>
+
+      <div class="alert alert-success mt-lg mb-0">
+        <span>{{ 'mautic.placeholder_tokens.fallback_text_info'|trans|raw }}</span>
+      </div>
+    </div>
+  </div>
+</div>

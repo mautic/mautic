@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\Translation\TranslatorInterface;
 
 trait TimelineEventLogTrait
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -27,15 +18,7 @@ trait TimelineEventLogTrait
      */
     private $eventLogRepository;
 
-    /**
-     * @param      $eventType
-     * @param      $eventTypeName
-     * @param      $icon
-     * @param null $bundle
-     * @param null $object
-     * @param null $action
-     */
-    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null)
+    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null): void
     {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
@@ -61,10 +44,7 @@ trait TimelineEventLogTrait
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate)
+    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate): array
     {
         $properties = json_decode($log['properties'], true);
 
@@ -87,8 +67,6 @@ trait TimelineEventLogTrait
     }
 
     /**
-     * @param $eventType
-     *
      * @return string
      */
     private function getSourceName(array $log, $eventType)

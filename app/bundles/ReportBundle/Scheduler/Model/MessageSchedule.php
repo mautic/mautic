@@ -1,65 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FileProperties
-     */
-    private $fileProperties;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
     public function __construct(
-        TranslatorInterface $translator,
-        FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper,
-        Router $router
+        private TranslatorInterface $translator,
+        private FileProperties $fileProperties,
+        private CoreParametersHelper $coreParametersHelper,
+        private UrlGeneratorInterface $router,
     ) {
-        $this->translator           = $translator;
-        $this->fileProperties       = $fileProperties;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router               = $router;
     }
 
     /**
      * @deprecated 2.15.2 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
      *
      * @param string $filePath
-     *
-     * @return string
      */
-    public function getMessage(Report $report, $filePath)
+    public function getMessage(Report $report, $filePath): string
     {
         $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -99,10 +63,7 @@ class MessageSchedule
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getSubject(Report $report)
+    public function getSubject(Report $report): string
     {
         $date = new \DateTime();
 
@@ -117,11 +78,9 @@ class MessageSchedule
      *
      * @param string $filePath
      *
-     * @return bool
-     *
      * @throws \Mautic\CoreBundle\Exception\FileInvalidException
      */
-    public function fileCouldBeSend($filePath)
+    public function fileCouldBeSend($filePath): bool
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);
         $maxFileSize = $this->coreParametersHelper->get('report_export_max_filesize_in_bytes');

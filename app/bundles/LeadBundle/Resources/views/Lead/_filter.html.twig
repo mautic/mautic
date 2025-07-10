@@ -1,0 +1,184 @@
+{% if isIndex %}
+    {% set toolbarButtons = [
+        {
+            'attr': {
+            'class': 'hidden-xs btn btn-ghost btn-icon btn-sm btn-nospin',
+            'href': 'javascript: void(0)',
+            'onclick': 'Mautic.toggleLiveLeadListUpdate();',
+            'id': 'liveModeButton',
+            'data-toggle': false,
+            'data-max-id': maxLeadId,
+        },
+            'tooltip': 'mautic.lead.lead.live_update'|trans,
+            'iconClass': 'ri-refresh-line',
+        }
+    ] %}
+    {% if 'list' == indexMode %}
+        {% set toolbarButtons = toolbarButtons|merge([{
+            'attr': {
+                'class': 'hidden-xs btn btn-icon btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ' btn-ghost'),
+                'href': 'javascript: void(0)',
+                'onclick': 'Mautic.toggleAnonymousLeads();',
+                'id': 'anonymousLeadButton',
+                'data-anonymous': 'mautic.lead.lead.searchcommand.isanonymous'|trans,
+            },
+            'tooltip': 'mautic.lead.lead.anonymous_leads'|trans,
+            'iconClass': 'ri-spy-line',
+        }]) %}
+    {% endif %}
+    <div id="page-list-wrapper" class="panel panel-default">
+        {%- set pageButtons = [] %}
+{% if permissions['lead:leads:create'] %}
+    {% set pageButtons = pageButtons|merge([{
+        'attr': {
+            'class': 'btn btn-ghost btn-nospin quickadd',
+            'data-toggle': 'ajaxmodal',
+            'data-target': '#MauticSharedModal',
+            'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
+            'data-header': 'mautic.lead.lead.menu.quickadd'|trans,
+        },
+        'iconClass': 'ri-flashlight-line',
+        'btnText': 'mautic.lead.lead.menu.quickadd',
+        'primary': true,
+    }]) %}
+
+    {% if permissions['lead:imports:create'] %}
+        {% set pageButtons = pageButtons|merge([{
+            'attr': {
+                'href': path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'}),
+            },
+            'iconClass': 'ri-import-line',
+            'btnText': 'mautic.lead.lead.import',
+        }]) %}
+    {% endif %}
+
+    {% if permissions['lead:imports:view'] %}
+        {% set pageButtons = pageButtons|merge([{
+            'attr': {
+                'href': path('mautic_import_index', {'object': 'contacts'}),
+            },
+            'iconClass': 'ri-history-line',
+            'btnText': 'mautic.lead.lead.import.index',
+        }]) %}
+    {% endif %}
+{% endif %}
+
+{% if (permissions['lead:leads:editown'] or permissions['lead:leads:editother']) %}
+    {% set bulkActionsCustom = [
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_segment_batch_contact_view'),
+              'data-header': 'mautic.lead.batch.lists'|trans,
+          },
+          'btnText': 'mautic.lead.batch.lists'|trans,
+          'iconClass': 'ri-pie-chart-line',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchStages'}),
+              'data-header': 'mautic.lead.batch.stages'|trans,
+          },
+          'btnText': 'mautic.lead.batch.stages'|trans,
+          'iconClass': 'ri-barricade-line flip-vertically',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_tagmanager_batch_index_action'),
+              'data-header': 'mautic.tagmanager.batch.tags'|trans,
+          },
+          'btnText': 'mautic.tagmanager.batch.tags'|trans,
+          'iconClass': 'ri-hashtag',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchCampaigns'}),
+              'data-header': 'mautic.lead.batch.campaigns'|trans,
+          },
+          'btnText': 'mautic.lead.batch.campaigns'|trans,
+          'iconClass': 'ri-megaphone-line',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchOwners'}),
+              'data-header': 'mautic.lead.batch.owner'|trans,
+          },
+          'btnText': 'mautic.lead.batch.owner'|trans,
+          'iconClass': 'ri-user-2-line',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
+              'data-header': 'mautic.lead.batch.dnc'|trans,
+          },
+          'btnText': 'mautic.lead.batch.dnc'|trans,
+          'iconClass': 'ri-prohibited-line text-danger',
+      },
+    ] %}
+{% endif %}
+
+{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+    'searchValue': searchValue|default(''),
+    'action': currentRoute,
+    'customButtons': toolbarButtons,
+    'page_actions': {
+        'templateButtons': {'new': permissions['lead:leads:create']},
+        'routeBase': 'contact',
+        'langVar': 'lead.lead',
+        'customButtons': pageButtons,
+    },
+    'bulk_actions': {
+        'target': '#leadTable',
+        'templateButtons': {
+            'delete': (permissions['lead:leads:deleteown'] or permissions['lead:leads:deleteother'])
+        },
+        'customButtons': bulkActionsCustom|default([]),
+        'routeBase': 'contact',
+        'langVar': 'lead.lead',
+    },
+    'quickFilters': [
+        {
+            'search': 'mautic.core.searchcommand.ismine',
+            'label': 'mautic.core.searchcommand.ismine.label',
+            'tooltip': 'mautic.core.searchcommand.ismine.description',
+            'icon': 'ri-user-line'
+        },
+        {
+            'search': 'mautic.lead.lead.searchcommand.isunowned',
+            'label': 'mautic.lead.lead.searchcommand.isunowned.label',
+            'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
+            'icon': 'ri-user-unfollow-line'
+        }
+    ]
+}) -}}
+<div class="btn-group ml-5 sr-only ">
+    <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
+      <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-ghost">
+          <i class="ri-table-line"></i>
+      </a>
+    </span>
+    <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
+      <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-ghost">
+        <i class="ri-layout-grid-line"></i>
+      </a>
+    </span>
+</div>
+        <div class="page-list">
+{% endif %}

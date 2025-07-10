@@ -1,0 +1,13 @@
+{% set messageChannels, channels = item.getChannels(), [] %}
+{% if messageChannels %}
+    {% for channelName, channel in messageChannels %}
+        {% if channel.isEnabled() %}
+            {% set channels = channels|merge({0: translatorHasId('mautic.channel.' ~ channelName) ? ('mautic.channel.' ~ channelName)|trans : channelName|title, }) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+<td class="visible-md visible-lg">
+    {% for channel in channels %}
+    <span size="sm" class="label label-gray">{{ channel }}</span>
+    {% endfor %}
+</td>

@@ -1,84 +1,59 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 
 trait VariantAjaxControllerTrait
 {
     /**
-     * @param string $modelName
-     * @param string $abSettingsFormName
-     * @param string $abSettingsFormBlockPrefix
-     * @param string $parentFormName
-     * @param string $abFormTemplate
-     * @param array  $formThemes
-     *
-     * @return mixed
+     * @return mixed[]
      */
-    private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $abSettingsFormBlockPrefix, $parentFormName, $abFormTemplate, $formThemes = [])
+    private function getAbTestForm(Request $request, EmailModel|PageModel $model, callable $buildForm, callable $renderView, string $abSettingsFormBlockPrefix, string $parentFormName): array
     {
-        $dataArray = [
-            'success' => 0,
-            'html'    => '',
-        ];
-        $type = InputHelper::clean($request->request->get('abKey'));
-        $id   = (int) $request->request->get('id');
+        $dataArray = ['success' => 0, 'html' => ''];
+        $type      = InputHelper::clean($request->request->get('abKey'));
+        $id        = (int) $request->request->get('id');
 
-        if (!empty($type)) {
-            //get the HTML for the form
-            $model  = $this->getModel($modelName);
-            $entity = $model->getEntity($id);
-
-            $abTestComponents = $model->getBuilderComponents($entity, 'abTestWinnerCriteria');
-            $abTestSettings   = $abTestComponents['criteria'];
-
-            if (isset($abTestSettings[$type])) {
-                $html     = '';
-                $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
-                if (!empty($formType)) {
-                    $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : [];
-                    $form        = $this->get('form.factory')->create(
-                        $abSettingsFormName,
-                        [],
-                        ['formType' => $formType, 'formTypeOptions' => $formOptions]
-                    );
-                    $html = $this->renderView(
-                        $abFormTemplate,
-                        [
-                            'form' => $this->setFormTheme($form, $formThemes),
-                        ]
-                    );
-                }
-
-                $html = str_replace(
-                    [
-                        "{$abSettingsFormBlockPrefix}[",
-                        "{$abSettingsFormBlockPrefix}_",
-                        $abSettingsFormBlockPrefix,
-                    ],
-                    [
-                        "{$parentFormName}[variantSettings][",
-                        "{$parentFormName}_variantSettings_",
-                        $parentFormName,
-                    ],
-                    $html
-                );
-                $dataArray['html']    = $html;
-                $dataArray['success'] = 1;
-            }
+        if (empty($type)) {
+            return $dataArray;
         }
 
-        return $this->sendJsonResponse($dataArray);
+        // get the HTML for the form
+        $entity           = $model->getEntity($id);
+        $abTestComponents = $model->getBuilderComponents($entity, 'abTestWinnerCriteria');
+        $abTestSettings   = $abTestComponents['criteria'];
+
+        if (!isset($abTestSettings[$type])) {
+            return $dataArray;
+        }
+
+        $html     = '';
+        $formType = $abTestSettings[$type]['formType'] ?? '';
+        if (!empty($formType)) {
+            $formOptions = $abTestSettings[$type]['formTypeOptions'] ?? [];
+            $html        = $renderView($buildForm($formType, $formOptions));
+        }
+
+        $html = str_replace(
+            [
+                "{$abSettingsFormBlockPrefix}[",
+                "{$abSettingsFormBlockPrefix}_",
+                $abSettingsFormBlockPrefix,
+            ],
+            [
+                "{$parentFormName}[variantSettings][",
+                "{$parentFormName}_variantSettings_",
+                $parentFormName,
+            ],
+            $html
+        );
+        $dataArray['html']    = $html;
+        $dataArray['success'] = 1;
+
+        return $dataArray;
     }
 }

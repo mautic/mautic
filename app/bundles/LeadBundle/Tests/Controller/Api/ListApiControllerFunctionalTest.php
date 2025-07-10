@@ -1,41 +1,109 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ListModel
-     */
-    protected $listModel;
+    protected ListModel $listModel;
+
+    private string $prefix;
+
+    private TranslatorInterface $translator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        /* @var ListModel $listModel */
-        $this->listModel = self::$container->get('mautic.lead.model.list');
+
+        $this->listModel  = static::getContainer()->get('mautic.lead.model.list');
+        $this->prefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->translator = static::getContainer()->get('translator');
     }
 
-    public function testSingleSegmentWorkflow()
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['categories']);
+    }
+
+    /**
+     * @return iterable<array<string|int|null>>
+     */
+    public function regexOperatorProvider(): iterable
+    {
+        yield [
+            'regexp',
+            '^{Test|Test string)', // invalid regex: the first parantheses should not be curly
+            Response::HTTP_BAD_REQUEST,
+            'filter: Got error \'unmatched parentheses at offset 18\' from regexp',
+        ];
+
+        yield [
+            '!regexp',
+            '^(Test|Test string))', // invalid regex: 2 ending parantheses
+            Response::HTTP_BAD_REQUEST,
+            'filter: Got error \'unmatched parentheses at offset 19\' from regexp',
+        ];
+
+        yield [
+            'regexp',
+            '^(Test|Test string)', // valid regex
+            Response::HTTP_CREATED,
+            null,
+        ];
+    }
+
+    /**
+     * @dataProvider regexOperatorProvider
+     */
+    public function testRegexOperatorValidation(string $operator, string $regex, int $expectedResponseCode, ?string $expectedErrorMessage): void
+    {
+        $version = $this->connection->executeQuery('SELECT VERSION()')->fetchOne();
+        version_compare($version, '8.0.0', '<') ? $this->markTestSkipped('MySQL 5.7.0 does not throw error for invalid REGEXP') : null;
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/segments/new',
+            [
+                'name'    => 'Regex test',
+                'filters' => [
+                    [
+                        'glue'       => 'and',
+                        'field'      => 'city',
+                        'object'     => 'lead',
+                        'type'       => 'text',
+                        'operator'   => $operator,
+                        'properties' => ['filter' => $regex],
+                    ],
+                ],
+            ]
+        );
+
+        Assert::assertSame($expectedResponseCode, $this->client->getResponse()->getStatusCode());
+
+        if ($expectedErrorMessage) {
+            Assert::assertSame(
+                $expectedErrorMessage,
+                json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
+                $this->client->getResponse()->getContent()
+            );
+        }
+    }
+
+    public function testSingleSegmentWorkflow(): void
     {
         $payload = [
             'name'        => 'API segment',
             'description' => 'Segment created via API test',
             'filters'     => [
+                // Legacy structure.
                 [
                     'object'   => 'lead',
                     'glue'     => 'and',
@@ -44,6 +112,37 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'filter'   => 'Prague',
                     'display'  => null,
                     'operator' => '=',
+                ],
+                [
+                    'object'   => 'lead',
+                    'glue'     => 'and',
+                    'field'    => 'owner_id',
+                    'type'     => 'lookup_id',
+                    'operator' => '=',
+                    'display'  => 'John Doe',
+                    'filter'   => '4',
+                ],
+                // Current structure.
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'properties' => ['filter' => 'Prague'],
+                    'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'display'    => 'outdated name',
+                    'filter'     => 'outdated_id',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
                 ],
                 [
                     'glue'     => 'and',
@@ -71,6 +170,58 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $segmentId);
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
+        $this->assertEquals([
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'city',
+                'type'       => 'text',
+                'properties' => ['filter' => 'Prague'],
+                'operator'   => '=',
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'owner_id',
+                'type'       => 'lookup_id',
+                'operator'   => '=',
+                'properties' => [
+                    'display' => 'John Doe',
+                    'filter'  => '4',
+                ],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'city',
+                'type'       => 'text',
+                'properties' => ['filter' => 'Prague'],
+                'operator'   => '=',
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'owner_id',
+                'type'       => 'lookup_id',
+                'operator'   => '=',
+                'properties' => [
+                    'display' => 'John Doe',
+                    'filter'  => '4',
+                ],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'email',
+                'type'       => 'email',
+                'operator'   => '!empty',
+                'properties' => [
+                    'filter'  => null,
+                ],
+            ],
+        ],
+            $response['list']['filters']
+        );
 
         // Edit:
         $this->client->request('PATCH', "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
@@ -111,12 +262,33 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
-    public function testBatchSegmentWorkflow()
+    public function testBatchSegmentWorkflow(): void
     {
         $payload = [
             [
                 'name'        => 'API batch segment 1',
                 'description' => 'Segment created via API test',
+                'filters'     => [
+                    // Legacy structure.
+                    [
+                        'object'   => 'lead',
+                        'glue'     => 'and',
+                        'field'    => 'city',
+                        'type'     => 'text',
+                        'filter'   => 'Prague',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    // Current structure.
+                    [
+                        'object'     => 'lead',
+                        'glue'       => 'and',
+                        'field'      => 'city',
+                        'type'       => 'text',
+                        'properties' => ['filter' => 'Prague'],
+                        'operator'   => '=',
+                    ],
+                ],
             ],
             [
                 'name'        => 'API batch segment 2',
@@ -169,8 +341,97 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertFalse($segment['isPreferenceCenter']);
             $this->assertSame($payload[$key]['name'], $segment['name']);
             $this->assertSame($payload[$key]['description'], $segment['description']);
-            $this->assertIsArray($segment['filters']);
         }
+
+        $this->assertSame(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => ['filter' => 'Prague'],
+                    'filter'     => 'Prague',
+                    'display'    => null,
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => ['filter' => 'Prague'],
+                    'filter'     => 'Prague',
+                    'display'    => null,
+                ],
+            ],
+            $response2['lists'][0]['filters']
+        );
+
+        $this->assertSame([], $response2['lists'][1]['filters']);
+    }
+
+    public function testWeGet422ResponseCodeIfSegmentIsBeingUsedInSomeCampaignAndWeUnpublishIt(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = new LeadList();
+        $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
+        $segment->setAlias(mb_strtolower($segmentName));
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        $campaign     = new Campaign();
+        $campaignName = 'Campaign1';
+        $campaign->setName($campaignName);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // insert unpublished record
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id'   => $campaign->getId(),
+            'leadlist_id'   => $segment->getId(),
+        ]);
+
+        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        Assert::assertArrayHasKey('errors', $response);
+        $errorMessage = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns',
+            [
+                '%count%'         => '1',
+                '%campaignNames%' => '"'.$campaignName.'"',
+            ],
+            'validators'
+        );
+        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
+    }
+
+    public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = new LeadList();
+        $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
+        $segment->setAlias(mb_strtolower($segmentName));
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        $campaign = new Campaign();
+        $campaign->setName('campaign1');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertArrayNotHasKey('errors', $response);
     }
 
     public function testUnpublishUsedSingleSegment(): void
@@ -294,8 +555,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
-        $segment->setName($name)->setAlias($alias)->setFilters($filters);
+        $segment ??= new LeadList();
+        $segment->setName($name)->setPublicName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
         return $segment;

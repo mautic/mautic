@@ -1,54 +1,39 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineEventLogSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * TimelineEventLogSubscriber constructor.
-     */
     public function __construct(
-        TranslatorInterface $translator,
-        LeadEventLogRepository $leadEventLogRepository
+        Translator $translator,
+        LeadEventLogRepository $leadEventLogRepository,
     ) {
         $this->translator         = $translator;
         $this->eventLogRepository = $leadEventLogRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
         ];
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
             'lead.source.created',
             'mautic.lead.timeline.created_source',
-            'fa-user-secret',
+            'ri-spy-line',
             null,
             null,
             'created_contact'
@@ -58,7 +43,7 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
             $event,
             'lead.source.identified',
             'mautic.lead.timeline.identified_source',
-            'fa-user',
+            'ri-user-6-fill',
             null,
             null,
             'identified_contact'

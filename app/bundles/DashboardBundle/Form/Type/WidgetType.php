@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -16,7 +7,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -27,27 +17,15 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Class WidgetType.
+ * @extends AbstractType<mixed>
  */
 class WidgetType extends AbstractType
 {
-    /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
+    public function __construct(protected EventDispatcherInterface $dispatcher, protected CorePermissions $security)
     {
-        $this->dispatcher = $dispatcher;
-        $this->security   = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -55,18 +33,16 @@ class WidgetType extends AbstractType
             [
                 'label'      => 'mautic.dashboard.widget.form.name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control form-control-widget'],
                 'required'   => false,
             ]
         );
 
         $event = new WidgetTypeListEvent();
         $event->setSecurity($this->security);
-        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
-        $types = array_map(function ($category) {
-            return array_flip($category);
-        }, $event->getTypes());
+        $types = array_map(fn ($category): array => array_flip($category), $event->getTypes());
 
         $builder->add(
             'type',
@@ -77,7 +53,7 @@ class WidgetType extends AbstractType
                 'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => 'mautic.core.select',
                 'attr'              => [
-                    'class'    => 'form-control',
+                    'class'    => 'form-control form-control-widget',
                     'onchange' => 'Mautic.updateWidgetForm(this)',
                 ],
             ]
@@ -96,7 +72,7 @@ class WidgetType extends AbstractType
                 ],
                 'empty_data'        => '100',
                 'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
+                'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]
         );
@@ -107,21 +83,21 @@ class WidgetType extends AbstractType
             [
                 'label'   => 'mautic.dashboard.widget.form.height',
                 'choices' => [
-                    '215px' => '215',
-                    '330px' => '330',
-                    '445px' => '445',
-                    '560px' => '560',
-                    '675px' => '675',
+                    'mautic.dashboard.widget.size.extra_small' => '215',
+                    'mautic.dashboard.widget.size.small'       => '330',
+                    'mautic.dashboard.widget.size.medium'      => '445',
+                    'mautic.dashboard.widget.size.large'       => '560',
+                    'mautic.dashboard.widget.size.extra_large' => '675',
                 ],
                 'empty_data'        => '330',
                 'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
+                'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]
         );
 
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();
@@ -142,7 +118,7 @@ class WidgetType extends AbstractType
             }
 
             $event->setType($type);
-            $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
+            $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE);
             $widgetForm = $event->getForm();
             $form->setData($params);
 
@@ -177,13 +153,5 @@ class WidgetType extends AbstractType
         // Register the function above as EventListener on PreSet and PreBind
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'widget';
     }
 }

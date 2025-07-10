@@ -1,0 +1,31 @@
+{% block emailsend_list_row %}
+  <div class="row">
+      <div class="col-xs-{% if form.email_type is defined %}6{% else %}12{% endif %} pr-0">
+          {{ form_row(form.email) }}
+          <div class="mb-lg d-flex">
+            {{ form_row(form.newEmailButton) }}
+            {{ form_row(form.editEmailButton) }}
+            {{ form_row(form.previewEmailButton) }}
+        </div>
+      </div>
+
+      {% if form.email_type is defined %}
+          <div class="col-xs-12">
+              {{ form_row(form.email_type) }}
+          </div>
+      {% endif %}
+      {% if form.priority is defined %}
+          <div id="priority" class="col-xs-5 queue_hide">
+              {{ form_row(form.priority) }}
+          </div>
+      {% endif %}
+      {% if form.attempts is defined %}
+          <div id="attempts" class="col-xs-5 queue_hide">
+              {{ form_row(form.attempts) }}
+          </div>
+      {% endif %}
+  </div>
+  <div class="row">
+
+  </div>
+{% endblock %}

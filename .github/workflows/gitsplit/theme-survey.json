@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-survey",
+            "directory": "themes/_survey",
+            "target": "git@github.com:mautic/theme-survey.git"
+        }
+    ]
+}

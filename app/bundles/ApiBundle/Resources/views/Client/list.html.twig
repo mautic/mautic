@@ -1,0 +1,119 @@
+{# //Check to see if the entire page should be displayed or just main content #}
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block headerTitle %}{% trans %}mautic.api.client.header.index{% endtrans %}{% endblock %}
+{% block mauticContent %}client{% endblock %}
+{% block actions %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'templateButtons' : {
+            'new' : permissions.create,
+        },
+        'routeBase' : 'client',
+        'langVar'   : 'api.client',
+    }
+) -}}
+{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue' : searchValue,
+                'searchHelp'  : 'mautic.api.client.help.searchcommands',
+                'filters'     : filters,
+            }) -}}
+            <div class="page-list">
+                {{ block('listResults') }}
+            </div>
+        </div>
+    {% else %}
+		{{ block('listResults') }}
+	{% endif %}
+{% endblock %}
+
+{% block listResults %}
+<div class="table-responsive panel-collapse pull out page-list">
+    <table class="table table-hover client-list">
+        <thead>
+        <tr>
+            {{- include(
+                '@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'checkall'        : false,
+                    'text'            : null,
+                    'target'          : '.client-list',
+                    'action'          : currentRoute,
+                    'routeBase'       : 'client',
+                    'templateButtons' : {},
+                }
+            ) -}}
+            {{- include(
+                '@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'sessionVar' : 'client',
+                    'orderBy'    : 'c.name',
+                    'text'       : 'mautic.core.name',
+                    'default'    : 'true',
+                    'class'      : 'col-client-name',
+                }
+            ) -}}
+            <th class="visible-md visible-lg col-client-publicid">{{ 'mautic.api.client.thead.publicid'|trans }}</th>
+            <th class="visible-md visible-lg col-client-secret">{{ 'mautic.api.client.thead.secret'|trans }}</th>
+            {{- include(
+                '@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'sessionVar' : 'client',
+                    'orderBy'    : 'c.id',
+                    'text'       : 'mautic.core.id',
+                    'class'      : 'visible-md visible-lg col-client-id',
+                }
+            ) -}}
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>
+                    {{- include(
+                        '@MauticCore/Helper/list_actions.html.twig',
+                        {
+                            'item'            : item,
+                            'templateButtons' : {
+                                'edit'   : permissions.edit,
+                                'delete' : permissions.delete,
+                            },
+                            'routeBase' : 'client',
+                            'langVar'   : 'api.client',
+                            'pull'      : 'left',
+                        }
+                    ) -}}
+                </td>
+                <td>
+                    {{ item.getName() }}
+                </td>
+                <td class="visible-md visible-lg">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ item.getPublicId() }}"/>
+                </td>
+                <td class="visible-md visible-lg">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ item.getSecret() }}"/>
+                </td>
+                <td class="visible-md visible-lg">{{ item.getId() }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="panel-footer">
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems' : items|length,
+            'page'       : page,
+            'limit'      : limit,
+            'menuLinkId' : 'mautic_client_index',
+            'baseUrl'    : path('mautic_client_index'),
+            'sessionVar' : 'client',
+            'tmpl'       : tmpl,
+        }) -}}
+    </div>
+</div>
+{% endblock %}

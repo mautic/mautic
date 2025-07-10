@@ -1,0 +1,19 @@
+<head>
+    <meta charset="UTF-8" />
+    <title>
+        {% if headerTitle is defined and headerTitle is not empty %}
+            {{ headerTitle|replace({'<': ' <'})|striptags|purify }} |
+        {% endif %}
+        {{ pageTitle|default('Mautic') }}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="icon" type="image/x-icon" href="{{ getOverridableUrl('images/favicon.ico') }}" />
+    <link rel="icon" sizes="192x192" href="{{ getOverridableUrl('images/favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ getOverridableUrl('images/apple-touch-icon.png') }}" />
+
+    {{ outputSystemStylesheets() }}
+
+    {% include('@MauticCore/Default/script.html.twig') %}
+
+    {{ outputHeadDeclarations() }}
+</head>

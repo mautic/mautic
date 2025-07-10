@@ -1,0 +1,17 @@
+{% block _config_companyconfig_widget %}
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.company.merge.settings'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.company.merge.settings.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                {% for child in form.children %}
+                <div class="col-xs-12">
+                    {{ form_row(child) }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

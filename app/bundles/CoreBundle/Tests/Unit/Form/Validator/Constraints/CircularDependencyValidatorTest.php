@@ -1,41 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
 class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
-     */
-    private $mockListModel;
+    private MockObject&ListModel $mockListModel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
-     */
-    private $context;
+    private MockObject&ExecutionContext $context;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
-     */
-    private $requestStack;
+    private MockObject&RequestStack $requestStack;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Request
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var CircularDependencyValidator
-     */
-    private $validator;
+    private CircularDependencyValidator $validator;
 
     protected function setUp(): void
     {
@@ -44,7 +32,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel = $this->createMock(ListModel::class);
         $this->context       = $this->createMock(ExecutionContext::class);
         $this->requestStack  = $this->createMock(RequestStack::class);
-        $this->request       = $this->createMock(Request::class);
+        $this->request       = new Request();
 
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -57,7 +45,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * Checks that the validator won't break if the segment ID is not present in the request.
      */
-    public function testIfSegmentIdIsNotInTheRequest()
+    public function testIfSegmentIdIsNotInTheRequest(): void
     {
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -84,7 +72,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 'field'    => 'leadlist',
                 'object'   => 'lead',
                 'type'     => 'leadlist',
-                'filter'   => [2],
+                'filter'   => [2], // Keeping filter in the root to test also for BC segments.
                 'display'  => null,
                 'operator' => 'in',
             ],
@@ -92,25 +80,25 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $filters2 = [
             [
-                'glue'     => 'and',
-                'field'    => 'leadlist',
-                'object'   => 'lead',
-                'type'     => 'leadlist',
-                'filter'   => [1],
-                'display'  => null,
-                'operator' => 'in',
+                'glue'       => 'and',
+                'field'      => 'leadlist',
+                'object'     => 'lead',
+                'type'       => 'leadlist',
+                'properties' => ['filter' => [1]],
+                'display'    => null,
+                'operator'   => 'in',
             ],
         ];
 
         $filters3 = [
             [
-                'glue'     => 'and',
-                'field'    => 'first_name',
-                'object'   => 'lead',
-                'type'     => 'text',
-                'filter'   => 'John',
-                'display'  => null,
-                'operator' => '=',
+                'glue'       => 'and',
+                'field'      => 'first_name',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'properties' => ['filter' => 'John'],
+                'display'    => null,
+                'operator'   => '=',
             ],
         ];
 
@@ -146,9 +134,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(function ($id) use ($entities) {
-                return $entities[$id];
-            });
+            ->willReturnCallback(fn ($id) => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())
@@ -159,12 +145,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 ->method('addViolation');
         }
 
-        $this->request->expects($this->once())
-            ->method('get')
-            ->with('_route_params')
-            ->willReturn([
-                'objectId' => $currentSegmentId,
-            ]);
+        $this->request->request->add(['_route_params' => ['objectId' => $currentSegmentId]]);
 
         return $this->validator;
     }
@@ -174,13 +155,13 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidateOnInvalid($message, $currentSegmentId, $filters)
+    public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
     }
 
-    public function validateDataProvider()
+    public static function validateDataProvider()
     {
         $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
 
@@ -195,7 +176,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                         'field'    => 'leadlist',
                         'object'   => 'lead',
                         'type'     => 'leadlist',
-                        'filter'   => [1],
+                        'filter'   => [1], // Keeping filter in the root to test also for BC segments.
                         'display'  => null,
                         'operator' => 'in',
                     ],
@@ -207,13 +188,13 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 1, // current segment id
                 [
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [2],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [2]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                 ],
             ],
@@ -224,13 +205,13 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 1, // current segment id
                 [
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [3],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [3]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                 ],
             ],
@@ -244,7 +225,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                         'field'    => 'first_name',
                         'object'   => 'lead',
                         'type'     => 'text',
-                        'filter'   => 'Doe',
+                        'filter'   => 'Doe', // Keeping filter in the root to test also for BC segments.
                         'display'  => null,
                         'operator' => '=',
                     ],
@@ -256,22 +237,22 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 2, // current segment id
                 [
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [1],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [1]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [3],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [3]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                 ],
             ],

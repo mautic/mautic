@@ -1,0 +1,35 @@
+{#
+  Variables
+    - notification (\Mautic\NotificationBundle\Entity\Notification)
+#}
+<label>Preview</label>
+<div id="notification-preview" class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="icon height-auto text-center">
+                <span class="ri-notification-3-fill fs-48"></span>
+            </div>
+            <div class="text height-auto">
+                <h4>
+                    {%- if notification.heading -%}
+                        {{- notification.heading -}}
+                    {%- else -%}
+                        Your notification header
+                    {%- endif -%}
+                </h4>
+                <p>
+                    {%- if notification.message %}
+                        {{- notification.message -}}
+                    {%- else -%}
+                        The message body of your notification
+                    {%- endif -%}
+                </p>
+                <span>{{ app.request.server.get('HTTP_HOST') }}</span>
+            </div>
+        </div>
+        {% if notification.url and notification.button %}
+            <hr>
+            <a href="{{ notification.url }}">{{ notification.button }}</a>
+        {% endif %}
+    </div>
+</div>

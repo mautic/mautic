@@ -1,0 +1,55 @@
+<li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" id="admin-menu" href="#">
+        <i class="ri-settings-5-line ri-xl"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-right">
+        {% if item.hasChildren() and (options.depth is not same as 0) and item.getDisplayChildren() %}
+            {% for child in item.getChildren() %}
+                {% if child.isDisplayed() %}
+                    <li>
+                        {% set extras = child.getExtras() %}
+                        {% set labelAttributes = child.getLabelAttributes() %}
+                        {% set labelClasses = (labelAttributes.class is not defined) ? 'nav-item-name' : labelAttributes.class ~ ' nav-item-name' %}
+
+                        {% if child.hasChildren() and child.getDisplayChildren() %}
+                            <div class="dropdown-header">
+                                {% if extras.iconClass is defined and extras.iconClass is not empty %}
+                                    <i class="icon {{ extras.iconClass }}"></i>
+                                {% endif %}
+                                <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
+                            </div>
+                            {% for grandchild in child.getChildren() %}
+                                {% if grandchild.isDisplayed() %}
+                                    <li>
+                                        {% set linkAttributes = grandchild.getLinkAttributes() %}
+                                        {% set extras = grandchild.getExtras() %}
+                                        {% set url = grandchild.getUri() %}
+                                        {% set url = (url is empty) ? 'javascript:void(0);' : url %}
+
+                                        <a href="{{ url }}"{{ parseMenuAttributes(linkAttributes) }} data-toggle="ajax">
+                                            {% if extras.iconClass is defined and extras.iconClass is not empty %}
+                                                <i class="icon {{ extras.iconClass }}"></i>
+                                            {% endif %}
+                                            <span{{ parseMenuAttributes(grandchild.getLabelAttributes()) }}>{{ grandchild.getLabel() | trans | purify }}</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% set linkAttributes = child.getLinkAttributes() %}
+                            {% set url = child.getUri() %}
+                            {% set url = (url is empty) ? 'javascript:void(0);' : url %}
+
+                            <a href="{{ url }}"{{ parseMenuAttributes(linkAttributes) }} data-toggle="ajax">
+                                {% if extras.iconClass is defined and extras.iconClass is not empty %}
+                                    <i class="icon {{ extras.iconClass }}"></i>
+                                {% endif %}
+                                <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>
+</li>

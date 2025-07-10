@@ -29,11 +29,17 @@
 .clickable-stat a { color: #fff; }
 .clickable-stat a:hover { color: #fff; }
 
-#emailGraphStats {
-    height: 437px;
+#emailGraphStats .spinner,
+#reads-map-container .spinner{
+    text-align: center;
+    font-size: 32px;
 }
 
-#emailGraphStats .spinner {
-    padding-top: 50px;
-    text-align: center;
+.dynamic-content .nav-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    display: flex;
+    scrollbar-width: thin; /* Firefox */
 }

@@ -1,0 +1,32 @@
+{#
+  Variables
+    - form
+    - leads
+    - searchValue
+    - action
+    - currentRoute
+#}
+{% if 'index' == tmpl %}
+<div class="lead-merge-form">
+    {{ include('@MauticCore/Helper/search.html.twig', {
+        'searchId': searchId|default(null),
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'target': '.lead-merge-options',
+        'tmpl': 'update',
+    }) }}
+    <div class="lead-merge-options mt-sm">
+{% endif %}
+
+        {{ form_start(form) }}
+
+        <div class="hide">
+            {{ form_row(form.buttons) }}
+        </div>
+
+        {{ form_end(form) }}
+
+{% if 'index' == tmpl %}
+    </div>
+</div>
+{% endif %}

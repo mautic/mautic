@@ -1,0 +1,20 @@
+<h5 class="fw-sb mb-xs">{% trans %}mautic.asset.asset.preview{% endtrans %}</h5>
+<div class="text-center">
+    {% if activeAsset.isImage() %}
+        <img src="{{ assetDownloadUrl ~ '?stream=1' }}" alt="{{ activeAsset.getTitle()|escape }}" class="img-thumbnail" />
+    {% elseif 'pdf' == activeAsset.getFileType()|lower %}
+        <iframe src="{{ assetDownloadUrl ~ '?stream=1' }}#view=FitH" class="col-sm-12"></iframe>
+    {% elseif activeAsset.getMime() starts with 'video' or activeAsset.getExtension() in ['mpg', 'mpeg', 'mp4', 'webm'] %}
+        <video src="{{ assetDownloadUrl ~ '?stream=1' }}" controls>
+            {% trans %}mautic.asset.no_video_support{% endtrans %}
+        </video>
+    {% elseif activeAsset.getMime() starts with 'audio' or activeAsset.getExtension() in ['mp3', 'ogg', 'wav'] %}
+        <audio controls>
+            <source src="{{ assetDownloadUrl ~ '?stream=1' }}" type="{{ activeAsset.getMime() }}">
+            {% trans %}mautic.asset.no_audio_support{% endtrans %}
+        </audio>
+    {% else %}
+        <i class="{{ activeAsset.getIconClass() }} ri-5x"></i>
+    {% endif %}
+</div>
+<div class="clearfix"></div>

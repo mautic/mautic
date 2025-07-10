@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,6 +10,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
@@ -34,55 +28,73 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|EventDispatcher
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var MockObject|Logger
      */
-    private $logger;
+    private MockObject $logger;
+
+    /**
+     * @var MockObject|StatRepository
+     */
+    private MockObject $statRepository;
+
+    /**
+     * @var MockObject|BotRatioHelper
+     */
+    private MockObject $botRatioHelper;
 
     /**
      * @var MockObject|Lead
      */
-    private $trackedContact;
+    private MockObject $trackedContact;
+
+    /**
+     * @var MockObject|ContactMerger
+     */
+    private MockObject $contactMerger;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->contactTracker       = $this->createMock(ContactTracker::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $this->requestStack         = $this->createMock(RequestStack::class);
-        $this->logger               = $this->createMock(Logger::class);
-        $this->dispatcher           = $this->createMock(EventDispatcher::class);
-        $this->trackedContact       = $this->createMock(Lead::class);
+        $this->leadModel                = $this->createMock(LeadModel::class);
+        $this->contactTracker           = $this->createMock(ContactTracker::class);
+        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
+        $this->requestStack             = $this->createMock(RequestStack::class);
+        $this->logger                   = $this->createMock(Logger::class);
+        $this->dispatcher               = $this->createMock(EventDispatcher::class);
+        $this->trackedContact           = $this->createMock(Lead::class);
+        $this->contactMerger            = $this->createMock(ContactMerger::class);
+        $this->statRepository           = $this->createMock(StatRepository::class);
+        $this->botRatioHelper           = $this->createMock(BotRatioHelper::class);
 
         $this->trackedContact->method('getId')
             ->willReturn(1);
@@ -116,8 +128,8 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $stat = new Stat();
         $stat->setEmail($email);
 
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
@@ -142,14 +154,14 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $contact = new Lead();
 
         $this->dispatcher->method('dispatch')
-            ->willReturnCallback(
-                function ($eventName, ContactIdentificationEvent $event) use ($contact) {
-                    $event->setIdentifiedContact($contact, 'email');
-                }
-            );
+            ->willReturnCallback(function (ContactIdentificationEvent $event) use ($contact) {
+                $event->setIdentifiedContact($contact, 'email');
 
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
+                return $event;
+            });
+
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
 
         $helper       = $this->getContactRequestHelper();
         $foundContact = $helper->getContactFromQuery($query);
@@ -193,7 +205,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($queryWithEmail, null, true, true)
+            ->with($queryWithEmail, true, true)
             ->willReturn([$lead, ['email' => 'test@test.com']]);
 
         $helper = $this->getContactRequestHelper();
@@ -225,7 +237,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($query, null, true, true)
+            ->with($query, true, true)
             ->willReturn([$this->trackedContact, []]);
 
         $helper = $this->getContactRequestHelper();
@@ -241,7 +253,10 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->ipLookupHelper,
             $this->requestStack,
             $this->logger,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->contactMerger,
+            $this->statRepository,
+            $this->botRatioHelper
         );
     }
 }

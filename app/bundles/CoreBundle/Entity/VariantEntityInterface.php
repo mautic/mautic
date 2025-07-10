@@ -1,27 +1,15 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * Interface VariantEntityInterface.
- */
 interface VariantEntityInterface
 {
     /**
      * Get translation parent.
      *
-     * @return VariantEntityInterface
+     * @return mixed
      */
     public function getVariantParent();
 
@@ -77,7 +65,7 @@ interface VariantEntityInterface
     /**
      * Get all entities for variant parent/children.
      *
-     * @return array[$parent, $children]
+     * @return array [$parent, $children]
      */
     public function getVariants();
 

@@ -1,0 +1,150 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}role{% endblock %}
+{% block headerTitle %}{% trans %}mautic.user.roles{% endtrans %}{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'page_actions': {
+                'templateButtons': {
+                    'new': permissions['create'],
+                },
+                'routeBase': 'role',
+                'langVar': 'user.role',
+            },
+            'bulk_actions': {
+                'routeBase': 'role',
+                'langVar': 'user.role',
+                'templateButtons': {
+                    'delete': permissions['delete']
+                }
+            },
+            'quickFilters': [
+                {
+                    'search': 'mautic.user.user.searchcommand.isadmin',
+                    'label': 'mautic.user.role.form.isadmin',
+                    'tooltip': 'mautic.core.search.quickfilter.is_admin',
+                    'icon': 'ri-admin-line'
+                }
+            ]
+        }) -}}
+            <div class="page-list">
+                {{ block('listResults') }}
+            </div>
+    </div>
+    {% else %}
+        {{ block('listResults') }}
+    {% endif %}
+{% endblock %}
+
+{% block listResults %}
+<div class="table-responsive">
+    <table class="table table-hover role-list" id="roleTable">
+        <thead>
+        <tr>
+            {{- include('@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'checkall'        : 'true',
+                    'target'          : '#roleTable'
+                }
+            ) -}}
+
+            {{- include(
+                '@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'sessionVar' : 'role',
+                    'orderBy'    : 'r.name',
+                    'text'       : 'mautic.core.name',
+                    'class'      : 'col-role-name',
+                    'default'    : true,
+                }
+            ) -}}
+
+            {{- include(
+                '@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'sessionVar' : 'role',
+                    'orderBy'    : 'r.description',
+                    'text'       : 'mautic.core.description',
+                    'class'      : 'visible-md visible-lg col-role-desc',
+                }
+            ) -}}
+            <th class="visible-md visible-lg col-rolelist-usercount">
+                {% trans %}mautic.user.role.list.thead.usercount{% endtrans %}
+            </th>
+            {{- include('@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'sessionVar' : 'role',
+                    'orderBy'    : 'r.id',
+                    'text'       : 'mautic.core.id',
+                    'class'      : 'visible-md visible-lg col-role-id',
+                }
+            ) -}}
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            {% set mauticTemplateVars = _context|merge({'item' : item}) %}
+            <tr>
+                <td>
+                    {{- include('@MauticCore/Helper/list_actions.html.twig',
+                        {
+                            'item'            : item,
+                            'templateButtons' : {
+                                'edit'   : permissions['edit'],
+                                'delete' : permissions['delete'],
+                            },
+                            'routeBase' : 'role',
+                            'langVar'   : 'user.role',
+                            'pull'      : 'left',
+                        }) -}}
+                </td>
+                <td>
+                    {% if permissions['edit'] %}
+                        <a href="{{ path('mautic_role_action',
+                            {'objectAction' : 'edit', 'objectId' : item.getId()}) }}" data-toggle="ajax">
+                            {{ item.getName() }}
+                            {{ customContent('role.name', mauticTemplateVars) }}
+                        </a>
+                    {% else %}
+                        {{ item.getName() }}
+
+                    {% endif %}
+                </td>
+                <td class="visible-md visible-lg">
+                    {{ item.getDescription()|purify }}
+                </td>
+                <td class="visible-md visible-lg">
+                    <a size="sm" class="label label-gray" href="{{ path('mautic_user_index',
+                        {'search' : ('mautic.user.user.searchcommand.role'|trans) ~ ':&quot;' ~ item.getName() ~ '&quot;'}) }}" data-toggle="ajax"{{ userCounts[item.getId()] == 0 ? 'disabled=disabled' : '' }}>
+                        {{ 'mautic.user.role.list.viewusers_count'|trans(
+                            {'%count%' : userCounts[item.getId()]}
+                        ) }}
+                    </a>
+                </td>
+                <td class="visible-md visible-lg">
+                    {{ item.getId() }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="panel-footer">
+    {{- include('@MauticCore/Helper/pagination.html.twig',
+        {
+            'totalItems' : items|length,
+            'page'       : page,
+            'limit'      : limit,
+            'baseUrl'    : path('mautic_role_index'),
+            'sessionVar' : 'role',
+        }
+    ) -}}
+</div>
+{% endblock %}

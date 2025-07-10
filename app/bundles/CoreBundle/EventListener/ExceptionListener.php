@@ -1,62 +1,57 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use LightSaml\Error\LightSamlException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener as KernelExceptionListener;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class ExceptionListener.
- */
-class ExceptionListener extends KernelExceptionListener
+class ExceptionListener extends ErrorListener
 {
     /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * ExceptionListener constructor.
-     *
      * @param LoggerInterface $controller
      */
-    public function __construct(Router $router, $controller, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        protected Router $router,
+        $controller,
+        LoggerInterface $logger = null,
+    ) {
         parent::__construct($controller, $logger);
-
-        $this->router = $router;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null): void
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
 
         if ($exception instanceof LightSamlException) {
+            // Convert the LightSamlException to a AuthenticationException so it can be passed in the session.
+            $exception = new AuthenticationException($exception->getMessage());
             // Redirect to login page with message
-            $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception->getMessage());
+            $event->getRequest()->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
 
             return;
+        }
+
+        // The authentication wraps a response in the LazyResponseException @see \Symfony\Component\Security\Http\Event\LazyResponseEvent::setResponse
+        if ($exception instanceof LazyResponseException) {
+            $response = $exception->getResponse();
+
+            if ($response instanceof RedirectResponse) {
+                return;
+            }
         }
 
         // Check for exceptions we don't want to handle
@@ -66,10 +61,10 @@ class ExceptionListener extends KernelExceptionListener
         }
 
         if (!$exception instanceof AccessDeniedHttpException && !$exception instanceof NotFoundHttpException) {
-            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $exception::class, $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $request   = $event->getRequest();
         $request   = $this->duplicateRequest($exception, $request);
         try {
@@ -81,7 +76,7 @@ class ExceptionListener extends KernelExceptionListener
                 $e,
                 sprintf(
                     'Exception thrown when handling an exception (%s: %s at %s line %s)',
-                    get_class($e),
+                    $e::class,
                     $e->getMessage(),
                     $e->getFile(),
                     $e->getLine()

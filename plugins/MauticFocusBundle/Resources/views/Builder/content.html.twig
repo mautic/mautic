@@ -1,0 +1,59 @@
+{#
+  Variables
+    - focus (MauticPlugin\MauticFocusBundle\Entity\Focus)
+    - preview (optional)
+    - clickUrl
+    - htmlMode
+
+  Notes
+    - focus.htmlMode === htmlMode? is this always true?
+#}
+{% set templateBase = '@MauticFocus/Builder/' ~ focus.style|capitalize ~ '/index.html.twig'  %}
+{% set preview = preview|default(false) %}
+{% set clickUrl = clickUrl|default('#') %}
+{% set props = focus.properties %}
+<div>
+    <style scoped>
+        .mautic-focus * {
+            all: revert;
+            box-sizing: border-box;
+        }
+        .mautic-focus {
+            font-family: {{ props.content.font }};
+            color: #{{ props.colors.text|replace({'#': ''}) }};
+        }
+
+        {% if props.colors is defined and props.colors is not empty %}
+          .mf-content a.mf-link, .mf-content .mauticform-button, .mf-content .mauticform-pagebreak {
+              background-color: #{{ props.colors.button|replace({'#': ''}) }};
+              color: #{{ props.colors.button_text }};
+          }
+          .mauticform-input:focus, select:focus {
+              border: 1px solid #{{ props.colors.button|replace({'#': ''}) }};
+          }
+        {% endif %}
+
+        {% if preview %}
+            {{ include('@MauticFocus/Builder/style.less.twig', {
+                    'preview': true,
+                    'focus': focus,
+            }, with_context=false) }}
+        {% endif %}
+    </style>
+    {{ include(templateBase, {
+            'focus': focus,
+            'preview': preview,
+            'clickUrl': clickUrl,
+            'htmlMode': htmlMode,
+    }, with_context=false) }}
+    {% if focus.properties.content.css is defined and focus.properties.content.css is not empty %}
+    <style scoped>
+        {{ focus.properties.content.css|raw }}
+    </style>
+    {% endif %}
+
+    {# Add view tracking image #}
+    {% if not preview %}
+        <img src="{{ url('mautic_focus_pixel', {'id': focus.id}, true) }}" alt="Mautic Focus" style="display: none;"/>
+    {% endif %}
+</div>

@@ -1,0 +1,38 @@
+{% set statusColors = {
+    'published': {'icon': 'success', 'text': 'green'},
+    'unpublished': {'icon': 'danger', 'text': 'red'},
+    'expired': {'icon': 'info', 'text': 'blue'},
+    'pending': {'icon': 'info', 'text': 'blue'}
+} %}
+
+{# Define the labels based on the combination of status and publishStatus #}
+{% set labelMappings = {
+    'available': {
+        'published': 'mautic.core.form.available',
+        'pending': 'mautic.core.form.not_yet_available',
+        'expired': 'mautic.core.form.no_longer_available',
+        'unpublished': 'mautic.core.form.unavailable'
+    },
+    'sending': {
+        'published': 'mautic.core.form.sending',
+        'pending': 'mautic.core.form.scheduled_to_send',
+        'expired': 'mautic.core.form.sending_expired',
+        'unpublished': 'mautic.core.form.unavailable'
+    },
+    'active': {
+        'published': 'mautic.core.form.active',
+        'pending': 'mautic.core.form.pending',
+        'expired': 'mautic.core.form.expired',
+        'unpublished': 'mautic.core.form.inactive'
+    }
+} %}
+
+{% set labelTextKey = (labelMappings[status|default('active')][entity.getPublishStatus()]) %}
+
+<div class="label label-{{ statusColors[entity.getPublishStatus()].text }} d-inline-flex ai-center gap-xs fw-b"{% if simplified is defined and simplified %} size="sm"{% endif %}>
+    {% if not (simplified is defined and simplified) %}
+        <span aria-hidden="true" focusable="false" class="bg-{{ statusColors[entity.getPublishStatus()].icon }} publishstatus_pulse">
+        </span>
+    {% endif %}
+    {{ labelTextKey|trans }}
+</div>

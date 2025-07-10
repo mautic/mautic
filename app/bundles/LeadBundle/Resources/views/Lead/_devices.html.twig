@@ -1,0 +1,38 @@
+{#
+  Variables
+    - devices
+#}
+<table class="table table-hover mb-0">
+    <thead>
+        <tr>
+            <th class="timeline-icon"></th>
+            <th>{{ 'mautic.lead.device.header'|trans }}</th>
+            <th>{{ 'mautic.lead.device_os_name.header'|trans }}</th>
+            <th>{{ 'mautic.lead.device_os_version.header'|trans }}</th>
+            <th>{{ 'mautic.lead.device_browser.header'|trans }}</th>
+            <th>{{ 'mautic.lead.device_brand.header'|trans }}</th>
+            <th>{{ 'mautic.core.date.added'|trans }}</th>
+        </tr>
+    </thead>
+    <tbody>
+      {% for device in devices %}
+          <tr>
+              <td>
+                  <i class="fa ri-fw ri-{{ device.device }}-line"></i>
+              </td>
+              <td>{{ translatorConditional('mautic.lead.device.' ~ device['device'], device['device']|title) }}</td>
+              <td>{{ device['device_os_name'] }}</td>
+              <td>{{ device['device_os_version'] }}</td>
+              <td>
+                  {% set clientInfo = serializerDecode(device.client_info) %}
+                  {{ clientInfo is iterable and clientInfo.name is defined ? clientInfo.name }}
+              </td>
+              <td>
+                  {# Short codes are being removed from DeviceParser but there are values stored in the DB that may still depend on it #}
+                  {{ deviceGetFullName(device['device_brand']) }}
+              </td>
+              <td>{{ dateToText(device['date_added'], 'utc') }}</td>
+          </tr>
+      {% endfor %}
+    </tbody>
+</table>

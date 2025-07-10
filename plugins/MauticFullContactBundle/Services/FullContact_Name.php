@@ -1,19 +1,5 @@
 <?php
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at.
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
 /**
@@ -30,6 +16,7 @@ class FullContact_Name extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['normalizer', 'deducer', 'similarity', 'stats', 'parser'];
+
     protected $_resourceUri      = '';
 
     /**
@@ -52,7 +39,6 @@ class FullContact_Name extends FullContact_Base
      * This resolves a person's name from either their email address or a
      *   username. This is basically a wrapper for the Person lookup methods.
      *
-     * @param type $name
      * @param type $type   -> valid values are email and username
      * @param type $casing -> valid values are uppercase, lowercase, titlecase
      *

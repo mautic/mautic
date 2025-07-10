@@ -1,0 +1,77 @@
+{#
+  Variables
+    - campaign
+    - campaignId
+    - campaignEvents
+    - campaignSources
+    - eventSettings
+    - canvasSettings
+#}
+<div id="campaign-builder" class="builder campaign-builder preview">
+    <div class="builder-content">
+        <div id="CampaignCanvas">
+            <div id="CampaignEvent_newsource{% if campaignSources is not empty %}_hide{% endif %}" class="text-center list-campaign-source list-campaign-leadsource">
+                <div class="campaign-event-content">
+                    <div>
+                        <span class="campaign-event-name ellipsis">
+                            <i class="mr-sm ri-team-line"></i> {{'mautic.campaign.add_new_source'|trans }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {% if campaign.forms|length %}
+              {% set names = [] %}
+              {% for form in campaign.forms.toArray %}
+                {% set names = names + [form.name] %}
+              {% endfor %}
+              {{- include('@MauticCampaign/Source/_index.html.twig', {
+                    'sourceType': 'forms',
+                    'campaignId': campaign.id,
+                    'names': names|join(', '),
+              }) -}}
+            {% endif %}
+
+            {% if campaign.lists|length %}
+              {% set names = [] %}
+              {% for list in campaign.lists.toArray %}
+                {% set names = names + [list.name] %}
+              {% endfor %}
+              {{- include('@MauticCampaign/Source/_index.html.twig', {
+                    'sourceType': 'lists',
+                    'campaignId': campaign.id,
+                    'names': names|join(', '),
+              }) -}}
+            {% endif %}
+
+            {% for event in campaignEvents %}
+              {{- include('@MauticCampaign/Event/_preview.html.twig', {
+                    'event': event,
+                    'campaignId': campaign.id,
+              }) -}}
+            {% endfor %}
+
+            {{- include('@MauticCampaign/Campaign/Builder/_index.html.twig', {
+                    'campaignSources': campaignSources,
+                    'eventSettings': eventSettings,
+                    'campaignId': campaign.id,
+            }) -}}
+        </div>
+    </div>
+</div>
+<!-- dropped coordinates -->
+<input type="hidden" value="" id="droppedX"/>
+<input type="hidden" value="" id="droppedY"/>
+<input type="hidden" value="{{ campaign.id|e }}" id="campaignId"/>
+{{- include('@MauticCore/Helper/modal.html.twig', {
+        'id': 'CampaignEventModal',
+        'header': false,
+        'footerButtons': true,
+        'dismissible': false,
+}) -}}
+<script>
+    Mautic.campaignBuilderCanvasSettings = {% if canvasSettings is not empty %}{{ canvasSettings|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderCanvasSources = {% if campaignSources is not empty %}{{ campaignSources|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderCanvasEvents = {% if campaignEvents is not empty %}{{ campaignEvents|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderConnectionRestrictions = {% if eventSettings['connectionRestrictions'] is not empty %}{{ eventSettings['connectionRestrictions']|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+</script>

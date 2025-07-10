@@ -1,36 +1,38 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
-    private $fieldModel;
+    private MockObject $fieldModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CompanyRepository
+     * @var MockObject&CompanyRepository
      */
-    private $companyRepository;
+    private MockObject $companyRepository;
+
+    /**
+     * @var MockObject&FieldsWithUniqueIdentifier
+     */
+    private MockObject $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {
         $this->fieldModel = $this->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->fieldsWithUniqueIdentifier = $this->getMockBuilder(FieldsWithUniqueIdentifier::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -39,20 +41,18 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testUniqueFieldNotFoundException()
+    public function testUniqueFieldNotFoundException(): void
     {
         $this->expectException(UniqueFieldNotFoundException::class);
         $this->fieldModel->method('getFieldList')->willReturn([]);
         $this->getDeduper()->checkForDuplicateCompanies([]);
     }
 
-    /**
-     * @return CompanyDeduper
-     */
-    private function getDeduper()
+    private function getDeduper(): CompanyDeduper
     {
         return new CompanyDeduper(
             $this->fieldModel,
+            $this->fieldsWithUniqueIdentifier,
             $this->companyRepository
         );
     }

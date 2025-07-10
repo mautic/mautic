@@ -1,0 +1,69 @@
+{% set isIndex = 'index' == tmpl %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'pointTrigger' %}
+
+{% block headerTitle 'mautic.point.trigger.header.index'|trans %}
+
+{% block content %}
+  {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'page_actions': {
+                'templateButtons': {
+                    'new': permissions['point:triggers:create'],
+                },
+                'routeBase': 'pointtrigger',
+                'langVar': 'point.trigger',
+            },
+            'bulk_actions': {
+                'langVar': 'point.trigger',
+                'routeBase': 'pointtrigger',
+                'templateButtons': {
+                    'delete': permissions['point:triggers:delete'],
+                },
+            },
+            'quickFilters': [
+                {
+                    'search': 'mautic.core.searchcommand.ispublished',
+                    'label': 'mautic.core.form.active',
+                    'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                    'icon': 'ri-check-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isunpublished',
+                    'label': 'mautic.core.form.inactive',
+                    'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                    'icon': 'ri-close-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isuncategorized',
+                    'label': 'mautic.core.form.uncategorized',
+                    'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                    'icon': 'ri-folder-unknow-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.ismine',
+                    'label': 'mautic.core.searchcommand.ismine.label',
+                    'tooltip': 'mautic.core.searchcommand.ismine.description',
+                    'icon': 'ri-user-line'
+                }
+            ]
+        }) }}
+        <div class="page-list">
+  {% endif %}
+
+  {{ include('@MauticPoint/Trigger/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.triggers.behavioral'])
+  }) }}
+  {% endif %}
+{% endblock %}

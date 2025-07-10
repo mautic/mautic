@@ -1,0 +1,659 @@
+{#
+    As long as Mautic 5 hasn't been released, and you make a change in one of the blocks below,
+    also update the corresponding PHP template!
+#}
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_attributes.html.php #}
+{% block button_attributes %}
+id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disabled"' : '' }}
+{% for k,v in attr|filter((v,k) => k not in ['icon']) %}
+{% if v in ['placeholder', 'title'] %}
+{{ '%s="%s" '|format(k|escape, v|trans({}, translation_domain)|escape)|raw }}
+{% elseif v is same as true %}
+{{ '%s="%s" '|format(k|escape, k|escape)|raw }}
+{% elseif v is not same as false %}
+{{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_group_grow.html.php #}
+{% block button_group_row %}
+{% set hasErrors = form.vars.errors|length %}
+{% set feedbackClass = (app.request.getMethod() is same as 'POST' and hasErrors > 0) ? ' has-error' : '' %}
+<div class="row form-group">
+    {% if form.vars.id is defined and 'config_' in form.vars.id %}
+    {# New structure for config_ elements #}
+    <div class="col-md-4">
+        {{ form_label(form, label) }}
+        {{ form_help(form) }}
+    </div>
+    <div class="col-md-8">
+        <div class="{{ feedbackClass }}">
+            {{ form_widget(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+    {% else %}
+    <div class="col-xs-12{{ feedbackClass }}">
+        {{ form_label(form, label) }}
+        <div class="choice-wrapper">
+            {{ form_widget(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_group_widget.html.php #}
+{% block button_group_widget %}
+{# apply attributes to radios #}
+{% set attr = form.vars.attr %}
+<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons">
+    {% for child in form %}
+        {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
+        <label class="btn {{ class }} btn-block mt-0 list-group-item">
+            {{ form_widget(child, {'attr': attr}) }}
+            <span class="list-group-item-heading btn-block text-left">{{ child.vars.label|trans }}</span>
+        </label>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_row.html.php #}
+{% block button_row %}
+{{ form_widget(form) }}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_widget.html.php #}
+{% block button_widget %}
+{% if not label %}
+{% set label = name|humanize %}
+{% endif %}
+<button type="{{ type is defined ? type|escape : 'button' }}"
+    {{ block('button_attributes') }}>
+    {% if form.vars.attr.icon is defined and form.vars.attr.icon is not empty %}
+    <i class="{{ form.vars.attr.icon }} "></i>
+    {% endif %}
+    {{ label|trans({}, translation_domain)|escape }}
+</button>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:checkbox_row.html.php #}
+{% block checkbox_row %}
+{% set hasErrors = form.vars.errors|length %}
+{% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
+<div class="row">
+    <div class="form-group col-xs-12{{ feedbackClass }}">
+        <div class="checkbox">
+            <label>
+                {{ form_widget(form) }}
+                {{ form.vars.label|trans }}
+            </label>
+        </div>
+        {{ form_errors(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:choice_attributes.html.php #}
+{% block choice_attributes %}
+{% for k,v in choice_attr %}
+{% if v is same as true %}
+{{ '%s="%s" '|format(k|escape, k|escape)|raw }}
+{% elseif v is not same as false %}
+{{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:choice_row.html.php #}
+{% block choice_row %}
+{% set hasErrors = form.vars.errors is not empty %}
+{% set feedbackClass = hasErrors ? ' has-error' : '' %}
+{# apply attributes to radios #}
+{% set attr = form.vars.attr %}
+<div class="row form-group">
+{% if form.vars.id is defined and 'config_' in form.vars.id %}
+    {# New structure for config_ elements #}
+    <div class="col-md-4">
+        {{ form_label(form, label) }}
+        {{ form_help(form) }}
+    </div>
+    <div class="col-md-8">
+        <div class="{{ feedbackClass }}">
+            {{ form_widget(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+    {% else %}
+    <div class="col-xs-12 {{ feedbackClass }}">
+        {{ form_label(form, label) }}
+        <div class="choice-wrapper">
+            {% if expanded and multiple %}
+            {% for child in form.children %}
+                <div class="checkbox">
+                    <label>
+                        {{ form_widget(child, {'attr': attr}) }}
+                        {{ child.vars.label|trans }}
+                    </label>
+                </div>
+            {% endfor %}
+            {% else %}
+            {{ form_widget(form) }}
+            {% endif %}
+            {{ form_help(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:dynamiclist_entry_row.html.php #}
+{% block dynamiclist_entry_row %}
+<div class="sortable">
+    {{ block('form_widget_simple') }}
+    {{ form_errors(form) }}
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:dynamiclist_row.html.php #}
+{% block dynamiclist_row %}
+{% set list = form.children %}
+{% set hasErrors = form.vars.errors|length %}
+{% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
+{% set datePrototype = list.vars.prototype is defined ? ('<div class="sortable">' ~ form_widget(list.vars.prototype|raw) ~ '</div>')|escape : '' %}
+<div class="row">
+    <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12{{ feedbackClass }}" id="{{ form.vars.id }}_list">
+        {{ form_label(form, label) }}
+        <a  data-prototype="{{ datePrototype|raw }}"
+           class="btn btn-tertiary btn-sm btn-warning btn-add-item" href="#" id="{{ form.vars.id }}_additem">
+            {{ 'mautic.core.form.list.additem'|trans }}
+        </a>
+        {% if isSortable %}
+        <div class="list-sortable">
+        {% endif %}
+        {% for item in list.children %}
+          {{ block('sortablelist_entry_row') }}
+        {% endfor %}
+        </div>
+        {{ form_errors(list) }}
+        {% if isSortable %}
+        <input type="hidden" class="sortable-itemcount" id="{{ form.vars.id }}_itemcount" value="{{ list|length }}" />
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_buttons_row.html.php #}
+{% block form_buttons_row %}
+<div {{ block('widget_container_attributes') }} class="{{ containerClass }}">
+    {% if not form.parent and errors %}
+        <div class="has-error">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+    {{- block('form_rows') -}}
+    {{ form_rest(form) }}
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_errors.html.php #}
+{% block form_errors %}
+{% if errors|length > 0 %}
+    <div class="help-block">
+    {% if errors|length > 1 %}
+        <ul>
+            {% for error in errors %}
+                <li>{{ error.getMessage()|escape }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {{ (errors|first).getMessage()|escape }}
+    {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_label.html.php #}
+{% block form_label %}
+{% if label is not same as false %}
+{% if required %}
+    {% set label_attr = label_attr|merge({'class': (label_attr.class is defined ? label_attr.class : '')|trim ~ ' required'}) %}
+{% endif %}
+{% if not compound %}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+{% endif %}
+{% if not label %}
+    {% set label = name|humanize %}
+{% endif %}
+{% set tooltip = form.vars.attr.tooltip is defined and form.vars.attr.tooltip is not empty ? form.vars.attr.tooltip|trans : false %}
+<label {% for k, v in label_attr %}
+    {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+{% endfor %}{{ tooltip ? 'data-toggle="tooltip" data-container="body" data-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
+{{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="ri-question-line"></i>' : '' }}</label>
+{% endif %}
+{% endblock form_label %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_row.html.php #}
+{% block form_row %}
+    {% set hasErrors = form.vars.errors|length %}
+    {% set feedbackClass = hasErrors > 0 ? ' has-error' : '' %}
+
+    <div class="row form-group">
+    {% if form.vars.id is defined and 'config_' in form.vars.id %}
+        {# New structure for config_ elements #}
+        <div class="col-md-4">
+            {{ form_label(form, label) }}
+            {{ form_help(form) }}
+        </div>
+        <div class="col-md-8">
+            <div class="{{ feedbackClass }}">
+                {{ form_widget(form) }}
+                {{ form_errors(form) }}
+            </div>
+        </div>
+    {% else %}
+        {# Original structure #}
+            <div class="col-xs-12{{ feedbackClass }}">
+                {{ form_label(form, label) }}
+                {{ form_widget(form) }}
+                {{ form_errors(form) }}
+                {{ form_help(form) }}
+            </div>
+            {% endif %}
+        </div>
+{% endblock form_row %}
+
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_start.html.php #}
+{% block form_start %}
+{% set method = method|upper %}
+{% set form_method = method is same as 'GET' or method is same as 'POST' ? method : 'POST' %}
+<form novalidate autocomplete="false" data-toggle="ajax" role="form" name="{{ form.vars.name }}" method="{{ method|lower }}" action="{{ action }}"{% for k,v in attr %}
+    {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+{% endfor %}{{ multipart ? ' enctype="multipart/form-data"' : '' }}>
+{% if form_method is not same as method %}
+    <input type="hidden" name="_method" value="{{ method|escape }}" />
+{% endif %}
+{% if form.vars.errors|length > 0 %}
+<div class="has-error pa-10">
+    {{ form_errors(form) }}
+</div>
+{% endif %}
+{% if form.vars.help|length > 0 %}
+<div class="pa-10">
+    {{ form_help(form) }}
+</div>
+{% endif %}
+{% endblock form_start %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_widget_compound.html.php #}
+{% block form_widget_compound %}
+<div {{ block('widget_container_attributes') }}>
+    {% if not form.parent and errors %}
+    <div class="has-error">
+        {{ form_errors(form) }}
+    </div>
+    {% endif %}
+    {{ block('form_rows') }}
+    {{ form_rest(form) }}
+</div>
+{% endblock form_widget_compound %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_widget_simple.html.php #}
+{% block form_widget_simple %}
+{% set preaddonAttr = attr.preaddon_attr is defined ? attr.preaddon_attr : {} %}
+{% set postaddonAttr = attr.postaddon_attr is defined ? attr.postaddon_attr : {} %}
+
+{% if (attr.preaddon is defined and attr.preaddon is not empty)
+    or (attr.postaddon is defined and attr.postaddon is not empty)
+    or (attr.preaddon_text is defined and attr.preaddon_text is not empty)
+    or (attr.postaddon_text is defined and attr.postaddon_text is not empty) %}
+    <div class="input-group">
+        {% if attr.preaddon is defined and attr.preaddon is not empty %}
+        <span class="input-group-addon preaddon" {% for k,v in preaddonAttr %}
+            {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+        {% endfor %}>
+            <i class="{{ attr.preaddon }}"></i>
+        </span>
+        {% endif %}
+        {% if attr.preaddon_text is defined and attr.preaddon_text is not empty %}
+        <span class="input-group-addon preaddon" {% for k,v in preaddonAttr %}
+            {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+        {% endfor %}>
+            <span>{{ attr.preaddon_text }}</span>
+        </span>
+        {% endif %}
+        <input autocomplete="false" type="{{ type is defined ? type|escape : 'text' }}"
+            {{ block('widget_attributes') }}{% if value is not empty or value is numeric %}
+            value="{{ value|escape }}"{% endif %} />
+
+        {% if attr.postaddon is defined and attr.postaddon is not empty %}
+        <span class="input-group-addon postaddon" {% for k,v in postaddonAttr %}
+            {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+        {% endfor %}>
+            <i class="{{ attr.postaddon }}"></i>
+        </span>
+        {% endif %}
+        {% if attr.postaddon_text is defined and attr.postaddon_text is not empty %}
+        <span class="input-group-addon postaddon" {% for k,v in postaddonAttr %}
+            {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+        {% endfor %}>
+            <span>{{ attr.postaddon_text }}</span>
+        </span>
+        {% endif %}
+    </div>
+    {% else %}
+    {% if id is defined and 'publish' in id %}
+    <div class="d-flex gap-3">
+        <label class="btn btn-tertiary btn-icon btn-nospin btn-datepicker" size="sm" for="{{ id|escape }}">
+            {% if 'publishUp' in id %}
+                <i class="ri-calendar-check-line ri-1x"></i>
+            {% elseif 'publishDown' in id %}
+                <i class="ri-calendar-close-line ri-1x"></i>
+            {% endif %}
+        </label>
+
+        <input type="{{ type is defined ? type|escape : 'text' }}"
+               {{ block('widget_attributes') }}
+               {% if value is not empty or value is numeric %}
+               value="{{ value|escape }}"
+               {% endif %} />
+    </div>
+
+    {% else %}
+    <input type="{{ type is defined ? type|escape : 'text' }}"
+        {{ block('widget_attributes') }}{% if value is not empty or value is numeric %}
+        value="{{ value|escape }}"{% endif %} />
+    {% endif %}
+    {% endif %}
+{% endblock form_widget_simple %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:sortable_value_label_list_widget.html.php #}
+{% block sortable_value_label_list_widget %}
+{% if form.label.vars.value is not iterable and form.value.vars.value is not iterable %}
+<div class="input-group sortable-no-reorder">
+    {% if preaddon is not empty %}
+    <span class="input-group-addon preaddon" {% for k,v in preaddonAttr %}
+    {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+    {% endfor %}>
+    <i class="{{ preaddon }}"></i>
+    </span>
+    {% endif %}
+    <div>
+        <div class="row">
+            <div class="col-xs-6 mr-0 pr-0 bdr-r-wdh-0">
+            {{ form_widget(form.label, {'attr': {'class': 'form-control sortable-label', 'placeholder': form.label.vars.label}}) }}
+            </div>
+            <div class="col-xs-6 ml-0 pl-0">
+            {{ form_widget(form.value, {'attr': {'class': 'form-control sortable-value', 'placeholder': form.value.vars.label}}) }}
+            </div>
+        </div>
+    </div>
+    {% if postaddon is not empty %}
+    <span class="input-group-addon postaddon" {% for k,v in postaddonAttr %}
+    {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+    {% endfor %}>
+        <i class="{{ postaddon }}"></i>
+    </span>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:sortablelist_entry_row.html.php #}
+{% block sortablelist_entry_row %}
+<div class="sortable">
+    {{ form_widget(item) }}
+    {{ form_errors(item) }}
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:sortablelist_errors.html.php #}
+{% block sortablelist_errors %}
+{% set errorMessages = [] %}
+{% for error in errors %}
+    {% if error.getMessage() not in errorMessages %}
+        {% set errorMessages = errorMessages|merge([error.getMessage()]) %}
+    {% endif %}
+{% endfor %}
+
+{% if errorMessages|length > 0 %}
+    <div class="help-block">
+        {% if errorMessages|length > 1 %}
+            <ul>
+                {% for errorMessage in errorMessages %}
+                    <li>{{ errorMessage|escape }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {{ (errorMessages|first)|escape }}
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:sortablelist_row.html.php #}
+{% block sortablelist_row %}
+{% set list = form.children.list %}
+{% if form_errors(form.parent) and list.vars.value is empty and form.parent.children.properties.list is defined and form.parent.vars.data.getId() is same as null %}
+    {# Work around for Symfony bug not repopulating values only for add action #}
+    {% set list = form.parent.children.properties.list %}
+{% endif %}
+{% set feedbackClass = form_errors(list) ? ' has-error' : '' %}
+{% set datePrototype = list.vars.prototype is defined ? ('<div class="sortable">' ~ form_widget(list.vars.prototype|raw) ~ '</div>')|e : '' %}
+<div class="row">
+    <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list" style="overflow:auto">
+        {{ form_label(form, label) }}
+        <a data-prototype="{{ datePrototype|raw }}"
+           class="btn btn-tertiary btn-sm btn-add-item" href="#" id="{{ form.vars.id }}_additem">
+            {{ addValueButton|trans }}
+        </a>
+        {{ block('sortablelist_errors') }}
+        {% if isSortable %}
+        <div id="sortable-{{ form.vars.id }}" class="list-sortable" {% for k,v in attr %}
+        {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+        {% endfor %}>
+        {% endif %}
+            {% for item in list.children %}
+            {{ block('sortablelist_entry_row') }}
+            {% endfor %}
+        </div>
+        {% if isSortable %}
+        <input type="hidden" class="sortable-itemcount" id="{{ form.vars.id }}_itemcount" value="{{ list|length }}" />
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:standalone_button_row.html.php #}
+{% block standalone_button_row %}
+<div class="row">
+    <div class="form-group col-xs-12 col-sm-8 col-md-6">
+        {{ form_widget(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:standalone_button_widget.html.php #}
+{% block standalone_button_widget %}
+{% if not label %}
+{% set label = name|humanize %}
+{% endif %}
+<button type="{{ type is defined ? type|escape : 'button' }}"
+    {{ block('button_attributes') }}>
+    {% if form.vars.attr.icon is defined and form.vars.attr.icon is not empty %}
+    <i class="{{ form.vars.attr.icon }} "></i>
+    {% endif %}
+    {{ label|trans({}, translation_domain)|escape }}
+</button>
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:tel_widget.html.php #}
+{% block tel_widget %}
+{#{ block('form_widget_simple', {'type': type is defined ? type : get_class('Mautic\\CoreBundle\\Form\\Type\\TelType')}) }#}
+{{ block('form_widget_simple') }}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:time_widget.html.php #}
+{% block time_widget %}
+{% if widget is same as 'single_text' %}
+    {{ block('form_widget_simple') }}
+{% else %}
+    {% set size = 4 %}
+    {% if not with_minutes and not with_seconds %}
+        {% set size = 12 %}
+    {% elseif not with_minutes or not with_seconds %}
+        {% set size = 6 %}
+    {% endif %}
+    {% set vars = widget is same as 'text' ? {'attr': {'size': 1, 'class': 'not-chosen'}} : {'attr': {'class': 'not-chosen'}} %}
+    <div {{ block('widget_container_attributes') }}>
+        {# There should be no spaces between the colons and the widgets, that's why
+          this block is written in a single PHP tag #}
+        {{ form_widget(form.hour, vars) }}
+
+        {% if with_minutes %}
+            {{ ':' ~ form_widget(form.minute, vars) }}
+        {% endif %}
+
+        {% if with_seconds %}
+            {{ ':' ~ form_widget(form.second, vars) }}
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:widget_attributes.html.php #}
+{% block widget_attributes %}
+id="{{ id|escape }}" name="{{ full_name|escape }}"
+{{ disabled|default(false) ? 'disabled="disabled"' : '' }}
+{{ required|default(false) ? 'required="required"' : '' }}
+
+{# Adjust the filter to exclude specific attributes but allow data-* #}
+{% for k,v in attr|filter((v,k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr', 'help_icon']) %}
+    {% if k in ['placeholder', 'title'] %}
+        {{ '%s="%s" '|format(k|escape, v|trans({}, translation_domain)|escape)|raw }}
+    {% elseif k is same as 'data-order' and v is string %}
+        {{ k }}="{{ v|raw }}"
+    {% elseif k starts with 'data-' and (k matches '/data-(none|start|both|end)/') %}
+        {{ '%s="%s"'|format(k|escape, v|escape)|raw }}
+    {% elseif v is same as true %}
+        {{ '%s="%s" '|format(k|escape, k|escape)|raw }}
+    {% elseif v is iterable %}
+        {% set v = formFieldFormatList(constant('Mautic\\FormBundle\\Helper\\FormFieldHelper::FORMAT_BAR'), v) %}
+        {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+    {% elseif v is not same as false %}
+        {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
+    {% endif %}
+{% endfor %}
+{{ attr.autocomplete is not defined ? 'autocomplete="false" ' : '' }}
+{% endblock %}
+
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:yesno_button_group_widget.html.php #}
+{% block yesno_button_group_widget %}
+    {# Merge 'attr' passed from 'form_widget' and 'form.vars.attr' #}
+    {% set attr = attr|default({})|merge(form.vars.attr|default({})) %}
+    {# Update 'onchange' in 'attr' #}
+    {% set attr = attr|merge({
+        'onchange': (attr.onchange|default('') ~ '; Mautic.toggleYesNo(this);')|trim
+    }) %}
+    {% set id = form.vars.id %}
+    {% set name = form.vars.full_name %}
+    {% set value = form.vars.value %}
+    {% set size = form.vars.attr.size|default(null) %}
+
+    {% set yes_choice = form.vars.choices[1] %}
+    {% set no_choice = form.vars.choices[0] %}
+
+    <div class="toggle"
+         data-yes="{{ yes_choice.label|trans }}"
+         data-no="{{ no_choice.label|trans }}"
+         data-yes-value="{{ yes_choice.value }}"
+         data-no-value="{{ no_choice.value }}"
+         {% if id is defined and 'Publish' in id %}
+            data-none="{{ attr['data-none']|default('mautic.core.form.inactive_regardless_of_scheduling') |trans }}"
+            data-start="{{ attr['data-start']|default('mautic.core.form.active_on_scheduled_date') |trans }}"
+            data-both="{{ attr['data-both']|default('mautic.core.form.active_during_scheduled_period') |trans }}"
+            data-end="{{ attr['data-end']|default('mautic.core.form.active_until_scheduled_end') |trans }}"
+        {% endif %} >
+
+        {# Hidden radio inputs #}
+        {% for choice in [yes_choice, no_choice] %}
+            <input type="radio"
+                   id="{{ id }}_{{ choice.value }}"
+                   name="{{ name }}"
+                   value="{{ choice.value }}"
+                   {% if value == choice.value %}checked{% endif %}
+                   style="display: none;"
+                   {% for attrname, attrvalue in attr %}
+                       {{ attrname }}="{{ attrvalue }}"
+                   {% endfor %}>
+        {% endfor %}
+
+        <label id="{{ id }}_label"
+               class="toggle__label"
+               data-yes-id="{{ id }}_{{ yes_choice.value }}"
+               data-no-id="{{ id }}_{{ no_choice.value }}"
+               onclick="Mautic.toggleYesNo(this);"
+               role="switch"
+               tabindex="0"
+               onkeydown="Mautic.handleKeyDown(event, this)"
+               aria-checked="{{ value == yes_choice.value ? 'true' : 'false' }}">
+            <div class="toggle__appearance" {% if size %}size="{{ size }}"{% endif %}>
+                <div class="toggle__switch {% if value == yes_choice.value %}toggle__switch--checked{% endif %}">
+                    <svg class="toggle__check" width="6px" height="5px" viewBox="0 0 6 5">
+                        <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z"></path>
+                    </svg>
+                </div>
+                <span class="toggle__text" aria-hidden="true">
+                    {{ value == yes_choice.value ? yes_choice.label|trans : no_choice.label|trans }}
+                </span>
+            </div>
+        </label>
+    </div>
+{% endblock %}
+
+{% block attributes -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
+        {%- elseif attrname in ['data-filter-definitions', 'data-filter-operators'] -%}
+            {{- attrname }}="{{ attrvalue|raw }}"
+        {%- elseif attrvalue is same as(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not same as(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{%- endblock attributes -%}
+
+{% block form_help -%}
+    {%- if help is not empty or form.vars.attr.help_icon is defined -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
+        <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+            {%- if form.vars.attr.help_icon is defined and form.vars.attr.help_icon is not empty -%}
+                <i class="{{ form.vars.attr.help_icon }} ri-lg mr-xs"></i>
+            {%- endif -%}
+            {%- if help is not empty -%}
+                {%- if help_html is same as(false) -%}
+                    {{- help|trans(help_translation_parameters, translation_domain) -}}
+                {%- else -%}
+                    {{- help|trans(help_translation_parameters, translation_domain)|purify -}}
+                {%- endif -%}
+            {%- endif -%}
+        </p>
+    {%- endif -%}
+{%- endblock form_help %}
+
+{% block alert_widget %}
+    <div class="row">
+        <div {% with { attr: {class: 'col-sm-12'}|merge(attr) } %} {{ block('attributes') }}{% endwith %}>
+            <div class="alert alert-{{ messageType }}">
+                {{ message }}
+            </div>
+        </div>
+    </div>
+{%- endblock alert_widget %}

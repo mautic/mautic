@@ -1,0 +1,150 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block headerTitle %}{% trans %}mautic.tagmanager.tag.header.index{%  endtrans %}{% endblock %}
+{% block mauticContent %}tags{% endblock %}
+
+
+{% if nameGetter is not defined %}
+    {% set nameGetter = 'getTag' %}
+{% endif %}
+
+{% set listCommand = 'mautic.tagmanager.tag.searchcommand.list'|trans %}
+
+{% block content %}
+    <div id="page-list-wrapper" class="panel panel-default">
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'page_actions': {
+                'templateButtons': {
+                    'new': security.isGranted('tagManager:tagManager:create')
+                },
+                'routeBase': 'tagmanager',
+                'langVar': 'tag.list'
+            },
+            'bulk_actions': {
+                'langVar': 'tagmanager.tag',
+                'routeBase': 'tagmanager',
+                'templateButtons': {
+                    'delete': permissions['tagManager:tagManager:delete'],
+                },
+            },
+        }) -}}
+        <div class="page-list">
+            {% if items is defined and items is not empty %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tagsTable">
+                        <thead>
+                        <tr>
+                            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                'checkall': 'true',
+                                'target': '#tagsTable',
+                            }) }}
+                            {{ include(
+                                '@MauticCore/Helper/tableheader.html.twig',
+                                {
+                                    'sessionVar': 'tags',
+                                    'orderBy'   : 'lt.tag',
+                                    'text'      : 'mautic.core.name',
+                                    'class'     : 'col-tag-name',
+                                }
+                            ) }}
+
+                            {{ include(
+                                '@MauticCore/Helper/tableheader.html.twig',
+                                {
+                                    'sessionVar' : 'tags',
+                                    'text'       : 'mautic.lead.list.thead.leadcount',
+                                    'class'      : 'visible-md visible-lg col-tag-leadcount',
+                                }
+                            ) }}
+
+                            {{ include(
+                                '@MauticCore/Helper/tableheader.html.twig',
+                                {
+                                    'sessionVar' : 'tags',
+                                    'orderBy'    : 'lt.id',
+                                    'text'       : 'mautic.core.id',
+                                    'class'      : 'visible-md visible-lg col-tag-id',
+                                }
+                            ) }}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    {{- include('@MauticCore/Helper/list_actions.html.twig', {
+                                        item: item,
+                                        templateButtons: {
+                                            edit: permissions['tagManager:tagManager:edit'],
+                                            delete: permissions['tagManager:tagManager:delete'],
+                                        },
+                                        routeBase: 'tagmanager',
+                                        langVar: 'tagmanager.tag',
+                                        nameGetter: nameGetter,
+                                        custom: {
+                                            0: {
+                                                attr : {
+                                                    'data-toggle': 'ajax',
+                                                    href: '',
+                                                },
+                                                icon: 'ri-team-line',
+                                                label: 'mautic.lead.list.view_contacts'
+                                            }
+                                        }
+                                    }) -}}
+                                </td>
+                                <td>
+                                    <div>
+                                        {% if permissions['tagManager:tagManager:edit'] %}
+                                            <a href="{{ path('mautic_tagmanager_action', {
+                                                objectAction: 'view',
+                                                objectId: item.getId()
+                                            }) }}" data-toggle="ajax">
+                                                {{ item.getTag() }}
+                                            </a>
+                                        {% else %}
+                                            {{ item.getTag() }}
+                                        {% endif %}
+                                    </div>
+                                    {% set description = item.getDescription() %}
+                                    {% if description %}
+                                        <div class="text-secondary mt-4">
+                                            <small>{{ description|purify }}</small>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="visible-md visible-lg">
+                                    <a size="sm" class="label label-gray" href="{{-  path('mautic_contact_index', {
+                                        'search' : "#{'mautic.tagmanager.lead.searchcommand.list'|trans}:\"#{item.getTag()}\"",
+                                    }) -}}" data-toggle="ajax" {{- 0 == tagsCount[item.getId()] ? 'disabled=disabled' : '' -}}>
+                                    {{- 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}) -}}
+                                    </a>
+                                </td>
+                                <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="panel-footer">
+                        {{- include('@MauticCore/Helper/pagination.html.twig', {
+                            'totalItems' : items|length,
+                            'page'       : page,
+                            'limit'      : limit,
+                            'baseUrl'    : path('mautic_tagmanager_index'),
+                            'sessionVar' : 'tagmanager',
+                        }) -}}
+                    </div>
+                </div>
+            {% else %}
+                {{ include('@MauticCore/Helper/noresults.html.twig') }}
+            {% endif %}
+        </div>
+    </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+        tip: random(['mautic.protip.tags.segmentation', 'mautic.protip.tags.multivalue', 'mautic.protip.tags.creation'])
+    }) }}
+{% endblock %}

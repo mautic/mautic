@@ -1,0 +1,118 @@
+{#
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+/** @var $exception \Symfony\Component\ErrorHandler\Exception\FlattenException */
+/** @var $logger \Symfony\Component\HttpKernel\Log\DebugLoggerInterface */
+#}
+
+
+{% set message = message | default('mautic.core.error.generic') %}
+{% set previousExceptions = [] %}
+{% set exceptionMessage = exception.message %}
+{% if exceptionMessage is defined and exceptionMessage is not empty%}
+    {% set exceptionMessage = ' - ' ~ exception.message %}
+{% endif %}
+{% set previousExceptions = exception.previous %}
+
+{% set isInline = inline ?? false %}
+{% set isAjax = app.request.isxmlhttprequest ?? false %}
+{% set src = src|default(mautibotGetImage('wave'))  %}
+
+ {% set headerTitle = headerTitle|default('') %}
+{% set pageTitle = pageTitle|default('Mautic') %}
+
+{% if isAjax == false %}
+    {% extends baseTemplate %}
+
+    {% set headerTitle = (isInline == false) ? status_code ~ " " ~ status_text : headerTitle %}
+    {% set pageTitle = (isInline == false) ? exceptionMessage : pageTitle %}
+{% endif %}
+
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block _content %}
+
+    <div class="pa-20 mautibot-error{% if isInline %} inline{% endif %}">
+
+        <div class="row">
+            {% if isInline %}
+            <div class="mautibot-content col-xs-12">
+                <h3><i class="ri-alert-line ri-fw text-danger"></i><strong>{{ status_code }}</strong> {{ status_text }}{{ exceptionMessage }}</h3>
+            </div>
+            {% else %}
+            <div class="mautibot-image col-xs-4 col-md-3">
+                <img class="img-responsive mautibot" src="{{ src }}" />
+            </div>
+            <div class="mautibot-content col-xs-8 col-md-9">
+                <blockquote class="np break-word">
+                    <h2><i class="ri-double-quotes-l"></i> <strong>{{ status_code }}</strong> {{ status_text }}{{ exceptionMessage }} <i class="ri-double-quotes-r"></i></h2>
+                    <footer class="text-right">Mautibot</footer>
+                </blockquote>
+                <div class="pull-right">
+                    <a class="text-secondary" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if isInline %}
+        <div class="slimscroll" style="max-height: 200px;">
+        {% else %}
+        <div>
+        {% endif %}
+
+            <div class="row mt-20">
+                <div class="col-sm-12">
+                    <h5 class="ml-lg text-danger">{{ exception.class }}</h5>
+                    <div class="well well-sm ma-md">
+                        {{ include ('@MauticCore/Exception/traces.html.twig', {
+                            'traces': exception.trace,
+                        })}}
+                    </div>
+                </div>
+            </div>
+
+            {% if previousExceptions and previousExceptions|length > 0 %}
+            <div class="row mt-20">
+                <div class="col-sm-12">
+                    <h5 class="ml-lg">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
+                    <div class="panel-group" id="previous" role="tablist" aria-multiselectable="true">
+                    {% for key, e  in previousExceptions %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="previous_heading_{{ key }}">
+                                <h4 class="panel-title pa-sm">
+                                    <a data-toggle="collapse" data-parent="#previous" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
+                                        {{ e.message }}
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="previous_body_{{ key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                <div class="panel-body">
+                                    <div class="pa-sm">
+                                        {{ include ('@MauticCore/Exception/traces.html.twig', {
+                                            'traces': e.trace,
+                                        })}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+
+
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+{% endblock %}

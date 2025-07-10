@@ -1,0 +1,15 @@
+<div class="col-md-4">
+    <div class="panel ovf-h">
+        <div class="panel-body box-layout pb-0">
+            <div class="col-xs-8 va-m">
+                <h5 class="dark-md fw-sb mb-xs">
+                    {{ graph.name|trans }}
+                </h5>
+            </div>
+            <div class="col-xs-4 va-t text-right">
+                <h3 class="text-white dark-sm"><span class="fa {{ graph.iconClass|default('') }}"></span></h3>
+            </div>
+        </div>
+        {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': graph.data, 'chartType': 'pie', 'chartHeight': 210}) }}
+    </div>
+</div>

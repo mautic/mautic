@@ -1,0 +1,26 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}sms{% endblock %}
+{% block headerTitle %}{{ 'mautic.sms.smses'|trans }}{% endblock %}
+{% block actions %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'templateButtons' : {
+            'new' : permissions['sms:smses:create'],
+        },
+        'routeBase' : 'sms',
+    }
+) -}}
+{% endblock %}
+{% block content %}
+<div id="page-list-wrapper" class="panel panel-default">
+    {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue' : searchValue,
+        'searchId'    : 'sms-search',
+        'action'      : currentRoute,
+    }) -}}
+
+    <div class="page-list">
+        {{ block('listResults') }}
+    </div>
+</div>
+{% endblock %}

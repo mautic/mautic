@@ -1,0 +1,71 @@
+{% set item = item is defined ? item : null %}
+{% set tooltip = tooltip is defined ? tooltip : null %}
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_PAGE_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_BUTTON_DROPDOWN'),
+    item) }}
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+
+{# Workaround to get variables from action_button_helper here #}
+{{ restore('action_button_helper') }}
+
+{% if templateButtons.close is defined %}
+    {# Render the custom "close" button only #}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                label: 'mautic.core.close_back'|trans({'%target%': targetLabel|default('mautic.core.close_back.fallback'|trans)}),
+                size: 'xs',
+                variant: 'tertiary',
+                icon: 'ri-arrow-left-line',
+                href: path(indexRoute, routeVars.close|default({})),
+                attributes: {
+                    'data-toggle': 'ajax',
+                    'class': 'btn-back mb-lg'
+                }
+            }
+        ]
+    } %}
+{% else %}
+    {# Render other buttons and dropdown if "close" button is not defined #}
+    {% if templateButtons is not empty %}
+        {{ buttonsAddFromTemplate(
+            templateButtons,
+            query,
+            actionRoute,
+            indexRoute,
+            langVar,
+            nameGetter,
+            editAttr,
+            routeVars,
+            item,
+            tooltip
+        ) }}
+    {% endif %}
+
+    <div class="std-toolbar">
+        {% set dropdownButton %}
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        variant: 'primary',
+                        icon_only: true,
+                        icon: 'ri-arrow-down-s-line',
+                        label: 'mautic.core.options',
+                        attributes: {
+                            'class': 'dropdown-toggle',
+                            'data-toggle': 'dropdown',
+                            'aria-expanded': 'false',
+                            'type': 'button'
+                        }
+                    }
+                ]
+            } %}
+        {% endset %}
+
+        {{ buttonsRender(dropdownButton ~ '<ul class="dropdown-menu dropdown-menu-right" role="menu">', '</ul>')|raw }}
+    </div>
+
+{% endif %}
+
+{{ extraHtml|raw }}

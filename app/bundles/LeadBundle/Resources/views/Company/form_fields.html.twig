@@ -1,0 +1,110 @@
+{#
+  Variables
+    - form
+    - groups
+    - fields
+#}
+{% set halfSize = embedded is defined ? 6 : 4 %}
+{% set fullSize = embedded is defined ? 12 : 8 %}
+<!-- pane -->
+{% for key, group in groups %}
+    {% if fields[group] is defined %}
+        {% set groupFields = fields[group] %}
+        {% if groupFields is not empty %}
+            <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="company-{{ group }}">
+                {% if embedded is not defined %}
+                    <div class="pa-md bdr-b">
+                        <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
+                    </div>
+                {% endif %}
+                <div class="pa-md">
+                    {% if 'core' == group %}
+                        <div class="form-group mb-0">
+                            <div class="row">
+                                {% if form.companyname is defined %}
+                                    <div class="col-sm-{{ halfSize }}">{{ form_row(form.companyname) }}</div>
+                                {% endif %}
+                                {% if form.companyemail is defined %}
+                                    <div class="col-sm-{{ halfSize }}">{{ form_row(form.companyemail) }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <hr class="mnr-md mnl-md">
+                        {% if
+                              form.companyaddress1 is defined or
+                              form.companyaddress2 is defined or
+                              form.companycity is defined or
+                              form.companystate is defined or
+                              form.companyzipcode is defined or
+                              form.companycountry is defined
+                         %}
+                            <div class="form-group mb-0">
+                                <label class="control-label mb-xs">{{ 'mautic.company.field.address'|trans }}</label>
+                                {% if form.companyaddress1 is defined %}
+                                    <div class="row mb-xs">
+                                        <div class="col-sm-{{ fullSize }}">
+                                            {{ form_widget(form.companyaddress1, {'attr': {'placeholder': form.companyaddress1.vars.label}}) }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if form.companyaddress2 is defined %}
+                                    <div class="row mb-xs">
+                                        <div class="col-sm-{{ fullSize }}">
+                                            {{ form_widget(form.companyaddress2, {'attr': {'placeholder': form.companyaddress2.vars.label}}) }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="row mb-xs">
+                                    {% if form.companycity is defined %}
+                                        <div class="col-sm-{{ halfSize }}">
+                                            {{ form_widget(form.companycity, {'attr': {'placeholder': form.companycity.vars.label}}) }}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.companystate is defined %}
+                                        <div class="col-sm-{{ halfSize }}">
+                                            {{ form_widget(form.companystate, {'attr': {'placeholder': form.companystate.vars.label}}) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="row mb-md">
+                                    {% if form.companyzipcode is defined %}
+                                        <div class="col-sm-{{ halfSize }}">
+                                            {{ form_widget(form.companyzipcode, {'attr': {'placeholder': form.companyzipcode.vars.label}}) }}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.companycountry is defined %}
+                                        <div class="col-sm-{{ halfSize }}">
+                                            {{ form_widget(form.companycountry, {'attr': {'placeholder': form.companycountry.vars.label}}) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="row">
+                                    <div  class="col-sm-{{ halfSize }}">
+                                        {{ form_row(form.score) }}
+                                    </div>
+                                    <div  class="col-sm-{{ halfSize }}">
+                                        {{ form_row(form.owner) }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <hr class="mnr-md mnl-md">
+                    {% endif %}
+                    <div class="form-group mb-0">
+                        <div class="row">
+                            {% for alias, field in groupFields %}
+                                {% if not form[alias].isRendered %}
+                                  <div class="col-sm-{{ fullSize }}">{{ form_row(form[alias]) }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if embedded is defined and not form['owner'].isRendered %}
+                        <hr class="mnr-md mnl-md">
+                        <div>{{ form_row(form.owner) }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endfor %}

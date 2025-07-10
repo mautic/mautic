@@ -1,0 +1,73 @@
+{#
+  Variables
+    - searchValue
+    - items (\Mautic\DynamicContentBundle\Entity\DynamicContent[])
+    - categories
+    - page
+    - limit
+    - permissions
+    - model
+    - tmpl
+#}
+{%- set isIndex = 'index' == tmpl -%}
+{%- set tmpl = 'list' -%}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'dynamicContent' %}
+
+{% block headerTitle 'mautic.dynamicContent.dynamicContents'|trans %}
+
+{% block content %}
+  {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+      {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'searchHelp': 'mautic.page.help.searchcommands',
+        'action': currentRoute,
+        'page_actions': {
+            'templateButtons': {
+                'new': permissions['dynamiccontent:dynamiccontents:create'],
+            },
+            'routeBase': 'dynamicContent',
+        },
+        'bulk_actions': {
+          'routeBase': 'dynamicContent',
+          'templateButtons': {
+              'delete': permissions['dynamiccontent:dynamiccontents:deleteown'] or permissions['dynamiccontent:dynamiccontents:deleteother'],
+          },
+        },
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.available',
+                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.unavailable',
+                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                'icon': 'ri-close-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isuncategorized',
+                'label': 'mautic.core.form.uncategorized',
+                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                'icon': 'ri-folder-unknow-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            }
+        ]
+    }) }}
+        <div class="page-list">
+          {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}
+        </div>
+    </div>
+  {% else %}
+    {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}
+  {% endif %}
+{% endblock %}

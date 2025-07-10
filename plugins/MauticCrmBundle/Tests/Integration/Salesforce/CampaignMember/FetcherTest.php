@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -20,7 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class FetcherTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEntitiesAreFetchedFromOrganizerResults()
+    public function testEntitiesAreFetchedFromOrganizerResults(): void
     {
         $organizer = $this->getOrgnanizer();
         $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
@@ -38,7 +29,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         new Fetcher($repo, $organizer, '701f10000021UnkAAE');
     }
 
-    public function testThatCampaignMembersAreFetched()
+    public function testThatCampaignMembersAreFetched(): void
     {
         $organizer = $this->getOrgnanizer();
         $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
@@ -145,9 +136,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $records = [
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe2AAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe2AAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYv4EAF',
@@ -155,9 +146,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe7AAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe7AAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYv9EAF',
@@ -165,9 +156,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeCAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeCAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYvEEAV',
@@ -175,9 +166,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeHAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeHAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYvJEAV',
@@ -185,9 +176,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeMAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeMAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYvOEAV',
@@ -195,9 +186,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeRAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeRAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYvTEAV',
                 'LeadId'     => null,
@@ -205,9 +196,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeWAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeWAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000X1NR5EAN',
                 'LeadId'     => null,
@@ -215,9 +206,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQebAAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQebAAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYvYEAV',
                 'LeadId'     => null,
@@ -225,9 +216,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQegAAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQegAAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYvdEAF',
                 'LeadId'     => null,
@@ -235,9 +226,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQelAAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQelAAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYviEAF',
                 'LeadId'     => null,

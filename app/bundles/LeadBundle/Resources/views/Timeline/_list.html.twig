@@ -1,0 +1,93 @@
+<!-- timeline -->
+<div class="table-responsive">
+    <table class="table table-hover" id="contact-timeline">
+        <thead>
+        <tr>
+            <th class="timeline-icon np"></th>
+            <th class="table-expand np">
+                <a class="table-expand-button" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                    <span class="ri-arrow-down-s-line"></span>
+                </a>
+            </th>
+            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                'orderBy': 'eventLabel',
+                'text': 'mautic.lead.timeline.event_name',
+                'class': 'timeline-name',
+                'sessionVar': 'lead.' ~ lead.id ~ '.timeline',
+                'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
+                'target': '#timeline-table',
+            }) }}
+
+            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                'orderBy': 'eventType',
+                'text': 'mautic.lead.timeline.event_type',
+                'class': 'visible-md visible-lg timeline-type',
+                'sessionVar': 'lead.' ~ lead.id ~ '.timeline',
+                'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
+                'target': '#timeline-table',
+            }) }}
+
+            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                'orderBy': 'timestamp',
+                'text': 'mautic.lead.timeline.event_timestamp',
+                'class': 'visible-md visible-lg timeline-timestamp',
+                'sessionVar': 'lead.' ~ lead.id ~ '.timeline',
+                'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
+                'target': '#timeline-table',
+            }) }}
+        </tr>
+        <tbody>
+        {% for event in events.events %}
+            {% set icon = event.icon is defined ? event.icon : 'ri-history-line' %}
+            {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
+            {% if eventLabel is iterable %}
+                {% set eventLabel %}
+                  <a href="{{ eventLabel.href }}" {% if eventLabel.isExternal is not defined %}data-toggle="ajax"{% else %}target="_new"{% endif %}>
+                    {{- eventLabel.label|purify -}}
+                  </a>
+                {% endset %}
+            {% endif %}
+
+            {% set details = '' %}
+            {% if event.contentTemplate is defined %}
+                {% set details = include(event.contentTemplate, {'event': event, 'lead': lead}, with_context=false, ignore_missing=true)|trim %}
+            {% endif %}
+
+            <tr class="timeline-row {% if loop.index is divisible by(2) %}timeline-row-highlighted{% endif %} {% if event.featured is defined and event.featured is not empty %}timeline-featured{% endif %}">
+                <td class="timeline-icon np">
+                    <span class="fa ri-fw {{ icon }}"></span>
+                </td>
+                <td class="table-expand np">
+                    <a href="javascript:void(0);"
+                       data-activate-details="{{ loop.index }}"
+                       class="table-expand-button {% if details is empty %}disabled{% endif %}"
+                       data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
+                       <span class="ri-arrow-down-s-line"></span>
+                    </a>
+                </td>
+                <td class="timeline-name">{{ eventLabel }}</td>
+                <td class="timeline-type">{% if event.eventType is defined %}{{ event.eventType }}{% endif %}</td>
+                <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
+            </tr>
+            {% if details is not empty %}
+                <tr class="timeline-row {% if loop.index is divisible by(2) %}timeline-row-highlighted{% endif %} timeline-details hide" id="timeline-details-{{ loop.index }}">
+                    <td colspan="6">
+                        <!-- template: "{{ event.contentTemplate }}" -->
+                        {{ details|raw }}
+                        <!--/ template: "{{ event.contentTemplate }}" -->
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ include('@MauticCore/Helper/pagination.html.twig', {
+        'page': events.page,
+        'fixedPages': events.maxPages,
+        'fixedLimit': true,
+        'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
+        'target': '#timeline-table',
+        'totalItems': events.total,
+}) }}
+<!--/ timeline -->

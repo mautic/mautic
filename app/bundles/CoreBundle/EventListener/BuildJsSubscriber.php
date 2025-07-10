@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -17,10 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 1000],
@@ -32,9 +20,9 @@ class BuildJsSubscriber implements EventSubscriberInterface
      * JS functions for use in Bundles. This
      * must retain top priority of 1000.
      */
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
-        $js = <<<'JS'
+        $js = <<<'JS_WRAP'
 // Polyfill for CustomEvent to support IE 9+
 (function () {
     if ( typeof window.CustomEvent === "function" ) return false;
@@ -84,7 +72,7 @@ MauticJS.log = function() {
 };
 
 MauticJS.setCookie = function(name, value) {
-    document.cookie = name+"="+value+"; path=/";
+    document.cookie = name+"="+value+"; path=/; secure";
 };
 
 MauticJS.createCORSRequest = function(method, url) {
@@ -242,7 +230,6 @@ MauticJS.getTrackedContact = function () {
 MauticJS.setTrackedContact = function(response) {
     if (response.id) {
         MauticJS.setCookie('mtc_id', response.id);
-        MauticJS.setCookie('mtc_sid', response.sid);
         MauticJS.setCookie('mautic_device_id', response.device_id);
         MauticJS.mtcSet = true;
             
@@ -250,7 +237,6 @@ MauticJS.setTrackedContact = function(response) {
         // than the current page
         try {
             localStorage.setItem('mtc_id', response.id);
-            localStorage.setItem('mtc_sid', response.sid);
             localStorage.setItem('mautic_device_id', response.device_id);
         } catch (e) {
             console.warn('Browser does not allow storing in local storage');
@@ -399,7 +385,7 @@ MauticJS.ensureEventContext = function(event, context0, context1) {
         && event.detail[0] === context0
         && event.detail[1] === context1);
 };
-JS;
+JS_WRAP;
         $event->appendJs($js, 'Mautic Core');
     }
 }

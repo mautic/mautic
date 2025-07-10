@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        http://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -19,16 +11,16 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    private $fileFields = [
+    /**
+     * @var string[]
+     */
+    private array $fileFields = [
         'saml_idp_metadata',
         'saml_idp_own_certificate',
         'saml_idp_own_private_key',
     ];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
@@ -36,7 +28,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addFileFields($this->fileFields)
             ->addForm(
@@ -44,13 +36,13 @@ class ConfigSubscriber implements EventSubscriberInterface
                     'bundle'     => 'UserBundle',
                     'formAlias'  => 'userconfig',
                     'formType'   => ConfigType::class,
-                    'formTheme'  => 'MauticUserBundle:FormTheme\Config',
+                    'formTheme'  => '@MauticUser/FormTheme/Config/_config_userconfig_widget.html.twig',
                     'parameters' => $event->getParametersFromConfig('MauticUserBundle'),
                 ]
             );
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         // Preserve existing value
         $event->unsetIfEmpty('saml_idp_own_password');
@@ -71,13 +63,13 @@ class ConfigSubscriber implements EventSubscriberInterface
                     }
                     break;
                 case 'saml_idp_own_certificate':
-                    if (0 !== strpos($data[$field], '-----BEGIN CERTIFICATE-----')) {
+                    if (!str_starts_with($data[$field], '-----BEGIN CERTIFICATE-----')) {
                         $event->setError('mautic.user.saml.certificate.invalid', [], 'userconfig', $field);
                     }
                     break;
                 case 'saml_idp_own_private_key':
-                    $encryptedKey = (0 === strpos($data[$field], '-----BEGIN ENCRYPTED PRIVATE KEY-----'));
-                    $decryptedKey = (0 === strpos($data[$field], '-----BEGIN RSA PRIVATE KEY-----'));
+                    $encryptedKey = str_starts_with($data[$field], '-----BEGIN ENCRYPTED PRIVATE KEY-----');
+                    $decryptedKey = str_starts_with($data[$field], '-----BEGIN RSA PRIVATE KEY-----');
 
                     if (!$encryptedKey && !$decryptedKey) {
                         $event->setError('mautic.user.saml.private_key.invalid', [], 'userconfig', $field);
@@ -100,12 +92,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'userconfig');
     }
 
-    /**
-     * @param $content
-     *
-     * @return bool
-     */
-    private function validateXml($content)
+    private function validateXml($content): bool
     {
         $valid = true;
 

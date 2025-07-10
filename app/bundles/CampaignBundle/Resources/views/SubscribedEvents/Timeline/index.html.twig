@@ -1,0 +1,92 @@
+{% set item = event.extra.log %}
+{% set errors = false %}
+{% if (item.metadata.errors is defined and item.metadata.errors is not empty) %}
+    {% set errors = (item.metadata.errors is iterable) ? item.metadata.errors|join('<br />') : item.metadata.errors %}
+{% elseif (item.metadata.failed is defined and item.metadata.failed is not empty) %}
+    {% set errors = (item.metadata.reason is not empty) ? item.metadata.reason : 'mautic.campaign.event.failed.timeline' %}
+    {% set errors = errors|trans %}
+{% elseif (item.fail_reason is defined and item.fail_reason is not empty) %}
+    {% set errors = item.fail_reason %}
+{% endif %}
+
+{% set parentDetails = false %}
+{% if (event.extra.parentDetails is defined) %}
+    {% set parentDetails = event.extra.parentDetails %}
+{% endif %}
+
+{% set cancelled = item.isScheduled is empty and item.dateTriggered is empty %}
+{% set dateSpan  = item.triggerDate is not empty ? '<span class="timeline-campaign-event-date-' ~ item.event_id ~ '" data-date="' ~ item.triggerDate.format('Y-m-d H:i:s') ~ '">' ~ dateToFullConcat(item.triggerDate) ~ '</span>' : '' %}
+
+{% if (cancelled) %}
+    {# Note is scheduled #}
+    {% set item = item|merge({'isScheduled': true}) %}
+{% endif %}
+
+<div class="mt-10">
+    {% if (item.isScheduled) %}
+        <p class="mt-0 mb-10 text-info" id="timeline-campaign-event-{{ item.event_id }}">
+        <span id="timeline-campaign-event-text-{{ item.event_id }}"{{ cancelled ? ' class="text-warning"' : '' }}>
+            <i class="ri-time-line"></i>
+            <span class="timeline-campaign-event-scheduled-{{ item.event_id }}{{ cancelled ? ' hide' : '' }}">
+                {{ 'mautic.core.timeline.event.scheduled.time'|trans({'%date%' : dateSpan, '%event%' : event.eventLabel})|purify }}
+            </span>
+            <span class="timeline-campaign-event-cancelled-{{ item.event_id }}{{ cancelled is empty ? ' hide' : '' }}">
+                {{ 'mautic.campaign.event.cancelled.time'|trans({'%date%' : dateSpan, '%event%' : event.eventLabel}) }}
+            </span>
+        </span>
+            {% if (lead and securityHasEntityAccess('lead:leads:editown', 'lead:leads:editother', lead.getPermissionUser())) %}
+                <span class="form-buttons btn-group btn-group-xs mb-3" role="group" aria-label="Field options">
+                    <button type="button" id="timeline-campaign-event-save-{{ item.event_id }}"
+                            class="btn btn-ghost btn-nospin" onmousedown="return false;"
+                            onclick="Mautic.saveScheduledCampaignEvent({{ item.event_id }}, {{ lead.getId() }})"
+                            data-toggle="tooltip" title="{{ 'mautic.campaign.event.save'|trans }}" style="display:none">
+                        <i class="ri-save-line text-interactive"></i>
+                    </button>
+                    <button type="button" class="btn btn-ghost btn-nospin btn-reschedule"
+                            onclick="Mautic.updateScheduledCampaignEvent({{ item.event_id }}, {{ lead.getId() }})"
+                            data-toggle="tooltip" title="{{ 'mautic.campaign.event.reschedule'|trans }}">
+                        <i class="ri-time-line text-interactive"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-ghost btn-nospin"{{ cancelled ? ' disabled' : '' }} onclick="Mautic.cancelScheduledCampaignEvent({{ item.event_id }}, {{ lead.getId() }})"
+                            data-toggle="tooltip" title="{{ 'mautic.campaign.event.cancel'|trans }}">
+                        <i class="ri-close-line text-danger"></i>
+                    </button>
+                </span>
+            {% endif %}
+        </p>
+    {% endif %}
+    
+    {% if (errors) %}
+        {% if (item.isScheduled) %}
+            <hr/>
+        {% endif %}
+        <p class="text-danger mt-0 mb-10"><i class="ri-alert-line"></i> {{ 'mautic.campaign.event.last_error'|trans }}
+            :<br/>{{ errors|purify }}</p>
+    {% endif %}
+    
+    {% if (item.metadata.timeline is defined and item.metadata.timeline is not empty or item.campaign_description or item.event_description) %}
+        <hr/>
+        {% if (item.metadata.timeline is defined and item.metadata.timeline is not empty) %}
+            <p class="mt-0 mb-10">{{ item.metadata.timeline }}</p>
+        {% endif %}
+        
+        {% if (item.campaign_description) %}
+            <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.campaign_description})|purify }}</p>
+        {% endif %}
+        {% if (item.event_description) %}
+            <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description})|purify }}</p>
+        {% endif %}
+    {% endif %}
+    {% if parentDetails != false %}
+        <h6 class="mt-lg mb-sm">
+            {{ 'mautic.campaign.parent.details'|trans({'%path%': parentDetails.path, '%type%': parentDetails.type, '%name%': parentDetails.name})|purify }}
+        </h6>
+        <dl class="dl-horizontal">
+            {% for key, value in parentDetails.properties %}
+                <dt>{{ key|capitalize }}:</dt>
+                <dd>{{ value|json_encode()|trim('"') }}</dd>
+            {% endfor %}
+        </dl>
+    {% endif %}
+</div>

@@ -1,0 +1,119 @@
+{#
+  Variables
+    - totalWeight
+    - variant
+    - variants
+    - abTestResults
+    - actionRoute
+    - activeEntity
+    - model
+    - nameGetter
+    - firstCriteria (optional)
+#}
+{% set id = variant.id %}
+
+{% if variants.properties[id] is not defined %}
+    {% set settings = variant.variantSettings %}
+    {% set variants = variants|merge({
+            'properties': variants.properties|merge({
+                (id): settings,
+            })
+    }) %}
+{% endif %}
+
+{% if variants.properties[id] is not empty %}
+    {% set thisCriteria = variants.properties[id].winnerCriteria %}
+    {% set weight = variants.properties[id].weight %}
+    {% set criteriaLabel = thisCriteria ? variants.criteria[thisCriteria].label|trans : '' %}
+{% else %}
+    {% set thisCriteria, criteriaLabel, weight = '', '', 0 %}
+{% endif %}
+
+{% set isPublished = variant.isPublished %}
+{% set totalWeight = totalWeight + (isPublished ? weight : 0) %}
+{% set firstCriteria = firstCriteria|default(thisCriteria) %}
+{% set isWinner = abTestResults.winners is defined and variant.id in abTestResults.winners and variants.parent.variantStartDate and isPublished %}
+{% set actionUrl = path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) %}
+{% set isCurrent = (variant.id is same as activeEntity.id) %}
+
+<li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
+    <div class="box-layout">
+        <div class="col-md-8 va-m">
+            <div class="row">
+                <div class="col-xs-1">
+                    <h3>
+                        {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                'item': variant,
+                                'model': model,
+                                'size': '',
+                                'query': 'size=',
+                        }) }}
+                    </h3>
+                </div>
+                <div class="col-xs-11">
+                    {% if isWinner %}
+                        <div class="mr-xs pull-left" data-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.ab_test.make_winner',
+                                        variant: 'warning',
+                                        icon_only: true,
+                                        icon: 'ri-trophy-fill',
+                                        href: path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}),
+                                        attributes: {
+                                            'data-toggle': 'confirmation',
+                                            'data-message': ('mautic.core.ab_test.confirm_make_winner'|trans({'%name%': attribute(variant, nameGetter)})|e),
+                                            'data-confirm-text': ('mautic.core.ab_test.make_winner'|trans|e),
+                                            'data-confirm-callback': 'executeAction',
+                                            'data-cancel-text': ('mautic.core.form.cancel'|trans|e)
+                                        }
+                                    }
+                                ]
+                            } %}
+                        </div>
+                    {% endif %}
+                    <h5 class="fw-sb text-interactive">
+                        <a href="{{ actionUrl }}" data-toggle="ajax">
+                            {{ attribute(variant, nameGetter) }}
+                        </a>
+                        {% if isCurrent %}
+                            &nbsp;<span class="label label-success">{{ 'mautic.core.current'|trans }}</span>
+                        {% endif %}
+                        {% if variants.parent.id is same as variant.id %}
+                            &nbsp;<span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
+                        {% endif %}
+                        {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation %}
+                            &nbsp;<span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                                <i class="ri-fw ri-translate"></i>
+                            </span>
+                        {% endif %}
+                    </h5>
+                    {% if method_exists(variant, 'getAlias') %}
+                        <span class="text-white dark-sm">{{ variant.alias }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 va-t text-right">
+            <em class="text-white dark-sm">
+                {% if isPublished and (totalWeight > 100 or (thisCriteria and firstCriteria != thisCriteria)) %}
+                    <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">
+                        <div><span class="badge">{{ weight }}%</span></div>
+                        <div><i class="ri-fw ri-alert-line"></i>{{ criteriaLabel }}</div>
+                    </div>
+                {% elseif isPublished and criteriaLabel %}
+                    <div class="text-success">
+                        <div><span class="label label-success">{{ weight }}%</span></div>
+                        <div><i class="ri-check-line"></i>{{ criteriaLabel }}</div>
+                    </div>
+                {% else %}
+                    <div class="text-secondary">
+                        <div><span size="sm" class="label label-gray">{{ weight }}%</span></div>
+                        <div>{{ criteriaLabel }}</div>
+                    </div>
+                {% endif %}
+            </em>
+        </div>
+    </div>
+</li>

@@ -2,55 +2,41 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
+class ReportGeneratorEventTest extends TestCase
 {
     /**
-     * @var MockObject|Report
+     * @var Report|MockObject
      */
     private $report;
 
     /**
-     * @var MockObject|QueryBuilder
+     * @var QueryBuilder|MockObject
      */
     private $queryBuilder;
 
-    /**
-     * @var MockObject|ChannelListHelper
-     */
-    private $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
-    /**
-     * @var ReportGeneratorEvent
-     */
-    private $reportGeneratorEvent;
+    private ReportGeneratorEvent $reportGeneratorEvent;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
-        $this->report               = $this->createMock(Report::class);
-        $this->queryBuilder         = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper    = $this->createMock(ChannelListHelper::class);
-        $this->reportGeneratorEvent = new ReportGeneratorEvent(
+        $this->report                = $this->createMock(Report::class);
+        $this->queryBuilder          = $this->createMock(QueryBuilder::class);
+        $this->channelListHelper     = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $this->reportGeneratorEvent  = new ReportGeneratorEvent(
             $this->report,
             [], // Use the setter if you need different options
             $this->queryBuilder,
@@ -247,7 +233,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
 
     public function testAddCompanyLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->once())
+        $this->report->expects($this->exactly(2))
       ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
       ->willReturn(['e.id', 'e.title']);
 
@@ -260,40 +246,135 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     public function testAddCompanyLeftJoinWhenColumnIsUsed(): void
     {
         $this->report->expects($this->once())
-      ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-      ->willReturn(['e.id', 'e.title', 'comp.name']);
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'e.title', 'comp.name']);
 
         $this->queryBuilder->expects($this->exactly(2))
-      ->method('leftJoin')
-      ->withConsecutive(
-        [
-          'l',
-          MAUTIC_TABLE_PREFIX.'companies_leads',
-          'companies_lead',
-          ReportGeneratorEvent::CONTACT_PREFIX.'.id = companies_lead.lead_id',
-        ],
-        [
-          'companies_lead',
-          MAUTIC_TABLE_PREFIX.'companies',
-          ReportGeneratorEvent::COMPANY_PREFIX,
-          'companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id',
-        ]
-      );
+            ->method('leftJoin')
+            ->withConsecutive(
+                [
+                    'l',
+                    MAUTIC_TABLE_PREFIX.'companies_leads',
+                    'companies_lead',
+                    ReportGeneratorEvent::CONTACT_PREFIX.'.id =companies_lead.lead_id',
+                ],
+                [
+                    'companies_lead',
+                    MAUTIC_TABLE_PREFIX.'companies',
+                    ReportGeneratorEvent::COMPANY_PREFIX,
+                    'companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id',
+                ]
+            );
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
 
     public function testAddCompanyLeftJoinOnlyOnceWhenTableAlreadyJoined(): void
     {
+        $this->report->expects($this->once())
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'e.title', 'comp.name']);
+
         $this->queryBuilder->expects($this->once())
       ->method('getQueryParts')
       ->willReturn([
-        'join' => [
-          'companies_lead' => [],
-        ],
+          'join' => [
+              'l' => [['joinTable' => MAUTIC_TABLE_PREFIX.'companies_leads', 'joinAlias' => ReportGeneratorEvent::COMPANY_LEAD_PREFIX]],
+          ],
       ]);
         $this->queryBuilder->expects($this->never())
       ->method('leftJoin');
 
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
+    }
+
+    /**
+     * @dataProvider applyFilterProvider
+     */
+    public function testApplyFilters(bool $dateOnly, string $condition, string $dateFormat): void
+    {
+        $tablePrefix = 't';
+        $dateColumn  = 'a_date';
+        $dateFrom    = new \DateTime('-30 days');
+        $dateTo      = new \DateTime();
+
+        $this->reportGeneratorEvent->setOptions([
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
+        ]);
+
+        $this
+            ->queryBuilder
+            ->expects($this->once())
+            ->method('andWhere')
+            ->with($condition)
+            ->willReturn($this->queryBuilder);
+
+        $this
+            ->queryBuilder
+            ->expects($this->any())
+            ->method('setParameter')
+            ->withConsecutive(
+                ['dateFrom', $this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat)],
+                ['dateTo', $this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat)]
+            )
+            ->willReturnOnConsecutiveCalls($this->queryBuilder, $this->queryBuilder);
+
+        $this->reportGeneratorEvent->applyDateFilters($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function applyFilterProvider(): array
+    {
+        return [
+            [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s'],
+            [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'],
+        ];
+    }
+
+    /**
+     * @dataProvider applyFilterWithoutNullValuesProvider
+     */
+    public function testApplyFiltersWithoutNullValues(bool $dateOnly, string $condition, string $dateFormat): void
+    {
+        $tablePrefix = 't';
+        $dateColumn  = 'a_date';
+        $dateFrom    = new \DateTime('-30 days');
+        $dateTo      = new \DateTime();
+
+        $this->reportGeneratorEvent->setOptions([
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
+        ]);
+
+        $this->queryBuilder
+            ->expects($this->once())
+            ->method('andWhere')
+            ->with($condition)
+            ->willReturn($this->queryBuilder);
+
+        $this
+            ->queryBuilder
+            ->expects($this->any())
+            ->method('setParameter')
+            ->withConsecutive(
+                ['dateFrom', $this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat)],
+                ['dateTo', $this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat)]
+            )
+            ->willReturnOnConsecutiveCalls($this->queryBuilder, $this->queryBuilder);
+
+        $this->reportGeneratorEvent->applyDateFiltersWithoutNullValues($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function applyFilterWithoutNullValuesProvider(): array
+    {
+        return [
+            [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s'],
+            [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'],
+        ];
     }
 }

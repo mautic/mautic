@@ -1,0 +1,149 @@
+{#
+  Variables
+    - form
+    - isVariant
+    - tokens
+    - activePage
+    - themes
+    - permissions
+    - previewUrl (optional)
+    - security (optional)
+      - Defined when editing page
+#}
+{% form_theme form with [
+    '@MauticPage/FormTheme/Page/_page_abtest_settings_properties_row.html.twig',
+    '@MauticPage/FormTheme/Page/_page_variantSettings_properties_row.html.twig',
+] %}
+{% set isExisting = activePage.id %}
+{% set variantParent = activePage.variantParent %}
+{% set previewUrl = previewUrl|default('') %}
+
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}page{% endblock %}
+
+{% block headerTitle %}
+  {%- if isExisting -%}
+    {{ 'mautic.page.header.edit'|trans({'%name%': activePage.title}) }}
+  {%- else -%}
+    {{ 'mautic.page.header.new'|trans }}
+  {%- endif -%}
+  {% if variantParent %}
+      <div><span class="small">{{ 'mautic.core.variant_of'|trans({'%name%': activePage.title, '%parent%': variantParent.title}) }}</span></div>
+  {% elseif activePage.isVariant(false) %}
+      <div><span class="small">{{ 'mautic.page.form.has_variants'|trans }}</span></div>
+  {%- endif -%}
+{% endblock %}
+
+{% block content %}
+  <div id="grapesjsbuilder_assets" class="hide"></div>
+
+  {% set template, attr = form.template.vars.data, form.vars.attr %}
+  {% set attr = attr|merge({
+          'data-submit-callback-async': 'clearThemeHtmlBeforeSave',
+  }) %}
+
+  {{ form_start(form, {'attr': attr}) }}
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- container -->
+      <div class="col-md-9 height-auto">
+          <div class="row">
+              <div class="col-xs-12">
+                  <!-- tabs controls -->
+                  <ul class="nav nav-tabs nav-tabs-contained">
+                      <li class="active">
+                          <a href="#theme-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
+                      </li>
+                      <li id="advanced-tab" class="hidden">
+                          <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
+                      </li>
+                  </ul>
+                  <!--/ tabs controls -->
+
+                  <div class="tab-content pa-md">
+                      <div class="tab-pane fade in active bdr-w-0" id="theme-container">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  {{ form_row(form.template) }}
+                              </div>
+                          </div>
+                          {{ include('@MauticCore/Helper/theme_select.html.twig', {
+                              'type': 'page',
+                              'themes': themes,
+                              'active': form.template.vars.value,
+                          }, with_context=false) }}
+                      </div>
+
+                      <div class="tab-pane fade bdr-w-0" id="advanced-container">
+                          <br>
+                          <div class="row hidden" id="custom-html-row">
+                              <div class="col-md-12">
+                                  {{ form_label(form.customHtml) }}
+                                  {{ form_widget(form.customHtml) }}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 height-auto bdr-l">
+          <div class="pr-lg pl-lg pt-md pb-md">
+              {{ form_row(form.title) }}
+              {% if isVariant %}
+
+                  {{ form_row(form.variantSettings) }}
+              {% else %}
+                  {{ form_row(form.alias) }}
+                  {{ form_row(form.category) }}
+                  {{ form_row(form.language) }}
+                  {{ form_row(form.translationParent) }}
+              {% endif %}
+
+              {{ form_row(form.isPublished, {
+				'attr': {
+					'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+					'data-start': 'mautic.core.form.available_on_scheduled_date',
+					'data-both': 'mautic.core.form.available_during_scheduled_period',
+					'data-end': 'mautic.core.form.available_until_scheduled_end'
+				}
+			}) }}
+
+              {% if (permissions['page:preference_center:editown'] or permissions['page:preference_center:editother']) and not activePage.isVariant %}
+                  {{ form_row(form.isPreferenceCenter) }}
+              {% endif %}
+
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+    	      {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
+
+              {% if not isVariant %}
+                  {{ form_row(form.redirectType) }}
+                  {{ form_row(form.redirectUrl) }}
+              {% endif %}
+
+              {{ form_row(form.noIndex) }}
+              <div class="template-fields {% if not template %}hide{% endif %}">
+                  {{ form_row(form.metaDescription) }}
+              </div>
+              <div class="template-fields {% if not template %}hide{% endif %}">
+                  {{ form_row(form.headScript) }}
+              </div>
+              <div class="template-fields {% if not template %}hide{% endif %}">
+                  {{ form_row(form.footerScript) }}
+              </div>
+              <div class="hide">
+                  {{ form_rest(form) }}
+              </div>
+          </div>
+      </div>
+  </div>
+  {{ form_end(form) }}
+
+  {{ include('@MauticCore/Helper/builder.html.twig', {
+      'type': 'page',
+      'isCodeMode': ('mautic_code_mode' is same as activePage.template),
+      'objectId': activePage.sessionId,
+      'previewUrl': previewUrl,
+  }, with_context=false) }}
+{% endblock %}

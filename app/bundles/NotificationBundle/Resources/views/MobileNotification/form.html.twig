@@ -1,0 +1,86 @@
+{#
+  Variables
+    - form
+    - notification
+    - integration (\Mautic\NotificationBundle\Integration\OneSignalIntegration)
+    - forceTypeSelection (optional, bool, default = false)
+        Only defined when editing notification
+#}
+{% form_theme form '@MauticNotification/FormTheme/MobileNotification/_mobile_notification_mobileSettings_widget.html.twig' %}
+
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}mobile_notification{% endblock %}
+
+{% block headerTitle %}
+  {% if notification.id %}
+    {{ 'mautic.notification.mobile.header.edit'|trans({'%name%': notification.name}) }}
+  {% else %}
+    {{ 'mautic.notification.mobile.header.new'|trans }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% set integrationSettings = integration.integrationSettings.featureSettings %}
+  {{ form_start(form) }}
+  <div class="box-layout">
+      <div class="col-md-9 height-auto">
+          <div class="row">
+              <div class="col-xs-12">
+
+                  <!-- tabs controls -->
+                  <ul class="nav nav-tabs nav-tabs-contained">
+                      <li class="active"><a href="#notification-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
+                      <li><a href="#data-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.data'|trans }}</a></li>
+                      {% if integrationSettings.platforms is defined and 'ios' in integrationSettings.platforms %}
+                          <li><a href="#ios-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.ios'|trans }}</a></li>
+                      {% endif %}
+                      {% if integrationSettings.platforms is defined and 'android' in integrationSettings.platforms %}
+                          <li><a href="#android-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.android'|trans }}</a></li>
+                      {% endif %}
+                  </ul>
+                  <!--/ tabs controls -->
+
+                  <!-- tabs content -->
+                  <div class="tab-content pa-md">
+                      <div class="tab-pane fade in active bdr-w-0" id="notification-container">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  {{- form_row(form.name) -}}
+                                  {{- form_row(form.heading) -}}
+                                  {{- form_row(form.url) -}}
+                              </div>
+                              <div class="col-md-6">{{ form_row(form.message) }}</div>
+                          </div>
+                      </div>
+                      <div class="tab-pane fade in bdr-w-0" id="data-notification-container">
+                          <div class="row">
+                              <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
+                          </div>
+                      </div>
+                      {% if form.mobileSettings.ios_sound is defined or form.mobileSettings.android_sound is defined  %}
+                        {{ form_widget(form.mobileSettings, {'integrationSettings': integrationSettings}) }}
+                      {% endif %}
+                  </div>
+                  <!--/ tabs content -->
+
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 height-auto bdr-l">
+          <div class="pr-lg pl-lg pt-md pb-md">
+              {{ form_row(form.category) }}
+              {{ form_row(form.language) }}
+              <hr />
+              {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
+              <div class="hide">
+                  {{ form_row(form.isPublished) }}
+                  {{ form_row(form.publishUp) }}
+                  {{ form_row(form.publishDown) }}
+                  {{ form_rest(form) }}
+              </div>
+          </div>
+      </div>
+  </div>
+  {{ form_end(form) }}
+{% endblock %}

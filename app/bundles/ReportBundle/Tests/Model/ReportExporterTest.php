@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,6 +7,7 @@ use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
@@ -29,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessExport()
+    public function testProcessExport(): void
     {
         $batchSize = 2;
 
@@ -89,9 +81,31 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
          * We have 2 scheduler = 3 report => 6 * 3 = 18 calls of getReportData
          * If test fails here, check content of $reportDataResult->getData() and follow the calculation
          */
-        $reportDataAdapter->expects($this->exactly(18))
+        $invokedCount = $this->exactly(18);
+        $reportDataAdapter->expects($invokedCount)
             ->method('getReportData')
-            ->willReturn($reportDataResult);
+            ->willReturnCallback(function (Report $report, ReportExportOptions $exportOptions) use ($reportNow, $report2, $report1, $reportDataResult, $invokedCount): ReportDataResult {
+                $invocationCount = $invokedCount->getInvocationCount();
+                if (0 < $invocationCount && $invocationCount <= 6) {
+                    self::assertSame($report1, $report);
+                    self::assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
+                    self::assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                }
+
+                if (6 < $invocationCount && $invocationCount <= 12) {
+                    self::assertSame($report2, $report);
+                    self::assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
+                    self::assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                }
+
+                if (12 < $invocationCount && $invocationCount <= 18) {
+                    self::assertSame($reportNow, $report);
+                    self::assertEquals((new \DateTime())->setTime(0, 0)->sub(new \DateInterval('P10Y')), $exportOptions->getDateFrom());
+                    self::assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                }
+
+                return $reportDataResult;
+            });
 
         $reportFileWriter->expects($this->exactly(18))
             ->method('writeReportData');
@@ -102,7 +116,11 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with(ReportEvents::REPORT_SCHEDULE_SEND);
+            ->withConsecutive(
+                [new ReportScheduleSendEvent($scheduler1, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND],
+                [new ReportScheduleSendEvent($scheduler2, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND],
+                [new ReportScheduleSendEvent($schedulerNow, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND]
+            );
 
         $schedulerModel->expects($this->exactly(4))
             ->method('reportWasScheduled');

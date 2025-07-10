@@ -1,0 +1,41 @@
+{
+  "name": "New Report",
+  "description": "A new report",
+  "system": true,
+  "isScheduled": false,
+  "source": "email.stats",
+  "columns": [
+    "es.date_sent",
+    "es.date_read",
+    "e.subject",
+    "es.email_address",
+    "e.id"
+  ],
+  "filters": [
+    {
+      "column": "e.is_published",
+      "condition": "eq",
+      "value": "1"
+    }
+  ],
+  "tableOrder": [
+    {
+      "column": "es.date_sent",
+      "direction": "ASC"
+    }
+  ],
+  "graphs": [
+    "mautic.email.graph.line.stats",
+    "mautic.email.graph.pie.ignored.read.failed",
+    "mautic.email.table.most.emails.read",
+    "mautic.email.table.most.emails.sent",
+    "mautic.email.table.most.emails.read.percent",
+    "mautic.email.table.most.emails.failed"
+  ],
+  "groupBy": null,
+  "settings": [],
+  "scheduleUnit": null,
+  "toAddress": null,
+  "scheduleDay": null,
+  "scheduleMonthFrequency": null
+}

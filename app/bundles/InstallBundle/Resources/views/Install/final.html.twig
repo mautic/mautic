@@ -1,0 +1,28 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+{% if 'index' == tmpl %}
+    {% extends '@MauticInstall/Install/content.html.twig' %}
+{% endif %}
+
+{% block content %}
+<div class="panel-heading">
+    <h2 class="panel-title">
+        {{ 'mautic.install.heading.final'|trans }}
+    </h2>
+</div>
+<div class="panel-body text-center">
+    <div><i class="ri-check-line ri-5x mb-20 text-success"></i></div>
+    <h4 class="mb-3">{{ 'mautic.install.heading.finished'|trans }}</h4>
+    <h5>{{ 'mautic.install.heading.configured'|trans|raw }}</h5>
+    {% if welcome_url %}
+        <a href="{{ welcome_url }}" role="button" class="btn btn-primary mt-20">
+            {{ 'mautic.install.sentence.proceed.to.mautic'|trans }}
+        </a>
+    {% endif %}
+</div>
+{% endblock %}

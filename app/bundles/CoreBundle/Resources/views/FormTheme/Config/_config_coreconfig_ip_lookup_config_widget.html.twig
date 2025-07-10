@@ -1,0 +1,9 @@
+{% block _config_coreconfig_ip_lookup_config_widget %}
+<div class="row">
+  {% for child in form %}
+    <div class="col-sm-12">
+        {{ form_row(child) }}
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

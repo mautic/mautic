@@ -1,0 +1,188 @@
+{% block _email_abtest_settings_properties_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _email_variantSettings_properties_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _emailform_dynamicContent_entry_content_row %}
+    <div class="row form-group">
+        <div class="col-xs-10">
+            {{ form_label(form) }}
+        </div>
+        <div class="col-xs-2">
+            {% if 'emailform_dynamicContent_0_content' is not same as id %}
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.dwc.delete_new',
+                        variant: 'ghost',
+                        icon_only: true,
+                        icon: 'ri-delete-bin-line',
+                        danger: true,
+                        size: 'xs',
+                        attributes: {
+                            'class': 'remove-item as-end',
+                            'type': 'button'
+                        }
+                    }
+                ]
+            } %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-xs-12">
+            {{ form_widget(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _emailform_dynamicContent_entry_filters_entry_filters_entry_widget %}
+  {%- set isPrototype = ('__name__' == form.vars.name) %}
+  {%- set filterType = form.field.vars.value %}
+  {%- set filterGroup = form.object.vars.value %}
+  {%- set inGroup = form.vars.data.glue is defined and 'and' is same as form.vars.data.glue %}
+  {%- set objectIcon  = (form.vars.data.object is defined and 'company' == form.vars.data.object) ? 'ri-building-2-line' : 'ri-user-6-fill' %}
+  <div class="panel {% if isPrototype or (inGroup and not first) %}in-group{% endif %}">
+      <div class="panel-footer {% if not isPrototype and '0' is same as form.vars.name %}hide{% endif %}">
+          <div class="col-sm-2 pl-0">
+              {{ form_widget(form.glue) }}
+          </div>
+      </div>
+      <div class="panel-body">
+          <div class="col-xs-6 col-sm-3 field-name">
+              <i class="object-icon fa {{ objectIcon }}" aria-hidden="true"></i>
+              <span>{% if isPrototype %}__label__{% else %}{{ form.parent.parent.vars.fields[filterGroup][filterType].label }}{% endif %}</span>
+          </div>
+          <div class="col-xs-6 col-sm-3 padding-none">
+              {{ form_widget(form.operator) }}
+          </div>
+          {% set hasErrors = (form.filter.vars.errors|length > 0 or form.display.vars.errors|length > 0) %}
+          <div class="col-xs-10 col-sm-5 padding-none {% if hasErrors %}has-error{% endif %}">
+            {{ form_widget(form.filter) }}
+            {{ form_errors(form.filter) }}
+            {{ form_widget(form.display) }}
+            {{ form_errors(form.display) }}
+          </div>
+          <div class="col-xs-2 col-sm-1">
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.report.report.label.removefilter',
+                        variant: 'ghost',
+                        icon_only: true,
+                        icon: 'ri-delete-bin-line',
+                        danger: true,
+                        size: 'xs',
+                        attributes: {
+                            'class': 'remove-selected pull-right'
+                        }
+                    }
+                ]
+            } %}
+          </div>
+          {{ form_widget(form.field) }}
+          {{ form_widget(form.type) }}
+          {{ form_widget(form.object) }}
+      </div>
+  </div>
+{% endblock %}
+
+{% block dynamic_content_filter_entry_widget %}
+    <div class="tab-pane dynamic-content-filter bdr-w-0" id="{{ form.vars.id }}">
+        <div class="row form-group">
+            <div class="col-xs-10">
+                {{ form_label(form.content) }}
+            </div>
+            <div class="col-xs-2">
+                {% if id is not same as 'emailform_dynamicContent_0_filters_0' %}
+                    <a class="remove-item remove-filter btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <div class="col-xs-12">
+                {{ form_widget(form.content) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-7">
+                <label>{{ 'Filters'|trans }}</label>
+            </div>
+            <div class="col-xs-5">
+                <div class="form-group">
+                    <div class="available-filters pl-0">
+                        <select class="chosen form-control" data-mautic="available_filters">
+                            <option value=""></option>
+                            {% for object, field in fields %}
+                                {% set icon = ('company' == object) ? 'ri-building-2-line' : 'ri-user-6-fill' %}
+                                <optgroup label="{{ ('mautic.lead.' ~ object)|trans }}">
+                                    {% for value, params in field %}
+                                        {% set list = params.properties.list|default([]) %}
+                                        {% set choices = (params.properties.type is same as 'boolean') ?  formFieldParseBooleanList(list) : formFieldParseListForChoices(list) %}
+                                        {% set list = choices|json_encode %}
+                                        {% set callback = params.properties.callback|default('') %}
+                                        {% set operators = (params.operators is defined and params.operators is not empty) ? params.operators|json_encode|escape : '{}' %}
+
+                                        <option value="{{ value|e }}"
+                                                data-mautic="available_{{ value }}"
+                                                data-field-object="{{ object }}"
+                                                data-field-type="{{ params.properties.type }}"
+                                                data-field-list="{{ list|escape }}"
+                                                data-field-callback="{{ callback }}"
+                                                data-field-operators="{{ operators|raw }}"
+                                                class="segment-filter fa {{ icon }}">{{ params.label|trans }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <div data-filter-container data-index="{{ form.filters|length }}">
+            {% for i, filter in form.filters %}
+                {% set isPrototype = ('__name__' == filter.vars.name) %}
+                {% if isPrototype or form.vars.fields[filter.vars.value.object][filter.vars.value.field] is defined %}
+                    {{ form_widget(filter, {'first' : loop.first}) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block dynamic_content_filter_widget %}
+    <div class="tab-pane dynamic-content bdr-w-0 {{ '0' == form.vars.name ? 'active' : 'fade' }}" id="{{ form.vars.id }}">
+        <div class="panel">
+            <ul class="nav nav-tabs nav-tabs-contained" id="dynamicContentFilterTabs_{{ form.vars.name }}">
+              <li>
+                <a role="tab" class="addNewDynamicContentFilter" data-index="{{ form.vars.name }}"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
+              </li>
+              <li class="active">
+                <a data-toggle="tab" href="#emailform_dynamicContent_{{ form.vars.name }}_default" role="tab">Default</a>
+              </li>
+              {% for i, filter in form['filters'] %}
+                <li><a role="tab" data-toggle="tab" href="#{{ filter.vars.id }}">{{ 'mautic.core.dynamicContent.tab'|trans }} {{ loop.index }}</a></li>
+              {% endfor %}
+            </ul>
+
+            <div class="tab-content pa-md">
+              <div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_{{ form.vars.name }}_default">
+                <div class="row hidden">
+                  <div class="col-xs-10">{{ form_row(form.tokenName) }}</div>
+                </div>
+                {{ form_row(form.content) }}
+              </div>
+              {% for filter in form.filters %}
+                {{ form_widget(filter) }}
+              {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

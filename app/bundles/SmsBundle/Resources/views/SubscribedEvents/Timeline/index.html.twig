@@ -1,0 +1,56 @@
+{% set item = event.extra.stat is defined ? event.extra.stat : false %}
+{% if (item) %}
+    {% set type = event.extra.type is defined ? event.extra.type : null %}
+    <p>
+        {% if item.isFailed is defined and item.isFailed is not empty and 'failed' == type %}
+            {% set details = item.details|json_decode|raw %}
+            {% set errors  = '' %}
+            {% if details.failed is defined %}
+                {% set failedDetails = details.failed %}
+                {% if failedDetails is not iterable %}
+                    {% set failedDetails = [failedDetails] %}
+                {% endif %}
+                {% set errors = failedDetails|join('<br />') %}
+            {% endif %}
+        <span class="text-danger mt-0 mb-10"><i class="ri-alert-line"></i>
+            {% if errors is defined and errors is not empty %}
+                {{ errors }}
+            {% else %}
+                {{ 'mautic.sms.timeline.event.failed'|trans }}
+            {% endif %}
+        </span>
+
+        {% endif %}
+        {% if item.list_name is defined and item.list_name is not empty and 'failed' != type %}
+            <br />{{ 'mautic.sms.timeline.event.list'|trans({ '%list%' : item.list_name }) }}
+        {% endif %}
+    </p>
+{% endif %}
+
+{% if errors is defined %}
+<p class="text-danger mt-0 mb-10">
+    <i class="ri-alert-line"></i> {{ 'mautic.campaign.event.last_error'|trans ~ ': ' ~ errors }}
+</p>
+{% else %}
+<dl class="dl-horizontal">
+    <dt>{{ 'mautic.sms.timeline.status'|trans }}</dt>
+    <dd>
+        {% if item.is_failed is defined and item.is_failed is not empty %}
+            {{ 'mautic.email.stat.failed'|trans }}
+        {% else %}
+            {{ 'mautic.email.send'|trans }}
+        {% endif %}
+    </dd>
+    <dt>{{ 'mautic.sms.timeline.type'|trans }}</dt>
+    <dd>{{ item.type|trans }}</dd>
+</dl>
+{% endif %}
+
+{% if item.message is defined and item.message is not empty %}
+<div class="small">
+    <hr />
+    <strong>{{ 'mautic.sms.timeline.content.heading'|trans }}</strong>
+    <br />
+    {{ item.message }}
+</div>
+{% endif %}

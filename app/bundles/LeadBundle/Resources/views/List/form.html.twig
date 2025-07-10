@@ -1,0 +1,118 @@
+{#
+  Variables
+    - form
+#}
+{% form_theme form with [
+      '@MauticLead/FormTheme/Filter/_leadlist_filters_entry_widget.html.twig',
+      '@MauticLead/FormTheme/Filter/_leadlist_filters_widget.html.twig',
+] %}
+
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}leadlist{% endblock %}
+
+{% block headerTitle %}
+  {% if form.vars.data.id is not empty %}
+      {{- 'mautic.lead.list.header.edit'|trans({'%name%': form.vars.data.name}) -}}
+  {% else %}
+      {{- 'mautic.lead.list.header.new'|trans -}}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% set index = form.filters.vars.value|length > 0 ? max(form.filters.vars.value|keys) : 0 %}
+{{ form_start(form) }}
+<div class="box-layout">
+    <div class="col-md-9 height-auto">
+        <div class="row">
+            <div class="col-xs-12">
+                <ul class="nav nav-tabs nav-tabs-contained">
+                    <li class="active">
+                        <a href="#details" role="tab" data-toggle="tab" class="{% if formContainsErrors(form, ['filters']) %}text-danger{% endif %}">
+                            {{ 'mautic.core.details'|trans }}
+                            {% if formContainsErrors(form, ['filters']) %}
+                              <i class="ri-alert-line"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ 'mautic.lead.lead.segment.add.help'|trans }}">
+                        <a href="#filters" role="tab" data-toggle="tab" class="{% if formContainsErrors(form.filters) %}text-danger{% endif %}">
+                            {{ 'mautic.core.filters'|trans }}
+                            {% if formContainsErrors(form.filters) %}
+                                <i class="ri-alert-line"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- start: tab-content -->
+                <div class="tab-content pa-md">
+                    <div class="tab-pane fade in active bdr-w-0" id="details">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(form.name) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.alias) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.publicName) }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {{ form_row(form.description) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade bdr-w-0" id="filters">
+                        <div class="alert alert-info"><p>{{ 'mautic.lead.lead.segment.filter.info'|trans }}</p></div>
+                        <div class="form-group">
+                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}" data-index="{{ index + 1 }}">
+                                <select class="chosen form-control" id="available_segment_filters">
+                                    <option value=""></option>
+                                    {% for object, field in form.vars.fields %}
+                                      {% set icon = 'company' == object ? 'building' : 'user' %}
+                                      {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
+                                      <optgroup label="{{ header }}">
+                                          {% for value, params in field %}
+                                              {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                                              <option value="{{ value|e }}"
+                                                      id="available_{{ object }}_{{ value }}"
+                                                      data-field-object="{{ object }}"
+                                                      data-field-type="{{ params.properties.type }}"
+                                                      data-field-operators="{{ operators|e }}"
+                                                      class="segment-filter {{ icon }}">
+                                                      {{ params.label|trans }}
+                                              </option>
+                                          {% endfor %}
+                                      </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="selected-filters" id="leadlist_filters">
+                            {% if formContainsErrors(form.filters) %}
+                                <div class="alert alert-danger has-error">
+                                    {{ form_errors(form.filters) }}
+                                </div>
+                            {% endif %}
+                            {{ form_widget(form.filters) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 height-auto bdr-l">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_row(form.category) }}
+            {{ form_row(form.isGlobal) }}
+            {{ form_row(form.isPreferenceCenter) }}
+            {{ form_row(form.isPublished) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+{% endblock %}

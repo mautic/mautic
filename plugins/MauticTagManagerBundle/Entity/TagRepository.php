@@ -1,42 +1,29 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-/**
- * Class TagRepository.
- */
 class TagRepository extends BaseTagRepository
 {
     /**
-     * @return array
+     * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['lt.tag', 'ASC'],
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lt';
     }
 
-    public function countOccurrences($tag)
+    public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -45,15 +32,11 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $result = $q->execute()->fetchAll();
-
-        return count($result);
+        return $q->executeQuery()->rowCount();
     }
 
     /**
      * Get a count of leads that belong to the tag.
-     *
-     * @param $tagIds
      *
      * @return array
      */
@@ -64,7 +47,7 @@ class TagRepository extends BaseTagRepository
         $q->select('count(ltx.lead_id) as thecount, ltx.tag_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
 
-        $returnArray = (is_array($tagIds));
+        $returnArray = is_array($tagIds);
 
         if (!$returnArray) {
             $tagIds = [$tagIds];
@@ -75,7 +58,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {
@@ -90,5 +73,15 @@ class TagRepository extends BaseTagRepository
         }
 
         return ($returnArray) ? $return : $return[$tagIds[0]];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function addCatchAllWhereClause($qb, $filter): array
+    {
+        return $this->addStandardCatchAllWhereClause($qb, $filter, [
+            'lt.tag',
+        ]);
     }
 }

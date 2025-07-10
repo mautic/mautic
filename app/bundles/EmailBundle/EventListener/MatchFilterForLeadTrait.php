@@ -1,24 +1,13 @@
 <?php
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\EmailBundle\EventListener;
 
-/**
- * Trait MatchFilterForLeadTrait.
- */
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Segment\OperatorOptions;
+
 trait MatchFilterForLeadTrait
 {
-    /**
-     * @return bool
-     */
-    protected function matchFilterForLead(array $filter, array $lead)
+    protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {
             // Lead in generated for preview with faked data
@@ -28,11 +17,21 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
+            $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
-            if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
-                continue;
+            if ('leadlist' === $data['type'] && isset($this->segmentRepository) && $this->segmentRepository instanceof LeadListRepository) {
+                return $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
+            }
+
+            if ($isCompanyField) {
+                if (empty($primaryCompany)) {
+                    continue;
+                }
+            } else {
+                if (!array_key_exists($data['field'], $lead)) {
+                    continue;
+                }
             }
 
             /*
@@ -89,20 +88,17 @@ trait MatchFilterForLeadTrait
                     if (!is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-
                     if (!is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
                     break;
                 case 'number':
-                    $leadVal   = (int) $leadVal;
-                    $filterVal = (int) $filterVal;
+                    $leadVal   = (float) $leadVal;
+                    $filterVal = (float) $filterVal;
                     break;
                 case 'select':
-                default:
-                    if (is_numeric($leadVal)) {
-                        $leadVal   = (int) $leadVal;
-                        $filterVal = (int) $filterVal;
+                    if (!is_array($filterVal)) {
+                        $filterVal = explode('|', $filterVal);
                     }
                     break;
             }
@@ -149,29 +145,12 @@ trait MatchFilterForLeadTrait
                     $filterVal         = str_replace('%', '.*', $filterVal);
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
-                case 'in':
-                    $leadValMatched = false;
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValMatched = true;
-                            // Break once we find a match
-                            break;
-                        }
-                    }
-                    $groups[$groupNum] = $leadValMatched;
+
+                case OperatorOptions::IN:
+                    $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
                     break;
-                case '!in':
-                    $leadValNotMatched = true;
-
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValNotMatched = false;
-                            // Break once we find a match
-                            break;
-                        }
-                    }
-
-                    $groups[$groupNum] = $leadValNotMatched;
+                case OperatorOptions::NOT_IN:
+                    $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
@@ -180,18 +159,57 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
                 case 'startsWith':
-                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                    $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
                     break;
                 case 'endsWith':
                     $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
                     $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
                     break;
                 case 'contains':
-                    $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
+                    $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                     break;
             }
         }
 
         return in_array(true, $groups);
+    }
+
+    /**
+     * @param mixed $leadVal
+     * @param mixed $filterVal
+     */
+    private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    {
+        $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;
+        $filterVal  = !is_array($filterVal) ? [$filterVal] : $filterVal;
+        $retFlag    = $defaultFlag;
+        foreach ($leadVal as $v) {
+            if (in_array($v, $filterVal)) {
+                $retFlag = !$defaultFlag;
+                // Break once we find a match
+                break;
+            }
+        }
+
+        return $retFlag;
+    }
+
+    /**
+     * Duplicate method. Needs refactoring.
+     *
+     * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
+     *
+     * @param string $operator   empty, !empty, in, !in
+     * @param int[]  $segmentIds
+     */
+    private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, array $segmentIds = null): bool
+    {
+        return match ($operator) {
+            OperatorOptions::EMPTY     => $segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY => $segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::IN        => $segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::NOT_IN    => $segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+        };
     }
 }

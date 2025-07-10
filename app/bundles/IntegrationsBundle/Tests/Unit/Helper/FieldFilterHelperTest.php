@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Helper;
 
 use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
@@ -74,19 +65,19 @@ class FieldFilterHelperTest extends TestCase
     private function getIntegrationObject()
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
-        $field1->method('getName')
+        $field1->method('getLabel')
             ->willReturn('field one');
         $field2 = $this->createMock(MappedFieldInfoInterface::class);
-        $field2->method('getName')
+        $field2->method('getLabel')
             ->willReturn('field two');
         $field3 = $this->createMock(MappedFieldInfoInterface::class);
-        $field3->method('getName')
+        $field3->method('getLabel')
             ->willReturn('field three');
         $field4 = $this->createMock(MappedFieldInfoInterface::class);
-        $field4->method('getName')
+        $field4->method('getLabel')
             ->willReturn('field four');
         $field5 = $this->createMock(MappedFieldInfoInterface::class);
-        $field5->method('getName')
+        $field5->method('getLabel')
             ->willReturn('field five');
 
         $integrationObject = $this->createMock(ConfigFormSyncInterface::class);

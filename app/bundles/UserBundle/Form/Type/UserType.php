@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -31,39 +23,21 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<User>
+ */
 class UserType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var UserModel
-     */
-    private $model;
-
-    /**
-     * @var LanguageHelper
-     */
-    private $languageHelper;
-
     public function __construct(
-        TranslatorInterface $translator,
-        UserModel $model,
-        LanguageHelper $languageHelper
+        private TranslatorInterface $translator,
+        private UserModel $model,
+        private LanguageHelper $languageHelper,
     ) {
-        $this->translator       = $translator;
-        $this->model            = $model;
-        $this->languageHelper   = $languageHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
@@ -76,7 +50,7 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'preaddon'     => 'fa fa-user',
+                    'preaddon'     => 'ri-user-6-fill',
                     'autocomplete' => 'off',
                 ],
             ]
@@ -102,7 +76,7 @@ class UserType extends AbstractType
             ]
         );
 
-        $positions = $this->model->getLookupResults('position', null, 0, true);
+        $positions = $this->model->getLookupResults('position', null, 0);
         $builder->add(
             'position',
             TextType::class,
@@ -125,7 +99,7 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
             ]
         );
@@ -146,7 +120,7 @@ class UserType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => $required,
@@ -160,7 +134,7 @@ class UserType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => $required,
@@ -202,6 +176,14 @@ class UserType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'preferences',
+            UserPreferencesType::class,
+            [
+                'label'      => false,
+            ]
+        );
+
         $defaultSignature = '';
         if (isset($options['data']) && null === $options['data']->getSignature()) {
             $defaultSignature = $this->translator->trans('mautic.email.default.signature', ['%from_name%' => '|FROM_NAME|']);
@@ -220,6 +202,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'data' => $defaultSignature,
+                'help' => 'mautic.user.config.signature.helper',
             ]
         );
 
@@ -236,11 +219,9 @@ class UserType extends AbstractType
                         ],
                         'class'         => Role::class,
                         'choice_label'  => 'name',
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('r')
-                                ->where('r.isPublished = true')
-                                ->orderBy('r.name', 'ASC');
-                        },
+                        'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('r')
+                            ->where('r.isPublished = true')
+                            ->orderBy('r.name', Order::Ascending->value),
                     ]
                 )
             );
@@ -264,10 +245,7 @@ class UserType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -282,18 +260,7 @@ class UserType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'user';
-    }
-
-    /**
-     * @return array
-     */
-    private function getSupportedLanguageChoices()
+    private function getSupportedLanguageChoices(): array
     {
         // Get the list of available languages
         $languages = $this->languageHelper->fetchLanguages(false, false);

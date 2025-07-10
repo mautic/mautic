@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
 class BouncedEmail
@@ -33,10 +24,7 @@ class BouncedEmail
      */
     private $bounceType;
 
-    /**
-     * @var int
-     */
-    private $final = 0;
+    private bool $final = false;
 
     /**
      * @var string|null
@@ -123,10 +111,7 @@ class BouncedEmail
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function isFinal()
+    public function isFinal(): bool
     {
         return $this->final;
     }
@@ -152,8 +137,6 @@ class BouncedEmail
     }
 
     /**
-     * @param string $originalTo
-     *
      * @return BouncedEmail
      */
     public function setBounceAddress($bounceAddress)

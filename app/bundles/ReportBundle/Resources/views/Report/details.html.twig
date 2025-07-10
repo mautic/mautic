@@ -1,0 +1,94 @@
+{%- set isIndex = 'index' == tmpl -%}
+{%- set tmpl = 'list' -%}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'report' %}
+
+{% block headerTitle 'mautic.report.report.header.view'|trans({'%name%': report.name|trans}) %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': report,
+        'status': 'available'
+    }) -}}
+{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : report,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(
+                permissions['report:reports:viewown'],
+                permissions['report:reports:viewother'],
+                report.createdBy
+            ),
+        },
+        'routeBase' : 'report',
+        'targetLabel': 'mautic.report.reports'|trans
+    }
+) -}}
+{% endblock %}
+
+{% block actions %}
+  {%- set buttons = [] -%}
+  {% if (data is not empty or graphs is not empty) and enableExportPermission is not empty %}
+      {%- set buttons = buttons|merge([{
+          'attr': {
+              'target': '_new',
+              'data-toggle': '',
+              'class': 'btn btn-ghost btn-nospin',
+              'href': path('mautic_report_export', {'objectId': report.id, 'format': 'html'}),
+          },
+          'btnText': 'mautic.form.result.export.html'|trans,
+          'iconClass': 'ri-file-code-line',
+      }]) -%}
+
+      {% if data is not empty %}
+          {%- set buttons = buttons|merge([{
+              'attr': {
+                  'data-toggle': 'download',
+                  'class': 'btn btn-ghost btn-nospin',
+                  'href': path('mautic_report_export', {'objectId': report.id, 'format': 'csv'}),
+              },
+              'btnText': 'mautic.form.result.export.csv'|trans,
+              'iconClass': 'ri-file-text-line',
+          }]) -%}
+
+          {% if '\\PhpOffice\\PhpSpreadsheet\\Spreadsheet' is class %}
+              {%- set buttons = buttons|merge([{
+                  'attr': {
+                      'data-toggle': 'download',
+                      'class': 'btn btn-ghost btn-nospin',
+                      'href': path('mautic_report_export', {'objectId': report.id, 'format': 'xlsx'}),
+                  },
+                  'btnText': 'mautic.form.result.export.xlsx'|trans,
+                  'iconClass': 'ri-file-excel-2-fill',
+              }]) -%}
+          {% endif %}
+      {% endif %}
+  {% endif %}
+
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+          'item': report,
+          'templateButtons': {
+              'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], report.createdBy),
+              'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], report.createdBy),
+          },
+          'routeBase': 'report',
+          'langVar': 'report.report',
+          'customButtons': buttons,
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    {{ include('@MauticReport/Report/_details_content_header.html.twig') }}
+  {% endif %}
+
+  {{ include('@MauticReport/Report/_details_report_content.html.twig') }}
+
+  {% if isIndex %}
+    {{ include('@MauticReport/Report/_details_content_footer.html.twig') }}
+  {% endif %}
+{% endblock %}

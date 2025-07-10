@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +10,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 {
     use ConfigAwareTrait;
 
-    const PRIORITY = 1000;
+    public const PRIORITY = 1000;
 
     /**
      * @var array
@@ -52,9 +43,6 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     protected $app;
 
-    /**
-     * CatchExceptionMiddleware constructor.
-     */
     public function __construct(HttpKernelInterface $app)
     {
         $this->app                 = $app;
@@ -63,10 +51,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         $this->validCORSDomains    = array_key_exists('cors_valid_domains', $this->config) ? (array) $this->config['cors_valid_domains'] : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         $this->corsHeaders['Access-Control-Allow-Origin'] = $this->getAllowOriginHeaderValue($request);
 
@@ -119,8 +104,13 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         // Check the domains using shell wildcard patterns
         $validCorsDomainFilter = function ($validCorsDomain) use ($origin) {
+            if (null === $origin) {
+                return null;
+            }
+
             return fnmatch($validCorsDomain, $origin, FNM_CASEFOLD);
         };
+
         if (array_filter($this->validCORSDomains, $validCorsDomainFilter)) {
             $this->requestOriginIsValid = true;
             $this->corsHeaders['Vary']  = 'Origin';
@@ -133,9 +123,6 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

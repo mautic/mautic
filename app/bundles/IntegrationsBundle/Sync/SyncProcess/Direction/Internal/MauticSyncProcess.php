@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
@@ -22,41 +13,23 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectSyncSkippedException;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MauticSyncProcess
 {
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
+    private ?InputOptionsDAO $inputOptionsDAO = null;
 
-    /**
-     * @var ObjectChangeGenerator
-     */
-    private $objectChangeGenerator;
+    private ?MappingManualDAO $mappingManualDAO = null;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private ?MauticSyncDataExchange $syncDataExchange = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
-
-    /**
-     * @var MauticSyncDataExchange
-     */
-    private $syncDataExchange;
-
-    public function __construct(SyncDateHelper $syncDateHelper, ObjectChangeGenerator $objectChangeGenerator)
-    {
-        $this->syncDateHelper        = $syncDateHelper;
-        $this->objectChangeGenerator = $objectChangeGenerator;
+    public function __construct(
+        private SyncDateHelper $syncDateHelper,
+        private ObjectChangeGenerator $objectChangeGenerator,
+    ) {
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, MauticSyncDataExchange $syncDataExchange): void
@@ -67,16 +40,33 @@ class MauticSyncProcess
     }
 
     /**
-     * @return ReportDAO
-     *
      * @throws ObjectNotFoundException
      */
-    public function getSyncReport(int $syncIteration)
+    public function getSyncReport(int $syncIteration): ReportDAO
     {
-        $internalRequestDAO = new RequestDAO($this->mappingManualDAO->getIntegration(), $syncIteration, $this->inputOptionsDAO);
+        $internalRequestDAO     = new RequestDAO($this->mappingManualDAO->getIntegration(), $syncIteration, $this->inputOptionsDAO);
+        $mauticObjectTypes      = $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds() ?
+            $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectTypes() : [];
+        $hasMauticObjectIDs = 0 < count($mauticObjectTypes);
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectNames();
         foreach ($internalObjectsNames as $internalObjectName) {
+            if ($hasMauticObjectIDs) {
+                try {
+                    $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor($internalObjectName);
+                } catch (ObjectNotFoundException) {
+                    DebugLogger::log(
+                        $this->mappingManualDAO->getIntegration(),
+                        sprintf(
+                            'Mautic to integration; skipping sync for the %s object because certain object IDs are specified for other object(s)',
+                            $internalObjectName
+                        ),
+                        __CLASS__.':'.__FUNCTION__
+                    );
+                    continue;
+                }
+            }
+
             $internalObjectFields = $this->mappingManualDAO->getInternalObjectFieldsToSyncToIntegration($internalObjectName);
             if (0 === count($internalObjectFields)) {
                 // No fields configured for a sync
@@ -86,7 +76,7 @@ class MauticSyncProcess
                         'Mautic to integration; there are no fields for the %s object',
                         $internalObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 continue;
@@ -103,7 +93,7 @@ class MauticSyncProcess
                     $internalObjectName,
                     count($internalObjectFields)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $internalRequestObject  = new RequestObjectDAO($internalObjectName, $objectSyncFromDateTime, $objectSyncToDateTime);
@@ -123,16 +113,15 @@ class MauticSyncProcess
     }
 
     /**
-     * @return OrderDAO
-     *
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      */
-    public function getSyncOrder(ReportDAO $syncReport)
+    public function getSyncOrder(ReportDAO $syncReport): OrderDAO
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
+        $orderDAO = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
+
         foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationObjects         = $syncReport->getObjects($integrationObjectName);
             $mappedInternalObjectsNames = $this->mappingManualDAO->getMappedInternalObjectsNames($integrationObjectName);
@@ -145,7 +134,7 @@ class MauticSyncProcess
                     $integrationObjectName,
                     implode(', ', $mappedInternalObjectsNames)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             foreach ($mappedInternalObjectsNames as $mappedInternalObjectName) {
@@ -166,13 +155,23 @@ class MauticSyncProcess
                         );
 
                         if ($objectChange->shouldSync()) {
-                            $syncOrder->addObjectChange($objectChange);
+                            $orderDAO->addObjectChange($objectChange);
                         }
-                    } catch (ObjectDeletedException $exception) {
+                    } catch (ObjectDeletedException) {
                         DebugLogger::log(
                             $this->mappingManualDAO->getIntegration(),
                             sprintf(
                                 'Integration to Mautic; the %s object with ID %s is marked deleted and thus not synced',
+                                $integrationObject->getObject(),
+                                $integrationObject->getObjectId()
+                            ),
+                            self::class.':'.__FUNCTION__
+                        );
+                    } catch (ObjectSyncSkippedException $exception) {
+                        DebugLogger::log(
+                            $this->mappingManualDAO->getIntegration(),
+                            sprintf(
+                                'Integration to Mautic; the %s object with ID %s is skipped and thus not synced with message: '.$exception->getMessage(),
                                 $integrationObject->getObject(),
                                 $integrationObject->getObjectId()
                             ),
@@ -183,6 +182,6 @@ class MauticSyncProcess
             }
         }
 
-        return $syncOrder;
+        return $orderDAO;
     }
 }

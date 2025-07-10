@@ -1,0 +1,189 @@
+{% block _report_aggregators_entry_column_row %}
+<div class="choice-wrapper col-xs-6" data-form-block="_report_aggregators_entry_column_row">
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
+        {% for column in form.vars.choices %}
+            <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
+                {{ column.label }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+{% endblock %}
+
+{% block _report_aggregators_entry_function_row %}
+<div class="choice-wrapper col-xs-4" data-form-block="_report_aggregators_entry_function_row">
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <select id="{{ form.vars.id }}"
+            name="{{ form.vars.full_name }}"
+            class="{{ form.vars.attr.class }}"
+            onchange="Mautic.checkReportCondition('{{ form.vars.id }}')">
+        {% for function in form.vars.choices %}
+            <option value="{{ function.value|e }}" {% if function.value == form.vars.data %}selected{% endif %}>
+                {{ function.label }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+{% endblock %}
+
+{% block _report_aggregators_row %}
+{%- set hasErrors = form.vars.errors|length > 0 -%}
+<div id="aggregatorsContainer" class="row" data-form-block="_report_aggregators_row">
+    <div class="form-group col-md-12 {% if hasErrors %}has-error{% endif %}">
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+    </div>
+    <div class="col-xs-12">
+        <button id="aggregators-button"
+                disabled
+                type="button"
+                class="btn btn-primary"
+                onclick="Mautic.addReportRow('report_aggregators');">{{ 'mautic.report.report.label.function'|trans }}</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block _report_filters_entry_column_row %}
+<label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+<select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
+    {% for column in form.vars.choices %}
+      <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
+          {{ column.label }}
+      </option>
+    {% endfor %}
+</select>
+{% endblock %}
+
+{% block _report_filters_entry_condition_row %}
+<label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+<select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}" onchange="Mautic.checkReportCondition('{{ form.vars.id }}')">
+    {% for condition in form.vars.choices %}
+    <option value="{{ condition.value|e }}" {% if condition.value == form.vars.data %}selected{% endif %}>
+        {{ condition.label }}
+    </option>
+    {% endfor %}
+</select>
+{% endblock %}
+
+{% block _report_filters_entry_value_row %}
+{%- set condition = form.parent.children.condition.vars.value -%}
+<div class="form-group mb-0" data-form-block="_report_filters_entry_value_row">
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <input type="text" id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}"
+    value="{% if form.vars.data is iterable %}{{ form.vars.data|join(', ')|e }}{% else %}{{ form.vars.data|e }}{% endif %}"
+    {% if condition in ['empty', 'notEmpty'] %}disabled{% endif %} />
+</div>
+{% endblock %}
+
+{% block _report_filters_row %}
+{%- set hasErrors = form.vars.errors|length > 0 -%}
+<div id="filterSelectorContainer" class="row" data-form-block="_report_filters_row">
+    <div class="form-group col-md-12 {% if hasErrors %}has-error{% endif %}">
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+    </div>
+    <div class="col-xs-12">
+        <button type="button" class="btn btn-primary" onclick="Mautic.addReportRow('report_filters');">{{ 'mautic.report.report.label.addfilter'|trans }}</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block _report_tableOrder_entry_column_row %}
+<div class="choice-wrapper col-xs-6" data-form-block="_report_tableOrder_entry_column_row">
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
+        {% for column in form.vars.choices %}
+          <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
+              {{ column.label }}
+          </option>
+        {% endfor %}
+    </select>
+</div>
+{% endblock %}
+
+{% block _report_tableOrder_entry_direction_row %}
+<div class="choice-wrapper col-xs-4" data-form-block="_report_tableOrder_entry_direction_row">
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
+        {% for direction in form.vars.choices %}
+        <option value="{{ direction.value|e }}" {% if direction.value == form.vars.data %}selected{% endif %}>
+            {{ direction.label }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+{% endblock %}
+
+{% block _report_tableOrder_row %}
+{%- set hasErrors = form.vars.errors|length > 0 -%}
+<div id="tableOrderContainer" class="row" data-form-block="_report_tableOrder_row">
+    <div class="form-group col-md-12 {% if hasErrors %}has-error{% endif %}">
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+    </div>
+    <div class="col-xs-12">
+        <button type="button" class="btn btn-primary" onclick="Mautic.addReportRow('report_tableOrder');">{{ 'mautic.report.report.label.addtableorder'|trans }}</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block aggregator_row %}
+<div id="{{ form.vars.id }}_container" class="row mb-sm" data-form-block="aggregator_row">
+    {{ form_row(form.vars.form.children.function) }}
+    {{ form_row(form.vars.form.children.column) }}
+    <div class="col-xs-1 mt-lg">
+        <button type="button" class="btn btn-danger btn-icon" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-delete-row"></i></button>
+    </div>
+</div>
+{% endblock %}
+
+{% block filter_selector_row %}
+{%- set inGroup = form.vars.data.glue is not defined or (form.vars.data.glue is defined and 'and' is same as form.vars.data.glue) -%}
+<div class="panel {% if inGroup %}in-group{% endif %}" id="{{ form.vars.id }}_container" data-form-block="filter_selector_row">
+    <div class="panel-heading">
+        <div class="panel-glue col-sm-2 pl-0">
+            {{ form_row(form.vars.form.children.glue) }}
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row mb-sm">
+            <div class="choice-wrapper col-xs-3">
+                {{ form_row(form.vars.form.children.column) }}
+            </div>
+            <div class="choice-wrapper col-xs-2">
+                {{ form_row(form.vars.form.children.condition) }}
+            </div>
+            <div class="choice-wrapper col-xs-4">
+                {{ form_row(form.vars.form.children.value) }}
+            </div>
+            <div class="choice-wrapper col-xs-2">
+                {{ form_row(form.vars.form.children.dynamic, {'attr': {'size': 'sm'}}) }}
+            </div>
+            <div class="col-xs-1 pa-0 jc-center">
+                <div class="d-flex fd-row">
+                    <!-- Clone Button -->
+                    <button type="button" class="btn btn-xs btn-ghost btn-icon btn-nospin" onclick="Mautic.cloneReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{'mautic.report.report.label.clonefilter'|trans}}">
+                        <i class="ri-file-copy-line"></i>
+                    </button>
+                    <!-- Remove Button -->
+                    <button type="button" class="btn btn-xs btn-ghost btn-icon btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}">
+                        <i class="ri-subtract-line"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block table_order_row %}
+<div id="{{ form.vars.id }}_container" class="row mb-sm" data-form-block="table_order_row">
+    {{ form_row(form.vars.form.children.column) }}
+    {{ form_row(form.vars.form.children.direction) }}
+    <div class="col-xs-2 mt-lg">
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-delete-bin-2-line fs-14"></i></button>
+    </div>
+</div>
+{% endblock %}

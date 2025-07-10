@@ -1,0 +1,68 @@
+{% if 'list' == email.getEmailType() %}
+    {% set label = 'mautic.email.lead.list.comparison' %}
+    {% set type = 'bar' %}
+{% else %}
+    {% set label = 'mautic.email.stats' %}
+    {% set type = 'line' %}
+{% endif %}
+
+{% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
+{% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
+{% set actionRoute = path('mautic_email_action', {
+    'objectAction' : 'view',
+    'objectId'     : email.getId(),
+    'daterange'    : {
+        'date_to'   : dateTo,
+        'date_from' : dateFrom,
+    }
+}) %}
+
+<div class="row">
+        <div class="col-sm-12">
+            {% if isVariant %}
+            <div class="text-right small" id="variant-chart-switcher">
+                <span>
+                    <a data-toggle="ajax" class="btn btn-xs{% if not showAllStats %}{{ ' disabled' }}{% endif %}" href="{{ actionRoute ~ '&stats=variant' }}">
+                        {{ 'mautic.email.variant.graph.variant'|trans }}
+                    </a>
+                </span>
+                </span> | </span>
+                <span>
+                    <a data-toggle="ajax" class="btn btn-xs{% if not showAllStats %}{{ ' disabled' }}{% endif %}" href="{{ actionRoute ~ '&stats=all' }}">
+                        {{ 'mautic.email.variant.graph.all'|trans }}
+                    </a>
+                </span>
+            </div>
+            {% endif %}
+
+                <div class="panel-body box-layout">
+                    <div class="col-xs-12 va-m">
+                        <h5 class="text-white dark-md fw-sb mb-xs">
+                            <span class="ri-mail-line"></span>
+                            {{ label|trans }}
+                        </h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                        {{- include('@MauticCore/Helper/chart.html.twig', {
+                            'chartData' : stats,
+                            'chartType' : type,
+                            'chartHeight' : 300
+                        })
+                        -}}
+                    </div>
+                    <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                        {{- include('@MauticCore/Helper/chart.html.twig', {
+                            'chartData' : statsDevices,
+                            'chartType' : 'horizontal-bar',
+                            'chartHeight' : 300
+                        })
+                        -}}
+                    </div>
+                </div>
+
+        </div>
+    </div>
+
+<!--/ some stats -->

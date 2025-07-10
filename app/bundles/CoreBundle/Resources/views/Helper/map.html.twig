@@ -1,0 +1,32 @@
+{%  if optionsEnabled|default(false) %}
+    <div class="map-options">
+        {% if optionsTitle is defined and optionsTitle is not empty %}
+            <h5 class="map-options__title text-white dark-md fw-sb mb-xs">{{ optionsTitle|trans }}</h5>
+        {% endif %}
+        <div class="map-options__container btn-group btn-block" data-toggle="buttons">
+            {% for option in options %}
+            <label class="map-options__item {{ loop.first ? 'active' : '' }} btn btn-ghost"
+                   data-map-option="true"
+                   data-map-series="{{ option.data|json_encode }}"
+                   data-legend-text="{{ option.legendText }}"
+                   data-stat-unit="{{ option.unit|default('Lead') }}"
+            >
+                <input type="radio"
+                       name="map-stats"
+                       id="read"
+                       autocomplete="off"
+                       {{ loop.first ? 'checked' : '' }}
+                >
+                {{ option.label|trans }}
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+<div class="vector-map"
+     style="height:{{ height }}px"
+     data-legend-enabled="{{ legendEnabled|default(false) }}"
+     data-stat-unit="{{ statUnit|default('Lead') }}"
+>
+    {{ data|json_encode }}
+</div>

@@ -1,0 +1,20 @@
+{#
+  Variables
+    - deleted
+    - id
+    - route
+    - sessionId
+#}
+{% set action = deleted ? 'undelete' : 'delete' %}
+{% set iconClass = deleted ? 'ri-arrow-go-back-line' : 'ri-close-line' %}
+{% set btnClass = deleted ? 'btn-warning' : 'btn-danger' %}
+{% set route = route|default('mautic_pointtriggerevent_action') %}
+<div class="form-buttons hide">
+    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': id, 'triggerId': sessionId}) }}" class="btn btn-primary btn-xs btn-edit">
+        <i class="ri-edit-line"></i>
+    </a>
+    <a data-menu-link="mautic_point_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': action, 'objectId': id, 'triggerId': sessionId}) }}"  class="btn {{ btnClass }} btn-xs">
+        <i class="fa {{ iconClass }}"></i>
+    </a>
+    <i class="ri-fw ri-more-2-line reorder-handle"></i>
+</div>

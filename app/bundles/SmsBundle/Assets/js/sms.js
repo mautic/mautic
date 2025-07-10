@@ -1,5 +1,14 @@
 /** SmsBundle **/
 Mautic.smsOnLoad = function (container, response) {
+    const smsMessage = mQuery('#sms_message');
+
+    if (smsMessage.length) {
+        Mautic.setSmsCharactersCount(smsMessage);
+        smsMessage.on('input', () => {
+            Mautic.setSmsCharactersCount(smsMessage);
+        });
+    }
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'sms');
     }
@@ -35,7 +44,28 @@ Mautic.smsOnLoad = function (container, response) {
             );
         }
     }
+
+    Mautic.initSmsAtWho();
 };
+
+Mautic.setSmsCharactersCount = function (smsMessage) {
+    mQuery('#sms_nb_char').text((smsMessage.val().length))
+};
+
+
+Mautic.initSmsAtWho = function () {
+    var smsMessage = mQuery('#sms_message, #send_sms_message');
+    smsMessage.each(function () {
+        var obj = mQuery(this);
+        var callbackAttr = obj.attr('data-token-callback');
+        if (typeof callbackAttr == 'undefined') {
+            obj.attr('data-token-callback', 'sms:getBuilderTokens');
+            obj.attr('data-token-activator', '{');
+            obj.attr('data-token-visual', 'false');
+            Mautic.initAtWho(obj, obj.attr('data-token-callback'));
+        }
+    })
+}
 
 Mautic.selectSmsType = function(smsType) {
     if (smsType == 'list') {

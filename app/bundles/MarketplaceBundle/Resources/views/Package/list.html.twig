@@ -1,0 +1,148 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}Package{% endblock %}
+{% block headerTitle %}{{ 'marketplace.title'|trans|purify }}{% endblock %}
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+    'customButtons' : {
+        0: {
+            'attr' : {
+                'class'       : 'btn btn-primary btn-nospin',
+                'data-toggle' : 'ajax',
+                'href'        : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_CLEAR_CACHE')),
+            },
+            'iconClass' : 'ri-refresh-line',
+            'btnText'   : 'marketplace.clear.cache',
+            'tooltip'   : 'marketplace.clear.cache.tooltip',
+        },
+    },
+    }) -}}
+{% endblock %}
+
+
+
+{% block content %}
+    {% if isIndex %}
+        {% if isComposerEnabled %}
+            <div class="alert alert-info" role="alert">
+                {% trans %}marketplace.beta.warning{% endtrans %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                {% trans %}marketplace.composer.required{% endtrans %}
+            </div>
+        {% endif %}
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue' : searchValue,
+                'action'      : currentRoute,
+            }) -}}
+            <div class="page-list">
+                {{ block('listResults') }}
+            </div>
+        </div>
+    {% else %}
+        {{ block('listResults') }}
+    {% endif %}
+{% endblock %}
+
+{% block listResults %}
+{% if items|length %}
+        <div class="table-responsive">
+        <table class="table table-hover" id="marketplace-packages-table">
+            <thead>
+            <tr>
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'checkall'  : 'true',
+                        'target'    : '#marketplace-packages-table',
+                        'langVar'   : 'marketplace.package',
+                        'routeBase' : 'marketplace',
+                    }
+                ) -}}
+
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'mautic.core.name',
+                    }
+                ) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'marketplace.vendor',
+                    }
+                ) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'marketplace.downloads',
+                    }
+                ) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'marketplace.favers',
+                    }
+                ) -}}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{- include(
+                            '@MauticCore/Helper/list_actions.html.twig',
+                            {
+                                'item'            : item,
+                                'customButtons'   : {},
+                            }
+                        ) -}}
+                    </td>
+                    <td class="package-name">
+                        <div>
+                            <a data-toggle="ajax" href="{{ path(
+                                    constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_DETAIL'),
+                                    {
+                                        'vendor'  : item.getVendorName()|escape,
+                                        'package' : item.getPackageName()|escape,
+                                    }
+                                ) }}">
+                                {{ item.getHumanPackageName()|escape }}
+                            </a>
+                        </div>
+                        {% if item.description %}
+                            <div class="text-secondary mt-4">
+                                <small>{{ item.description|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="vendor-name">{{ item.getVendorName()|escape }}</td>
+                    <td class="downloads">{{ item.downloads|escape }}</td>
+                    <td class="favers">{{ item.favers|escape }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+
+        {{- include(
+            '@MauticCore/Helper/pagination.html.twig',
+            {
+                'totalItems' : count,
+                'page'       : page,
+                'limit'      : limit,
+                'baseUrl'    : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+                'sessionVar' : 'marketplace.package',
+                'routeBase'  : constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST'),
+            }
+        ) -}}
+    </div>
+    {% else %}
+        {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'marketplace.noresults.tip'}) -}}
+    {% endif %}
+{% endblock %}

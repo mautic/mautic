@@ -1,0 +1,38 @@
+{%- set isIndex = 'index' == tmpl -%}
+{%- set tmpl = 'list' -%}
+{% extends '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="box-layout mb-lg">
+        <div class="col-xs-12 col-md-9 col-lg-10 va-m">
+            {{ include('@MauticLead/Note/_list_filter_form.html.twig') }}
+        </div>
+        <div class="col-xs-12 col-md-3 col-lg-2 va-t">
+          {% include '@MauticCore/Helper/button.html.twig' with {
+              buttons: [
+                  {
+                      label: 'mautic.lead.add.note',
+                      variant: 'primary',
+                      icon: 'ri-add-line',
+                      href: path('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'new'}),
+                      attributes: {
+                          'class': 'btn-leadnote-add pull-right',
+                          'data-toggle': 'ajaxmodal',
+                          'data-target': '#MauticSharedModal',
+                          'data-header': 'mautic.lead.note.header.new'|trans
+                      }
+                  }
+              ]
+          } %}
+        </div>
+    </div>
+    <div id="NoteList">
+  {% endif %}
+
+  {{ include('@MauticLead/Note/_list.html.twig') }}
+
+  {% if isIndex %}
+    </div>
+  {% endif %}
+{% endblock %}

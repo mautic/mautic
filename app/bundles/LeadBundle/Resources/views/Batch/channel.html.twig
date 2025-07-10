@@ -1,0 +1,87 @@
+{#
+  Variables
+    - form
+    - leadChannels
+#}
+{{ form_start(form, {
+    'attr': {
+        'data-submit-callback': 'leadBatchSubmit',
+    }
+}) }}
+<table class="table" width="100%">
+    <thead >
+    <tr >
+        <th>
+            <input type="checkbox" id="contact_channels_subscribed_channels_0" name="check_all" onclick="Mautic.togglePreferredChannel('all');" value="all">
+        </th>
+        <th>{{ 'mautic.lead.contact.channels'|trans }}</th>
+        <th>{{ 'mautic.lead.preferred.frequency'|trans }}</th>
+        <th>{{ 'mautic.lead.preferred.channels'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for channel in form['subscribed_channels'].vars['choices'] %}
+        {% set contactMe = leadChannels[channel.value] is defined %}
+        {% set isContactable = contactMe ? '' : 'text-secondary' %}
+        {% set hidden = contactMe ? '' : 'hide' %}
+        {% set checked = contactMe ? 'checked' : '' %}
+        {% set disabled = leadChannels[channel.value] is defined ? '' : 'disabled' %}
+        <tr>
+            <th style="vertical-align: top" class="col-md-1">
+                <input type="checkbox" id="{{ channel.value }}"
+                       name="contact_channels[subscribed_channels][]" class="control-label" onclick="Mautic.togglePreferredChannel(this.value);"
+                       value="{{ channel.value|e }}" {{ checked }}>
+            </th>
+            <td class="col-md-1" style="vertical-align: top">
+                <div id="is-contactable-{{ channel.value }}" class="{{ isContactable }} fw-sb">
+                    {{ getChannelLabel(channel.value) }}
+                </div>
+            </td>
+            <td class="col-md-9" style="vertical-align: top">
+                <div>
+                    <div class="pull-left">
+                        {% set existingFieldClass = form['frequency_number_'~channel.value].vars['attr']['class'] %}
+                        {{ form_widget(form['frequency_number_'~channel.value], {
+                            'attr': {
+                              'class': existingFieldClass~' pull-left',
+                            }
+                        }) }}
+                        {{ form_label(form['frequency_time_'~channel.value]) }}
+                        <div class="frequency-select">
+                          {{ form_widget(form['frequency_time_'~channel.value]) }}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="col-md-1" style="vertical-align: top;" align="center">
+                <input type="radio" id="preferred_{{ channel.value }}"
+                       name="contact_channels[preferred_channel]" class="contact"
+                       value="{{ channel.value|e }}" {% if form['preferred_channel'].vars['value'] == channel.value %}checked{% endif %} {{ disabled }}>
+
+            </td>
+        </tr>
+        <tr style="border-top:none"><th style="border-top:none"></th>
+            <td  style="border-top:none"></td>
+            <td colspan="2" style="border-top:none">
+                <div id="frequency_{{ channel.value }}" class="{{ hidden }}">
+                    <div>
+                        <label class="text-secondary fw-n">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                    </div>
+                    <div>
+                        {{ form_widget(form['contact_pause_start_date_'~channel.value]) }}
+                        <div style="float:left;">
+                            {{ form_label(form['contact_pause_end_date_'~channel.value]) }}
+                        </div>
+                        {{ form_widget(form['contact_pause_end_date_'~channel.value]) }}
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% do form.preferred_channel.setRendered %}
+{% do form.subscribed_channels.setRendered %}
+{{ form_end(form) }}

@@ -1,0 +1,33 @@
+{% set item = event.extra.log is not empty ? event.extra.log : null %}
+{% if item is not empty %}
+    <table class="table table-hover table-sm table-condensed">
+        <thead>
+            <tr>
+                <th>{% trans %}mautic.queued.message.timeline.channel{% endtrans %}</th>
+                <th>{% trans %}mautic.queued.message.timeline.attempts{% endtrans %}</th>
+                <th>{% trans %}mautic.queued.message.timeline.date.added{% endtrans %}</th>
+                <th>{% trans %}mautic.queued.message.timeline.rescheduled{% endtrans %}</th>
+                <th>{% trans %}mautic.queued.message.timeline.status{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">{{ getChannelLabel(item.channelName) }}</th>
+                <td>{{ item.attempts }}</td>
+                <td>{% if item.dateAdded is not empty %}{{ dateToFullConcat(item.dateAdded, 'UTC') }}{% endif %}</td>
+                <td>{% if item.scheduledDate is not empty %}{{ dateToFullConcat(item.scheduledDate, 'UTC') }}{% endif %}</td>
+                <td id="queued-status-{{ item.id }}">
+                    {{ ('mautic.message.queue.status.' ~ item.status) | trans({},'javascript') }}
+                </td>
+                <td>
+                    {% if ('pending' == item.status) %}
+                    <button type="button" id="queued-message-{{ item.id }}" class="btn btn-ghost btn-nospin" onclick="Mautic.cancelQueuedMessageEvent({{ item.id }})" data-toggle="tooltip" title="{% trans %}mautic.queued.message.event.cancel{% endtrans %}">
+                        <i class="ri-close-line text-danger"></i>
+                    </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endif %}

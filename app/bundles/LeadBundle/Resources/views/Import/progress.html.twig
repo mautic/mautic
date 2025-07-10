@@ -1,0 +1,125 @@
+{#
+  Variables
+    - progress
+    - import
+    - complete
+    - failedRows
+    - objectName
+    - indexRoute
+    - indexRouteParams
+    - step
+    - currentRoute
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}leadImport{% endblock %}
+
+{% block headerTitle %}
+  {{ 'mautic.lead.import.leads'|trans({'%object%': objectName|trans}) }}
+{% endblock %}
+
+{% block content %}
+  {% set object = app.request.get('object', 'contacts') %}
+  {% set objectName = objectName|trans %}
+  {% set percent = progress.toPercent %}
+  {% set id = complete ? 'leadImportProgressComplete' : 'leadImportProgress' %}
+  {% set header = complete ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave' %}
+
+<div class="row ma-lg" id="{{ id }}">
+    <div class="col-sm-offset-3 col-sm-6 text-center">
+        <div class="panel panel-{% if complete %}success{% else %}danger{% endif %}">
+            <div class="panel-heading">
+                <h4 class="panel-title">{{ header|trans({'object': object}) }}</h4>
+            </div>
+            <div class="panel-body">
+                {% if not complete %}
+                    <h4>{{ 'mautic.lead.import.inprogress'|trans }}</h4>
+                {% else %}
+                    <h4>{{ 'mautic.lead.import.stats'|trans({'%merged%': import.updatedCount, '%created%': import.insertedCount, '%ignored%': import.ignoredCount}) }}</h4>
+                {% endif %}
+                <div class="progress mt-md" style="height:50px;">
+                    <div class="progress-bar-import progress-bar progress-bar-striped {% if not complete %}active{% endif %}"
+                         role="progressbar"
+                         aria-valuenow="{{ progress.done }}"
+                         aria-valuemin="0"
+                         aria-valuemax="{{ progress.total }}"
+                         style="width: {{ percent }}%; height: 50px;"><span class="sr-only">{{ percent }}%</span>
+                    </div>
+                </div>
+            </div>
+            {% if failedRows is not empty %}
+                <ul class="list-group">
+                    {% for row in failedRows %}
+                        {% set lineNumber = row.properties.line|default('N/A') %}
+                        {% set failure = row.properties.error|default('N/A') %}
+                        <li class="list-group-item text-left">
+                            <a target="_new" class="text-danger">(#{{ lineNumber }}) {{ failure }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="panel-footer">
+                <p class="small"><span class="imported-count">{{ progress.done }}</span> / <span class="total-count">{{ progress.total }}</span></p>
+                {% if not complete %}
+                    <div>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.form.cancel',
+                                    variant: 'danger',
+                                    href: path('mautic_import_action', {'objectAction': 'cancel', 'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                },
+                                {
+                                    label: 'mautic.lead.import.queue.btn',
+                                    variant: 'primary',
+                                    href: path('mautic_import_action', {'objectAction': 'queue', 'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                }
+                            ]
+                        } %}
+                    </div>
+                {% else %}
+                    <div>
+                        {% set indexRouteParams = indexRouteParams|merge({
+                            'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
+                        }) %}
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.lead.list.view'|trans({'%objects%': objectName}),
+                                    variant: 'secondary',
+                                    href: path(indexRoute, indexRouteParams),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                },
+                                {
+                                    label: 'mautic.lead.view.imports',
+                                    variant: 'secondary',
+                                    href: path('mautic_import_index', {'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                },
+                                {
+                                    label: 'mautic.lead.import.result.info'|trans({'%import%': import.name()}),
+                                    variant: 'secondary',
+                                    href: path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                }
+                            ]
+                        } %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

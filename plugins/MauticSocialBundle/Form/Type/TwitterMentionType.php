@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,10 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TwitterMentionType extends TwitterAbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('handle', TextType::class, [
             'label'      => 'mautic.social.monitoring.twitter.handle',
@@ -28,7 +16,7 @@ class TwitterMentionType extends TwitterAbstractType
             'attr'       => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.social.monitoring.twitter.handle.tooltip',
-                'preaddon' => 'fa fa-at',
+                'preaddon' => 'ri-at-line',
             ],
         ]);
 
@@ -51,7 +39,7 @@ class TwitterMentionType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'twitter_handle';
     }

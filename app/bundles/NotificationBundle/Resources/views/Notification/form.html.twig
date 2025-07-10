@@ -1,0 +1,63 @@
+{#
+  Variables
+    - form
+    - notification
+    - forceTypeSelection (optional, bool, default=false)
+        This will be defined when the notification entity is being edited
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}notification{% endblock %}
+
+{% block headerTitle %}
+  {% if notification.id %}
+    {{ 'mautic.notification.header.edit'|trans({'%name%': notification.name}) }}
+  {% else %}
+    {{ 'mautic.notification.header.new'|trans }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-9 height-auto">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="tab-content pa-md">
+                        <div class="tab-pane fade in active bdr-w-0" id="notification-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form_row(form.name) }}
+                                    {{ form_row(form.heading) }}
+                                    {{ form_row(form.message) }}
+                                    {{ form_row(form.url) }}
+                                    {{ form_row(form.button) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ include('@MauticNotification/Notification/preview.html.twig', {
+                                        'notification': notification,
+                                    }, with_context=false) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 height-auto bdr-l">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ form_row(form.category) }}
+                {{ form_row(form.language) }}
+                <hr />
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
+                <div class="hide">
+                    {{ form_row(form.isPublished) }}
+                    {{ form_row(form.publishUp) }}
+                    {{ form_row(form.publishDown) }}
+                    {{ form_rest(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+  {{ form_end(form) }}
+{% endblock %}

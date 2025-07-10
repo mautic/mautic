@@ -1,0 +1,26 @@
+<div class="pa-md">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel">
+                <div class="panel-body box-layout">
+                    <div class="col-xs-4 va-m">
+                        <h5 class="text-white dark-md fw-sb mb-xs">
+                            <span class="ri-mail-line"></span>
+                            {{ 'mautic.sms.stats'|trans }}
+                        </h5>
+                    </div>
+                    <div class="col-xs-6 va-m" id="legend"></div>
+                    <div class="col-xs-2 va-m">
+                        {{- include('@MauticCore/Helper/graph_dateselect.htm.twig', {'mescallbacksage' : 'updateSmsStatsChart'}) -}}
+                    </div>
+                </div>
+                <div class="pt-0 pl-15 pb-10 pr-15">
+                    <div>
+                        <canvas id="stat-chart" height="300"></canvas>
+                    </div>
+                </div>
+                <div id="stat-chart-data" class="hide">{{ stats|json_encode|raw }}</div>
+            </div>
+        </div>
+    </div>
+</div>

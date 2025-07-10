@@ -1,0 +1,49 @@
+{#
+  Variables
+    - failed (bool)
+    - noMigrations (bool)
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'update' %}
+
+{% block headerTitle 'mautic.core.update.index'|trans %}
+
+{% block content %}
+{%- set message = 'mautic.core.update.schema_updated'|trans %}
+{%- set class = 'success' %}
+
+{%- if failed %}
+    {%- set message = 'mautic.core.update.error_performing_migration'|trans %}
+    {%- set class   = 'danger' %}
+{%- elseif noMigrations %}
+    {%- set message = 'mautic.core.update.schema_uptodate'|trans %}
+    {%- set class   = 'info' %}
+{%- endif %}
+<div class="panel panel-default mnb-5 bdr-t-wdh-0">
+    <div id="update-panel" class="panel-body">
+        <div class="col-sm-offset-2 col-sm-8">
+            <div class="alert alert-{{ class }} mb-sm">
+                {{ message }}
+            </div>
+            {%- if not failed %}
+                <div class="text-center">
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.core.go_to_dashboard',
+                                variant: 'primary',
+                                href: path('mautic_dashboard_index'),
+                                icon: 'ri-funds-fill',
+                                attributes: {
+                                    'data-toggle': 'ajax'
+                                }
+                            }
+                        ]
+                    } %}
+                </div>
+            {%- endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,80 +1,32 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
-/**
- * Report generator.
- */
 class ReportGenerator
 {
-    /**
-     * @var Connection
-     */
-    private $db;
+    private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
 
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
+    private ?string $contentTemplate = null;
 
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var \Mautic\ReportBundle\Entity\Report
-     */
-    private $entity;
-
-    /**
-     * @var string
-     */
-    private $validInterface = 'Mautic\\ReportBundle\\Builder\\ReportBuilderInterface';
-
-    /**
-     * @var string
-     */
-    private $contentTemplate;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    /**
-     * ReportGenerator constructor.
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
-    {
-        $this->db                = $db;
-        $this->dispatcher        = $dispatcher;
-        $this->formFactory       = $formFactory;
-        $this->channelListHelper = $channelListHelper;
-        $this->entity            = $entity;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private Connection $db,
+        private Report $entity,
+        private ChannelListHelper $channelListHelper,
+        private ?FormFactoryInterface $formFactory = null,
+    ) {
     }
 
     /**
-     * Gets query.
-     *
      * @param array $options Optional options array for the query
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
@@ -91,38 +43,29 @@ class ReportGenerator
     }
 
     /**
-     * Gets form.
+     * @param array $options Parameters set by the caller
      *
-     * @param Report $entity  Report Entity
-     * @param array  $options Parameters set by the caller
-     *
-     * @return \Symfony\Component\Form\FormInterface
+     * @return \Symfony\Component\Form\FormInterface<Report>
      */
-    public function getForm(Report $entity, $options)
+    public function getForm(Report $entity, $options): \Symfony\Component\Form\FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
 
     /**
      * Gets the getContentTemplate path.
-     *
-     * @return string
      */
-    public function getContentTemplate()
+    public function getContentTemplate(): ?string
     {
         return $this->contentTemplate;
     }
 
     /**
-     * Gets report builder.
-     *
-     * @return \Mautic\ReportBundle\Builder\ReportBuilderInterface
-     *
-     * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @throws RuntimeException
      */
-    protected function getBuilder()
+    protected function getBuilder(): MauticReportBuilder
     {
-        $className = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
+        $className = MauticReportBuilder::class;
 
         if (!class_exists($className)) {
             throw new RuntimeException('The MauticReportBuilder does not exist.');

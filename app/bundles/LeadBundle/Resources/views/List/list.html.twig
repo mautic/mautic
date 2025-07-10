@@ -1,0 +1,72 @@
+{#
+  Variables
+    - items
+    - leadCounts
+    - page
+    - limit
+#}
+{# Check to see if the entire page should be displayed or just main content #}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}leadlist{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.lead.list.header.index'|trans }}{% endblock %}
+
+{% block content %}
+  {% set listCommand = 'mautic.lead.lead.searchcommand.list'|trans %}
+
+  {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+      {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'filters': filters|default([]),
+        'page_actions': {
+            'templateButtons': {'new': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')]},
+            'routeBase': 'segment',
+            'langVar': 'lead.list',
+            'tooltip': 'mautic.lead.lead.segment.add.help',
+        },
+        'bulk_actions': {
+          'langVar': 'lead.list',
+          'routeBase': 'segment',
+          'templateButtons': {
+              'delete': permissions['lead:lists:deleteother'],
+          },
+        },
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.active',
+                'tooltip': 'mautic.core.search.quickfilter.is_published',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.inactive',
+                'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+                'icon': 'ri-close-line'
+            }
+        ]
+    }) -}}
+    <div class="page-list">
+  {% endif %}
+
+  {{ include('@MauticLead/List/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.segments.dynamic', 'mautic.protip.segments.test'])
+  }) }}
+  {% endif %}
+{% endblock %}

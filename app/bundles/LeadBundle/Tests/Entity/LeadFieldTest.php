@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -87,5 +78,19 @@ class LeadFieldTest extends \PHPUnit\Framework\TestCase
         $leadField->setColumnWasCreated();
 
         $this->assertFalse($leadField->disablePublishChange());
+    }
+
+    public function testClone(): void
+    {
+        $leadField = new LeadField();
+        $leadField->setLabel('Test value for custom field 4');
+        $leadField->setAlias('test_value_for_custom_field_4');
+
+        $clonedField = clone $leadField;
+
+        $this->assertEquals($leadField->getLabel(), $clonedField->getLabel());
+        $this->assertEquals($leadField->getAlias(), $clonedField->getAlias());
+        $this->assertEquals(0, $clonedField->getOrder());
+        $this->assertTrue($clonedField->getIsCloned());
     }
 }

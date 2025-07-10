@@ -1,0 +1,59 @@
+{#
+  Variables
+    - contact
+    - noContactList
+#}
+{% set fields = contact.fields %}
+{% set color = contact.color|default('a0acb8') %}
+{% set img = leadGetAvatar(contact) %}
+<div class="shuffle shuffle-item grid col-sm-6 col-lg-4 contact-cards">
+    <div data-color="#{{ color }}" class="panel {% if highlight is defined %}highlight{% endif %} card ovf-h" style="border-top: 3px solid #{{ color }};">
+        <div class="box-layout">
+            <div class="col-xs-4 va-m">
+                <div class="panel-body">
+                  <span class="img-wrapper img-rounded">
+                      <img class="img" src="{{ img }}" />
+                  </span>
+                </div>
+            </div>
+            <div class="col-xs-8 va-t">
+                <div class="panel-body">
+                    {% if contact.id in noContactList|keys %}
+                        <div class="pull-right label label-danger"><i class="ri-prohibited-line"></i></div>
+                    {% endif %}
+                    <h4 class="fw-sb mb-xs ellipsis">
+                        <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
+                            <span>{{ contact.primaryIdentifier }}</span>
+                        </a>
+                    </h4>
+                    <div class="text-secondary mb-1 ellipsis">
+                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ fields.core.company.value|default('') }}
+                    </div>
+                    <div class="text-secondary mb-1 ellipsis">
+                        <i class="ri-fw ri-map-pin-2-line mr-xs"></i>
+                        {% set location = [] %}
+                        {% if fields.core.city is defined %}
+                          {% set location = location|merge([fields.core.city.value]) %}
+                        {% endif %}
+                        {% if fields.core.state is defined %}
+                          {% set location = location|merge([fields.core.state.value]) %}
+                        {% elseif fields.core.country is defined %}
+                          {% set location = location|merge([fields.core.country.value]) %}
+                        {% endif %}
+                        {{ location|join(', ') }}
+                    </div>
+                    <div class="text-secondary mb-1 ellipsis">
+                        <i class="ri-earth-line mr-xs"></i>{{ fields.core.country.value|default('') }}
+                    </div>
+                    {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                    {% if flag is not empty %}
+                        <div style="position: absolute; right: 30px; bottom: 30px">
+                            <img src="{{ flag }}" style="max-height: 24px;" class="ml-sm" />
+                        </div>
+                    {% endif %}
+                    {{ customContent('lead.grid', _context) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

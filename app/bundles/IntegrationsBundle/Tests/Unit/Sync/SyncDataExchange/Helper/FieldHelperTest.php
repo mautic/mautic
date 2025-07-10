@@ -2,64 +2,57 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelperTest extends TestCase
 {
     /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldModel&MockObject
      */
-    private $fieldModel;
+    private MockObject $fieldModel;
 
     /**
-     * @var VariableExpresserHelperInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
-    private $variableExpresserHelper;
+    private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var VariableExpresserHelperInterface&MockObject
      */
-    private $channelListHelper;
+    private MockObject $variableExpresserHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var ChannelListHelper&MockObject
      */
-    private $eventDispatcher;
+    private MockObject $channelListHelper;
+
+    private MockObject $eventDispatcher;
 
     /**
-     * @var MauticSyncFieldsLoadEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @var MauticSyncFieldsLoadEvent&MockObject
      */
-    private $mauticSyncFieldsLoadEvent;
+    private MockObject $mauticSyncFieldsLoadEvent;
 
     /**
-     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @var ObjectProvider&MockObject
      */
-    private $objectProvider;
+    private MockObject $objectProvider;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private FieldHelper $fieldHelper;
 
     protected function setUp(): void
     {
@@ -75,8 +68,11 @@ class FieldHelperTest extends TestCase
         $this->eventDispatcher->method('dispatch')
             ->willReturn($this->mauticSyncFieldsLoadEvent);
 
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+
         $this->fieldHelper = new FieldHelper(
             $this->fieldModel,
+            $this->fieldsWithUniqueIdentifier,
             $this->variableExpresserHelper,
             $this->channelListHelper,
             $this->createMock(TranslatorInterface::class),
@@ -102,10 +98,10 @@ class FieldHelperTest extends TestCase
 
         $this->assertEquals(
             [
+                'email',
+                'mautic_internal_contact_timeline',
                 'mautic_internal_dnc_email',
                 'mautic_internal_id',
-                'mautic_internal_contact_timeline',
-                'email',
             ],
             array_keys($fields)
         );
@@ -128,10 +124,10 @@ class FieldHelperTest extends TestCase
 
         $this->assertEquals(
             [
+                'email',
+                'mautic_internal_contact_timeline',
                 'mautic_internal_dnc_email',
                 'mautic_internal_id',
-                'mautic_internal_contact_timeline',
-                'email',
             ],
             array_keys($fields)
         );
@@ -143,8 +139,8 @@ class FieldHelperTest extends TestCase
             ->method('getFieldList')
             ->willReturn(['some fields']);
 
-        $this->fieldModel->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['some unique fields']);
 
         $this->assertSame(
@@ -165,8 +161,8 @@ class FieldHelperTest extends TestCase
             ->method('getFieldList')
             ->willReturn(['some fields']);
 
-        $this->fieldModel->expects($this->never())
-            ->method('getUniqueIdentifierFields');
+        $this->fieldsWithUniqueIdentifier->expects($this->never())
+            ->method('getFieldsWithUniqueIdentifier');
 
         $this->assertSame(
             ['some fields'],
@@ -191,5 +187,17 @@ class FieldHelperTest extends TestCase
             Contact::ENTITY,
             $this->fieldHelper->getFieldObjectName(Contact::NAME)
         );
+    }
+
+    public function testGetNormalizedFieldType(): void
+    {
+        $this->assertEquals(NormalizedValueDAO::BOOLEAN_TYPE, $this->fieldHelper->getNormalizedFieldType('boolean'));
+        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('date'));
+        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('datetime'));
+        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('time'));
+        $this->assertEquals(NormalizedValueDAO::FLOAT_TYPE, $this->fieldHelper->getNormalizedFieldType('number'));
+        $this->assertEquals(NormalizedValueDAO::SELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('select'));
+        $this->assertEquals(NormalizedValueDAO::MULTISELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('multiselect'));
+        $this->assertEquals(NormalizedValueDAO::STRING_TYPE, $this->fieldHelper->getNormalizedFieldType('default'));
     }
 }

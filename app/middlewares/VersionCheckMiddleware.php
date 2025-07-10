@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +8,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 10;
+    public const PRIORITY = 10;
 
     /**
      * @var HttpKernelInterface
@@ -52,7 +43,7 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
      *
      * {@inheritdoc}
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         // Are we running the minimum version?
         if (version_compare(PHP_VERSION, $this->minimumPHPVersion, 'lt')) {
@@ -67,9 +58,6 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
         return $this->app->handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

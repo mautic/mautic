@@ -1,27 +1,12 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use IP2Location\Database;
 
-/**
- * Class IP2LocationBinLookup.
- */
 class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return 'IP2Location Local Bin File DB9BIN only';
     }
@@ -52,7 +37,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
 
             return 'https://www.ip2location.com/download?'.$queryString;
         } else {
-            $this->logger->warn('Both username and password are required');
+            $this->logger->warning('Both username and password are required');
         }
     }
 
@@ -77,7 +62,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
-                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
+                $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }
         }
     }

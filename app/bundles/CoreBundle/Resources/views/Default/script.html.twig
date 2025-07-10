@@ -1,0 +1,20 @@
+{% set mautic_content = mauticContent is defined ? mauticContent : '' %}
+
+{% set editor_fonts = getSortedEditorFonts(configGetParameter('editor_fonts')) %}
+
+<script>
+    var mauticBasePath                  = '{{ app.request.getBasePath() }}';
+    var mauticBaseUrl                   = "{{ path('mautic_base_index') }}";
+    var mauticAjaxUrl                   = "{{ path('mautic_core_ajax') }}";
+    var mauticAjaxCsrf                  = '{{ securityGetCsrfToken("mautic_ajax_post") }}';
+    var mauticSessionLifetime           = "{{ ini_get('session.gc_maxlifetime') }}";
+    var mauticImagesPath                = '{{ assetsGetImagesPath() }}';
+    var mauticAssetPrefix               = '{{ assetsGetPrefix(true) }}';
+    var mauticContent                   = '{{ mautic_content }}';
+    var mauticEnv                       = '{{ app.environment }}';
+    var mauticLang                      = {{ translatorGetJsLang()|raw }};
+    var mauticLocale                    = '{{ app.request.getLocale() }}';
+    var mauticEditorFonts               = {{ editor_fonts|json_encode|raw }};
+    var mauticContactExportInBackground = {{ configGetParameter('contact_export_in_background')|number_format }};
+</script>
+{{ outputSystemScripts(true) }}

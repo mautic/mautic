@@ -1,0 +1,114 @@
+{% set target = target is defined ? target : '.page-list' %}
+
+{% if checkall is defined and checkall is not empty %}
+<th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
+    <div class="input-group input-group-sm">
+        <span class="input-group-addon">
+            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="{{ target }}">
+        </span>
+
+        {% if templateButtons is defined and templateButtons is not empty or customButtons is defined and customButtons is not empty %}
+
+        {{ buttonReset(
+        constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
+        constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
+        ) }}
+
+        {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+        {# Workaround to get variables from action_button_helper here #}
+        {{ restore('action_button_helper') }}
+
+        {% if templateButtons.delete is defined and templateButtons.delete is not empty %}
+            {{ buttonAdd({
+                confirm: {
+                    message: translatorHasId(translationBase ~ '.form.confirmbatchdelete')
+                        ? (translationBase ~ '.form.confirmbatchdelete')|trans
+                        : 'mautic.core.form.confirmbatchdelete'|trans,
+                    confirmAction: path(actionRoute, query|filter((v, k) => k != 'tmpl')|merge({objectAction: 'batchDelete'})),
+                    template: 'batchdelete'
+                },
+                priority: -1
+            }) }}
+        {% endif %}
+        
+        <div class="ml-xs">
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.core.options',
+                        size: 'sm',
+                        variant: 'ghost',
+                        icon: 'ri-more-2-line',
+                        icon_only: true,
+                        spin: false,
+                        attributes: {
+                            'class': 'dropdown-toggle',
+                            'data-toggle': 'dropdown',
+                            'type': 'button',
+                            'disabled': ''
+                        }
+                    }
+                ]
+            } %}
+            <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
+                {{ buttonsRender() }}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</th>
+{% elseif sessionVar is not defined or sessionVar is empty %}
+<th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
+    <span>{{ text|trans }}</span>
+</th>
+{% else %}
+{% set defaultOrder = default is defined and default is not empty ? orderBy : '' %}
+{% set order = order|default(app.session.get('mautic.' ~ sessionVar ~ '.orderby', defaultOrder)) %}
+{% set dir = dir|default(app.session.get('mautic.' ~ sessionVar ~ '.orderbydir', 'ASC')) %}
+{% set filters = filters|default(app.session.get('mautic.' ~ sessionVar ~ '.filters', [])) %}
+{% set tmpl = tmpl|default('list') %}
+<th{% if class is defined and class is not empty %} class="{{ class }} pa-0"{% endif %}
+    scope="col"
+    aria-sort="{% if orderBy is defined and orderBy is not empty and order == orderBy %}{% if dir == 'ASC' %}ascending{% else %}descending{% endif %}{% else %}none{% endif %}">
+    {% if orderBy is defined and orderBy is not empty %}
+    <a aria-label="{% if order == orderBy and dir == 'ASC' %}{{ 'mautic.core.sort.descending.description'|trans({'%header%': text|trans}) }}{% else %}{{ 'mautic.core.sort.ascending.description'|trans({'%header%': text|trans}) }}{% endif %}" class="btn btn-ghost btn-block jc-space-between table-sort" href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
+        <span class="fw-b">{{ text|trans }}</span>
+        {% if order == orderBy %}
+            {% if dir == 'ASC' %}
+                <i class="ri-arrow-up-line ri-lg fw-n" aria-hidden="true" focusable="false"></i>
+            {% else %}
+                <i class="ri-arrow-down-line ri-lg fw-n" aria-hidden="true" focusable="false"></i>
+            {% endif %}
+        {% else %}
+        <i class="ri-arrow-up-down-line ri-lg fw-n table-sort__icon-unsorted" aria-hidden="true" focusable="false"></i>
+        {% endif %}
+    </a>
+    {% else %}
+    <span class="pa-md">{{ text|trans }}</span>
+    {% endif %}
+
+    <div class="thead-filter">
+        {% if filterBy is defined and filterBy is not empty %}
+        {% set value = filters[filterBy] is defined ? filters[filterBy].value : '' %}
+        <div class="input-group input-group-sm">
+            <input
+                type="text"
+                placeholder="{% trans %}mautic.core.form.thead.filter{% endtrans %}"
+                autocomplete="false"
+                class="form-control input-sm"
+                value="{{ value|escape }}"
+                {% if dataToggle is defined and dataToggle is not empty %} data-toggle="{{ dataToggle }}"{% endif %}
+                onchange="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',this.value,'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"
+            />
+            <span class="input-group-btn">
+                <button
+                    class="btn btn-ghost btn-icon btn-xs"
+                    onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
+                    <i class="ri-fw ri-lg {{ value is defined and value is not empty ? 'ri-close-line' : 'ri-filter-2-fill' }}"></i>
+                </button>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</th>
+{% endif %}

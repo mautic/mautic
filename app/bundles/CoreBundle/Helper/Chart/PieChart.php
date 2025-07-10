@@ -1,19 +1,7 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Chart;
 
-/**
- * Class PieChart.
- */
 class PieChart extends AbstractChart implements ChartInterface
 {
     /**
@@ -24,9 +12,9 @@ class PieChart extends AbstractChart implements ChartInterface
     protected $totalCount = 0;
 
     /**
-     * Render chart data.
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function render($withCounts = true)
+    public function render($withCounts = true): array
     {
         $data = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
 

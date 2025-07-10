@@ -1,0 +1,180 @@
+{% if not isEmbedded %}
+    {% extends '@MauticCore/Default/content.html.twig' %}
+{% endif %}
+
+{% block mauticContent %}sms{% endblock %}
+{% block headerTitle %}{{sms.getName()}}{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : sms,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(
+                permissions['sms:smses:viewown'],
+                permissions['sms:smses:viewother'],
+                sms.getCreatedBy()
+            ),
+        },
+        'routeBase' : 'sms',
+        'targetLabel': 'mautic.sms.smses'|trans
+    }
+) -}}
+{% endblock %}
+
+{% block actions %}
+    {% set customButtons = [] %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig',
+        {
+            'item'            : sms,
+            'customButtons'   : customButtons is defined ? customButtons : [],
+            'templateButtons' : {
+                'edit' : securityHasEntityAccess(
+                    permissions['sms:smses:editown'],
+                    permissions['sms:smses:editother'],
+                    sms.getCreatedBy()
+                ),
+                'clone'  : permissions['sms:smses:create'],
+                'delete' : securityHasEntityAccess(
+                    permissions['sms:smses:deleteown'],
+                    permissions['sms:smses:deleteother'],
+                    sms.getCreatedBy()
+                ),
+            },
+            'routeBase' : 'sms',
+        }
+    ) -}}
+{% endblock %}
+
+{% block publishStatus %}
+{{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+    'entity': sms,
+    'status': sms.getPublishUp() is not null ? 'sending' : 'available'
+}) -}}
+{% set tags = [
+    {
+        color: 'warm-gray',
+        label: smsType == 'list'
+            ? 'mautic.sms.type.list.header'
+            : (smsType == 'template' ? 'mautic.sms.type.template.header' : type)
+    }
+] %}
+
+{% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+{% endblock %}
+
+{% set smsType = sms.getSmsType() %}
+{% if smsType is empty %}
+    {% set smsType = 'template' %}
+{% endif %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 height-auto">
+        <div>
+            <!-- page detail header -->
+            <!-- sms detail collapseable toggler -->
+            <div class="collapse pr-md pl-md" id="sms-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                                {{- include('@MauticCore/Helper/details.html.twig', {'entity' : sms}) -}}
+                                {% if sms.getSmsType() == 'list' %}
+                                    <tr>
+                                        <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.lead.lists'|trans }}</span></td>
+                                        <td>
+                                            {% set segments = sms.getLists %}
+                                            {% set segmentNames = segments.toArray|map(segment => segment.getName) %}
+                                            {{ segmentNames|join(', ') }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!--/ sms detail collapseable toggler -->
+        <div>
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#sms-details">
+                        <span class="caret"></span> {{ 'mautic.core.details'|trans }}
+                    </a>
+                </span>
+            </div>
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="ri-line-chart-fill"></span>
+                                        {{ 'mautic.core.stats'|trans }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-9 va-m">
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : entityViews, 'chartType' : 'line', 'chartHeight' : 300}) -}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+
+            {{ customContent('details.stats.graph.below', _context) }}
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs nav-tabs-contained">
+                <li class="active">
+                    <a href="#clicks-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.trackable.click_counts'|trans }}
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#contacts-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.lead.leads'|trans }}
+                    </a>
+                </li>
+            </ul>
+            <!--/ tabs controls -->
+        </div>
+
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <div class="tab-pane active bdr-w-0" id="clicks-container">
+                {{- include('@MauticPage/Trackable/click_counts.html.twig', {
+                    'trackables' : trackables,
+                    'entity'     : sms,
+                    'channel'    : 'sms'
+                }) -}}
+            </div>
+
+            <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
+                {{ contacts|raw }}
+            </div>
+        </div>
+        <!-- end: tab-content -->
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bdr-l height-auto">
+        <!-- activity feed -->
+        {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
+    </div>
+    <!--/ right section -->
+    <input name="entityId" id="entityId" type="hidden" value="{{ sms.getId() }}" />
+</div>
+<!--/ end: box layout -->
+{% endblock %}

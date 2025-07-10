@@ -1,0 +1,6 @@
+{
+  "isScheduled": true,
+  "scheduleUnit": "WEEKLY",
+  "toAddress": "test@mailinator.com",
+  "scheduleDay": "TU"
+}

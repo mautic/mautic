@@ -1,0 +1,8 @@
+{% import '@MauticSocial//macros.html.twig' as social %}
+<div class="media">
+    {{ social.profileImage(profile) }}
+    <div class="media-body">
+        <h4 class="media-heading">{{ profile.name }}</h4>
+        <p class="text-secondary"><a href="https://facebook.com/{{ profile.profileHandle }}" target="_blank">{{ profile.profileHandle }}</a></p>
+    </div>
+</div>

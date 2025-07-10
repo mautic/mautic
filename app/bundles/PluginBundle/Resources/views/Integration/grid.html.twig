@@ -1,0 +1,102 @@
+{#
+  Variables
+    - items
+    - tmpl
+    - pluginFilter
+    - plugins
+#}
+{% set isIndex = ('index' == tmpl) %}
+{% set tmpl = 'list' %}
+{% set filterValue = pluginFilter.id|default(null) %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'integration' %}
+
+{% block headerTitle %}
+  {{ 'mautic.plugin.manage.plugins'|trans }} {% if pluginFilter %}- {{ pluginFilter.name }}{% endif %}
+{% endblock %}
+
+{% block actions %}
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'customButtons': [
+        {
+            'attr': {
+                'data-toggle': 'ajax',
+                'href': path('mautic_plugin_reload'),
+                'class': 'btn btn-primary'
+            },
+            'btnText': 'mautic.plugin.reload.plugins'|trans,
+            'iconClass': 'ri-instance-fill',
+            'tooltip': 'mautic.plugin.reload.plugins.tooltip',
+        },
+    ],
+}) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+        <div class="panel-body">
+            <div class="box-layout">
+                <div class="row">
+                    <div class="col-xs-3 va-m">
+                        <select id="integrationFilter" onchange="Mautic.filterIntegrations(true);"
+                                class="form-control"
+                                data-placeholder="{{ 'mautic.integration.filter.all'|trans }}">
+                            <option value=""></option>
+                            {% for plugin in plugins %}
+                              <option {% if filterValue is same as(plugin.id) %}selected{% endif %} value="{{ plugin.id|e }}">
+                                  {{- plugin.name -}}
+                              </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-list">
+  {% endif %}
+
+  {% if items|length > 0 %}
+      <div class="pa-md">
+          <div class="row shuffle-integrations native-integrations">
+              {% for item in items %}
+                  {% if item.plugin in plugins|keys %}
+                      {% set pluginTitle = plugins[item.plugin].name ~ ' - ' ~ item.display %}
+                  {% else %}
+                      {% set pluginTitle = item.name ~ ' - ' ~ item.display %}
+                  {% endif %}
+                  <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
+                      <div class="panel ovf-h pa-10">
+                          <a href="{{ path((item.isBundle ? 'mautic_plugin_info' : 'mautic_plugin_config'), {'name': item.name}) }}"
+                             {% if item.isBundle %}data-footer="false"{% endif %}
+                             data-prevent-dismiss="true"
+                             data-toggle="ajaxmodal"
+                             data-target="#IntegrationEditModal"
+                             data-header="{{ item.display }}">
+                              <p><img style="height: 78px;" class="img img-responsive" src="{{ getAssetUrl(item.icon) }}" /></p>
+                              <h5 class="mt-20">
+                                  <span class="ellipsis" data-toggle="tooltip" title="{{ pluginTitle }}">{{ item.display }}</span>
+                              </h5>
+                          </a>
+                      </div>
+                  </div>
+              {% endfor %}
+          </div>
+      </div>
+      {{ include('@MauticCore/Helper/modal.html.twig', {
+          'id': 'IntegrationEditModal',
+          'footerButtons': true,
+      }) }}
+  {% else %}
+      {{ include('@MauticCore/Helper/noresults.html.twig', {
+          'message': 'mautic.integrations.noresults',
+          'tip': 'mautic.integration.noresults.tip',
+      }) }}
+  {% endif %}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

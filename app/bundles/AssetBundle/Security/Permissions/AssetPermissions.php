@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -22,18 +13,18 @@ class AssetPermissions extends AbstractPermissions
         parent::__construct($coreParametersHelper->all());
     }
 
-    public function definePermissions()
+    public function definePermissions(): void
     {
         $this->addExtendedPermissions('assets');
         $this->addStandardPermissions('categories');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'asset';
     }
 
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('asset', 'categories', $builder, $data);
         $this->addExtendedFormFields('asset', 'assets', $builder, $data);

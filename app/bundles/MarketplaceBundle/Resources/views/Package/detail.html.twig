@@ -1,0 +1,243 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block headerTitle %}{% endblock %}
+
+{% set latestVersion = packageDetail.versions.findLatestStableVersionPackage() %}
+
+{% if not latestVersion %}
+    {% set latestVersion = packageDetail.versions.findLatestVersionPackage() %}
+{% endif %}
+
+{% block indexButton %}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                label: 'mautic.core.close_back'|trans({'%target%': 'mautic.marketplace.marketplace'|trans}),
+                size: 'xs',
+                variant: 'tertiary',
+                icon: 'ri-arrow-left-line',
+                href: path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+                attributes: {
+                    'data-toggle': 'ajax',
+                    'class': 'btn-back mb-lg'
+                }
+            }
+        ]
+    } %}
+{% endblock %}
+
+{% block actions %}
+{% set buttons = {} %}
+
+ {% if latestVersion and latestVersion.issues %}
+ {% set buttons = buttons|merge({0: {
+     'attr' : {
+         'href'        : latestVersion.issues,
+         'target'      : '_blank',
+         'rel'         : 'noopener noreferrer',
+         'data-toggle' : '',
+     },
+     'btnText'   : 'marketplace.package.issue.tracker'|trans,
+     'iconClass' : 'ri-question-mark',
+     'primary'   : false,
+ }}) %}
+{% endif %}
+
+{% if latestVersion and latestVersion.wiki %}
+ {% set buttons = buttons|merge({0:{
+     'attr' : {
+         'href'        : latestVersion.wiki,
+         'target'      : '_blank',
+         'rel'         : 'noopener noreferrer',
+         'data-toggle' : '',
+     },
+     'btnText'   : 'marketplace.package.wiki'|trans,
+     'iconClass' : 'ri-book-line',
+     'primary'   : false,
+ }}) %}
+{% endif %}
+
+{% if security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and not isInstalled and isComposerEnabled %}
+    {% set installRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_INSTALL'),
+        {
+            'vendor' : packageDetail.packageBase.getVendorName(),
+            'package' : packageDetail.packageBase.getPackageName(),
+        }
+    ) %}
+
+    {% set buttons = buttons|merge({0:{
+        'attr' : {
+            'data-toggle' : 'ajaxmodal',
+            'data-target' : '#InstallationInProgressModal',
+            'href'        : installRoute,
+        },
+        'btnText'   : 'marketplace.package.install'|trans,
+        'iconClass' : 'ri-download-line',
+        'primary'   : true,
+    }}) %}
+
+{% elseif security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and isComposerEnabled %}
+    {% set removeRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_REMOVE'),
+        {'vendor' : packageDetail.packageBase.getVendorName(),
+        'package' : packageDetail.packageBase.getPackageName(),
+        }) %}
+
+    {% set buttons = buttons|merge({ 0: {
+        'attr' : {
+            'data-toggle' : 'ajaxmodal',
+            'data-target' :'#RemovalInProgressModal',
+            'href'        : removeRoute,
+    },
+        'btnText'   : 'marketplace.package.remove'|trans,
+        'iconClass' : 'ri-delete-bin-line',
+        'primary'   : true,
+    }}) %}
+{% endif %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'customButtons' : buttons
+    }) -}}
+{% endblock %}
+
+{% block content %}
+<div class="col-md-9">
+    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 jc-center pt-lg pb-lg">
+
+        <h1 class="fw-b fs-46">{{ packageDetail.packageBase.getHumanPackageName()|escape }}</h1>
+        {% if packageDetail.packageBase.description %}
+            <div class="text-muted mt-sm">{{ packageDetail.packageBase.description|purify }}</div>
+        {% endif %}
+        <hr>
+        <div class="d-flex gap-3 mt-sm">
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                tags: [
+                    {
+                        type: 'read-only',
+                        color: 'warning',
+                        label: packageDetail.githubInfo.stars|escape,
+                        icon: 'ri-star-s-fill ri-lg',
+                        attributes: {
+                            'title': 'marketplace.package.github.stars'|trans,
+                            'data-toggle': 'tooltip',
+                            'size': 'md'
+                        }
+                    },
+                    {
+                        type: 'read-only',
+                        color: 'warm-gray',
+                        label: packageDetail.packageBase.downloads|escape,
+                        icon: 'ri-download-line',
+                        attributes: {
+                            'title': 'marketplace.package.total.downloads'|trans,
+                            'data-toggle': 'tooltip',
+                            'size': 'md'
+                        }
+                    },
+                    {
+                        type: 'read-only',
+                        color: 'warm-gray',
+                        label: packageDetail.packageBase.type == 'theme'
+                            ? 'marketplace.package.type.theme'|trans
+                            : 'marketplace.package.type.plugin'|trans,
+                        icon: packageDetail.packageBase.type == 'theme'
+                            ? 'ri-paint-brush-line marketplace-icon'
+                            : 'ri-plug-line',
+                        attributes: {
+                            'title': 'marketplace.package.type'|trans,
+                            'data-toggle': 'tooltip',
+                            'size': 'md'
+                        }
+                    },
+                    {
+                        type: 'read-only',
+                        color: 'warm-gray',
+                        label: latestVersion is not empty
+                            ? ('marketplace.package.last_updated'|trans ~ ' ' ~ dateToHumanized(latestVersion.time))
+                            : '',
+                        attributes: {
+                            'size': 'md'
+                        }
+                    }
+                ]
+            } %}
+
+        </div>
+    </div>
+    <hr>
+
+    {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
+        'tabs': [
+            {
+                'title': 'mautic.core.overview',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_overview.html.twig')
+            },
+            {
+                'title': 'mautic.core.details',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_details.html.twig')
+            }
+        ],
+        'style': 'line'
+    } %}
+
+</div>
+
+<div class="col-md-3 pb-lg">
+    <!-- Maintainers -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
+        </div>
+
+        {% for maintainer in packageDetail.maintainers %}
+        <div class="box-layout">
+            <div class="col-xs-3 va-m">
+                <div class="panel-body">
+                    <span class="img-wrapper img-rounded">
+                        <img class="img" src="{{ maintainer.avatar|escape }}">
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-9 va-t">
+                <div class="panel-body">
+                    <h4 class="fw-sb mb-xs ellipsis">
+                        {{ maintainer.name|title|escape }}
+                    </h4>
+                    <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">
+                        {{ 'marketplace.other.packages'|trans({'%name%' : maintainer.name}) }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    </div>
+    <hr>
+
+    {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
+        'tabs': [
+            {
+                'title': 'marketplace.package.github.info',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_github.html.twig')
+            },
+            {
+                'title': 'marketplace.package.packagist.info',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_packagist.html.twig')
+            }
+        ],
+        'style': 'contained'
+    } %}
+
+</div>
+
+{{- include('@MauticCore/Helper/modal.html.twig', {
+    'id'            : 'InstallationInProgressModal',
+    'header'        : 'Installing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
+    'size'          : 'md',
+    'footerButtons' : false,
+}) -}}
+
+{{- include('@MauticCore/Helper/modal.html.twig', {
+    'id'            : 'RemovalInProgressModal',
+    'header'        : 'Removing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
+    'size'          : 'md',
+    'footerButtons' : false,
+}) -}}
+{% endblock %}

@@ -1,0 +1,242 @@
+{#
+  Variables
+    - fields
+    - viewOnlyFields
+    - actions
+    - actionSettings
+    - formFields
+    - formActions
+    - deletedFields
+    - deletedActions
+    - tmpl
+    - activeForm
+    - form
+    - inBuilder
+    - mappedFields
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}form{% endblock %}
+
+{% block headerTitle %}
+  {% if activeForm.id %}
+    {{ 'mautic.form.form.header.edit'|trans({'%name%': activeForm.name|trans}) }}
+  {% else %}
+    {{ 'mautic.form.form.header.new'|trans }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% set formId = form.sessionId.vars.data %}
+  {% set inBuilder = inBuilder|default(false) %}
+  {% set fieldsTabError = false %}
+  {% if form_errors(form.progressiveProfilingLimit) %}
+    {% set fieldsTabError = true %}
+  {% endif %}
+
+  {{ form_start(form) }}
+  <div class="box-layout">
+      <div class="col-md-9 height-auto">
+          <div class="row">
+              <div class="col-xs-12">
+
+                  <!-- tabs controls -->
+                  <ul class="nav nav-tabs nav-tabs-contained">
+                      <li class="active"><a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
+                      <li id="fields-tab" class="text-danger">
+                          <a class="{% if fieldsTabError %}text-danger{% endif %}" href="#fields-container" role="tab" data-toggle="tab">
+                            {{- 'mautic.form.tab.fields'|trans }}
+                            {% if fieldsTabError %}<i class="ri-alert-line"></i>{% endif -%}
+                          </a>
+                      </li>
+                      <li id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a></li>
+                  </ul>
+                  <!--/ tabs controls -->
+
+                  <div class="tab-content pa-md">
+                      <div class="tab-pane fade in active bdr-w-0" id="details-container">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  {{ form_row(form.name) }}
+                                  {{ form_row(form.formAttributes) }}
+                                  {{ form_row(form.description) }}
+                              </div>
+                              <div class="col-md-6">
+                                  {{ form_row(form.postAction) }}
+                                  {{ form_row(form.postActionProperty) }}
+                              </div>
+                          </div>
+                      </div>
+                      <div class="tab-pane fade bdr-w-0" id="fields-container">
+                          <div id="mauticforms_fields">
+                              <div class="row">
+                                  <div class="available-fields mb-md col-sm-4">
+                                      <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.fields'|trans }}">
+                                          <option value=""></option>
+                                          {% for field, fieldType in fields %}
+                                              <option data-toggle="ajaxmodal"
+                                                      data-target="#formComponentModal"
+                                                      data-href="{{ path('mautic_formfield_action', {'objectAction': 'new', 'type': fieldType, 'tmpl': 'field', 'formId': formId, 'inBuilder': inBuilder}) }}">
+                                                  {{ field }}
+                                              </option>
+                                          {% endfor %}
+                                      </select>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-sm-12 mb-10">
+                                      {{ form_label(form.progressiveProfilingLimit) }}
+                                      <div class="ml-5 mr-5" style="display:inline-block;">
+                                          {{ form_widget(form.progressiveProfilingLimit) }}
+                                      </div>
+                                      <div class="has-error" style="display:inline-block;">
+                                          {{ form_errors(form.progressiveProfilingLimit) }}
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="drop-here">
+                                {% for field in formFields %}
+                                    {% if field.parent is null %}
+                                      {% if field.id not in deletedFields %}
+                                          {% if field.isCustom is defined and field.isCustom is not empty %}
+                                              {% set params = field.customParameters %}
+                                              {% set template = params.template %}
+                                          {% else %}
+                                              {% set template = '@MauticForm/Field/' ~ field.type ~ '.html.twig' %}
+                                          {% endif %}
+                                          {{ include('@MauticForm/Builder/_field_wrapper.html.twig', {
+                                                  'template': template,
+                                                  'field': field,
+                                                  'viewOnlyFields': viewOnlyFields,
+                                                  'inForm': true,
+                                                  'id': field.id,
+                                                  'formId': formId,
+                                                  'formName': activeForm.generateFormName,
+                                                  'mappedFields': mappedFields,
+                                                  'inBuilder': inBuilder,
+                                                  'fields': fields,
+                                                  'formFields': formFields,
+                                          }, with_context=false) }}
+                                      {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                              </div>
+                              {% if 0 == formFields|length %}
+                                <div class="alert alert-info" id="form-field-placeholder">
+                                    <p>{{ 'mautic.form.form.addfield'|trans }}</p>
+                                </div>
+                              {% endif %}
+                          </div>
+                      </div>
+                      <div class="tab-pane fade bdr-w-0" id="actions-container">
+                          <div id="mauticforms_actions">
+                              <div class="row">
+                                  <div class="available-actions mb-md col-sm-4">
+                                      <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.submitactions'|trans }}">
+                                          <option value=""></option>
+                                          {% for group, groupActions in actions %}
+                                                  {% set campaignActionFound = false %}
+                                                  {% for k, e in groupActions %}
+                                                      {% if e.allowCampaignForm is defined and e.allowCampaignForm is not empty %}
+                                                          {% set campaignActionFound = true %}
+                                                      {% endif %}
+                                                  {% endfor %}
+                                                  {% set class = campaignActionFound is empty ? 'action-standalone-only' : '' %}
+                                                  {% if not campaignActionFound and not activeForm.isStandalone %}
+                                                      {% set class = class ~ ' hide' %}
+                                                  {% endif %}
+                                                  <optgroup class="{{ class }}" label="{{ group|trans }}"></optgroup>
+                                                  {% for k, e in groupActions %}
+                                                      {{ include('@MauticForm/Action/_option.html.twig', {
+                                                              'action': e,
+                                                              'type': k,
+                                                              'isStandalone': activeForm.isStandalone,
+                                                              'formId': form['sessionId'].vars['data'],
+                                                      }, with_context=false) }}
+                                                  {% endfor %}
+                                          {% endfor %}
+                                      </select>
+                                  </div>
+                              </div>
+                              <div class="drop-here">
+                                {% for action in formActions %}
+                                    {% if action.id not in deletedActions %}
+                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/base_form_action.html.twig') %}
+                                        {% set action = action|merge({
+                                              'settings': actionSettings[action.type],
+                                        }) %}
+                                        {{ include(template, {
+                                                'action': action,
+                                                'inForm': true,
+                                                'id': action.id,
+                                                'formId': formId,
+                                        }, with_context=false) }}
+                                    {% endif %}
+                                {% endfor %}
+                              </div>
+                              {% if 0 == formActions|length %}
+                                <div class="alert alert-info" id="form-action-placeholder">
+                                    <p>{{ 'mautic.form.form.addaction'|trans }}</p>
+                                </div>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 height-auto bdr-l">
+          <div class="pr-lg pl-lg pt-md pb-md">
+              {{ form_row(form.category) }}
+              {{ form_row(form.isPublished, {
+				'attr': {
+					'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+					'data-start': 'mautic.core.form.available_on_scheduled_date',
+					'data-both': 'mautic.core.form.available_during_scheduled_period',
+					'data-end': 'mautic.core.form.available_until_scheduled_end'
+				}
+			}) }}
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+              {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
+              {{ form_row(form.noIndex) }}
+              {{ form_row(form.inKioskMode) }}
+              {{ form_row(form.renderStyle) }}
+              {{ form_row(form.template) }}
+              {{ form_row(form.language) }}
+          </div>
+      </div>
+  </div>
+  {{ form_end(form) }}
+
+  {% set typeOneDifferences = ['mautic.form.type.one.differences.1st', 'mautic.form.type.one.differences.2nd', 'mautic.form.type.one.differences.3rd'] %}
+  {% set typeTwoDifferences = ['mautic.form.type.two.differences.1st', 'mautic.form.type.two.differences.2nd', 'mautic.form.type.two.differences.3rd'] %}
+
+  {% if activeForm.formType is null or (forceTypeSelection is defined and forceTypeSelection is not empty) %}
+      {{ include('@MauticCore/Helper/form_selecttype.html.twig', {
+              'item': activeForm,
+              'mauticLang': {
+                  'newStandaloneForm': 'mautic.form.type.standalone.header',
+                  'newCampaignForm': 'mautic.form.type.campaign.header',
+              },
+              'typePrefix': 'form',
+              'cancelUrl': 'mautic_form_index',
+              'header': 'mautic.form.type.header',
+              'typeOneHeader': 'mautic.form.type.campaign.header',
+              'typeOneIconClass': 'ri-megaphone-fill',
+              'typeOneDifferences': typeOneDifferences,
+              'typeOneOnClick': "Mautic.selectFormType('campaign');",
+              'typeTwoHeader': 'mautic.form.type.standalone.header',
+              'typeTwoIconClass': 'ri-survey-fill',
+              'typeTwoDifferences': typeTwoDifferences,
+              'typeTwoOnClick': "Mautic.selectFormType('standalone');",
+      }, with_context=false) }}
+  {% endif %}
+{% endblock %}
+
+{% block modal %}
+    {{ include('@MauticCore/Helper/modal.html.twig', {
+            'id': 'formComponentModal',
+            'header': false,
+            'footerButtons': true,
+    }) }}
+{% endblock %}

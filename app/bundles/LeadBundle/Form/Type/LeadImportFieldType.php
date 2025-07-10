@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -21,27 +12,20 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class LeadImportFieldType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
-    {
-        $this->translator    = $translator;
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EntityManager $entityManager,
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         foreach ($options['all_fields'] as $optionGroup => $fields) {
@@ -129,18 +113,18 @@ class LeadImportFieldType extends AbstractType
             ]
         );
 
-        $buttons = ['cancel_icon' => 'fa fa-times'];
+        $buttons = ['cancel_icon' => 'ri-close-line'];
 
         if (empty($options['line_count_limit'])) {
             $buttons = array_merge(
                 $buttons,
                 [
                     'apply_text'  => 'mautic.lead.import.in.background',
-                    'apply_class' => 'btn btn-success',
-                    'apply_icon'  => 'fa fa-history',
+                    'apply_class' => 'btn btn-secondary',
+                    'apply_icon'  => 'ri-history-line',
                     'save_text'   => 'mautic.lead.import.start',
-                    'save_class'  => 'btn btn-primary',
-                    'save_icon'   => 'fa fa-upload',
+                    'save_class'  => 'btn btn-secondary',
+                    'save_icon'   => 'ri-import-line',
                 ]
             );
         } else {
@@ -150,7 +134,7 @@ class LeadImportFieldType extends AbstractType
                     'apply_text' => false,
                     'save_text'  => 'mautic.lead.import',
                     'save_class' => 'btn btn-primary',
-                    'save_icon'  => 'fa fa-upload',
+                    'save_icon'  => 'ri-import-line',
                 ]
             );
         }
@@ -158,16 +142,19 @@ class LeadImportFieldType extends AbstractType
         $builder->add('buttons', FormButtonsType::class, $buttons);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['all_fields', 'import_fields', 'object']);
-        $resolver->setDefaults(['line_count_limit' => 0]);
+        $resolver->setDefaults([
+            'line_count_limit'  => 0,
+            'validation_groups' => [
+                User::class,
+                'determineValidationGroups',
+            ],
+        ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_field_import';
     }
@@ -179,10 +166,6 @@ class LeadImportFieldType extends AbstractType
      */
     public function getDefaultValue($fieldName, array $importFields)
     {
-        if (isset($importFields[$fieldName])) {
-            return $importFields[$fieldName];
-        }
-
-        return null;
+        return $importFields[$fieldName] ?? null;
     }
 }

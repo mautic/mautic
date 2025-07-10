@@ -1,0 +1,116 @@
+{#
+  Variables
+    - form
+#}
+{% form_theme form with [
+      '@MauticCampaign/FormTheme/Event/_campaignevent_properties_row.html.twig',
+] %}
+{% if formTheme is defined %}
+  {% form_theme form formTheme %}
+{% endif %}
+<div class="bundle-form">
+    <div class="bundle-form-header mb-10">
+        <h3>{{ eventHeader }}</h3>
+        {% if eventDescription is defined %}
+          <h6 class="text-secondary">{{ eventDescription|purify }}</h6>
+        {% endif %}
+    </div>
+
+    {{ form_start(form) }}
+
+    {{ form_widget(form.canvasSettings.droppedX) }}
+    {{ form_widget(form.canvasSettings.droppedY) }}
+
+    {{ form_row(form.name) }}
+
+    {% if form.triggerMode is defined %}
+    <div class="mb-lg{% if hideTriggerMode %} hide{% endif %}">
+        {{ form_row(form.triggerMode) }}
+
+        <div{% if ('date' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerDate">
+            {{ form_row(form.triggerDate) }}
+        </div>
+
+        <div{% if 'interval' != form.triggerMode.vars['data'] %} class="hide"{% endif %} id="triggerInterval">
+            <div class="row">
+                <div class="col-sm-4">
+                    {{ form_row(form.triggerInterval) }}
+                </div>
+                <div class="col-sm-8">
+                    {{ form_row(form.triggerIntervalUnit) }}
+                </div>
+            </div>
+            <div id="interval_settings">
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="d-flex fd-row fw-nowrap ai-center gap-sm">
+                            <div>{{ 'mautic.campaign.form.type.interval_schedule_at'|trans }} </div>
+                            <div>{{ form_widget(form.triggerHour) }}</div>
+                            <div> {{ 'mautic.campaign.form.type.interval_schedule_between_hours'|trans }} </div>
+                            <div>{{ form_widget(form.triggerRestrictedStartHour) }}</div>
+                            <div> {{ 'mautic.core.and'|trans }} </div>
+                            <div>{{ form_widget(form.triggerRestrictedStopHour) }}</div>
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="row mt-5">
+                    <div class="col-sm-12" style="font-weight: 600;">{{ 'mautic.campaign.form.type.interval_trigger_restricted_dow'|trans }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][0]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][0]) }}</label>
+                        </div>
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][1]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][1]) }}</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][2]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][2]) }}</label>
+                        </div>
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][3]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][3]) }}</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][4]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][4]) }}</label>
+                        </div>
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][5]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][5]) }}</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][6]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][6]) }}</label>
+                        </div>
+                        <div class="checkbox">
+                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][7]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][7]) }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div{% if ('optimized' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerOptimized">
+            <div class="row">
+                <div class="col-xs-7">
+                    <div class="mb-15">
+                        {% for child in form.triggerWindow %}
+                            <div>
+                                {{ form_widget(child) }}
+                                {{ form_label(child, null) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {{ form_end(form) }}
+</div>

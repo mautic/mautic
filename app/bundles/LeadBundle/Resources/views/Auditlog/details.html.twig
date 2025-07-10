@@ -1,0 +1,26 @@
+{#
+  Variables
+    - event
+    - lead
+#}
+{% set objects = event.details.fields is defined ? event.details.fields : {} %}
+{% for key, value in event.details %}
+    {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
+        {% set objects = objects|merge({(key): value}) %}
+    {% endif %}
+{% endfor %}
+{% if objects|length > 0 %}
+    {% if 'create' == event.eventType %}
+        {{ include('@MauticLead/Auditlog/_table.html.twig', { 'objects': objects }) }}
+    {% elseif 'delete' == event.eventType %}
+        {{ 'mautic.lead.audit.deleted'|trans }}
+    {% elseif 'update' == event.eventType %}
+        {{ include('@MauticLead/Auditlog/_table.html.twig', { 'objects': objects }) }}
+    {% elseif 'identified' == event.eventType %}
+        {{ 'mautic.lead.audit.identified'|trans }}
+    {% elseif 'ipadded' == event.eventType %}
+        {{ 'mautic.lead.audit.accessed'|trans }} {{ event.details|first|join(',') }}
+    {% elseif 'merged' == event.eventType %}
+        {{ 'mautic.lead.audit.merged'|trans }}
+    {% endif %}
+{% endif %}

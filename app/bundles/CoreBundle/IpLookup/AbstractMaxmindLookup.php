@@ -1,15 +1,8 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
+
+use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 {
@@ -28,6 +21,10 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
+        if (!$this->auth) {
+            throw new \InvalidArgumentException('Maxmind Authentication key canot be empty.');
+        }
+
         return ['Authorization' => 'Basic '.base64_encode($this->auth)];
     }
 
@@ -38,24 +35,16 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
     {
         $url = 'https://geoip.maxmind.com/geoip/v2.1/';
 
-        switch ($this->getName()) {
-            case 'maxmind_country':
-                $url .= 'country';
-                break;
-            case 'maxmind_precision':
-                $url .= 'city';
-                break;
-            case 'maxmind_omni':
-                $url .= 'insights';
-                break;
-        }
+        match ($this->getName()) {
+            'maxmind_country'   => $url .= 'country',
+            'maxmind_precision' => $url .= 'city',
+            'maxmind_omni'      => $url .= 'insights',
+            default             => $url."/{$this->ip}",
+        };
 
         return $url."/{$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);
@@ -98,5 +87,22 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                 $this->logger->warning('IP LOOKUP: '.$data->error);
             }
         }
+    }
+
+    protected function shouldPerformLookup(): bool
+    {
+        if (!isset($this->ip)) {
+            return false;
+        }
+
+        $doNotSellList = new MaxMindDoNotSellList($this->coreParametersHelper);
+
+        $ip = $this->ip;
+        $doNotSellList->loadList();
+        $ipMatch = array_filter($doNotSellList->getList(), function ($item) use ($ip, $doNotSellList): bool {
+            return $doNotSellList->stripCIDR($item['value']) == $ip;
+        });
+
+        return !boolval(count($ipMatch));
     }
 }

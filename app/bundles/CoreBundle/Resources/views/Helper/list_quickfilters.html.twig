@@ -1,0 +1,49 @@
+{% if quickFilters is defined and quickFilters is not empty %}
+    {% set filterGroups = {
+        'mautic.core.quick_filters.status': 'ispublished|isunpublished',
+        'mautic.core.quick_filters.ownership': 'ismine|isunowned',
+        'mautic.core.quick_filters.others': ''
+    } %}
+
+    {% set visibleGroups = [] %}
+    {% for header, pattern in filterGroups %}
+        {% set groupFilters = pattern
+            ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
+            : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|ismine|isunowned/'))
+        %}
+        {% if groupFilters is not empty %}
+            {% set visibleGroups = visibleGroups|merge([header]) %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="d-flex fd-column gap-xs">
+        {% for header, pattern in filterGroups %}
+            {% set groupFilters = pattern
+                ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
+                : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|ismine|isunowned/'))
+            %}
+
+            {% if groupFilters is not empty %}
+                <div class="dropdown-header{% if loop.first or visibleGroups|length == 1 %} mt-0{% endif %}">{{ header|trans }}</div>
+                <div class="d-flex gap-xs pi-md fw-wrap">
+                    {% for filter in groupFilters %}
+                        <a class="label label-outline label-selectable"
+                        data-filter="{{ filter.search|trans }}"
+                        {% if header == 'mautic.core.quick_filters.status' %}
+                            data-conflict-group="status"
+                        {% elseif header == 'mautic.core.quick_filters.ownership' %}
+                            data-conflict-group="ownership"
+                        {% endif %}
+                        onclick="Mautic.toggleFilter(this)"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        data-original-title="{{ filter.tooltip|trans }}">
+                            <i class="{{ filter.icon }}"></i>
+                            {{ filter.label|trans }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}

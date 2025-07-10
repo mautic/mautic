@@ -1,0 +1,24 @@
+{#
+  Variables
+    - lead
+    - campaigns
+#}
+{% set leadId = lead.id %}
+{% set leadName = lead.primaryIdentifier %}
+{% if campaigns is not empty %}
+<ul class="list-group">
+    {% for c in campaigns %}
+        {% set switch = c.inCampaign ? 'ri-toggle-fill' : 'ri-toggle-line' %}
+        {% set bgClass = c.inCampaign ? 'text-success' : 'text-danger' %}
+    <li class="list-group-item">
+        <i class="ri-lg ri-fw {{ switch }} {{ bgClass }}" id="leadCampaignToggle{{ c.id }}" onclick="Mautic.toggleLeadCampaign('leadCampaignToggle{{ c.id }}', {{ leadId }}, {{ c.id }});"></i>
+        <a data-dismiss="modal" class="pull-right" href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': c.id}) }}" data-toggle="ajax"><span class="label label-primary">{{ 'mautic.core.id'|trans }}: {{ c.id }}</span></a>
+        <span> {{ c.name }}</span>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+{{ include('@MauticCore/Helper/no_information.html.twig', {
+    'tip': 'mautic.campaign.lead.notfound'
+}) }}
+{% endif %}

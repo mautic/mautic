@@ -1,26 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface
+abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface /** @phpstan-ignore-line ContainerAwareInterface is deprecated. This will need bigger refactoring. See https://github.com/doctrine/DoctrineMigrationsBundle/issues/521 */
 {
+    protected const TABLE_NAME = null;
+
     /**
      * @var ContainerInterface
      */
@@ -48,17 +39,14 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected $platform;
 
     /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
-
-    /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws AbortMigration
+     *
+     * @todo remove this method to make it absctract for Mautic 6
      */
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform()->getName();
+        $platform = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
 
         // Abort the migration if the platform is unsupported
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
@@ -70,33 +58,23 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         }
     }
 
-    /**
-     * @throws AbortMigration
-     */
     public function down(Schema $schema): void
     {
         // Not supported
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
-        $this->platform      = $this->connection->getDatabasePlatform()->getName();
-        $this->entityManager = $this->container->get('doctrine')->getManager();
+        $this->platform      = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
     }
 
     /**
      * Finds/creates the local name for constraints and indexes.
-     *
-     * @param $table
-     * @param $type
-     * @param $suffix
      *
      * @return string
      */
@@ -106,7 +84,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         static $tables = [];
 
         if (empty($schemaManager)) {
-            $schemaManager = $this->connection->getSchemaManager();
+            $schemaManager = $this->connection->createSchemaManager();
         }
 
         // Prepend prefix
@@ -170,9 +148,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * Generate the  name for the property.
      *
-     * @param $table
-     * @param $type
-     *
      * @return string
      */
     protected function generatePropertyName($table, $type, array $columnNames)
@@ -181,9 +156,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $hash        = implode(
             '',
             array_map(
-                function ($column) {
-                    return dechex(crc32($column));
-                },
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );
@@ -193,8 +166,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
     /**
      * Generate index and foreign constraint.
-     *
-     * @param $table
      *
      * @return array [idx, fk]
      */
@@ -214,5 +185,18 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected function suppressNoSQLStatementError()
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name in individual migration file.
+     * Individual migration files just need to keep a protected constant TABLE_NAME.
+     */
+    protected function getPrefixedTableName(string $tableName = null): string
+    {
+        if (null === $tableName) {
+            $tableName = static::TABLE_NAME;
+        }
+
+        return $this->prefix.$tableName;
     }
 }

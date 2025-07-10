@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class MaxMindDoNotSellList implements DoNotSellListInterface
 {
-    private $position = 0;
+    private int $position = 0;
 
     private $list = [];
 
@@ -42,6 +42,19 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
         return false;
     }
 
+    /**
+     * This function trims the CIDR notation from an IP address
+     * i.e given '1.2.3.4/32' it will return '1.2.3.4'.
+     */
+    public static function stripCIDR(string $ip): string
+    {
+        if ($position = strpos($ip, '/')) {
+            return substr_replace($ip, '', $position, 3);
+        }
+
+        return $ip;
+    }
+
     public function getListPath(): string
     {
         return $this->listPath;
@@ -57,27 +70,27 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
         return $this->list;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->list[$this->position];
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->list[$this->position]);
     }

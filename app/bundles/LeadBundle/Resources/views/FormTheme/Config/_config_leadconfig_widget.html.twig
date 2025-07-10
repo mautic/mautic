@@ -1,0 +1,71 @@
+{% block _config_leadconfig_widget %}
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.leadconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.leadconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.contact_allow_multiple_companies) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.contact.merge.settings'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.contact.merge.settings.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.contact_unique_identifiers_operator) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.contact.list.settings'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.contact.list.settings.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.contact_columns) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.importconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.importconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.background_import_if_more_rows_than) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.exportconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.exportconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.contact_export_in_background) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

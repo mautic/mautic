@@ -1,0 +1,29 @@
+<div class="alert {% if n.type is defined %}alert-{{ n.type }}{% endif %} ma-0 bdr-b notification" id="notification{{ n.id }}">
+    <div class="media-body notification">
+        <div class="text-secondary fw-b mb-xs {% if n.type is defined %}ml-lg{% endif %}">
+            {{ dateToHumanized(n.dateAdded) }}
+            {% if not n.isRead %}
+                <span class="is-unread text-danger"><i class="ri-asterisk"></i></span>
+            {% endif %}
+        </div>
+        {% if n.header %}
+           <div class="notification-header fs-b-e fw-b mb-3 mt-sm">{{ n.header|trans|purify }}</div>
+        {% endif %}
+        <div class="text-secondary">{{ format(n.message, 'html') }}</div>
+    </div>
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                variant: 'ghost',
+                icon_only: true,
+                icon: 'ri-close-line do-not-close',
+                label: 'mautic.core.notifications.clear',
+                size: 'xs',
+                attributes: {
+                    'class': 'pull-right close do-not-close'
+                },
+                onclick: 'Mautic.clearNotification(' ~ n.id ~ ');'
+            }
+        ]
+    } %}
+</div>

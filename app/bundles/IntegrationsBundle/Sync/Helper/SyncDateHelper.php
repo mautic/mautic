@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -18,34 +9,22 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class SyncDateHelper
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private ?\DateTimeInterface $syncFromDateTime = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncFromDateTime;
+    private ?\DateTimeInterface $syncToDateTime = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncToDateTime;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncDateTime;
+    private ?\DateTimeImmutable $syncDateTime = null;
 
     /**
      * @var \DateTimeInterface[]
      */
-    private $lastObjectSyncDates = [];
+    private array $lastObjectSyncDates = [];
 
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    private ?\DateTimeInterface $internalSyncStartDateTime = null;
+
+    public function __construct(
+        private Connection $connection,
+    ) {
     }
 
     public function setSyncDateTimes(?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null): void
@@ -82,7 +61,7 @@ class SyncDateHelper
         return $this->lastObjectSyncDates[$key];
     }
 
-    public function getSyncToDateTime(): \DateTimeInterface
+    public function getSyncToDateTime(): ?\DateTimeInterface
     {
         if ($this->syncToDateTime) {
             return $this->syncToDateTime;
@@ -112,8 +91,8 @@ class SyncDateHelper
             )
             ->setParameter('integration', $integration)
             ->setParameter('object', $object)
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
 
         if (!$result) {
             return null;
@@ -132,5 +111,40 @@ class SyncDateHelper
         }
 
         return $lastSync;
+    }
+
+    public function getInternalSyncStartDateTime(): ?\DateTimeInterface
+    {
+        return $this->internalSyncStartDateTime;
+    }
+
+    public function setInternalSyncStartDateTime(): void
+    {
+        if ($this->internalSyncStartDateTime) {
+            return;
+        }
+
+        $this->internalSyncStartDateTime = $this->calculateInternalSyncStartDateTime();
+    }
+
+    private function calculateInternalSyncStartDateTime(): \DateTimeInterface
+    {
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        // If there is no syncToDateTime value use "now"
+        if (!$this->getSyncToDateTime()) {
+            return $now;
+        }
+
+        // Clone it so that we don't modify the initial object
+        $syncToDateTime = clone $this->getSyncToDateTime();
+
+        // We should compare in UTC timezone
+        if (method_exists($syncToDateTime, 'setTimezone')) {
+            $syncToDateTime->setTimezone(new \DateTimeZone('UTC'));
+        }
+
+        // If syncToDate is less than now then use syncToDate, because otherwise we may delete
+        // changes that aren't supposed to be deleted from the sync_object_field_change_report table
+        return min($now, $syncToDateTime);
     }
 }

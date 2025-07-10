@@ -1,0 +1,7 @@
+<div class="well well-sm" style="margin-bottom:0 !important;">
+    <p>{{ 'mautic.plugin.outlook.url'|trans }}</p>
+    <div class="alert alert-warning">
+        {{ 'mautic.plugin.outlook.public_info'|trans|purify }}
+    </div>
+    <input type="text" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length);" value="{{ mauticUrl }}" class="form-control">
+</div>

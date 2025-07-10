@@ -1,0 +1,54 @@
+{%- set showDynamicFilters = (report.settings.showDynamicFilters is defined and report.settings.showDynamicFilters) -%}
+{%- set hideDateRangeFilter = (report.settings.hideDateRangeFilter is defined and report.settings.hideDateRangeFilter) -%}
+
+<!-- report detail header -->
+{% include '@MauticCore/Helper/description.html.twig' with {'description': report.description} %}
+<!--/ report detail header -->
+<!-- report detail collapseable -->
+<div id="report-shelves" class="mb-5" aria-multiselectable="true">
+    <div class="collapse pr-md pl-md" id="report-details">
+        <div class="pr-md pl-md pb-md">
+            <div class="panel shd-none mb-0">
+                <table class="table table-hover mb-0">
+                    <tbody>
+                      {{ include('@MauticCore/Helper/details.html.twig', {'entity': report}) }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="collapse {% if showDynamicFilters %}in{% endif %}" id="report-filters">
+        <div class="pr-md pl-md pb-md">
+            <div class="panel shd-none mb-0 pa-lg">
+                <div class="row">
+                    <div class="col-sm-12 mb-10 {% if hideDateRangeFilter %}hide{% endif %}">
+                        {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
+                    </div>
+                    {{ form_start(dynamicFilterForm) }}
+                    {% for child in dynamicFilterForm.children|filter(v => 'hidden' != v.vars.block_prefixes[1]) %}
+                      <div class="col-sm-4">
+                          {{ form_row(child) }}
+                      </div>
+                    {% endfor %}
+                    {{ form_end(dynamicFilterForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ report detail collapseable -->
+
+    <div>
+        <!-- report detail collapseable toggler -->
+        <div class="hr-expand nm">
+            <a href="#report-details" class="arrow text-secondary collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
+                <span class="caret"></span> {{ 'mautic.core.details'|trans }}
+            </a>
+            <a href="#report-filters" class="arrow text-secondary {% if not showDynamicFilters %}collapsed{% endif %}" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+                <span class="caret"></span> {{ 'mautic.core.filters'|trans }}
+            </a>
+        </div>
+        <!--/ report detail collapseable toggler -->
+    </div>
+</div>
+
+<div class="report-content">

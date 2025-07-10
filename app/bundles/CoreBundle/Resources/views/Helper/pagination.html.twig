@@ -1,0 +1,124 @@
+{% set target = target|default('.page-list') %}
+{% set tmpl = tmpl|default('list') %}
+
+{% if fixedPages is not defined or fixedPages is empty %}
+    {% set limit = limit is not defined ? 30 : limit|int %}
+    {% set totalPages = limit ? (totalItems / limit)|round(0, 'ceil') : 1 %}
+    {% if totalPages == 0 %}
+      {% set totalPages = 1 %}
+    {% endif %}
+{% else %}
+    {# Fixed number of pages #}
+    {% set limit = 1 %}
+    {% set totalPages = fixedPages %}
+{% endif %}
+
+{% set range = range is defined ? range : 5 %}
+{% set page = page <= 0 ? 1 : page|int %}
+{% set linkType = inModal is defined and inModal is not empty ? 'ajaxmodal' : 'ajax' %}
+{% set pageClass = paginationClass is defined ? (' pagination-' ~ paginationClass) : '' %}
+{% set menuLink = menuLinkId is defined and menuLinkId is not empty ? (' data-menu-link="' ~ menuLinkId ~ '"') : '' %}
+{% set paginationWrapper = paginationWrapper is defined ? paginationWrapper : 'pagination-wrapper ml-md mr-md' %}
+{% set queryString = ('?tmpl=' ~ tmpl ~ (queryString is defined ? queryString : '')) %}
+{% set formExit = ignoreFormExit is defined and ignoreFormExit is not empty ? ' data-ignore-formexit="true"' : '' %}
+{% set responsiveViewports = ['desktop', 'mobile'] %}
+{% set limitOptions = {
+    5: '5',
+    10: '10',
+    15: '15',
+    20: '20',
+    25: '25',
+    30: '30',
+    50: '50',
+    100: '100'
+} %}
+{% set jsCallback = jsCallback is defined ? jsCallback : '' %}
+{% set jsArguments = jsArguments is defined ? jsArguments|array : [] %}
+{% set baseUrl = baseUrl is defined ? baseUrl : null %}
+
+{% for viewport in responsiveViewports %}
+    {% if viewport == 'mobile' %}
+        {% set paginationClass = 'sm' %}
+        {% set pageClass = 'pagination-sm' %}
+        {% set responsiveClass = 'visible-xs hidden-sm hidden-md hidden-lg' %}
+        {% set paginationWrapper = 'pagination-wrapper pull-left nm' %}
+    {% else %}
+        {% set responsiveClass = 'hidden-xs visible-sm visible-md visible-lg' %}
+    {% endif %}
+
+    <div class="{{ responsiveClass }}">
+        {% if fixedLimit is not defined or fixedLimit is empty %}
+            <div class="pull-right">
+                <select
+                    autocomplete="false"
+                    class="form-control not-chosen pagination-limit{% if paginationClass is defined and paginationClass is not empty %} input-{{ paginationClass }}{% endif %}"
+                    onchange="Mautic.limitTableData('{{ sessionVar }}',this.value,'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %}, '{{ baseUrl ~ queryString }}'{% endif %});"
+                >
+                    {% for value, label in limitOptions %}
+                        <option{% if limit == value %} selected="selected"{% endif %} value="{{ value|escape('html_attr') }}">
+                            {{ ('mautic.core.pagination.' ~ label)|trans }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+
+        <div class="{{ paginationWrapper }} text-center">
+            <ul class="pagination np nm {{ pageClass }}">
+                {% set action = getPaginationAction(1, page > 1, jsCallback, jsArguments, baseUrl, queryString) %}
+                {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
+                <li{% if page <= 1 %} class="disabled"{% endif %}>
+                    <a {{ (action ~ data ~ formExit)|raw }}>
+                        <i class="ri-arrow-left-double-line"></i>
+                    </a>
+                </li>
+
+                {% set action = getPaginationAction(page - 1, (page - 1) >= 1, jsCallback, jsArguments, baseUrl, queryString) %}
+                {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
+                <li{% if (page - 1) <= 0 %} class="disabled"{% endif %}>
+                    <a {{ (action ~ data ~ formExit)|raw }}>
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                </li>
+
+                {% set startPage = page - ((range / 2)|round(0, 'ceil')) + 1 %}
+                {% set startPage = startPage <= 0 ? 1 : startPage %}
+                {% set lastPage = startPage + range - 1 %}
+                {% set lastPage = lastPage > totalPages ? totalPages : lastPage %}
+                {% for i in startPage..lastPage %}
+                    {% set action = getPaginationAction(i, (page != i|int), jsCallback, jsArguments, baseUrl, queryString) %}
+                    {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
+
+                    <li{% if page == i|int %} class="active"{% endif %}>
+                        <a {{ (action ~ data ~ formExit)|raw }}>
+                            <span>{{ i }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+
+                {% set action = getPaginationAction(page + 1, (page + 1) <= totalPages, jsCallback, jsArguments, baseUrl, queryString) %}
+                {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
+                <li{% if (page + 1) > totalPages %} class="disabled"{% endif %}>
+                    <a {{ (action ~ data ~ formExit)|raw }}>
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                </li>
+
+                {% set action = getPaginationAction(totalPages, page < totalPages, jsCallback, jsArguments, baseUrl, queryString) %}
+                {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
+
+                <li{% if page == totalPages %} class="disabled"{% endif %}>
+                    <a {{ (action ~ data ~ formExit)|raw }}>
+                        <i class="ri-arrow-right-double-line"></i>
+                    </a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+            <small class="text-secondary">
+                {% trans with {'%count%': totalItems} %}mautic.core.pagination.items{% endtrans %},
+                {% trans with {'%count%': totalPages} %}mautic.core.pagination.pages{% endtrans %}
+                {% trans %}mautic.core.pagination.total{% endtrans %}
+            </small>
+        </div>
+    </div>
+{% endfor %}

@@ -1,0 +1,247 @@
+{#
+  Variables
+    - mappedFields (\Mautic\FormBundle\Collection\MappedObjectCollection)
+#}
+{%- set defaultInputFormClass = 'not-chosen' -%}
+{%- set defaultInputClass = 'selectbox' -%}
+{%- set containerType = 'select' -%}
+
+{# start: field_helper #}
+{%- set defaultInputFormClass = defaultInputFormClass|default('') -%}
+{%- set defaultLabelClass = defaultLabelClass|default('label') -%}
+{%- set formName = formName|default('') -%}
+{%- set defaultInputClass = 'mauticform-' ~ defaultInputClass -%}
+{%- set defaultLabelClass = 'mauticform-' ~ defaultLabelClass -%}
+{%- set containerClass = containerClass|default(containerType) -%}
+{%- set order = field.order|default(0) -%}
+{%- set validationMessage = '' -%}
+
+{%- set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) -%}
+{%- set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) -%}
+{%- set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) -%}
+
+{%- if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) -%}
+  {%- set inputName = 'mauticform[' ~ field.alias ~ ']' -%}
+  {%- if field.properties.multiple is defined and true == field.properties.multiple -%}
+    {%- set inputName = inputName ~ '[]' -%}
+  {%- endif -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'name': inputName,
+  }) -%}
+{%- endif -%}
+
+{%- if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'value': field.defaultValue|default(''),
+  }) -%}
+{%- endif -%}
+
+{%- if ignoreId is not defined or (ignoreId is defined and ignoreId is empty) -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'id': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) -%}
+  {%- set labelAttributes = labelAttributes|merge({
+          'id': 'mauticform_label' ~ formName ~ '_' ~ field.alias,
+          'for': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) -%}
+{%- endif -%}
+
+{%- if field.properties.placeholder is defined and field.properties.placeholder is not empty -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'placeholder': field.properties.placeholder,
+  }) -%}
+{%- endif -%}
+
+{%- if inForm is defined and (true == inForm or inForm is not empty) -%}
+  {%- if field.type in ['button', 'pagebreak'] -%}
+    {%- set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' -%}
+  {%- endif -%}
+
+  {%- set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'disabled': 'disabled',
+          'class': inputAttributes.class|default([])|merge([defaultInputClass, defaultInputFormClass]),
+  }) -%}
+{%- else -%}
+  {%- set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'class': inputAttributes.class|default([])|merge([defaultInputClass]),
+  }) -%}
+{%- endif -%}
+
+{%- set containerAttributes = containerAttributes|merge({
+        'id': 'mauticform' ~ formName ~ '_' ~ id,
+        'class': containerAttributes.class|default([])|merge([
+          'mauticform-row',
+          'mauticform-' ~ containerClass,
+          'mauticform-field-' ~ order,
+        ]),
+}) -%}
+{%- if field.parent and fields[field.parent] is defined -%}
+  {%- set values = field.conditions.values|join('|') -%}
+
+  {%- if field.conditions.any != false and 'notIn' != field.conditions.expr -%}
+    {%- set values = '*' -%}
+  {%- endif -%}
+
+  {%- set containerAttributes = containerAttributes|merge({
+          'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
+          'data-mautic-form-expr': field.conditions.expr,
+          'class': containerAttributes.class|merge([
+            'mauticform-field-hidden',
+          ]),
+  }) -%}
+{%- endif -%}
+
+{%- if field.isRequired is defined and field.isRequired -%}
+  {%- set required = true -%}
+  {%- set validationMessage = field.validationMessage -%}
+  {%- if validationMessage is empty -%}
+        {%- set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) -%}
+  {%- endif -%}
+  {%- set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+          'data-validate': field.alias,
+          'data-validation-type': field.type,
+  }) -%}
+  {%- if field.properties.multiple is defined and field.properties.multiple != false -%}
+    {%- set containerAttributes = containerAttributes|merge({
+            'data-validate-multiple': 'true',
+    }) -%}
+  {%- endif -%}
+{%- elseif required is defined and true == required -%}
+  {# Forced to be required #}
+  {%- set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+  }) -%}
+{%- endif -%}
+
+{# Setup list parsing #}
+{%- if list is defined or field.properties.syncList is defined or field.properties.list is defined or field.properties.optionList is defined -%}
+  {%- set parseList = [] -%}
+  {%- set isBooleanList = false -%}
+
+  {%- if
+        (field.properties.syncList is defined and field.properties.syncList is not empty) and
+        field.mappedField is not empty and
+        field.mappedObject is not empty and
+        mappedFields[field.mappedObject] is defined
+  -%}
+    {# @var \Mautic\FormBundle\Collection\FieldCollection #}
+    {% set fieldCollection = mappedFields[field.mappedObject] %}
+    {% if fieldCollection.getFieldByKey(field.mappedField, false) is not empty %}
+      {% set mappedField = fieldCollection.getFieldByKey(field.mappedField) %}
+      {% set mappedFieldType = mappedField.type %}
+
+      {%- if field.properties.syncList is defined and field.properties.syncList is not empty and field.properties.syncList -%}
+        {%- if mappedField.properties.list is defined and mappedField.properties.list is not empty -%}
+          {%- set parseList = mappedField.properties.list -%}
+        {%- elseif 'boolean' == mappedFieldType -%}
+          {%- set parseList = {
+                  '0': mappedField.properties.no,
+                  '1': mappedField.properties.yes,
+          }-%}
+        {%- elseif 'country' == mappedFieldType -%}
+          {%- set list = leadFieldCountryChoices() -%}
+        {%- elseif 'region' == mappedFieldType -%}
+          {%- set list = leadFieldRegionChoices() -%}
+        {%- elseif 'timezone' == mappedFieldType -%}
+          {%- set list = leadFieldTimezonesChoices() -%}
+        {%- elseif 'locale' == mappedFieldType -%}
+          {%- set list = leadFieldLocaleChoices() -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if parseList is empty -%}
+    {%- if list is defined -%}
+      {%- set parseList = list -%}
+    {%- elseif field.properties.optionList is defined and field.properties.optionList is not empty -%}
+      {%- set parseList = field.properties.optionList -%}
+    {%- elseif field.properties.list is defined and field.properties.list is not empty -%}
+      {%- set parseList = field.properties.list -%}
+    {%- endif -%}
+
+    {%- if parseList.list is defined -%}
+      {%- set parseList = parseList.list -%}
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if field.mappedField and mappedFields[field.mappedObject] is defined -%}
+    {# @var \Mautic\FormBundle\Collection\FieldCollection #}
+    {% set fieldCollection = mappedFields[field.mappedObject] %}
+
+    {% if fieldCollection[field.mappedField] is defined %}
+      {% set mappedField = fieldCollection[field.mappedField] %}
+      {%- if mappedField.type in ['datetime', 'date'] -%}
+        {%- for key, aTemp in parseList -%}
+          {%- set date = 'datetime' == mappedField.type ? dateToFull(aTemp.label) : dateToDate(aTemp.label) -%}
+          {%- if date -%}
+              {%- set parseList = parseList|merge({
+                      (key): parseList[key]|merge({
+                              'label': date,
+                      }),
+              }) -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if isBooleanList -%}
+    {%- set list = formFieldParseBooleanList(parseList) -%}
+  {%- else -%}
+    {%- set list = formFieldParseList(parseList) -%}
+  {%- endif -%}
+
+  {%- set firstListValue = list|first -%}
+{%- endif -%}
+{# end: field_helper #}
+
+{%- if field.properties.multiple is defined and true == field.properties.multiple -%}
+  {%- set inputAttributes = inputAttributes|merge({
+          'multiple': 'multiple',
+  }) -%}
+{%- endif -%}
+
+{%- macro print_options(list, field) -%}
+  {% for listValue, listLabel in list %}
+    {% if listLabel is iterable %}
+      {# this is an option group #}
+      <optgroup label="{{ listValue }}">
+        {{ _self.print_options(listLabel, field) }}
+      </optgroup>
+    {% else -%}
+      <option value="{{ listValue|e }}" {% if listValue == field.defaultValue %}selected="selected"{% endif %}>{{ listLabel }}</option>
+    {%- endif %}
+  {% endfor %}
+{%- endmacro -%}
+
+<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+  {% if field.showLabel -%}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>{% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
+
+  <select {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+    {# (!empty($properties['placeholder']) || empty($field['defaultValue']) && empty($properties['multiple'])) #}
+    {%- if
+          (
+            field.properties.placeholder is defined or (field.defaultValue is not defined or (field.defaultValue is defined and false == field.defaultValue))
+          ) and
+          (field.properties.multiple is not defined or (field.properties.multiple is defined and false == field.properties.multiple))
+    -%}
+        {%- set placeholder = field.properties.placeholder|default('') -%}
+        <option value="">{{ placeholder }}</option>
+    {%- endif -%}
+    {{ _self.print_options(list, field) }}
+  </select>
+  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
+</div>

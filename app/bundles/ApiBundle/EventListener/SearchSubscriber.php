@@ -1,51 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ClientModel
-     */
-    private $apiClientModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var TemplatingHelper
-     */
-    private $templating;
-
-    public function __construct(ClientModel $apiClientModel, CorePermissions $security, TemplatingHelper $templating)
-    {
-        $this->apiClientModel = $apiClientModel;
-        $this->security       = $security;
-        $this->templating     = $templating;
+    public function __construct(
+        private ClientModel $apiClientModel,
+        private CorePermissions $security,
+        private GlobalSearch $globalSearch,
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -53,49 +29,21 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
-        if ($this->security->isGranted('api:clients:view')) {
-            $str = $event->getSearchString();
-            if (empty($str)) {
-                return;
-            }
+        $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
+        $results   = $this->globalSearch->performSearch(
+            $filterDTO,
+            $this->apiClientModel,
+            '@MauticApi/SubscribedEvents/Search/global.html.twig'
+        );
 
-            $clients = $this->apiClientModel->getEntities(
-                [
-                    'limit'  => 5,
-                    'filter' => $str,
-                ]);
-
-            if (count($clients) > 0) {
-                $clientResults = [];
-                $canEdit       = $this->security->isGranted('api:clients:edit');
-                foreach ($clients as $client) {
-                    $clientResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticApiBundle:SubscribedEvents\Search:global.html.php',
-                        [
-                            'client'  => $client,
-                            'canEdit' => $canEdit,
-                        ]
-                    )->getContent();
-                }
-                if (count($clients) > 5) {
-                    $clientResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticApiBundle:SubscribedEvents\Search:global.html.php',
-                        [
-                            'showMore'     => true,
-                            'searchString' => $str,
-                            'remaining'    => (count($clients) - 5),
-                        ]
-                    )->getContent();
-                }
-                $clientResults['count'] = count($clients);
-                $event->addResults('mautic.api.client.menu.index', $clientResults);
-            }
+        if (!empty($results)) {
+            $event->addResults('mautic.api.client.menu.index', $results);
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('api:clients:view')) {
             $event->addCommands(

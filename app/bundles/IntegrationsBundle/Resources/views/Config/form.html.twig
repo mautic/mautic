@@ -1,0 +1,159 @@
+{{ includeScript('app/bundles/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad') }}
+{# @var integrationObject \Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface Set through buildView #}
+{% set activeTab = activeTab|default('details-container') %}
+
+{{ form_start(form) }}
+<ul class="nav nav-tabs nav-tabs-contained">
+    <!-- Enabled\Auth -->
+    <li class="{% if 'details-container' == activeTab %} active{% endif %}" id="details-tab">
+        <a href="#details-container" role="tab" data-toggle="tab">
+            {{ 'mautic.plugin.integration.tab.details'|trans }}
+            {% if (hasAuthErrors) %}
+                <i class="ri-fw ri-alert-fill text-danger"></i>
+            {% endif %}
+        </a>
+    </li>
+    <!-- Enabled\Auth -->
+
+    <!-- Features -->
+    {% if showFeaturesTab is not empty %}
+        <li class="" id="features-tab">
+            <a href="#features-container" role="tab" data-toggle="tab">
+                {{ 'mautic.plugin.integration.tab.features'|trans }}
+                {% if hasFeatureErrors is not empty %}
+                <i class="ri-fw ri-alert-fill text-danger"></i>
+                {% endif %}
+            </a>
+        </li>
+    {% endif %}
+    <!-- Features -->
+
+    <!-- Field Mapping -->
+    {% if useSyncFeatures is not empty %}
+    {% set objects = integrationObject.getSyncConfigObjects() %}
+    {% for object, objectFieldMapping in form.featureSettings.sync.fieldMappings %}
+        <li class="{% if activeTab == 'field-mapping-' ~ object %} active{% endif %}" id="fields-{{ object }}-tab">
+            <a href="#field-mappings-{{ object }}-container" role="tab" data-toggle="tab">
+                {{ 'mautic.integration.sync_field_mapping'|trans({'%object%' : objects[object]|trans }) }}
+                {% if formContainsErrors(objectFieldMapping) %}
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
+                {% endif %}
+            </a>
+        </li>
+        {% endfor %}
+    {% endif %}
+    <!-- Field Mapping -->
+</ul>
+
+<div class="tab-content pa-md">
+    <!-- Enabled\Auth -->
+    <div class="tab-pane fade{% if 'details-container' == activeTab %} in active{% endif %} bdr-w-0" id="details-container">
+        {% if useConfigFormNotes and integrationObject.getAuthorizationNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
+            <div class="alert alert-{{ integrationObject.getAuthorizationNote().getType() }}">
+                {{ integrationObject.getAuthorizationNote().getNote()|trans|purify  }}
+            </div>
+        {% endif %}
+        {{ form_row(form.isPublished) }}
+        {% if integrationObject is instanceof('\\Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormAuthInterface') %}
+        <hr />
+        {{ form_row(form.apiKeys) }}
+            {% if useAuthorizationUrl %}
+            <div class="alert alert-warning">
+                {{ integrationObject.getCallbackHelpMessageTranslationKey()|trans }}
+            </div>
+            {% if callbackUrl is not empty %}
+            <div class="well well-sm">
+                {{ 'mautic.integration.callbackuri'|trans }}<br/>
+                <input type="text" name="callback_url" readonly onclick="this.setSelectionRange(0, this.value.length);" value="{{ callbackUrl }}" class="form-control"/>
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: integrationObject.isAuthorized() ? 'mautic.integration.form.reauthorize' : 'mautic.integration.form.authorize',
+                                variant: 'success',
+                                icon: 'ri-key-2-line',
+                                attributes: {
+                                    'id': 'integration_details_authButton',
+                                    'name': 'integration_details[authButton]'
+                                },
+                                onclick: 'Mautic.authorizeIntegration()'
+                            }
+                        ]
+                    } %}
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    <!-- Enabled\Auth -->
+
+    <!-- Features -->
+    {% if showFeaturesTab %}
+    <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
+        {% if useConfigFormNotes and integrationObject.getFeaturesNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
+            <div class="alert alert-{{ integrationObject.getFeaturesNote().getType() }}">
+                {{ integrationObject.getFeaturesNote().getNote()|trans|purify  }}
+            </div>
+        {% endif %}
+
+        {%- if form.supportedFeatures is defined %}{{ form_row(form.supportedFeatures) }}{% endif %}
+
+        {% if useFeatureSettings or useSyncFeatures %}
+            <hr />
+        {% endif %}
+
+        {% if useSyncFeatures %}
+            {{ form_row(form.featureSettings.sync.objects) }}
+            {# // @todo echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']); #}
+
+            {% if form.featureSettings.sync.integration is defined %}
+                {{ form_row(form.featureSettings.sync.integration) }}
+            {% endif %}
+
+            {% if useFeatureSettings %}
+                <hr />
+            {% endif %}
+        {% endif %}
+
+        {% if useFeatureSettings %}
+            {{ form_row(form.featureSettings.integration) }}
+        {% endif %}
+    </div>
+    {% endif %}
+    <!-- Features -->
+
+    <!-- Field Mapping -->
+    {% if useSyncFeatures %}
+    {% for object, objectFieldMapping in form.featureSettings.sync.fieldMappings %}
+    <div class="tab-pane fade{% if activeTab == 'field-mapping-' ~ object %} in active{% endif %} bdr-w-0" id="field-mappings-{{ object }}-container">
+        <div class="has-error">
+            {{ form_errors(objectFieldMapping) }}
+        </div>
+
+        {% if useConfigFormNotes and integrationObject.getFieldMappingNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
+            <div class="alert alert-{{ integrationObject.getFieldMappingNote().getType() }}">
+                {{ integrationObject.getFieldMappingNote().getNote()|trans|purify  }}
+            </div>
+        {% endif %}
+
+        {{ form_row(objectFieldMapping['filter-keyword']) }}
+
+        <div id="field-mappings-{{ object }}">
+        {{- include('@Integrations/Config/field_mapping.html.twig', {
+            'form'        : form.featureSettings.sync.fieldMappings[object],
+            'integration' : integrationObject.getName(),
+            'object'      : object,
+            'page'        : 1,
+        }) -}}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <!-- Field Mapping -->
+</div>
+
+{{ form_end(form) }}

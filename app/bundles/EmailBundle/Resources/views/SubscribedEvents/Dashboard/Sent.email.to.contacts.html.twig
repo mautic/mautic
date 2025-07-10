@@ -1,0 +1,90 @@
+{#
+  Variables
+    - class
+    - shortenLinkText
+    - headItems
+    - widget
+    - bodyItems
+#}
+{% set class = class|default('table') %}
+{% set shortenLinkText = shortenLinkText|default(30) %}
+{% set showHeaders = [
+    'mautic.dashboard.label.contact.email.address',
+    'mautic.dashboard.label.contact.open',
+    'mautic.dashboard.label.contact.click',
+    'mautic.dashboard.label.email.name',
+    'mautic.dashboard.label.segment.name',
+    'mautic.dashboard.label.company.name',
+    'mautic.dashboard.label.campaign.name',
+] %}
+{% set showValues = [
+    'contact_email',
+    'open',
+    'click',
+    'email_name',
+    'segment_name',
+    'company_name',
+    'campaign_name',
+] %}
+<table class="{{ class }}">
+    {% if headItems is not empty %}
+        <thead>
+          <tr>
+            {% for headItem in headItems %}
+              {% if headItem in showHeaders %}
+                <th>{{ headItem|trans }}</th>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+    {% endif %}
+    {% if bodyItems is not empty %}
+        <tbody>
+            {% for id, row in bodyItems %}
+                <tr>
+                    {% if row is iterable %}
+                        {% for key, item in row %}
+                            {% if key in showValues %}
+                            <td>
+                                {% if 'contact_email' == key and row.contact_id is not empty %}
+                                    <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': row.contact_id}) }}"
+                                        title="{{ item|e }}"
+                                        data-toggle="ajax">
+                                        {{ item|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% elseif 'email_name' == key and row.email_id is not empty %}
+                                    <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': row.email_id}) }}"
+                                        title="{{ item|e }}"
+                                        data-toggle="ajax">
+                                        {{ item|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% elseif 'segment_name' == key and row.segment_id is not empty %}
+                                    <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': row.segment_id}) }}"
+                                        title="{{ item|e }}"
+                                        data-toggle="ajax">
+                                        {{ item|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% elseif 'company_name' == key and row.company_id is not empty %}
+                                    <a href="{{ path('mautic_company_action', {'objectAction': 'edit', 'objectId': row.company_id}) }}"
+                                        title="{{ item|e }}"
+                                        data-toggle="ajax">
+                                        {{ item|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% elseif 'campaign_name' == key and row.campaign_id is not empty %}
+                                    <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': row.campaign_id}) }}"
+                                        title="{{ item|e }}"
+                                        data-toggle="ajax">
+                                        {{ item|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% else %}
+                                    {{ item }}
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endif %}
+</table>

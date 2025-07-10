@@ -1,0 +1,12 @@
+{#
+  Variables
+    - form
+    - lookupItem
+#}
+<div class="alert alert-info">{{ 'mautic.plugin.fullcontact.submit'|trans }}</div>
+<div style="margin-top: 10px">
+    <ul class="list-group" style="max-height: 400px;overflow-y: auto">
+        <li class="list-group-item">{{ lookupItem }}</li>
+    </ul>
+</div>
+{{ form(form) }}

@@ -1,0 +1,61 @@
+{%- set isIndex = 'index' == tmpl -%}
+{%- set tmpl = 'list' -%}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'report' %}
+
+{% block headerTitle 'mautic.report.reports'|trans %}
+
+{% block content %}
+  {% if isIndex %}
+  <div id="page-list-wrapper" class="panel panel-default">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+      'searchValue': searchValue,
+      'action': currentRoute,
+      'page_actions': {
+          'templateButtons': {
+              'new': permissions['report:reports:create'],
+          },
+          'routeBase': 'report',
+          'langVar': 'report.report',
+      },
+      'bulk_actions': {
+        'langVar': 'report.report',
+        'routeBase': 'report',
+        'templateButtons': {
+            'delete': permissions['report:reports:deleteown'] or permissions['report:reports:deleteother'],
+        },
+      },
+      'quickFilters': [
+          {
+              'search': 'mautic.core.searchcommand.ispublished',
+              'label': 'mautic.core.form.available',
+              'tooltip': 'mautic.core.searchcommand.ispublished.description',
+              'icon': 'ri-check-line'
+          },
+          {
+              'search': 'mautic.core.searchcommand.isunpublished',
+              'label': 'mautic.core.form.unavailable',
+              'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+              'icon': 'ri-close-line'
+          },
+          {
+              'search': 'mautic.core.searchcommand.ismine',
+              'label': 'mautic.core.searchcommand.ismine.label',
+              'tooltip': 'mautic.core.searchcommand.ismine.description',
+              'icon': 'ri-user-line'
+          }
+      ]
+  }) }}
+      <div class="page-list">
+        {{- include('@MauticReport/Report/_list.html.twig') -}}
+      </div>
+  </div>
+
+  {{ include('@MauticCore/Helper/protip.html.twig', {
+    tip: random(['mautic.protip.reports.dnc'])
+}) }}
+  {% else %}
+    {{- include('@MauticReport/Report/_list.html.twig') -}}
+  {% endif %}
+{% endblock %}

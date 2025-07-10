@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Search;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
@@ -25,14 +15,14 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Contact should be found via contact email address
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::find()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::findByAddress()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::find
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::findByAddress
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts
      */
-    public function testContactFoundByDelegationForAddress()
+    public function testContactFoundByDelegationForAddress(): void
     {
         $lead = new Lead();
         $lead->setEmail('contact@email.com');
@@ -57,23 +47,21 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'contact@test.com');
 
-        $this->assertInstanceOf(Result::class, $result);
-
         $this->assertEquals($result->getContacts(), [$lead]);
     }
 
     /**
      * @testdox Contact should be found via a hash in to email address
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::find()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::findByHash()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseAddressForStatHash()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::addContact()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::find
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::findByHash
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseAddressForStatHash
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::addContact
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts
      */
-    public function testContactFoundByDelegationForHash()
+    public function testContactFoundByDelegationForHash(): void
     {
         $lead = new Lead();
         $lead->setEmail('contact@email.com');
@@ -109,8 +97,6 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
 
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'test+unsubscribe_123abc@test.com');
-
-        $this->assertInstanceOf(Result::class, $result);
 
         $this->assertEquals($result->getStat(), $stat);
         $this->assertEquals($result->getContacts(), [$lead]);

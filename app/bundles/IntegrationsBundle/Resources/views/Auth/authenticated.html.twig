@@ -1,0 +1,30 @@
+{% extends '@MauticCore/Default/slim.html.twig' %}
+{% set alertClass = authenticationError ? 'danger' : 'success' %}
+{% block content %}
+<style>
+    #app-content {margin: 0;}
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-{{ alertClass }} margin" style="margin:20px" role="alert">
+            {{ message }}
+        </div>
+    </div>
+</div>
+<div class="row text-center">
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                label: 'mautic.integration.closewindow',
+                variant: 'success',
+                icon: 'ri-check-line',
+                attributes: {
+                    'id': 'integration_details_authButton',
+                    'name': 'integration_details[authButton]'
+                },
+                onclick: 'window.close();'
+            }
+        ]
+    } %}
+</div>
+{% endblock %}

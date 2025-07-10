@@ -1,0 +1,26 @@
+{% if emailStats is defined %}
+    <div class="lead-stats-title">{{ 'mautic.lead.stats.email_title'|trans }}</div>
+    <div class="lead-stats row-no-gutters jc-space-between gap-sm fw-nowrap-md">
+        {% set stats = [
+            {'name': 'mautic.lead.stats.sent_count', 'value': emailStats['sent_count'], 'icon': 'ri-mail-send-line'},
+            {'name': 'mautic.lead.stats.open_rate', 'value': emailStats['open_rate'] * 100, 'suffix': '%', 'icon': 'ri-mail-open-line'},
+            {'name': 'mautic.lead.stats.click_through_rate', 'value': emailStats['click_through_rate'] * 100, 'suffix': '%', 'icon': 'ri-cursor-line'},
+            {'name': 'mautic.lead.stats.click_through_open_rate', 'value': emailStats['click_through_open_rate'] * 100, 'suffix': '%', 'icon': 'ri-bar-chart-line'}
+        ] %}
+
+        {% for stat in stats %}
+        <div class="lead-stats-el tile h-144 jc-space-between col-lg-3 col-xs-12">
+            <i class="tile-icon {{ stat.icon }}"></i>
+            <span class="lead-stats-name fw-b ellipsis">{{ stat.name|trans }}</span>
+            <span class="lead-stats-val lh-1 fs-40">{{ stat.value }}{{ stat.suffix|default('') }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% if emailStats['sent_count'] == 0 and
+        emailStats['open_rate'] == 0 and
+        emailStats['click_through_rate'] == 0 and
+        emailStats['click_through_open_rate'] == 0
+    %}
+        {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.statistics'}) }}
+    {% endif %}
+{% endif %}

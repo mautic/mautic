@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
@@ -21,20 +18,20 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm(
             [
                 'bundle'     => 'CampaignBundle',
                 'formAlias'  => 'campaignconfig',
                 'formType'   => ConfigType::class,
-                'formTheme'  => 'MauticCampaignBundle:FormTheme\Config',
+                'formTheme'  => '@MauticCampaign/FormTheme/Config/_config_campaignconfig_widget.html.twig',
                 'parameters' => $event->getParametersFromConfig('MauticCampaignBundle'),
             ]
         );
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         /** @var array $values */
         $values = $event->getConfig();

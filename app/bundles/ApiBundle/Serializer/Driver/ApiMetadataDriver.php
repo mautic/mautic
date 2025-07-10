@@ -1,56 +1,31 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\Driver\DriverInterface;
-use ReflectionClass;
-use ReflectionException;
 
 class ApiMetadataDriver implements DriverInterface
 {
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
+    private ?ClassMetadata $metadata = null;
 
     /**
      * @var PropertyMetadata[]
      */
-    private $properties = [];
+    private array $properties = [];
+
+    private string $groupPrefix = '';
+
+    private string $defaultVersion = '1.0';
+
+    private ?string $currentPropertyName = null;
 
     /**
-     * @var string
+     * @throws \ReflectionException
      */
-    private $groupPrefix = '';
-
-    /**
-     * @var null
-     */
-    private $defaultVersion = '1.0';
-
-    /**
-     * @var null
-     */
-    private $currentPropertyName;
-
-    /**
-     * @return \Metadata\ClassMetadata
-     *
-     * @throws ReflectionException
-     */
-    public function loadMetadataForClass(ReflectionClass $class): ?BaseClassMetadata
+    public function loadMetadataForClass(\ReflectionClass $class): ?BaseClassMetadata
     {
         if ($class->hasMethod('loadApiMetadata')) {
             $this->metadata = new ClassMetadata($class->getName());
@@ -62,12 +37,12 @@ class ApiMetadataDriver implements DriverInterface
             $this->resetDefaults();
 
             return $metadata;
+        } else {
+            return new ClassMetadata($class->getName());
         }
-
-        return null;
     }
 
-    private function resetDefaults()
+    private function resetDefaults(): void
     {
         $this->metadata       = null;
         $this->properties     = [];
@@ -77,8 +52,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the root (base key).
-     *
-     * @param $root
      *
      * @return $this
      */
@@ -92,8 +65,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Set prefix for the List and Details groups.
      *
-     * @param $name
-     *
      * @return $this
      */
     public function setGroupPrefix($name)
@@ -106,11 +77,9 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Set the default version for the properties if different than 1.0.
      *
-     * @param $version
-     *
      * @return $this
      */
-    public function setDefaultVersion($version)
+    public function setDefaultVersion(string $version)
     {
         $this->defaultVersion = $version;
 
@@ -119,8 +88,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create a new property.
-     *
-     * @param $name
      *
      * @return $this
      */
@@ -138,8 +105,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Add property and set default version and Details group.
      *
-     * @param      $name
-     * @param null $serializedName
      * @param bool $useGetter
      *
      * @return $this
@@ -158,15 +123,12 @@ class ApiMetadataDriver implements DriverInterface
 
         $this->properties[$name]->serializedName = $serializedName ?? $name;
 
-        if (null !== $this->defaultVersion) {
+        if ($this->defaultVersion) {
             // Set the default version
             $this->setSinceVersion($this->defaultVersion);
         }
 
-        if (null !== $this->groupPrefix) {
-            // Auto add to the Details group
-            $this->addGroup($this->groupPrefix.'Details');
-        }
+        $this->addGroup($this->groupPrefix.'Details');
 
         return $this;
     }
@@ -185,7 +147,7 @@ class ApiMetadataDriver implements DriverInterface
             if (!empty($prop)) {
                 $serializedName = null;
                 if (is_array($prop)) {
-                    list($prop, $serializedName) = $prop;
+                    [$prop, $serializedName] = $prop;
                 }
                 $this->addProperty($prop, $serializedName, $useGetter);
 
@@ -211,9 +173,6 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @param      $version
-     * @param null $property
-     *
      * @return $this
      */
     public function setSinceVersion($version, $property = null)
@@ -228,9 +187,6 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @param      $version
-     * @param null $property
-     *
      * @return $this
      */
     public function setUntilVersion($version, $property = null)
@@ -245,9 +201,6 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @param      $name
-     * @param null $property
-     *
      * @return $this
      */
     public function setSerializedName($name, $property = null)
@@ -263,9 +216,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the groups a property belongs to.
-     *
-     * @param $groups
-     * @param $property
      *
      * @return $this
      */
@@ -287,8 +237,7 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Add a group the property belongs to.
      *
-     * @param      $group
-     * @param null $property True to apply to all current properties
+     * @param mixed $property
      *
      * @return $this
      */
@@ -325,9 +274,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Set max depth for the property if an association.
      *
-     * @param      $depth
-     * @param null $property
-     *
      * @return $this
      */
     public function setMaxDepth($depth, $property = null)
@@ -344,7 +290,7 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Push the properties into ClassMetadata.
      */
-    public function build()
+    public function build(): void
     {
         foreach ($this->properties as $prop) {
             $this->metadata->addPropertyMetadata($prop);

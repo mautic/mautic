@@ -1,0 +1,68 @@
+{% block _dwc_filters_entry_widget %}
+{%- set isPrototype = '__name__' == form.vars.name -%}
+{%- set filterType = form.field.vars.value -%}
+{%- set inGroup = form.vars.data.glue is defined and 'and' is same as form.vars.data.glue -%}
+{%- set isBehavior = fields.behaviors[filterType].label is defined -%}
+{%- set icon = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'ri-building-2-line' : 'ri-user-6-fill' -%}
+
+{%- if isBehavior -%}
+    {%- set object = 'behaviors' -%}
+{%- else -%}
+    {%- set object = form.vars.data.object is defined ? form.vars.data.object : 'lead' -%}
+{%- endif -%}
+
+{%- if isPrototype or fields[object][filterType].label is defined -%}
+<div class="panel {% if inGroup and false is same as first %}in-group{% endif %}">
+    <div class="panel-heading {% if not isPrototype and '0' is same as form.vars.name %}hide{% endif %}">
+        <div class="panel-glue col-sm-2 pl-0 ">
+            {{ form_widget(form.glue) }}
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="col-xs-6 col-sm-3 field-name">
+            <i class="object-icon fa {{ icon }}" aria-hidden="true"></i>
+            <span>{{ isPrototype ? '__label__' : fields[object][filterType].label }}</span>
+        </div>
+
+        <div class="col-xs-6 col-sm-3 padding-none">
+            {{ form_widget(form.operator) }}
+        </div>
+
+        {%- set hasErrors = form.filter.vars.errors|length or form.display.vars.errors|length -%}
+        <div class="col-xs-10 col-sm-5 padding-none {% if hasErrors %}has-error{% endif %}">
+            {{ form_widget(form.filter) }}
+            {{ form_widget(form.display) }}
+            {{ form_errors(form.filter) }}
+            {{ form_errors(form.display) }}
+        </div>
+
+        <div class="col-xs-2 col-sm-1">
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.report.report.label.removefilter',
+                        variant: 'ghost',
+                        icon_only: true,
+                        size: 'xs',
+                        danger: 'true',
+                        icon: 'ri-delete-bin-line',
+                        href: 'javascript: void(0);',
+                        attributes: {
+                            'class': 'remove-selected text-danger pull-right'
+                        }
+                    }
+                ]
+            } %}
+        </div>
+        {{ form_widget(form.field) }}
+        {{ form_widget(form.type) }}
+        {{ form_widget(form.object) }}
+    </div>
+</div>
+{%- endif -%}
+{% endblock %}
+
+{% block _dwc_filters_widget %}
+  {% use '@MauticLead/FormTheme/Filter/_leadlist_filters_widget.html.twig' %}
+  {{ block('_leadlist_filters_widget') }}
+{% endblock %}

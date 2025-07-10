@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Event;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -16,9 +7,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class MessageQueueProcessEvent extends CommonEvent
 {
-    /**
-     * MessageQueueEvent constructor.
-     */
     public function __construct(MessageQueue $entity)
     {
         $this->entity = $entity;
@@ -32,12 +20,7 @@ class MessageQueueProcessEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param $channel
-     *
-     * @return bool
-     */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         return $channel === $this->entity->getChannel();
     }

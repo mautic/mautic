@@ -1,0 +1,356 @@
+{#
+  Variables
+    - activePage (\Mautic\PageBundle\Entity\Page)
+    - variants
+    - translations
+    - permissions
+    - stats
+    - abTestResults
+    - security
+    - pageUrl
+    - previewUrl
+    - logs
+    - dateRangeForm
+
+  @todo - add landing page stats/analytics
+#}
+{# Only show A/B test button if not already a translation of an a/b test #}
+{% set allowAbTest = (activePage.isPreferenceCenter or (activePage.isTranslation(true) and translations.parent.isVariant)) ? false : true %}
+
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}page{% endblock %}
+
+{% block indexButton %}
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': activePage,
+    'customButtons': customButtons|default([]),
+    'templateButtons': {
+        'close': securityHasEntityAccess( permissions['page:pages:viewown'], permissions['page:pages:viewother'], activePage.createdBy),
+    },
+    'routeBase': 'page',
+    'targetLabel': 'mautic.page.pages'|trans
+}) }}
+{% endblock %}
+
+{% block headerTitle %}{{ activePage.title }}{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+            'item': activePage,
+            'customButtons': customButtons|default([]),
+            'templateButtons': {
+                'edit': securityHasEntityAccess(permissions['page:pages:editown'], permissions['page:pages:editother'], activePage.createdBy),
+                'abtest': allowAbTest and permissions['page:pages:create'],
+                'clone': permissions['page:pages:create'],
+                'delete': securityHasEntityAccess(permissions['page:pages:deleteown'], permissions['page:pages:deleteown'], activePage.createdBy),
+            },
+            'routeBase': 'page',
+    }) }}
+{% endblock %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activePage,
+        'status': 'available'
+    }) -}}
+
+    {% set tags = [] %}
+
+    {% set tags = tags
+        |merge(activePage.isPreferenceCenter
+            ? [{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.form.preference_center' }]
+            : [])
+        |merge(activePage.isVariant and not activePage.isVariant(true)
+            ? [{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]
+            : [])
+        |merge(activePage.isVariant(true)
+            ? [{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]
+            : [])
+        |merge(activePage.isTranslation and not activePage.isTranslation(true)
+            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+            : [])
+        |merge(activePage.isTranslation(true)
+            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
+            : [])
+    %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+
+{% endblock %}
+
+{% block content %}
+  {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
+          'activeEntity': activePage,
+          'variants': variants,
+          'abTestResults': abTestResults,
+          'model': 'page',
+          'actionRoute': 'mautic_page_action',
+          'nameGetter': 'getTitle',
+  })|trim %}
+  {% set showVariants = variantContent is not empty %}
+
+  {% set translationContent = include('@MauticCore/Translation/index.html.twig', {
+          'activeEntity': activePage,
+          'translations': translations,
+          'model': 'page',
+          'actionRoute': 'mautic_page_action',
+          'nameGetter': 'getTitle',
+  })|trim %}
+  {% set showTranslations = translationContent is not empty %}
+
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- left section -->
+      <div class="col-md-9 height-auto">
+          <div>
+              <!-- page detail header -->
+                {% set extra_content %}
+                    {% if activePage.isVariant(true) %}
+                        <div class="small">
+                            <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': variants.parent.id}) }}" data-toggle="ajax">
+                                {{- 'mautic.core.variant_of'|trans({'%parent%': variants.parent.getName()}) -}}
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if activePage.isTranslation(true) %}
+                        <div class="small">
+                            <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id}) }}" data-toggle="ajax">
+                                {{- 'mautic.core.translation_of'|trans({'%parent%': translations.parent.getName()}) -}}
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if activePage.isPreferenceCenter %}
+                        <div class="small">
+                            {{ 'mautic.core.icon_tooltip.preference_center'|trans }}
+                        </div>
+                    {% endif %}
+                {% endset %}
+
+                {% include '@MauticCore/Helper/description.html.twig' with {
+                    'description': activePage.metaDescription,
+                    'extra_content': extra_content
+                } %}
+              <!--/ page detail header -->
+
+              <!-- page detail collapseable -->
+              <div class="collapse pr-md pl-md" id="page-details">
+                  <div class="pr-md pl-md pb-md">
+                      <div class="panel shd-none mb-0">
+                          <table class="table table-hover mb-0">
+                              <tbody>
+                                {{ include('@MauticCore/Helper/details.html.twig', {'entity': activePage}, with_context=false) }}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+              <!--/ page detail collapseable -->
+          </div>
+
+          <div>
+              <!-- page detail collapseable toggler -->
+              <div class="hr-expand nm">
+                  <span data-toggle="tooltip" title="Detail">
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#page-details">
+                          <span class="caret"></span> {{ 'mautic.core.details'|trans }}
+                      </a>
+                  </span>
+              </div>
+              <!--/ page detail collapseable toggler -->
+
+              <!-- some stats -->
+              <div class="pa-md">
+                  <div class="row">
+                      <div class="col-sm-12">
+                          <div class="panel">
+                              <div class="panel-body box-layout">
+                                  <div class="col-md-3 va-m">
+                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                          <span class="ri-line-chart-fill"></span>
+                                          {{ 'mautic.page.pageviews'|trans }}
+                                      </h5>
+                                  </div>
+                                  <div class="col-md-9 va-m">
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                  </div>
+                              </div>
+                              <div class="pt-0 pl-15 pb-10 pr-15">
+                                  {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats.pageviews, 'chartType': 'line', 'chartHeight': 300}) }}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!--/ stats -->
+
+              {{ customContent('details.stats.graph.below', _context) }}
+
+              <!-- tabs controls -->
+              <ul class="nav nav-tabs nav-tabs-contained">
+                  {% if showVariants %}
+                      <li class="active">
+                          <a href="#variants-container" role="tab" data-toggle="tab">
+                              {{- 'mautic.core.variants'|trans -}}
+                          </a>
+                      </li>
+                  {% endif %}
+                  {% if showTranslations %}
+                      <li class="{% if not showVariants %}active{% endif %}">
+                          <a href="#translation-container" role="tab" data-toggle="tab">
+                              {{- 'mautic.core.translations'|trans -}}
+                          </a>
+                      </li>
+                  {% endif %}
+              </ul>
+              <!--/ tabs controls -->
+          </div>
+
+          {% if showVariants or showTranslations %}
+          <!-- start: tab-content -->
+          <div class="tab-content pa-md">
+              {% if showVariants %}
+              <!-- #variants-container -->
+              <div class="tab-pane active bdr-w-0" id="variants-container">
+                  {{ variantContent|raw }}
+              </div>
+              <!--/ #variants-container -->
+              {% endif %}
+              <!-- #translation-container -->
+              {% if showTranslations %}
+              <div class="tab-pane {% if not showVariants %}active{% endif %} bdr-w-0" id="translation-container">
+                  {{ translationContent|raw }}
+              </div>
+              {% endif %}
+              <!--/ #translation-container -->
+          </div>
+          <!--/ end: tab-content -->
+          {% elseif allowAbTest %}
+          <div class="pa-md">
+              <div class="text-center">
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.core.ab_test.create',
+                                variant: 'tertiary',
+                                href: path('mautic_page_action', {'objectAction': 'abtest', 'objectId': activePage.id}),
+                                icon: 'ri-arrow-right-s-line',
+                                attributes: {
+                                    'class': 'create-abtest-link',
+                                    'data-toggle': 'ajax'
+                                }
+                            }
+                        ]
+                    } %}
+              </div>
+          </div>
+          {% endif %}
+      </div>
+      <!--/ left section -->
+
+      <!-- right section -->
+      <div class="col-md-3 bdr-l height-auto">
+          <!-- preview URL -->
+          {% if not activePage.isPreferenceCenter %}
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.page.url'|trans }}</div>
+              </div>
+              <div class="panel-body pt-xs">
+                  <div class="input-group">
+                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                             readonly
+                             value="{{ pageUrl|e }}"/>
+                      <span class="input-group-btn">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.open_link',
+                                    variant: 'ghost',
+                                    icon_only: true,
+                                    icon: 'ri-external-link-line',
+                                    onclick: 'window.open("' ~ pageUrl ~ '", "_blank");',
+                                    attributes: {
+                                        'class': 'btn-nospin'
+                                    }
+                                }
+                            ]
+                        } %}
+                      </span>
+                  </div>
+              </div>
+          </div>
+          {% endif %}
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.page.preview.url'|trans }}</div>
+              </div>
+              <div class="panel-body pt-xs">
+                  {% if previewSettingsForm.translation is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.translation) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if previewSettingsForm.variant is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.variant) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if previewSettingsForm.contact is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.contact) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="input-group">
+                              <input id="content_preview_url"
+                                     data-route="page/preview"
+                                     onclick="this.setSelectionRange(0, this.value.length);"
+                                     type="text"
+                                     class="form-control"
+                                     readonly
+                                     value="{{ previewUrl|e }}"/>
+                              <span class="input-group-btn">
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.open_link',
+                                            variant: 'ghost',
+                                            icon_only: true,
+                                            icon: 'ri-external-link-line',
+                                            onclick: 'window.open("' ~ previewUrl ~ '", "_blank");',
+                                            attributes: {
+                                                'id': 'content_preview_url_button',
+                                                'class': 'btn-nospin'
+                                            }
+                                        }
+                                    ]
+                                } %}
+                              </span>
+                              <input type="hidden" id="content_preview_settings_object_id" value="{{ activePage.id }}">
+                              <input type="hidden" id="content_preview_settings_contact_id" value="">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!--/ preview URL -->
+          <hr class="hr-w-2" style="width:50%">
+          <!-- recent activity -->
+          {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}, with_context=false) }}
+      </div>
+      <!--/ right section -->
+  </div>
+
+  <!--/ end: box layout -->
+{% endblock %}

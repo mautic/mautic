@@ -1,0 +1,36 @@
+{% set class = class|default('table') %}
+{% set shortenLinkText = shortenLinkText|default(30) %}
+<table class="{{ class }}">
+    {% if headItems is defined and headItems is iterable %}
+        <thead>
+            <tr>
+                {% for headItem in headItems %}
+                    <th>{{ headItem|trans }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+    {% endif %}
+    {% if bodyItems is defined and bodyItems is iterable %}
+        <tbody>
+            {% for row in bodyItems %}
+                <tr>
+                    {% if row is iterable %}
+                        {% for item in row %}
+                            <td>
+                                {% if item.type is defined and 'link' == item.type %}
+                                    <a href="{{ item.link }}" title="{{ item.value }}" {% if item.external is defined %}target="_blank"{% else %}data-toggle="ajax"{% endif %}>
+                                        {{ item.value|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% elseif item.value is defined %}
+                                    {{ item.value }}
+                                {% else %}
+                                    {{ item }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endif %}
+</table>

@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 
 trait ComponentValidationTrait
 {
-    private function verifyComponent(array $keys, array $component, array $callbacks = [])
+    private function verifyComponent(array $keys, array $component, array $callbacks = []): void
     {
         foreach ($keys as $k) {
             if (is_array($k)) {
@@ -28,11 +19,9 @@ trait ComponentValidationTrait
             }
         }
 
-        if ($callbacks) {
-            foreach ($callbacks as $m) {
-                if (isset($component[$m]) && !is_callable($component[$m])) {
-                    throw new BadConfigurationException($component[$m].' is not callable.');
-                }
+        foreach ($callbacks as $m) {
+            if (isset($component[$m]) && !is_callable($component[$m])) {
+                throw new BadConfigurationException($component[$m].' is not callable.');
             }
         }
     }

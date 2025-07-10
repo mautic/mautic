@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Model\MessageModel;
@@ -20,23 +11,17 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class MessageSendType.
+ * @extends AbstractType<mixed>
  */
 class MessageSendType extends AbstractType
 {
-    protected $router;
-    protected $messageModel;
-
-    /**
-     * MessageSendType constructor.
-     */
-    public function __construct(RouterInterface $router, MessageModel $messageModel)
-    {
-        $this->router       = $router;
-        $this->messageModel = $messageModel;
+    public function __construct(
+        protected RouterInterface $router,
+        protected MessageModel $messageModel,
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'marketingMessage',
@@ -71,7 +56,7 @@ class MessageSendType extends AbstractType
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({windowUrl: \''.$windowUrl.'\'})',
-                        'icon'    => 'fa fa-plus',
+                        'icon'    => 'ri-add-line',
                     ],
                     'label' => 'mautic.channel.create.new.message',
                 ]
@@ -96,7 +81,7 @@ class MessageSendType extends AbstractType
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow({windowUrl: \''.$windowUrlEdit.'\'})',
                         'disabled' => !isset($options['data']['message']),
-                        'icon'     => 'fa fa-edit',
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.channel.send.edit.message',
                 ]
@@ -104,16 +89,8 @@ class MessageSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'message_send';
     }
 }

@@ -1,0 +1,23 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'pointTrigger' %}
+
+{% block headerTitle entity.name %}
+
+{% block actions %}
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': entity,
+    'templateButtons': {
+        'edit': permissions['point:triggers:edit'],
+        'delete': permissions['point:triggers:delete'],
+    },
+    'routeBase': 'pointtrigger',
+    'langVar': 'point.trigger',
+}) }}
+{% endblock %}
+
+{% block content %}
+<div class="scrollable trigger-details">
+    {# @todo - output trigger details/actions #}
+</div>
+{% endblock %}

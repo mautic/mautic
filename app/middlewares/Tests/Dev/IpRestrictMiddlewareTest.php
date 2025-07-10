@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware\Tests\Dev;
 
 use Mautic\Middleware\Dev\IpRestrictMiddleware;
@@ -19,16 +10,33 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
 {
+    private mixed $originalDdevTldValue;
+
+    public function setUp(): void
+    {
+        $this->originalDdevTldValue = getenv('DDEV_TLD');
+        putenv('DDEV_TLD');
+
+        parent::setUp();
+    }
+
+    public function tearDown(): void
+    {
+        putenv('DDEV_TLD='.$this->originalDdevTldValue);
+
+        parent::tearDown();
+    }
+
     public function testWorkflowWithLocalhostIp(): void
     {
         $inputRequest = new Request();
         $inputRequest->server->set('REMOTE_ADDR', '127.0.0.1'); // 127.0.0.1 is always allowed.
-        $httpKernel = new class() implements HttpKernelInterface {
+        $httpKernel = new class implements HttpKernelInterface {
             public function __construct()
             {
             }
 
-            public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
             {
                 return new Response();
             }
@@ -44,16 +52,18 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
     {
         $inputRequest = new Request();
         $inputRequest->server->set('REMOTE_ADDR', 'unallowed.ip.address');
-        $httpKernel                 = new class() implements HttpKernelInterface {
+        $httpKernel                 = new class implements HttpKernelInterface {
             public $handleWasCalled = false;
 
             public function __construct()
             {
             }
 
-            public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
             {
                 $this->handleWasCalled = true;
+
+                return new Response();
             }
         };
 
@@ -78,7 +88,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
             {
                 return new Response();
             }

@@ -1,24 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stats\FetchOptions;
 
 use Mautic\StatsBundle\Event\Options\FetchOptions;
 
 class EmailStatOptions extends FetchOptions
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     /**
      * @var int|null
@@ -35,15 +23,9 @@ class EmailStatOptions extends FetchOptions
      */
     private $segmentId;
 
-    /**
-     * @var array
-     */
-    private $filters = [];
+    private array $filters = [];
 
-    /**
-     * @var bool
-     */
-    private $canViewOthers = false;
+    private bool $canViewOthers = false;
 
     /**
      * @var string
@@ -78,10 +60,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param int|null $companyId
-     *
-     * @return $this;
      */
-    public function setCompanyId($companyId)
+    public function setCompanyId($companyId): self
     {
         $this->companyId = $companyId;
 
@@ -98,10 +78,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param int|null $campaignId
-     *
-     * @return $this;
      */
-    public function setCampaignId($campaignId)
+    public function setCampaignId($campaignId): self
     {
         $this->campaignId = $campaignId;
 
@@ -118,10 +96,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param int|null $segmentId
-     *
-     * @return $this;
      */
-    public function setSegmentId($segmentId)
+    public function setSegmentId($segmentId): self
     {
         $this->segmentId = $segmentId;
 
@@ -136,30 +112,22 @@ class EmailStatOptions extends FetchOptions
         return $this->filters;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFilters(array $filters)
+    public function setFilters(array $filters): self
     {
         $this->filters = $filters;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function canViewOthers()
+    public function canViewOthers(): bool
     {
         return $this->canViewOthers;
     }
 
     /**
      * @param bool $canViewOthers
-     *
-     * @return $this
      */
-    public function setCanViewOthers($canViewOthers)
+    public function setCanViewOthers($canViewOthers): self
     {
         $this->canViewOthers = $canViewOthers;
 

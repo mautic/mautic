@@ -1,0 +1,120 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ 'mautic.dashboard.header.index'|trans }}{% endblock %}
+
+{% block mauticContent %}dashboard{% endblock %}
+
+{% block actions %}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+      'routeBase': 'dashboard',
+      'langVar': 'dashboard',
+      'customButtons': [
+          {
+              'attr': {
+                  'class': 'btn btn-primary btn-nospin',
+                  'data-toggle': 'ajaxmodal',
+                  'data-target': '#MauticSharedModal',
+                  'href': path('mautic_dashboard_action', {'objectAction': 'new'}),
+                  'data-header': 'mautic.dashboard.widget.add'|trans,
+              },
+              'iconClass': 'ri-add-fill',
+              'btnText': 'mautic.dashboard.widget.add',
+              'primary': true,
+          },
+          {
+              'attr': {
+                  'class': 'btn btn-ghost btn-nospin',
+                  'href': 'javascript:void(0)',
+                  'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"');",
+                  'data-toggle': '',
+              },
+              'iconClass': 'ri-save-line',
+              'btnText': 'mautic.dashboard.save_as_predefined',
+          },
+          {
+              'attr': {
+                  'class': 'btn btn-ghost btn-nospin',
+                  'href': 'javascript:void(0)',
+                  'onclick': "Mautic.exportDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"', '"~path('mautic_dashboard_action', {'objectAction': 'export'})~"');",
+                  'data-toggle': '',
+              },
+              'iconClass': 'ri-export-line',
+              'btnText': 'mautic.dashboard.export.widgets',
+          },
+          {
+              'attr': {
+                  'class': 'btn btn-ghost',
+                  'href': path('mautic_dashboard_action', {'objectAction': 'import'}),
+                  'data-header': 'mautic.dashboard.widget.import'|trans,
+              },
+              'iconClass': 'ri-import-line',
+              'btnText': 'mautic.dashboard.widget.import',
+          },
+      ],
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% if true == phpVersion['isOutdated'] %}
+  <div class="pt-md pl-md col-md-12">
+      <div class="pt-md pl-md alert alert-warning">
+          <h3>{{ 'mautic.dashboard.phpversionwarning.title'|trans }}</h3>
+          <p>{{ 'mautic.dashboard.phpversionwarning.body'|trans({'%phpversion%': phpVersion['version']})|purify }}</p>
+      </div>
+  </div>
+  {% endif %}
+
+  <div class="row pt-md ml-0">
+      <div class="col-sm-12">
+        <div class="d-flex fd-row fw-nowrap gap-sm ai-center jc-space-between">
+            {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
+            <div class="dropdown">
+                <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-toggle="dropdown" aria-expanded="false">
+                  {{ 'mautic.core.quick_filters'|trans }}
+                  <i class="ri-arrow-down-s-line"></i>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" onclick="Mautic.setDateRange('today'); event.preventDefault();">{{ 'mautic.dashboard.date.today'|trans }}</a></li>
+                  <li><a href="#" onclick="Mautic.setDateRange('yesterday'); event.preventDefault();">{{ 'mautic.dashboard.date.yesterday'|trans }}</a></li>
+                  <li><a href="#" onclick="Mautic.setDateRange(7); event.preventDefault();">{{ 'mautic.dashboard.date.last_7_days'|trans }}</a></li>
+                  <li><a href="#" onclick="Mautic.setDateRange(30); event.preventDefault();">{{ 'mautic.dashboard.date.last_30_days'|trans }}</a></li>
+                  <li><a href="#" onclick="Mautic.setDateRange(90); event.preventDefault();">{{ 'mautic.dashboard.date.last_90_days'|trans }}</a></li>
+                </ul>
+              </div>
+        </div>
+      </div>
+  </div>
+
+  {% if widgets|length > 0 %}
+      <div id="dashboard-widgets" class="dashboard-widgets cards">
+          {% for widget in widgets %}
+              <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default(100) }}%; height: {{ widget.height|default(300) }}px">
+                  <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
+                  {{ include('@MauticDashboard/Dashboard/widget.html.twig', {'widget': widget}) }}
+              </div>
+          {% endfor %}
+      </div>
+      <div id="cloned-widgets" class="dashboard-widgets cards"></div>
+  {% else %}
+      <div class="well well col-md-6 col-md-offset-3 mt-md">
+          <div class="row">
+              <div class="mautibot-image col-xs-3 text-center">
+                  <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
+              </div>
+              <div class="col-xs-9">
+                  <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="ri-double-quotes-r"></i></h4>
+                  <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
+                  {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: [
+                        {
+                            label: 'mautic.dashboard.apply_default',
+                            variant: 'success',
+                            href: path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': 'default.json'})
+                        }
+                    ]
+                } %}
+              </div>
+          </div>
+      </div>
+  {% endif %}
+{% endblock %}

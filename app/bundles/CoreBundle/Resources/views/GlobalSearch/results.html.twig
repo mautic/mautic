@@ -1,0 +1,53 @@
+<div aria-hidden="true"
+    class="gsearch--interaction-helper d-flex jc-space-between pr-md pl-md pt-sm pb-sm text-secondary">
+    <div class="gsearch--interaction-navigate d-flex ai-center gap-5">
+        <span class="fs-16">{{ 'mautic.core.navigate'|trans }}</span>
+        <kbd><i class="ri-arrow-up-line"></i></kbd>
+        <kbd><i class="ri-arrow-down-line"></i></kbd>
+        <span class="fs-16">{{ 'mautic.core.or'|trans }}</span>
+        <kbd>tab</kbd>
+    </div>
+    <div class="gsearch--interaction-close d-flex ai-center gap-5">
+        <span class="fs-16">{{ 'mautic.core.close'|trans }}</span>
+        <kbd>esc</kbd>
+    </div>
+</div>
+
+<div class="pa-sm" id="globalSearchPanel">
+    {% if results is not empty %}
+        {%- for header, result in results %}
+            {% if not loop.first %}
+                <hr class="mr-sm ml-sm">
+            {% endif %}
+
+            <div class="text-secondary pl-sm pr-sm ml-2 mr-2 mb-xs d-flex gap-xs{% if loop.first %} mt-md{% endif %}">
+                {{ header }}
+                {% if result.count is defined and result.count is not empty %}
+                    <span class="label label-gray fs-10 gs-count-badge" size="sm">{{ result.count }}</span>
+                {% endif %}
+            </div>
+
+            <div class="np">
+                <ul class="pa-0">
+                    {% for k, r in result %}
+                        {% if 'count' is not same as k %}
+                            <li class="list-group-item gsearch--results-item mb-3">
+                                {{ r|raw }}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {%- endfor %}
+    {% else %}
+        <!-- No results message -->
+        <div class="text-center text-secondary mt-sm">
+            {{ random([
+                'mautic.core.search_everything.no_results.nothing_found',
+                'mautic.core.search_everything.no_results.nothing_yet',
+                'mautic.core.search_everything.no_results.no_results',
+                'mautic.core.search_everything.no_results.hang_tight'
+            ]) | trans }}
+        </div>
+    {% endif %}
+</div>

@@ -16,19 +16,19 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private MockObject $logger;
 
     /**
      * @var MockObject|InputInterface
      */
-    private $input;
+    private MockObject $input;
 
     /**
      * @var MockObject|OutputInterface
      */
-    private $output;
+    private MockObject $output;
 
-    private ?ConsoleErrorListener $listener;
+    private ConsoleErrorListener $listener;
 
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Should not throw an error when command is null.
      */
-    public function testConsoleErrorWithNullCommand()
+    public function testConsoleErrorWithNullCommand(): void
     {
         $event = new ConsoleErrorEvent(
             $this->input,
@@ -52,7 +52,7 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->logger->expects($this->once())
-            ->method('notice');
+            ->method('error');
 
         $this->listener->onConsoleError($event);
     }

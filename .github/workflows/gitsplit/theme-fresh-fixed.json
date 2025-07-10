@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-fresh-fixed",
+            "directory": "themes/fresh-fixed",
+            "target": "git@github.com:mautic/theme-fresh-fixed.git"
+        }
+    ]
+}

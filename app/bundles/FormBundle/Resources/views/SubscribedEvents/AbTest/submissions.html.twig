@@ -1,0 +1,37 @@
+{% set support = results.support %}
+{% set label = variants.criteria[results.basedOn].label|trans %}
+{% set chart = barChartInitialize(support.labels) %}
+
+{% if support.data %}
+    {% for datasetLabel, values in support.data %}
+        {% do chart.setDataset(datasetLabel, values) %}
+    {% endfor %}
+{% endif %}
+
+<div class="panel ovf-h abtest-bar-chart">
+    <div class="panel-body box-layout">
+        <div class="col-xs-8 va-m">
+            <h5 class="text-white dark-md fw-sb mb-xs">
+                {{ label }}
+            </h5>
+        </div>
+        <div class="col-xs-4 va-t text-right">
+            <h3 class="text-white dark-sm"><span class="ri-bar-chart-box-line"></span></h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <canvas id="abtest-bar-chart" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    mQuery(document).ready(function() {
+        mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
+            var canvas = document.getElementById("abtest-bar-chart");
+            var barData = mQuery.parseJSON('{{ chart.render|json_encode|replace({'\'': '\\\''}) }}');
+            var barGraph = new Chart(canvas, {type: 'bar', data: barData});
+        });
+    });
+</script>

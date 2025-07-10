@@ -1,29 +1,19 @@
+import AssetService from './asset.service';
 import BuilderService from './builder.service';
-// import builder from './builder.service';
+
+// all css get combined into one builder.css and automatically loaded via js/parcel
+import 'grapesjs/dist/css/grapes.min.css';
+import './grapesjs-custom.css';
 
 /**
  * Launch builder
  *
  * @param formName
- * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
-  // Parse HTML template
-  const parser = new DOMParser();
-  const textareaHtml = mQuery('textarea.builder-html');
-  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
-  const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
-
-  const canvasContent = mQuery('textarea.builder-mjml').val() ? mQuery('textarea.builder-mjml').val() : fullHtml.body.innerHTML;
-
-  const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
-
-  const builder = new BuilderService(
-    canvasContent,
-    assets,
-    textareaAssets.data('upload'),
-    textareaAssets.data('delete')
-  );
+  if (useBuilderForCodeMode() === false) {
+    return;
+  }
 
   Mautic.showChangeThemeWarning = true;
 
@@ -32,10 +22,44 @@ function launchBuilderGrapesjs(formName) {
   mQuery('body').css('overflow-y', 'hidden');
   mQuery('.builder-panel').css('padding', 0);
   mQuery('.builder-panel').css('display', 'block');
-  mQuery('.builder').addClass('builder-active').removeClass('hide');
+  const $builder = mQuery('.builder');
+  $builder.addClass('builder-active').removeClass('hide');
 
+  const assetService = new AssetService();
+  const builder = new BuilderService(assetService);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+
+  // trigger show event on DOM element
+  $builder.trigger('builder:show', [builder.editor])
+  // trigger show event on editor instance
+  builder.editor.trigger('show');
+
+  // Load and add assets
+  (async () => {
+    try {
+      const result = await assetService.getAssetsXhr();
+      builder.editor.AssetManager.add(result.data);
+    } catch (error) {
+      console.error('Error loading initial assets:', error);
+    }
+  })();
+}
+
+/**
+ * The user acknowledges the risk before editing an email or landing page created in Code Mode in the Builder
+ */
+function useBuilderForCodeMode() {
+  const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  if (isCodeMode) {
+    if (confirm(Mautic.translate('grapesjsbuilder.builder.warning.code_mode')) === false) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -61,10 +85,12 @@ function setThemeHtml(theme) {
       }
 
       // If MJML template, generate HTML before save
-      // if (!textareaHtml.val().length && textareaMjml.val().length) {
-      //   builder.mjmlToHtml(textareaMjml, textareaHtml);
-      // }
-      // }
+      if (!textareaHtml.val().length && textareaMjml.val().length) {
+        const assetService = new AssetService();
+        const builder = new BuilderService(assetService);
+
+        textareaHtml.val(builder.mjmlToHtml(response.templateMjml));
+      }
     },
     error(request, textStatus) {
       console.log(`setThemeHtml - Request failed: ${textStatus}`);
@@ -76,12 +102,63 @@ function setThemeHtml(theme) {
 }
 
 /**
+ * The builder button to launch GrapesJS will be disabled when the code mode theme is selected
+ *
+ * @param theme
+ */
+function switchBuilderButton(theme) {
+  const builderButton = mQuery('.btn-builder');
+  const mEmailBuilderButton = mQuery('#emailform_buttons_builder_toolbar_mobile');
+  const mPageBuilderButton = mQuery('#page_buttons_builder_toolbar_mobile');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  builderButton.attr('disabled', isCodeMode);
+
+  if (isCodeMode) {
+    mPageBuilderButton.addClass('link-is-disabled');
+    mEmailBuilderButton.addClass('link-is-disabled');
+
+    mPageBuilderButton.parent().addClass('is-not-allowed');
+    mEmailBuilderButton.parent().addClass('is-not-allowed');
+  } else {
+    mPageBuilderButton.removeClass('link-is-disabled');
+    mEmailBuilderButton.removeClass('link-is-disabled');
+
+    mPageBuilderButton.parent().removeClass('is-not-allowed');
+    mEmailBuilderButton.parent().removeClass('is-not-allowed');
+  }
+}
+
+/**
+ * The textarea with the HTML source will be displayed if the code mode theme is selected
+ *
+ * @param theme
+ */
+function switchCustomHtml(theme) {
+  const customHtmlRow = mQuery('#custom-html-row');
+  const isPageMode = mQuery('[name="page"]').length !== 0;
+  const isCodeMode = theme === 'mautic_code_mode';
+  const advancedTab = isPageMode ? mQuery('#advanced-tab') : null;
+
+  if (isCodeMode === true) {
+    customHtmlRow.removeClass('hidden');
+    isPageMode && advancedTab.removeClass('hidden');
+  } else {
+    customHtmlRow.addClass('hidden');
+    isPageMode && advancedTab.addClass('hidden');
+  }
+}
+
+/**
  * Initialize original Mautic theme selection with grapejs specific modifications
  */
 function initSelectThemeGrapesjs(parentInitSelectTheme) {
   function childInitSelectTheme(themeField) {
     const builderUrl = mQuery('#builder_url');
     let url;
+
+    switchBuilderButton(themeField.val());
+    switchCustomHtml(themeField.val());
 
     // Replace Mautic URL by plugin URL
     if (builderUrl.length) {
@@ -96,15 +173,18 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
 
     // Launch original Mautic.initSelectTheme function
     parentInitSelectTheme(themeField);
+
+    mQuery('[data-theme]').click((event) => {
+      const target = mQuery(event.target);
+      const theme = target.closest('[data-theme]').attr('data-theme');
+
+      switchBuilderButton(theme);
+      switchCustomHtml(theme);
+    });
   }
   return childInitSelectTheme;
 }
 
-Mautic.grapesConvertDynamicContentTokenToSlot =
-  BuilderService.grapesConvertDynamicContentTokenToSlot;
-Mautic.grapesConvertDynamicContentSlotsToTokens =
-  BuilderService.grapesConvertDynamicContentSlotsToTokens;
-Mautic.manageDynamicContentTokenToSlot = BuilderService.manageDynamicContentTokenToSlot;
 Mautic.launchBuilder = launchBuilderGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;

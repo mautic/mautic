@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -19,112 +10,57 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportGeneratorEvent extends AbstractReportEvent
 {
-    const CATEGORY_PREFIX    = 'c';
-    const CONTACT_PREFIX     = 'l';
-    const COMPANY_PREFIX     = 'comp';
-    const IP_ADDRESS_PREFIX  = 'i';
+    public const CATEGORY_PREFIX         = 'c';
 
-    /**
-     * @var array
-     */
-    private $selectColumns = [];
+    public const CONTACT_PREFIX          = 'l';
 
-    /**
-     * QueryBuilder object.
-     *
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
+    public const COMPANY_PREFIX          = 'comp';
 
-    /**
-     * contentTemplate.
-     *
-     * @var string
-     */
-    private $contentTemplate;
+    public const COMPANY_LEAD_PREFIX     = 'companies_lead';
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    public const IP_ADDRESS_PREFIX       = 'i';
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $filterExpression;
+    private array $selectColumns = [];
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private ?string $contentTemplate = null;
 
-    /**
-     * @var array|null
-     */
-    private $sortedFilters;
+    private ?ExpressionBuilder $filterExpression = null;
 
-    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
-    {
+    private ?array $sortedFilters = null;
+
+    public function __construct(
+        Report $report,
+        private array $options,
+        private QueryBuilder $queryBuilder,
+        private ChannelListHelper $channelListHelper,
+    ) {
         $this->report            = $report;
         $this->context           = $report->getSource();
-        $this->options           = $options;
-        $this->queryBuilder      = $qb;
-        $this->channelListHelper = $channelListHelper;
     }
 
-    /**
-     * Fetch the QueryBuilder object.
-     *
-     * @return QueryBuilder
-     *
-     * @throws \RuntimeException
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
-        if ($this->queryBuilder instanceof QueryBuilder) {
-            return $this->queryBuilder;
-        }
-
-        throw new \RuntimeException('QueryBuilder not set.');
+        return $this->queryBuilder;
     }
 
-    /**
-     * Set the QueryBuilder object.
-     *
-     * @return $this
-     */
-    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    public function setQueryBuilder(QueryBuilder $queryBuilder): self
     {
         $this->queryBuilder = $queryBuilder;
 
         return $this;
     }
 
-    /**
-     * Fetch the ContentTemplate path.
-     *
-     * @return QueryBuilder
-     *
-     * @throws \RuntimeException
-     */
-    public function getContentTemplate()
+    public function getContentTemplate(): ?string
     {
         if ($this->contentTemplate) {
             return $this->contentTemplate;
         }
 
         // Default content template
-        return 'MauticReportBundle:Report:details_data.html.php';
+        return '@MauticReport/Report/details.html.twig';
     }
 
-    /**
-     * Set the ContentTemplate path.
-     *
-     * @param string $contentTemplate
-     *
-     * @return $this
-     */
-    public function setContentTemplate($contentTemplate)
+    public function setContentTemplate(?string $contentTemplate): self
     {
         $this->contentTemplate = $contentTemplate;
 
@@ -141,10 +77,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * Set custom select columns with aliases based on report settings.
-     *
-     * @return $this
      */
-    public function setSelectColumns(array $selectColumns)
+    public function setSelectColumns(array $selectColumns): self
     {
         $this->selectColumns = $selectColumns;
 
@@ -169,18 +103,12 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @return ExpressionBuilder|null
-     */
-    public function getFilterExpression()
+    public function getFilterExpression(): ?ExpressionBuilder
     {
         return $this->filterExpression;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFilterExpression(ExpressionBuilder $filterExpression)
+    public function setFilterExpression(ExpressionBuilder $filterExpression): self
     {
         $this->filterExpression = $filterExpression;
 
@@ -192,10 +120,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param string $prefix
      * @param string $categoryPrefix
-     *
-     * @return $this
      */
-    public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = self::CATEGORY_PREFIX)
+    public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = self::CATEGORY_PREFIX): self
     {
         if ($this->usesColumnWithPrefix($categoryPrefix)) {
             $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, $categoryPrefix.'.id = '.$prefix.'.category_id');
@@ -209,10 +135,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param string $prefix
      * @param string $leadPrefix
-     *
-     * @return $this
      */
-    public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = self::CONTACT_PREFIX)
+    public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = self::CONTACT_PREFIX): self
     {
         if ($this->usesColumnWithPrefix($leadPrefix)
             || $this->usesColumnWithPrefix(self::IP_ADDRESS_PREFIX)
@@ -231,10 +155,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param string $prefix
      * @param string $ipPrefix
-     *
-     * @return $this
      */
-    public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = self::IP_ADDRESS_PREFIX)
+    public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = self::IP_ADDRESS_PREFIX): self
     {
         if ($this->usesColumnWithPrefix($ipPrefix)) {
             $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, $ipPrefix.'.id = '.$prefix.'.ip_id');
@@ -249,10 +171,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param string $ipXrefPrefix
      * @param string $ipPrefix
      * @param string $leadPrefix
-     *
-     * @return $this
      */
-    public function addLeadIpAddressLeftJoin(QueryBuilder $queryBuilder, $ipXrefPrefix = 'lip', $ipPrefix = self::IP_ADDRESS_PREFIX, $leadPrefix = self::CONTACT_PREFIX)
+    public function addLeadIpAddressLeftJoin(QueryBuilder $queryBuilder, $ipXrefPrefix = 'lip', $ipPrefix = self::IP_ADDRESS_PREFIX, $leadPrefix = self::CONTACT_PREFIX): self
     {
         if ($this->usesColumnWithPrefix($ipPrefix)) {
             $this->addIpAddressLeftJoin($queryBuilder, $ipXrefPrefix, $ipPrefix);
@@ -269,10 +189,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param string $channel
      * @param string $leadPrefix
      * @param string $onColumn
-     *
-     * @return $this
      */
-    public function addCampaignByChannelJoin(QueryBuilder $queryBuilder, $prefix, $channel, $leadPrefix = self::CONTACT_PREFIX, $onColumn = 'id')
+    public function addCampaignByChannelJoin(QueryBuilder $queryBuilder, $prefix, $channel, $leadPrefix = self::CONTACT_PREFIX, $onColumn = 'id'): self
     {
         if ($this->usesColumn('cmp.name') || $this->usesColumn('clel.campaign_id')) {
             $condition = "clel.channel='{$channel}' AND {$prefix}.{$onColumn} = clel.channel_id AND clel.lead_id = {$leadPrefix}.id";
@@ -287,10 +205,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Join channel columns.
      *
      * @param string $prefix
-     *
-     * @return $this
      */
-    public function addChannelLeftJoins(QueryBuilder $queryBuilder, $prefix)
+    public function addChannelLeftJoins(QueryBuilder $queryBuilder, $prefix): self
     {
         foreach ($this->channelListHelper->getChannels() as $channel => $details) {
             if (!array_key_exists(ReportModel::CHANNEL_FEATURE, $details)) {
@@ -321,13 +237,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add company left join.
      */
-    public function addCompanyLeftJoin(QueryBuilder $queryBuilder, $companyPrefix = self::COMPANY_PREFIX, $contactPrefix = self::CONTACT_PREFIX)
+    public function addCompanyLeftJoin(QueryBuilder $queryBuilder, string $companyPrefix = self::COMPANY_PREFIX, string $contactPrefix = self::CONTACT_PREFIX): void
     {
-        $queryParts    =  $queryBuilder->getQueryParts();
-        $alreadyJoined = isset($queryParts['join']['companies_lead']);
-        if (!$alreadyJoined && $this->usesColumnWithPrefix($companyPrefix)) {
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
-            $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
+        if ($this->usesColumnWithPrefix($companyPrefix) || $this->usesColumnWithPrefix(self::COMPANY_LEAD_PREFIX)) {
+            if ($this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'companies_leads', 'l', self::COMPANY_LEAD_PREFIX)) {
+                return;
+            }
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', self::COMPANY_LEAD_PREFIX, $contactPrefix.'.id ='.self::COMPANY_LEAD_PREFIX.'.lead_id');
+            $queryBuilder->leftJoin(self::COMPANY_LEAD_PREFIX, MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, self::COMPANY_LEAD_PREFIX.'.company_id = '.$companyPrefix.'.id');
         }
     }
 
@@ -338,34 +255,26 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param string $tablePrefix
      * @param bool   $dateOnly
      *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
+    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false): ReportGeneratorEvent
     {
-        if ($tablePrefix) {
-            $tablePrefix .= '.';
-        }
+        $this->setDateRangeQueryFilters(
+            $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
+            '%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)',
+            '%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)'
+        );
 
-        if (empty($this->options['dateFrom'])) {
-            $this->options['dateFrom'] = new \DateTime();
-            $this->options['dateFrom']->modify('-30 days');
-        }
+        return $this;
+    }
 
-        if (empty($this->options['dateTo'])) {
-            $this->options['dateTo'] = new \DateTime();
-        }
-
-        if ($dateOnly) {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
-            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
-        } else {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
-            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
-        }
+    public function applyDateFiltersWithoutNullValues(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): ReportGeneratorEvent
+    {
+        $this->setDateRangeQueryFilters(
+            $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
+            'DATE(%1$s) BETWEEN :dateFrom AND :dateTo',
+            '%1$s BETWEEN :dateFrom AND :dateTo'
+        );
 
         return $this;
     }
@@ -408,10 +317,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Check if the report has a specific column.
      *
      * @param array|string $column
-     *
-     * @return bool
      */
-    public function hasColumn($column)
+    public function hasColumn($column): bool
     {
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
@@ -432,10 +339,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Check if the report has a specific filter.
      *
      * @param array|string $column
-     *
-     * @return bool
      */
-    public function hasFilter($column)
+    public function hasFilter($column): bool
     {
         $this->buildSortedFilters();
 
@@ -471,21 +376,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param string $column
      *
-     * @return array
-     *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValues($column)
+    public function getFilterValues($column): array
     {
         return $this->getReport()->getFilterValues($column);
     }
 
     /**
      * Check if the report has a groupBy columns selected.
-     *
-     * @return bool
      */
-    public function hasGroupBy()
+    public function hasGroupBy(): bool
     {
         if (!empty($this->getReport()->getGroupBy())) {
             return true;
@@ -494,10 +395,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return false;
     }
 
-    /**
-     * @return string
-     */
-    public function createParameterName()
+    public function createParameterName(): string
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -516,5 +414,47 @@ class ReportGeneratorEvent extends AbstractReportEvent
         foreach ($filters as $field) {
             $this->sortedFilters[$field['column']] = true;
         }
+    }
+
+    private function setDateRangeQueryFilters(QueryBuilder $queryBuilder, string $tablePrefix, bool $dateOnly, string $dateColumn, string $dateOnlyFilter, string $dateTimeFilter): void
+    {
+        if ($tablePrefix) {
+            $tablePrefix .= '.';
+        }
+
+        if (empty($this->options['dateFrom'])) {
+            $this->options['dateFrom'] = new \DateTime();
+            $this->options['dateFrom']->modify('-30 days');
+        }
+
+        if (empty($this->options['dateTo'])) {
+            $this->options['dateTo'] = new \DateTime();
+        }
+
+        if ($dateOnly) {
+            $queryBuilder->andWhere(sprintf($dateOnlyFilter, $tablePrefix.$dateColumn));
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
+        } else {
+            $queryBuilder->andWhere(sprintf($dateTimeFilter, $tablePrefix.$dateColumn));
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
+        }
+    }
+
+    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    {
+        $queryParts = $query->getQueryParts();
+        $joins      =   !empty($queryParts) && $queryParts['join'] ? $queryParts['join'] : null;
+        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { // @phpstan-ignore-line
+            return false;
+        }
+        foreach ($joins[$fromAlias] as $join) {
+            if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

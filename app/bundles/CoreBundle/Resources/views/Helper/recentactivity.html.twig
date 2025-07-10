@@ -1,0 +1,34 @@
+<div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans %}mautic.core.recent.activity{% endtrans %}</div>
+    </div>
+    <div class="panel-body pt-xs">
+        {% if logs is defined and logs is not empty %}
+        <ul class="media-list media-list-feed">
+            {% for log in logs %}
+            <li class="media">
+                <div class="media-object pull-left">
+                {% if log.action == 'create' %}
+                    <span class="figure featured bg-success"><span class="ri-check-line"></span></span>
+                {% else %}
+                    <span class="figure"></span>
+                {% endif %}
+                </div>
+                <div class="media-body">
+                    {{ ('mautic.core.' ~ log.action ~ '.by.past.tense')|trans }}
+                    {% if log.userId is defined and log.userId is not empty %}
+                        <a
+                            href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: log.userId}) }}"
+                            data-toggle="ajax"
+                        >{{ log.userName }}</a>
+                    {% else %}
+                        {{ log.userName }}
+                    {% endif %}
+                    <p class="fs-12 dark-sm"><small> {{ dateToFull(log.dateAdded) }}</small></p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,135 @@
+<h4 class="mt-lg fw-sb pa-md">{{'mautic.placeholder_tokens.landing_page_tokens'|trans}}</h4>
+<p class="text-secondary pi-md">{{'mautic.placeholder_tokens.landing_page_tokens.explanation'|trans}}</p>
+<ul id="pageTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
+  <!-- Landing Page tokens -->
+  <li class="panel">
+    <a role="button" id="headingLandingPageTokens" class="accordion-heading collapsed" data-toggle="collapse"
+      data-parent="#pageTokensAccordion" href="#collapseLandingPageTokens" aria-expanded="false"
+      aria-controls="collapseLandingPageTokens">
+      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+      <span class="accordion-title">{{ 'mautic.placeholder_tokens.landing_page_tokens'|trans }}</span>
+    </a>
+    <div id="collapseLandingPageTokens" class="collapse accordion-wrapper" role="tabpanel"
+      aria-labelledby="headingLandingPageTokens">
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.landing_page.meta_description'|trans }}</td>
+            <td><code>{pagemetadescription}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.landing_page.title'|trans }}</td>
+            <td><code>{pagetitle}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.landing_page.language_bar'|trans }}</td>
+            <td><code>{langbar}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.landing_page.share_buttons'|trans }}</td>
+            <td><code>{sharebuttons}</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </li>
+
+  <!-- Preference Center Landing Page tokens -->
+  <li class="panel">
+    <a role="button" id="headingPreferenceCenterTokens" class="accordion-heading collapsed" data-toggle="collapse"
+      data-parent="#pageTokensAccordion" href="#collapsePreferenceCenterTokens" aria-expanded="false"
+      aria-controls="collapsePreferenceCenterTokens">
+      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+      <span class="accordion-title">{{ 'mautic.placeholder_tokens.preference_center_tokens'|trans }}</span>
+    </a>
+    <div id="collapsePreferenceCenterTokens" class="collapse accordion-wrapper" role="tabpanel"
+      aria-labelledby="headingPreferenceCenterTokens">
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.preference_center.lead_identifier'|trans }}</td>
+            <td><code>{leadidentifier}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.preference_center.category_list'|trans }}</td>
+            <td><code>{categorylist}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.preference_center.segment_list'|trans }}</td>
+            <td><code>{segmentlist}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.preference_center.preferred_channel'|trans }}</td>
+            <td><code>{preferredchannel}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.preference_center.channel_frequency'|trans }}</td>
+            <td><code>{channelfrequency}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.preference_center.save_preferences'|trans }}</td>
+            <td><code>{saveprefsbutton}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.landing_page.success_message'|trans }}</td>
+            <td><code>{successmessage}</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </li>
+
+  <!-- Mautic component tokens -->
+  <li class="panel">
+    <a role="button" id="headingComponentTokens" class="accordion-heading collapsed" data-toggle="collapse"
+      data-parent="#pageTokensAccordion" href="#collapseComponentTokens" aria-expanded="false"
+      aria-controls="collapseComponentTokens">
+      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+      <span class="accordion-title">{{ 'mautic.placeholder_tokens.component_tokens'|trans }}</span>
+    </a>
+    <div id="collapseComponentTokens" class="collapse accordion-wrapper" role="tabpanel"
+      aria-labelledby="headingComponentTokens">
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.component.asset_link'|trans }}</td>
+            <td><code>{assetlink=25}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.component.focus_item'|trans }}</td>
+            <td><code>{focus=4}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.component.form'|trans }}</td>
+            <td><code>{form=83}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.component.landing_page_link'|trans }}</td>
+            <td><code>{pagelink=17}</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </li>
+</ul>

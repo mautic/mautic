@@ -1,0 +1,53 @@
+{#
+  Variables
+    - lead
+    - socialProfiles
+    - socialProfileUrls
+#}
+{% if socialProfiles is empty %}
+{{ include('@MauticCore/Helper/no_information.html.twig', {
+    'tip': 'mautic.lead.socialprofiles.header',
+    'link': 'mautic.lead.socialprofiles.noresults',
+    'href': 'javascript: void(0);',
+    'onclick': "Mautic.refreshLeadSocialProfile('', {{ lead.id }}, event);"
+}) }}
+{% else %}
+  <div class="row">
+  {% for integrationName, details in socialProfiles %}
+      {{ cycle(['', '</div><div class="row">'], loop.index0) }}
+      <div class="col-md-6">
+          <div class="panel panel-default panel-{{ integrationName|lower }}">
+              <div class="panel-heading pr-0">
+                  <h3 class="panel-title">{{ ('mautic.integration.'~integrationName)|trans }}</h3>
+                  <div class="panel-toolbar text-right">
+                      <a href="javascript:void(0);" class="btn" data-toggle="tooltip" onclick="Mautic.refreshLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);"
+                         title="{{ 'mautic.lead.lead.social.lastupdate'|trans({'%datetime%': dateToFullConcat(details.lastRefresh, 'utc')}) }}">
+                          <i class="text-white ri-refresh-line"></i>
+                      </a>
+                      <a href="javascript:void(0);" class="btn" onclick="Mautic.clearLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);" data-toggle="tooltip"
+                         title="{{ 'mautic.lead.lead.social.removecache'|trans }}">
+                          <i class="text-white ri-close-line"></i>
+                      </a>
+                      {# trickery to allow tooltip and onclick for close button #}
+                      <a class="hide {{ integrationName }}-panelremove" data-toggle="panelremove" data-parent=".col-md-6">&amp;</a>
+                  </div>
+              </div>
+               <div class="panel-collapse pull out" id="{{ integrationName }}CompleteProfile">
+                  {{ include(details.social_profile_template, {
+                      'lead': lead,
+                      'details': details,
+                      'integrationName': integrationName,
+                      'socialProfileUrls': socialProfileUrls,
+                  }) }}
+              </div>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+{% endif %}
+{{ include('@MauticCore/Helper/modal.html.twig', {
+    'id': 'socialImageModal',
+    'body': '<img class="img-responsive img-thumbnail" />',
+    'header': false,
+    'padding': 'np',
+}) }}

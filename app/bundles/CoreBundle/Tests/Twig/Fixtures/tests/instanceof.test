@@ -1,0 +1,17 @@
+--TEST--
+instanceof test
+--TEMPLATE--
+{% if date is instanceof('DateTimeInterface') %}
+Date is instance of DateTimeInterface
+{% endif %}
+{% if date is instanceof('DateTimeImmutable') %}
+Date is instance of DateTimeImmutable
+{% endif %}
+{% if date is not instanceof('DateTimeImmutable') %}
+Date is not instance of DateTimeImmutable
+{% endif %}
+--DATA--
+return ['date' => new \DateTime()]
+--EXPECT--
+Date is instance of DateTimeInterface
+Date is not instance of DateTimeImmutable

@@ -39,22 +39,22 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
         return $this->records[$this->position];
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->records[$this->position]);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -64,7 +64,7 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
         return count($this->records);
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             $this->records[] = $value;
@@ -73,12 +73,12 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->records[$offset]);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->records[$offset]);
     }

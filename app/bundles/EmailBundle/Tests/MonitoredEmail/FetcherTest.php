@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -59,20 +50,18 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::fetch()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getMessages()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getConfigs()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::fetch
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getMessages
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getConfigs
      */
-    public function testMessagesAreFetchedAndEventDispatched()
+    public function testMessagesAreFetchedAndEventDispatched(): void
     {
         $mailbox = $this->getMockBuilder(Mailbox::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
-                function ($mailbox) {
-                    return $this->mailboxes[$mailbox];
-                }
+                fn ($mailbox) => $this->mailboxes[$mailbox]
             );
         $mailbox->method('searchMailBox')
             ->willReturn([1]);

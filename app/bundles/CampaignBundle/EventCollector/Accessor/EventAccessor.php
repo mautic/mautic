@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector\Accessor;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -21,20 +12,11 @@ use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
 class EventAccessor
 {
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    /**
-     * @var array
-     */
-    private $conditions = [];
+    private array $conditions = [];
 
-    /**
-     * @var array
-     */
-    private $decisions = [];
+    private array $decisions = [];
 
     public function __construct(array $events)
     {
@@ -52,16 +34,12 @@ class EventAccessor
      */
     public function getEvent($type, $key)
     {
-        switch ($type) {
-            case Event::TYPE_ACTION:
-                return $this->getAction($key);
-            case Event::TYPE_CONDITION:
-                return $this->getCondition($key);
-            case Event::TYPE_DECISION:
-                return $this->getDecision($key);
-            default:
-                throw new TypeNotFoundException("$type is not a valid event type");
-        }
+        return match ($type) {
+            Event::TYPE_ACTION    => $this->getAction($key),
+            Event::TYPE_CONDITION => $this->getCondition($key),
+            Event::TYPE_DECISION  => $this->getDecision($key),
+            default               => throw new TypeNotFoundException("$type is not a valid event type"),
+        };
     }
 
     /**
@@ -136,7 +114,7 @@ class EventAccessor
         return $this->decisions;
     }
 
-    private function buildEvents(array $events)
+    private function buildEvents(array $events): void
     {
         if (isset($events[Event::TYPE_ACTION])) {
             $this->actions = EventBuilder::buildActions($events[Event::TYPE_ACTION]);

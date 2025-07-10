@@ -1,0 +1,75 @@
+{#
+  Variables
+    - tmpl
+    - security
+    - form
+    - formThemes
+    - formConfigs
+    - isWritable
+#}
+{% if formThemes is not empty and formThemes is iterable %}
+  {% form_theme form with formThemes %}
+{% elseif formThemes is not empty and formThemes is string %}
+  {% form_theme form formThemes %}
+{% endif %}
+
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}config{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.config.header.index'|trans }}{% endblock %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="container">
+    <!-- step container -->
+     <div class="row">
+         <div class="col-md-3 height-auto">
+             <div class="">
+                 {% if not isWritable %}
+                     <div class="alert alert-danger">{{ 'mautic.config.notwritable'|trans }}</div>
+                 {% endif %}
+                 <!-- Nav tabs -->
+                 <ul class="list-group list-group-tabs" role="tablist">
+                     {% for key in form.children|keys|filter(v => formConfigs[v] is defined and form[v].children|length > 0) %}
+                         <li role="presentation" class="list-group-item {% if loop.first %}in active{% endif %}">
+                             {% set containsErrors = formContainsErrors(form[key]) %}
+                             <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="list-group-item-text steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
+                                 {{ ('mautic.config.tab.' ~ key)|trans }}
+                                 {% if formContainsErrors(form[key]) %}
+                                     <i class="ri-alert-line"></i>
+                                 {% endif %}
+                             </a>
+                         </li>
+                     {% endfor %}
+                 </ul>
+             </div>
+         </div>
+
+         <!-- container -->
+         <div class="col-md-9 height-auto">
+             {{ form_start(form) }}
+             <!-- Tab panes -->
+             <div class="tab-content">
+                 {% for key in form.children|keys|filter(v => formConfigs[v] is defined) %}
+                     {% if form[key].children|length > 0 %}
+                       <div role="tabpanel" class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ key }}">
+                           <div>
+                            <div class="row pa-md bdr-b">
+                                <h4 class="fw-sb">{{ ('mautic.config.tab.' ~ key)|trans }}</h4>
+                            </div>
+                               {{ form_widget(form[key], {'formConfig': formConfigs[key]}) }}
+                           </div>
+                       </div>
+                     {% else %}
+                       {% do form[key].setRendered() %}
+                     {% endif %}
+                 {% endfor %}
+             </div>
+             {{ form_end(form) }}
+         </div>
+     </div>
+</div>
+{% endblock %}

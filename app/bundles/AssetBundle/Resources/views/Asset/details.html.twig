@@ -1,0 +1,200 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}asset{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+        {
+            'item'            : activeAsset,
+            'templateButtons' : {
+                'close' : securityHasEntityAccess(
+                    permissions['asset:assets:viewown'],
+                    permissions['asset:assets:viewother'],
+                    activeAsset.getCreatedBy()
+                ),
+            },
+            'routeBase'  : 'asset',
+            'langVar'    : 'asset.asset',
+            'nameGetter' : 'getTitle',
+            'targetLabel': 'mautic.asset.assets'|trans
+        }
+    ) -}}
+{% endblock %}
+
+{% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}
+
+{% block actions %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+        {
+            'item'            : activeAsset,
+            'templateButtons' : {
+                'edit' : securityHasEntityAccess(
+                    permissions['asset:assets:editown'],
+                    permissions['asset:assets:editother'],
+                    activeAsset.getCreatedBy()
+                ),
+                'clone'  : permissions['asset:assets:create'],
+                'delete' : securityHasEntityAccess(
+                    permissions['asset:assets:deleteown'],
+                    permissions['asset:assets:deleteother'],
+                    activeAsset.getCreatedBy()
+                ),
+            },
+            'routeBase'  : 'asset',
+            'langVar'    : 'asset.asset',
+            'nameGetter' : 'getTitle',
+}) -}}
+{% endblock %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activeAsset,
+        'status': 'available'
+    }) -}}
+{% endblock %}
+{% block content %}
+
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 height-auto">
+        <div>
+            <!-- asset detail header -->
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeAsset.description} %}
+            <!--/ asset detail header -->
+            <!-- asset detail collapseable -->
+            <div class="collapse pr-md pl-md" id="asset-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                            {{- include(
+                                '@MauticCore/Helper/details.html.twig',
+                                {'entity' : activeAsset}
+                            ) -}}
+                            <tr>
+                                <td width="20%">
+                                <span class="fw-b textTitle">
+                                {% trans %}mautic.asset.asset.size{% endtrans %}
+                                </span>
+                                </td>
+                                <td>{{ activeAsset.getSize() }}</td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.asset.asset.path.relative{% endtrans %}</span></td>
+                                <td>{{ assetDownloadUrl }}</td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.asset.filename.original{% endtrans %}</span></td>
+                                <td>{{ activeAsset.getOriginalFilename() }}</td>
+                            </tr>
+                            <tr>
+                                {% set location = activeAsset.getStorageLocation() %}
+                                <td width="20%"><span class="fw-b textTitle">{{ ('mautic.asset.filename.' ~ location)|trans }}</span></td>
+                                <td>{{ ('local' == location) ? activeAsset.getPath() : activeAsset.getRemotePath() }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--/ asset detail collapseable -->
+        </div>
+
+        <div>
+            <!-- asset detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
+                       data-target="#asset-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
+                </span>
+            </div>
+            <!--/ asset detail collapseable toggler -->
+
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-2 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="ri-download-line"></span>
+                                        {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
+                                    </h5>
+                                </div>
+                                <div class="col-md-2 va-m text-center">
+                                    <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.total'|trans({'count' : stats.downloads.total}) }}</span>
+                                    <span class="text-white dark-md fw-sb mb-xs">|</span>
+                                    <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.unique'|trans({'count' : stats.downloads.unique}) }}</span>
+                                </div>
+                                <div class="col-md-8 va-m">
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : stats.downloads.timeStats, 'chartType' : 'line', 'chartHeight' : 300}) -}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+        </div>
+
+        {{ customContent('details.stats.graph.below', _context) }}
+
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md preview-detail">
+            {{- include('@MauticAsset/Asset/preview.html.twig',
+                {
+                    'activeAsset' : activeAsset,
+                    'assetDownloadUrl' : url(
+                    'mautic_asset_action',
+                    {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
+                )}) -}}
+        </div>
+        <!--/ end: tab-content -->
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bdr-l height-auto">
+        <!-- preview URL -->
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <div class="panel-title">{% trans %}mautic.asset.asset.url{% endtrans %}</div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="input-group">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                           readonly value="{{ assetDownloadUrl|escape }}"/>
+                <span class="input-group-btn">
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                icon: 'ri-external-link-line',
+                                icon_only: true,
+                                tooltip_placement: 'left',
+                                label: 'mautic.core.open_link',
+                                onclick: "window.open('" ~ assetDownloadUrl ~ "', '_blank')",
+                                variant: 'ghost'
+                            }
+                        ]
+                    } %}
+                </span>
+                </div>
+            </div>
+        </div>
+        <!--/ preview URL -->
+
+        <hr class="hr-w-2" style="width:50%">
+
+        <!-- activity feed -->
+        {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
+    </div>
+    <!--/ right section -->
+    <input name="entityId" id="entityId" type="hidden" value="{{ activeAsset.getId() }}"/>
+</div>
+<!--/ end: box layout -->
+
+{% endblock %}

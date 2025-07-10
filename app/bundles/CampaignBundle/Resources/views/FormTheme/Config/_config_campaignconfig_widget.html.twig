@@ -1,0 +1,42 @@
+{% block _config_campaignconfig_widget %}
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.campaignconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.campaignconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.campaign_time_wait_on_event_false) }}
+                    {{ form_row(form.campaign_by_range) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.campaign_use_summary) }}
+                    {{ form_row(form.campaign_email_stats_enabled) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.peak_interaction_timer.title'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.peak_interaction_timer.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.peak_interaction_timer_best_default_hour_start) }}
+                    {{ form_row(form.peak_interaction_timer_best_default_hour_end) }}
+                    {{ form_row(form.peak_interaction_timer_best_default_days) }}
+                </div>
+                <hr>
+                <div class="col-xs-12">
+                    {{ form_row(form.peak_interaction_timer_cache_timeout) }}
+                    {{ form_row(form.peak_interaction_timer_fetch_interactions_from) }}
+                    {{ form_row(form.peak_interaction_timer_fetch_limit) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}focus{% endblock %}
+
+{% block headerTitle %}{{ item.name }}{% endblock %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : item,
+        'templateButtons' : {
+            'close' : securityIsGranted('focus:items:view'),
+        },
+        'routeBase' : 'focus',
+        'targetLabel': 'mautic.focus.focus_items'|trans
+    }
+) -}}
+{% endblock %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+            'item': item,
+            'templateButtons': {
+                'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy),
+                'clone': permissions['focus:items:create'],
+                'delete': securityHasEntityAccess(permissions['focus:items:deleteown'], permissions['focus:items:deleteother'], item.createdBy),
+            },
+            'routeBase': 'focus',
+            'langVar': 'focus',
+    }) -}}
+{% endblock %}
+
+
+{% block content %}
+  {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- left section -->
+      <div class="col-md-9 height-auto">
+          <div>
+              <!-- form detail header -->
+              {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
+              <!--/ form detail header -->
+
+              <!-- form detail collapseable -->
+              <div class="collapse pr-md pl-md" id="focus-details">
+                  <div class="pr-md pl-md pb-md">
+                      <div class="panel shd-none mb-0">
+                          <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}>
+                              <tbody>
+                              {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.focus.details.views'|trans }}</span>
+                                  </td>
+                                  <td data-focus-total-views-cell>
+                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.focus.details.unique_views'|trans }}</span>
+                                  </td>
+                                  <td data-focus-total-unique-views-cell>
+                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
+                                  </td>
+                              </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+              <!--/ form detail collapseable -->
+          </div>
+
+          <div>
+              <!-- form detail collapseable toggler -->
+              <div class="hr-expand nm">
+                  <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span>
+                        {{ 'mautic.core.details'|trans }}
+                      </a>
+                  </span>
+              </div>
+              <!--/ form detail collapseable toggler -->
+
+              <!-- stats -->
+              <div class="pa-md">
+                  <div class="row">
+                      <div class="col-sm-12">
+                          <div class="panel">
+                              <div class="panel-body box-layout">
+                                  <div class="col-xs-4 va-m">
+                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                          <span class="ri-line-chart-fill"></span>
+                                          {{ 'mautic.focus.graph.stats'|trans }}
+                                      </h5>
+                                  </div>
+                                  <div class="col-xs-8 va-m">
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                  </div>
+                              </div>
+                              <div class="pt-0 pl-15 pb-10 pr-15">
+                                  {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats, 'chartType': 'line', 'chartHeight': 300}) }}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!--/ stats -->
+
+              {{ customContent('details.stats.graph.below', _context) }}
+
+              {% if trackables is defined and trackables is not empty %}
+                  <!-- tabs controls -->
+                  <ul class="nav nav-tabs nav-tabs-contained">
+                      <li class="active">
+                          <a href="#clicks-container" role="tab" data-toggle="tab">
+                              {{ 'mautic.trackable.click_counts'|trans }}
+                          </a>
+                      </li>
+                  </ul>
+                  <!--/ tabs controls -->
+
+                  <!-- start: tab-content -->
+                  <div class="tab-content pa-md">
+                      <div class="tab-pane active bdr-w-0" id="clicks-container">
+                          {{ include('@MauticPage/Trackable/click_counts.html.twig', {
+                                  'trackables': trackables,
+                                  'entity': item,
+                                  'channel': 'focus',
+                          }) }}
+                      </div>
+                  </div>
+                  <!-- end: tab-content -->
+              {% endif %}
+
+          </div>
+      </div>
+      <!--/ left section -->
+
+      <!-- right section -->
+      <div class="col-md-3 bdr-l height-auto">
+          <!-- form HTML -->
+          <div class="pa-md">
+              <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
+                  <div class="panel-body">
+                      <h5 class="fw-sb mb-sm">{{ 'mautic.focus.install.header'|trans }}</h5>
+                      <p class="mb-sm">{{ 'mautic.focus.install.description'|trans }}</p>
+                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
+                  </div>
+              </div>
+          </div>
+          <!--/ form HTML -->
+
+          <hr class="hr-w-2" style="width:50%">
+
+          {# we can leverage data from audit_log table and build activity feed from it #}
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+              <!-- recent activity -->
+              {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
+          </div>
+      </div>
+      <!--/ right section -->
+  </div>
+  <!--/ end: box layout -->
+
+  <input type="hidden" name="entityId" id="entityId" value="{{ item.id }}"/>
+{% endblock %}

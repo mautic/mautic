@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * WidgetRepository.
+ * @extends CommonRepository<Widget>
  */
 class WidgetRepository extends CommonRepository
 {
@@ -23,10 +14,8 @@ class WidgetRepository extends CommonRepository
      *
      * @param array $ordering
      * @param int   $userId
-     *
-     * @return string
      */
-    public function updateOrdering($ordering, $userId)
+    public function updateOrdering($ordering, $userId): void
     {
         $widgets = $this->getEntities(
             [
@@ -45,20 +34,14 @@ class WidgetRepository extends CommonRepository
         $this->saveEntities($widgets);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['w.ordering', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'w';
     }

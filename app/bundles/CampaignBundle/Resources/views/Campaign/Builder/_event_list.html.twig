@@ -1,0 +1,46 @@
+{#
+  Variables
+    - campaignSettings
+    - campaignId
+#}
+{% for eventGroup, color in {'action': 'primary', 'decision': 'success', 'condition': 'danger'} %}
+    <div id="{{ eventGroup|title }}GroupList" class="hide">
+        <h4 class="mb-xs">
+            <span>{{ ('mautic.campaign.event.'~eventGroup~'s.header')|trans }}</span>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        icon: 'ri-fw ri-corner-right-up-line',
+                        label: 'mautic.campaign.event.back_to_panel',
+                        icon_only: true,
+                        size: 'xs',
+                        variant: color,
+                        attributes: {
+                            'class': 'pull-right mb-xs',
+                            'type': 'button'
+                        }
+                    }
+                ]
+            } %}
+        </h4>
+        <select id="{{ eventGroup|title }}List" class="campaign-event-selector">
+            <option value=""></option>
+            {% for k, e in eventSettings[eventGroup] %}
+                <option id="campaignEvent_{{ k|replace({'.': ''}) }}"
+                        class="option_campaignEvent_{{ k|replace({'.': ''}) }}"
+                        data-href="{{ path('mautic_campaignevent_action', {
+                                    'objectAction': 'new',
+                                    'type': k,
+                                    'eventType': eventGroup,
+                                    'campaignId': campaignId,
+                                    'anchor': '',
+                            }) }}"
+                        data-target="#CampaignEventModal"
+                        title="{{ e['description']|e }}"
+                        value="{{ k|e }}">
+                    <span>{{ e['label'] }}</span>
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+{% endfor %}

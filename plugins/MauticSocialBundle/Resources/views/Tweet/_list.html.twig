@@ -1,0 +1,77 @@
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover tweet-list" id="tweetTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#tweetTable',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'social.tweet',
+                        'orderBy': 'e.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-tweet-name',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'social.tweet',
+                        'orderBy': 'e.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-asset-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityIsGranted('mauticSocial:tweet:edit'),
+                                    'delete': securityIsGranted('mauticSocial:tweet:delete'),
+                                },
+                                'routeBase': 'mautic_tweet',
+                                'langVar': 'mautic.integration.Twitter',
+                                'nameGetter': 'getName',
+                        }) }}
+                    </td>
+                    <td>
+                        <div>
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                    'item': item,
+                                    'model': 'social.tweet',
+                            }) }}
+                            <a href="{{ path('mautic_tweet_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">
+                                {{ item.name }}
+                            </a>
+                        </div>
+                        {% if item.description %}
+                            <div class="text-secondary mt-4">
+                                <small>{{ item.description|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': items|length,
+                'page': page,
+                'limit': limit,
+                'menuLinkId': 'mautic_tweet_index',
+                'baseUrl': path('mautic_tweet_index'),
+                'sessionVar': 'social.tweet',
+                'routeBase': 'tweet',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.mautic.social.tweet.noresults.tip'}) }}
+{% endif %}

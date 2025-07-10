@@ -1,0 +1,103 @@
+{#
+#}
+{{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
+{% if items|length > 0 %}
+    <div class="table-responsive page-list">
+        <table class="table table-hover focus-list" id="focusTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#focusTable',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'focus',
+                        'orderBy': 'f.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-focus-name',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'focus',
+                        'orderBy': 'c.title',
+                        'text': 'mautic.core.category',
+                        'class': 'visible-md visible-lg col-focus-category',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'focus',
+                        'orderBy': 'f.type',
+                        'text': 'mautic.focus.thead.type',
+                        'class': 'visible-md visible-lg col-focus-type',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'focus',
+                        'orderBy': 'f.style',
+                        'text': 'mautic.focus.thead.style',
+                        'class': 'visible-md visible-lg col-focus-style',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'focus',
+                        'orderBy': 'f.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-focus-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy),
+                                    'clone': permissions['focus:items:create'],
+                                    'delete': securityHasEntityAccess(permissions['focus:items:deleteown'], permissions['focus:items:deleteother'], item.createdBy),
+                                },
+                                'routeBase': 'focus',
+                        }) }}
+                    </td>
+                    <td>
+                        <div>
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'focus'}) }}
+                            <a data-toggle="ajax" href="{{ path('mautic_focus_action', {'objectId': item.id, 'objectAction': 'view'}) }}">
+                                {{ item.name }}
+                            </a>
+                        </div>
+                        {% if item.description %}
+                            <div class="text-secondary mt-4">
+                                <small>{{ item.description|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.category %}
+                        {% set catName  = category.title|default('mautic.core.form.uncategorized'|trans) %}
+                        {% set color    = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                    </td>
+                    <td class="visible-md visible-lg">{{ ('mautic.focus.type.' ~ item.type)|trans }}</td>
+                    <td class="visible-md visible-lg">{{ ('mautic.focus.style.' ~ item.style)|trans }}</td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': items|length,
+                'page': page,
+                'limit': limit,
+                'baseUrl': path('mautic_focus_index'),
+                'sessionVar': 'focus',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.focus.noresults.tip'}) }}
+{% endif %}

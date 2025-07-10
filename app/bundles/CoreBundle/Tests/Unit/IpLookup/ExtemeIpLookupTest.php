@@ -1,28 +1,16 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 
-/**
- * Class ExtremeIpLookupTest.
- */
 class ExtemeIpLookupTest extends \PHPUnit\Framework\TestCase
 {
     private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
-    public function testIpLookupSuccessful()
+    public function testIpLookupSuccessful(): void
     {
         // Mock http connector
         $mockHttp = $this->createMock(Client::class);

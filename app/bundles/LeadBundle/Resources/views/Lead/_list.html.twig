@@ -1,0 +1,47 @@
+
+
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover" id="leadTable">
+            <thead>
+                <tr>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#leadTable',
+                    }) }}
+
+                    {% for column, label in columns %}
+                        {{ include([('@MauticLead/Lead/_list_header_'~column~'.html.twig'), '@MauticLead/Lead/_list_header_default.html.twig'], {
+                              'label': label,
+                              'column': column,
+                              'class': (column in columns|keys) ? 'hidden-xs' : '',
+                        }) }}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {{ include('@MauticLead/Lead/_list_rows.html.twig', {
+                    'items': items,
+                    'columns': columns,
+                    'security': security,
+                    'currentList': currentList,
+                    'permissions': permissions,
+                    'noContactList': noContactList,
+                }) }}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems': totalItems,
+            'page': page,
+            'limit': limit,
+            'menuLinkId': 'mautic_contact_index',
+            'baseUrl': path('mautic_contact_index'),
+            'tmpl': indexMode,
+            'sessionVar': 'lead',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

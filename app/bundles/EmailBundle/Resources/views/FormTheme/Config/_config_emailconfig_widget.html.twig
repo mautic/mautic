@@ -1,0 +1,116 @@
+{%- macro row_if_exists(form, field) %}
+  {% if form[field] is defined %}
+    <div class="col-xs-12">
+      {{ form_row(form[field]) }}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
+{% block _config_emailconfig_widget %}
+{% set fields = form.children %}
+{% set fieldKeys = fields|keys %}
+
+{% form_theme form with [
+    '@MauticEmail/FormTheme/Config/monitored_email_widget.html.twig',
+    '@MauticEmail/FormTheme/Config/monitored_mailboxes_widget.html.twig',
+] %}
+
+{% if fieldKeys|filter(k => k in ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email'])|length > 0 %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.email.config.header.mail'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.mail.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="row">
+                    {{ _self.row_if_exists(fields, 'mailer_from_name') }}
+                    {{ _self.row_if_exists(fields, 'mailer_from_email') }}
+                    {{ _self.row_if_exists(fields, 'mailer_reply_to_email') }}
+                    {{ _self.row_if_exists(fields, 'mailer_return_path') }}
+                    {{ _self.row_if_exists(fields, 'mailer_address_length_limit') }}
+                    {{ _self.row_if_exists(fields, 'mailer_is_owner') }}
+                    {{ _self.row_if_exists(fields, 'mailer_custom_headers') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.email.config.header.dsn'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.dsn.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="col-xs-12">
+                {{ form_row(fields.mailer_dsn) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.frequency_rules'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.frequency_rules.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="col-xs-12">
+                {{ form_row(fields.email_frequency_number) }}
+                {{ form_row(fields.email_frequency_time) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if fields.monitored_email is defined %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.email.config.header.monitored_email'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.monitored_email.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                {% if 'imap_open' is function %}
+                    {{ form_widget(form.monitored_email) }}
+                {% else %}
+                    <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans|purify }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.email.config.header.message'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.message.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                {{ _self.row_if_exists(fields, 'webview_text') }}
+                {{ _self.row_if_exists(fields, 'default_signature_text') }}
+                {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
+                {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
+                {{ _self.row_if_exists(fields, 'disable_trackable_urls') }}
+                {{ _self.row_if_exists(fields, 'minify_email_html') }}
+                {{ _self.row_if_exists(fields, 'email_draft_enabled') }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.email.config.header.unsubscribe'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.unsubscribe.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
+                {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
+                {{ _self.row_if_exists(fields, 'resubscribe_message') }}
+                {{ _self.row_if_exists(fields, 'show_contact_preferences') }}
+                {{ _self.row_if_exists(fields, 'show_contact_segments') }}
+                {{ _self.row_if_exists(fields, 'show_contact_frequency') }}
+                {{ _self.row_if_exists(fields, 'show_contact_pause_dates') }}
+                {{ _self.row_if_exists(fields, 'show_contact_categories') }}
+                {{ _self.row_if_exists(fields, 'show_contact_preferred_channels') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

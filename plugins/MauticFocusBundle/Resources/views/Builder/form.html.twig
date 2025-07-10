@@ -1,0 +1,118 @@
+{#
+  Variables
+    - form
+    - pages
+    - lastPage
+    - style
+    - focusId
+    - preview
+    - contactFields
+    - companyFields
+    - viewOnlyFields
+    - displayManager
+#}
+{% set formName = '_' ~ inputAlphanum(inputTransliterate(form.name))|lower ~ '_focus' %}
+{% set jsFormName = formName|trim('_', 'left') %}
+{% set fields = form.fields %}
+{% set required = [] %}
+
+<!-- START FOCUS FORM -->
+{{ include('@MauticForm/Builder/_script.html.twig', {'form': form, 'formName': formName}, with_context=false) }}
+<script>
+    var MauticFocusHandler = function (messageType, message) {
+        var wrapper = document.getElementById('mauticform_wrapper{{ formName }}');
+        var innerForm = wrapper.getElementsByClassName('mauticform-innerform');
+        innerForm[0].style.display = "none";
+
+        {% if 'page' == style %}
+        document.getElementById('mauticform{{ formName }}_' + messageType).style.fontSize = "2em";
+        {% elseif 'bar' == style %}
+        document.getElementById('mauticform{{ formName }}_' + messageType).style.fontSize = "1.1em";
+        {% endif %}
+
+        var headline = document.getElementsByClassName('mf-headline');
+        if (headline.length) {
+            headline[0].style.display = "none";
+        }
+
+        var tagline = document.getElementsByClassName('mf-tagline');
+        if (tagline.length) {
+            tagline[0].style.display = "none";
+        }
+
+        if (message) {
+            document.getElementById('mauticform{{ formName }}_' + messageType).innerHTML = message;
+        }
+
+        if (messageType == 'error') {
+            setTimeout(function () {
+                if (headline.length) {
+                    {% if 'bar' == style %}
+                    headline[0].style.display = "inline-block";
+                    {% else %}
+                    headline[0].style.display = "block";
+                    {% endif %}
+                }
+                if (tagline.length) {
+                    tagline[0].style.display = "inherit";
+                }
+
+                innerForm[0].style.display = "inherit";
+                document.getElementById('mauticform{{ formName }}_' + messageType).innerHTML = '';
+            }, 1500);
+        }
+    };
+    if (typeof MauticFormCallback == 'undefined') {
+        var MauticFormCallback = {};
+    }
+    MauticFormCallback["{{ jsFormName }}"] = {
+        onMessageSet: function (data) {
+            if (data.message) {
+                MauticFocusHandler(data.type);
+            }
+        },
+        onErrorMark: function (data) {
+            if (data.validationMessage) {
+                MauticFocusHandler('error', data.validationMessage);
+
+                return true;
+            }
+        },
+        onResponse: function (data) {
+            if (data.download) {
+                document.getElementById('mauticiframe{{ formName }}').src = data.download;
+
+                if (data.redirect) {
+                    setTimeout(function () {
+                        window.top.location = data.redirect;
+                    }, 2000);
+                }
+
+                return true;
+            } else if (data.redirect) {
+                window.top.location = data.redirect;
+
+                return true;
+            }
+
+            return false;
+        }
+    }
+</script>
+{% set formExtra %}
+  <input type="hidden" name="mauticform[focusId]" id="mauticform{{ formName }}_focus_id" value="{{ focusId }}"/>
+{% endset %}
+
+{{ include('@MauticForm/Builder/form.html.twig', {
+        'form': form,
+        'formPages': pages,
+        'lastFormPage': lastPage,
+        'formExtra': formExtra,
+        'action': preview ? '#' : null,
+        'suffix': '_focus',
+        'contactFields': contactFields,
+        'companyFields': companyFields,
+        'viewOnlyFields': viewOnlyFields,
+        'displayManager': displayManager,
+}, with_context=false) }}
+<!-- END FOCUS FORM -->

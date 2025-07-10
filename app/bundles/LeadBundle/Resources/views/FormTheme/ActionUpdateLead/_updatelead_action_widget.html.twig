@@ -1,0 +1,13 @@
+{% block _campaignevent_properties_row %}
+    <div class="row">
+        <div class="col-xs-12">
+            <h4 class="mb-sm">{{ 'mautic.lead.lead.update.action.help'|trans }}</h4>
+        </div>
+        {% for child in form.children %}
+            <div class="form-group col-md-6 col-xs-12">
+                {{ form_label(child) }}
+                {{ form_widget(child) }}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

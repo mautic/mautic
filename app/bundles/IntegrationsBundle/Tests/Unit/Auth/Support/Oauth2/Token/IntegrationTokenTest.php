@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
@@ -33,6 +24,13 @@ class IntegrationTokenTest extends TestCase
     public function testIsExpired(): void
     {
         $token = new IntegrationToken('accessToken', 'refreshToken', time() - 100);
+
+        $this->assertTrue($token->isExpired());
+    }
+
+    public function testIsExpiredIfAccessTokenIsMissing(): void
+    {
+        $token = new IntegrationToken('', 'refreshToken');
 
         $this->assertTrue($token->isExpired());
     }

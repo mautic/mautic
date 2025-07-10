@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
+
+use Mautic\CoreBundle\Predis\Command\Unlink;
+use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
+use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
+use Predis\Client;
+use Predis\Cluster\ClusterStrategy;
+use Predis\Connection\Aggregate\PredisCluster;
+use Predis\Connection\Aggregate\RedisCluster;
+use Predis\Connection\Aggregate\SentinelReplication;
+use Predis\Profile\RedisProfile;
 
 /**
  * Helper functions for simpler operations with arrays.
@@ -73,6 +74,50 @@ class PRedisConnectionHelper
             $redisOptions['parameters'] = ['password' => $redisConfiguration['password']];
         }
 
+        foreach (['cluster', 'scheme', 'ssl'] as $key) {
+            if (isset($redisConfiguration[$key])) {
+                $redisOptions[$key] = $redisConfiguration[$key];
+            }
+        }
+
         return $redisOptions;
+    }
+
+    /**
+     * @param mixed[] $endpoints
+     * @param mixed[] $inputOptions
+     */
+    public static function createClient(array $endpoints, array $inputOptions): Client
+    {
+        $replication = $inputOptions['replication'] ?? null;
+
+        if ('sentinel' === $replication) {
+            $inputOptions['aggregate'] = fn () => fn ($sentinels, $options): SentinelReplication => new SentinelReplication(
+                $options->service,
+                $sentinels,
+                $options->connections,
+                new MasterOnlyStrategy(StrategyConfig::fromArray($inputOptions))
+            );
+        }
+
+        $client  = new Client($endpoints, $inputOptions);
+        $profile = $client->getProfile();
+        \assert($profile instanceof RedisProfile);
+
+        if (!$profile->getCommandClass(Unlink::ID)) {
+            $profile->defineCommand(Unlink::ID, Unlink::class);
+        }
+
+        $connection = $client->getConnection();
+
+        if ($connection instanceof RedisCluster || $connection instanceof PredisCluster) {
+            $clusterStrategy = $connection->getClusterStrategy();
+
+            if ($clusterStrategy instanceof ClusterStrategy && !in_array(Unlink::ID, $clusterStrategy->getSupportedCommands())) {
+                $clusterStrategy->setCommandHandler(Unlink::ID, [$clusterStrategy, 'getKeyFromAllArguments']);
+            }
+        }
+
+        return $client;
     }
 }

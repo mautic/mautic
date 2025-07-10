@@ -1,21 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Model;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -27,77 +23,60 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\ResetInterface;
 
-class PointModel extends CommonFormModel
+/**
+ * @extends CommonFormModel<Point>
+ */
+class PointModel extends CommonFormModel implements GlobalSearchInterface, ResetInterface
 {
     /**
-     * @var Session
+     * @var array<string, mixed>
      */
-    protected $session;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
-     */
-    protected $mauticFactory;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private array $actions = [];
 
     public function __construct(
-        Session $session,
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        MauticFactory $mauticFactory,
-        ContactTracker $contactTracker
+        protected RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private PointGroupModel $pointGroupModel,
     ) {
-        $this->session            = $session;
-        $this->ipLookupHelper     = $ipLookupHelper;
-        $this->leadModel          = $leadModel;
-        $this->mauticFactory      = $mauticFactory;
-        $this->contactTracker     = $contactTracker;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return PointRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:Point');
+        return $this->em->getRepository(Point::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'point:points';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -114,12 +93,7 @@ class PointModel extends CommonFormModel
         return $formFactory->create(PointType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Point|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Point
     {
         if (null === $id) {
             return new Point();
@@ -129,11 +103,9 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -162,7 +134,7 @@ class PointModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -177,55 +149,56 @@ class PointModel extends CommonFormModel
      */
     public function getPointActions()
     {
-        static $actions;
-
-        if (empty($actions)) {
-            //build them
-            $actions = [];
-            $event   = new PointBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
-            $actions['actions'] = $event->getActions();
-            $actions['list']    = $event->getActionList();
-            $actions['choices'] = $event->getActionChoices();
+        if ([] === $this->actions) {
+            // build them
+            $this->actions = [];
+            $event         = new PointBuilderEvent($this->translator);
+            $this->dispatcher->dispatch($event, PointEvents::POINT_ON_BUILD);
+            $this->actions['actions'] = $event->getActions();
+            $this->actions['list']    = $event->getActionList();
+            $this->actions['choices'] = $event->getActionChoices();
         }
 
-        return $actions;
+        return $this->actions;
     }
 
     /**
      * Triggers a specific point change.
      *
-     * @param       $type
      * @param mixed $eventDetails     passthrough from function triggering action to the callback function
      * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
      * @param bool  $allowUserRequest
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false): void
     {
-        //only trigger actions for not logged Mautic users
+        // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
             return;
         }
 
-        if (null !== $typeId && MAUTIC_ENV === 'prod') {
-            //let's prevent some unnecessary DB calls
-            $triggeredEvents = $this->session->get('mautic.triggered.point.actions', []);
+        if (null !== $typeId && MAUTIC_ENV === 'prod' && null !== $this->requestStack->getMainRequest()) {
+            // let's prevent some unnecessary DB calls
+            $session         = $this->requestStack->getMainRequest()->getSession();
+            $triggeredEvents = $session->get('mautic.triggered.point.actions', []);
             if (in_array($typeId, $triggeredEvents)) {
                 return;
             }
             $triggeredEvents[] = $typeId;
-            $this->session->set('mautic.triggered.point.actions', $triggeredEvents);
+            $session->set('mautic.triggered.point.actions', $triggeredEvents);
         }
 
-        //find all the actions for published points
-        /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
+        // find all the actions for published points
+        /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
+        if (empty($availablePoints)) {
+            return;
+        }
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
+        $hasLeadPointChanges = false;
         if (null === $lead) {
             $lead = $this->contactTracker->getContact();
 
@@ -234,20 +207,20 @@ class PointModel extends CommonFormModel
             }
         }
 
-        //get available actions
+        // get available actions
         $availableActions = $this->getPointActions();
 
-        //get a list of actions that has already been performed on this lead
+        // get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
 
         $persist = [];
         /** @var Point $action */
         foreach ($availablePoints as $action) {
-            //if it's already been done or not repeatable, then skip it
+            // if it's already been done or not repeatable, then skip it
             if (!$action->getRepeatable() && isset($completedActions[$action->getId()])) {
                 continue;
             }
-            //make sure the action still exists
+            // make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
                 continue;
             }
@@ -262,17 +235,19 @@ class PointModel extends CommonFormModel
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->mauticFactory, // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+            $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
 
             if (is_callable($callback)) {
+                $object = null;
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (false !== strpos($callback, '::')) {
+                    if (is_object($callback[0])) {
+                        $object = $callback[0];
+                    }
+                } elseif (str_contains($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
@@ -287,22 +262,33 @@ class PointModel extends CommonFormModel
                         $pass[] = null;
                     }
                 }
-                $pointsChange = $reflection->invokeArgs($this, $pass);
+
+                $pointsChange = $reflection->invokeArgs($object, $pass);
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    $lead->adjustPoints($delta);
-                    $parsed = explode('.', $action->getType());
+
+                    $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
+                    $pointGroup               = $action->getGroup();
+                    if (!empty($pointGroup)) {
+                        $this->pointGroupModel->adjustPoints($lead, $pointGroup, $delta);
+                    } else {
+                        $lead->adjustPoints($delta);
+                    }
+
+                    $hasLeadPointChanges = true;
+                    $parsed              = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        $action->getId().': '.$action->getName(),
+                        $pointsChangeLogEntryName,
                         $parsed[1],
                         $delta,
-                        $ipAddress
+                        $ipAddress,
+                        $pointGroup
                     );
 
                     $event = new PointActionEvent($action, $lead);
-                    $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
+                    $this->dispatcher->dispatch($event, PointEvents::POINT_ON_ACTION);
 
                     if (!$action->getRepeatable()) {
                         $log = new LeadPointLog();
@@ -318,11 +304,10 @@ class PointModel extends CommonFormModel
 
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
-            // Detach logs to reserve memory
-            $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+            $this->getRepository()->detachEntities($persist);
         }
 
-        if (!empty($lead->getpointchanges())) {
+        if ($hasLeadPointChanges) {
             $this->leadModel->saveEntity($lead);
         }
     }
@@ -334,10 +319,8 @@ class PointModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -353,5 +336,36 @@ class PointModel extends CommonFormModel
         $chart->setDataset($this->translator->trans('mautic.point.changes'), $data);
 
         return $chart->render();
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointActionIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'p.type', 'expr' => 'in', 'value' => ['email.send', 'email.open']],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $pointActionIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (in_array($emailId, $properties['emails'] ?? [])) {
+                $pointActionIds[] = $entity->getId();
+            }
+        }
+
+        return array_unique($pointActionIds);
+    }
+
+    public function reset(): void
+    {
+        $this->actions = [];
     }
 }

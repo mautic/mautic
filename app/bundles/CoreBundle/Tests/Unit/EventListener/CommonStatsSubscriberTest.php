@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -27,32 +18,32 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CorePermissions|MockObject
      */
-    private $security;
+    private MockObject $security;
 
     /**
      * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var User|MockObject
      */
-    private $user;
+    private MockObject $user;
 
     /**
-     * @var CommonRepository|MockObject
+     * @var MockObject&CommonRepository<object>
      */
-    private $repository;
+    private MockObject $repository;
 
     /**
      * @var StatsEvent|MockObject
      */
-    private $statsEvent;
+    private MockObject $statsEvent;
 
     /**
      * @var CommonStatsSubscriber|MockObject
      */
-    private $subscirber;
+    private MockObject $subscirber;
 
     protected function setUp(): void
     {

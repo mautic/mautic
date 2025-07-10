@@ -1,25 +1,16 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class ArrayLinebreakTransformer.
+ * @implements DataTransformerInterface<array<string>|null, string|null>
  */
 class ArrayLinebreakTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
+     * @param array<string>|null $array
      *
      * @return string
      */
@@ -33,9 +24,9 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|null $string
      *
-     * @return array
+     * @return array<string>
      */
     public function reverseTransform($string)
     {

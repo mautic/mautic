@@ -1,0 +1,59 @@
+<div class="tile" style="height: {{ widget.height|default('310') - 10 }}px;">
+    <div class="card-header d-flex jc-space-between ai-center">
+        <h4 class="fw-sb">{{ widget.name|purify }}</h4>
+        {% if widget.id %}
+            <div class="dropdown">
+                <a class="btn btn-ghost btn-icon btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                    <i class="ri-more-2-fill"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li class="small fw-sb text-secondary ma-md ellipsis">
+                        {% if widget.isCached %}
+                            <i class="ri-history-line mr-xs"></i>
+                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
+                        {% else %}
+                            <i class="ri-flashlight-line mr-xs"></i>
+                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
+                            data-toggle="ajaxmodal"
+                            data-target="#MauticSharedModal"
+                            data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}">
+                            <span>
+                                <i class="ri-edit-line"></i>
+                                {{'mautic.core.form.edit'|trans}}
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
+                            data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
+                            class="remove-widget danger">
+                            <span>
+                                <i class="ri-close-line"></i>
+                                {{'mautic.core.remove'|trans}}
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    <hr class="bdr-b">
+    <div class="card-body">
+        {% if widget.errorMessage %}
+            <div class="alert alert-danger" role="alert">
+                {{ widget.errorMessage|trans }}
+            </div>
+        {% elseif widget.template %}
+            <!-- start: {{ widget.template }} -->
+            {{ include(widget.template, widget.templateData) }}
+            <!-- end: {{ widget.template }} -->
+        {% endif %}
+    </div>
+    <div class="widget-overlay d-flex ai-center jc-center">
+        <i class="ri-drag-drop-fill ri-4x text-interactive"></i>
+    </div>
+</div>

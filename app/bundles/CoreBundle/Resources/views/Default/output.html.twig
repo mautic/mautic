@@ -1,0 +1,6 @@
+<div class="content-body container-fluid {{ app.request.pathinfo|trim('/', 'left')|replace({'/' : '-'})|replace({' ' : '_'})|lower|raw }}">
+    {{ include('@MauticCore/Default/pageheader.html.twig') }}
+    {{ content|default('')|raw }}
+</div>
+{{ modal|default('')|raw }}
+{{ securityGetAuthenticationContext()|raw }}

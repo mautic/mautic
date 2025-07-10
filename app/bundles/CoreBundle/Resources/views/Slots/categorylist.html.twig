@@ -1,0 +1,29 @@
+{% if form is defined %}
+    {% if showContactCategories is defined and showContactCategories and form.global_categories is defined and form.global_categories|length > 0 %}
+<div class="global-categories text-left">
+    <div>
+        <label class="control-label">{{ 'mautic.lead.form.categories'|trans }}</label>
+    </div>
+        {% set categoryNumber = form.global_categories.vars.choices|length %}
+        {% for temp in form.global_categories %}
+            <div id="category-{{ loop.revindex0 }}" class="text-left">
+                {{ form_widget(form.global_categories[loop.revindex0]) }}
+                {{ form_label(form.global_categories[loop.revindex0]) }}
+            </div>
+        {% endfor %}
+        {#unset($form['global_categories']);#}
+    </div>
+    {% else %}
+        {#unset($form['global_categories']);#}
+    {% endif %}
+{% else %}
+    <div class="global-categories text-left">
+        <div>
+            <label class="control-label">{{ 'mautic.lead.form.categories'|trans }}</label>
+        </div>
+        <div id="category-1" class="text-left">
+            <input type="checkbox" id="lead_contact_frequency_rules_global_categories_1" name="lead_contact_frequency_rules[global_categories][]" autocomplete="false" value="1" checked="checked">
+            <label for="lead_contact_frequency_rules_global_categories_1">{{ 'mautic.core.category'|trans }}</label>
+        </div>
+    </div>
+{% endif %}

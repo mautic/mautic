@@ -1,0 +1,8 @@
+{% set contentOnly = true %}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle '' %}
+
+{% block content %}
+  {{- assetAddScriptDeclaration('Mautic.handleIntegrationCallback("'~integration~'", "'~csrfToken~'", "'~code~'", "'~callbackUrl~'", "'~clientIdKey~'", "'~clientSecretKey~'");', 'bodyClose') -}}
+{% endblock %}

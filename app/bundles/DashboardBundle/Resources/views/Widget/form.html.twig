@@ -1,0 +1,25 @@
+{{ form_start(form) }}
+    <div class="row form-group">
+        <div class="col-xs-6">
+            {{ form_label(form.name) }}
+            {{ form_widget(form.name) }}
+            <div class="has-error">{{ form_errors(form.name) }}</div>
+        </div>
+        <div class="col-xs-6">
+            {{ form_label(form.type) }}
+            {{ form_widget(form.type) }}
+            <div class="has-error">{{ form_errors(form.type) }}</div>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-xs-6">
+            {{ form_label(form.width) }}
+            {{ form_widget(form.width) }}
+        </div>
+        <div class="col-xs-6">
+            {{ form_label(form.height) }}
+            {{ form_widget(form.height) }}
+        </div>
+    </div>
+    {{ form_row(form.buttons) }}
+{{ form_end(form) }}

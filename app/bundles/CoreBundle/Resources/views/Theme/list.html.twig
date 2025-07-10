@@ -1,0 +1,175 @@
+{% extends "@MauticCore/Theme/index.html.twig" %}
+
+{% block mainContent %}
+
+    {% if items|length %}
+        <div class="table-responsive">
+            <table class="table table-hover theme-list" id="themeTable">
+                <thead>
+                    <tr>
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'checkall': 'true',
+                            'target'  : '#themeTable',
+                        })}}
+
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'text': 'mautic.core.title',
+                        })}}
+
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'text': 'mautic.core.author',
+                        })}}
+
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'text': 'mautic.core.features',
+                        })}}
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k, item in items %}
+                        {% set thumbnailUrl = asset('themes/' ~ k ~ '/thumbnail.png') %}
+                        {% set hasThumbnail = (item['dir'] ~ '/thumbnail.png') is file %}
+                        {% set visibilityButton = [] %}
+                        {% set visibilityCss = '' %}
+                        {% set customButtons = [] %}
+
+                        {% if item.visibility is defined %}
+                            {% set btnText         = 'mautic.core.theme.hide' %}
+                            {% set iconClass       = 'ri-eye-off-line' %}
+                            {% set message         = 'mautic.core.theme.form.confirm.hide' %}
+                            {% set confirmBtnClass = '' %}
+
+                            {% if item.visibility.hidden|default(false) %}
+                                {% set btnText         = 'mautic.core.theme.unhide' %}
+                                {% set iconClass       = 'ri-eye-line' %}
+                                {% set message         = 'mautic.core.theme.form.confirm.unhide' %}
+                                {% set confirmBtnClass = 'btn btn-success' %}
+                                {% set visibilityCss   = 'disabled-row' %}
+                            {% endif %}
+
+                            {% set visibilityButton = {
+                                'attr': {
+                                    'data-toggle': 'confirmation',
+                                    'href': path('mautic_themes_action', {'objectAction': 'visibility', 'objectId': k}),
+                                    'data-message': message|trans({'%theme%': item.name ~ ' (' ~ k ~ ')'}),
+                                    'data-confirm-text': btnText|trans,
+                                    'data-confirm-callback': 'executeAction',
+                                    'data-cancel-text': 'mautic.core.form.cancel'|trans,
+                                    'data-confirm-btn-class': confirmBtnClass,
+                                },
+                                'btnText': btnText|trans,
+                                'iconClass': iconClass,
+                                'priority': -1,
+                            } %}
+                        {% endif %}
+
+                        <tr>
+                            <td>
+                                {% set item = item|merge({id: item.key}) %}
+                                {% set previewButtonSettings = {
+                                    'attr': {
+                                        'data-toggle': 'modal',
+                                        'data-target': '#theme-' ~ k,
+                                    },
+                                    'btnText': 'mautic.asset.asset.preview'|trans,
+                                    'iconClass': 'ri-image-line',
+                                    } %}
+                                {% set customButtons = hasThumbnail 
+                                    ? customButtons|merge([previewButtonSettings]) 
+                                    : customButtons 
+                                %}
+                                {% set deleteButton = {
+                                    'delete': permissions['core:themes:delete']
+                                } %}
+                                {% set templateButtons = (k not in defaultThemes) ? deleteButton : {} %}
+                                {% set downloadButton = {
+                                    'attr': {
+                                        'href': path('mautic_themes_action', {
+                                            objectAction: 'download',
+                                            objectId: k
+                                        }),
+                                        'data-toggle': '0',
+                                    },
+                                    'btnText': 'mautic.core.download'|trans,
+                                    'iconClass': 'ri-download-line',
+                                } %}
+                                {% set customButtons = customButtons|merge([downloadButton]) %}
+                                {% if visibilityButton is not empty %}
+                                    {% set customButtons = customButtons|merge([visibilityButton]) %}
+                                {% endif %}
+
+                                {{ include ('@MauticCore/Helper/list_actions.html.twig',
+                                    {
+                                        'item': item,
+                                        'templateButtons': templateButtons,
+                                        'routeBase': 'themes',
+                                        'langVar': 'core.theme',
+                                        'customButtons': customButtons,
+                                    }
+                                ) }}
+
+                                {% if hasThumbnail %}
+                                <!-- Modal -->
+                                <div class="modal fade" id="theme-{{ k }}" tabindex="-1" role="dialog" aria-labelledby="{{ k }}">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span></button>
+                                                <h4 class="modal-title" id="{{ k }}">{{ item['name']|e }}</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div style="background-image: url({{ thumbnailUrl }});background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="{{ visibilityCss }}">
+                                <div>
+                                    {{ item['name']|e }} ({{ item['key']|e }})
+                                </div>
+                            </td>
+                            <td class="{{ visibilityCss }}">
+                                <div>
+                                    {% if item['config']['authorUrl'] is defined and item['config']['authorUrl'] is not empty and item['config']['author'] is defined %}
+                                        <a href="{{ inputUrl(item['config']['authorUrl']) }}" target="_blank">
+                                            {{ item['config']['author']|e }}
+                                        </a>
+                                    {% elseif item['config']['author'] is defined and item['config']['author'] is not empty %}
+                                        {{ item['config']['author']|e }}
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="visible-md visible-lg {{ visibilityCss }}">
+                                <div class="d-flex ai-center gap-xs">
+                                    {% for builder in item['config']['builder'] %}
+                                    <span style="white-space: nowrap;">
+                                        <span class="label label-primary">{{ builder }}</span>
+                                    </span>
+                                {% endfor %}
+                                {% if item['config']['features'] is defined and item['config']['features'] is not empty %}
+                                    {% for feature in item['config']['features'] %}
+
+                                            <span class="label label-gray">
+                                                {{ ('mautic.core.theme.feature.' ~ feature|e)|trans }}
+                                            </span>
+
+                                    {% endfor %}
+                                {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {
+                'tip': 'mautic.theme.noresults.tip'
+            })
+        }}
+    {% endif %}
+{% endblock %}

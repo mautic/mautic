@@ -21,7 +21,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    public function setIsPreferenceCenterDataProvider(): iterable
+    public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, null, []];
         yield [true, true, ['isPreferenceCenter' => [null, true]]];
@@ -43,7 +43,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    public function setNoIndexDataProvider(): iterable
+    public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];
         yield [true, true, ['noIndex' => [null, true]]];
@@ -51,5 +51,29 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield ['', false, ['noIndex' => [null, false]]];
         yield [0, false, ['noIndex' => [null, false]]];
         yield ['string', true, ['noIndex' => [null, true]]];
+    }
+
+    /**
+     * Test setHeadScript and getHeadScript.
+     */
+    public function testSetHeadScript(): void
+    {
+        $script = '<script>console.log("test")';
+        $page   = new Page();
+        $page->setHeadScript($script);
+
+        $this->assertEquals($script, $page->getHeadScript());
+    }
+
+    /**
+     * Test setFooterScript and getFooterScript.
+     */
+    public function testSetFooterScript(): void
+    {
+        $script = '<script>console.log("test")';
+        $page   = new Page();
+        $page->setFooterScript($script);
+
+        $this->assertEquals($script, $page->getFooterScript());
     }
 }

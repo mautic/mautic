@@ -1,0 +1,117 @@
+{#
+  Variables
+    - isConditional (bool)
+    - template
+    - field
+    - viewOnlyFields
+    - inForm
+    - id
+    - formId
+    - formName
+    - mappedFields (\Mautic\FormBundle\Collection\MappedObjectCollection)
+    - inBuilder
+    - fields
+    - formFields
+    - conditionalFieldTypes
+#}
+{% set inBuilder = inBuilder|default(false) %}
+<div class="form-field-wrapper" data-sortable-id="mauticform_{{ field.id }}">
+    <div class="{% if isConditional is not defined or (isConditional is defined and false == isConditional) %}panel mt-40{% else %}panel2 tile ml-sm mt-sm{% endif %} mb-0">
+            {{ include('@MauticForm/Builder/_actions.html.twig', {
+                    'id': field.id,
+                    'formId': formId,
+                    'formName': '',
+                    'disallowDelete': ('button' == field.type),
+            }, with_context=false) }}
+            <div class="row ml-0 mr-0">
+                {# wrap in a row to keep bootstrap container classes from affecting builder layout #}
+                <!-- start: "{{ template }}" -->
+                {{- include(template, {
+                        'field': field,
+                        'inForm': true,
+                        'id': field.id,
+                        'formId': formId,
+                        'mappedFields': mappedFields,
+                        'inBuilder': inBuilder,
+                }, with_context=false) -}}
+                <!-- end: "{{ template }}" -->
+            </div>
+
+            {% if (field.conditions|default(null) is not empty) %}
+            <div class="mr-sm ml-sm">
+                {% if field.conditions.expr is defined and field.conditions.expr is not empty %}
+                    <span class="inline-spacer">
+                    <span style="text-transform: none">{{ 'mautic.form.field.form.condition.show.on'|trans }}</span>
+                    <strong>{{ formFields[field['parent']]['label'] }}</strong>
+                    <span style="text-transform: none">
+                        {{ ('mautic.core.operator.' ~ field['conditions']['expr']|lower)|trans }}
+                        {{ 'mautic.form.field.form.condition.select.value'|trans }}
+                    </span>
+                    <strong>
+                        {% if 'in' is same as field.conditions.expr and (field.conditions.any is not empty and 0 is not same as field.conditions.any) %}
+                            *
+                        {% else %}
+                            {{ field.conditions.values|join(', ') }}
+                        {% endif %}
+                    </strong>
+                    </span>
+                    <br>
+                {% endif %}
+
+            </div>
+            {% endif %}
+
+
+
+            {% if (isConditional is not defined or (isConditional is defined and isConditional is same as false)) and fields is defined and field.type in enumConditionalFieldTypes() %}
+                <div class="row ml-15 mr-0 pb-15">
+                    <div class="pull-left mt-15">
+                    <a class="add-new-conditional-field" href=""><i class="ri-add-line"></i> {{ 'mautic.form.form.component.fields.conditional'|trans }}</a>
+                    </div>
+                    <div class="mt-10 col-sm-4 col-xs-12" style="display:none">
+                        <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.fields'|trans }}">
+                            <option value=""></option>
+                            {% for conditionalField, conditionalFieldType in fields %}
+                                {% if conditionalFieldType not in viewOnlyFields %}
+                                    <option data-toggle="ajaxmodal"
+                                            data-target="#formComponentModal"
+                                            data-href="{{ path('mautic_formfield_action', {'objectAction': 'new', 'type': conditionalFieldType, 'tmpl': 'field', 'formId': formId, 'inBuilder': inBuilder, 'parent': field.id}) }}">
+                                    {{ conditionalField }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% for field2 in formFields %}
+                {% if field2.parent is not empty and field2.parent == field.id %}
+                {% if field2.isCustom is defined and field2.isCustom is not empty %}
+                    {% set params  = field2.customParameters %}
+                    {% set template = params.template %}
+                {% else %}
+                    {% set template = '@MauticForm/Field/' ~ field2.type ~ '.html.twig' %}
+                {% endif %}
+                {{ include('@MauticForm/Builder/_field_wrapper.html.twig', {
+                        'isConditional': true,
+                        'template': template,
+                        'field': field2,
+                        'viewOnlyFields': viewOnlyFields,
+                        'inForm': true,
+                        'id': field2.id,
+                        'formId': formId,
+                        'mappedFields': mappedFields,
+                        'inBuilder': inBuilder,
+                        'fields': fields,
+                        'formFields': formFields,
+                }) }}
+                {% endif %}
+            {% endfor %}
+    </div>
+
+    {% include '@MauticForm/Builder/_labels.html.twig' with {
+        'isConditional': isConditional|default(false)
+    } %}
+
+</div>

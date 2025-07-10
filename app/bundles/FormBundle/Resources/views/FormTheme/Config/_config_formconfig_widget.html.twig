@@ -1,0 +1,31 @@
+{% block _config_formconfig_widget %}
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.formconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.formconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                {% for child in form.children|filter((v, k) => 'form_results_data_sources' is not same as k) %}
+                <div class="col-xs-12">
+                    {{ form_row(child) }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.formresultsconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.formresultsconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.form_results_data_sources) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

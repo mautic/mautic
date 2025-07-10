@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Notification;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -21,32 +12,16 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Notifier
 {
-    /**
-     * @var HandlerContainer
-     */
-    private $handlerContainer;
-
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
-
-    /**
-     * @var ConfigIntegrationsHelper
-     */
-    private $configIntegrationsHelper;
-
     public function __construct(
-        HandlerContainer $handlerContainer,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        ConfigIntegrationsHelper $configIntegrationsHelper
+        private HandlerContainer $handlerContainer,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private ConfigIntegrationsHelper $configIntegrationsHelper,
+        private TranslatorInterface $translator,
     ) {
-        $this->handlerContainer         = $handlerContainer;
-        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
-        $this->configIntegrationsHelper = $configIntegrationsHelper;
     }
 
     /**
@@ -78,14 +53,11 @@ class Notifier
         }
     }
 
-    /**
-     * @return string
-     */
-    private function getObjectDisplayName(string $integration, string $object)
+    private function getObjectDisplayName(string $integration, string $object): string
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return ucfirst($object);
         }
 
@@ -99,6 +71,6 @@ class Notifier
             return ucfirst($object);
         }
 
-        return $objects[$object];
+        return $this->translator->trans($objects[$object]);
     }
 }

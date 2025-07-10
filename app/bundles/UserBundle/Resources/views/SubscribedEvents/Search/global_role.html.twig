@@ -1,0 +1,10 @@
+{% if showMore is defined and showMore is not empty %}
+<a href="{{ url('mautic_role_index', {'filter-user' : searchString}) }}" data-toggle="ajax">
+    <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
+</a>
+{% else %}
+<a href="{{ url('mautic_role_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+    <span class="fw-sb">{{ item.name }}</span>
+    <span class="ml-4 mr-sm">#{{ item.id }}</span>
+</a>
+{% endif %}

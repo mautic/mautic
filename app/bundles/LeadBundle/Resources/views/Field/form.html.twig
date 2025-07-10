@@ -1,0 +1,155 @@
+{#
+  Variables
+    - form
+    - currentRoute
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}leadfield{% endblock %}
+
+{% block headerTitle %}
+  {%- if form.vars.data.id -%}
+    {{- 'mautic.lead.field.header.edit'|trans({'%name%': form.vars.data.label}) -}}
+  {%- else -%}
+    {{- 'mautic.lead.field.header.new'|trans -}}
+  {%- endif -%}
+{% endblock %}
+
+{% block content %}
+{# Render the templates so they don't get rendered automatically #}
+{% set selectTemplate          = form_row(form['properties_select_template']) %}
+{% set lookupTemplate          = form_row(form['properties_lookup_template']) %}
+{% set defaultTextTemplate     = form_widget(form['default_template_text']) %}
+{% set defaultTextareaTemplate = form_widget(form['default_template_textarea']) %}
+{% set defaultLocaleTemplate   = form_widget(form['default_template_locale']) %}
+{% set defaultSelectTemplate   = form_widget(form['default_template_select']) %}
+{% set defaultBoolTemplate     = form_widget(form['default_template_boolean']) %}
+{% set defaultCountryTemplate  = form_widget(form['default_template_country']) %}
+{% set defaultRegionTemplate   = form_widget(form['default_template_region']) %}
+{% set defaultTimezoneTemplate = form_widget(form['default_template_timezone']) %}
+
+{{ form_start(form) }}
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-8 height-auto bdr-r">
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.label) }}</div>
+                <div class="col-md-6">{{ form_row(form.alias) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.object) }}</div>
+                <div class="col-md-6">{{ form_row(form.group) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.type) }}</div>
+                <div class="col-md-6">{{ form_row(form.defaultValue) }}</div>
+            </div>
+
+            {% set type = form.type.vars.data %}
+            {% set properties = form.properties.vars.data %}
+            {% set errors = form.properties.vars.errors|length %}
+            <div class="row">
+                <div class="form-group col-md-6 {% if errors > 0 %}has-error{% endif %}">
+                    <div id="leadfield_properties">
+                        {% if 'boolean' == type %}
+                            {{ include('@MauticLead/Field/properties_boolean.html.twig', {
+                                'yes':  properties.yes|default(''),
+                                'no':  properties.no|default(''),
+                            }) }}
+                        {% elseif 'number' == type %}
+                            {{ include('@MauticLead/Field/properties_number.html.twig', {
+                                'roundMode': properties.roundmode|default(''),
+                                'scale': properties.scale|default(''),
+                            }) }}
+                        {% elseif 'select' == type or 'multiselect' == type %}
+                            {{ include('@MauticLead/Field/properties_select.html.twig', {
+                                'form': form.properties,
+                                'selectTemplate': selectTemplate,
+                                'type': 'select',
+                            }) }}
+                        {% elseif 'lookup' == type %}
+                            {{ include('@MauticLead/Field/properties_select.html.twig', {
+                                'form': form.properties,
+                                'selectTemplate': lookupTemplate,
+                                'type': 'lookup',
+                            }) }}
+                        {% endif %}
+                    </div>
+                    {{ form_errors(form.properties) }}
+                </div>
+            </div>
+            {% do form.properties.setRendered() %}
+        </div>
+    </div>
+    <div class="col-md-4 height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="row">
+                <div class="col-md-12" id="leadfield_order_container">{{ form_row(form.order) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.isPublished) }}</div>
+                <div class="col-md-6">{{ form_row(form.isRequired) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.isVisible) }}</div>
+                <div class="col-md-6">{{ form_row(form.isShortVisible) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.isListable) }}</div>
+                <div class="col-md-6">{{ form_row(form.isPubliclyUpdatable) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.isIndex) }}</div>
+                <div class="col-md-6">
+                    {% if form.charLengthLimit is defined %}
+                        {{ form_row(form.charLengthLimit) }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form_row(form.isUniqueIdentifer) }}</div>
+            </div>
+            <div class="row unique-identifier-warning" style="{% if not form.isUniqueIdentifer.vars.data %}display:none;{% endif %}">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">{{ 'mautic.lead.field.form.isuniqueidentifer.warning'|trans|purify }}</div>
+                </div>
+            </div>
+            {{ form_rest(form) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+
+{% if form.vars.data.id is empty and not (leadField is not null and leadField.getIsCloned()) %}
+    <div id="field-templates" class="hide">
+      <div class="default_template_text">{{ defaultTextTemplate|raw }}</div>
+      <div class="default_template_textarea">{{ defaultTextareaTemplate|raw }}</div>
+      <div class="default_template_boolean">{{ defaultBoolTemplate|raw }}</div>
+      <div class="default_template_country">{{ defaultCountryTemplate|raw }}</div>
+      <div class="default_template_region">{{ defaultRegionTemplate|raw }}</div>
+      <div class="default_template_locale">{{ defaultLocaleTemplate|raw }}</div>
+      <div class="default_template_timezone">{{ defaultTimezoneTemplate|raw }}</div>
+      <div class="default_template_select">{{ defaultSelectTemplate|raw }}</div>
+      {{ include('@MauticLead/Field/properties_number.html.twig') }}
+      {{ include('@MauticLead/Field/properties_boolean.html.twig') }}
+      {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
+          'selectTemplate': selectTemplate,
+          'type': 'select',
+      }) }}
+
+      {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
+          'selectTemplate': selectTemplate,
+          'type': 'multiselect',
+      }) }}
+
+      {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
+          'selectTemplate': selectTemplate,
+          'type': 'lookup',
+      }) }}
+    </div>
+{% endif %}
+{% endblock %}

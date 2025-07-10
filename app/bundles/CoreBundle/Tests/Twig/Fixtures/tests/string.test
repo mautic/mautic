@@ -1,0 +1,17 @@
+--TEST--
+is string test
+--TEMPLATE--
+{% if some_string is string %}
+some_string is string
+{% endif %}
+{% if some_int is string %}
+some_int is string
+{% endif %}
+{% if some_int is not string %}
+some_int is not string
+{% endif %}
+--DATA--
+return ['some_string' => 'abc', 'some_int' => 123]
+--EXPECT--
+some_string is string
+some_int is not string

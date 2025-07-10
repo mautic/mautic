@@ -1,0 +1,69 @@
+{% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
+{% block header %}{% trans %}mautic.user.auth.header{% endtrans %}{% endblock %}
+{% block headerTitle %}{% trans %}mautic.user.auth.expired.header{% endtrans %}{% endblock %}
+
+{% block content %}
+    {% if app.request.xmlHttpRequest %}
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-6 inline-login">
+                {{ block('mainContent') }}
+            </div>
+        </div>
+    {% else %}
+        {{ block('mainContent') }}
+    {% endif %}
+{% endblock %}
+
+{% block mainContent %}
+	<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
+		<div class="input-group mb-md">
+
+			<span class="input-group-addon">
+				<i class="ri-user-6-fill"></i>
+			</span>
+			<label for="username" class="sr-only">{% trans %}mautic.user.auth.form.loginusername{% endtrans %}</label>
+			<input type="text" id="username" name="_username" class="form-control input-lg" value="{{ last_username|escape }}" required autofocus placeholder="{% trans %}mautic.user.auth.form.loginusername{% endtrans %}"/>
+		</div>
+		<div class="input-group mb-md">
+			<span class="input-group-addon">
+				<i class="ri-key-2-line"></i>
+			</span>
+			<label for="password" class="sr-only">{% trans %}mautic.core.password{% endtrans %}:</label>
+			<input type="password" id="password" name="_password" class="form-control input-lg" required placeholder="{% trans %}mautic.core.password{% endtrans %}"/>
+		</div>
+
+		<div class="checkbox-inline custom-primary pull-left mb-md">
+			<label for="remember_me">
+				<input type="checkbox" id="remember_me" name="_remember_me"/>
+				<span></span>
+				{% trans %}mautic.user.auth.form.rememberme{% endtrans %}
+			</label>
+		</div>
+
+		<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')|escape }}"/>
+		{% include '@MauticCore/Helper/button.html.twig' with {
+			buttons: [
+				{
+					label: 'mautic.user.auth.form.loginbtn',
+					variant: 'primary',
+					size: 'lg',
+					wide: true
+				}
+			]
+		} %}
+
+		<div class="mt-sm text-right">
+			<a href="{{ path('mautic_user_passwordreset') }}">{% trans %}mautic.user.user.passwordreset.link{% endtrans %}</a>
+		</div>
+	</form>
+	{% if integrations is not empty %}
+		<ul class="list-group">
+			{% for sso in integrations %}
+				<a href="{{ path('mautic_sso_login', {'integration' : sso.getName()}) }}" class="list-group-item">
+					<img class="pull-left mr-xs" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
+					<p class="list-group-item-heading">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
+				</a>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}

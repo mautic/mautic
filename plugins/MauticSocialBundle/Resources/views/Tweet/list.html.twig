@@ -1,0 +1,37 @@
+{%- set isIndex = 'index' == tmpl -%}
+{%- set tmpl = 'list' -%}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'tweet' %}
+
+{% block headerTitle 'mautic.social.tweets'|trans %}
+
+{% block content %}
+  {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+      {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'page_actions': {
+            'templateButtons': {
+                'new': securityIsGranted('mauticSocial:tweet:create'),
+            },
+            'routeBase': 'mautic_tweet',
+            'langVar': 'tweet',
+        },
+        'bulk_actions': {
+          'langVar': 'mautic.social.tweets',
+          'routeBase': 'mautic_tweet',
+          'templateButtons': {
+              'delete': securityIsGranted('mauticSocial:tweet:delete'),
+          },
+      },
+    }) }}
+      <div class="page-list">
+        {{- include('@MauticSocial/Tweet/_list.html.twig') -}}
+      </div>
+    </div>
+  {% else %}
+    {{- include('@MauticSocial/Tweet/_list.html.twig') -}}
+  {% endif %}
+{% endblock %}

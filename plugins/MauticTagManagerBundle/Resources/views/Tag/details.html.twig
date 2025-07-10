@@ -1,0 +1,85 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}tagmanager{% endblock %}
+{% block headerTitle %} {{ tag.getTag() }} {% endblock %}
+
+{% set customButtons = {} %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        item            : tag,
+        templateButtons : {
+            close : security.isGranted('tagManager:tagManager:edit'),
+        },
+        routeBase       : 'tagmanager',
+        targetLabel     : 'mautic.lead.tags'|trans
+    }
+) -}}
+{% endblock %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        item            : tag,
+        nameGetter      : 'getTag',
+        templateButtons : {
+            edit   : security.isGranted('tagManager:tagManager:edit'),
+            delete : security.isGranted('tagManager:tagManager:delete'),
+        },
+        routeBase       : 'tagmanager'
+    }) -}}
+{% endblock %}
+
+
+{% block content %}
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- left section -->
+        <div class="col-md-9 height-auto">
+            <div>
+                <!-- page detail header -->
+                <!-- sms detail collapseable toggler -->
+                {% include '@MauticCore/Helper/description.html.twig' with {'description': tag.description} %}
+                <div class="collapse pr-md pl-md" id="sms-details">
+                    <div class="pr-md pl-md pb-md">
+                        <div class="panel shd-none mb-0">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                <tr>
+                                    <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.id{% endtrans %}</span></td>
+                                    <td>{{ tag.getId() }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ sms detail collapseable toggler -->
+            <div>
+                <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
+                       data-target="#sms-details">
+                        <span class="caret"></span>{% trans %}mautic.core.details{% endtrans %}
+                    </a>
+                </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- right section -->
+        <div class="col-md-3 bdr-l height-auto">
+            {{ include('@MauticCore/Helper/usage.html.twig', {
+                'title': 'mautic.tagmanager.tag.usages'|trans,
+                'stats': usageStats,
+                'noUsages': 'mautic.tagmanager.tag.no_usages'|trans,
+            }) }}
+        </div>
+        <!--/ right section -->
+
+        <input name="entityId" id="entityId" type="hidden" value="{{ tag.getId()|escape }}" />
+    </div>
+    <!--/ end: box layout -->
+
+{% endblock %}

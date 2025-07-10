@@ -1,0 +1,80 @@
+{#
+  Variables
+    - form
+    - fields
+    - first
+#}
+{% block _leadlist_filters_entry_widget %}
+  {% set isPrototype = ('__name__' == form.vars.name) %}
+  {% set filterType = form.field.vars.value %}
+  {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue and false == first %}
+  {% set isBehavior = fields.behaviors[filterType].label is defined %}
+  {% set class = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'ri-building-2-line' : 'ri-user-6-fill' %}
+
+  {% if isBehavior %}
+      {% set object = 'behaviors' %}
+  {% else %}
+      {% set object = (form.vars.data.object is defined) ? form.vars.data.object : 'lead' %}
+  {% endif %}
+
+  {% if isPrototype or fields[object][filterType].label is defined %}
+    <div class="segment-filter panel {% if inGroup %}in-group{% endif %}" id="{{ id }}">
+        <div class="panel-heading pl-0 pr-0">
+            <div class="panel-glue col-sm-2 pl-0{% if '0' == form.vars.name %} hide{% endif %}">
+                {{ form_widget(form.glue) }}
+            </div>
+            <div class="col-sm-2 pr-0 pull-right">
+                <div class="segment-button d-flex jc-end btn-group btn-group-xs pull-right" role="group">
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.lead_list.filter.label.clonefilter',
+                                variant: 'ghost',
+                                icon_only: true,
+                                size: 'sm',
+                                icon: 'ri-file-copy-line',
+                                href: 'javascript: void(0);',
+                                attributes: {
+                                'class': 'copy-filter-group',
+                            },
+                            },
+                            {
+                                label: 'mautic.lead_list.filter.label.removefilter',
+                                variant: 'ghost',
+                                icon_only: true,
+                                size: 'sm',
+                                danger: 'true',
+                                icon: 'ri-delete-bin-line',
+                                href: 'javascript: void(0);',
+                                attributes: {
+                                'class': 'remove-selected',
+                            },
+                            }
+                        ]
+                    } %}
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-xs-6 col-sm-3 field-name">
+                <span><i class="object-icon {{ class }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+            </div>
+
+            <div class="col-xs-6 col-sm-3 padding-none">
+                {{ form_widget(form.operator) }}
+            </div>
+
+            {% set hasErrors = (form.properties.vars.errors|length > 0) %}
+            <div class="col-xs-12 col-sm-6 padding-none {% if hasErrors %}has-error{% endif %}">
+                <div class="properties-form">
+                    {{ form_widget(form.properties) }}
+                </div>
+                {{ form_errors(form.properties) }}
+            </div>
+            {{ form_widget(form.field) }}
+            {{ form_widget(form.type) }}
+            {{ form_widget(form.object) }}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+
+{% extends '@MauticUser/Security/base.html.twig' %}
+{% block headerTitle %}mautic.api.oauth.header{% endblock %}
+{% set name = client.getName() %}
+{% set msg = name is empty ? 'mautic.api.oauth.clientnoname'|trans : 'mautic.api.oauth.clientwithname'|trans({'name' : name}) %}
+{% block content %}
+<h4 class="mb-lg">{{ msg|purify }} </h4>
+<form class="form-login text-center" role="form" name="fos_oauth_server_authorize_form" action="{{ path('fos_oauth_server_authorize') }}" method="post">
+
+<input type="submit" class="btn btn-primary btn-accept" name="accepted" value="{{ 'mautic.api.oauth.accept'|trans }}" />
+<input type="submit" class="btn btn-danger btn-deny" name="rejected" value="{{ 'mautic.api.oauth.deny'|trans }}" />
+
+{{ form_row(form.client_id) }}
+{{ form_row(form.response_type) }}
+{{ form_row(form.redirect_uri) }}
+{{ form_row(form.state) }}
+{{ form_row(form.scope) }}
+{{ form_rest(form) }}
+</form>
+{% endblock %}

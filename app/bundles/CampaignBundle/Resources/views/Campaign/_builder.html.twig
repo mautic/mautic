@@ -1,0 +1,97 @@
+{#
+  Variables
+    - campaignId
+    - campaignEvents
+    - campaignSources
+    - eventSettings
+    - canvasSettings
+#}
+<div id="campaign-builder" class="hide builder campaign-builder live">
+    <div class="btns-builder">
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.form.apply',
+                    variant: 'primary',
+                    onclick: 'Mautic.saveCampaignFromBuilder();',
+                    icon: 'ri-save-line',
+                    attributes: {
+                        class: 'btn-apply-builder',
+                        type: 'submit'
+                    }
+                },
+                {
+                    label: 'mautic.core.close.builder',
+                    variant: 'secondary',
+                    onclick: 'Mautic.closeCampaignBuilder();',
+                    icon: 'ri-close-line',
+                    attributes: {
+                        class: 'btn-close-campaign-builder'
+                    }
+                }
+            ]
+        } %}
+    </div>
+    <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
+    <div class="builder-content">
+        <div id="CampaignCanvas">
+            <div id="CampaignEvent_newsource{% if campaignSources is defined and campaignSources is not empty %}_hide{% endif %}" class="text-center list-campaign-source list-campaign-leadsource">
+                <div class="campaign-event-content">
+                    <div>
+                        <span class="campaign-event-name ellipsis">
+                            <i class="mr-sm ri-team-line"></i> {{ 'mautic.campaign.add_new_source'|trans }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {% for source in campaignSources %}
+              {{- include('@MauticCampaign/Source/_index.html.twig', {
+                    'sourceType': source.sourceType,
+                    'names': source.names,
+                    'campaignId': source.campaignId,
+              }) -}}
+            {% endfor %}
+
+            {% for event in campaignEvents %}
+                {% if event.deleted|default(null) is empty %}
+                  {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
+                  {{- include(settings['template']|default('@MauticCampaign/Event/_generic.html.twig'), {
+                        'event': event,
+                        'campaignId': campaignId,
+                  }) -}}
+                {% endif %}
+            {% endfor %}
+
+            {{- include('@MauticCampaign/Campaign/Builder/_index.html.twig', {
+                  'campaignSources': campaignSources,
+                  'eventSettings': eventSettings,
+                  'campaignId': campaignId,
+            }) -}}
+        </div>
+        <div id="EventJumpOverlay"></div>
+    </div>
+</div>
+<!-- dropped coordinates -->
+<input type="hidden" value="" id="droppedX"/>
+<input type="hidden" value="" id="droppedY"/>
+<input type="hidden" value="{{ campaignId|e }}" id="campaignId"/>
+{{- include('@MauticCore/Helper/modal.html.twig', {
+        'id': 'CampaignEventModal',
+        'header': false,
+        'footerButtons': true,
+        'dismissible': false,
+}) -}}
+<script>
+    /**
+     * We typecast to object here so that an empty value will
+     * be encoded to {} instead of []. Adding JSON_FORCE_OBJECT
+     * is not an option because it does a deep transform to
+     * object, whereas typecasting only does the first level.
+     */
+    Mautic.campaignBuilderCanvasSettings = {% if canvasSettings is not empty %}{{ canvasSettings|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderCanvasSources = {% if campaignSources is not empty %}{{ campaignSources|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderCanvasEvents = {% if campaignEvents is not empty %}{{ campaignEvents|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderConnectionRestrictions = {% if eventSettings['connectionRestrictions'] is not empty %}{{ eventSettings['connectionRestrictions']|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderHasEventClone = {% if hasEventClone %}true{% else %}false{% endif %};
+</script>

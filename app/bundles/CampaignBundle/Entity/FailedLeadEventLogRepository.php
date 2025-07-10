@@ -1,21 +1,29 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * LeadEventLogRepository.
+ * @extends CommonRepository<FailedLeadEventLog>
  */
 class FailedLeadEventLogRepository extends CommonRepository
 {
+    /**
+     * @param array<string|int> $ids
+     */
+    public function deleteByIds(array $ids): void
+    {
+        if (!$ids) {
+            return;
+        }
+
+        $this->_em->getConnection()
+            ->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log')
+            ->where('log_id IN (:ids)')
+            ->setParameter('ids', $ids, ArrayParameterType::STRING)
+            ->executeStatement();
+    }
 }

@@ -1,0 +1,105 @@
+{% if item.hasChildren() and (options.depth is not same as 0) and item.getDisplayChildren()  %}
+
+    {# Top menu level start #}
+    {% if item.isRoot() %}
+        <ul class="nav mt-10" data-toggle="menu">
+    {% else %}
+        {# get attributes from item + the ones passed from parent #}
+        {% set ulAttributes = item.getChildrenAttributes() %}
+        {% set ulAttributes = ulAttributes|merge(itemAttributes is defined ? itemAttributes : {}) %}
+
+        <ul{{ parseMenuAttributes(ulAttributes) }}>
+    {% endif %}
+
+    {# Submenu levels start #}
+    {% for child in item.getChildren() %}
+
+        {% if child.isDisplayed() %}
+
+            {% set showChildren = (child.hasChildren() and child.getDisplayChildren() ? true : false) %}
+            {% set liAttributes = child.getAttributes() %}
+            {% set isAncestor = matcher.isAncestor(child, options['matchingDepth']) %}
+
+            {# save default classes for the item #}
+            {% set liClasses = (liAttributes.class is defined) ? liAttributes.class ~ ' nav-group' : 'nav-group' %}
+
+            {# fetch classes from options and merge with the default classes #}
+            {% set liAttributes = liAttributes|merge(buildMenuClasses(child, matcher, options, liClasses)) %}
+
+            {# Menu item start #}
+            <li{{ parseMenuAttributes(liAttributes) }}>
+
+                {% set linkAttributes = child.getLinkAttributes() %}
+                {% set extras = child.getExtras() %}
+
+                {# Menu link start #}
+
+                {% if (showChildren) %}
+                    {# Main item #}
+                    <a href="javascript:void(0);" data-target="#{{linkAttributes['id']}}_child" data-toggle="submenu" data-parent=".nav" {{parseMenuAttributes(linkAttributes)}}">
+                        <span class="ri-arrow-down-s-line arrow pull-right text-right"></span>
+                {% else %}
+                    {# Submenu item #}
+                    {% set url = child.getUri() %}
+                    {% set url = (url is empty) ? 'javascript:void(0);' : url %}
+                    {% if (linkAttributes.target is not defined or linkAttributes.target is empty) %}
+                        {% set linkAttributes = linkAttributes|merge({'data-toggle': 'ajax'}) %}
+                    {% endif %}
+                    <a href="{{url}}"{{ parseMenuAttributes(linkAttributes) }}>
+                {% endif %}
+
+                {% if (extras.iconClass is defined and extras.iconClass is not empty) %}
+                    <span class="icon pull-left fa {{extras.iconClass}}"></span>
+                {% endif %}
+
+                    {% set labelAttributes = child.getLabelAttributes() %}
+                    {% set labelClasses = (labelAttributes.class is not defined) ? 'nav-item-name' : labelAttributes.class ~ ' nav-item-name' %}
+                    {% set labelPull = (extras.depth is empty) ? ' pull-left' : '' %}
+
+                    {% set labelClasses = labelClasses ~ ' text' ~ labelPull %}
+                    {% set labelAttributes = labelAttributes|merge({'class': labelClasses|trim }) %}
+
+                        <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
+
+                    </a>
+                {# Menu link end #}
+
+                {# Submenu items start #}
+                {% if showChildren %}
+                    {% set optionsDepth = (options['depth'] is defined and options['depth'] is not empty) ? (--options['depth']) : null %}
+                    {% set optionsMatchingDepth = (options['matchingDepth'] is defined and options['matchingDepth'] is not empty) ? (--options['matchingDepth']) : null %}
+                    {% set options = options|merge({
+                        'depth': optionsDepth,
+                        'matchingDepth': optionsMatchingDepth
+                    }) %}
+
+                    {% set levelClass = isAncestor ? 'nav-submenu collapse in' : 'nav-submenu collapse' %}
+
+                    {# include a class and id for children #}
+
+                    {{ include('@MauticCore/Menu/main.html.twig', {
+                        'item': child,
+                        'itemAttributes': {
+                            'class': levelClass,
+                            'id': linkAttributes['id'] ~ '_child'
+                        },
+                        'options': options,
+                        'matcher': matcher,
+                    }) }}
+
+                {% endif %}
+
+                {# Submenu items end #}
+
+            {# Menu item end #}
+            </li>
+
+        {% endif %}
+
+    {% endfor %}
+    {# Submenu levels ends #}
+
+    {# Top menu level end#}
+    </ul>
+
+{% endif %}

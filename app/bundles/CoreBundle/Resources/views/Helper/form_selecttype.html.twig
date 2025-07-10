@@ -1,0 +1,128 @@
+<script>
+    {% for key, string in mauticLang %}
+    mauticLang.{{ key }} = "{{ string|trans }}";
+    {% endfor %}
+</script>
+<div class="{{ typePrefix }}-type-modal-backdrop" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #000000; opacity: 0.9; z-index: 9000"></div>
+
+<div class="modal fade in {{ typePrefix }}-type-modal" style="display: block; z-index: 9999;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="javascript: void(0);" onclick="Mautic.closeModalAndRedirect('.{{ typePrefix }}-type-modal', '{{ path(cancelUrl) }}');" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+                <h4 class="modal-title">{{ header|trans }}</h4>
+                <div class="modal-loading-bar"></div>
+            </div>
+            <div class="modal-body form-select-modal">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="panel panel-success">
+                            <div class="panel-heading row-no-gutters">
+                                <div class="col-xs-8 col-sm-10 np jc-center">
+                                    <h3 class="panel-title">{{ typeOneHeader|trans }}</h3>
+                                </div>
+                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 ai-end jc-center">
+                                    <i class="hidden-xs {{ typeOneIconClass }} ri-lg"></i>
+                                    {% include '@MauticCore/Helper/button.html.twig' with {
+                                        buttons: [
+                                            {
+                                                label: 'mautic.core.select',
+                                                size: 'sm',
+                                                variant: 'ghost',
+                                                spin: false,
+                                                onclick: typeOneOnClick,
+                                                attributes: {
+                                                    'class': 'visible-xs pull-right text-interactive'
+                                                }
+                                            }
+                                        ]
+                                    } %}
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                {% if typeOneDescription is defined and typeOneDescription is not empty %}
+                                    {{ typeOneDescription|trans }}
+                                {% endif %}
+                                <ul class="ds-list-group ds-list-check">
+                                    {% for difference in typeOneDifferences %}
+                                        <li>{{ difference|trans }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="hidden-xs panel-footer text-center">
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.select',
+                                            size: 'lg',
+                                            variant: 'ghost',
+                                            spin: false,
+                                            onclick: typeOneOnClick,
+                                            attributes: {
+                                                'class': 'text-success'
+                                            }
+                                        }
+                                    ]
+                                } %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading row-no-gutters">
+                                <div class="col-xs-8 col-sm-10 np jc-center">
+                                    <h3 class="panel-title">{{ typeTwoHeader|trans }}</h3>
+                                </div>
+                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 ai-end jc-center">
+                                    <i class="hidden-xs {{ typeTwoIconClass }} ri-lg"></i>
+                                    {% include '@MauticCore/Helper/button.html.twig' with {
+                                        buttons: [
+                                            {
+                                                label: 'mautic.core.select',
+                                                size: 'sm',
+                                                variant: 'ghost',
+                                                spin: false,
+                                                onclick: typeTwoOnClick,
+                                                attributes: {
+                                                    'class': 'visible-xs pull-right text-interactive'
+                                                }
+                                            }
+                                        ]
+                                    } %}
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
+                                    {{ typeTwoDescription|trans }}
+                                {% endif %}
+                                <ul class="ds-list-group ds-list-check">
+                                    {% for difference in typeTwoDifferences %}
+                                        <li>{{ difference|trans }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="hidden-xs panel-footer text-center">
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.select',
+                                            size: 'lg',
+                                            variant: 'ghost',
+                                            spin: false,
+                                            onclick: typeTwoOnClick,
+                                            attributes: {
+                                                'class': 'text-interactive'
+                                            }
+                                        }
+                                    ]
+                                } %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

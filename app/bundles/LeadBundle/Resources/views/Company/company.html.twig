@@ -1,0 +1,240 @@
+{#
+  Variables
+    - company
+    - fields
+    - items
+    - permissions
+    - engagementData
+    - security
+    - page
+    - totalItems
+    - limit
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+
+{% block headerTitle %}{{ company.name }}{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : company,
+        'routeBase'       : 'company',
+        'langVar'         : 'company',
+        'customButtons'   : [],
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser),
+        },
+        'targetLabel'     : 'mautic.lead.lead.companies'|trans
+    }
+) -}}
+{% endblock %}
+
+{% block actions %}
+{% set canEdit     = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser) %}
+{% set canMerge    = securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser) %}
+{% set canDownload = securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser) %}
+{% set buttons     = [] %}
+
+{% if canMerge and canEdit %}
+    {% set buttons = buttons|merge([{
+        'attr': {
+            'data-toggle': 'ajaxmodal',
+            'data-target': '#MauticSharedModal',
+            'data-header': 'mautic.lead.company.header.merge'|trans({'%name%': company.primaryIdentifier}),
+            'href': path('mautic_company_action', {'objectId': company.id, 'objectAction': 'merge'}),
+        },
+        'btnText': 'mautic.lead.merge'|trans,
+        'iconClass': 'ri-exchange-2-line',
+    }]) %}
+{% endif %}
+
+{% if canDownload %}
+    {% set buttons = buttons|merge([{
+        'attr': {
+            'data-toggle': 'download',
+            'href': path('mautic_company_export_action', {'companyId': company.id}),
+        },
+        'btnText': 'mautic.core.export'|trans,
+        'iconClass': 'ri-export-line',
+    }]) %}
+{% endif %}
+
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+        'item': company,
+        'routeBase': 'company',
+        'langVar': 'company',
+        'customButtons': buttons,
+        'templateButtons': {
+            'edit': canEdit,
+            'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser),
+        },
+  }) }}
+{% endblock %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 height-auto">
+        <div>
+            <!--/ lead detail header -->
+
+            <!-- lead detail collapseable -->
+            <div class="collapse pr-md pl-md" id="lead-details">
+                <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
+                    {% for g in fields|keys %}
+                        {% if fields[g] is not empty %}
+                            <li class="{% if loop.first %}active{% endif %}">
+                                <a href="#{{ g }}" class="group" data-toggle="tab">{{ ('mautic.lead.field.group.'~g)|trans }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+                <!-- start: tab-content -->
+                <div class="tab-content pa-md">
+                    {% for group in fields|keys %}
+                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
+                            <div class="pr-md pl-md pb-md">
+                                <div class="panel shd-none mb-0">
+                                    <table class="table table-hover mb-0">
+                                        <tbody>
+                                        {% for field in fields[group] %}
+                                            {% if field.value is not empty %}
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b">{{ field.label }}</span></td>
+                                                    <td>
+                                                        {% if 'core' == group and 'country' == field.alias and flag is defined %}
+                                                          <img class="mr-sm" src="{{ flag }}" alt="" style="max-height: 24px;"/>
+                                                          <span class="mt-1">{{ field.value }}</span>
+                                                        {% else %}
+                                                          {% if field.value is iterable and 'multiselect' == field.type %}
+                                                              {{ field.value|join(', ') }}
+                                                          {% elseif 'url' == field.type %}
+                                                              <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
+                                                          {% else %}
+                                                              {{ field.normalizedValue }}
+                                                          {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!--/ lead detail collapseable -->
+        </div>
+
+        <div>
+            <!-- lead detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#lead-details">
+                       <span class="caret"></span>
+                       {{ 'mautic.core.details'|trans }}
+                    </a>
+                </span>
+            </div>
+            <!--/ lead detail collapseable toggler -->
+        </div>
+
+        <div class="pa-md enage">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel">
+                        <div class="panel-body box-layout">
+                            <div class="col-xs-8 va-m">
+                                <h5 class="text-white dark-md fw-sb mb-xs">
+                                    {{ 'mautic.lead.field.header.engagements'|trans }}
+                                </h5>
+                            </div>
+                            <div class="col-xs-4 va-t text-right">
+                                <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
+                            </div>
+                        </div>
+                        {{ include('@MauticCore/Helper/chart.html.twig', {
+                            'chartData': engagementData,
+                            'chartType': 'line',
+                            'chartHeight': 250,
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- contacts section -->
+        <div class="pa-md enage">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div id="contacts-table">
+                        {{ include('@MauticLead/Company/list_rows_contacts.html.twig', {
+                                'contacts': items,
+                                'company': company,
+                                'tmpl': 'index',
+                                'permissions': permissions,
+                                'security': security,
+                                'page': page,
+                                'limit': limit,
+                                'totalItems': totalItems,
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/ contacts section -->
+
+        <!--/ end: tab-content -->
+    </div>
+
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bdr-l height-auto">
+        <!-- form HTML -->
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <div class="mt-sm points-panel text-center">
+                <h1>{{ 'mautic.company.score.count'|trans({'%count%': company.score}) }}</h1>
+                <hr/>
+            </div>
+            <div class="panel-heading">
+                <div class="panel-title">{{ 'mautic.lead.field.group.company'|trans }}</div>
+            </div>
+            <div class="panel-body pt-sm">
+                {% if company.owner %}
+                  <h6 class="fw-sb">{{ 'mautic.lead.company.field.owner'|trans }}</h6>
+                  <p class="text-secondary">{{ company.owner.name }}</p>
+                {% endif %}
+
+                <h6 class="fw-sb">{{ 'mautic.lead.field.address'|trans }}</h6>
+                <address class="text-secondary">
+                    {% if company.address1 is not empty %}
+                        {{ company.address1 }}<br>
+                    {% endif %}
+                    {% if company.address2 is not empty %}
+                        {{ company.address2 }}<br>
+                    {% endif %}
+                    {{ company.city }} {{ company.zipcode }}
+                    <br>
+                </address>
+
+                <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
+                <p class="text-secondary">{{ company.email }}</p>
+
+                {% if company.phone is not empty %}
+                  <h6 class="fw-sb">{{ 'mautic.company.phone'|trans }}</h6>
+                  <p class="text-secondary">{{ company.phone }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <!--/ form HTML -->
+    </div>
+    <!--/ right section -->
+</div>
+<!--/ end: box layout -->
+{% endblock %}

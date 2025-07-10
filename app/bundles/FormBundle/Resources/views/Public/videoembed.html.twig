@@ -1,0 +1,17 @@
+<div id="mautic-video-form-embed">
+    <form method="post" action="{{ url('mautic_form_postresults', {'formId': form.id}) }}">
+        {# @var \Mautic\FormBundle\Entity\Field $f #}
+        {% for f in form.fields %}
+            {% if f.isCustom and fieldSettings[f.type] is defined %}
+                {% if f.isCustom %}
+                    {% set params = fieldSettings[f.type] %}
+                    {{ f.setCustomParameters(params) }}
+                    {% set template = params.template %}
+                {% else %}
+                    {% set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' %}
+                {% endif %}
+                {{ include(template, {'field': f.convertToArray(), 'id': f.alias, 'formName': f.form.generateFormName()}) }}
+            {% endif %}
+        {% endfor %}
+    </form>
+</div>

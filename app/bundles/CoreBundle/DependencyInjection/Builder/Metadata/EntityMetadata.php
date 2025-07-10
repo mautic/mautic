@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
@@ -17,24 +8,13 @@ use Symfony\Component\Finder\Finder;
 
 class EntityMetadata
 {
-    /**
-     * @var BundleMetadata
-     */
-    private $metadata;
+    private array $ormConfig = [];
 
-    /**
-     * @var array
-     */
-    private $ormConfig = [];
+    private array $serializerConfig = [];
 
-    /**
-     * @var array
-     */
-    private $serializerConfig = [];
-
-    public function __construct(BundleMetadata $metadata)
-    {
-        $this->metadata = $metadata;
+    public function __construct(
+        private BundleMetadata $metadata,
+    ) {
     }
 
     public function build(): void
@@ -53,7 +33,6 @@ class EntityMetadata
         $bundleNamespace = $this->metadata->getNamespace();
         $bundleName      = $this->metadata->getBundleName();
 
-        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             // Check to see if entities are organized by subfolder
             $subFolder = $file->getRelativePath() ? $file->getRelativePath().'\\' : '';

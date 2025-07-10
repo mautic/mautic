@@ -1,0 +1,132 @@
+{% if items|length %}
+    <div class="table-responsive panel-collapse pull out page-list">
+        <table class="table table-hover report-list" id="reportTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#reportTable',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'report',
+                        'orderBy': 'r.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-report-name'
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'report',
+                    'text': 'mautic.report.report.form.source',
+                    'class': 'visible-lg col-email-source'
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'report',
+                    'orderBy': 'r.dateAdded',
+                    'text': 'mautic.lead.import.label.dateAdded',
+                    'class': 'visible-lg col-report-dateAdded'
+                }) }}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'report',
+                    'orderBy'    : 'r.dateModified',
+                    'dir'        : 'DESC',
+                    'text'       : 'mautic.lead.import.label.dateModified',
+                    'class'      : 'visible-lg col-report-dateModified',
+                    'default'    : true,
+                }) -}}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'report',
+                    'orderBy': 'r.createdByUser',
+                    'text': 'mautic.core.createdby',
+                    'class': 'visible-lg col-report-createdByUser'
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'report',
+                        'orderBy': 'r.id',
+                        'text': 'mautic.core.id',
+                        'class': 'col-report-id visible-md visible-lg',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {% if item.isScheduled %}
+                          {% set customButtons = [
+                              {
+                                  'attr': {
+                                      'data-toggle': 'ajaxmodal',
+                                      'data-target': '#AssetPreviewModal',
+                                      'href': path('mautic_report_schedule', {'reportId': item.id}),
+                                  },
+                                  'btnText': 'mautic.report.export.and.send'|trans,
+                                  'iconClass': 'ri-send-plane-line-o',
+                              },
+                          ] %}
+                        {% endif %}
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], item.createdBy),
+                                    'clone': permissions['report:reports:create'],
+                                    'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], item.createdBy),
+                                },
+                                'routeBase': 'report',
+                                'langVar': 'report.report',
+                                'customButtons': customButtons|default([]),
+                        }) }}
+                    </td>
+                    <td>
+                        <div>
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'report.report'}) }}
+                            <a href="{{ path('mautic_report_view', {'objectId': item.id}) }}" data-toggle="ajax">
+                                {{ item.name|e }}
+                            </a>
+                            {% if item.isScheduled %}
+                                <label class="control-label" data-toggle="tooltip"
+                                       data-container="body" data-placement="top" title=""
+                                       data-original-title="{{ 'mautic.report.is.scheduled'|trans }}">
+                                    <i class="ri-fw ri-send-plane-line-o"></i></label>
+                            {% endif %}
+                        </div>
+                        {% if item.description %}
+                            <div class="text-secondary mt-4">
+                                <small>{{ item.description|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ (model.getTableData()[item.getSource()]['display_name'] ?? item.getSource())|trans }}</td>
+
+                    <td class="visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+                        {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
+                    </td>
+                    <td class="visible-lg" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+                        {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
+                    </td>
+                    <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>
+
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': totalItems,
+                    'page': page,
+                    'limit': limit,
+                    'menuLinkId': 'mautic_report_index',
+                    'baseUrl': path('mautic_report_index'),
+                    'sessionVar': 'report',
+            }) }}
+        </div>
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

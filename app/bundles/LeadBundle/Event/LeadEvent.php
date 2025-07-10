@@ -1,48 +1,41 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class LeadEvent.
- */
-class LeadEvent extends CommonEvent
+final class LeadEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Lead &$lead, $isNew = false)
-    {
-        $this->entity = &$lead;
+    protected bool $alreadyProcessedInBatch = false;
+
+    public function __construct(
+        Lead $lead,
+        bool $isNew = false,
+    ) {
+        $this->entity = $lead;
         $this->isNew  = $isNew;
     }
 
-    /**
-     * Returns the Lead entity.
-     *
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->entity;
     }
 
-    /**
-     * Sets the Lead entity.
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): void
     {
         $this->entity = $lead;
+    }
+
+    public function isAlreadyProcessedInBatch(): bool
+    {
+        return $this->alreadyProcessedInBatch;
+    }
+
+    public function setAlreadyProcessedInBatch(bool $alreadyProcessedInBatch): void
+    {
+        $this->alreadyProcessedInBatch = $alreadyProcessedInBatch;
     }
 }

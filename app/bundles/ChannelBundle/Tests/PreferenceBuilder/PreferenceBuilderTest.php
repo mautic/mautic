@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +13,7 @@ use Psr\Log\NullLogger;
 
 class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testChannelsArePrioritized()
+    public function testChannelsArePrioritized(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -111,7 +102,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pushLogs);
     }
 
-    public function testLogIsRemovedFromAllChannels()
+    public function testLogIsRemovedFromAllChannels(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();

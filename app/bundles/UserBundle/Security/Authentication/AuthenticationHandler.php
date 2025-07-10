@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -17,23 +8,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
-    private $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router  = $router;
+    public function __construct(
+        private RouterInterface $router,
+    ) {
     }
 
-    /**
-     * @return Response
-     */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         // Remove post_logout if set
         $request->getSession()->remove('post_logout');
@@ -53,10 +39,7 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
         }
     }
 
-    /**
-     * @return Response
-     */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         // Remove post_logout if set
         $request->getSession()->remove('post_logout');
@@ -70,7 +53,7 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
 
             return $response;
         } else {
-            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
 
             return new RedirectResponse($this->router->generate('login'));
         }

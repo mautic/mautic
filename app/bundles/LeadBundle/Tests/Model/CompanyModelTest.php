@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
@@ -23,22 +15,22 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var EmailValidator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidator;
 
     /**
      * @var CompanyDeduper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyDeduper;
+    private \PHPUnit\Framework\MockObject\MockObject $companyDeduper;
 
     public function setUp(): void
     {
@@ -53,7 +45,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      */
-    public function testArrayValueIsFlattenedBeforeSave()
+    public function testArrayValueIsFlattenedBeforeSave(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
@@ -86,7 +78,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testImportCompanySkipIfExistsTrue()
+    public function testImportCompanySkipIfExistsTrue(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -99,7 +91,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel->importCompany([], [], null, false, true);
     }
 
-    public function testImportCompanySkipIfExistsFalse()
+    public function testImportCompanySkipIfExistsFalse(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -129,6 +121,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $companyModel->method('getFieldData')->willReturn(['companyfield' => 'xxx']);
+        $this->setSecurity($companyModel);
 
         return $companyModel;
     }
@@ -155,5 +148,64 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp = new \ReflectionProperty($class, $property);
         $reflectedProp->setAccessible(true);
         $reflectedProp->setValue($object, $value);
+    }
+
+    public function testExtractCompanyDataFromImport(): void
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['fetchCompanyFields'])
+            ->getMock();
+
+        $companyModel->method('fetchCompanyFields')
+            ->will($this->returnValue([
+                ['alias' => 'companyname'],
+                ['alias' => 'companyemail'],
+                ['alias' => 'companyindustry'],
+            ]));
+
+        $fields = [
+            'email'           => 'i_contact_email',
+            'companyemail'    => 'i_company_email',
+            'company'         => 'i_company_name',
+            'companyindustry' => 'i_company_industry',
+        ];
+        $data= [
+            'i_contact_email'    => 'PennyKMoore@dayrep.com',
+            'i_company_email'    => 'turbochicken@dayrep.com',
+            'i_company_name'     => 'Turbo chicken',
+            'i_company_industry' => 'Biotechnology',
+        ];
+
+        [$companyFields, $companyData] = $companyModel->extractCompanyDataFromImport($fields, $data);
+
+        $expectedCompanyFields = [
+            'companyemail'    => 'i_company_email',
+            'companyindustry' => 'i_company_industry',
+            'companyname'     => 'i_company_name',
+        ];
+        $expectedCompanyData = [
+            'i_company_email'    => 'turbochicken@dayrep.com',
+            'i_company_industry' => 'Biotechnology',
+            'i_company_name'     => 'Turbo chicken',
+        ];
+
+        $this->assertSame($expectedCompanyFields, $companyFields);
+        $this->assertSame($expectedCompanyData, $companyData);
+    }
+
+    private function setSecurity(CompanyModel $companyModel): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('hasEntityAccess')
+            ->willReturn(true);
+        $security->method('isGranted')
+            ->willReturn(true);
+
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }

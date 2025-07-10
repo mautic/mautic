@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
@@ -16,6 +7,8 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -27,27 +20,25 @@ use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
 {
     protected $persistNewLead = false;
 
     /**
-     * @var IntegrationHelper
+     * @var Translator
      */
-    protected $integrationHelper;
+    protected TranslatorInterface $translator;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
         EntityManager $entityManager,
-        Session $session,
         RequestStack $requestStack,
         Router $router,
-        TranslatorInterface $translator,
+        Translator $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,
@@ -55,17 +46,15 @@ abstract class SocialIntegration extends AbstractIntegration
         PathsHelper $pathsHelper,
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         IntegrationEntityModel $integrationEntityModel,
         DoNotContact $doNotContact,
-        IntegrationHelper $integrationHelper
+        protected IntegrationHelper $integrationHelper,
     ) {
-        $this->integrationHelper = $integrationHelper;
-
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,
             $entityManager,
-            $session,
             $requestStack,
             $router,
             $translator,
@@ -77,7 +66,8 @@ abstract class SocialIntegration extends AbstractIntegration
             $notificationModel,
             $fieldModel,
             $integrationEntityModel,
-            $doNotContact
+            $doNotContact,
+            $fieldsWithUniqueIdentifier
         );
     }
 
@@ -86,7 +76,7 @@ abstract class SocialIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $name     = strtolower($this->getName());
@@ -95,15 +85,13 @@ abstract class SocialIntegration extends AbstractIntegration
                 $builder->add('shareButton', $formType, [
                     'label'    => 'mautic.integration.form.sharebutton',
                     'required' => false,
-                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : [],
+                    'data'     => $data['shareButton'] ?? [],
                 ]);
             }
         }
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $settings
      *
      * @return array
@@ -115,10 +103,10 @@ abstract class SocialIntegration extends AbstractIntegration
         if (empty($fields)) {
             $s         = $this->getName();
             $available = $this->getAvailableLeadFields($settings);
-            if (empty($available) || !is_array($available)) {
+            if (empty($available)) {
                 return [];
             }
-            //create social profile fields
+            // create social profile fields
             $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex();
 
             foreach ($available as $field => $details) {
@@ -180,25 +168,18 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @param array $settings
-     */
     public function getFormCompanyFields($settings = [])
     {
         $settings['feature_settings']['objects'] = ['Company'];
+
+        return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'oauth2';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredKeyFields()
     {
         return [
@@ -228,8 +209,6 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *
@@ -247,9 +226,7 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * Returns notes specific to sections of the integration form (if applicable).
      *
-     * @param $section
-     *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
@@ -263,27 +240,25 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     public function getSocialProfileTemplate()
     {
-        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.php";
+        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.twig";
     }
 
     /**
      * Get the access token from session or socialCache.
      *
-     * @param $socialCache
-     *
      * @return array|mixed|null
      */
     protected function getContactAccessToken(&$socialCache)
     {
-        if (!$this->session) {
+        if (!$this->requestStack->getCurrentRequest()->hasSession()) {
             return null;
         }
 
-        if (!$this->session->isStarted()) {
+        if (!$this->requestStack->getSession()->isStarted()) {
             return (isset($socialCache['accessToken'])) ? $this->decryptApiKeys($socialCache['accessToken']) : null;
         }
 
-        $accessToken = $this->session->get($this->getName().'_tokenResponse', []);
+        $accessToken = $this->requestStack->getSession()->get($this->getName().'_tokenResponse', []);
         if (!isset($accessToken[$this->getAuthTokenKey()])) {
             if (isset($socialCache['accessToken'])) {
                 $accessToken = $this->decryptApiKeys($socialCache['accessToken']);
@@ -291,7 +266,7 @@ abstract class SocialIntegration extends AbstractIntegration
                 return null;
             }
         } else {
-            $this->session->remove($this->getName().'_tokenResponse');
+            $this->requestStack->getSession()->remove($this->getName().'_tokenResponse');
             $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
 
             $this->persistNewLead = true;

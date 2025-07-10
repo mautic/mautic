@@ -5,13 +5,11 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * @ORM\Entity()
- */
+#[ORM\Entity]
 class IdEntry
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -25,7 +23,7 @@ class IdEntry
      */
     protected $expiryTimestamp;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -66,10 +64,7 @@ class IdEntry
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getExpiryTime()
+    public function getExpiryTime(): \DateTime
     {
         $dt = new \DateTime();
         $dt->setTimestamp($this->expiryTimestamp);
@@ -96,13 +91,13 @@ class IdEntry
     }
 
     /**
-     * @param int $id
+     * @param string $id
      *
      * @return IdEntry
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id =  $id;
 
         return $this;
     }

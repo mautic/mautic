@@ -1,0 +1,91 @@
+{% for tag in tags %}
+    {% set type = tag.type|default('read-only') %}
+    {% set color = tag.color|default('gray') %}
+    {% set icon = tag.icon|default('') %}
+    {% set attributes = tag.attributes|default({}) %}
+    {% set icon_only = tag.icon_only|default(false) %}
+    {% set size = tag.size|default('md') %}
+
+    {# ID generation #}
+    {% if attributes.id is defined %}
+        {% set id = attributes.id %}
+    {% elseif tag.label %}
+        {% set parts = tag.label|split('.') %}
+        {% if parts|length >= 2 %}
+            {% set id = parts|slice(-2, 2)|join('-')|replace({' ': '-'})|lower %}
+        {% else %}
+            {% set id = 'tag-' ~ (tag.label|replace({' ': '-', '.' : '-'})|lower) %}
+        {% endif %}
+    {% else %}
+        {% set id = 'tag-' ~ random() %}
+    {% endif %}
+
+    {% set translated_label = tag.label|trans %}
+    {% set classes = ['label', 'label-' ~ color] %}
+
+    {% if icon_only %}
+        {% set classes = classes|merge(['label-icon']) %}
+    {% endif %}
+
+    {# Merge additional classes #}
+    {% if attributes.class is defined %}
+        {% set classes = attributes.class is iterable ? classes|merge(attributes.class) : classes|merge([attributes.class]) %}
+    {% endif %}
+
+    {% set other_attributes = attributes|filter((v, k) => k != 'class' and k != 'id') %}
+    {% set truncated_label = translated_label %}
+    {% set label_tooltip = '' %}
+    {% if translated_label|length > 27 %}
+        {% set truncated_label = translated_label|slice(0,24) ~ '...' %}
+        {% set label_tooltip = translated_label %}
+    {% endif %}
+
+    {# Wrapper element switching logic #}
+    {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
+    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label }}" size="{{ size }}"
+        {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
+        {% for attr_key, attr_value in other_attributes %}
+            {{ attr_key }}="{{ attr_value }}"
+        {% endfor %}>
+
+        {% if icon_only %}
+            <i class="{{ icon }}" aria-hidden="true" focusable="false" title="{{ translated_label }}" data-toggle="tooltip" tooltip-placement="top"></i>
+        {% else %}
+            {% if type == 'dismissible' %}
+                {% if icon %}
+                    <i class="{{ icon }}" aria-hidden="true" focusable="false"></i>
+                {% endif %}
+                <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-toggle="tooltip" tooltip-placement="top"{% endif %}>
+                    {{ truncated_label }}
+                </span>
+                <button type="button" aria-label="{{ 'mautic.core.builder.storage.dismiss.button'|trans }}" title="{{ 'mautic.core.builder.storage.dismiss.button'|trans }}">
+                    <i class="ri-close-line" aria-hidden="true" focusable="false"></i>
+                </button>
+
+            {% elseif type == 'read-only' %}
+                {% if icon %}
+                    <i class="{{ icon }}" aria-hidden="true" focusable="false"></i>
+                {% endif %}
+                <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-toggle="tooltip" tooltip-placement="top"{% endif %}>
+                    {{ truncated_label }}
+                </span>
+
+            {% elseif type == 'selectable' %}
+                <button type="button" aria-pressed="false" title="{{ label_tooltip ?: translated_label }}">
+                    {% if icon %}
+                        <i class="{{ icon }}" aria-hidden="true" focusable="false"></i>
+                    {% endif %}
+                    <span aria-hidden="true">{{ truncated_label }}</span>
+                </button>
+
+            {% else %}
+                {% if icon %}
+                    <i class="{{ icon }}" aria-hidden="true" focusable="false"></i>
+                {% endif %}
+                <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}"{% endif %}>
+                    {{ truncated_label }}
+                </span>
+            {% endif %}
+        {% endif %}
+    </{{ wrapper_tag }}>
+{% endfor %}

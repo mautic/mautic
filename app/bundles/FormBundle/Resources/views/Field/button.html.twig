@@ -1,0 +1,126 @@
+{% set defaultInputClass = 'button' %}
+{% set containerType = 'button-wrapper' %}
+
+{# start: field_helper #}
+{% set defaultInputFormClass = defaultInputFormClass|default('') %}
+{% set defaultLabelClass = defaultLabelClass|default('label') %}
+{% set formName = formName|default('') %}
+{% set defaultInputClass = 'mauticform-' ~ defaultInputClass %}
+{% set defaultLabelClass = 'mauticform-' ~ defaultLabelClass %}
+{% set containerClass = containerClass|default(containerType) %}
+{% set order = field.order|default(0) %}
+{% set validationMessage = '' %}
+{% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
+{% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
+{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+{% if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
+  {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+  {% if field.properties.multiple is defined %}
+    {% set inputName = inputName ~ '[]' %}
+  {% endif %}
+  {% set inputAttributes = inputAttributes|merge({
+          'name': inputName,
+  }) %}
+{% endif %}
+
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+  {% set inputAttributes = inputAttributes|merge({
+          'value': field.defaultValue|default(''),
+  }) %}
+{% endif %}
+
+{% if ignoreId is not defined or (ignoreId is defined and ignoreId is empty) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'id': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) %}
+  {% set labelAttributes = labelAttributes|merge({
+          'id': 'mauticform_label' ~ formName ~ '_' ~ field.alias,
+          'for': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) %}
+{% endif %}
+
+{% if field.properties.placeholder is defined and field.properties.placeholder is not empty %}
+  {% set inputAttributes = inputAttributes|merge({
+          'placeholder': field.properties.placeholder,
+  }) %}
+{% endif %}
+{% if inForm is defined and (true == inForm or inForm is not empty) %}
+  {% if field.type in ['button', 'pagebreak'] %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
+  {% endif %}
+
+  {% set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'disabled': 'disabled',
+          'class': inputAttributes.class|default([])|merge([defaultInputClass, defaultInputFormClass]),
+  }) %}
+{% else %}
+  {% set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'class': inputAttributes.class|default([])|merge([defaultInputClass]),
+  }) %}
+{% endif %}
+{% set containerAttributes = containerAttributes|merge({
+        'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
+        'class': containerAttributes.class|default([])|merge([
+          'mauticform-row',
+          'mauticform-' ~ containerClass,
+          'mauticform-field-' ~ order,
+        ]),
+}) %}
+{% if field.parent and fields[field.parent] is defined %}
+  {% set values = field.conditions.values|join('|') %}
+
+  {%- if field.conditions.any != false and 'notIn' != field.conditions.expr -%}
+    {% set values = '*' %}
+  {% endif %}
+
+  {% set containerAttributes = containerAttributes|merge({
+          'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
+          'data-mautic-form-expr': field.conditions.expr,
+          'class': containerAttributes.class|merge([
+            'mauticform-field-hidden',
+          ]),
+  }) %}
+{% endif %}
+{% if field.isRequired is defined and true == field.isRequired %}
+  {% set required = true %}
+  {% set validationMessage = field.validationMessage %}
+  {% if validationMessage is empty %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
+  {% endif %}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+          'data-validate': field.alias,
+          'data-validation-type': field.type,
+  }) %}
+  {% if field.properties.multiple is not empty %}
+    {% set containerAttributes = containerAttributes|merge({
+            'data-validate-multiple': 'true',
+    }) %}
+  {% endif %}
+{% elseif required is defined and true == required %}
+  {# Forced to be required #}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+  }) %}
+{% endif %}
+{# end: field_helper #}
+
+{% set buttonType = field.properties.type|default('submit') %}
+{% set inputAttributes = inputAttributes|merge({
+        'type': buttonType,
+        'name': 'mauticform[' ~ field.alias ~ ']',
+        'value': '1',
+}) %}
+<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+  <button {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</button>
+</div>

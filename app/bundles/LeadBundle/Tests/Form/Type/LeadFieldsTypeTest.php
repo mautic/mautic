@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
@@ -23,12 +14,9 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private MockObject $fieldModel;
 
-    /**
-     * @var LeadFieldsType
-     */
-    private $form;
+    private LeadFieldsType $form;
 
     protected function setUp(): void
     {
@@ -70,18 +58,18 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(
                         [
                             'Core' => [
-                              'Contact field 1 label'  => 'contact_field_1',
-                              'mautic.lead.field.tags' => 'tags',
+                                'Contact field 1 label'  => 'contact_field_1',
+                                'mautic.lead.field.tags' => 'tags',
                             ],
                             'Company' => [
-                              'Company field 1 label' => 'company_field_1',
+                                'Company field 1 label' => 'company_field_1',
                             ],
                             'UTM' => [
-                              'mautic.lead.field.utmcampaign' => 'utm_campaign',
-                              'mautic.lead.field.utmcontent'  => 'utm_content',
-                              'mautic.lead.field.utmmedium'   => 'utm_medium',
-                              'mautic.lead.field.umtsource'   => 'utm_source',
-                              'mautic.lead.field.utmterm'     => 'utm_term',
+                                'mautic.lead.field.utmcampaign' => 'utm_campaign',
+                                'mautic.lead.field.utmcontent'  => 'utm_content',
+                                'mautic.lead.field.utmmedium'   => 'utm_medium',
+                                'mautic.lead.field.umtsource'   => 'utm_source',
+                                'mautic.lead.field.utmterm'     => 'utm_term',
                             ],
                         ],
                         $choices

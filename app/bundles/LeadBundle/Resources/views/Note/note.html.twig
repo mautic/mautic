@@ -1,0 +1,73 @@
+{#
+Variables:
+- note
+- lead
+- permissions
+#}
+{% set icon = 'ri-sticky-note-2-line' %}
+{% if 'email' == note.type %}
+{% set icon = 'ri-mail-line' %}
+{% elseif 'call' == note.type %}
+{% set icon = 'ri-phone-line' %}
+{% elseif 'meeting' == note.type %}
+{% set icon = 'ri-video-chat-line' %}
+{% endif %}
+<li class="note-single mb-lg" id="LeadNote{{ note.id }}">
+    <div class="note-body d-flex np mb-md">
+        <div class="height-auto icon text-right">
+            <div class="icon-wrapper d-flex ai-center jc-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
+        </div>
+        <div class="tile media-body pa-lg">
+
+            <div class="d-flex jc-space-between ai-center mb-md fw-wrap fw-nowrap-lg">
+                <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
+                <div class="d-flex fg-1 ai-center jc-space-between jc-end-lg gap-sm">
+                    <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
+                    <div class="pull-right btn-group">
+                        {% if permissions['edit'] %}
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.lead.note.header.edit',
+                                    variant: 'ghost',
+                                    icon_only: true,
+                                    icon: 'ri-edit-line',
+                                    size: 'xs',
+                                    href: url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}),
+                                    attributes: {
+                                        'data-toggle': 'ajaxmodal',
+                                        'data-target': '#MauticSharedModal'
+                                    }
+                                }
+                            ]
+                        } %}
+                        {% endif %}
+                        {% if permissions['delete'] %}
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.lead.note.confirmdelete',
+                                    variant: 'ghost',
+                                    icon_only: true,
+                                    danger: 'true',
+                                    icon: 'ri-delete-bin-line',
+                                    size: 'xs',
+                                    href: path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}),
+                                    attributes: {
+                                        'data-toggle': 'confirmation',
+                                        'data-message': 'mautic.lead.note.confirmdelete'|trans,
+                                        'data-confirm-text': 'mautic.core.form.delete'|trans,
+                                        'data-confirm-callback': 'executeAction',
+                                        'data-cancel-text': 'mautic.core.form.cancel'|trans
+                                    }
+                                }
+                            ]
+                        } %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="fs-18">{{ note.text|purify }}</div>
+        </div>
+    </div>
+</li>

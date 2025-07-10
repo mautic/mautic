@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CacheBundle\Tests\EventListener;
 
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
@@ -22,29 +14,24 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FilesystemTagAwareAdapter
      */
-    private $adapter;
-
-    /**
-     * @var string
-     */
-    private $random;
+    private MockObject $adapter;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->random  = sha1((string) time());
         $this->adapter = $this->getMockBuilder(FilesystemTagAwareAdapter::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['clear', 'commit'])
-            ->addMethods(['getCacheAdapter'])
+            ->addMethods(['getCacheAdapter']) // because CacheProvider does not have an interface.
             ->getMock();
-        $this->adapter->method('clear')->willReturn($this->random);
-        $this->adapter->method('commit')->willReturn(null);
+        $this->adapter->method('clear')->willReturn(true);
+        $this->adapter->method('commit')->willReturn(true);
+        $this->adapter->method('getCacheAdapter')->willReturn('');
     }
 
     public function testClear(): void
     {
-        $this->adapter->expects($this->once())->method('clear')->willReturn($this->random);
+        $this->adapter->expects($this->once())->method('clear')->willReturn(true);
         $subscriber = new CacheClearSubscriber($this->adapter, new Logger('test'));
         $subscriber->clear('aaa');
     }

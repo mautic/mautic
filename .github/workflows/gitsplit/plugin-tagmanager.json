@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticTagManagerBundle",
+            "directory": "plugins/MauticTagManagerBundle",
+            "target": "git@github.com:mautic/plugin-tagmanager.git"
+        }
+    ]
+}

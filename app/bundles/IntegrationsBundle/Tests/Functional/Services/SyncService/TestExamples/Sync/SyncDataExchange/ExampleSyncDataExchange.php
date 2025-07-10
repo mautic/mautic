@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -26,12 +17,12 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
-    const OBJECT_LEAD = 'integration_lead';
+    public const OBJECT_LEAD = 'integration_lead';
 
     /**
      * @var array
      */
-    const FIELDS = [
+    public const FIELDS = [
         'id'            => [
             'label' => 'ID',
             'type'  => NormalizedValueDAO::INT_TYPE,
@@ -64,9 +55,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     private $valueNormalizer;
 
-    /**
-     * ExampleSyncDataExchange constructor.
-     */
     public function __construct()
     {
         // Using the default normalizer for this example but each integration may need it's own if
@@ -158,7 +146,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                     );
 
                     break;
-                case 201: //created
+                case 201: // created
                     $syncOrderDAO->addObjectMapping(
                         $changeObject,
                         $result['object'],
@@ -226,7 +214,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
                     // If we know for certain that this specific field was modified at a specific date/time, set the change timestamp
                     // on the field itself for the judge to weigh certain versus possible changes
-                    //$reportFieldDAO->setChangeTimestamp($fieldChangeTimestamp);
+                    // $reportFieldDAO->setChangeTimestamp($fieldChangeTimestamp);
 
                     $objectDAO->addField($reportFieldDAO);
                 }
@@ -247,8 +235,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param $object
-     *
      * @return mixed
      */
     private function getReportPayload($object, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, array $mappedFields)

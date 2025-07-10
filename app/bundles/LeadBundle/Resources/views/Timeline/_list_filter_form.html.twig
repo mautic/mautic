@@ -1,0 +1,50 @@
+<!-- filter form -->
+<form method="post" action="{{ path('mautic_contacttimeline_action', {'leadId': lead.id}) }}" class="panel" id="timeline-filters">
+    <div class="form-control-icon pa-md">
+        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events.filters.search|e }}">
+        <span class="the-icon ri-search-line text-secondary"></span>
+    </div>
+    {% if events.types is defined and events.types is iterable %}
+        <div class="history-search panel-footer text-secondary">
+            <div class="row">
+                <div class="col-sm-5 mna-3">
+                <label class="pt-lg">{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}</label>
+                    <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0">
+                        {% for typeKey, typeName in events.types %}
+                            <option value="{{ typeKey|e }}" {% if typeKey in events.filters.includeEvents %}selected{% endif %}>
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-5 mna-3">
+                <label class="pt-lg">{{ 'mautic.lead.lead.filter.bundles.exclude.placeholder'|trans }}</label>
+                    <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0">
+                        {% for typeKey, typeName in events.types %}
+                            <option value="{{ typeKey|e }}" {% if typeKey in events.filters.excludeEvents %}selected{% endif %}>
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-2 jc-end">
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                href: url('mautic_contact_timeline_export_action', {'leadId': lead.id}),
+                                icon: 'ri-download-line',
+                                label: 'mautic.core.export',
+                                size: 'sm',
+                                attributes: {
+                                    'data-toggle': 'download'
+                                }
+                            }
+                        ]
+                    } %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
+</form>
+<!--/ filter form -->

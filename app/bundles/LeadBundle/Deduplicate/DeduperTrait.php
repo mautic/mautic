@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Deduplicate;
 
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
 
 trait DeduperTrait
@@ -22,17 +14,16 @@ trait DeduperTrait
      */
     private $fieldModel;
 
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
+
     /**
      * @var array
      */
     private $availableFields;
 
-    /**
-     * @return array
-     */
-    public function getUniqueData(array $queryFields)
+    public function getUniqueData(array $queryFields): array
     {
-        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields(['object' => $this->object]);
+        $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => $this->object]);
         $uniqueLeadFieldData = [];
         $inQuery             = array_intersect_key($queryFields, $this->getAvailableFields());
         foreach ($inQuery as $k => $v) {

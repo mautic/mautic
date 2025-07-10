@@ -1,0 +1,142 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}sysinfo{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.sysinfo.header.index'|trans }}{% endblock %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- step container -->
+    <div class="col-md-3 height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <!-- Nav tabs -->
+            <ul class="list-group list-group-tabs" role="tablist">
+                <li role="presentation" class="list-group-item in active">
+                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                        {{ 'mautic.sysinfo.tab.phpinfo'|trans }}
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                        {{ 'mautic.sysinfo.tab.recommendations'|trans }}
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab" class="list-group-item-heading">
+                        {{ 'mautic.sysinfo.tab.folders'|trans }}
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#log" aria-controls="log" role="tab" data-toggle="tab" class="list-group-item-heading">
+                        {{ 'mautic.sysinfo.tab.log'|trans }}
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                        {{ 'mautic.sysinfo.tab.dbinfo'|trans }}
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- container -->
+    <div class="col-md-9 height-auto bdr-l">
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
+                <div class="pt-md pr-md pl-md pb-md">
+                    {{ phpInfo|raw }}
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
+                <div class="pt-md pr-md pl-md pb-md">
+                    {% if recommendations is empty and requirements is empty %}
+                        <div class="alert alert-info">
+                            {{ 'mautic.sysinfo.no.recommendations'|trans }}
+                        </div>
+                    {% endif %}
+                    {% for requirement in requirements %}
+                        <div class="alert alert-danger">
+                            {{ requirement|raw }}
+                        </div>
+                    {% endfor %}
+                    {% for recommendation in recommendations %}
+                        <div class="alert alert-warning">
+                            {{ recommendation|raw }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <h2 class="pb-md">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ 'mautic.sysinfo.folder.path'|trans }}</th>
+                                <th>{{ 'mautic.sysinfo.is.writable'|trans }}</th>
+                            </tr>
+                        </thead>
+                        {% for folder, isWritable in folders %}
+                            <tr class="{% if isWritable %}success{% else %}danger{% endif %}">
+                                <td>{{ folder }}</td>
+                                <td>
+                                    {% if isWritable %}
+                                        {{ 'mautic.sysinfo.writable'|trans }}
+                                    {% else %}
+                                        {{ 'mautic.sysinfo.unwritable'|trans }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="log">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <h2 class="pb-md">{{ 'mautic.sysinfo.log.title'|trans }}</h2>
+                    {% if log is defined and log is not empty %}
+                        <pre>{{ log }}</pre>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            {{ 'mautic.sysinfo.log.missing'|trans }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <h2 class="pb-md">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ 'mautic.sysinfo.dbinfo.property'|trans }}</th>
+                                <th>{{ 'mautic.sysinfo.dbinfo.value'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ 'mautic.sysinfo.dbinfo.version'|trans }}</td>
+                                <td id="dbinfo-version">{{ dbInfo.version }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'mautic.sysinfo.dbinfo.driver'|trans }}</td>
+                                <td id="dbinfo-driver">{{ dbInfo.driver }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'mautic.sysinfo.dbinfo.platform'|trans }}</td>
+                                <td id="dbinfo-platform">{{ dbInfo.platform }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

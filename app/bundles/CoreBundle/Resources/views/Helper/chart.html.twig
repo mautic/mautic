@@ -1,0 +1,21 @@
+{% if chartType is defined and chartData is defined and chartData.datasets is defined %}
+    {% set dataValues = chartData.datasets[0].data %}
+    {% if dataValues|reduce((carry, v) => carry + v) > 0 %}
+        <div class="chart-wrapper">
+            <div class="pt-sd pr-md pb-md pl-md">
+                <div {% if chartHeight is defined %} style="height: calc({{ chartHeight }}px - 15px)" {% endif %}>
+                    <canvas class="chart {{ chartType }}-chart" {{ disableLegend is defined ? 'data-disable-legend' : '' }}>
+                        {{ chartData|json_encode }}
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    {% else %}
+    <div class="col-xs-12">
+        <div class="d-flex ai-center jc-center gap-xs text-disabled h-256">
+            <i class="ri-bar-chart-grouped-line ri-xl"></i>
+            <div class="fw-sb">{{'mautic.dashboard.widget.no_data'|trans}}</div>
+        </div>
+    </div>
+    {% endif %}
+{% endif %}

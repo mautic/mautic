@@ -1,3 +1,4 @@
+// Mautic note: coming from https://github.com/tomiford/bootstrap-overflow-navs and is not a library installable via npm.
 /* ===================================================
  * bootstrap-overflow-navs.js v0.4
  * ===================================================

@@ -2,18 +2,10 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal;
 
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
+use Mautic\IntegrationsBundle\Exception\RequiredValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
@@ -26,7 +18,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectSyncSkippedException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
+use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
@@ -34,63 +28,18 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var SyncJudgeInterface
-     */
-    private $syncJudge;
-
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
-
-    /**
-     * @var ValueHelper
-     */
-    private $valueHelper;
-
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
-
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManual;
-
-    /**
-     * @var ReportObjectDAO
-     */
-    private $internalObject;
-
-    /**
-     * @var ReportObjectDAO
-     */
-    private $integrationObject;
-
-    /**
-     * @var ObjectChangeDAO
-     */
-    private $objectChange;
-
-    /**
-     * @var array
-     */
-    private $judgementModes = [
+    private array $judgementModes = [
         SyncJudgeInterface::HARD_EVIDENCE_MODE,
         SyncJudgeInterface::BEST_EVIDENCE_MODE,
         SyncJudgeInterface::FUZZY_EVIDENCE_MODE,
     ];
 
-    /**
-     * ObjectChangeGenerator constructor.
-     */
-    public function __construct(SyncJudgeInterface $syncJudge, ValueHelper $valueHelper, FieldHelper $fieldHelper)
-    {
-        $this->syncJudge   = $syncJudge;
-        $this->valueHelper = $valueHelper;
-        $this->fieldHelper = $fieldHelper;
+    public function __construct(
+        private SyncJudgeInterface $syncJudge,
+        private ValueHelper $valueHelper,
+        private FieldHelper $fieldHelper,
+        private BulkNotification $bulkNotification,
+    ) {
     }
 
     /**
@@ -103,15 +52,10 @@ class ObjectChangeGenerator
         MappingManualDAO $mappingManual,
         ObjectMappingDAO $objectMapping,
         ReportObjectDAO $internalObject,
-        ReportObjectDAO $integrationObject
+        ReportObjectDAO $integrationObject,
     ) {
-        $this->syncReport        = $syncReport;
-        $this->mappingManual     = $mappingManual;
-        $this->internalObject    = $internalObject;
-        $this->integrationObject = $integrationObject;
-
-        $this->objectChange = new ObjectChangeDAO(
-            $this->mappingManual->getIntegration(),
+        $objectChange = new ObjectChangeDAO(
+            $mappingManual->getIntegration(),
             $internalObject->getObject(),
             $internalObject->getObjectId(),
             $integrationObject->getObject(),
@@ -120,7 +64,7 @@ class ObjectChangeGenerator
 
         if ($internalObject->getObjectId()) {
             DebugLogger::log(
-                $this->mappingManual->getIntegration(),
+                $mappingManual->getIntegration(),
                 sprintf(
                     "Integration to Mautic; found a match between Mautic's %s:%s object and the integration %s:%s object ",
                     $internalObject->getObject(),
@@ -128,90 +72,52 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
-                $this->mappingManual->getIntegration(),
+                $mappingManual->getIntegration(),
                 sprintf(
                     'Integration to Mautic; no match found for %s:%s',
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            $this->addFieldToObjectChange($fieldMappingDAO);
+            $this->addFieldToObjectChange($fieldMappingDAO, $syncReport, $mappingManual, $internalObject, $integrationObject, $objectChange);
         }
 
         // Set the change date/time from the object so that we can update last sync date based on this
-        $this->objectChange->setChangeDateTime($integrationObject->getChangeDateTime());
+        $objectChange->setChangeDateTime($integrationObject->getChangeDateTime());
 
-        return $this->objectChange;
+        return $objectChange;
     }
 
     /**
      * @throws ObjectNotFoundException
+     * @throws ObjectSyncSkippedException
      */
-    private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void
-    {
-        try {
-            $integrationFieldState = $this->integrationObject->getField($fieldMappingDAO->getIntegrationField())->getState();
-            $internalFieldState    = $this->getFieldState(
-                $fieldMappingDAO->getInternalObject(),
-                $fieldMappingDAO->getInternalField(),
-                $integrationFieldState
-            );
-
-            $integrationInformationChangeRequest = $this->syncReport->getInformationChangeRequest(
-                $this->integrationObject->getObject(),
-                $this->integrationObject->getObjectId(),
-                $fieldMappingDAO->getIntegrationField()
-            );
-        } catch (FieldNotFoundException $e) {
-            return;
-        }
-
-        // If syncing bidirectional, let the sync judge determine what value should be used for the field
-        if (ObjectMappingDAO::SYNC_BIDIRECTIONALLY === $fieldMappingDAO->getSyncDirection()) {
-            $this->judgeThenAddFieldToObjectChange($fieldMappingDAO, $integrationInformationChangeRequest, $internalFieldState);
-
-            return;
-        }
-
-        try {
-            $newValue = $this->valueHelper->getValueForMautic(
-                $integrationInformationChangeRequest->getNewValue(),
-                $internalFieldState,
-                $fieldMappingDAO->getSyncDirection()
-            );
-        } catch (InvalidValueException $e) {
-            return; // Field has to be skipped
-        }
-
-        // Add the value to the field based on the field state
-        $this->objectChange->addField(
-            new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
-            $internalFieldState
-        );
-
-        /*
-         * Below here is just debug logging
-         */
-
-        // ObjectMappingDAO::SYNC_TO_MAUTIC
-        if (ObjectMappingDAO::SYNC_TO_MAUTIC === $fieldMappingDAO->getSyncDirection()) {
+    private function addFieldToObjectChange(
+        FieldMappingDAO $fieldMappingDAO,
+        ReportDAO $syncReport,
+        MappingManualDAO $mappingManual,
+        ReportObjectDAO $internalObject,
+        ReportObjectDAO $integrationObject,
+        ObjectChangeDAO $objectChange,
+    ): void {
+        // Skip adding fields for the pull process that should sync to integration only.
+        if (ObjectMappingDAO::SYNC_TO_INTEGRATION === $fieldMappingDAO->getSyncDirection()) {
             DebugLogger::log(
-                $this->mappingManual->getIntegration(),
+                $mappingManual->getIntegration(),
                 sprintf(
-                    'Integration to Mautic; syncing %s %s with a value of %s',
-                    $internalFieldState,
-                    $fieldMappingDAO->getInternalField(),
-                    var_export($newValue->getNormalizedValue(), true)
+                    "Integration to Mautic; the %s object's field %s was skipped because it's configured to sync to the integration",
+                    $internalObject->getObject(),
+                    $fieldMappingDAO->getInternalField()
                 ),
                 __CLASS__.':'.__FUNCTION__
             );
@@ -219,27 +125,81 @@ class ObjectChangeGenerator
             return;
         }
 
-        // ObjectMappingDAO::SYNC_TO_INTEGRATION:
-        DebugLogger::log(
-            $this->mappingManual->getIntegration(),
-            sprintf(
-                "Integration to Mautic; the %s object's %s field %s was added to the list of required fields because it's configured to sync to the integration",
-                $this->internalObject->getObject(),
+        try {
+            $integrationFieldState = $integrationObject->getField($fieldMappingDAO->getIntegrationField())->getState();
+            $internalFieldState    = $this->getFieldState(
+                $fieldMappingDAO->getInternalObject(),
+                $fieldMappingDAO->getInternalField(),
+                $integrationFieldState
+            );
+
+            $integrationInformationChangeRequest = $syncReport->getInformationChangeRequest(
+                $integrationObject->getObject(),
+                $integrationObject->getObjectId(),
+                $fieldMappingDAO->getIntegrationField()
+            );
+        } catch (FieldNotFoundException) {
+            return;
+        }
+
+        try {
+            // If syncing bidirectional, let the sync judge determine what value should be used for the field
+            if (ObjectMappingDAO::SYNC_BIDIRECTIONALLY === $fieldMappingDAO->getSyncDirection()) {
+                $this->judgeThenAddFieldToObjectChange($mappingManual, $internalObject, $fieldMappingDAO, $integrationInformationChangeRequest, $objectChange, $internalFieldState);
+
+                return;
+            }
+
+            $newValue = $this->valueHelper->getValueForMautic(
+                $integrationInformationChangeRequest->getNewValue(),
                 $internalFieldState,
-                $fieldMappingDAO->getInternalField()
+                $fieldMappingDAO->getSyncDirection()
+            );
+        } catch (RequiredValueException $e) {
+            $isNewObject = (null === $internalObject->getObjectId());
+
+            $this->notifyAboutInvalidValue($e, $fieldMappingDAO, $integrationInformationChangeRequest, $isNewObject);
+
+            if ($isNewObject) {
+                // Empty required field for new contact means completely rejected contact from sync
+                throw new ObjectSyncSkippedException(sprintf("Skipping creating lead '%s' because required value for internal field '%s' is empty", $integrationInformationChangeRequest->getObjectId(), $fieldMappingDAO->getInternalField()));
+            }
+
+            return; // Empty required field for existing contact is skipped
+        } catch (InvalidValueException) {
+            return; // Field has to be skipped
+        }
+
+        // Add the value to the field based on the field state
+        $objectChange->addField(
+            new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
+            $internalFieldState
+        );
+
+        // ObjectMappingDAO::SYNC_TO_MAUTIC
+        DebugLogger::log(
+            $mappingManual->getIntegration(),
+            sprintf(
+                'Integration to Mautic; syncing %s %s with a value of %s',
+                $internalFieldState,
+                $fieldMappingDAO->getInternalField(),
+                var_export($newValue->getNormalizedValue(), true)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 
     private function judgeThenAddFieldToObjectChange(
+        MappingManualDAO $mappingManual,
+        ReportObjectDAO $internalObject,
         FieldMappingDAO $fieldMappingDAO,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
-        string $fieldState
+        ObjectChangeDAO $objectChange,
+        string $fieldState,
     ): void {
         try {
-            $internalField = $this->internalObject->getField($fieldMappingDAO->getInternalField());
-        } catch (FieldNotFoundException $exception) {
+            $internalField = $internalObject->getField($fieldMappingDAO->getInternalField());
+        } catch (FieldNotFoundException) {
             $internalField = null;
         }
 
@@ -250,21 +210,21 @@ class ObjectChangeGenerator
                 $fieldMappingDAO->getSyncDirection()
             );
 
-            $this->objectChange->addField(
+            $objectChange->addField(
                 new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
                 $fieldState
             );
 
             DebugLogger::log(
-                $this->mappingManual->getIntegration(),
+                $mappingManual->getIntegration(),
                 sprintf(
                     "Integration to Mautic; the sync is bidirectional but no conflicts were found so syncing the %s object's %s field %s with a value of %s",
-                    $this->internalObject->getObject(),
+                    $internalObject->getObject(),
                     $fieldState,
                     $fieldMappingDAO->getInternalField(),
                     var_export($newValue->getNormalizedValue(), true)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -272,13 +232,13 @@ class ObjectChangeGenerator
 
         $internalInformationChangeRequest = new InformationChangeRequestDAO(
             MauticSyncDataExchange::NAME,
-            $this->internalObject->getObject(),
-            $this->internalObject->getObjectId(),
+            $internalObject->getObject(),
+            $internalObject->getObjectId(),
             $internalField->getName(),
             $internalField->getValue()
         );
 
-        $possibleChangeDateTime = $this->internalObject->getChangeDateTime();
+        $possibleChangeDateTime = $internalObject->getChangeDateTime();
         $certainChangeDateTime  = $internalField->getChangeDateTime();
 
         // If we know certain change datetime and it's newer than possible change datetime
@@ -294,24 +254,26 @@ class ObjectChangeGenerator
         foreach ($this->judgementModes as $judgeMode) {
             try {
                 $this->makeJudgement(
+                    $mappingManual,
                     $judgeMode,
                     $fieldMappingDAO,
+                    $objectChange,
                     $integrationInformationChangeRequest,
                     $internalInformationChangeRequest,
                     $fieldState
                 );
 
                 break;
-            } catch (ConflictUnresolvedException $exception) {
+            } catch (ConflictUnresolvedException) {
                 DebugLogger::log(
-                    $this->mappingManual->getIntegration(),
+                    $mappingManual->getIntegration(),
                     sprintf(
                         'Integration to Mautic; no winner was determined using the %s judging mode for object %s field %s',
                         $judgeMode,
-                        $this->internalObject->getObject(),
+                        $internalObject->getObject(),
                         $fieldMappingDAO->getInternalField()
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }
@@ -321,11 +283,13 @@ class ObjectChangeGenerator
      * @throws ConflictUnresolvedException
      */
     private function makeJudgement(
+        MappingManualDAO $mappingManual,
         string $judgeMode,
         FieldMappingDAO $fieldMappingDAO,
+        ObjectChangeDAO $objectChange,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
         InformationChangeRequestDAO $internalInformationChangeRequest,
-        string $fieldState
+        string $fieldState,
     ): void {
         $winningChangeRequest = $this->syncJudge->adjudicate(
             $judgeMode,
@@ -339,13 +303,13 @@ class ObjectChangeGenerator
             $fieldMappingDAO->getSyncDirection()
         );
 
-        $this->objectChange->addField(
+        $objectChange->addField(
             new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
             $fieldState
         );
 
         DebugLogger::log(
-            $this->mappingManual->getIntegration(),
+            $mappingManual->getIntegration(),
             sprintf(
                 "Integration to Mautic; sync judge determined to sync %s to the %s object's %s field %s with a value of %s using the %s judging mode",
                 $winningChangeRequest->getIntegration(),
@@ -355,14 +319,11 @@ class ObjectChangeGenerator
                 var_export($newValue->getNormalizedValue(), true),
                 $judgeMode
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 
-    /**
-     * @return string
-     */
-    private function getFieldState(string $object, string $field, string $integrationFieldState)
+    private function getFieldState(string $object, string $field, string $integrationFieldState): string
     {
         // If this is a Mautic required field, return required
         if (isset($this->fieldHelper->getRequiredFields($object)[$field])) {
@@ -370,5 +331,39 @@ class ObjectChangeGenerator
         }
 
         return $integrationFieldState;
+    }
+
+    private function notifyAboutInvalidValue(
+        InvalidValueException $e,
+        FieldMappingDAO $fieldMappingDAO,
+        InformationChangeRequestDAO $integrationInformationChangeRequest,
+        bool $isNewObject,
+    ): void {
+        $newObjectSkippedMessagePart = ($isNewObject) ? ' New object sync skipped.' : '';
+
+        $message = sprintf(
+            "Field '%s' for object ID '%s' mapped to internal '%s' with value '%s'",
+            $integrationInformationChangeRequest->getField(),
+            $integrationInformationChangeRequest->getObjectId(),
+            $fieldMappingDAO->getIntegrationField(),
+            $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
+        );
+
+        $deduplicateValue = static::class.'-'.
+            $integrationInformationChangeRequest->getIntegration().'-'.
+            $fieldMappingDAO->getInternalObject().'-'.
+            $integrationInformationChangeRequest->getField();
+
+        $this->bulkNotification->addNotification(
+            $deduplicateValue,
+            $e->getMessage().$newObjectSkippedMessagePart,
+            $integrationInformationChangeRequest->getIntegration(),
+            $fieldMappingDAO->getIntegrationObject(),
+            $fieldMappingDAO->getInternalObject(),
+            0,
+            $message
+        );
+
+        $this->bulkNotification->flush();
     }
 }

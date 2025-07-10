@@ -1,0 +1,36 @@
+{% set extraMenu = menuRender('extra') %}
+{% if extraMenu is not empty %}
+    <!-- start: sidebar-header -->
+    <div class="sidebar-header">
+        <a class="mautic-brand{{ extraMenu is empty ? '' : ' pull-left pl-0 pr-0' }}" href="#">
+            <div class="dropdown extra-menu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                    <i class="ri-arrow-down-s-line ri-lg"></i>
+                </a>
+                {{ extraMenu }}
+            </div>
+        </a>
+    </div>
+    <!--/ end: sidebar-header -->
+{% endif %}
+
+
+<!-- start: sidebar-content -->
+<div class="sidebar-content">
+    <!-- scroll-content -->
+    <div class="scroll-content slimscroll">
+        <!-- start: navigation -->
+        <nav class="nav-sidebar">
+            {{ customContent('menu.above', _context) }}
+            {{ menuRender('main') }}
+
+            <!-- start: left nav -->
+            <ul class="nav sidebar-left-dark"></ul>
+            <!--/ end: left nav -->
+
+        </nav>
+        <!--/ end: navigation -->
+    </div>
+    <!--/ scroll-content -->
+</div>
+<!--/ end: sidebar-content -->

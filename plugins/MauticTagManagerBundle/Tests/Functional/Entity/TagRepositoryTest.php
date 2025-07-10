@@ -5,27 +5,17 @@ namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
-use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use PHPUnit\Framework\Assert;
 
 class TagRepositoryTest extends MauticMysqlTestCase
 {
-    /**
-     * @var TagRepository
-     */
-    private $tagRepository;
-
-    /**
-     * @var TagModel
-     */
-    private $tagModel;
+    private TagRepository $tagRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->tagRepository = self::$container->get('mautic.tagmanager.repository.tag');
-        $this->tagModel      = self::$container->get('mautic.tagmanager.repository.tag');
+        $this->tagRepository = self::getContainer()->get('mautic.tagmanager.repository.tag');
 
         $tags = [
             'tag1',
@@ -37,7 +27,7 @@ class TagRepositoryTest extends MauticMysqlTestCase
         foreach ($tags as $tagName) {
             $tag = new Tag();
             $tag->setTag($tagName);
-            $this->tagModel->saveEntity($tag);
+            $this->tagRepository->saveEntity($tag);
         }
     }
 

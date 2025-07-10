@@ -1,0 +1,36 @@
+{% set contentOnly = true %}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'social' %}
+{% block headerTitle '' %}
+
+{% block content %}
+{% set data = data|json_encode %}
+<script>
+function postFormHandler() {
+    var opener = window.opener;
+    if (opener && typeof opener.postAuthCallback == 'function') {
+        opener.postAuthCallback({$data});
+    } else {
+        Mautic.refreshIntegrationForm();
+    }
+    window.close()
+}
+{% if message is not empty and 'success' is same as alert %}
+(function() { postFormHandler(); })();
+{% endif %}
+</script>
+
+{% if message is not empty %}
+    <div class="alert alert-{{ alert }}">
+        {{ message|purify }}
+    </div>
+{% endif %}
+<div class="row">
+    <div class="col-sm-12 text-center">
+        <a class="btn btn-lg btn-primary" href="javascript:void(0);" onclick="postFormHandler();">
+            {{ 'mautic.integration.closewindow'|trans }}
+        </a>
+    </div>
+</div>
+{% endblock %}

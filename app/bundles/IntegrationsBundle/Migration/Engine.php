@@ -2,49 +2,22 @@
 
 declare(strict_types=1);
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\IntegrationsBundle\Migration;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
 class Engine
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private string $migrationsPath;
 
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
-    /**
-     * @var string
-     */
-    private $migrationsPath;
-
-    /**
-     * @var string
-     */
-    private $bundleName;
-
-    public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath, string $bundleName)
-    {
-        $this->entityManager  = $entityManager;
-        $this->tablePrefix    = $tablePrefix;
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private string $tablePrefix,
+        string $pluginPath,
+        private string $bundleName,
+    ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
-        $this->bundleName     = $bundleName;
     }
 
     /**
@@ -74,8 +47,13 @@ class Engine
                 }
             }
 
-            $this->entityManager->commit();
-        } catch (DBALException $e) {
+            // PHP 8+ and pdo_mysql will autocommit a DDL transaction and therefore will throw "No active transaction"
+            // So check directly if the transaction is still active before committing
+            $connection = $this->entityManager->getConnection()->getNativeConnection();
+            if (!$connection instanceof \PDO || $connection->inTransaction()) {
+                $this->entityManager->commit();
+            }
+        } catch (\Doctrine\DBAL\Exception $e) {
             $this->entityManager->rollback();
 
             throw $e;
@@ -95,7 +73,7 @@ class Engine
         foreach ($migrationFileNames as $fileName) {
             require_once $this->migrationsPath.$fileName;
             $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className          = 'MauticPlugin\\'.$this->bundleName."\Migrations\\${className}";
+            $className          = 'MauticPlugin\\'.$this->bundleName."\Migrations\\{$className}";
             $migrationClasses[] = $className;
         }
 

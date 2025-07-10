@@ -1,0 +1,45 @@
+{% if upcomingEmails %}
+    <ul class="list-group mb-0 bdr-w-0">
+        {% for email in upcomingEmails %}
+            <li class="mb-md">
+                <div class="box-layout">
+                    {% if icons.email is defined and icons.email is not empty %}
+                        <div class="col-md-1 va-m">
+                            <h3><span class="fa {{ icons.email }} fw-sb text-success"></span></h3>
+                        </div>
+                    {% endif %}
+                    <div class="col-md-8 va-m">
+                        <h5 class="fw-sb text-primary">
+                            <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': email.campaign_id}) }}" data-toggle="ajax">
+                                {{ email.campaign_name }}
+                            </a>
+                        </h5>
+                        <span class="text-white dark-sm">
+                            {{ email.event_name }}
+                            {{'mautic.core.send.email.to'|trans|lower}}
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: email.lead_name ?: ('mautic.lead.lead'|trans ~ ' #' ~ email.lead_id),
+                                        variant: 'tertiary',
+                                        size: 'xs',
+                                        href: path('mautic_contact_action', {'objectAction': 'view', 'objectId': email.lead_id}),
+                                        attributes: {
+                                            'data-toggle': 'ajax',
+                                            'class': 'pr-sm pl-sm fs-12 ml-3'
+                                        }
+                                    }
+                                ]
+                            } %}
+                        </span>
+                    </div>
+                    <div class="col-md-4 va-m text-right small">
+                        {{ dateToFull(email.trigger_date) }}
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <div class="alert alert-warning" role="alert">{{ 'mautic.note.no.upcoming.emails'|trans }}</div>
+{% endif %}

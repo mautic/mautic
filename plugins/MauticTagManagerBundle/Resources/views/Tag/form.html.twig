@@ -1,0 +1,42 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}tagmanager{% endblock %}
+{% set id = form.vars['data'].getId() %}
+
+{% set header = id is empty ? 'mautic.tagmanager.menu.new'|trans : 'mautic.tagmanager.menu.edit'|trans({'%name%': entity.getTag()|trans}) %}
+{% block headerTitle %} {{ header }} {% endblock %}
+
+{% block content %}
+    {{- form_start(form) -}}
+    <div class="box-layout">
+        <div class="col-md-9 height-auto">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="nav nav-tabs nav-tabs-contained">
+                        <li class="active">
+                            <a href="#details" role="tab" data-toggle="tab">
+                                {% trans %}mautic.core.details{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- start: tab-content -->
+                    <div class="tab-content pa-md">
+                        <div class="tab-pane fade in active bdr-w-0" id="details">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {{- form_row(form.tag) -}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {{ form_row(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{- form_end(form) -}}
+{% endblock %}

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
@@ -71,7 +62,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         'professional',
     ];
 
-    public function testFormatFieldValues()
+    public function testFormatFieldValues(): void
     {
         $mockTrait = $this->getMockForTrait(CustomFieldRepositoryTrait::class, [], '', false, true, true, ['getCustomFieldList', 'getBaseColumns', 'getClassName', 'getFieldGroups']);
         $mockTrait->method('getCustomFieldList')
@@ -81,7 +72,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->will($this->returnValue($this->baseColumns));
 
         $mockTrait->method('getClassName')
-            ->will($this->returnValue('Mautic\LeadBundle\Entity\Lead'));
+            ->will($this->returnValue(\Mautic\LeadBundle\Entity\Lead::class));
 
         $mockTrait->method('getFieldGroups')
             ->will($this->returnValue($this->fieldGroups));
@@ -133,7 +124,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         $this->assertSame($expected, $result);
     }
 
-    public function testFormatFieldValuesWhenAFieldIsUnpublished()
+    public function testFormatFieldValuesWhenAFieldIsUnpublished(): void
     {
         $mockTrait = $this->getMockForTrait(CustomFieldRepositoryTrait::class, [], '', false, true, true, ['getCustomFieldList', 'getBaseColumns', 'getClassName', 'getFieldGroups']);
         $mockTrait->method('getCustomFieldList')
@@ -143,7 +134,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->will($this->returnValue($this->baseColumns));
 
         $mockTrait->method('getClassName')
-            ->will($this->returnValue('Mautic\LeadBundle\Entity\Lead'));
+            ->will($this->returnValue(\Mautic\LeadBundle\Entity\Lead::class));
 
         $mockTrait->method('getFieldGroups')
             ->will($this->returnValue($this->fieldGroups));

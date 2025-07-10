@@ -1,61 +1,41 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
+use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MembershipManager
-     */
-    private $membershipManager;
-
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * CampaignActionChangeMembershipSubscriber constructor.
-     */
-    public function __construct(MembershipManager $membershipManager, CampaignModel $campaignModel)
-    {
-        $this->membershipManager = $membershipManager;
-        $this->campaignModel     = $campaignModel;
+    public function __construct(
+        private MembershipManager $membershipManager,
+        private CampaignModel $campaignModel,
+        private InfiniteLoopValidator $infiniteLoopValidator,
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                    => ['addAction', 0],
             CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP => ['changeMembership', 0],
+            EntityValidateEvent::class                           => ['validateInfiniteLoop', 0],
         ];
     }
 
     /**
      * Add change membership action.
      */
-    public function addAction(CampaignBuilderEvent $event)
+    public function addAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'campaign.addremovelead',
@@ -71,7 +51,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         );
     }
 
-    public function changeMembership(PendingEvent $event)
+    public function changeMembership(PendingEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
         $contacts            = $event->getContactsKeyedById();
@@ -96,7 +76,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
             /** @var Campaign $campaign */
             foreach ($campaigns as $campaign) {
                 $this->membershipManager->removeContacts(
-                    $contacts,
+                    $event->getContactsKeyedById(),
                     $campaign,
                     true
                 );
@@ -104,6 +84,27 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         }
 
         $event->passAll();
+    }
+
+    public function validateInfiniteLoop(EntityValidateEvent $event): void
+    {
+        $campaignEvent = $event->getEntity();
+
+        if (!$campaignEvent instanceof Event) {
+            return;
+        }
+
+        if ('campaign.addremovelead' !== $campaignEvent->getType()) {
+            return;
+        }
+
+        $this->infiniteLoopValidator->validateEvent(
+            $event->getContext(),
+            $campaignEvent->getTriggerMode(),
+            $campaignEvent->getProperties()['addTo'],
+            $campaignEvent->getTriggerInterval(),
+            $campaignEvent->getTriggerIntervalUnit()
+        );
     }
 
     /**

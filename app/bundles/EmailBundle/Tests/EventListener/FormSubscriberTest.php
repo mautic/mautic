@@ -12,8 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ReflectionException;
-use ReflectionMethod;
 
 class FormSubscriberTest extends TestCase
 {
@@ -43,11 +41,11 @@ class FormSubscriberTest extends TestCase
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function testGetCurrentLeadWithLeadInFeedback(): void
     {
-        $reflection = new ReflectionMethod($this->formSubscriber, 'getCurrentLead');
+        $reflection = new \ReflectionMethod($this->formSubscriber, 'getCurrentLead');
 
         $reflection->setAccessible(true);
 
@@ -58,11 +56,11 @@ class FormSubscriberTest extends TestCase
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function testGetCurrentLeadWithoutLeadInFeedback(): void
     {
-        $reflection = new ReflectionMethod($this->formSubscriber, 'getCurrentLead');
+        $reflection = new \ReflectionMethod($this->formSubscriber, 'getCurrentLead');
 
         $reflection->setAccessible(true);
 

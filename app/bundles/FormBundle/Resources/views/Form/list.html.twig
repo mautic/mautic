@@ -1,0 +1,112 @@
+{#
+  Variables
+    - searchValue
+    - items
+    - totalItems
+    - page
+    - limit
+    - permissions
+    - security
+    - tmpl
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}form{% endblock %}
+
+{% block headerTitle %}
+  {{ 'mautic.form.forms'|trans }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+      {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'searchId': 'list-search',
+        'action': currentRoute,
+        'page_actions': {
+            'templateButtons': {
+                'new': permissions['form:forms:create']
+            },
+            'routeBase': 'form',
+            'langVar': 'form.form'
+        },
+        'bulk_actions': {
+          'routeBase': 'form',
+          'templateButtons': {
+              'delete': permissions['form:forms:deleteown'] or permissions['form:forms:deleteother'],
+          },
+          'customButtons': [
+              {
+                  'confirm': {
+                      'message': 'mautic.form.confirm_batch_rebuild'|trans,
+                      'confirmText': 'mautic.form.rebuild'|trans,
+                      'confirmAction': path('mautic_form_action', {'objectAction': 'batchRebuildHtml'}),
+                      'iconClass': 'fa ri-fw ri-refresh-line',
+                      'btnText': 'mautic.form.rebuild'|trans,
+                      'precheck': 'batchActionPrecheck',
+                      'confirmCallback': 'executeBatchAction',
+                  },
+                  'primary': true,
+              },
+          ],
+        },
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.available',
+                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.unavailable',
+                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                'icon': 'ri-close-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isuncategorized',
+                'label': 'mautic.core.form.uncategorized',
+                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                'icon': 'ri-folder-unknow-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            },
+            {
+                'search': 'mautic.form.form.searchcommand.isexpired',
+                'label': 'mautic.core.form.no_longer_available',
+                'tooltip': 'mautic.form.form.searchcommand.isexpired.description',
+                'icon': 'ri-time-line'
+            },
+            {
+                'search': 'mautic.form.form.searchcommand.ispending',
+                'label': 'mautic.core.form.not_yet_available',
+                'tooltip': 'mautic.form.form.searchcommand.ispending.description',
+                'icon': 'ri-timer-line'
+            },
+            {
+                'search': 'has:results',
+                'label': 'mautic.core.search.quickfilter.form_results',
+                'tooltip': 'mautic.core.search.quickfilter.form_results.tooltip',
+                'icon': 'ri-file-list-2-line'
+            }
+        ]
+    }) -}}
+
+        <div class="page-list">
+          {{ include('@MauticForm/Form/_list.html.twig') }}
+        </div>
+    </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.forms.redirect', 'mautic.protip.forms.minimize', 'mautic.protip.forms.language', 'mautic.protip.forms.multistep'])
+  }) }}
+  {% else %}
+    {{ include('@MauticForm/Form/_list.html.twig') }}
+  {% endif %}
+{% endblock %}

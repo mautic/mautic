@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,22 +17,19 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FilePathResolver
      */
-    private $filePathResolver;
+    private MockObject $filePathResolver;
 
     /**
      * @var MockObject|FileProperties
      */
-    private $fileProperties;
+    private MockObject $fileProperties;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
-    /**
-     * @var FileHandler
-     */
-    private $fileHandler;
+    private FileHandler $fileHandler;
 
     protected function setUp(): void
     {
@@ -151,6 +139,35 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($filePath, '/some/path/csv_reports/report_33.zip');
 
         $this->fileHandler->moveZipToPermanentLocation($report, $filePath);
+    }
+
+    public function testDeleteCompressedCsvFileForReportId(): void
+    {
+        $reportId   = 33;
+        $tempDir    = sys_get_temp_dir();
+        $reportsDir = $tempDir.'/csv_reports';
+        $fileName   = "report_{$reportId}.zip";
+        $filePath   = $reportsDir.'/'.$fileName;
+
+        if (!file_exists($reportsDir)) {
+            mkdir($reportsDir);
+        }
+
+        $this->createTmpFile('csv_reports/'.$fileName);
+
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('report_temp_dir')
+            ->willReturn($tempDir);
+
+        $this->filePathResolver->expects($this->once())
+            ->method('delete')
+            ->with($filePath);
+
+        $this->fileHandler->deleteCompressedCsvFileForReportId($reportId);
+
+        unlink($filePath);
+        rmdir($reportsDir);
     }
 
     private function createTmpFile(string $name = 'test.csv', string $content = ''): string

@@ -1,0 +1,10 @@
+<div class="container-fluid">
+  <div class="img-grid row">
+    {% for a in activity %}
+      {% if not loop.first and loop.index0 is divisible by(3) %}</div><div class="row">{% endif %}
+      <div class="col-xs-4 social-image">
+        <a href="javascript: void(0);" onclick="Mautic.showSocialMediaImageModal('{{ a.url }}');"><img class="img-responsive img-thumbnail" src="{{ a.url }}" /></a>
+      </div>
+    {% endfor %}
+  </div>
+</div>

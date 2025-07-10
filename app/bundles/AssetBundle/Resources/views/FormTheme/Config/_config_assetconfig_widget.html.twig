@@ -1,0 +1,17 @@
+{% block _config_assetconfig_widget %}
+<h4 class="fw-sb mt-48 mb-xs">{% trans %}mautic.config.tab.assetconfig{% endtrans %}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.assetconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                {% for f in form.children %}
+                <div class="col-xs-12">
+                    {{ form_row(f) }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

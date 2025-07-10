@@ -2,19 +2,12 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -22,28 +15,23 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\EventListener\CompanyObjectSubscriber;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use Mautic\LeadBundle\Entity\Company as CompanyEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
 class CompanyObjectSubscriberTest extends TestCase
 {
-    /**
-     * @var CompanyObjectHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $companyObjectHelper;
+    private CompanyObjectHelper|MockObject $companyObjectHelper;
 
-    /**
-     * @var Router|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $router;
+    private Router|MockObject $router;
 
-    /**
-     * @var CompanyObjectHelper
-     */
-    private $subscriber;
+    private CompanyObjectSubscriber $subscriber;
 
     public function setUp(): void
     {
@@ -71,6 +59,7 @@ class CompanyObjectSubscriberTest extends TestCase
                 ],
                 IntegrationEvents::INTEGRATION_FIND_OWNER_IDS              => ['findOwnerIdsForCompanies', 0],
                 IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => ['buildCompanyRoute', 0],
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD        => ['findCompanyById', 0],
             ],
             CompanyObjectSubscriber::getSubscribedEvents()
         );
@@ -103,16 +92,19 @@ class CompanyObjectSubscriberTest extends TestCase
 
     public function testUpdateCompaniesWithRightObject(): void
     {
-        $event = new InternalObjectUpdateEvent(new Company(), [123], [['id' => 345]]);
+        $objectChangeDAO = new ObjectChangeDAO('integration', 'object', 'objectId', 'mappedObject', 'mappedId');
 
+        $event = new InternalObjectUpdateEvent(new Company(), [123], [$objectChangeDAO]);
+
+        $objectMapping = $this->createMock(UpdatedObjectMappingDAO::class);
         $this->companyObjectHelper->expects($this->once())
             ->method('update')
-            ->with([123], [['id' => 345]])
-            ->willReturn([['object_mapping_1']]);
+            ->with([123], [$objectChangeDAO])
+            ->willReturn([$objectMapping]);
 
         $this->subscriber->updateCompanies($event);
 
-        $this->assertSame([['object_mapping_1']], $event->getUpdatedObjectMappings());
+        $this->assertSame([$objectMapping], $event->getUpdatedObjectMappings());
     }
 
     public function testCreateCompaniesWithWrongObject(): void
@@ -131,14 +123,15 @@ class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectCreateEvent(new Company(), [['somefield' => 'somevalue']]);
 
+        $objectMapping = $this->createMock(ObjectMapping::class);
         $this->companyObjectHelper->expects($this->once())
             ->method('create')
             ->with([['somefield' => 'somevalue']])
-            ->willReturn([['object_mapping_1']]);
+            ->willReturn([$objectMapping]);
 
         $this->subscriber->createCompanies($event);
 
-        $this->assertSame([['object_mapping_1']], $event->getObjectMappings());
+        $this->assertSame([$objectMapping], $event->getObjectMappings());
     }
 
     public function testFindCompaniesByIdsWithWrongObject(): void
@@ -329,5 +322,39 @@ class CompanyObjectSubscriberTest extends TestCase
         $this->subscriber->buildCompanyRoute($event);
 
         $this->assertSame('some/route', $event->getRoute());
+    }
+
+    public function testFindCompanyById(): void
+    {
+        $event = new InternalObjectFindByIdEvent(new Company());
+        $event->setId(1);
+        $companyObj = $this->createMock(CompanyEntity::class);
+        $this->companyObjectHelper->expects($this->once())
+            ->method('findObjectById')
+            ->with(1)
+            ->willReturn($companyObj);
+        $this->subscriber->findCompanyById($event);
+        self::assertSame($companyObj, $event->getEntity());
+    }
+
+    public function testFindCompanyByIdWithNoIdSet(): void
+    {
+        $event = new InternalObjectFindByIdEvent(new Company());
+        $this->companyObjectHelper->expects($this->never())
+            ->method('findObjectById');
+        $this->subscriber->findCompanyById($event);
+        self::assertNull($event->getEntity());
+    }
+
+    public function testFindCompanyByIdWithNoCompany(): void
+    {
+        $event = new InternalObjectFindByIdEvent(new Company());
+        $event->setId(1);
+        $this->companyObjectHelper->expects($this->once())
+            ->method('findObjectById')
+            ->with(1)
+            ->willReturn(null);
+        $this->subscriber->findCompanyById($event);
+        self::assertNull($event->getEntity());
     }
 }

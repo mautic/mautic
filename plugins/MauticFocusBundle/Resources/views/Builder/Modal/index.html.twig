@@ -1,0 +1,40 @@
+{%- set props = focus.properties -%}
+{%- set style = focus.style -%}
+{%- set placement = props[style].placement is defined ? props[style].placement|replace({'_': '-'}) : false -%}
+{%- set animate = not preview and props.animate is defined and props.animate == 1 -%}
+<style scoped>
+    .mf-{{ style }} {
+        border-color: #{{ props.colors.primary }};
+    }
+</style>
+<div class="mautic-focus mf-{{ style }} {% if placement %}mf-{{ style }}-{{ placement }}{% endif %} {% if animate %}mf-animate{% endif %}">
+    <div class="mf-{{ style }}-container">
+        <div class="mf-{{ style }}-close">
+            <a href="javascript:void(0)" {% if not preview %}onclick="Mautic.closeFocusModal('{{ style }}')"{% endif %}>x</a>
+        </div>
+        <div class="mf-content">
+            {% if htmlMode in ['editor', 'html'] %}
+                {{ focus[htmlMode]|raw }}
+            {% else %}
+              <div class="mf-headline">{{ props['content']['headline'] }}</div>
+              {% if props['content']['tagline'] is defined %}
+                  <div class="mf-tagline">{{ props['content']['tagline'] }}</div>
+              {% endif %}
+              <div class="mf-inner-container">
+                  {% if 'form' == focus.type %}
+                      {focus_form}
+                  {% elseif 'link' == focus.type %}
+                      <a href="{% if not preview %}{{ clickUrl }}{% else %}#{% endif %}"
+                         class="mf-link"
+                         target="{% if props.content.link_new_window %}_new{% else %}_parent{% endif %}">
+                          {{ props['content']['link_text'] }}
+                      </a>
+                  {% endif %}
+              </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% if 'modal' == style %}
+    <div class="mf-move-to-parent mf-{{ style }}-overlay mf-{{ style }}-overlay-{{ focus['id'] }}"></div>
+{% endif %}

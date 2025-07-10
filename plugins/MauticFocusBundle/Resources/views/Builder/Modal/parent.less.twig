@@ -1,0 +1,46 @@
+{{ include('@MauticFocus/Builder/Modal/animations.less.twig', with_context=false) }}
+{{ include('@MauticFocus/Builder/Modal/overlay.less.twig', with_context=false) }}
+.mf-modal-iframe {
+    position: fixed;
+    z-index: 21003;
+    left: 50%;
+
+    &.mf-animate {
+        .modalAnimate();
+    }
+
+    &.mf-modal-iframe-top {
+        top: 10px;
+        margin-top: -100%;
+        .modalTranslate(-50%, 0);
+
+        &.mf-animate {
+            .modalAnimateName(mf-modal-slide-down-top);
+        }
+    }
+
+    &.mf-modal-iframe-middle {
+        top: 50%;
+        margin-top: -100%;
+        .modalTranslate(-50%, -50%);
+
+        &.mf-animate {
+            .modalAnimateName(mf-modal-slide-down-middle);
+        }
+    }
+
+    &.mf-modal-iframe-bottom {
+        bottom: 10px;
+        margin-bottom: -100%;
+        .modalTranslate(-50%, 0);
+
+        &.mf-animate {
+            .modalAnimateName(mf-modal-slide-up-bottom);
+        }
+    }
+
+    &.mf-loaded {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}

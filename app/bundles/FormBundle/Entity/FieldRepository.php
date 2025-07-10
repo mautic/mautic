@@ -1,21 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\FormBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FieldRepository.
+ * @extends CommonRepository<Field>
  */
 class FieldRepository extends CommonRepository
 {
+    public function fieldExistsByFormAndType(int $formId, string $type): bool
+    {
+        return (bool) $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.Field::TABLE_NAME, 'f')
+            ->where('f.type = :type')
+            ->andWhere('f.form_id = :formId')
+            ->setParameter('type', $type)
+            ->setParameter('formId', $formId)
+            ->executeQuery()
+            ->fetchOne();
+    }
 }

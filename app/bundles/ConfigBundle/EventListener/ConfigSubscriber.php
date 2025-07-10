@@ -1,31 +1,23 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ConfigChangeLogger
-     */
-    private $configChangeLogger;
-
-    public function __construct(ConfigChangeLogger $configChangeLogger)
-    {
-        $this->configChangeLogger = $configChangeLogger;
+    public function __construct(
+        private ConfigChangeLogger $configChangeLogger,
+        private IpAddressRepository $ipAddressRepository,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuditLogRepository $auditLogRepository,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -38,10 +30,23 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function onConfigPostSave(ConfigEvent $event): void
     {
         if ($originalNormData = $event->getOriginalNormData()) {
+            $normData = $event->getNormData();
             // We have something to log
             $this->configChangeLogger
                 ->setOriginalNormData($originalNormData)
-                ->log($event->getNormData());
+                ->log($normData);
+
+            if (!isset($originalNormData['trackingconfig']) && !isset($normData['trackingconfig'])) {
+                return;
+            }
+
+            $oldAnonymizeIp = $originalNormData['trackingconfig']['parameters']['anonymize_ip'];
+            $newAnonymizeIp = $normData['trackingconfig']['anonymize_ip'];
+
+            if ($oldAnonymizeIp !== $newAnonymizeIp && $newAnonymizeIp && !$this->coreParametersHelper->get('anonymize_ip_address_in_background', false)) {
+                $this->ipAddressRepository->anonymizeAllIpAddress();
+                $this->auditLogRepository->anonymizeAllIpAddress();
+            }
         }
     }
 }

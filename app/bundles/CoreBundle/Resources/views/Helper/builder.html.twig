@@ -1,0 +1,18 @@
+{#
+  Variables
+    - type
+    - isCodeMode
+    - objectId
+    - previewUrl
+#}
+<div class="hide builder {{ type }}-builder {% if isCodeMode %}code-mode{% endif %}">
+    <div class="builder-content">
+        <input type="hidden" id="builder_url" value="{{ path('mautic_' ~ type ~ '_action', {'objectAction': 'builder', 'objectId': objectId}) }}" />
+    </div>
+    <div class="builder-panel">
+        <div class="code-editor {% if not isCodeMode %}hide{% endif %}">
+            <div id="customHtmlContainer"></div>
+            <i class="text-secondary">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans|purify }}</i>
+        </div>
+    </div>
+</div>

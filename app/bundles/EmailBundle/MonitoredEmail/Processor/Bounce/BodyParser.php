@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -17,17 +8,12 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-/**
- * Class BodyParser.
- */
 class BodyParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message, $contactEmail = null)
+    public function getBounce(Message $message, $contactEmail = null): BouncedEmail
     {
         $report = $this->parse($message->textPlain, $contactEmail);
 
@@ -48,12 +34,9 @@ class BodyParser
     /**
      * @todo - refactor to get rid of the if/else statements
      *
-     * @param        $body
      * @param string $knownEmail
-     *
-     * @return array
      */
-    public function parse($body, $knownEmail = '')
+    public function parse($body, $knownEmail = ''): array
     {
         // initialize the result array
         $result = [

@@ -1,33 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Controller;
 
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function categoryListAction(Request $request)
+    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
-        $bundle    = InputHelper::clean($request->query->get('bundle'));
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->getModel('category')->getLookupResults($bundle, $filter, 10);
+        $bundle        = InputHelper::clean($request->query->get('bundle'));
+        $filter        = InputHelper::clean($request->query->get('filter'));
+        $categoryModel = $this->getModel('category');
+        \assert($categoryModel instanceof CategoryModel);
+        $results   = $categoryModel->getLookupResults($bundle, $filter, 10);
         $dataArray = [];
         foreach ($results as $r) {
             $dataArray[] = [

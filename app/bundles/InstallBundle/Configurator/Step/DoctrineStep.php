@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -29,6 +20,11 @@ class DoctrineStep implements StepInterface
      * Database host.
      */
     public $host = 'localhost';
+
+    /**
+     * Database host. Read Only Replica.
+     */
+    public ?string $host_ro = null;
 
     /**
      * Database table prefix.
@@ -76,12 +72,14 @@ class DoctrineStep implements StepInterface
      */
     public $backup_prefix = 'bak_';
 
+    public ?string $server_version;
+
     public function __construct(Configurator $configurator)
     {
         $parameters = $configurator->getParameters();
 
         foreach ($parameters as $key => $value) {
-            if (0 === strpos($key, 'db_')) {
+            if (str_starts_with($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;
                 $key                         = substr($key, 3);
                 $this->$key                  = $value;
@@ -89,26 +87,19 @@ class DoctrineStep implements StepInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return DoctrineStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         $messages = [];
 
         if (!class_exists('\PDO')) {
             $messages[] = 'mautic.install.pdo.mandatory';
         } else {
-            $drivers = \PDO::getAvailableDrivers();
-            if (0 == count($drivers)) {
+            if (!in_array('mysql', \PDO::getAvailableDrivers(), true)) {
                 $messages[] = 'mautic.install.pdo.drivers';
             }
         }
@@ -116,18 +107,15 @@ class DoctrineStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         return [];
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed[]
      */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         $parameters = [];
 
@@ -138,12 +126,9 @@ class DoctrineStep implements StepInterface
         return $parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
-        return 'MauticInstallBundle:Install:doctrine.html.php';
+        return '@MauticInstall/Install/doctrine.html.twig';
     }
 
     /**
@@ -151,24 +136,19 @@ class DoctrineStep implements StepInterface
      * Required in step.
      *
      * @see \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::buildForm()
-     *
-     * @return array
      */
-    public static function getDriverKeys()
+    public static function getDriverKeys(): array
     {
         return array_keys(static::getDrivers());
     }
 
     /**
      * Fetches the available database drivers for the environment.
-     *
-     * @return array
      */
-    public static function getDrivers()
+    public static function getDrivers(): array
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
-            'mysqli'    => 'MySQLi',
         ];
 
         $supported = [];
@@ -182,11 +162,6 @@ class DoctrineStep implements StepInterface
                     $supported['pdo_'.$driver] = $mauticSupported['pdo_'.$driver];
                 }
             }
-        }
-
-        // Add MySQLi if available
-        if (function_exists('mysqli_connect')) {
-            $supported['mysqli'] = $mauticSupported['mysqli'];
         }
 
         return $supported;

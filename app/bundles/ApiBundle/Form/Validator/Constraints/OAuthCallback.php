@@ -1,24 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Form\Validator\Constraints;
 
-use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator;
 use Symfony\Component\Validator\Constraint;
 
 class OAuthCallback extends Constraint
 {
     public $message = 'The callback URL is invalid.';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return OAuthCallbackValidator::class;
     }

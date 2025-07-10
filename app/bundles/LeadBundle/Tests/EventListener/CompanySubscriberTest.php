@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -20,7 +11,7 @@ use Mautic\LeadBundle\LeadEvents;
 
 class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $auditLogModel  = $this->createMock(AuditLogModel::class);
@@ -35,13 +26,13 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnCompanyPostSave()
+    public function testOnCompanyPostSave(): void
     {
         $this->onCompanyPostSaveMethodCall(false); // update company log
         $this->onCompanyPostSaveMethodCall(true); // create company log
     }
 
-    public function testOnCompanyDelete()
+    public function testOnCompanyDelete(): void
     {
         $companyId        = 1;
         $companyName      = 'name';
@@ -87,7 +78,7 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
      *
      * @param bool $isNew
      */
-    private function onCompanyPostSaveMethodCall($isNew)
+    private function onCompanyPostSaveMethodCall($isNew): void
     {
         $companyId = 1;
         $changes   = ['changes'];

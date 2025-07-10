@@ -1,0 +1,26 @@
+{% if updateMessage.message is not empty %}
+<div class="pt-sm pb-sm pr-md pl-md nm bdr-b alert-mautic mautic-update">
+    <h4 class="pull-left">{{ updateMessage.message|purify }}</h4>
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.update.now',
+                    variant: 'primary',
+                    icon: 'ri-refresh-line',
+                    danger: 'true',
+                    size: 'sm',
+                    href: path('mautic_core_update'),
+                    attributes: {
+                        'data-toggle': 'ajax',
+                        'class': 'mt-sm'
+                    },
+                    wide: true
+                }
+            ]
+        } %}
+    <div class="clearfix"></div>
+</div>
+{% endif %}
+{% for n in notifications %}
+    {{ include('@MauticCore/Notification/notification.html.twig', {n: n}) }}
+{% endfor %}

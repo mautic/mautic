@@ -2,39 +2,32 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\EventListener\SegmentReportSubscriber;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContext(): void
     {
-        $translatorMock          = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock   = $this->createMock(ChannelListHelper::class);
-        $reportHelperMock        = $this->createMock(ReportHelper::class);
-        $fieldsBuilderMock       = $this->createMock(FieldsBuilder::class);
-        $reportMock              = $this->createMock(Report::class);
-        $queryBuilder            = $this->createMock(QueryBuilder::class);
-        $reportBuilderEvent      = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'badContext', [], $reportHelperMock);
-        $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
+        $translatorMock                   = $this->createMock(TranslatorInterface::class);
+        $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
+        $reportMock                       = $this->createMock(Report::class);
+        $queryBuilder                     = $this->createMock(QueryBuilder::class);
+        $reportBuilderEvent               = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'badContext', [], $reportHelperMock);
+        $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
 
         $this->assertSame([], $reportBuilderEvent->getTables());
@@ -53,10 +46,9 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportBuilder(): void
     {
-        $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock = $this->createMock(ChannelListHelper::class);
-        $reportHelperMock      = $this->createMock(ReportHelper::class);
-        $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
+        $translatorMock                   = $this->createMock(TranslatorInterface::class);
+        $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
 
         $leadColumns = [
             'xx.yyy' => [
@@ -82,7 +74,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.', 'lll.')
             ->willReturn($filterColumns);
 
-        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], $reportHelperMock);
+        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper($this->createMock(EventDispatcherInterface::class)));
 
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
@@ -92,64 +84,64 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'display_name' => 'mautic.lead.report.segment.membership',
                 'columns'      => [
                     'xx.yyy' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'yyy',
                     ],
                     'lll.manually_removed' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'manually_removed',
                     ],
                     'lll.manually_added' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'manually_added',
                     ],
                     's.id' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'int',
                         'alias' => 's_id',
                     ],
                     's.name' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_name',
                     ],
                     's.created_by_user' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_created_by_user',
                     ],
                     's.date_added' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'datetime',
                         'alias' => 's_date_added',
                     ],
                     's.modified_by_user' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_modified_by_user',
                     ],
                     's.date_modified' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'datetime',
                         'alias' => 's_date_modified',
                     ],
                     's.description' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_description',
                     ],
                     's.is_published' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 's_is_published',
                     ],
                 ],
                 'filters' => [
                     'filter' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'text',
                         'alias' => 'filter',
                     ],
@@ -163,15 +155,11 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerate(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
-        $channelListHelperMock   = $this->createMock(ChannelListHelper::class);
-        $fieldsBuilderMock       = $this->createMock(FieldsBuilder::class);
-        $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
-        $reportMock              = $this->createMock(Report::class);
-        $queryBuilder            = $this->createMock(QueryBuilder::class);
+        $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
+        $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
+        $reportMock                       = $this->createMock(Report::class);
+        $queryBuilder                     = $this->createMock(QueryBuilder::class);
 
         $reportMock->expects($this->once())
             ->method('getSource')

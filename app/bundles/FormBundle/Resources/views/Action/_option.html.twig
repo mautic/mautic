@@ -1,0 +1,21 @@
+{#
+  Variables
+    - action
+    - type
+    - isStandalone
+    - formId
+#}
+{% set class = action.allowCampaignForm is not defined or action.allowCampaignForm is empty ? 'action-standalone-only' : '' %}
+{% if ( action.allowCampaignForm is not defined or action.allowCampaignForm is empty) and not isStandalone %}
+    {% set class = class ~ ' hide' %}
+{% endif %}
+<option id="action_{{ type }}"
+        class="{{ class }}"
+        data-toggle="ajaxmodal"
+        data-target="#formComponentModal"
+        data-href="{{ path('mautic_formaction_action', {
+            'objectAction': 'new',
+            'type': type,
+            'tmpl': 'action',
+            'formId': formId,
+        }) }}">{{ action['label']|trans }}</option>

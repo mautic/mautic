@@ -1,40 +1,51 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 
 /**
- * FormRepository.
+ * @extends CommonRepository<Form>
  */
 class FormRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
-        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+        $q = $this->createQueryBuilder('f');
+        $q->select('f');
+
+        // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
             ->select('count(fs.id)')
-            ->from('MauticFormBundle:Submission', 'fs')
+            ->from(Submission::class, 'fs')
             ->where('fs.form = f');
 
-        $q = $this->createQueryBuilder('f');
-        $q->select('f, ('.$sq->getDql().') as submission_count');
+        $q->addSelect('('.$sq->getDql().') as submission_count');
         $q->leftJoin('f.category', 'c');
 
         $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
+     */
+    public function getEntitiesForGlobalSearch(array $filter): Paginator
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('f');
+
+        $args = [
+            'qb'               => $q,
+            'filter'           => $filter,
+            'start'            => 0,
+            'limit'            => GlobalSearchEvent::RESULTS_LIMIT,
+            'ignore_paginator' => false,
+        ];
 
         return parent::getEntities($args);
     }
@@ -44,11 +55,8 @@ class FormRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param null   $formType
-     *
-     * @return array
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null)
+    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
@@ -79,10 +87,7 @@ class FormRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'f.name',
@@ -90,12 +95,9 @@ class FormRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $standardSearchParameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $standardSearchParameters];
         }
@@ -103,12 +105,12 @@ class FormRepository extends CommonRepository
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $parameters      = [];
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $q->expr()->andX(
+                $expr = $q->expr()->and(
                     $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishDown'),
                     $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
@@ -118,7 +120,7 @@ class FormRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
             case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $q->expr()->andX(
+                $expr = $q->expr()->and(
                     $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishUp'),
                     $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
@@ -130,8 +132,8 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults', [], null, 'en_US'):
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
-                    ->from('MauticFormBundle:Submission', 's')
-                    ->leftJoin('MauticFormBundle:Form', 'f2',
+                    ->from(Submission::class, 's')
+                    ->leftJoin(Form::class, 'f2',
                         Join::WITH,
                         $sq->expr()->eq('s.form', 'f2')
                     )
@@ -168,12 +170,10 @@ class FormRepository extends CommonRepository
     /**
      * Fetch the form results.
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getFormResults(Form $form, array $options = [])
+    public function getFormResults(Form $form, array $options = []): array
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
 
@@ -184,7 +184,8 @@ class FormRepository extends CommonRepository
             ->setParameter('formId', $form->getId());
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = '.(int) $options['leadId']);
+            $query->andWhere('fs.lead_id = :leadId')
+                ->setParameter('leadId', $options['leadId']);
         }
 
         if (!empty($options['formId'])) {
@@ -196,7 +197,7 @@ class FormRepository extends CommonRepository
             $query->setMaxResults((int) $options['limit']);
         }
 
-        return $query->execute()->fetchAll();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -204,18 +205,24 @@ class FormRepository extends CommonRepository
      *
      * @param int    $formId
      * @param string $formAlias
-     *
-     * @return string
      */
-    public function getResultsTableName($formId, $formAlias)
+    public function getResultsTableName($formId, $formAlias): string
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
 
+    public function getFormTableIdViaResults(string $resultsTableName): ?string
+    {
+        $regexp = '/.*'.MAUTIC_TABLE_PREFIX.'form_results_([0-9]+)_(.*)/i';
+        preg_match($regexp, $resultsTableName, $matches);
+
+        return $matches[1] ?? null;
+    }
+
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -232,20 +239,14 @@ class FormRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['f.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'f';
     }

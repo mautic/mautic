@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\ElFinderEnvVars;
@@ -39,7 +30,7 @@ class ElFinderEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testPathAndUrlSet()
+    public function testPathAndUrlSet(): void
     {
         $this->config->set('image_path', 'images');
         $this->config->set('site_url', 'https://foo.bar/test');
@@ -49,7 +40,7 @@ class ElFinderEnvVarsTest extends TestCase
         $this->assertEquals('https://foo.bar/test/images', $this->envVars->get('MAUTIC_EL_FINDER_URL'));
     }
 
-    public function testTrailingSlashHandled()
+    public function testTrailingSlashHandled(): void
     {
         $this->config->set('image_path', 'images/');
         $this->config->set('site_url', 'https://foo.bar/test/');
@@ -59,7 +50,7 @@ class ElFinderEnvVarsTest extends TestCase
         $this->assertEquals('https://foo.bar/test/images', $this->envVars->get('MAUTIC_EL_FINDER_URL'));
     }
 
-    public function testThatTheLocalRootHasPriorityOverTheKernelRootDir()
+    public function testThatTheLocalRootHasPriorityOverTheKernelRootDir(): void
     {
         $this->defaultConfig->set('local_root', '/foo/bar');
         $this->config->set('image_path', 'images/');

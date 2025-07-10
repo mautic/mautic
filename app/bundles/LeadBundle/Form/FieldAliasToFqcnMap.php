@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -21,6 +12,7 @@ use Mautic\CoreBundle\Form\Type\SelectType;
 use Mautic\CoreBundle\Form\Type\TelType;
 use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\LeadBundle\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Form\Type\HtmlType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -58,6 +50,7 @@ final class FieldAliasToFqcnMap
         'time'        => TimeType::class,
         'timezone'    => TimezoneType::class,
         'url'         => UrlType::class,
+        'html'        => HtmlType::class,
     ];
 
     public static function getFqcn(string $alias): string

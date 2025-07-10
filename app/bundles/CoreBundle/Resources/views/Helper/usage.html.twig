@@ -1,0 +1,32 @@
+{#
+Variables
+  - title
+  - stats
+  - noUsages
+#}
+
+{% if stats is defined and stats is not empty %}
+    <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel-heading">
+            <div class="panel-title">{{- title -}}</div>
+        </div>
+        <div class="panel-body pt-xs">
+            {% set hasDependences = false %}
+            {% for stat in stats %}
+                {% if stat.ids|length > 0 %}
+                    <a href="{{ path(stat.route, {'search': 'mautic.core.searchcommand.ids'|trans~':'~stat.ids|join(',')}) }}"
+                       class="btn btn-ghost mt-4">
+                        {{ stat.label|trans }}
+                        <span class="mt-xs label label-primary">{{ stat.ids|length }}</span>
+                    </a>
+                    {% set hasDependences = true %}
+                {% endif %}
+            {% endfor %}
+            {% if not hasDependences %}
+                <p class="text-secondary mb-0">
+                    {{ noUsages|default('mautic.core.usage.not_found'|trans) }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
@@ -21,44 +12,32 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
+    private ?Integration $integration = null;
 
-    /**
-     * @var Integration|null
-     */
-    private $integration;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
-    {
-        $this->integrationsHelper = $integrationsHelper;
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper,
+    ) {
     }
 
     /**
      * Restore the token data into the give token.
-     *
-     * @param TokenInterface|IntegrationToken $token
      *
      * @return TokenInterface|IntegrationToken Restored token
      */
     public function restoreToken(TokenInterface $token): TokenInterface
     {
         $apiKeys               = $this->getIntegration()->getApiKeys();
-        $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
+        $apiKeys['expires_at'] ??= null;
 
         return new IntegrationToken(
             empty($apiKeys['access_token']) ? null : $apiKeys['access_token'],
             empty($apiKeys['refresh_token']) ? null : $apiKeys['refresh_token'],
-            $apiKeys['expires_at'] ? $apiKeys['expires_at'] - time() : -1
+            $apiKeys['expires_at'] ?? null
         );
     }
 
     /**
      * Save the token data.
-     *
-     * @param TokenInterface|IntegrationToken $token
      */
     public function saveToken(TokenInterface $token): void
     {
@@ -91,7 +70,8 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $apiKeys = $integration->getApiKeys();
 
-        unset($apiKeys['access_token']);
+        // Must delete both the access token and the expiration in order for the middleware to refresh
+        unset($apiKeys['access_token'], $apiKeys['expires_at']);
 
         $integration->setApiKeys($apiKeys);
 

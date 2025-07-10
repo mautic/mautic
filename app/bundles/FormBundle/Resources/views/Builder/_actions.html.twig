@@ -1,0 +1,51 @@
+{#
+  Variables
+    - route (optional)
+    - id
+    - formId
+    - disallowDelete (optional)
+#}
+{% set route = route|default('mautic_formfield_action') %}
+
+<div class="form-buttons btn-group" role="group" aria-label="Field options">
+  {% include '@MauticCore/Helper/button.html.twig' with {
+      buttons: [
+          {
+              variant: 'ghost',
+              label: 'mautic.core.form.edit',
+              icon_only: true,
+              icon: 'ri-edit-line text-interactive',
+              size: 'sm',
+              href: path(route, {'objectAction': 'edit', 'objectId': id, 'formId': formId}),
+              attributes: {
+                  'data-toggle': 'ajaxmodal',
+                  'data-target': '#formComponentModal',
+                  'class': 'btn-edit'
+              }
+          }
+      ]
+  } %}
+
+  {% if disallowDelete is not defined or (disallowDelete is defined and false == disallowDelete) %}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                label: 'mautic.form.builder.formfield.remove_row',
+                variant: 'ghost',
+                danger: 'true',
+                icon_only: 'true',
+                size: 'sm',
+                icon: 'ri-delete-bin-line text-danger',
+                href: path(route, {'objectAction': 'delete', 'objectId': id, 'formId': formId}),
+                attributes: {
+                    'data-hide-panel': 'true',
+                    'data-toggle': 'ajax',
+                    'data-ignore-formexit': 'true',
+                    'data-method': 'POST',
+                    'data-hide-loadingbar': 'true'
+                }
+            }
+        ]
+    } %}
+  {% endif %}
+</div>

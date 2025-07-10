@@ -1,0 +1,19 @@
+{#
+  Variables
+    - event
+#}
+{%- set data = event.extra.log.metadata -%}
+{%- if data.failed is not defined -%}
+<dl class="dl-horizontal">
+    <dt>{{ 'mautic.notification.timeline.status'|trans }}</dt>
+    <dd>{{ data.status|trans }}</dd>
+    <dt>{{ 'mautic.notification.timeline.type'|trans }}</dt>
+    <dd>{{ data.type|trans }}</dd>
+</dl>
+<div class="small">
+    <hr />
+    <strong>{{ data.heading }}</strong>
+    <br />
+    {{ data.content }}
+</div>
+{%- endif -%}

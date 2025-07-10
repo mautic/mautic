@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EqualTo;
@@ -24,20 +16,11 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class FormFieldHelper.
- */
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private ValidatorInterface $validator;
 
-    /**
-     * @var array
-     */
-    private $types = [
+    private array $types = [
         'captcha' => [
             'constraints' => [
                 NotBlank::class => ['message' => 'mautic.form.submission.captcha.invalid'],
@@ -57,10 +40,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Email::class => ['message' => 'mautic.form.submission.email.invalid'],
             ],
         ],
-        'freetext' => [],
-        'freehtml' => [],
-        'hidden'   => [],
-        'number'   => [
+        'freetext'      => [],
+        'freehtml'      => [],
+        'hidden'        => [],
+        'companyLookup' => [],
+        'number'        => [
             'filter' => 'float',
         ],
         'pagebreak' => [],
@@ -79,12 +63,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'file' => [],
     ];
 
-    /**
-     * FormFieldHelper constructor.
-     *
-     * @param ValidatorInterface $validator
-     */
-    public function __construct(TranslatorInterface $translator, ValidatorInterface $validator = null)
+    public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
 
@@ -99,7 +78,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Set the translation key prefix.
      */
-    public function setTranslationKeyPrefix()
+    public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
@@ -116,47 +95,25 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $this->getChoiceList($customFields);
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }
 
-    /**
-     * Get fields input filter.
-     *
-     * @param $type
-     *
-     * @return string
-     */
-    public function getFieldFilter($type)
+    public function getFieldFilter(string $type): string
     {
-        if (array_key_exists($type, $this->types)) {
-            if (isset($this->types[$type]['filter'])) {
-                return $this->types[$type]['filter'];
-            }
-
-            return 'clean';
-        }
-
-        return 'alphanum';
+        return $this->types[$type]['filter'] ?? 'string';
     }
 
     /**
-     * @param       $type
-     * @param       $value
      * @param Field $f
-     *
-     * @return array
      */
-    public function validateFieldValue($type, $value, $f = null)
+    public function validateFieldValue($type, $value, $f = null): array
     {
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {
             foreach ($this->types[$type]['constraints'] as $constraint => $opts) {
-                //don't check empty values unless the constraint is NotBlank
+                // don't check empty values unless the constraint is NotBlank
                 if (NotBlank::class === $constraint && empty($value)) {
                     continue;
                 }
@@ -197,38 +154,46 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param $field
-     * @param $value
-     * @param $formName
-     * @param $formHtml
+     * Search and replace the HTML of the form field with the value.
      */
-    public function populateField($field, $value, $formName, &$formHtml)
+    public function populateField($field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 
+        // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
+        $fieldAttributeReadOnly = fn ($field, $sanitizedValue) => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
+
         switch ($field->getType()) {
             case 'text':
+            case 'number':
             case 'email':
             case 'hidden':
             case 'tel':
             case 'url':
             case 'date':
             case 'datetime':
-                if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
-                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.$this->sanitizeValue($value).'"'
-                        .$match[4].'/>';
+                if ('tel' === $field->getType()) {
+                    $sanitizedValue = InputHelper::clean($value);
+                } else {
+                    $sanitizedValue = $this->sanitizeValue($value);
+                }
+                if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
+                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
+                        .$match[4].$fieldAttributeReadOnly($field, $sanitizedValue).'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
                 if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.$this->sanitizeValue($value).'</textarea>';
+                    $value    = $this->sanitizeValue($value);
+                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].$fieldAttributeReadOnly($field, $value).'>'.$value.'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'checkboxgrp':
-                if (is_string($value) && strrpos($value, '|') > 0) {
-                    $value = explode('|', $value);
+                $separator = urlencode('|');
+                if (is_string($value) && strrpos($value, $separator) > 0) {
+                    $value = explode($separator, $value);
                 } elseif (!is_array($value)) {
                     $value = [$value];
                 }
@@ -236,7 +201,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 foreach ($value as $val) {
                     $val = $this->sanitizeValue($val);
                     if (preg_match(
-                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox_'.$alias.'(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
+                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox_'.$alias.'(.*?)"(.*?)value="'.$val.'"(.*?)\/?>/i',
                         $formHtml,
                         $match
                     )) {
@@ -248,7 +213,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 break;
             case 'radiogrp':
                 $value = $this->sanitizeValue($value);
-                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio_'.$alias.'(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
+                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio_'.$alias.'(.*?)"(.*?)value="'.$value.'"(.*?)\/?>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio_'.$alias.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
                         .' checked />';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
@@ -279,7 +244,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function sanitizeValue($value)
     {
         $valueType = gettype($value);
-        $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
+        $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));
         // for boolean expect 0 or 1
         if ('boolean' === $valueType) {
             return (int) $value;

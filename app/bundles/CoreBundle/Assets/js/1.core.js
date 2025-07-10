@@ -45,11 +45,50 @@ mQuery.ajaxSetup({
     cache: false
 });
 
-mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+// Attach document click handler once
+mQuery(document).on('click', function (e) {
+    var target = mQuery(e.target);
+    // Check if the click is outside the popover and its trigger
+    if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
+        mQuery('[data-toggle="popover"]').each(function () {
+            var $this = mQuery(this);
+            var popover = $this.data('bs.popover');
+            if (popover && popover.tip().hasClass('in')) {
+                $this.popover('hide');
+                popover.inState.click = false; // Reset the internal click state
+            }
+        });
+    }
+});
+
+mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.stopPageLoadingBar();
     if (xhr.responseJSON && xhr.responseJSON.flashes) {
         Mautic.setFlashes(xhr.responseJSON.flashes);
     }
+    Mautic.attachDismissHandlers();
+
+    // Initialize popovers with custom configuration
+    mQuery('[data-toggle="popover"]').popover({
+        sanitize: false,
+        content: function() {
+            return mQuery(this).data('content');
+        }
+    });
+
+    // Handle popover shown event
+    mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
+        // Initialize code blocks after popover is fully shown
+        Mautic.initializeCodeBlocks();
+
+        // Initialize other elements inside popover
+        mQuery('.popover-content select').chosen({
+            allow_single_deselect: true,
+            disable_search_threshold: 10
+        });
+
+        mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
+    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -57,6 +96,7 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
+    Mautic.initializeCodeBlocks();
 });
 
 mQuery( document ).ready(function() {
@@ -66,24 +106,41 @@ mQuery( document ).ready(function() {
         });
     }
 
+    Mautic.initListGroupToggle('body');
+
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
         if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {
             e.preventDefault();
         }
     });
+
+    // Try to keep alive the session.
+    setInterval(function() {
+        if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
+            mQuery.get('/s/keep-alive')
+                .fail(function(errorThrown) {
+                    console.error('Error with keep-alive:', errorThrown);
+                });
+        }
+    }, mauticSessionLifetime * 1000 / 2);
+
+    // Copy code blocks when clicked
+    mQuery(document).on('click', 'code', function(e) {
+        e.preventDefault();
+        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
+            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
+            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
+        });
+    });
+    Mautic.initializeCodeBlocks();
+    Mautic.attachDismissHandlers();
 });
 
-//Fix for back/forward buttons not loading ajax content with History.pushState()
-MauticVars.manualStateChange = true;
-
-if (typeof History != 'undefined') {
-    History.Adapter.bind(window, 'statechange', function () {
-        if (MauticVars.manualStateChange == true) {
-            //back/forward button pressed
-            window.location.reload();
-        }
-        MauticVars.manualStateChange = true;
+if (typeof history != 'undefined') {
+    //back/forward button pressed
+    window.addEventListener('popstate', function (event) {
+        window.location.reload();
     });
 }
 
@@ -99,8 +156,125 @@ MauticVars.intervalsInProgress   = {};
 
 var Mautic = {
     loadedContent: {},
-
     keyboardShortcutHtml: {},
+
+    /**
+     * Initializes dismissed elements by injecting necessary CSS.
+     */
+    initializeDismissedElements: function() {
+        // Ensure MauticVars and dismissedElements exist
+        this.dismissedElements = JSON.parse(localStorage.getItem('dismissedElements')) || [];
+        this.dismissedStyle = null;
+
+        if (this.dismissedElements.length > 0) {
+            // Combine IDs with commas for efficient CSS
+            var selector = this.dismissedElements.map(function(id) {
+                return '#' + id;
+            }).join(', ');
+
+            var css = selector + ' { display: none !important; }';
+
+            // Create a style element and append the CSS
+            this.dismissedStyle = document.createElement('style');
+            this.dismissedStyle.type = 'text/css';
+            this.dismissedStyle.appendChild(document.createTextNode(css));
+
+            // Append the style element to the document head
+            var head = document.head || document.getElementsByTagName('head')[0];
+            head.appendChild(this.dismissedStyle);
+        }
+    },
+
+    /**
+     * Dismisses an element by ID.
+     *
+     * @param {string} elementId - The ID of the element to dismiss.
+     */
+    dismissElement: function(elementId) {
+        if (this.dismissedElements.indexOf(elementId) === -1) {
+            this.dismissedElements.push(elementId);
+            localStorage.setItem('dismissedElements', JSON.stringify(this.dismissedElements));
+
+            // Inject CSS to hide the newly dismissed element
+            if (this.dismissedStyle) {
+                var newSelector = '#' + elementId;
+                this.dismissedStyle.appendChild(document.createTextNode(newSelector + ' { display: none !important; }'));
+            } else {
+                // Create a new style element if not existing
+                var css = '#' + elementId + ' { display: none !important; }';
+                this.dismissedStyle = document.createElement('style');
+                this.dismissedStyle.type = 'text/css';
+                this.dismissedStyle.appendChild(document.createTextNode(css));
+
+                // Append the style element to the document head
+                var head = document.head || document.getElementsByTagName('head')[0];
+                head.appendChild(this.dismissedStyle);
+            }
+
+            // Hide the element
+            var element = mQuery('#' + elementId);
+            if (element.length) {
+                element.hide();
+            }
+        }
+    },
+
+    /**
+     * Resets all dismissed elements.
+     */
+    resetDismissedElements: function() {
+        // Clear the dismissedElements array
+        this.dismissedElements = [];
+        localStorage.setItem('dismissedElements', JSON.stringify(this.dismissedElements));
+
+        // Remove the injected CSS that hides dismissed elements
+        if (this.dismissedStyle && this.dismissedStyle.parentNode) {
+            this.dismissedStyle.parentNode.removeChild(this.dismissedStyle);
+            this.dismissedStyle = null;
+        }
+
+        // Show all dismissible elements
+        mQuery('[user-dismiss]').each(function () {
+            var dismissButton = mQuery(this);
+            var dismissType = dismissButton.attr('user-dismiss');
+            var dismissibleElement = dismissButton.closest('.' + dismissType);
+
+            // Remove any inline display styles and show the element
+            dismissibleElement.css('display', '');
+        });
+
+        // Create the flash message
+        const flashMessage = Mautic.addInfoFlashMessage(
+            Mautic.translate('mautic.user.config.title.experience_and_learning.reset_confirmation')
+        );
+        Mautic.setFlashes(flashMessage);
+    },
+
+    /**
+     * Attaches event handlers to dismiss buttons.
+     */
+    attachDismissHandlers: function() {
+        mQuery('[user-dismiss]').each(function () {
+            var dismissButton = mQuery(this);
+            var dismissType = dismissButton.attr('user-dismiss');
+            var dismissibleElement = dismissButton.closest('.' + dismissType);
+            var elementId = dismissibleElement.attr('id');
+
+            // Attach dismiss event handler to the close button
+            dismissButton.off('click').on('click', function (e) {
+                e.preventDefault();
+                Mautic.dismissElement(elementId);
+            });
+        });
+    },
+
+    /**
+     * Initializes the dismiss functionality.
+     */
+    initDismiss: function() {
+        this.initializeDismissedElements();
+        this.attachDismissHandlers();
+    },
 
     /**
      *
@@ -124,62 +298,129 @@ var Mautic = {
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mautic.addKeyboardShortcut('shift+d', 'Load the Dashboard', function (e) {
+        Mautic.addKeyboardShortcut('g d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+c', 'Load Contacts', function (e) {
+        Mautic.addKeyboardShortcut('g c', 'Load Contacts', function (e) {
             mQuery('#mautic_contact_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
-            mQuery(".navbar-right a[data-toggle='sidebar']").click();
+        Mautic.addKeyboardShortcut('g e', 'Load Emails', function (e) {
+            mQuery('#mautic_email_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+n', 'Show Notifications', function (e) {
+        Mautic.addKeyboardShortcut('g f', 'Load Forms', function (e) {
+            mQuery('#mautic_form_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('g s', 'Load Segments', function (e) {
+            mQuery('#mautic_segment_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('g p', 'Load Segments', function (e) {
+            mQuery('#mautic_page_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('f m', 'Toggle Admin Menu', function (e) {
+            mQuery("#admin-menu").click();
+        });
+
+        Mautic.addKeyboardShortcut('f n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
-            mQuery('#globalSearchContainer .search-button').click();
+        Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
+            mQuery('.search-button').click();
         });
 
-        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
-            if (mQuery('.btn-undo').length) {
-                mQuery('.btn-undo').click();
-            }
+        Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mQuery('#list-search').focus();
         });
 
-        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
-            if (mQuery('.btn-redo').length) {
-                mQuery('.btn-redo').click();
-            }
+        Mautic.addKeyboardShortcut('e', 'Edit current resource', function(e) {
+            mQuery('#edit').click();
+        });
+
+        Mautic.addKeyboardShortcut('c', 'Create current resource', function(e) {
+            mQuery('#new').click();
+        });
+
+        Mautic.addKeyboardShortcut(['del', 'meta+backspace'], 'Delete current resource', function(e) {
+            mQuery('#delete').click();
+        });
+
+        Mautic.addKeyboardShortcut('enter', 'Modal confirm action', function(e) {
+            mQuery('#confirm').click();
+        });
+
+        Mautic.addKeyboardShortcut('s', 'General send example button', function(e) {
+            mQuery('#sendEmailButton').click();
+        });
+
+        Mautic.addKeyboardShortcut('g i', 'Back to index (list)', function(e) {
+            mQuery('[id*="buttons_cancel"]').click();
+            mQuery('#close').click();
         });
 
         Mousetrap.bind('?', function (e) {
-            var modalWindow = mQuery('#MauticSharedModal');
-
-            modalWindow.find('.modal-title').html('Keyboard Shortcuts');
-            modalWindow.find('.modal-body').html(function () {
-                var modalHtml = '';
-                var sections = Object.keys(Mautic.keyboardShortcutHtml);
-                sections.forEach(function (section) {
-                    var sectionTitle = (section + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
-                        return $1.toUpperCase();
-                    });
-                    modalHtml += '<h4>' + sectionTitle + '</h4><br />';
-                    modalHtml += '<div class="row">';
-                    var sequences = Object.keys(Mautic.keyboardShortcutHtml[section]);
-                    sequences.forEach(function (sequence) {
-                        modalHtml += Mautic.keyboardShortcutHtml[section][sequence];
-                    });
-                    modalHtml += '</div><hr />';
-                });
-
-                return modalHtml;
-            });
-            modalWindow.find('.modal-footer').html('<p>Press <mark>shift+?</mark> at any time to view this help modal.');
+            var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
+        });
+
+    },
+
+    /**
+     * Copy code blocks when clicked
+     *
+     */
+    initializeCodeBlocks: function () {
+        mQuery('code').each(function() {
+            var $codeBlock = mQuery(this);
+            if (!$codeBlock.find('.copy-icon').length) {
+                $codeBlock.append('<i class="ri-clipboard-fill copy-icon"></i>');
+            }
+        });
+    },
+
+    /**
+     * Initializes list group toggle functionality.
+     */
+    initListGroupToggle: function(container) {
+        mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+            e.preventDefault(); // Prevent default action if necessary
+
+            var $item = mQuery(this);
+            var $input = $item.find('input');
+
+            // If the input is disabled or readonly, do nothing
+            if ($input.prop('disabled') || $input.prop('readonly')) {
+                return;
+            }
+
+            var type = $input.prop('type');
+
+            if (type === 'radio') {
+                // Remove 'active' class from all items in the group
+                $item.closest('.list-group').find('.list-group-item').removeClass('active');
+
+                // Add 'active' class to the clicked item
+                $item.addClass('active');
+
+                // Set the input as checked
+                $input.prop('checked', true);
+            } else if (type === 'checkbox') {
+                // Toggle 'active' class on the clicked item
+                $item.toggleClass('active');
+
+                // Update the input's checked property based on the 'active' class
+                $input.prop('checked', $item.hasClass('active'));
+            }
+
+            // Trigger the 'change' event on the input
+            $input.trigger('change');
         });
     },
 
@@ -206,28 +447,6 @@ var Mautic = {
         }
 
         return translated;
-    },
-
-    /**
-     * Setups browser notifications
-     */
-    setupBrowserNotifier: function () {
-        //request notification support
-        notify.requestPermission();
-        notify.config({
-            autoClose: 10000
-        });
-
-        Mautic.browserNotifier = {
-            isSupported: notify.isSupported,
-            permissionLevel: notify.permissionLevel()
-        };
-
-        Mautic.browserNotifier.isSupported = notify.isSupported;
-        Mautic.browserNotifier.permissionLevel = notify.permissionLevel();
-        Mautic.browserNotifier.createNotification = function (title, options) {
-            return notify.createNotification(title, options);
-        }
     },
 
     /**
@@ -294,8 +513,8 @@ var Mautic = {
      */
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
-        if (!button.find('.fa-spinner.fa-spin').length) {
-            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        if (!button.find('.ri-loader-3-line.ri-spin').length) {
+            button.append(mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>'));
         }
     },
 
@@ -306,7 +525,7 @@ var Mautic = {
      */
     removeButtonLoadingIndicator: function (button) {
         button.prop('disabled', false);
-        button.find('.fa-spinner').remove();
+        button.find('.ri-loader-3-line').remove();
     },
 
     /**
@@ -316,7 +535,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
@@ -435,27 +654,30 @@ var Mautic = {
 
         if (mQuery(target).length) {
             var hasBtn = mQuery(target).hasClass('btn');
-            var hasIcon = mQuery(target).hasClass('fa');
+            var hasIcon = mQuery(target).attr('class') && mQuery(target).attr('class').startsWith('ri-');
             var dontspin = mQuery(target).hasClass('btn-nospin');
 
-            var i = (hasBtn && mQuery(target).find('i.fa').length) ? mQuery(target).find('i.fa') : target;
+            var icon = (hasBtn && mQuery(target).find('i[class^="ri-"]').length) ? mQuery(target).find('i[class^="ri-"]') : target;
 
-            if (!dontspin && ((hasBtn && mQuery(target).find('i.fa').length) || hasIcon)) {
-                var el = (hasIcon) ? target : mQuery(target).find('i.fa').first();
+            if (!dontspin && ((hasBtn && mQuery(target).find('i[class^="ri-"]').length) || hasIcon)) {
+                var el = (hasIcon) ? target : mQuery(target).find('i[class^="ri-"]').first();
                 var identifierClass = (new Date).getTime();
+
+                if (typeof MauticVars.iconClasses === 'undefined') {
+                    MauticVars.iconClasses = {};
+                }
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li', 'text-white', 'text-muted'];
+                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-secondary'];
                 var appendClasses = "";
 
-                //check for special classes to add to spinner
-                for (var i = 0; i < specialClasses.length; i++) {
-                    if (mQuery(el).hasClass(specialClasses[i])) {
-                        appendClasses += " " + specialClasses[i];
+                for (var j = 0; j < specialClasses.length; j++) {
+                    if (mQuery(el).hasClass(specialClasses[j])) {
+                        appendClasses += " " + specialClasses[j];
                     }
                 }
                 mQuery(el).removeClass();
-                mQuery(el).addClass('fa fa-spinner fa-spin ' + identifierClass + appendClasses);
+                mQuery(el).addClass('ri-loader-3-line ri-spin ' + identifierClass + appendClasses);
             }
         }
     },
@@ -465,14 +687,13 @@ var Mautic = {
      */
     stopIconSpinPostEvent: function (specificId) {
         if (typeof specificId != 'undefined' && specificId in MauticVars.iconClasses) {
-            mQuery('.' + specificId).removeClass('fa fa-spinner fa-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
+            mQuery('.' + specificId).removeClass('ri-loader-3-line ri-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
             delete MauticVars.iconClasses[specificId];
         } else {
             mQuery.each(MauticVars.iconClasses, function (index, value) {
-                mQuery('.' + index).removeClass('fa fa-spinner fa-spin ' + index).addClass(value);
+                mQuery('.' + index).removeClass('ri-loader-3-line ri-spin ' + index).addClass(value);
+                delete MauticVars.iconClasses[index];
             });
-
-            MauticVars.iconClasses = {};
         }
     },
 
@@ -540,6 +761,7 @@ var Mautic = {
         Mautic.dismissConfirmation();
 
         if (action.indexOf('batchExport') >= 0) {
+            delete Mautic.activeActions[action]
             Mautic.initiateFileDownload(action);
             return;
         }
@@ -590,6 +812,9 @@ var Mautic = {
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
         } else if (typeof(request.responseText) !== 'undefined') {
+            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
+            Mautic.setFlashes(flashMessage);
+
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');
@@ -617,8 +842,7 @@ var Mautic = {
                 mQuery('#app-content .content-body').html(response.newContent);
                 if (response.route && response.route.indexOf("ajax") == -1) {
                     //update URL in address bar
-                    MauticVars.manualStateChange = false;
-                    History.pushState(null, "Mautic", response.route);
+                    history.pushState(null, "Mautic", response.route);
                 }
             } else if (response.newContent && mQuery('.modal.in').length) {
                 //assume a modal was the recipient of the information
@@ -696,38 +920,59 @@ var Mautic = {
 
     /**
      * Sets flashes
-     * @param flashes
+     * @param flashes The flash message HTML to append
+     * @param autoClose Optional boolean to determine if the flash should automatically close, defaults to true
      */
-    setFlashes: function (flashes) {
+    setFlashes: function (flashes, autoClose = true) {
         mQuery('#flashes').append(flashes);
 
         mQuery('#flashes .alert-new').each(function () {
             var me = this;
-            window.setTimeout(function () {
-                mQuery(me).fadeTo(500, 0).slideUp(500, function () {
-                    mQuery(this).remove();
-                });
-            }, 4000);
+            // Only set the timeout if autoClose is true
+            if (autoClose) {
+                window.setTimeout(function () {
+                    mQuery(me).fadeTo(500, 0).slideUp(500, function () {
+                        mQuery(this).remove();
+                    });
+                }, 4000);
+            }
 
             mQuery(this).removeClass('alert-new');
         });
     },
 
-    /**
-     * Set browser notifications
-     *
-     * @param notifications
-     */
-    setBrowserNotifications: function (notifications) {
-        mQuery.each(notifications, function (key, notification) {
-            Mautic.browserNotifier.createNotification(
-                notification.title,
-                {
-                    body: notification.message,
-                    icon: notification.icon
-                }
-            );
-        });
+    addFlashMessage: function (message) {
+        const elDiv = document.createElement('div');
+        elDiv.className = 'alert alert-growl alert-growl--error alert-new';
+
+        const elButton = document.createElement('button');
+        elButton.classList.add('close');
+        elButton.type = "button";
+        elButton.dataset.dismiss = "alert";
+        elButton.ariaHidden = "true";
+        elButton.ariaLabel = "Close";
+
+        const elI = document.createElement('i');
+        elI.className = 'ri-close-line';
+
+        const elSpan = document.createElement('span');
+        elSpan.innerHTML = message;
+
+        elButton.append(elI);
+        elDiv.append(elButton);
+        elDiv.append(elSpan);
+
+        return elDiv;
+    },
+
+    addErrorFlashMessage: function(message) {
+        return this.addFlashMessage(message);
+    },
+
+    addInfoFlashMessage: function(message) {
+        const el = this.addFlashMessage(message);
+        el.classList.remove('alert-growl--error');
+        return el;
     },
 
     /**
@@ -755,12 +1000,6 @@ var Mautic = {
             if (!mQuery('#notificationMautibot').hasClass('hide')) {
                 mQuery('#notificationMautibot').addClass('hide');
             }
-        }
-
-        if (notifications.sound) {
-            mQuery('.playSound').remove();
-
-            mQuery.playSound(notifications.sound);
         }
     },
 
@@ -817,9 +1056,10 @@ var Mautic = {
      * @param data
      * @param successClosure
      * @param showLoadingBar
-     * @param failureClosure
+     * @param queue
+     * @param method
      */
-    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue) {
+    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue, method = "POST") {
         if (typeof Mautic.ajaxActionXhrQueue == 'undefined') {
             Mautic.ajaxActionXhrQueue = {};
         }
@@ -831,7 +1071,7 @@ var Mautic = {
                     Mautic.ajaxActionXhrQueue[action] = [];
                 }
 
-                Mautic.ajaxActionXhrQueue[action].push({action: action, data: data, successClosure: successClosure, showLoadingBar: showLoadingBar});
+                Mautic.ajaxActionXhrQueue[action].push({action: action, data: data, successClosure: successClosure, showLoadingBar: showLoadingBar, method: method});
 
                 return;
             } else {
@@ -846,7 +1086,7 @@ var Mautic = {
 
         Mautic.ajaxActionXhr[action] = mQuery.ajax({
             url: mauticAjaxUrl + '?action=' + action,
-            type: 'POST',
+            type: method,
             data: data,
             showLoadingBar: showLoadingBar,
             success: function (response) {
@@ -863,7 +1103,7 @@ var Mautic = {
                 if (typeof Mautic.ajaxActionXhrQueue[action] !== 'undefined' && Mautic.ajaxActionXhrQueue[action].length) {
                     var next = Mautic.ajaxActionXhrQueue[action].shift();
 
-                    Mautic.ajaxActionRequest(next.action, next.data, next.successClosure, next.showLoadingBar, false);
+                    Mautic.ajaxActionRequest(next.action, next.data, next.successClosure, next.showLoadingBar, false, next.method);
                 }
             }
         });
@@ -886,3 +1126,5 @@ var Mautic = {
         }
     }
 };
+
+Mautic.initDismiss();

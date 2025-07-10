@@ -1,0 +1,40 @@
+{% set extra = event.extra %}
+{% set log = extra.log %}
+{% set eventType = log.type %}
+{% set eventSettings = extra.campaignEventSettings %}
+{% set messageSettings = eventSettings.action[eventType].timelineTemplateVars.messageSettings %}
+{% set template = '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig' %}
+{% set channelEvent = event %}
+{% set channelEvent = channelEvent|merge({extra: {log: log}}) %}
+{% set vars = {'event' : channelEvent} %}
+
+{% set counter = extra.log.metadata|length %}
+{% for channel, results in extra.log.metadata %}
+    {% if messageSettings[channel] is defined %}
+        <h4>{{ messageSettings[channel]['label'] }}</h4>
+        {% if log.metadata[channel].dnc is defined %}
+            {{ getChannelDncText(log.metadata[channel].dnc) }}
+        {% endif %}
+        {# Successful send through this channel #}
+        {% if messageSettings[channel].campaignAction is not empty %}
+        {% set eventType = messageSettings[channel]['campaignAction'] %}
+
+        {% if eventSettings.action[eventType].timelineTemplate is defined and eventSettings.action[eventType].timelineTemplate is not empty %}
+            {% set template = eventSettings.action[eventType].timelineTemplate %}
+        {% endif %}
+        {% if eventSettings.action[eventType].timelineTemplateVars is defined and eventSettings.action[eventType].timelineTemplateVars is not empty %}
+            {% set extra = vars.event.extra|merge(eventSettings.action[eventType].timelineTemplateVars) %}
+            {% set vars = {
+                'event': {
+                    'extra' : extra
+                }
+            } %}
+        {% endif %}
+        {% endif %}
+        {% set counter = counter - 1 %}
+        {% if counter > 0 %}
+            <hr/>
+        {% endif %}
+    {% endif %}
+    {{- include(template, vars) -}}
+{% endfor %}

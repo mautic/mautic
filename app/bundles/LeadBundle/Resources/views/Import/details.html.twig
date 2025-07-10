@@ -1,0 +1,231 @@
+{#
+  Variables
+    - item
+    - logs
+    - failedRows
+    - importedRowsChart
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}asset{% endblock %}
+
+{% block headerTitle %}{{ item.name }}{% endblock %}
+
+{% block publishStatus %}
+  {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
+{% endblock %}
+
+{% block indexButton %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+            'routeBase': 'import',
+            'langVar': 'lead.import',
+            'templateButtons': {
+                'close': securityHasEntityAccess(permissions['lead:imports:viewown'], permissions['lead:imports:viewother'], item.createdBy),
+            },
+            'routeVars': {
+                'close': {
+                    'object': app.request.get('object', 'contacts'),
+                },
+            },
+            'targetLabel'  : 'mautic.lead.import.list'|trans
+    }) }}
+{% endblock %}
+
+{% macro arrayToString(a) %}
+  {% for k, v in a %}
+    {{- k }}=
+    {%- if v is iterable -%}
+      {% for k2, v2 in v %}
+        {{ v2 }}
+      {% endfor %}
+    {%- elseif v is same as false or v is same as true -%}
+      {% if v %}Yes{% else %}No{% endif %}
+    {%- elseif v is not empty -%}
+      "{{- v -}}"
+    {%- endif -%}
+    {%- if not loop.last %},{% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 height-auto">
+        <div>
+            <!-- asset detail collapseable -->
+            <div class="collapse pr-md pl-md" id="asset-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                                {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
+
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.source.file',
+                                    'value': item.originalFile,
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.status',
+                                    'value': include('@MauticCore/Helper/_label.html.twig', {'text': 'mautic.lead.import.status.'~item.status, 'type': item.satusLabelClass}),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.status.info',
+                                    'value': item.statusInfo,
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.line.count',
+                                    'value': item.lineCount,
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.date.started',
+                                    'value': dateToFull(item.dateStarted),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.date.ended',
+                                    'value': dateToFull(item.dateEnded),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.runtime',
+                                    'value': item.runTime ? dateFormatRange(item.runTime) : '',
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.speed',
+                                    'value': 'mautic.lead.import.speed.value'|trans({'%speed%': item.speed}),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.progress',
+                                    'value': item.progressPercentage~'%',
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.mapped.fields',
+                                    'value': _self.arrayToString(item.matchedFields),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.default.options',
+                                    'value': _self.arrayToString(item.defaults),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.csv.headers',
+                                    'value': item.headers|join(', '),
+                                }) }}
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
+                                    'label': 'mautic.lead.import.csv.parser.config',
+                                    'value': _self.arrayToString(item.parserConfig),
+                                }) }}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--/ asset detail collapseable -->
+        </div>
+
+        <div>
+            <!-- asset detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
+                       data-target="#asset-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                </span>
+            </div>
+            <!--/ asset detail collapseable toggler -->
+
+            {% if item.dateStarted %}
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa-row-statuses"></span>
+                                        {{ 'mautic.lead.import.row.statuses'|trans }}
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{ include('@MauticCore/Helper/chart.html.twig', {
+                                      'chartData': item.getRowStatusesPieChart(translatorGetHelper()),
+                                      'chartType': 'pie',
+                                      'chartHeight': 210,
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa-row-statuses"></span>
+                                        {{ 'mautic.lead.import.processed.rows.minute'|trans }}
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{ include('@MauticCore/Helper/chart.html.twig', {
+                                      'chartData': importedRowsChart,
+                                      'chartType': 'line',
+                                      'chartHeight': 210,
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+            {% endif %}
+        </div>
+
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md preview-detail">
+        {% if failedRows is not empty and failedRows|length > 0 %}
+        <h3>{{ 'mautic.lead.import.failed.rows'|trans }}</h3>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                      <th>{{ 'mautic.lead.import.csv.line.number'|trans }}</th>
+                      <th>{{ 'mautic.core.error.message'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in failedRows %}
+                        {% if row.properties is iterable %}
+                            <tr>
+                                <td>{{ row.properties.line }}</td>
+                                <td>
+                                    {% set error = 'N/A' %}
+                                    {% if row.properties.error is defined %}
+                                        {% set error = row.properties.error %}
+                                        {% if error matches '/^SQLSTATE\\[\\w+\\]: (.*)$/' %}
+                                          {% set error = error|split(': ')[1] %}
+                                        {% endif %}
+                                    {% endif %}
+                                    {{ error }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <i>{{ 'mautic.lead.import.no.failed.rows'|trans }}</i>
+        {% endif %}
+        </div>
+        <!--/ end: tab-content -->
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bdr-l height-auto">
+
+        <!-- activity feed -->
+        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
+    </div>
+    <!--/ right section -->
+    <input name="entityId" id="entityId" type="hidden" value="{{ item.id|e }}"/>
+</div>
+<!--/ end: box layout -->
+{% endblock %}

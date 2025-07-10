@@ -1,0 +1,55 @@
+{% block dsn_row %}
+    <div class="config-dsn-container">
+        {% if form.test_button is defined %}
+            <div class="help-block">
+                <span class="ri-loader-3-line ri-spin hide pull-left"></span>
+                <div class="status-msg"></div>
+                <div class="alert alert-warning save-config-msg hide">{{ 'mautic.config.dsn.save_to_test'|trans }}</div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-xs-12">
+                {{ form_row(form.scheme) }}
+            </div>
+            <div class="col-xs-12">
+                {{ form_row(form.host, { 'attr': {'preaddon_text': '://'} }) }}
+            </div>
+            <div class="col-xs-12">
+                {{ form_row(form.port, { 'attr': {'preaddon_text': ':'} }) }}
+            </div>
+            <div class="col-xs-12">
+                {{ form_row(form.path, { 'attr': {'preaddon_text': '/'} }) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{ form_row(form.user) }}
+                    </div>
+                    <div class="col-xs-12">
+                        {{ form_row(form.password, { 'attr': {'preaddon_text': ':'} }) }}
+                    </div>
+                </div>
+                <div class="config-dsn-test-container">
+                    <div class="form-group">
+                        {% if form.test_button is defined %}
+                            {{ form_widget(form.test_button) }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <div class="form-control-static ml-10">
+                            <span class="text-muted">{{ 'mautic.config.dsn.using_current_dsn'|trans }}:</span>
+                            <code>{{ form.vars.currentDsn|default('n/a') }}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="col-xs-12">
+                {{ form_row(form.options) }}
+            </div>
+        </div>
+        {{ form_rest(form) }}
+    </div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{#
+  Variables
+    - events
+#}
+{% if events is not empty and events is iterable %}
+<!-- start: trigger type event -->
+<ul class="campaign-event-list">
+    {% for event in events %}
+        {% set typeClass    = ('action' == event.eventType and 'no' == event.decisionPath) ? 'danger' : 'success' %}
+        {% set percentLabel = ('danger' == typeClass) ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent' %}
+        {% set percentProp  = ('danger' == typeClass) ? 'noPercent' : 'yesPercent' %}
+        <li class="list-group-item">
+            <div class="progress-bar progress-bar-{{ typeClass }}" style="width:{{ event.yesPercent }}%; left: 0;"></div>
+            <div class="progress-bar progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
+            <div class="box-layout">
+                <div class="visible-sm visible-md visible-lg col-stats">
+                    <span class="mt-xs label label-{{ typeClass }}" data-toggle="tooltip" title="{{ percentLabel|trans }}">
+                      {{ event[percentProp] }}%
+                    </span>
+                    {% if event.eventType is defined and 'action' != event.eventType %}
+                        <span class="label label-danger" data-toggle="tooltip" title="{{ 'mautic.report.campaign.no.percent'|trans }}">
+                          {{ event.noPercent }}%
+                        </span>
+                    {% endif %}
+                <span class="mt-xs label label-warning" data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}">
+                    {{ event.logCountProcessed }}
+                </span>
+                <span size="sm" class="mt-xs label label-gray"  data-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}">
+                    {{ event.logCountForPending }}
+                </span>
+                </div>
+                    <div class="col-md-5 va-m">
+                    <h5 class="fw-sb text-interactive mb-xs">
+                        {{ event.name }}
+                        {% if event.eventType is defined and 'action' != event.eventType %}
+                          <small class="text-secondary">{{ event.percent }}%</small>
+                        {% endif %}
+
+                    </h5>
+                    <h6 class="text-white dark-sm">{{ event.description }}</h6>
+                </div>
+                <div class="col-md-3 va-m text-right">
+                    <em class="text-white dark-sm">{{ ('mautic.campaign.'~event.type)|trans }}</em>
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+<!--/ end: trigger type event -->
+{% endif %}

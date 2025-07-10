@@ -1,57 +1,46 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\EventListener\SAMLSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Router;
 
 class SAMLSubscriberTest extends TestCase
 {
     /**
-     * @var GetResponseEvent|MockObject
+     * @var RequestEvent&MockObject
      */
-    private $event;
+    private MockObject $event;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var Router&MockObject
      */
-    private $coreParametersHelper;
-
-    /**
-     * @var Router|MockObject
-     */
-    private $router;
+    private MockObject $router;
 
     protected function setUp(): void
     {
-        $this->event = $this->createMock(GetResponseEvent::class);
+        $this->event = $this->createMock(RequestEvent::class);
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->router               = $this->createMock(Router::class);
+        $this->router = $this->createMock(Router::class);
     }
 
-    public function testSamlRoutesAreRedirectedToDefaultLoginIfSamlIsDisabled()
+    /**
+     * Because this subscriber is removed from the kernel if the SAML is disabled,
+     * this need to be tested always in the case it's enabled.
+     */
+    public function testRedirectIsIgnoredIfSamlEnabled(): void
     {
-        $subscriber = new SAMLSubscriber($this->coreParametersHelper, $this->router);
+        $redirect   = '/redirect';
+        $subscriber = new SAMLSubscriber($this->router);
 
         $request             = $this->createMock(Request::class);
         $request->attributes = new ParameterBag();
@@ -61,46 +50,15 @@ class SAMLSubscriberTest extends TestCase
 
         $this->event->method('getRequest')
             ->willReturn($request);
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with('saml_idp_metadata')
-            ->willReturn('');
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->willReturn('/s/login');
+            ->with('login')
+            ->willReturn($redirect);
 
         $this->event->expects($this->once())
             ->method('setResponse')
-            ->with($this->isInstanceOf(RedirectResponse::class));
-
-        $subscriber->onKernelRequest($this->event);
-    }
-
-    public function testRedirectIsIgnoredIfSamlEnabled()
-    {
-        $subscriber = new SAMLSubscriber($this->coreParametersHelper, $this->router);
-
-        $request             = $this->createMock(Request::class);
-        $request->attributes = new ParameterBag();
-
-        $request->method('getRequestUri')
-            ->willReturn('/saml/login');
-
-        $this->event->method('getRequest')
-            ->willReturn($request);
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with('saml_idp_metadata')
-            ->willReturn('1');
-
-        $this->router->expects($this->never())
-            ->method('generate');
-
-        $this->event->expects($this->never())
-            ->method('setResponse');
+            ->with(new RedirectResponse($redirect));
 
         $subscriber->onKernelRequest($this->event);
     }

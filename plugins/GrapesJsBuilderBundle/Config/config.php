@@ -11,15 +11,24 @@ return [
         'main'   => [
             'grapesjsbuilder_upload' => [
                 'path'       => '/grapesjsbuilder/upload',
-                'controller' => 'GrapesJsBuilderBundle:FileManager:upload',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::uploadAction',
             ],
             'grapesjsbuilder_delete' => [
                 'path'       => '/grapesjsbuilder/delete',
-                'controller' => 'GrapesJsBuilderBundle:FileManager:delete',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
+            ],
+            /** @depreacated since Mautic 5.2, to be removed in 6.0. Use grapesjsbuilder_media instead */
+            'grapesjsbuilder_assets' => [
+                'path'       => '/grapesjsbuilder/assets',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::assetsAction',
+            ],
+            'grapesjsbuilder_media' => [
+                'path'       => '/grapesjsbuilder/media',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::getMediaAction',
             ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
-                'controller' => 'GrapesJsBuilderBundle:GrapesJs:builder',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
             ],
         ],
         'public' => [],
@@ -30,80 +39,20 @@ return [
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
             'grapesjsbuilder.config' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
+                'class'     => MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
             ],
         ],
         'sync'         => [],
-        'integrations' => [
-            // Basic definitions with name, display name and icon
-            'mautic.integration.grapesjsbuilder' => [
-                'class' => \MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration::class,
-                'tags'  => [
-                    'mautic.integration',
-                    'mautic.basic_integration',
-                ],
-            ],
-            // Provides the form types to use for the configuration UI
-            'grapesjsbuilder.integration.configuration' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport::class,
-                'tags'      => [
-                    'mautic.config_integration',
-                ],
-            ],
-            // Tells Mautic what themes it should support when enabled
-            'grapesjsbuilder.integration.builder' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
-                'tags'      => [
-                    'mautic.builder_integration',
-                ],
-            ],
-        ],
-        'models'  => [
-            'grapesjsbuilder.model' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.email.model.email',
-                ],
-            ],
-        ],
-        'helpers' => [
+        'helpers'      => [
             'grapesjsbuilder.helper.filemanager' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
+                'class'     => MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
-                ],
-            ],
-        ],
-        'events'  => [
-            'grapesjsbuilder.event.assets.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'mautic.install.service',
-                ],
-            ],
-            'grapesjsbuilder.event.email.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                ],
-            ],
-            'grapesjsbuilder.event.content.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\InjectCustomContentSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                    'grapesjsbuilder.helper.filemanager',
-                    'mautic.helper.templating',
-                    'request_stack',
-                    'router',
                 ],
             ],
         ],

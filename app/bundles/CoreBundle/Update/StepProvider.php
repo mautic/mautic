@@ -1,22 +1,20 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
 
 class StepProvider
 {
-    private $initialSteps = [];
-    private $finalSteps   = [];
+    /**
+     * @var StepInterface[]
+     */
+    private array $initialSteps = [];
+
+    /**
+     * @var StepInterface[]
+     */
+    private array $finalSteps = [];
 
     public function addStep(StepInterface $step): void
     {
@@ -50,13 +48,7 @@ class StepProvider
      */
     private function orderSteps(array $steps): array
     {
-        usort($steps, function (StepInterface $step1, StepInterface $step2) {
-            if ($step1->getOrder() === $step2->getOrder()) {
-                return 0;
-            }
-
-            return ($step1->getOrder() < $step2->getOrder()) ? -1 : 1;
-        });
+        usort($steps, fn (StepInterface $step1, StepInterface $step2): int => $step1->getOrder() <=> $step2->getOrder());
 
         return $steps;
     }

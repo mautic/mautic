@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Tests\Dashboard;
 
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -18,10 +9,9 @@ use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Entity\Widget as WidgetEntity;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\UserBundle\Entity\User;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -30,29 +20,26 @@ class WidgetTest extends TestCase
     private const USER_ID = 1;
 
     /**
-     * @var DashboardModel|MockObject
+     * @var DashboardModel&MockObject
      */
-    private $dashboardModel;
+    private MockObject $dashboardModel;
 
     /**
-     * @var UserHelper|MockObject
+     * @var UserHelper&MockObject
      */
-    private $userHelper;
+    private MockObject $userHelper;
 
     /**
-     * @var MockObject|Session
+     * @var MockObject&RequestStack
      */
-    private $session;
+    private MockObject $requestStack;
 
     /**
-     * @var User|MockObject
+     * @var User&MockObject
      */
-    private $user;
+    private MockObject $user;
 
-    /**
-     * @var Widget
-     */
-    private $widget;
+    private Widget $widget;
 
     protected function setUp(): void
     {
@@ -60,7 +47,7 @@ class WidgetTest extends TestCase
 
         $this->dashboardModel = $this->createMock(DashboardModel::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
-        $this->session        = $this->createMock(Session::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
 
         $this->user = $this->createMock(User::class);
         $this->user
@@ -70,7 +57,7 @@ class WidgetTest extends TestCase
         $this->widget = new Widget(
             $this->dashboardModel,
             $this->userHelper,
-            $this->session
+            $this->requestStack
         );
     }
 
@@ -87,8 +74,8 @@ class WidgetTest extends TestCase
 
         $widget->setCreatedBy(self::USER_ID);
         $filter = [
-            'dateFrom' => new Date(),
-            'dateTo'   => new Date(),
+            'dateFrom' => new \DateTime(),
+            'dateTo'   => new \DateTime(),
         ];
 
         $this->dashboardModel->expects(self::once())

@@ -1,0 +1,19 @@
+{% if showMore is defined and showMore is not empty %}
+    <a href="{{ path('mautic_email_index', {'search' : searchString }) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans ({ '%count%' : remaining }) }}</span>
+    </a>
+{% else %}
+    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : item.id}) }}" data-toggle="ajax">
+        <span class="fw-sb">{{ item.getName() }}</span>
+        <span class="ml-4 mr-sm">#{{ item.getId() }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': item,
+            'status': item.getPublishUp() is not null ? 'sending' : 'available',
+            'simplified': 'true'
+        }) -}}
+        <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.email.readcount'|trans }}" data-placement="left">
+            <i class="ri-mail-open-line"></i>
+            {{ item.readCount }}
+        </span>
+    </a>
+{% endif %}

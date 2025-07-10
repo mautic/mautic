@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
@@ -18,9 +9,9 @@ class AddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that an email header with email addresses are parsed into array
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList
      */
-    public function testArrayOfAddressesAreReturnedFromEmailHeader()
+    public function testArrayOfAddressesAreReturnedFromEmailHeader(): void
     {
         $results = Address::parseList('<user@test.com>,<user2@test.com>');
 
@@ -36,9 +27,9 @@ class AddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Obtain hash ID from a special formatted email address
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList
      */
-    public function testStatHashIsParsedFromEmail()
+    public function testStatHashIsParsedFromEmail(): void
     {
         $hash = Address::parseAddressForStatHash('hello+bounce_123abc@test.com');
 

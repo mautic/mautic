@@ -1,0 +1,123 @@
+{#
+  Variables
+    - searchValue
+    - items
+    - totalItems
+    - page
+    - limit
+    - tmpl
+    - permissions
+    - model
+    - security
+#}
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover notification-list">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'notification',
+                        'orderBy': 'e.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-notification-name',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'notification',
+                        'orderBy': 'c.title',
+                        'text': 'mautic.core.category',
+                        'class': 'visible-md visible-lg col-notification-category',
+                }) }}
+
+                <th class="visible-sm visible-md visible-lg col-notification-stats">{{ 'mautic.core.stats'|trans }}</th>
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'notification',
+                        'orderBy': 'e.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-notification-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {# @var \Mautic\NotificationBundle\Entity\Notification $item #}
+            {% for item in items %}
+                {% set type = item.notificationType %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityHasEntityAccess(permissions['notification:notifications:editown'], permissions['notification:notifications:editother'], item.createdBy),
+                                    'delete': securityHasEntityAccess(permissions['notification:notifications:deleteown'], permissions['notification:notifications:deleteother'], item.createdBy),
+                                },
+                                'routeBase': 'notification',
+                                'customButtons': [
+                                    {
+                                        'attr': {
+                                            'data-toggle': 'ajaxmodal',
+                                            'data-target': '#MauticSharedModal',
+                                            'data-header': 'mautic.notification.notification.header.preview'|trans,
+                                            'data-footer': 'false',
+                                            'href': path('mautic_notification_action', {'objectId': item.id, 'objectAction': 'preview'}),
+                                        },
+                                        'btnText': 'mautic.notification.preview'|trans,
+                                        'iconClass': 'ri-share-forward-box-fill',
+                                    },
+                                ],
+                        }) }}
+                    </td>
+                    <td>
+                        <div>
+                            {% if 'template' == type %}
+                                {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'notification'}) }}
+                            {% else %}
+                                <i class="ri-fw ri-lg ri-toggle-fill text-secondary disabled"></i>
+                            {% endif %}
+                            <a href="{{ path('mautic_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
+                                {{ item.name }}
+                                {% if 'list' == type %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="ri-fw ri-list-check"></i></span>
+                                {% endif %}
+                            </a>
+                            {{ customContent('notification.name', _context) }}
+                        </div>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.category %}
+                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
+                        {% set color = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                    </td>
+                    <td class="visible-sm visible-md visible-lg col-stats">
+                        <span class="mt-xs label label-green"
+                              data-toggle="tooltip"
+                              title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+                            <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.web_sent'|trans ~ ':' ~ item.id}) }}">
+                              {{- 'mautic.notification.stat.sentcount'|trans({'%count%': item.getSentCount(true)}) -}}
+                            </a>
+                        </span>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': totalItems,
+                'page': page,
+                'limit': limit,
+                'baseUrl': path('mautic_notification_index'),
+                'sessionVar': 'notification',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

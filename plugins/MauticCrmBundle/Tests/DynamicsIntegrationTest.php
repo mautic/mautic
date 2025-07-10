@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Werner
- * Date: 6/20/2017
- * Time: 8:10 AM.
- */
 
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
@@ -13,8 +7,7 @@ use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
 class DynamicsIntegrationTest extends AbstractIntegrationTestCase
 {
-    /** @var DynamicsIntegration */
-    private $integration;
+    private DynamicsIntegration $integration;
 
     protected function setUp(): void
     {
@@ -24,7 +17,6 @@ class DynamicsIntegrationTest extends AbstractIntegrationTestCase
             $this->dispatcher,
             $this->cache,
             $this->em,
-            $this->session,
             $this->request,
             $this->router,
             $this->translator,
@@ -36,11 +28,12 @@ class DynamicsIntegrationTest extends AbstractIntegrationTestCase
             $this->notificationModel,
             $this->fieldModel,
             $this->integrationEntityModel,
-            $this->doNotContact
+            $this->doNotContact,
+            $this->fieldsWithUniqueIdentifier
         );
     }
 
-    public function testIntegration()
+    public function testIntegration(): void
     {
         $this->assertSame('Dynamics', $this->integration->getName());
     }

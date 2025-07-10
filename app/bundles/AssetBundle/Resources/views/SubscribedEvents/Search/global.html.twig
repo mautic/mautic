@@ -1,0 +1,21 @@
+{% if showMore is defined and showMore is not empty %}
+<a href="{{ url('mautic_asset_index', {'search' : searchString}) }}" data-toggle="ajax">
+    <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining})|escape }}</span>
+</a>
+{% else %}
+<a class="gsearch--results-common" href="{{ url('mautic_asset_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}" data-toggle="ajax">
+        <i class="{{ item.getIconClass() }} gsearch--results-common__icon mr-3"></i>
+        <span class="fw-sb">{{ item.getTitle()|escape }}</span>
+        <span class="ml-4 mr-4">#{{ item.getId() }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': item,
+            'status': 'available',
+            'simplified': 'true'
+        }) -}}
+
+    <span size="sm" class="pull-right" data-toggle="tooltip" title="{% trans %}mautic.asset.downloadcount{% endtrans %}" data-placement="left">
+        <i class="ri-download-line"></i>
+        {{ item.getDownloadCount() }}
+    </span>
+</a>
+{% endif %}

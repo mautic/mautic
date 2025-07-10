@@ -1,60 +1,36 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 
 class CustomTemplateEvent extends AbstractCustomRequestEvent
 {
-    /**
-     * @var string|null
-     */
-    protected $template;
+    protected string $template;
 
     /**
-     * @var array
+     * @param array<string, string> $vars
      */
-    protected $vars;
-
-    /**
-     * @param Request     $request
-     * @param string|null $template
-     */
-    public function __construct(Request $request = null, $template = null, array $vars = [])
-    {
+    public function __construct(
+        Request $request = null,
+        string $template = '',
+        protected array $vars = [],
+    ) {
         parent::__construct($request);
 
-        if (empty($template)) {
+        if ('' === $template) {
             throw new \InvalidArgumentException('$template is required');
         }
 
         $this->template = $template;
-        $this->vars     = $vars;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return $this->template;
     }
 
-    /**
-     * @param string|null $template
-     *
-     * @return CustomTemplateEvent
-     */
-    public function setTemplate($template)
+    public function setTemplate(string $template): self
     {
         $this->template = $template;
 
@@ -64,19 +40,17 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getVars()
+    public function getVars(): array
     {
         return $this->vars;
     }
 
     /**
-     * @param arrat $vars
-     *
-     * @return CustomTemplateEvent
+     * @param array<string, string> $vars
      */
-    public function setVars($vars)
+    public function setVars(array $vars): self
     {
         $this->vars = $vars;
 

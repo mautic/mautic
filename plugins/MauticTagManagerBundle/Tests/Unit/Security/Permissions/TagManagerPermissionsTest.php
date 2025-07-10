@@ -11,12 +11,12 @@ class TagManagerPermissionsTest extends TestCase
     /**
      * @var TagManagerPermissions
      */
-    private $tagManagerPermissions;
+    private \PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
 
     /**
      * @var FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
     protected function setUp(): void
     {

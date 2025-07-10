@@ -1,24 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Event>
+ */
 class EventRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param mixed[] $args
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<object>|object[]|mixed[]
      */
     public function getEntities(array $args = [])
     {
@@ -47,7 +45,8 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param $contactId
+     * @param int    $contactId
+     * @param string $type
      *
      * @return array
      */
@@ -83,7 +82,17 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('c.publishUp'),
+                        $q->expr()->lt('c.publishUp', 'CURRENT_TIMESTAMP()'),
+                    ),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('c.publishDown'),
+                        $q->expr()->gt('c.publishDown', 'CURRENT_TIMESTAMP()'),
+                    ),
+                    $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
+                    $q->expr()->isNull('e.deleted'),
                     $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
                     $q->expr()->eq('l.manuallyRemoved', 0),
                     $q->expr()->notIn('e.id', $eventQb->getDQL()),
@@ -102,9 +111,9 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events by parent.
      *
-     * @param      $parentId
-     * @param null $decisionPath
-     * @param null $eventType
+     * @param int         $parentId
+     * @param string|null $decisionPath
+     * @param string|null $eventType
      *
      * @return array
      */
@@ -113,7 +122,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->from(Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
             );
@@ -136,19 +145,24 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int  $campaignId
+     * @param bool $ignoreDeleted
      *
-     * @return array
+     * @return array<int,mixed[]>
      */
-    public function getCampaignEvents($campaignId)
+    public function getCampaignEvents($campaignId, $ignoreDeleted = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->from(Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.order', 'ASC');
+            ->orderBy('e.order', Order::Ascending->value);
+
+        if ($ignoreDeleted) {
+            $q->andWhere($q->expr()->isNull('e.deleted'));
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -161,6 +175,19 @@ class EventRepository extends CommonRepository
         unset($results);
 
         return $events;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getCampaignEventIds(int $campaignId): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('e.id')
+            ->from(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME, 'e')
+            ->where($q->expr()->eq('e.campaign_id', $campaignId));
+
+        return array_column($q->executeQuery()->fetchAllAssociative(), 'id');
     }
 
     /**
@@ -202,9 +229,9 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleI'lting a campaign.
      *
-     * @param $campaignId
+     * @param int $campaignId
      */
-    public function nullEventParents($campaignId)
+    public function nullEventParents($campaignId): void
     {
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaign_events',
@@ -216,9 +243,9 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleting events from a campaign.
      *
-     * @param $events
+     * @param string[] $events
      */
-    public function nullEventRelationships($events)
+    public function nullEventRelationships($events): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -227,81 +254,65 @@ class EventRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('parent_id', $events)
             )
+            ->executeStatement();
+    }
+
+    /**
+     * @param string[] $eventIds
+     */
+    public function deleteEvents(array $eventIds): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(Event::class, 'e')
+            ->where($qb->expr()->in('e.id', ':event_ids'))
+            ->setParameter('event_ids', $eventIds, ArrayParameterType::INTEGER)
+            ->getQuery()
             ->execute();
     }
 
     /**
-     * @return string
+     * @param string[] $eventIds
      */
-    public function getTableAlias()
+    public function setEventsAsDeleted(array $eventIds): void
+    {
+        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
+        $qb       = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
+            ->set('deleted', ':deleted')
+            ->setParameter('deleted', $dateTime)
+            ->where(
+                $qb->expr()->in('id', $eventIds)
+            )
+            ->executeStatement();
+    }
+
+    public function getTableAlias(): string
     {
         return 'e';
     }
 
     /**
-     * {@inheritdoc}
+     * For the API.
      *
-     * For the API
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }
 
     /**
-     * @param        $channel
-     * @param null   $campaignId
-     * @param string $eventType
-     */
-    public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
-    {
-        $q = $this->getEntityManager()->createQueryBuilder();
-
-        $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id');
-
-        $expr = $q->expr()->andX();
-        if ($campaignId) {
-            $expr->add(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            );
-
-            $q->orderBy('e.order');
-        }
-
-        $expr->add(
-            $q->expr()->eq('e.channel', ':channel')
-        );
-        $q->setParameter('channel', $channel);
-
-        if ($eventType) {
-            $expr->add(
-                $q->expr()->eq('e.eventType', ':eventType')
-            );
-            $q->setParameter('eventType', $eventType);
-        }
-
-        $q->where($expr);
-
-        return $q->getQuery()->getResult();
-    }
-
-    /**
      * Get an array of events that have been triggered by this lead.
-     *
-     * @param $leadId
-     *
-     * @return array
      */
-    public function getLeadTriggeredEvents($leadId)
+    public function getLeadTriggeredEvents($leadId): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')
-            ->from('MauticCampaignBundle:Event', 'e')
+            ->from(Event::class, 'e')
             ->join('e.campaign', 'c')
             ->join('e.log', 'l');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
 
         $results = $q->getQuery()->getArrayResult();
@@ -319,7 +330,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -335,8 +346,92 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
+    }
+
+    /**
+     * Update the failed count using DBAL to avoid
+     * race conditions and deadlocks.
+     */
+    public function incrementFailedCount(Event $event): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', 'failed_count + 1')
+            ->where($q->expr()->eq('id', ':id'))
+            ->setParameter('id', $event->getId());
+
+        $q->executeStatement();
+
+        return $this->getFailedCount($event);
+    }
+
+    /**
+     * Update the failed count using DBAL to avoid
+     * race conditions and deadlocks.
+     */
+    public function decreaseFailedCount(Event $event): void
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', 'failed_count - 1')
+            ->where($q->expr()->eq('id', ':id'))
+            ->andWhere($q->expr()->gt('failed_count', 0))
+            ->setParameter('id', $event->getId());
+
+        $q->executeStatement();
+    }
+
+    /**
+     * Get the up to date failed count
+     * for the given Event.
+     */
+    public function getFailedCount(Event $event): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('failed_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->where($q->expr()->eq('id', ':id'))
+            ->setParameter('id', $event->getId());
+
+        return (int) $q->executeQuery()->fetchOne();
+    }
+
+    /**
+     * Reset the failed_count's for all events
+     * within the given Campaign.
+     */
+    public function resetFailedCountsForEventsInCampaign(Campaign $campaign): void
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', ':failedCount')
+            ->where($q->expr()->eq('campaign_id', ':campaignId'))
+            ->setParameter('failedCount', 0)
+            ->setParameter('campaignId', $campaign->getId());
+
+        $q->executeStatement();
+    }
+
+    /**
+     * Get the count of failed event for Lead/Event.
+     */
+    public function getFailedCountLeadEvent(int $leadId, int $eventId): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(le.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
+            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
+            ->where('le.lead_id = :leadId')
+            ->andWhere('le.event_id = :eventId')
+            ->setParameters(['leadId' => $leadId, 'eventId' => $eventId]);
+
+        return (int) $q->executeQuery()->fetchOne();
     }
 }

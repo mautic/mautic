@@ -1,12 +1,4 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 return [
     'name'        => 'Mautic tag manager bundle',
@@ -15,29 +7,36 @@ return [
     'author'      => 'Leuchtfeuer',
     'routes'      => [
         'main' => [
+            'mautic_tagmanager_batch_index_action' => [
+                'path'       => '/tags/batch/view',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\BatchTagController::indexAction',
+            ],
+            'mautic_tagmanager_batch_set_action' => [
+                'path'       => '/tags/batch/set',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\BatchTagController::execAction',
+            ],
             'mautic_tagmanager_index' => [
                 'path'       => '/tags/{page}',
-                'controller' => 'MauticTagManagerBundle:Tag:index',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             ],
             'mautic_tagmanager_action' => [
                 'path'       => '/tags/{objectAction}/{objectId}',
-                'controller' => 'MauticTagManagerBundle:Tag:execute',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::executeAction',
             ],
         ],
     ],
     'services'    => [
         'integrations' => [
             'mautic.integration.tagmanager' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
+                'class'     => MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
                     'doctrine.orm.entity_manager',
-                    'session',
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -46,23 +45,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.tagmanager.repository.tag' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \MauticPlugin\MauticTagManagerBundle\Entity\Tag::class,
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.tagmanager.model.tag' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Model\TagModel::class,
-                'arguments' => [
-                    'service_container',
+                    'mautic.lead.field.fields_with_unique_identifier',
                 ],
             ],
         ],
@@ -73,9 +56,9 @@ return [
                 'id'        => 'mautic_tagmanager_index',
                 'route'     => 'mautic_tagmanager_index',
                 'access'    => 'tagManager:tagManager:view',
-                'iconClass' => 'fa-tag',
+                'iconClass' => 'ri-hashtag',
                 'priority'  => 1,
             ],
         ],
     ],
-  ];
+];

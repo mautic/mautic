@@ -1,0 +1,24 @@
+{#
+  Variables
+    - event
+    - lead
+#}
+{% set import = event['extra'] %}
+<dl class="dl-horizontal">
+{% if import['user_id'] is not empty %}
+    <dt>{{ 'mautic.core.createdby'|trans }}</dt>
+    <dd>
+        <a href="{{ path('mautic_user_action', {'objectAction': 'view', 'objectId': import['user_id']}) }}" data-toggle="ajax">
+            {{ import['user_name'] }}
+        </a>
+    </dd>
+{% endif %}
+{% if import['properties']['file'] is not empty %}
+    <dt>{{ 'mautic.lead.import.source.file'|trans }}</dt>
+    <dd>{{ import['properties']['file'] }}</dd>
+{% endif %}
+{% if import['properties']['line'] is not empty %}
+    <dt>{{ 'mautic.lead.import.csv.line.number'|trans }}</dt>
+    <dd>{{ import['properties']['line'] }}</dd>
+{% endif %}
+</dl>

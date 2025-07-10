@@ -1,0 +1,47 @@
+{% block _mobile_notification_mobileSettings_widget %}
+  {% if 'ios' in integrationSettings.platforms %}
+      <div class="tab-pane fade in bdr-w-0" id="ios-notification-container">
+          <div class="row">
+              <div class="col-md-6">
+                  {{ form_row(form.ios_subtitle) }}
+                  {{ form_row(form.ios_media) }}
+              </div>
+              <div class="col-md-6">
+                  <div class="well">
+                      <h4>{{ 'Advanced Settings'|trans }}</h4>
+                      <hr />
+                      {{ form_row(form.ios_badges) }}
+                      {{ form_row(form.ios_badgeCount) }}
+                      {{ form_row(form.ios_sound) }}
+                      {{ form_label(form.ios_contentAvailable) }}
+                      {{ form_row(form.ios_contentAvailable) }}
+                      {{ form_label(form.ios_mutableContent) }}
+                      {{ form_row(form.ios_mutableContent) }}
+                  </div>
+              </div>
+          </div>
+      </div>
+  {% endif %}
+  {% if 'android' in integrationSettings.platforms %}
+      <div class="tab-pane fade in bdr-w-0" id="android-notification-container">
+          <div class="row">
+              <div class="col-md-6">
+                  {{ form_row(form.android_small_icon) }}
+                  {{ form_row(form.android_large_icon) }}
+                  {{ form_row(form.android_big_picture) }}
+              </div>
+              <div class="col-md-6">
+                  <div class="well">
+                      <h4>{{ 'Advanced Settings'|trans }}</h4>
+                      <hr />
+                      {{ form_row(form.android_sound) }}
+                      {{ form_row(form.android_group_key) }}
+                      {{ form_row(form.android_led_color) }}
+                      {{ form_row(form.android_accent_color) }}
+                      {{ form_row(form.android_lockscreen_visibility) }}
+                  </div>
+              </div>
+          </div>
+      </div>
+  {% endif %}
+{% endblock %}

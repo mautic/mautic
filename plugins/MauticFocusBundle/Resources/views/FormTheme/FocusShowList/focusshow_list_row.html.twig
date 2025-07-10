@@ -1,0 +1,19 @@
+{#
+  Used in the Campaign Builder
+    1. Add Decision for "Visits Page"
+    2. Add Action for "Show Focus Item"
+#}
+{% block focusshow_list_row %}
+  {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
+  <div class="row">
+      <div class="col-xs-12">
+          {{ form_row(form.focus) }}
+      </div>
+      <div class="col-xs-12 mt-lg">
+          <div class="mt-3">
+              {{ form_row(form.newFocusButton) }}
+              {{ form_row(form.editFocusButton) }}
+          </div>
+      </div>
+  </div>
+{% endblock %}

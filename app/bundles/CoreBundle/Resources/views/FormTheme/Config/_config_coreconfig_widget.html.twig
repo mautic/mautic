@@ -1,0 +1,337 @@
+{% block _config_coreconfig_widget %}
+{% set fields = form.children %}
+{% set fieldKeys = fields|keys %}
+
+{# General Configuration #}
+{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path',
+'last_shown_tab'])|length > 0 %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.general'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.general.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="row">
+
+                    {% if form.webroot is defined %}
+                    <div class="col-xs-12">{{ form_row(form.webroot) }}</div>
+                    {% endif %}
+
+                    {% if form['404_page'] is defined %}
+                    <div class="col-xs-12">{{ form_row(form['404_page']) }}</div>
+                    {% endif %}
+
+                    {% set technicalPathsContent %}
+                    {% if form.site_url is defined %}
+                        {{ form_row(form.site_url) }}
+                    {% endif %}
+
+                    {% if form.cache_path is defined %}
+                        {{ form_row(form.cache_path) }}
+                    {% endif %}
+
+                    {% if form.log_path is defined %}
+                        {{ form_row(form.log_path) }}
+                    {% endif %}
+
+                    {% if form.theme is defined %}
+                        {{ form_row(form.theme) }}
+                    {% endif %}
+
+                    {% if form.image_path is defined %}
+                        {{ form_row(form.image_path) }}
+                    {% endif %}
+
+                    {% if form.last_shown_tab is defined %}
+                        {{ form_row(form.last_shown_tab) }}
+                    {% endif %}
+                {% endset %}
+
+                {% include '@MauticCore/Helper/accordion.html.twig' with {
+                    'items': [
+                        {
+                            'title': 'mautic.core.config.technical_paths',
+                            'content': technicalPathsContent
+                        }
+                    ]
+                } %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{# Defaults Configuration #}
+{% if fieldKeys|filter(k => k in ['default_pagelist', 'timezone', 'locale', 'date_format_full', 'date_format_short',
+'date_format_dateonly', 'date_format_timeonly'])|length > 0 %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.defaults'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.defaults.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="row">
+
+                    {% if form.locale is defined %}
+                    <div class="col-xs-12">{{ form_row(form.locale) }}</div>
+                    {% endif %}
+
+                    {% if form.default_timezone is defined %}
+                    <div class="col-xs-12">{{ form_row(form.default_timezone) }}</div>
+                    {% endif %}
+
+                    <div class="mt-lg">
+                        {% set paginationContent %}
+                            {% if form.default_pagelimit is defined %}
+                                {{ form_row(form.default_pagelimit) }}
+                            {% endif %}
+
+                            {% if form.cached_data_timeout is defined %}
+                                {{ form_row(form.cached_data_timeout) }}
+                            {% endif %}
+
+                            {% if form.default_daterange_filter is defined %}
+                                {{ form_row(form.default_daterange_filter) }}
+                            {% endif %}
+                        {% endset %}
+
+                        {% set dateFormatsContent %}
+                            {% if form.date_format_full is defined %}
+                                {{ form_row(form.date_format_full) }}
+                            {% endif %}
+
+                            {% if form.date_format_short is defined %}
+                                {{ form_row(form.date_format_short) }}
+                            {% endif %}
+
+                            {% if form.date_format_dateonly is defined %}
+                                {{ form_row(form.date_format_dateonly) }}
+                            {% endif %}
+
+                            {% if form.date_format_timeonly is defined %}
+                                {{ form_row(form.date_format_timeonly) }}
+                            {% endif %}
+
+                            {% include '@MauticCore/FormTheme/Config/_config_coreconfig_widget--dateformat.html.twig' %}
+                        {% endset %}
+
+                        {% include '@MauticCore/Helper/accordion.html.twig' with {
+                            'items': [
+                                {
+                                    'title': 'mautic.core.config.pagination_and_display',
+                                    'content': paginationContent
+                                },
+                                {
+                                    'title': 'mautic.core.config.date_formats',
+                                    'content': dateFormatsContent
+                                }
+                            ]
+                        } %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+
+{# CORS Configuration #}
+{% if fieldKeys|filter(k => k in ['cors_restrict_domains', 'trusted_hosts', 'trusted_proxies', 'headers_sts'])|length > 0 %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.cors'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.cors.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="row">
+
+                    {% if form.cors_restrict_domains is defined %}
+                        <div class="col-xs-12">{{ form_row(form.cors_restrict_domains) }}</div>
+                    {% endif %}
+
+                    {% if form.cors_valid_domains is defined %}
+                        <div class="col-xs-12">{{ form_row(form.cors_valid_domains) }}</div>
+                    {% endif %}
+
+                    <hr>
+
+                    {% if form.trusted_hosts is defined %}
+                        <div class="col-xs-12">{{ form_row(form.trusted_hosts) }}</div>
+                    {% endif %}
+
+                    {% set trustSettingsContent %}
+                        {% if form.trusted_proxies is defined %}
+                            {{ form_row(form.trusted_proxies) }}
+                        {% endif %}
+                    {% endset %}
+
+                    {% set responseHeadersContent %}
+                    {% if form.headers_sts is defined %}
+                        {{ form_row(form.headers_sts) }}
+                    {% endif %}
+
+                    {% if form.headers_sts_subdomains is defined %}
+                        {{ form_row(form.headers_sts_subdomains) }}
+                    {% endif %}
+
+                    {% if form.headers_sts_preload is defined %}
+                        {{ form_row(form.headers_sts_preload) }}
+                    {% endif %}
+
+                    {% if form.headers_sts_expire_time is defined %}
+                        {{ form_row(form.headers_sts_expire_time) }}
+                    {% endif %}
+
+                    {% endset %}
+
+                    {% include '@MauticCore/Helper/accordion.html.twig' with {
+                        'items': [
+                            {
+                                'title': 'mautic.core.config.trust_settings',
+                                'content': trustSettingsContent
+                            },
+                            {
+                                'title': 'mautic.core.config.response_headers',
+                                'content': responseHeadersContent
+                            }
+                        ]
+                    } %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{# Miscellaneous Configuration #}
+{% if fieldKeys|filter(k => k in ['ip_lookup_service', 'do_not_track_ips',
+'do_not_track_bots', 'transliterate_page_title'])|length > 0 %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.misc'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.misc.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="row">
+
+                    {% if form.max_entity_lock_time is defined %}
+                        <div class="col-xs-12">{{ form_row(form.max_entity_lock_time) }}</div>
+                    {% endif %}
+
+                    {% if form.transliterate_page_title is defined %}
+                        <div class="col-xs-12">{{ form_row(form.transliterate_page_title) }}</div>
+                    {% endif %}
+
+                    {% set ipLookupContent %}
+                        {% if form.ip_lookup_service is defined %}
+                            {{ form_row(form.ip_lookup_service) }}
+                        {% endif %}
+
+                        {% if form.ip_lookup_auth is defined %}
+                            {{ form_row(form.ip_lookup_auth) }}
+                        {% endif %}
+
+                        {% if form.ip_lookup_create_organization is defined %}
+                            {{ form_row(form.ip_lookup_create_organization) }}
+                        {% endif %}
+
+                        <div id="ip_lookup_config_container">
+                            {% if form.ip_lookup_config is defined %}
+                                {{ form_row(form.ip_lookup_config) }}
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <div class="small text-center" id="ip_lookup_attribution">{{ ipLookupAttribution|raw }}</div>
+                        </div>
+                    {% endset %}
+
+                    {% set trackingContent %}
+                        {% if form.do_not_track_ips is defined %}
+                            {{ form_row(form.do_not_track_ips) }}
+                        {% endif %}
+
+                        {% if form.do_not_track_bots is defined %}
+                            {{ form_row(form.do_not_track_bots) }}
+                        {% endif %}
+                    {% endset %}
+
+                    {% set shortenerContent %}
+                        {% if form.shortener_service is defined %}
+
+                                <div class="col-xs-12">
+                                    {{ form_label(form.shortener_service) }}
+                                    {% if form.shortener_service.vars.choices|length > 0 %}
+                                        {{ form_widget(form.shortener_service) }}
+                                    {% else %}
+                                        <div class="alert alert-info">{{ 'mautic.core.config.form.shortener.empty'|trans }}</div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.shortener_service.vars.choices|length > 0 %}
+                                    {% if form.shortener_email_enable is defined %}
+                                        <div class="col-md-3">
+                                            {{ form_row(form.shortener_email_enable) }}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.shortener_sms_enable is defined %}
+                                        <div class="col-md-3">
+                                            {{ form_row(form.shortener_sms_enable) }}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+
+                        {% endif %}
+                    {% endset %}
+
+                    {% include '@MauticCore/Helper/accordion.html.twig' with {
+                        'items': [
+                            {
+                                'title': 'mautic.core.config.ip_lookup',
+                                'content': ipLookupContent
+                            },
+                            {
+                                'title': 'mautic.core.config.tracking_settings',
+                                'content': trackingContent
+                            },
+                            {
+                                'title': 'mautic.core.config.link_shorteners',
+                                'padding_inline': false,
+                                'content': shortenerContent
+                            }
+                        ]
+                    } %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{# Update Configuration #}
+{% if fieldKeys|filter(k => k in ['update_stability', 'composer_updates'])|length > 0 %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.update'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.update.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="row">
+
+                    {% if form.update_stability is defined %}
+                        <div class="col-xs-12">{{ form_row(form.update_stability) }}</div>
+                    {% endif %}
+
+                    {% if form.composer_updates is defined %}
+
+                        <div class="col-xs-12">
+                            {{ form_row(form.composer_updates) }}
+                            <div class="alert alert-danger" role="alert">
+                                {{ 'mautic.core.config.form.update.composer.warning'|trans({
+                                    '%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
+                                    '%url_end%': '</a>'
+                                })|raw }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+{% endblock %}

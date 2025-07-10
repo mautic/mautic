@@ -1,0 +1,208 @@
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover email-list">
+            <thead>
+            <tr>
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall'        : 'true'
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'e.name',
+                    'text'       : 'mautic.core.name',
+                    'class'      : 'col-email-name',
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'c.title',
+                    'text'       : 'mautic.core.category',
+                    'class'      : 'visible-md visible-lg col-email-category',
+                }) -}}
+
+                <th class="visible-sm visible-md visible-lg col-email-stats">{{ 'mautic.core.stats'|trans }}</th>
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'e.dateAdded',
+                    'text'       : 'mautic.lead.import.label.dateAdded',
+                    'class'      : 'visible-lg col-email-dateAdded',
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'e.dateModified',
+                    'defaultDir' : 'DESC',
+                    'text'       : 'mautic.lead.import.label.dateModified',
+                    'class'      : 'visible-lg col-email-dateModified',
+                    'default'    : true,
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'e.createdByUser',
+                    'text'       : 'mautic.core.createdby',
+                    'class'      : 'visible-lg col-email-createdByUser',
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'e.id',
+                    'text'       : 'mautic.core.id',
+                    'class'      : 'visible-md visible-lg col-email-id',
+                }) -}}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                {% set hasVariants  = item.isVariant() %}
+                {% set hasTranslations  = item.isTranslation() %}
+                {% set type = item.getEmailType() %}
+                {% set hasDraft  = item.hasDraft() %}
+                {% set mauticTemplateVars = _context|merge({'item' : item}) %}
+                <tr id="row_email_{{ item.id }}">
+                    <td>
+                        {% set edit = securityHasEntityAccess(
+                            permissions['email:emails:editown'],
+                            permissions['email:emails:editother'],
+                            item.getCreatedBy()
+                        ) %}
+
+                        {% set sendButton = {
+                            'attr': {
+                                'data-toggle': 'ajax',
+                                'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
+                            },
+                            'iconClass': 'ri-send-plane-line-o',
+                            'btnText': 'mautic.email.send'
+                        } %}
+
+                        {% if item.isBackgroundSending() %}
+                            {% set sendButton = sendButton|merge({
+                                'attr': {
+                                    'href': 'javascript:void(0);',
+                                    'disabled': true
+                                },
+                                'tooltip': 'mautic.email.send.disabled',
+                                'btnClass': 'disabled'
+                            }) %}
+                        {% endif %}
+
+                        {% set customButtons = ('list' == type) ? [sendButton] : [] %}
+
+
+                        {{- include('@MauticCore/Helper/list_actions.html.twig', {
+                            'item'            : item,
+                            'templateButtons' : {
+                                'edit'   : edit,
+                                'clone'  : permissions['email:emails:create'],
+                                'delete' : securityHasEntityAccess(
+                                    permissions['email:emails:deleteown'],
+                                    permissions['email:emails:deleteother'],
+                                    item.getCreatedBy()
+                                ),
+                                'abtest' : ((not hasVariants) and edit and permissions['email:emails:create']),
+                            },
+                            'routeBase'     : 'email',
+                            'customButtons' : customButtons,
+                        }) -}}
+                    </td>
+                    <td>
+                        <div>
+                            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                'item'  : item,
+                                'model' : 'email'
+                            }) -}}
+                            <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}"
+                               data-toggle="ajax">
+                                {{ item.getName() }}
+                                {% if hasVariants %}
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="ri-fw ri-organization-chart fs-14"></i></span>
+                                {% endif %}
+                                {% if hasTranslations %}
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="ri-fw ri-translate fs-14"></i></span>
+                                {% endif %}
+                                {% if 'list' == type %}
+                                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line fs-14"></i></span>
+                                {% endif %}
+                                {% if isDraftEnabled and hasDraft %}
+                                <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
+                                {% endif %}
+                                {{ customContent('email.name', mauticTemplateVars) }}
+                            </a>
+                        </div>
+                        {% if item.getDescription() is not empty %}
+                            <div class="text-secondary mt-4">
+                                <small>{{ item.getDescription()|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.getCategory() %}
+                        {% set catName  = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
+                        {% set color = (category) ? '#' ~ category.getColor() : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                    </td>
+                    <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
+                        {{ customContent('email.stats.above', mauticTemplateVars) }}
+                        <span class="mt-xs label label-warm-gray{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
+                              id="pending-{{ item.getId() }}"
+                              data-toggle="tooltip"
+                              title="{{ 'mautic.email.stat.leadcount.tooltip'|trans }}">
+                          <i class="ri-more-fill"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
+                              {{ 'mautic.email.stat.leadcount'|trans ({'%count%' : item.getPendingCount()}) }}
+                          </a>
+                        </span>
+                        <span class="mt-xs label label-magenta{{ item.getQueuedCount() > 0 ? '' : ' hide' }}"
+                              id="queued-{{ item.getId() }}"
+                              data-toggle="tooltip"
+                              title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
+                          <i class="ri-mail-send-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
+                              {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
+                          </a>
+                        </span>
+                        <span class="mt-xs label label-blue" id="sent-count-{{ item.getId() }}">
+                            <i class="ri-mail-unread-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_sent'|trans ~ ':' ~ item.getId()}) }}"
+                             data-toggle="tooltip"
+                             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.sentcount'|trans ({'%count%' : item.getSentCount(true)}) }}</a>
+                        </span>
+                        <span class="mt-xs label label-teal" id="read-count-{{ item.getId() }}">
+                            <i class="ri-mail-open-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
+                             data-toggle="tooltip"
+                             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.readcount'|trans ({'%count%' : item.getReadCount(true)}) }}</a>
+                             <span id="read-percent-{{ item.getId() }}">
+                                ({{ item.getReadPercentage(true) }}%)
+                            </span>
+                        </span>
+
+                        {{ customContent('email.stats', mauticTemplateVars) }}
+                        {{ customContent('email.stats.below', mauticTemplateVars) }}
+                    </td>
+                    <td class="visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+                        {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
+                    </td>
+                    <td class="visible-lg" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+                        {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
+                    </td>
+                    <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>
+                    <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems'    : totalItems,
+            'page'          : page,
+            'limit'         : limit,
+            'baseUrl'       : path('mautic_email_index'),
+            'sessionVar'    : 'email',
+        }) -}}
+    </div>
+{% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+{% endif %}

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Validator;
 
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -57,10 +48,10 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
         $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
-        $emailValidatorMock->expects($this->exactly(2))
+        $emailValidatorMock->expects($this->exactly(1))
             ->method('validate')
-            ->withConsecutive(['john@don.com'], ['xxx'])
-            ->willReturn(null, $this->throwException(new InvalidEmailException('xxx')));
+            ->with('xxx')
+            ->willThrowException(new InvalidEmailException('xxx'));
 
         $executionContextInterfaceMock->expects($this->once())
             ->method('buildViolation')
@@ -73,7 +64,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
         $multipleEmailsValidValidator->initialize($executionContextInterfaceMock);
 
-        $emails = 'john@don.com, xxx';
+        $emails = 'xxx';
         $multipleEmailsValidValidator->validate($emails, $constraintMock);
     }
 }

@@ -1,79 +1,103 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Role.
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "role:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"permissions"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "role:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
  */
-class Role extends FormEntity
+class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
+    use UuidTrait;
+    public const CACHE_NAMESPACE = 'Role';
     /**
      * @var int
+     *
+     * @Groups({"role:read"})
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $name;
 
     /**
-     * @var string
+     * @var string|null
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $description;
 
     /**
      * @var bool
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $isAdmin = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, Permission>
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $permissions;
 
     /**
      * @var array
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $rawPermissions;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, User>
      */
     private $users;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
         $this->users       = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('roles')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\RoleRepository');
+            ->setCustomRepositoryClass(RoleRepository::class);
 
         $builder->addIdColumns();
 
@@ -97,9 +121,11 @@ class Role extends FormEntity
             ->mappedBy('role')
             ->fetchExtraLazy()
             ->build();
+
+        static::addUuidField($builder);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -108,10 +134,8 @@ class Role extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('role')
             ->addListProperties(
@@ -178,7 +202,7 @@ class Role extends FormEntity
     /**
      * Remove permissions.
      */
-    public function removePermission(Permission $permissions)
+    public function removePermission(Permission $permissions): void
     {
         $this->permissions->removeElement($permissions);
     }
@@ -256,7 +280,7 @@ class Role extends FormEntity
     /**
      * Simply used to store a readable format of permissions for the changelog.
      */
-    public function setRawPermissions(array $permissions)
+    public function setRawPermissions(array $permissions): void
     {
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
@@ -287,7 +311,7 @@ class Role extends FormEntity
     /**
      * Remove users.
      */
-    public function removeUser(User $users)
+    public function removeUser(User $users): void
     {
         $this->users->removeElement($users);
     }
@@ -300,5 +324,13 @@ class Role extends FormEntity
     public function getUsers()
     {
         return $this->users;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [
+            self::CACHE_NAMESPACE,
+            User::CACHE_NAMESPACE,
+        ];
     }
 }

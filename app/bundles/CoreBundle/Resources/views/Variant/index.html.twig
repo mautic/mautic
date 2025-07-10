@@ -1,0 +1,90 @@
+{#
+  Variables
+    - activeEntity
+    - variants
+    - abTestResults
+    - model
+    - actionRoute
+    - nameGetter
+#}
+{%- apply spaceless -%}
+{%- set nameGetter = nameGetter|default('getName') -%}
+{%- set totalWeight = 0 -%}
+{%- set abStatsHeader = 'mautic.core.ab_test.stats'|trans -%}
+{%- if variants.properties is defined and variants.properties is not empty -%}
+  {% if variants.parent.variantStartDate is not empty %}
+    <div class="box-layout mb-lg">
+        <div class="col-xs-10 va-m">
+            <h4>
+                    {{ 'mautic.core.variant_start_date'|trans({
+                        '%time%': dateToTime(variants.parent.variantStartDate),
+                        '%date%': dateToShort(variants.parent.variantStartDate),
+                        '%full%': dateToTime(variants.parent.variantStartDate),
+                    }) }}
+            </h4>
+        </div>
+        <!-- button -->
+        <div class="col-xs-2 va-m text-right">
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: abStatsHeader,
+                        variant: 'primary',
+                        href: '#',
+                        attributes: {
+                            'data-toggle': 'modal',
+                            'data-target': '#abStatsModal'
+                        }
+                    }
+                ]
+            } %}
+        </div>
+    </div>
+  {% endif %}
+  <!--/ header -->
+
+  <!-- start: variants list -->
+  <ul class="list-group">
+      {% if variants.parent %}
+          {# totalWeight was &$totalReference #}
+          {{ include('@MauticCore/Variant/row.html.twig', {
+                  'totalWeight': totalWeight,
+                  'variant': variants.parent,
+                  'variants': variants,
+                  'abTestResults': abTestResults,
+                  'actionRoute': actionRoute,
+                  'activeEntity': activeEntity,
+                  'model': model,
+                  'nameGetter': nameGetter,
+          }) }}
+      {% endif %}
+      {% if variants.children|length > 0 %}
+          {% for id, variant in variants.children %}
+              {# totalWeight was &$totalReference #}
+              {{ include('@MauticCore/Variant/row.html.twig', {
+                      'totalWeight': totalWeight,
+                      'variant': variant,
+                      'variants': variants,
+                      'abTestResults': abTestResults,
+                      'actionRoute': actionRoute,
+                      'activeEntity': activeEntity,
+                      'model': model,
+                      'nameGetter': nameGetter,
+              }) }}
+          {% endfor %}
+      {% endif %}
+  </ul>
+  <!--/ end: variants list -->
+
+  {% set bodyContent = 'mautic.core.ab_test.noresults'|trans %}
+  {% if abTestResults.supportTemplate is defined %}
+      {% set bodyContent = include(abTestResults.supportTemplate, {'results': abTestResults, 'variants': variants}) %}
+  {% endif %}
+  {{ include('@MauticCore/Helper/modal.html.twig', {
+          'id': 'abStatsModal',
+          'header': abStatsHeader,
+          'body': bodyContent,
+          'size': 'lg',
+  }) }}
+{%- endif -%}
+{%- endapply -%}
