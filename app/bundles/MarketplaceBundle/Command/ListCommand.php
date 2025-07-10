@@ -4,6 +4,7 @@ namespace Mautic\MarketplaceBundle\Command;
 
 use Mautic\MarketplaceBundle\DTO\PackageBase;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,6 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+#[AsCommand(
+    name: ListCommand::NAME,
+    description: 'Lists plugins that are available at Packagist.org'
+)]
 class ListCommand extends Command
 {
     public const NAME = 'mautic:marketplace:list';
@@ -24,7 +29,6 @@ class ListCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME);
         $this->addOption('page', 'p', InputOption::VALUE_OPTIONAL, 'Page number', 1);
         $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Packages per page', 15);
         $this->addOption('filter', 'f', InputOption::VALUE_OPTIONAL, 'Filter the packages', '');
@@ -63,6 +67,4 @@ class ListCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Lists plugins that are available at Packagist.org';
 }

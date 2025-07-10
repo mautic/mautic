@@ -129,10 +129,7 @@ class Form extends FormEntity implements UuidInterface
      */
     private Collection $submissions;
 
-    /**
-     * @var int
-     */
-    public $submissionCount;
+    public int $submission_count = 0;
 
     /**
      * @var string|null

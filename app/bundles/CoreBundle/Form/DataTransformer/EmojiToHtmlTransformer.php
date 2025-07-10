@@ -19,7 +19,7 @@ class EmojiToHtmlTransformer implements DataTransformerInterface
      *
      * @return string|array
      */
-    public function transform($content)
+    public function transform(mixed $content): mixed
     {
         if (is_array($content)) {
             foreach ($content as &$convert) {
@@ -39,7 +39,7 @@ class EmojiToHtmlTransformer implements DataTransformerInterface
      *
      * @return array|string
      */
-    public function reverseTransform($content)
+    public function reverseTransform(mixed $content): mixed
     {
         if (is_array($content)) {
             foreach ($content as &$convert) {
