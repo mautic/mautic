@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\FormBundle\Form\Type\FormListType;
@@ -23,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -32,6 +32,7 @@ class FocusType extends AbstractType
 {
     public function __construct(
         private CorePermissions $security,
+        private CoreParametersHelper $coreParametersHelper,
         private RouterInterface $router,
     ) {
     }
@@ -129,9 +130,9 @@ class FocusType extends AbstractType
         $websiteValue = $options['data']->getWebsite();
         if (empty($websiteValue)) {
             $websiteValue = $this->router->generate('mautic_focus_index',
-                ['page' => 1],
-                \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
-            );
+            ['page' => 1],
+            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
+        );
         }
         $builder->add(
             'website',
