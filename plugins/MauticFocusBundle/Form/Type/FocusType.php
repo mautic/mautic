@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\FormBundle\Form\Type\FormListType;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -144,6 +145,8 @@ class FocusType extends AbstractType
                 'bundle' => 'plugin:focus',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('focus:items:publish');

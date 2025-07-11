@@ -9,7 +9,7 @@ use Mautic\FormBundle\Exception\FileValidationException;
 use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(UploadFieldValidator::class)]
@@ -23,7 +23,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidatorMock->expects($this->never())
             ->method('validate');
 
-        $parameterBagMock = $this->createMock(ParameterBag::class);
+        $parameterBagMock = $this->createMock(FileBag::class);
 
         $parameterBagMock->expects($this->once())
             ->method('get')
@@ -51,7 +51,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('validate')
             ->willThrowException(new FileInvalidException('Validation failed'));
 
-        $parameterBagMock = $this->createMock(ParameterBag::class);
+        $parameterBagMock = $this->createMock(FileBag::class);
 
         $fileMock = $this->createMock(UploadedFile::class);
 
@@ -90,7 +90,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidatorMock->expects($this->once())
             ->method('validate');
 
-        $parameterBagMock = $this->createMock(ParameterBag::class);
+        $parameterBagMock = $this->createMock(FileBag::class);
 
         $fileMock = $this->createMock(UploadedFile::class);
 

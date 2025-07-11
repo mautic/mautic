@@ -251,6 +251,26 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 $("[data-toggle~=popover]").popover({
                     sanitize: false
                 });
+                
+                var hideAllPopovers = function() {
+                    $("[data-toggle~=popover]").each(function() {
+                        var popover = $(this).data('bs.popover');
+                        if (popover && popover.tip().hasClass('in')) {
+                            $(this).popover('hide');
+                        }
+                    });
+                };
+                
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.popover').length && 
+                        !$(e.target).closest('[data-toggle="popover"]').length) {
+                        hideAllPopovers();
+                    }
+                });
+                
+                $(document).on('mouseenter', '[data-toggle="popover"][data-trigger="hover"]', function() {
+                    hideAllPopovers();
+                });
             },
 
             // @MISC: IE9 input placeholder support

@@ -26,7 +26,7 @@ class SmsRepository extends CommonRepository
             ->select($this->getTableAlias())
             ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
@@ -151,7 +151,6 @@ class SmsRepository extends CommonRepository
                     'sms_id',
                     'sms_projects_xref',
                     $this->getTableAlias(),
-                    $unique,
                     $filter->string,
                     $filter->not
                 );

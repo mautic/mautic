@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -130,6 +131,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var bool
      *
      * @Groups({"report:read", "report:write"})
+     *
+     * @ApiProperty(readable=true)
      */
     private $isScheduled = false;
 

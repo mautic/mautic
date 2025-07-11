@@ -13,6 +13,7 @@
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
+            'searchHelp': 'mautic.focus.help.searchcommands',
             'action': currentRoute,
             'page_actions': {
                 'templateButtons': {

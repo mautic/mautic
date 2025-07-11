@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
@@ -357,5 +358,31 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->submit($form, $data);
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertStringNotContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+    }
+
+    public function testAssetWithProject(): void
+    {
+        $asset = new Asset();
+        $asset->setTitle('test');
+        $asset->setAlias('test');
+        $this->em->persist($asset);
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['asset[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedAsset = $this->em->find(Asset::class, $asset->getId());
+        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

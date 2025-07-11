@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -166,5 +167,26 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $saveButton, 'Save button not found');
         $this->assertCount(1, $cancelButton, 'Cancel button not found');
         $this->assertCount(0, $mergeButton, 'Merge button found');
+    }
+
+    public function testCompanyWithProject(): void
+    {
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $form    = $crawler->selectButton('Save')->form();
+        $form['company[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedCompany = $this->em->find(Company::class, $this->company1Id);
+        $this->assertSame($project->getId(), $savedCompany->getProjects()->first()->getId());
     }
 }
