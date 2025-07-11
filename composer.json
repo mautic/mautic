@@ -42,12 +42,12 @@
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpunit": "^10.0",
     "rector/rector": "2.0",
-    "symfony/browser-kit": "~6.4.0",
-    "symfony/dom-crawler": "~6.4.0",
+    "symfony/browser-kit": "^7.2.0",
+    "symfony/dom-crawler": "^7.2.0",
     "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~6.4.0",
-    "symfony/var-dumper": "~6.4.0",
-    "symfony/web-profiler-bundle": "~6.4.0",
+    "symfony/phpunit-bridge": "^7.2.0",
+    "symfony/var-dumper": "^7.2.0",
+    "symfony/web-profiler-bundle": "^7.2.0",
     "symplify/easy-coding-standard": "^12.0.13"
   },
   "replace": {

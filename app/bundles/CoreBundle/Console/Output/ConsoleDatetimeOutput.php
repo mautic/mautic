@@ -13,11 +13,8 @@ class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterf
 {
     /**
      * Prefix message with current datetime.
-     *
-     * @param string $message
-     * @param bool   $newline
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         $date = (new \DateTime())->format('Y-m-d H:i:s');
 

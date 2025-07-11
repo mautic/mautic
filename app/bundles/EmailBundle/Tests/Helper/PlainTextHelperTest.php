@@ -61,6 +61,47 @@ class PlainTextHelperTest extends TestCase
 </html>',
                 "WELCOME TO OUR NEWSLETTER\n\nThis is an example paragraph in our email content.",
             ],
+            [
+                <<<HTML
+<a href="https://example.com">text</a>
+HTML
+                ,
+                <<<HTML
+text [https://example.com]
+HTML,
+            ],
+            [
+                <<<HTML
+<a href="https://example.com">link 1</a>
+<a href="https://examples.com">link 2</a>
+HTML
+                ,
+                <<<HTML
+link 1 [https://example.com] link 2 [https://examples.com]
+HTML,
+            ],
+            [
+                <<<HTML
+<a href="https://example.com">text<br></a>
+HTML
+                ,
+                <<<HTML
+text
+[https://example.com]
+HTML,
+            ],
+            [
+                <<<HTML
+<h1>something</h1>
+<h2>another something</h2>
+HTML
+                ,
+                <<<HTML
+SOMETHING
+
+ANOTHER SOMETHING
+HTML,
+            ],
         ];
     }
 
