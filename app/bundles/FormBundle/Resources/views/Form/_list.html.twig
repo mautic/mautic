@@ -114,12 +114,11 @@
                                 {% endif %}
                             </a>
                             {{ customContent('form.name', _context) }}
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
-                        {% if item.description %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ item.description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': item.description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
@@ -148,5 +147,78 @@
         </div>
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.form.noresults.tip'}) }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.form.noresults.tip'}) }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'text--input',
+                        'size': '80'
+                    } %}
+                </div>
+
+                {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                    type: 'default',
+                    eyebrow: 'mautic.form.list.eyebrow',
+                    heading: 'mautic.form.list.heading',
+                    copy: 'mautic.form.list.copy',
+                }) }}
+                
+                {% set formFeaturesContainer %}
+                <div class="row">
+                    <div class="col-sm-6 col-xs-12">
+                        {{ include('@MauticCore/Components/content-item.html.twig', {
+                            type: 'pictogram',
+                            pictogram: 'select--range',
+                            heading: 'mautic.form.list.feature1.heading',
+                            copy: 'mautic.form.list.feature1.copy',
+                        }) }}
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        {{ include('@MauticCore/Components/content-item.html.twig', {
+                            type: 'pictogram',
+                            pictogram: 'event-driven',
+                            heading: 'mautic.form.list.feature2.heading',
+                            copy: 'mautic.form.list.feature2.copy',
+                        }) }}
+                    </div>
+                </div>
+                {% endset %}
+
+                {{ include('@MauticCore/Components/content-group.html.twig', {
+                    heading: 'mautic.form.list.capabilities.heading',
+                    childContainer: formFeaturesContainer,
+                }) }}
+
+                {% set formUsesContainer %}
+                <div class="type-body-02 mb-32">
+                    {% include '@MauticCore/Components/list--styled.html.twig' with {
+                        'type': 'unordered',
+                        'style': 'checkmark',
+                        'items': [
+                            'mautic.form.list.use1',
+                            'mautic.form.list.use2',
+                            'mautic.form.list.use3',
+                            'mautic.form.list.use4',
+                            'mautic.form.list.use5',
+                        ]
+                    } %}
+                </div>
+                {% endset %}
+                
+                {{ include('@MauticCore/Components/content-group.html.twig', {
+                    heading: 'mautic.form.list.uses.heading',
+                    childContainer: formUsesContainer,
+                }) }}
+                {% endset %}
+                
+                {{ include('@MauticCore/Components/content-block.html.twig', {
+                    heading: 'mautic.form.list.block.heading',
+                    subheading: 'mautic.form.list.block.subheading',
+                    childContainer: childContainer,
+                }) }}
+        </div>
+    {% endif %}
 {% endif %}

@@ -227,8 +227,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $metadata->addConstraint(new SlotNameType());
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (self $dwc, ExecutionContextInterface $context): void {
                 if (!$dwc->getIsCampaignBased()) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
@@ -264,7 +264,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     }
                 }
             },
-        ]));
+        ));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
@@ -310,7 +310,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {

@@ -63,7 +63,15 @@ class CampaignApiController extends CommonApiController
         $this->entityNameOne     = 'campaign';
         $this->entityNameMulti   = 'campaigns';
         $this->permissionBase    = 'campaign:campaigns';
-        $this->serializerGroups  = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+        $this->serializerGroups  = [
+            'campaignDetails',
+            'campaignEventDetails',
+            'categoryList',
+            'publishDetails',
+            'leadListList',
+            'formList',
+            'projectList',
+        ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -39,6 +41,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    use ProjectTrait;
 
     public const TABLE_NAME = 'lead_lists';
 
@@ -105,6 +108,7 @@ class LeadList extends FormEntity implements UuidInterface
     public function __construct()
     {
         $this->leads = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -151,6 +155,7 @@ class LeadList extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
+        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
         static::addUuidField($builder);
     }
 
@@ -193,6 +198,8 @@ class LeadList extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'leadList');
     }
 
     /**

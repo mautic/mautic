@@ -90,7 +90,7 @@
                                       'disableToggle': item.disablePublishChange,
                                       'aditionalLabel': (item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : '') ~ (item.getColumnIsNotRemoved() ? 'mautic.lead.field.being_removed_in_background'|trans : ''),
                           }) }}
-                          <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}">{{ item.label }}</a>
+                          <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">{{ item.label }}</a>
                           {{ customContent('lead.field.name', _context) }}
                       </span>
                       </td>
@@ -119,7 +119,7 @@
                               <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
                           {% endif %}
                           {% if item.isIsIndex %}
-                              <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
+                              <i class="ri-menu-search-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
                           {% endif %}
                       </td>
                   </tr>

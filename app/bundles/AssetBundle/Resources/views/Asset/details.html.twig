@@ -19,6 +19,7 @@
         }
     ) -}}
     {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeAsset.category}) }}
+    {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeAsset}) }}
 {% endblock %}
 
 {% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}
@@ -51,6 +52,7 @@
         'entity': activeAsset,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {# Asset type #}
     {% if activeAsset.getFileType() is defined and activeAsset.getFileType() is not empty %}
@@ -120,7 +122,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- asset detail header -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeAsset.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': activeAsset.description} %}
             <!--/ asset detail header -->
             <!-- asset detail collapseable -->
             <div class="collapse pr-md pl-md" id="asset-details">
@@ -175,18 +177,29 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% include '@MauticCore/Modules/stat--icon.html.twig' with {
+                            'stats': [
+                                {
+                                    'title': 'mautic.asset.asset.downloads.total',
+                                    'value': stats.downloads.total,
+                                    'tooltip': 'mautic.asset.asset.downloads.total.all_time',
+                                    'icon': 'ri-download-line'
+                                },
+                                {
+                                    'title': 'mautic.asset.asset.downloads.unique',
+                                    'value': stats.downloads.unique,
+                                    'tooltip': 'mautic.asset.asset.downloads.unique.all_time',
+                                    'icon': 'ri-user-6-line'
+                                }
+                            ]
+                        } %}
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-md-2 va-m">
+                                <div class="col-md-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="ri-download-line"></span>
                                         {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
                                     </h5>
-                                </div>
-                                <div class="col-md-2 va-m text-center">
-                                    <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.total'|trans({'count' : stats.downloads.total}) }}</span>
-                                    <span class="text-white dark-md fw-sb mb-xs">|</span>
-                                    <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.unique'|trans({'count' : stats.downloads.unique}) }}</span>
                                 </div>
                                 <div class="col-md-8 va-m">
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}

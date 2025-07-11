@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -121,6 +122,7 @@ class ListType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object' => 'lead']);

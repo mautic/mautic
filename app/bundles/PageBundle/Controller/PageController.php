@@ -584,7 +584,7 @@ class PageController extends FormController
                 );
             } elseif ($valid && $this->isButtonClicked($form, 'apply')) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
-                $form = $model->createForm($entity, $this->coreParametersHelper->get('form.factory'), $action);
+                $form = $model->createForm($entity, $this->formFactory, $action);
             }
         } else {
             // lock the entity

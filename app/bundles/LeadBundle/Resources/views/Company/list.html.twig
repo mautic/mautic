@@ -21,7 +21,7 @@
 
 {% block content %}
   {% if isIndex %}
-    <div id="page-list-wrapper" class="panel panel-default">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
       {%- set pageButtons = [] %}
 {% if permissions['lead:leads:create'] %}
     {% set pageButtons = pageButtons|merge([
@@ -44,6 +44,7 @@
 
 {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
     'searchValue': searchValue,
+    'searchHelp': 'mautic.company.help.searchcommands',
     'action': currentRoute,
     'page_actions': {
         'templateButtons': {'new': permissions['lead:leads:create']},
@@ -142,6 +143,7 @@
                                 {{ fields.core.companyname.value|purify }}
                               {% endif %}
                           {% endif %}
+                          {{ include('@MauticProject/Modules/projects.html.twig') }}
                           </div>
                       </td>
                       <td>
@@ -183,7 +185,44 @@
           }) }}
       </div>
   {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.company.action.noresults.tip'}) }}
+    {% if searchValue is not empty %}
+      {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% else %}
+      <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+        {% set childContainer %}
+          <div class="mb-32">
+              {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                  'pictogram': 'organization',
+                  'size': '80'
+              } %}
+          </div>
+          <div class="type-body-02">
+              {% include '@MauticCore/Components/list--styled.html.twig' with {
+                  'type': 'unordered',
+                  'style': 'checkmark',
+                  'items': [
+                      'mautic.company.empty.feature.segment_contacts',
+                      'mautic.company.empty.feature.custom_fields',
+                      'mautic.company.empty.feature.adjust_scores',
+                      'mautic.company.empty.feature.identify',
+                      'mautic.company.empty.feature.assign_contacts',
+                  ]
+              } %}
+          </div>
+        {% endset %}
+
+        {{ include('@MauticCore/Components/content-block.html.twig', {
+            heading: 'mautic.company.empty.heading',
+            subheading: 'mautic.company.empty.subheading',
+            childContainer: childContainer,
+            cta: permissions['lead:leads:create'] ? {
+                'label': 'mautic.company.action.add',
+                'link': path('mautic_import_action', {'object': 'companies', 'objectAction': 'new'}),
+                'attributes': {'data-toggle': 'ajax'}
+            } : null
+        }) }}
+      </div>
+    {% endif %}
   {% endif %}
 
   {% if isIndex %}

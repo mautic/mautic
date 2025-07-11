@@ -51,9 +51,9 @@ class PageModelTest extends MauticMysqlTestCase
     public function testItRegistersPageHitsWithFieldValues(): void
     {
         $requestParameters = [
-            'page_title'       => $this->generateRandomString(50),
-            'page_language'    => $this->generateRandomString(50),
-            'page_url'         => 'https://some.page.url/test/'.$this->generateRandomString(50),
+            'page_title'       => $this->generateRandomUTF8String(512),
+            'page_language'    => $this->generateRandomUTF8String(512),
+            'page_url'         => 'https://some.page.url/test/'.$this->generateRandomUTF8String(512),
             'counter'          => 0,
             'timezone_offset'  => -120,
             'resolution'       => '2560x1440',
@@ -73,6 +73,23 @@ class PageModelTest extends MauticMysqlTestCase
     public function generateRandomString(int $length): string
     {
         return substr(bin2hex(random_bytes($length)), 0, $length);
+    }
+
+    public function generateRandomUTF8String(int $length): string
+    {
+        $result = '';
+
+        for ($i = 0; $i < $length; ++$i) {
+            $codePoint = mt_rand(0x80, 0xFFFF);
+            $char      = \IntlChar::chr($codePoint);
+            if (null !== $char && \IntlChar::isprint($char)) {
+                $result .= $char;
+            } else {
+                --$i;
+            }
+        }
+
+        return $result;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]

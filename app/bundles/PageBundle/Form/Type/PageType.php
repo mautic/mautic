@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Helper\PageConfigInterface;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -313,6 +314,8 @@ class PageType extends AbstractType
                 'bundle' => 'page',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         $builder->add(
             'language',

@@ -425,6 +425,12 @@ class ImportController extends FormController
                         ->setHeaders($this->requestStack->getSession()->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->requestStack->getSession()->get('mautic.'.$object.'.import.config'));
 
+                    $successMessage = 'mautic.lead.batch.import.created';
+                    if (!$this->security->isGranted($this->getPermissionBase().':publish')) {
+                        $import->setIsPublished(false);
+                        $successMessage = 'mautic.lead.batch.import.created.unpublished';
+                    }
+
                     // In case the user chose to import in browser
                     if ($this->importInBrowser($form, $object)) {
                         $import->setStatus($import::MANUAL);
@@ -434,7 +440,7 @@ class ImportController extends FormController
                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.id', $import->getId());
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
-                        $this->addFlashMessage('mautic.lead.batch.import.created');
+                        $this->addFlashMessage($successMessage);
                         $this->resetImport($object);
 
                         return $this->indexAction($request);

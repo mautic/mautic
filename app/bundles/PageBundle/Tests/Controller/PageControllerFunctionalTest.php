@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageControllerFunctionalTest extends MauticMysqlTestCase
@@ -78,5 +79,28 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $page;
+    }
+
+    public function testPageWithProject(): void
+    {
+        $page = $this->createPage();
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/pages/edit/'.$page->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['page[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedPage = $this->em->find(Page::class, $page->getId());
+        $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
     }
 }

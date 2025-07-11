@@ -90,14 +90,7 @@
     &.btn-info { color: @brand-info; }
   }
 
-  &.btn-block {width: 100%;}
-}
-
-.btn ~ .btn,
-.btn ~ .btn-group,
-.btn-group ~ .btn,
-.btn-group ~ .btn-group {
-  margin-left: 5px;
+  &.btn-block, &.btn-wide {width: 100%;}
 }
 
 // Hierarchycal buttons
@@ -278,11 +271,14 @@
 // Make a button look and behave like a link
 .btn-link {
   font-weight: @btn-font-weight;
+  color: var(--link-primary);
   height: auto;
   line-height: normal;
   padding: 0;
   &:hover,
   &:focus { text-decoration: none; }
+
+  i { font-size: 18px; }
 }
 
 .btn-info {

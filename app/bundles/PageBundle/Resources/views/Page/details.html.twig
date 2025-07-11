@@ -32,6 +32,7 @@
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
 {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activePage.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': activePage}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
@@ -55,6 +56,7 @@
         'entity': activePage,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {% set blueTags = [] %}
     {% set grayTags = [] %}
@@ -124,7 +126,7 @@
       <div class="col-md-9 height-auto">
           <div>
               <!-- page detail header -->
-                {% include '@MauticCore/Helper/description.html.twig' with {
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with {
                     'description': activePage.metaDescription
                 } %}
               <!--/ page detail header -->

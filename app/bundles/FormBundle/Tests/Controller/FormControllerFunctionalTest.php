@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
@@ -631,6 +632,53 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         list($clonedField1, $clonedField2, $clonedSubmit) = $fields;
         Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
+    }
+
+    public function testFormWithProject(): void
+    {
+        $form = $this->createForm('Name', 'Alias');
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler     = $this->client->request('GET', '/s/forms/edit/'.$form->getId());
+        $formCrawler = $crawler->selectButton('Save')->form();
+        $formCrawler['mauticform[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($formCrawler);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedForm = $this->em->find(Form::class, $form->getId());
+        Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
+    }
+
+    public function testFormDetailsViewWithPreviewPanel(): void
+    {
+        // Create a form
+        $form = $this->createForm('Test Form Details', 'test_form_details');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // Request the form details view
+        $crawler = $this->client->request('GET', sprintf('/s/forms/view/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Check if preview panel exists
+        $previewPanel = $crawler->filter('div.panel.shd-none.bdr-rds-0.bdr-w-0.mt-sm.mb-0');
+
+        if ($previewPanel->count() > 0) {
+            // If preview panel exists, verify its structure
+            $panelHeading = $previewPanel->filter('.panel-heading .panel-title:contains("Preview")');
+            $this->assertCount(1, $panelHeading, 'Preview panel should have correct heading structure');
+
+            $panelBody = $previewPanel->filter('.panel-body.pt-xs');
+            $this->assertCount(1, $panelBody, 'Preview panel should have correct body structure');
+        }
     }
 
     private function createForm(string $name, string $alias): Form

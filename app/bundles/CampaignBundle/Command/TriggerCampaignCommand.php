@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -28,6 +29,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:campaigns:trigger',
+    description: 'Trigger timed events for published campaigns.'
+)]
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
@@ -59,7 +64,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         private ListModel $listModel,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
         private ProcessSignalService $processSignalService,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
@@ -68,7 +73,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:trigger')
             ->addOption(
                 '--campaign-id',
                 '-i',
@@ -411,13 +415,15 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private function updateCampaignSegmentContactCount(Campaign $campaign): void
     {
-        $segmentIds = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
-
+        $segmentIds                     = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
+        $updateSegmentCountInBackground = $this->coreParametersHelper->get('update_segment_contact_count_in_background', false);
         foreach ($segmentIds as $segmentId) {
-            $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
-            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+            if ($updateSegmentCountInBackground) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+            } else {
+                $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+                $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+            }
         }
     }
-
-    protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

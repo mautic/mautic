@@ -23,10 +23,7 @@ class EventLogger
 
     private array $contactRotations = [];
 
-    /**
-     * @var int
-     */
-    private $lastUsedCampaignIdToFetchRotation;
+    private int $lastUsedCampaignIdToFetchRotation;
 
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -69,7 +66,7 @@ class EventLogger
         }
 
         $log->setEvent($event);
-        $log->setCampaign($event->getCampaign());
+        $log->setCampaign($campaign = $event->getCampaign());
 
         if (null === $contact) {
             $contact = $this->contactTracker->getContact();
@@ -83,8 +80,8 @@ class EventLogger
         $log->setDateTriggered(new \DateTime());
         $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
 
-        if (isset($this->contactRotations[$contact->getId()]) && ($this->lastUsedCampaignIdToFetchRotation === $event->getCampaign()->getId())) {
-            $log->setRotation($this->contactRotations[$contact->getId()]['rotation']);
+        if (isset($this->contactRotations[$campaign->getId()][$contact->getId()]) && ($this->lastUsedCampaignIdToFetchRotation === $event->getCampaign()->getId())) {
+            $log->setRotation($this->contactRotations[$campaign->getId()][$contact->getId()]['rotation']);
         } else {
             // Likely a single contact handle such as decision processing
             $rotations   = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
@@ -164,10 +161,11 @@ class EventLogger
     public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
+        $campaign   = $event->getCampaign();
 
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
-            if (isset($this->contactRotations[$contact->getId()]) && $this->contactRotations[$contact->getId()]['manually_removed']) {
+            if (isset($this->contactRotations[$campaign->getId()][$contact->getId()]) && $this->contactRotations[$campaign->getId()][$contact->getId()]['manually_removed']) {
                 continue;
             }
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
@@ -191,7 +189,7 @@ class EventLogger
      */
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId): void
     {
-        $this->contactRotations                  = $this->leadRepository->getContactRotations($contactIds, $campaignId);
+        $this->contactRotations[$campaignId]     = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->lastUsedCampaignIdToFetchRotation = $campaignId;
     }
 
