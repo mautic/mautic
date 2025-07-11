@@ -254,8 +254,10 @@ class DynamicContentRepository extends CommonRepository
             ->select('id, name, display_order')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content')
             ->where('slot_name = :slot_name')
+            ->andWhere('is_campaign_based = :false')
             ->orderBy('display_order')
             ->setParameter('slot_name', $slotName)
+            ->setParameter('false', false, 'boolean')
             ->executeQuery()
             ->fetchAllAssociative();
     }

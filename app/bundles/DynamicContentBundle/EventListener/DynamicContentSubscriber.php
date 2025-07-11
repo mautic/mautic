@@ -62,16 +62,38 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function setDisplayOrder(Events\DynamicContentEvent $event): void
     {
-        $dynamicContent = $event->getDynamicContent();
-        $changes        = $event->getChanges();
-        if ($dynamicContent->getIsCampaignBased() || !isset($changes['displayOrder'])) {
+        $dynamicContent         = $event->getDynamicContent();
+        $changes                = $dynamicContent->getChanges();
+        $isSlotNameChanged      = isset($changes['slotName'][0]) && $changes['slotName'][0] !== $dynamicContent->getSlotName();
+        $isCampaignBasedChanged = isset($changes['isCampaignBased'][0]) && $changes['isCampaignBased'][0] != $dynamicContent->getIsCampaignBased();
+
+        if (($dynamicContent->getIsCampaignBased() && !$isCampaignBasedChanged) || (!isset($changes['displayOrder']) && !$isSlotNameChanged)) {
             return;
         }
+
         $dcRepository = $this->dynamicContentModel->getRepository();
         $lastOrder    = $dcRepository->getLastDisplayOrder($dynamicContent->getSlotName()) + 1;
-        if ($dynamicContent->isNew()) {
-            $newOrder     = $dynamicContent->getDisplayOrder() + 1;
 
+        // reorder dwc if non campaign based dwc converted to campaign based
+        if ($dynamicContent->getIsCampaignBased() && $isCampaignBasedChanged) {
+            $dcRepository = $this->dynamicContentModel->getRepository();
+            $slotName     = $dynamicContent->getSlotName();
+            $currentOrder = $changes['displayOrder'][0];
+            if ($currentOrder < $lastOrder) {
+                $dcRepository->reorderDwc($currentOrder, $lastOrder, $slotName);
+            }
+
+            return;
+        }
+
+        if ($isSlotNameChanged) {
+            $prevSlotName      = $changes['slotName'][0];
+            $prevOrder         = $changes['displayOrder'][0] ?? $dynamicContent->getDisplayOrder();
+            $prevCampaignBased = $changes['isCampaignBased'][0];
+        }
+
+        if ($dynamicContent->isNew() || $isSlotNameChanged) {
+            $newOrder = $dynamicContent->getDisplayOrder() + 1;
             if ($lastOrder !== $newOrder) {
                 $dcRepository->reorderDwc($lastOrder, $newOrder, $dynamicContent->getSlotName());
             }
@@ -85,6 +107,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                     $dynamicContent->setDisplayOrder($newOrder);
                 }
             }
+        }
+
+        if (!empty($prevSlotName) && $isSlotNameChanged && !$prevCampaignBased
+            && $prevOrder < $lastOrder = $dcRepository->getLastDisplayOrder($prevSlotName)) {
+            $dcRepository->reorderDwc($prevOrder, $lastOrder + 1, $prevSlotName);
         }
     }
 

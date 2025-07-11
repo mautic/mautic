@@ -29,15 +29,24 @@ final class AjaxController extends CommonAjaxController
 
     public function getDwcTokensBySlotNameAction(Request $request): JsonResponse
     {
-        $slotName = InputHelper::clean($request->query->get('slotName'));
+        $displayOrderArray    = [];
+        $slotName             = InputHelper::clean($request->query->get('slotName'));
+        $includeDefaultOption = InputHelper::clean($request->query->get('includeDefaultOption'));
 
-        /** @var DynamicContentRepository $dynamicContentRepository */
-        $dynamicContentRepository = $this->getModel('dynamicContent')->getRepository();
-        $dwcTokens                = $dynamicContentRepository->getDynamicContentBySlotName($slotName);
+        $translator = $this->get('translator');
+        if ($includeDefaultOption) {
+            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.placeholder')]   = '';
+            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.default.order')] = 0;
+        }
 
-        $displayOrderArray = [];
-        foreach ($dwcTokens as $dwcToken) {
-            $displayOrderArray["({$dwcToken['display_order']}) {$dwcToken['name']}"] = (int) $dwcToken['display_order'];
+        if (!empty($slotName)) {
+            /** @var DynamicContentRepository $dynamicContentRepository */
+            $dynamicContentRepository = $this->getModel('dynamicContent')->getRepository();
+            $dwcTokens                = $dynamicContentRepository->getDynamicContentBySlotName($slotName);
+
+            foreach ($dwcTokens as $dwcToken) {
+                $displayOrderArray["({$dwcToken['display_order']}) {$dwcToken['name']}"] = (int) $dwcToken['display_order'];
+            }
         }
 
         return $this->sendJsonResponse(['display_orders' => $displayOrderArray]);

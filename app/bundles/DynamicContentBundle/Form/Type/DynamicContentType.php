@@ -148,12 +148,14 @@ class DynamicContentType extends AbstractType
         $displayOrderArray = ['mautic.dynamicContent.choose.default.order' => 0];
         $slotName          = $options['data']->getSlotName() ?? '';
         $currentOrder      = $options['data']->getDisplayOrder() ?? 0;
+        $changes           = $options['data']->getChanges();
+        $isSlotNameChanged = isset($changes['slotName'][0]) && $changes['slotName'][0] !== $slotName;
 
         if (!empty($slotName)) {
             $dynamicContents = $this->em->getRepository(DynamicContent::class)
                 ->getDynamicContentBySlotName($slotName);
             foreach ($dynamicContents as $dynamicContent) {
-                if ($currentOrder != (int) $dynamicContent['display_order']) {
+                if ($currentOrder != (int) $dynamicContent['display_order'] || $isSlotNameChanged) {
                     $key                     = "({$dynamicContent['display_order']}) {$dynamicContent['name']}";
                     $displayOrderArray[$key] = (int) $dynamicContent['display_order'];
                 }
@@ -170,6 +172,7 @@ class DynamicContentType extends AbstractType
                     'class'              => 'form-control',
                     'tooltip'            => 'mautic.dynamicContent.label.order.tooltip',
                     'data-current-order' => $options['data']->getDisplayOrder(),
+                    'data-current-slot'  => $slotName,
                 ],
                 'choices'     => $displayOrderArray,
                 'data'        => $options['data']->getDisplayOrder() - 1,

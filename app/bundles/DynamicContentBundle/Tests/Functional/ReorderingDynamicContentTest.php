@@ -56,4 +56,53 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         Assert::assertEquals('DC 3', $dwcList[1]['name']);
         Assert::assertEquals(2, $dwcList[1]['display_order']);
     }
+
+    public function testReorderingDynamicContentWhenSlotNameChanges(): void
+    {
+        // Create 3 DWC in slot-1 and 2 in slot-2
+        $dwc1 = $this->createDynamicContent('DC-1', 'slot-1', 0);
+        $this->createDynamicContent('DC-2', 'slot-1', 1);
+        $this->createDynamicContent('DC-3', 'slot-1', 2);
+        $this->createDynamicContent('DC-4', 'slot-2', 0);
+        $this->createDynamicContent('DC-5', 'slot-2', 1);
+
+        // Move DC-1 from slot-1 to slot-2, set display order to 1 (between DC-4 and DC-5)
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$dwc1->getId());
+        $dwcForm = $crawler->selectButton('Save & Close')->form();
+        $dwcForm['dwc[slotName]']->setValue('slot-2');
+        $dwcForm['dwc[displayOrder]']->setValue('0');
+        $this->client->submit($dwcForm);
+        $this->assertResponseIsSuccessful();
+
+        // slot-1 should now have DC-2 (1), DC-3 (2)
+        $this->assertDynamicContentOrder('slot-1', [
+            'DC-2' => 1,
+            'DC-3' => 2,
+        ]);
+
+        // slot-2 should have DC-1 (1), DC-4 (2), DC-5 (3)
+        $this->assertDynamicContentOrder('slot-2', [
+            'DC-1' => 1,
+            'DC-4' => 2,
+            'DC-5' => 3,
+        ]);
+    }
+
+    public function testReorderingDynamicContentWhenIsCampaignBasedChanged(): void
+    {
+        $dwc1 = $this->createDynamicContent('DC-1', 'slot-1', 0);
+        $this->createDynamicContent('DC-2', 'slot-1', 1);
+        $this->createDynamicContent('DC-3', 'slot-1', 2);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$dwc1->getId());
+        $dwcForm = $crawler->selectButton('Save & Close')->form();
+        $dwcForm['dwc[isCampaignBased]']->setValue('1');
+        $this->client->submit($dwcForm);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertDynamicContentOrder('slot-1', [
+            'DC-2' => 1,
+            'DC-3' => 2,
+        ]);
+    }
 }

@@ -1,3 +1,5 @@
+Mautic.refreshDisplayOrderFlag = null;
+
 Mautic.toggleDwcFilters = function () {
     mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
     if (mQuery("#dwcFiltersTab").hasClass('hide')) {
@@ -170,21 +172,47 @@ Mautic.activateSlotNameLookupField = function (fieldOptions, filterId) {
     Mautic.activateLookupField (fieldOptions, filterId, 'dwc_slotName');
 };
 
+mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    if (settings.type === 'POST' && (settings.url.indexOf('dwc/edit') > -1 || settings.url.indexOf('dwc/new') > -1)) {
+        Mautic.refreshDisplayOrder();
+    }
+});
+
+Mautic.refreshDisplayOrder = function () {
+    if (mQuery('form[name="dwc"]').length === 0) {
+        Mautic.refreshDisplayOrderFlag = null;
+        return;
+    }
+    const slotName = mQuery('#dwc_slotName').val();
+    const orderField = mQuery('select#dwc_displayOrder');
+    const orderFieldValue = parseInt(orderField.val());
+    const currentOrder = Mautic.refreshDisplayOrderFlag === null
+        ? orderFieldValue + 1
+        : orderFieldValue < Mautic.dwcLastOrder ? orderFieldValue + 1 : orderFieldValue
+    orderField.attr('data-current-order', currentOrder);
+    orderField.attr('data-current-slot', slotName);
+    Mautic.refreshDisplayOrderFlag = 1;
+    Mautic.dwcLastOrder = currentOrder;
+    Mautic.fetchDwcDisplayOrder(slotName);
+}
+
 Mautic.fetchDwcDisplayOrder = function(slotName) {
     mQuery.ajax({
-        url: `${mauticAjaxUrl}?action=dynamicContent:getDwcTokensBySlotName`,
+        url: `${mauticAjaxUrl}?action=dynamicContent:getDwcTokensBySlotName&includeDefaultOption=true`,
         data: { slotName: slotName },
         success: function(response) {
             const displayOrders = response.display_orders;
             const orderField = mQuery('select#dwc_displayOrder').empty();
-            const currentOrder = parseInt(orderField.attr('data-current-order'));
-
-            mQuery('<option/>').val('').text(Mautic.translate('mautic.dynamicContent.choose.placeholder')).appendTo(orderField);
-            mQuery('<option/>').val(0).text(Mautic.translate('mautic.dynamicContent.choose.default.order')).appendTo(orderField);
+            const currentOrder = parseInt(orderField.data('current-order'));
+            const currentSlot  = orderField.data('current-slot');
 
             mQuery.each(displayOrders, function (label, value) {
-                if (value !== currentOrder) {
-                    mQuery('<option/>').val(value).text(label).appendTo(orderField);
+                if (value !== currentOrder || currentSlot !== slotName) {
+                    mQuery('<option/>', {
+                        value: value,
+                        text: label,
+                        selected: (value === currentOrder - 1)
+                    }).appendTo(orderField);
                 }
             })
             orderField.trigger('chosen:updated');
