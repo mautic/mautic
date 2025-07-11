@@ -15,6 +15,6 @@ $profiler->addPrefix('/_profiler');
 $collection->addCollection($profiler);
 
 // main
-$collection->addCollection($loader->import('routing.php'));
+$collection->addCollection($loader->import(__DIR__.'/routing.php'));
 
 return $collection;

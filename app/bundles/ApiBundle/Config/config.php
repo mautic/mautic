@@ -86,7 +86,6 @@ return [
                     ],
                 ],
             ],
-            'fos_oauth_server.security.authentication.listener.class' => Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener::class,
             'mautic.validator.oauthcallback'                          => [
                 'class' => Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class,
                 'tag'   => 'validator.constraint_validator',

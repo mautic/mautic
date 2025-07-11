@@ -15,15 +15,12 @@
     &.tile--clickable,
     &.tile--selectable,
     &.tile--expandable {
-        box-sizing: border-box;
-        padding: 0;
         border: 1px solid var(--border-no-color);
         margin: 0;
         font-family: inherit;
         vertical-align: baseline;
         font-weight: 400;
         line-height: 1.28572;
-        padding: var(--layout-density-padding-inline-local);
         cursor: pointer;
         transition: var(--transition-all-productive);
         outline: 2px solid transparent;
@@ -75,6 +72,18 @@
         padding-bottom: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);    
     }
 
+    &.tile--expandable,
+    &.tile--expandable--interactive {
+        padding-bottom: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);    
+    }
+
+    &.tile--expandable--interactive {
+        &:hover { 
+            background: var(--layer); 
+            cursor: default;
+        }
+    }
+
     .tile-icon {
         position: absolute;
         inset-block-start: var(--layout-density-padding-inline-local);
@@ -97,13 +106,50 @@
     inline-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
     inset-block-end: 0;
     inset-inline-end: 0;
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
 }
 
-.tile--expandable.collapsed .tile__chevron {
+.tile__chevron svg {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    transition: var(--transition-all-productive);
+}
+
+.collapsed svg {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
+}
+
+.tile__chevron--interactive {
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: 100%;
+    vertical-align: baseline;
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: none;
+    cursor: pointer;
+    text-align: start;
+    inline-size: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    block-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    inline-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    transition: var(--transition-all-productive);
+}
+
+.tile__chevron--interactive:hover {
+    background-color: var(--layer-hover);
+    cursor: pointer;
 }
 
 .nav-tabs-contained + .tab-content {

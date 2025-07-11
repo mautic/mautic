@@ -638,7 +638,6 @@ Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, r
 Mautic.addLeadListFilter = function (elId, elObj) {
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
-    var label = filterOption.text();
 
     // Create a new filter
 
@@ -646,6 +645,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
+    var label = filterOption.data('field-label');
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
@@ -667,11 +667,9 @@ Mautic.addLeadListFilter = function (elId, elObj) {
         prototype.find(".panel-heading .panel-glue").addClass('hide');
     }
 
-    if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
-    } else {
-        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
-    }
+    const filterTypeIcon = filterOption.data('field-icon');
+    prototype.find('.object-icon').removeClass('ri-shapes-line').addClass(filterTypeIcon);
+
     prototype.find(".inline-spacer").append(fieldObject);
 
     Mautic.segmentFilter().attachEvents(prototype);

@@ -52,7 +52,7 @@ class SchemaDefinition
             case 'tel':
             case 'url':
                 $schemaType        = 'string';
-                $options['length'] = $length;
+                $options['length'] = $length ?: self::MAX_VARCHAR_LENGTH;
                 break;
             case 'text':
                 $schemaType        = (str_contains($alias, 'description')) ? 'text' : 'string';

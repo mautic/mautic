@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -28,6 +29,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:campaigns:trigger',
+    description: 'Trigger timed events for published campaigns.'
+)]
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
@@ -68,7 +73,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:trigger')
             ->addOption(
                 '--campaign-id',
                 '-i',
@@ -422,6 +426,4 @@ class TriggerCampaignCommand extends ModeratedCommand
             }
         }
     }
-
-    protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

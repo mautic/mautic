@@ -3,11 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
-use Mautic\CoreBundle\EventListener\OptimisticLockSubscriber;
-use Mautic\CoreBundle\EventListener\UUIDListener;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -46,6 +42,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set('mautic.http.client', GuzzleHttp\Client::class)->autowire();
+    $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)->autowire();
 
     $services->alias(GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
@@ -66,12 +63,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.model.auditlog', Mautic\CoreBundle\Model\AuditLogModel::class);
     $services->alias('mautic.core.model.notification', Mautic\CoreBundle\Model\NotificationModel::class);
     $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
-    $services->get(Mautic\CoreBundle\EventListener\CacheInvalidateSubscriber::class)
-        ->arg('$ormConfiguration', service('doctrine.orm.default_configuration'))
-        ->tag('doctrine.event_subscriber');
-    $services->get(OptimisticLockSubscriber::class)
-        ->tag('doctrine.event_subscriber');
-    $services->set(UUIDListener::class)
-        ->arg('$em', service('doctrine.orm.entity_manager'))
-        ->tag('doctrine.event_subscriber');
 };

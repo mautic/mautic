@@ -24,7 +24,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     /**
      * @return array
      */
-    public function transform($filters)
+    public function transform(mixed $filters): mixed
     {
         if (!is_array($filters)) {
             return [];
@@ -48,7 +48,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     /**
      * @return array
      */
-    public function reverseTransform($filters)
+    public function reverseTransform(mixed $filters): mixed
     {
         if (!is_array($filters)) {
             return [];
