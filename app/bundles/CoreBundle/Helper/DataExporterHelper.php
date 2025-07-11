@@ -23,7 +23,7 @@ class DataExporterHelper
         AbstractCommonModel $model,
         array $args,
         callable $resultsCallback = null,
-        bool $skipOrdering = false
+        bool $skipOrdering = false,
     ) {
         $args['limit']        = max($args['limit'], 200);
         $args['start']        = $start;

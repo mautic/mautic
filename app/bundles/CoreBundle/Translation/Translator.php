@@ -43,9 +43,9 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        $this->translator->warmUp($cacheDir);
+        $this->translator->warmUp($cacheDir, $buildDir);
 
         return [];
     }
@@ -53,6 +53,11 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
     public function getCatalogue($locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
+    }
+
+    public function getCatalogues(): array
+    {
+        return $this->translator->getCatalogues();
     }
 
     public function getLocale(): string

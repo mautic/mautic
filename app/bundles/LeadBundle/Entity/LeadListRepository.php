@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -17,6 +19,7 @@ class LeadListRepository extends CommonRepository
 
     use ExpressionHelperTrait;
     use RegexTrait;
+    use ProjectRepositoryTrait;
 
     /**
      * @var bool
@@ -65,20 +68,23 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a list of lists.
      *
-     * @param bool   $user
      * @param string $alias
      * @param string $id
+     * @param bool   $justPublished if false, returns all published and unpublished segments
      *
      * @return array
      */
-    public function getLists(?User $user = null, $alias = '', $id = '')
+    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
 
-        $q->select('partial l.{id, name, alias}')
-            ->andWhere($q->expr()->eq('l.isPublished', ':true'))
-            ->setParameter('true', true, 'boolean');
+        $q->select('partial l.{id, name, alias}');
+
+        if ($justPublished) {
+            $q->andWhere($q->expr()->eq('l.isPublished', ':true'))
+                ->setParameter('true', true, 'boolean');
+        }
 
         if ($user) {
             $q->andWhere($q->expr()->eq('l.isGlobal', ':true'));
@@ -289,7 +295,7 @@ class LeadListRepository extends CommonRepository
 
         $return = [];
         foreach ($result as $r) {
-            $return[$r['leadlist_id']] = $r['thecount'];
+            $return[$r['leadlist_id']] = (int) $r['thecount'];
         }
 
         // Ensure lists without leads have a value
@@ -423,6 +429,16 @@ class LeadListRepository extends CommonRepository
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'leadlist_id',
+                    'lead_list_projects_xref',
+                    'l',
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if (!empty($forceParameters)) {
@@ -450,6 +466,7 @@ class LeadListRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -622,5 +639,209 @@ SQL;
                 ]
             )
             ->fetchFirstColumn();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getAllSegments(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('title', 'title');
+        $rsm->addScalarResult('item_id', 'item_id');
+        $rsm->addScalarResult('is_published', 'is_published');
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            ll.name as title, 
+            ll.id as item_id,
+            ll.is_published as is_published
+            FROM '.MAUTIC_TABLE_PREFIX.'lead_lists ll', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getCampaignEntryPoints(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getEmailIncludeExcludeList(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'email_list_xref 
+            GROUP BY leadlist_id', $rsm);
+
+        $included = $query->getResult();
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'email_list_excluded 
+            GROUP BY leadlist_id', $rsm);
+
+        $excluded = $query->getResult();
+
+        return array_merge($included, $excluded);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getCampaignChangeSegmentAction(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('properties', 'properties');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            properties 
+        FROM '.MAUTIC_TABLE_PREFIX.'campaign_events ce 
+        WHERE ce.type = \'lead.changelist\'', $rsm);
+
+        $segmentIds = [];
+        foreach ($query->getResult() as $property) {
+            $property       = unserialize($property['properties']);
+            $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
+        }
+
+        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFilterSegmentsAction(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('filters', 'filters');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            filters 
+        FROM '.MAUTIC_TABLE_PREFIX.'lead_lists', $rsm);
+
+        $childSegmentIds = [];
+
+        foreach ($query->getResult() as $rowFilters) {
+            $segmentMembershipFilters = array_filter(
+                unserialize($rowFilters['filters']),
+                fn (array $filter) => 'leadlist' === $filter['type']
+            );
+
+            foreach ($segmentMembershipFilters as $filter) {
+                if (is_array($filter['properties']['filter'])) {
+                    foreach ($filter['properties']['filter'] as $childSegmentId) {
+                        $childSegmentIds[] = ['item_id' => (string) $childSegmentId];
+                    }
+                }
+            }
+        }
+
+        return $childSegmentIds;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getLeadListLeads(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getNotificationIncludedList(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'push_notification_list_xref
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getSMSIncludedList(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'sms_message_list_xref
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFormAction(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('properties', 'properties');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            properties 
+        FROM '.MAUTIC_TABLE_PREFIX.'form_actions fa 
+        WHERE fa.type = \'lead.changelist\'', $rsm);
+
+        $segmentIds = [];
+        foreach ($query->getResult() as $property) {
+            $property       = unserialize($property['properties']);
+            $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
+        }
+
+        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getLeadSegmentIds(int $leadId): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('ll.id')
+            ->from(LeadList::class, 'll')
+            ->innerJoin('ll.leads', 'l')
+            ->where(
+                $qb->expr()->eq('l.lead', ':leadId')
+            )
+            ->setParameter('leadId', $leadId);
+        $result = $qb->getQuery()->getArrayResult();
+
+        return array_column($result, 'id');
     }
 }

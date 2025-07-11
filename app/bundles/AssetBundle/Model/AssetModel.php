@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
@@ -40,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Asset>
  */
-class AssetModel extends FormModel
+class AssetModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var int
@@ -63,7 +64,7 @@ class AssetModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -107,13 +108,12 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param string $code
-     * @param array  $systemEntry
+     * @param array $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = []): void
+    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -122,6 +122,12 @@ class AssetModel extends FormModel
 
         if (null == $request) {
             $request = $this->requestStack->getCurrentRequest();
+        }
+
+        if (!($request instanceof Request)) {
+            // likely this download came via a cron (no request), do not bother logging the download.
+            // https://github.com/mautic/mautic/issues/13577
+            return;
         }
 
         $download = new Download();
@@ -245,7 +251,7 @@ class AssetModel extends FormModel
 
         $download->setTrackingId($trackingId);
 
-        if (!empty($asset) && empty($systemEntry)) {
+        if (empty($systemEntry)) {
             $download->setAsset($asset);
 
             $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
@@ -256,10 +262,7 @@ class AssetModel extends FormModel
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
-
-        if (null !== $request) {
-            $download->setReferer($request->server->get('HTTP_REFERER'));
-        }
+        $download->setReferer($request->server->get('HTTP_REFERER'));
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
@@ -598,10 +601,8 @@ class AssetModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param array $options
-     *
-     * @return array
      */
-    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
+    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')

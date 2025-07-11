@@ -37,7 +37,7 @@ class TableSchemaHelper
     public function __construct(
         protected Connection $db,
         protected $prefix,
-        protected ColumnSchemaHelper $columnHelper
+        protected ColumnSchemaHelper $columnHelper,
     ) {
         $this->sm = $db->createSchemaManager();
     }
@@ -196,7 +196,7 @@ class TableSchemaHelper
      */
     public function checkTableExists($table, $throwException = false): bool
     {
-        if ($this->sm->tablesExist($this->prefix.$table)) {
+        if ($this->sm->tablesExist([$this->prefix.$table])) {
             if ($throwException) {
                 throw new SchemaException($this->prefix."$table already exists");
             }

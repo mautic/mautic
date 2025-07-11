@@ -19,7 +19,7 @@ final class DoNotContactAddEvent extends Event
         private int $reason = DNC::BOUNCED,
         private bool $persist = true,
         private bool $checkCurrentStatus = true,
-        private bool $override = true
+        private bool $override = true,
     ) {
     }
 

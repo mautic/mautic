@@ -34,7 +34,7 @@ class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
     {
         $this->widget
             ->method('getParams')
-            ->willReturn(['dateFrom' => [], 'dateTo' => []]);
+            ->willReturn(['dateFrom' => '', 'dateTo' => '']);
 
         $this->translator->expects($this->once())
             ->method('getLocale')

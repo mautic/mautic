@@ -14,11 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailTriggerTest extends MauticMysqlTestCase
 {
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testButtonsAreEnabledOnEditSendEmailToUserWhenEmailIsSelected(): void
     {
         $email = new Email();
@@ -45,11 +42,8 @@ class EmailTriggerTest extends MauticMysqlTestCase
         self::assertStringContainsString('"origin":"#pointtriggerevent_properties_useremail_email"', $crawler->selectButton('Preview')->attr('onclick'), 'The origin value should be correct.');
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
     {
         $trigger      = $this->createTrigger();
@@ -75,7 +69,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
         self::assertTrue($this->client->getResponse()->isSuccessful());
 
         $uri = sprintf('/s/points/triggers/events/edit/%s?triggerId=%s', $triggerEvent->getId(), $trigger->getId());
-        $this->client->request(Request::METHOD_GET, $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, $uri);
         self::assertTrue($this->client->getResponse()->isSuccessful());
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);

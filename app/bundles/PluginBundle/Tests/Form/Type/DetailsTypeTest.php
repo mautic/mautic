@@ -9,6 +9,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Form\Type\KeysType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,6 +18,7 @@ class DetailsTypeTest extends TestCase
 {
     public function testBuildFormRemovesHiddenKeys(): void
     {
+        /** @var MockObject&FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
 
@@ -52,7 +54,7 @@ class DetailsTypeTest extends TestCase
             ->method('setAction');
         $builder->expects(self::atLeastOnce())
             ->method('add')
-            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use (&$calls): void {
+            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use (&$calls, $builder): FormBuilderInterface {
                 if ('apiKeys' === $key) {
                     ++$calls;
                     self::assertSame(KeysType::class, $fieldFQCN);
@@ -67,6 +69,8 @@ class DetailsTypeTest extends TestCase
                 if ('supportedFeatures' === $key) {
                     ++$calls;
                 }
+
+                return $builder;
             });
 
         $integrationObject->expects(self::once())
@@ -79,11 +83,10 @@ class DetailsTypeTest extends TestCase
         self::assertSame(1, $calls);
     }
 
-    /**
-     * @dataProvider authorizedDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('authorizedDataProvider')]
     public function testBuildFormRequiresAuthorization(bool $isAuthorized, string $label): void
     {
+        /** @var MockObject&FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
 
@@ -120,7 +123,7 @@ class DetailsTypeTest extends TestCase
             ->method('setAction');
         $builder->expects(self::atLeastOnce())
             ->method('add')
-            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($label, &$calls): void {
+            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($label, &$calls, $builder): FormBuilderInterface {
                 if ('apiKeys' === $key) {
                     ++$calls;
                     self::assertSame(KeysType::class, $fieldFQCN);
@@ -138,6 +141,8 @@ class DetailsTypeTest extends TestCase
                 if ('supportedFeatures' === $key) {
                     ++$calls;
                 }
+
+                return $builder;
             });
 
         $integrationObject->expects(self::once())
@@ -158,11 +163,11 @@ class DetailsTypeTest extends TestCase
 
     /**
      * @param array<string> $expectedFeatures
-     *
-     * @dataProvider withFeaturesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('withFeaturesProvider')]
     public function testBuildFormWithFeatures(?int $integrationId, array $expectedFeatures): void
     {
+        /** @var MockObject&FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
 
@@ -200,7 +205,7 @@ class DetailsTypeTest extends TestCase
             ->method('setAction');
         $builder->expects(self::atLeastOnce())
             ->method('add')
-            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($expectedFeatures, &$calls): void {
+            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($expectedFeatures, &$calls, $builder): FormBuilderInterface {
                 if ('apiKeys' === $key) {
                     ++$calls;
                     self::assertSame(KeysType::class, $fieldFQCN);
@@ -220,6 +225,8 @@ class DetailsTypeTest extends TestCase
                 if ('authButton' === $key) {
                     ++$calls;
                 }
+
+                return $builder;
             });
 
         $integrationObject->expects(self::once())
@@ -241,8 +248,10 @@ class DetailsTypeTest extends TestCase
     public function testBuildFormWithAction(): void
     {
         $action  = 'the_action';
-        $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['action' => $action, 'integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
+
+        /** @var MockObject&FormBuilderInterface $builder */
+        $builder = $this->createMock(FormBuilderInterface::class);
 
         $integrationObject = $this->createMock(AbstractIntegration::class);
         $integrationObject->expects(self::once())
@@ -276,7 +285,7 @@ class DetailsTypeTest extends TestCase
             ->with($action);
         $builder->expects(self::atLeastOnce())
             ->method('add')
-            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use (&$calls): void {
+            ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use (&$calls, $builder): FormBuilderInterface {
                 if ('apiKeys' === $key) {
                     ++$calls;
                     self::assertSame(KeysType::class, $fieldFQCN);
@@ -291,6 +300,8 @@ class DetailsTypeTest extends TestCase
                 if ('authButton' === $key) {
                     ++$calls;
                 }
+
+                return $builder;
             });
 
         $integrationObject->expects(self::once())

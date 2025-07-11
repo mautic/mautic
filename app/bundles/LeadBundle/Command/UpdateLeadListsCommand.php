@@ -7,12 +7,18 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: UpdateLeadListsCommand::NAME,
+    description: 'Update contacts in smart segments based on new contact data.',
+    aliases: ['mautic:segments:rebuild']
+)]
 class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
@@ -21,7 +27,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         private ListModel $listModel,
         private TranslatorInterface $translator,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -29,8 +35,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:segments:update')
-            ->setAliases(['mautic:segments:rebuild'])
             ->addOption(
                 '--batch-limit',
                 '-b',
@@ -78,6 +82,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
         $excludeSegments       = $input->getOption('exclude');
+
+        if (is_numeric($max)) {
+            $max = (int) $max;
+        }
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
@@ -156,6 +164,4 @@ class UpdateLeadListsCommand extends ModeratedCommand
             );
         }
     }
-
-    protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }

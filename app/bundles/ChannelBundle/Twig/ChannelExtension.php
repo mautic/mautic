@@ -14,7 +14,7 @@ class ChannelExtension extends AbstractExtension
 {
     public function __construct(
         private DncReasonHelper $dncReasonHelper,
-        private ChannelListHelper $channelListHelper
+        private ChannelListHelper $channelListHelper,
     ) {
     }
 

@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Model\IpAddressModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,6 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
+#[AsCommand(
+    name: 'mautic:unusedip:delete',
+    description: 'Deletes IP addresses that are not used in any other database table'
+)]
 class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
@@ -19,14 +24,14 @@ class UnusedIpDeleteCommand extends ModeratedCommand
     public function __construct(
         private IpAddressModel $ipAddressModel,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure(): void
     {
-        $this->setName('mautic:unusedip:delete')
+        $this
             ->addOption(
                 '--limit',
                 '-l',
@@ -64,6 +69,4 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Deletes IP addresses that are not used in any other database table';
 }

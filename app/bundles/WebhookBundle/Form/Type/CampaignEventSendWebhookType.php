@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignEventSendWebhookType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -100,10 +100,7 @@ class CampaignEventSendWebhookType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignevent_sendwebhook';
     }

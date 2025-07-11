@@ -51,9 +51,9 @@ class ContentPreviewSettingsType extends AbstractType
                 [
                     'attr' => [
                         'class'                => 'form-control',
-                        'data-callback'        => 'activateContactLookupField',
+                        'data-callback'        => 'activatePreviewContactLookupField',
                         'data-toggle'          => 'field-lookup',
-                        'data-lookup-callback' => 'updateContactLookupListFilter',
+                        'data-lookup-callback' => 'updatePreviewContactLookupListFilter',
                         'data-chosen-lookup'   => 'lead:contactList',
                         'placeholder'          => $this->translator->trans(
                             'mautic.lead.list.form.startTyping'
@@ -90,7 +90,7 @@ class ContentPreviewSettingsType extends AbstractType
         FormBuilderInterface $builder,
         string $type,
         array $variants,
-        int $objectId
+        int $objectId,
     ): void {
         if (!count($variants['children'])) {
             return;

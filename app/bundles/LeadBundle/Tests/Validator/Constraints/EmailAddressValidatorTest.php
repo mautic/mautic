@@ -14,9 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailAddressValidatorTest extends AbstractMauticTestCase
 {
-    /**
-     * @dataProvider provider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
     public function testValidate(?string $value, int $expectedViolationCount): void
     {
         /** @var EmailAddressValidator $emailAddressValidator */
@@ -31,7 +29,7 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
         $emailAddressValidator->initialize($context);
         $emailAddressValidator->validate($value, new EmailAddress());
 
-        Assert::assertSame($expectedViolationCount, $context->getViolations()->count());
+        Assert::assertCount($expectedViolationCount, $context->getViolations());
     }
 
     /**

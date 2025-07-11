@@ -12,19 +12,47 @@ use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Mautic\DynamicContentBundle\DynamicContent\TypeList;
+use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
+use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "dynamicContent:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "translationChildren"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "dynamicContent:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use FiltersEntityTrait;
+    use UuidTrait;
 
     /**
      * @var int
@@ -35,6 +63,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var string
      */
     private $name;
+
+    /**
+     * @Groups({"dynamicContent:read", "dynamicContent:write"})
+     */
+    private string $type = TypeList::HTML;
 
     /**
      * @var string|null
@@ -72,7 +105,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $sentCount = 0;
 
     /**
-     * @var ArrayCollection<\Mautic\DynamicContentBundle\Entity\Stat>
+     * @var ArrayCollection<Stat>
      */
     private $stats;
 
@@ -130,6 +163,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $builder->addCategory();
 
+        $builder->addField(
+            'type',
+            Types::STRING,
+            [
+                'length'  => 10,
+                'default' => TypeList::HTML,
+            ]
+        );
+
         $builder->addPublishDates();
 
         $builder->createField('sentCount', 'integer')
@@ -166,6 +208,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->columnName('slot_name')
                 ->nullable()
                 ->build();
+
+        static::addUuidField($builder);
     }
 
     /**
@@ -176,9 +220,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
+        $metadata->addPropertyConstraint('content', new NoNesting());
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context): void {
+        $metadata->addPropertyConstraint('type', new NotBlank(['message' => 'mautic.core.type.required']));
+        $metadata->addPropertyConstraint('type', new Choice(['choices' => (new TypeList())->getChoices()]));
+
+        $metadata->addConstraint(new SlotNameType());
+
+        $metadata->addConstraint(new Callback(
+            function (self $dwc, ExecutionContextInterface $context): void {
                 if (!$dwc->getIsCampaignBased()) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
@@ -214,7 +264,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     }
                 }
             },
-        ]));
+        ));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
@@ -224,6 +274,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'id',
                 'name',
                 'category',
+                'type',
             ])
             ->addProperties([
                 'publishUp',
@@ -259,7 +310,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -305,6 +356,18 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $this->description = $description;
 
         return $this;
+    }
+
+    public function setType(string $type): void
+    {
+        $type = strtolower($type);
+        $this->isChanged('type', $type);
+        $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**

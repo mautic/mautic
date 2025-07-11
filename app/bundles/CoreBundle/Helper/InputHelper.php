@@ -483,10 +483,8 @@ class InputHelper
 
     /**
      * Converts UTF8 into Latin.
-     *
-     * @return mixed
      */
-    public static function transliterate($value)
+    public static function transliterate($value): string|false
     {
         $transId = 'Any-Latin; Latin-ASCII';
         if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {

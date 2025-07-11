@@ -13,7 +13,7 @@ final class ImportMappingEvent extends CommonEvent
     public array $fields         = [];
 
     public function __construct(
-        public string $routeObjectName
+        public string $routeObjectName,
     ) {
     }
 

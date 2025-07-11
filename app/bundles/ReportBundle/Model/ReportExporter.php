@@ -18,7 +18,7 @@ class ReportExporter
         private ReportDataAdapter $reportDataAdapter,
         private ReportExportOptions $reportExportOptions,
         private ReportFileWriter $reportFileWriter,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

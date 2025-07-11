@@ -49,10 +49,7 @@ class DncType extends AbstractType
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_batch_dnc';
     }

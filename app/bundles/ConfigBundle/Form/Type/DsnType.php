@@ -24,12 +24,13 @@ class DsnType extends AbstractType
 {
     public function __construct(
         private DsnTransformerFactory $dsnTransformerFactory,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

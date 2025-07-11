@@ -2,16 +2,20 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Asset>
  */
 class AssetRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * Get a list of entities.
      *
@@ -94,12 +98,22 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('a.language', ":$unique"),
                     $q->expr()->like('a.language', ":$langUnique")
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'asset_id',
+                    'asset_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -130,6 +144,7 @@ class AssetRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -199,7 +214,7 @@ class AssetRepository extends CommonRepository
         $q->where($this->getTableAlias().'.category = :categoryId');
         $q->andWhere($this->getTableAlias().'.isPublished = TRUE');
         $q->setParameter('categoryId', $categoryId);
-        $q->orderBy($this->getTableAlias().'.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
+        $q->orderBy($this->getTableAlias().'.dateAdded', Order::Descending->value);
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();

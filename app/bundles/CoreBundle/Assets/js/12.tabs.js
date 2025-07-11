@@ -22,7 +22,7 @@ Mautic.toggleTabPublished = function(el) {
  * @param tab
  */
 Mautic.publishTab = function(tab) {
-    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-muted').addClass('text-success');
+    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-secondary').addClass('text-success');
 };
 
 /**
@@ -31,7 +31,7 @@ Mautic.publishTab = function(tab) {
  * @param tab
  */
 Mautic.unpublishTab = function(tab) {
-    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-success').addClass('text-muted');
+    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-success').addClass('text-secondary');
 };
 
 /**

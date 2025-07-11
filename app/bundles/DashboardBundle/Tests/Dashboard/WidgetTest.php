@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -21,22 +21,22 @@ class WidgetTest extends TestCase
     private const USER_ID = 1;
 
     /**
-     * @var DashboardModel|MockObject
+     * @var DashboardModel&MockObject
      */
     private MockObject $dashboardModel;
 
     /**
-     * @var UserHelper|MockObject
+     * @var UserHelper&MockObject
      */
     private MockObject $userHelper;
 
     /**
-     * @var MockObject|Session
+     * @var MockObject&RequestStack
      */
-    private MockObject $session;
+    private MockObject $requestStack;
 
     /**
-     * @var User|MockObject
+     * @var User&MockObject
      */
     private MockObject $user;
 
@@ -48,7 +48,7 @@ class WidgetTest extends TestCase
 
         $this->dashboardModel = $this->createMock(DashboardModel::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
-        $this->session        = $this->createMock(Session::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
 
         $this->user = $this->createMock(User::class);
         $this->user
@@ -58,7 +58,7 @@ class WidgetTest extends TestCase
         $this->widget = new Widget(
             $this->dashboardModel,
             $this->userHelper,
-            $this->session
+            $this->requestStack
         );
     }
 

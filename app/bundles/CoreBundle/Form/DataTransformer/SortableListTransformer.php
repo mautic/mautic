@@ -16,14 +16,14 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function __construct(
         private $withLabels = true,
-        private $useKeyValuePairs = false
+        private $useKeyValuePairs = false,
     ) {
     }
 
     /**
      * @return array<mixed>
      */
-    public function transform($array)
+    public function transform(mixed $array): mixed
     {
         if ($this->useKeyValuePairs) {
             return $this->transformKeyValuePair($array);
@@ -35,7 +35,7 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @return array<mixed>
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array): mixed
     {
         if ($this->useKeyValuePairs) {
             return $this->reverseTransformKeyValuePair($array);
@@ -54,6 +54,9 @@ class SortableListTransformer implements DataTransformerInterface
         if (null === $array || !isset($array['list'])) {
             return ['list' => []];
         }
+
+        // Reindex the array before processing
+        $array['list'] = array_values($array['list']);
 
         $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
 

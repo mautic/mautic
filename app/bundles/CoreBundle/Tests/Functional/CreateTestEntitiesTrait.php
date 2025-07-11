@@ -9,15 +9,17 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\User;
 
 trait CreateTestEntitiesTrait
 {
-    private function createLead(string $firstName, string $lastName = '', string $emailId = ''): Lead
+    private function createLead(string $firstName, string $lastName = '', string $emailId = '', User $createdBy = null): Lead
     {
         $lead = new Lead();
         $lead->setFirstname($firstName);
@@ -28,6 +30,10 @@ trait CreateTestEntitiesTrait
 
         if ($emailId) {
             $lead->setEmail($emailId);
+        }
+
+        if ($createdBy) {
+            $lead->setCreatedBy($createdBy);
         }
 
         $this->em->persist($lead);
@@ -156,5 +162,17 @@ trait CreateTestEntitiesTrait
         $this->em->persist($listEventLog);
 
         return $listEventLog;
+    }
+
+    private function createPrimaryCompanyForLead(Lead $lead, Company $company, bool $isPrimary = true): CompanyLead
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary($isPrimary);
+        $this->em->persist($companyLead);
+
+        return $companyLead;
     }
 }

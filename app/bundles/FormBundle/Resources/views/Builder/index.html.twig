@@ -161,7 +161,7 @@
                               <div class="drop-here">
                                 {% for action in formActions %}
                                     {% if action.id not in deletedActions %}
-                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/_generic.html.twig') %}
+                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/base_form_action.html.twig') %}
                                         {% set action = action|merge({
                                               'settings': actionSettings[action.type],
                                         }) %}
@@ -188,6 +188,7 @@
       <div class="col-md-3 height-auto bdr-l">
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.category) }}
+              {{ form_row(form.projects) }}
               {{ form_row(form.isPublished, {
 				'attr': {
 					'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
@@ -222,12 +223,14 @@
               'cancelUrl': 'mautic_form_index',
               'header': 'mautic.form.type.header',
               'typeOneHeader': 'mautic.form.type.campaign.header',
-              'typeOneIconClass': 'ri-megaphone-fill',
               'typeOneDifferences': typeOneDifferences,
+              'typeOnePictogram': 'process--automation',
+              'typeOneTag': 'mautic.form.type.campaign.tag',
               'typeOneOnClick': "Mautic.selectFormType('campaign');",
               'typeTwoHeader': 'mautic.form.type.standalone.header',
-              'typeTwoIconClass': 'ri-survey-fill',
               'typeTwoDifferences': typeTwoDifferences,
+              'typeTwoPictogram': 'flexible',
+              'typeTwoTag': 'mautic.form.type.standalone.tag',
               'typeTwoOnClick': "Mautic.selectFormType('standalone');",
       }, with_context=false) }}
   {% endif %}

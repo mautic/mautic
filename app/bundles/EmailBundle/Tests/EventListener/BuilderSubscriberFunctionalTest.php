@@ -11,17 +11,17 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        if (str_contains($this->getDataSetAsString(false), 'Invalid unsubscribe_text configured')) {
+        $this->configParams['disable_trackable_urls'] = false;
+        if (str_contains($this->dataSetAsString(), 'Invalid unsubscribe_text configured')) {
             $this->configParams['unsubscribe_text']  = '<a href="|some|">Unsubscribe</a> with invalid token within the href attribute.';
         }
 
-        if (str_contains($this->getDataSetAsString(false), 'No unsubscribe_text configured')) {
+        if (str_contains($this->dataName(), 'No unsubscribe_text configured')) {
             $this->configParams['unsubscribe_text']  = '';
         }
 
@@ -32,16 +32,14 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string}>
      */
-    public function dataOneTrackingLinkIsNotUsedForDifferentContacts(): iterable
+    public static function dataOneTrackingLinkIsNotUsedForDifferentContacts(): iterable
     {
         yield 'Invalid unsubscribe_text configured' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a></body></html>'];
         yield 'No unsubscribe_text configured' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a></body></html>'];
         yield 'Invalid tag attribute for unsubscribe_url' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a><a id="{unsubscribe_url}">unsubscribe</a></body></html>'];
     }
 
-    /**
-     * @dataProvider dataOneTrackingLinkIsNotUsedForDifferentContacts
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataOneTrackingLinkIsNotUsedForDifferentContacts')]
     public function testOneTrackingLinkIsNotUsedForDifferentContacts(string $content): void
     {
         $numContacts = 3;
@@ -77,7 +75,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, LEAD>
+     * @return array<string, Lead>
      */
     private function createContacts(int $count, LeadList $segment): array
     {
@@ -118,16 +116,15 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 
     private function sendMessages(Email $email, int $pending): void
     {
-        $this->client->request(
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
             Request::METHOD_POST,
             '/s/ajax?action=email:sendBatch',
             ['id' => $email->getId(), 'pending' => $pending],
-            [],
-            $this->createAjaxHeaders()
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
         Assert::assertSame(
             '{"success":1,"percent":100,"progress":['.$pending.','.$pending.'],"stats":{"sent":'.$pending.',"failed":0,"failedRecipients":[]}}',
             $response->getContent()

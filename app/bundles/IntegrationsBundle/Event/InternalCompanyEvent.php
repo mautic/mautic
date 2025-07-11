@@ -11,7 +11,7 @@ final class InternalCompanyEvent extends Event
 {
     public function __construct(
         private string $integrationName,
-        private Company $company
+        private Company $company,
     ) {
     }
 

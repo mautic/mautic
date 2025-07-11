@@ -19,7 +19,7 @@ class PageSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private FocusModel $model,
         private RouterInterface $router,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 
@@ -51,7 +51,7 @@ class PageSubscriber implements EventSubscriberInterface
 
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
-                $focus = $this->model->getEntity($id);
+                $focus = $this->model->getEntity((int) $id);
                 if (null !== $focus
                     && (
                         $focus->isPublished()

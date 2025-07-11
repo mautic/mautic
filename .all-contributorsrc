@@ -1338,7 +1338,8 @@
       "profile": "https://matbcvo.github.io",
       "contributions": [
         "review",
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -1440,6 +1441,153 @@
       "contributions": [
         "userTesting",
         "review"
+      ]
+    },
+    {
+      "login": "caiqueportela",
+      "name": "Caique Portela",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44068957?v=4",
+      "profile": "https://github.com/caiqueportela",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "levente999",
+      "name": "levente999",
+      "avatar_url": "https://avatars.githubusercontent.com/u/168987998?v=4",
+      "profile": "https://github.com/levente999",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rishithreddy89",
+      "name": "rishithreddy89",
+      "avatar_url": "https://avatars.githubusercontent.com/u/178993450?v=4",
+      "profile": "https://github.com/rishithreddy89",
+      "contributions": [
+        "code",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "Jaishree2310",
+      "name": "Jaishree Singh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73012522?v=4",
+      "profile": "https://linktr.ee/Jaishree2310",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "kingsedem",
+      "name": "Kingsley_E_",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47061881?v=4",
+      "profile": "https://github.com/kingsedem",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "Hugo-Prossaird",
+      "name": "Hugo-Prossaird",
+      "avatar_url": "https://avatars.githubusercontent.com/u/176997845?v=4",
+      "profile": "https://github.com/Hugo-Prossaird",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "farzammadani",
+      "name": "Farzam Madani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/69846004?v=4",
+      "profile": "https://github.com/farzammadani",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "SaraCRM",
+      "name": "Sara Matos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/121267071?v=4",
+      "profile": "https://github.com/SaraCRM",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "VishnuGurrapu",
+      "name": "Vishnu Gurrapu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/169230642?v=4",
+      "profile": "https://github.com/VishnuGurrapu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "1792826181",
+      "name": "Jun",
+      "avatar_url": "https://avatars.githubusercontent.com/u/105675530?v=4",
+      "profile": "https://github.com/1792826181",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "goma101",
+      "name": "Guilherme Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104629384?v=4",
+      "profile": "https://github.com/goma101",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "pedroasgomes",
+      "name": "Pedro Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99080726?v=4",
+      "profile": "https://github.com/pedroasgomes",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ElPollero",
+      "name": "ElPollero",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130322184?v=4",
+      "profile": "https://github.com/ElPollero",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "pelbox",
+      "name": "Gagandeep Singh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6670191?v=4",
+      "profile": "http://pelbox.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "PedroLoureiro1",
+      "name": "PedroLoureiro1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116733776?v=4",
+      "profile": "https://github.com/PedroLoureiro1",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "OlgaMarchuk",
+      "name": "OlgaMarchuk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/219189660?v=4",
+      "profile": "https://github.com/OlgaMarchuk",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],

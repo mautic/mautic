@@ -24,7 +24,7 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['queue_mode']            = WebhookModel::COMMAND_PROCESS;
-        $this->configParams['webhook_email_details'] = 'testWebhooksWithDetailsEnabled' === $this->getName();
+        $this->configParams['webhook_email_details'] = 'testWebhooksWithDetailsEnabled' === $this->name();
 
         parent::setUp();
     }

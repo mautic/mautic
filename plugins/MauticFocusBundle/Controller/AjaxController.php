@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
@@ -42,7 +42,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($responseContent);
     }
 
-    public function getViewsCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    public function getViewsCountAction(Request $request, CacheProviderTagAwareInterface $cacheProvider): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 
@@ -89,7 +89,7 @@ class AjaxController extends CommonAjaxController
         ]);
     }
 
-    public function getClickThroughCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    public function getClickThroughCountAction(Request $request, CacheProviderTagAwareInterface $cacheProvider): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 

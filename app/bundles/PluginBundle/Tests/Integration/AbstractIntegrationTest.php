@@ -24,7 +24,6 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->dispatcher,
                 $this->cache,
                 $this->em,
-                $this->session,
                 $this->request,
                 $this->router,
                 $this->translator,
@@ -37,6 +36,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->fieldModel,
                 $this->integrationEntityModel,
                 $this->doNotContact,
+                $this->fieldsWithUniqueIdentifier,
             ])
             ->onlyMethods(['getName', 'getAuthenticationType', 'getAvailableLeadFields'])
             ->getMock();
@@ -66,11 +66,10 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider requestProvider
-     *
      * @param mixed[] $parameters
      * @param mixed[] $settings
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('requestProvider')]
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
         /**
@@ -81,7 +80,6 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->dispatcher,
                 $this->cache,
                 $this->em,
-                $this->session,
                 $this->request,
                 $this->router,
                 $this->translator,
@@ -94,6 +92,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->fieldModel,
                 $this->integrationEntityModel,
                 $this->doNotContact,
+                $this->fieldsWithUniqueIdentifier,
             ])
             ->onlyMethods(['getName', 'getAuthenticationType', 'makeHttpClient'])
             ->getMock();
@@ -102,7 +101,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn(
                 new class($assertRequest) extends Client {
                     public function __construct(
-                        private object $assertRequest
+                        private object $assertRequest,
                     ) {
                     }
 
@@ -135,7 +134,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 'ignore_event_dispatch' => true,
                 'encode_parameters'     => 'json',
             ],
-            new class() {
+            new class {
                 /**
                  * @param mixed[] $options
                  */
@@ -161,7 +160,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
             ['this will be' => 'encoded to form array'],
             'POST',
             ['ignore_event_dispatch' => true],
-            new class() {
+            new class {
                 /**
                  * @param mixed[] $options
                  */

@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilde
 class DateCompanyDecorator implements FilterDecoratorInterface
 {
     public function __construct(
-        private FilterDecoratorInterface $dateDecorator
+        private FilterDecoratorInterface $dateDecorator,
     ) {
     }
 

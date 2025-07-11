@@ -9,12 +9,14 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Email>
  */
 class EmailRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
     public const EMAILS_PREFIX        = 'e';
 
     public const DNC_PREFIX           = 'dnc';
@@ -58,7 +60,7 @@ class EmailRepository extends CommonRepository
      *
      * @param string $email
      *
-     * @return bool
+     * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
     public function checkDoNotEmail($email)
     {
@@ -110,7 +112,7 @@ class EmailRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from(Email::class, 'e', 'e.id');
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
 
             if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || 'list' == $args['email_type'])) {
@@ -170,7 +172,7 @@ class EmailRepository extends CommonRepository
         $countWithMaxMin = false,
         $maxDate = null,
         int $maxThreads = null,
-        int $threadId = null
+        int $threadId = null,
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -319,7 +321,7 @@ class EmailRepository extends CommonRepository
         $maxContactId = null,
         $countWithMaxMin = false,
         int $maxThreads = null,
-        int $threadId = null
+        int $threadId = null,
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -559,12 +561,22 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'email_id',
+                    'email_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -593,6 +605,7 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -717,7 +730,7 @@ class EmailRepository extends CommonRepository
         }
     }
 
-    public function incrementRead(int $emailId, int $statId, bool $isVariant = false): void
+    public function incrementRead(int $emailId, string $statId, bool $isVariant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

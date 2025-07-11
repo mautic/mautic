@@ -4,27 +4,7 @@
             <thead>
             <tr>
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
-                    'checkall'        : 'true',
-                    'routeBase'       : 'email',
-                    'templateButtons' : {
-                        'delete' : permissions['email:emails:deleteown'] or permissions['email:emails:deleteother'],
-                    },
-                    'customButtons': [
-                        {
-                            'attr': {
-                                'class': 'btn btn-default btn-sm btn-nospin',
-                                'data-toggle': 'ajaxmodal',
-                                'data-target': '#MauticSharedModal',
-                                'href': path('mautic_email_batch_categories_view'),
-                                'data-header': 'mautic.email.batch.categories'|trans,
-                            },
-                            'btnText': 'mautic.email.batch.categories'|trans,
-                            'iconClass': 'ri-folder-line',
-                        },
-                    ],
-                    'langVar': 'lead.lead',
-                    'routeBase': 'contact',
-                    'tooltip': 'mautic.lead.list.checkall.help'|trans,
+                    'checkall'        : 'true'
                 }) -}}
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
@@ -94,7 +74,7 @@
                                 'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                            'iconClass': 'ri-send-plane-line-o',
+                            'iconClass': 'ri-send-plane-line',
                             'btnText': 'mautic.email.send'
                         } %}
 
@@ -109,8 +89,19 @@
                             }) %}
                         {% endif %}
 
-                        {% set customButtons = ('list' == type) ? [sendButton] : [] %}
+                        {% set previewButton = {
+                            'attr': {
+                                'class': 'btn btn-ghost btn-sm btn-nospin',
+                                'href': url('mautic_email_preview', {'objectId': item.getId()}),
+                                'target': '_blank',
+                                'data-toggle': '',
+                            },
+                            'iconClass': 'ri-external-link-line',
+                            'btnText': 'mautic.core.open_link'|trans,
+                            'priority': 100
+                        } %}
 
+                        {% set customButtons = ('list' == type) ? [sendButton, previewButton] : [previewButton] %}
 
                         {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,
@@ -153,18 +144,16 @@
                                 {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                         {% if item.getDescription() is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.getDescription()|purify }}</small>
                             </div>
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName  = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = (category) ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
@@ -181,7 +170,7 @@
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
                           <i class="ri-mail-send-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
-                              {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
+                              {{ 'mautic.email.stat.queuedcount'|trans ({'%count%' : item.getQueuedCount()}) }}
                           </a>
                         </span>
                         <span class="mt-xs label label-blue" id="sent-count-{{ item.getId() }}">
@@ -224,5 +213,25 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'mail--verse',
+                        'size': '80'
+                    } %}
+                </div>                
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.email.contentblock.heading',
+                subheading: 'mautic.email.contentblock.subheading',
+                copy: 'mautic.email.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

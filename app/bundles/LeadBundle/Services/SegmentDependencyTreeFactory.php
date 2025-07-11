@@ -19,7 +19,7 @@ class SegmentDependencyTreeFactory
 
     public function __construct(
         private ListModel $segmentModel,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

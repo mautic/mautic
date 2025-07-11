@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class DynamicContentSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 
@@ -101,10 +101,7 @@ class DynamicContentSendType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dwcsend_list';
     }

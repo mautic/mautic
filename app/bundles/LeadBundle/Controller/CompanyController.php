@@ -199,7 +199,7 @@ class CompanyController extends FormController
         $page         = $request->getSession()->get('mautic.company.page', 1);
         $method       = $request->getMethod();
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
-        $company      = $request->request->get('company') ?? [];
+        $company      = $request->request->all()['company'] ?? [];
         $updateSelect = InputHelper::clean(
             'POST' === $method
                 ? ($company['updateSelect'] ?? false)
@@ -222,7 +222,7 @@ class CompanyController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
                     // get custom field values
-                    $data = $request->request->get('company');
+                    $data = $request->request->all()['company'] ?? [];
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
                         $data[$f->getName()] = $f->getData();
@@ -368,7 +368,7 @@ class CompanyController extends FormController
         } elseif (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
-            $entity->getOwner())) {
+            $entity->getPermissionUser())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -377,7 +377,7 @@ class CompanyController extends FormController
 
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $method       = $request->getMethod();
-        $company      = $request->request->get('company') ?? [];
+        $company      = $request->request->all()['company'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($company['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -398,7 +398,7 @@ class CompanyController extends FormController
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data = $request->request->get('company');
+                    $data = $request->request->all()['company'] ?? [];
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
                         $data[$f->getName()] = $f->getData();
@@ -742,10 +742,8 @@ class CompanyController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);

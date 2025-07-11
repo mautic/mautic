@@ -19,7 +19,7 @@ class NotificationHelper
         private NotificationModel $notificationModel,
         private TranslatorInterface $translator,
         private Router $router,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -86,7 +86,7 @@ class NotificationHelper
         );
 
         $subject = $this->translator->trans(
-            'mautic.campaign.event.campaign_unpublished.title',
+            'mautic.campaign.event.campaign_unpublished',
             [
                 '%title%' => $campaign->getName(),
             ]

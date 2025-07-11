@@ -21,7 +21,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private PointsChangeLogRepository $pointsChangeLogRepository,
         private LeadPointLogRepository $leadPointLogRepository,
-        private LeadTriggerLogRepository $leadTriggerLogRepository
+        private LeadTriggerLogRepository $leadTriggerLogRepository,
     ) {
     }
 

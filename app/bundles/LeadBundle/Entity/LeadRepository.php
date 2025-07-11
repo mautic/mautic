@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -13,6 +14,7 @@ use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,6 +29,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
     use ExpressionHelperTrait;
     use OperatorListTrait;
+
+    private static LeadFieldRepository $leadFieldRepository;
 
     /**
      * @var EventDispatcherInterface
@@ -87,6 +91,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
     {
         $this->listLeadRepository = $listLeadRepository;
+    }
+
+    public function setLeadFieldRepository(LeadFieldRepository $leadFieldRepository): void
+    {
+        self::$leadFieldRepository = $leadFieldRepository;
+    }
+
+    public static function getLeadFieldRepository(): LeadFieldRepository
+    {
+        return self::$leadFieldRepository;
     }
 
     /**
@@ -229,8 +243,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->expr()->in('l.id', ':ids')
         )
             ->setParameter('ids', array_keys($leads))
-            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
-            ->addOrderBy('l.id', \Doctrine\Common\Collections\Criteria::DESC);
+            ->orderBy('l.dateAdded', Order::Descending->value)
+            ->addOrderBy('l.id', Order::Descending->value);
         $entities = $q->getQuery()
             ->getResult();
 
@@ -329,7 +343,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $col = ($byId) ? 'i.id' : 'i.ipAddress';
         $q->where($col.' = :ip')
             ->setParameter('ip', $ip)
-            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
+            ->orderBy('l.dateAdded', Order::Descending->value);
         $results = $q->getQuery()->getResult();
 
         /** @var Lead $lead */
@@ -352,6 +366,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $results = $fq->executeQuery()->fetchAllAssociative();
 
         return $results[0] ?? [];
+    }
+
+    public function exists(string $id): bool
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = :id')
+            ->setParameter('id', $id);
+
+        return (bool) $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -589,7 +614,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         array $additionalJoins = null,
         $contactColumnName = 'lead_id',
         \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null
+        \DateTimeInterface $dateTo = null,
     ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
@@ -668,6 +693,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
+        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
+        $availableForSearch = array_map(fn ($alias) => 'l.'.$alias, $customFields);
+
         $columns = array_merge(
             [
                 'l.firstname',
@@ -679,7 +707,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 'l.zipcode',
                 'l.country',
             ],
-            $this->availableSocialFields
+            $this->availableSocialFields,
+            $availableForSearch,
         );
 
         return $this->addStandardCatchAllWhereClause($q, $filter, $columns);
@@ -703,7 +732,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // This will be switched by some commands that use join tables as NOT EXISTS queries will be used
         $exprType = ($filter->not) ? 'negate_expr' : 'expr';
 
-        $operators = $this->getFilterExpressionFunctions();
+        $operators = OperatorOptions::getFilterExpressionFunctions();
         $operators = array_merge($operators, [
             'null' => [
                 'expr'        => 'isNull',

@@ -9,10 +9,6 @@ body {
 
 hr,
 .hr-expand {
-  margin-top:    15px;
-  margin-bottom: 15px;
-  border: 0;
-  border-top: 0;
   width: auto;
 
   &.hr-w-2 {
@@ -80,5 +76,10 @@ a {
   &:focus {
     text-decoration: none;
     outline: 2px solid transparent;
+  }
+
+  &.disabled {
+    color: var(--text-disabled);
+    cursor: not-allowed;
   }
 }

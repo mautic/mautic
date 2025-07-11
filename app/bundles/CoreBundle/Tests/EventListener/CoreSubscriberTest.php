@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriberTest extends TestCase
@@ -16,9 +15,6 @@ class CoreSubscriberTest extends TestCase
     {
         self::assertSame(
             [
-                KernelEvents::CONTROLLER => [
-                    ['onKernelRequestAddGlobalJS', 0],
-                ],
                 CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
                 CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
                 CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],

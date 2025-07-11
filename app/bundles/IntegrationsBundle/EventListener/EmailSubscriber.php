@@ -29,7 +29,7 @@ class EmailSubscriber implements EventSubscriberInterface
         protected EventDispatcherInterface $eventDispatcher,
         protected TokenParser $tokenParser,
         protected ObjectMappingRepository $objectMappingRepository,
-        protected IntegrationHelper $integrationHelper
+        protected IntegrationHelper $integrationHelper,
     ) {
     }
 

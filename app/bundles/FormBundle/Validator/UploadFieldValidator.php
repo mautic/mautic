@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 class UploadFieldValidator
 {
     public function __construct(
-        private FileUploadValidator $fileUploadValidator
+        private FileUploadValidator $fileUploadValidator,
     ) {
     }
 

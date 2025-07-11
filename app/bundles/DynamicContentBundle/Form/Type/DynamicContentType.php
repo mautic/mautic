@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
@@ -20,6 +21,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -38,7 +40,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DynamicContentType extends AbstractType
 {
-    private $fieldChoices;
+    /**
+     * @var mixed[]
+     */
+    private array $fieldChoices;
 
     /**
      * @var mixed[]
@@ -81,13 +86,15 @@ class DynamicContentType extends AbstractType
         private EntityManager $em,
         ListModel $listModel,
         private TranslatorInterface $translator,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
+        private TypeList $typeList,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
+        $this->typeList        = $typeList;
 
         $this->filterFieldChoices();
 
@@ -143,6 +150,15 @@ class DynamicContentType extends AbstractType
             ]
         );
 
+        $builder->add('type', ChoiceType::class, [
+            'label'   => 'mautic.dynamicContent.type.label',
+            'choices' => $this->typeList->getChoices(),
+            'attr'    => [
+                'class'    => 'form-control',
+                'onchange' => 'Mautic.toggleContentEditor()',
+            ],
+        ]);
+
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'label' => 'mautic.core.form.available',
         ]);
@@ -176,22 +192,6 @@ class DynamicContentType extends AbstractType
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
-        $builder->add(
-            'content',
-            TextareaType::class,
-            [
-                'label'      => 'mautic.dynamicContent.form.content',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'tooltip'              => 'mautic.dynamicContent.form.content.help',
-                    'class'                => 'form-control editor editor-advanced editor-builder-tokens',
-                    'data-token-callback'  => 'email:getBuilderTokens',
-                    'data-token-activator' => '{',
-                    'rows'                 => '15',
-                ],
-                'required' => false,
-            ]
-        );
         $builder->add(
             'utmTags',
             EmailUtmTagsType::class,
@@ -294,6 +294,17 @@ class DynamicContentType extends AbstractType
                 $event->setData($data);
             }
         );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var DynamicContent|null $dynamicContent */
+            $dynamicContent = $event->getData();
+            $this->addContentField($event->getForm(), $dynamicContent?->getType());
+        });
+
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $this->addContentField($form->getParent(), $form->getData());
+        });
     }
 
     /**
@@ -344,9 +355,30 @@ class DynamicContentType extends AbstractType
     }
 
     /**
-     * @return string
+     * @param FormInterface<FormInterface> $form
      */
-    public function getBlockPrefix()
+    private function addContentField(FormInterface $form, ?string $type): void
+    {
+        $enableEditor = TypeList::HTML === $type;
+        $editorClass  = 'editor editor-advanced editor-builder-tokens';
+
+        $form->add('content', TextareaType::class, [
+            'label'      => 'mautic.dynamicContent.form.content',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'tooltip'              => 'mautic.dynamicContent.form.content.help',
+                'class'                => 'form-control'.($enableEditor ? ' '.$editorClass : ''),
+                'rows'                 => 15,
+                'data-editor-enable'   => $enableEditor,
+                'data-editor-class'    => $editorClass,
+                'data-token-callback'  => 'email:getBuilderTokens',
+                'data-token-activator' => '{',
+            ],
+            'required' => false,
+        ]);
+    }
+
+    public function getBlockPrefix(): string
     {
         return 'dwc';
     }

@@ -50,11 +50,18 @@ class ConfigSubscriberTest extends TestCase
             'formTheme'  => '@MauticLead/FormTheme/Config/_config_leadconfig_widget.html.twig',
             'parameters' => null,
         ];
+        $matcher = $this->exactly(2);
 
         $this->configBuilderEvent
-            ->expects($this->exactly(2))
-            ->method('addForm')
-            ->withConsecutive([$leadConfig], [$segmentConfig]);
+            ->expects($matcher)
+            ->method('addForm')->willReturnCallback(function (...$parameters) use ($matcher, $leadConfig, $segmentConfig) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($leadConfig, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($segmentConfig, $parameters[0]);
+                }
+            });
 
         $this->configSubscriber->onConfigGenerate($this->configBuilderEvent);
     }

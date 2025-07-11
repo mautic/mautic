@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
@@ -9,11 +10,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(DateAnniversary::class)]
 class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getOperator
-     */
     public function testGetOperator(): void
     {
         $dateDecorator             = $this->createMock(DateDecorator::class);
@@ -32,15 +31,10 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('like', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getParameterValue
-     */
     public function testGetParameterValue(): void
     {
         /**
          * Today in '%-m-d%' format. This matches date and datetime fields.
-         *
-         * @var string
          */
         $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d').'%';
 
@@ -67,9 +61,6 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getParameterValue
-     */
     public function testGetParameterValueWithRelativeDate(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -95,5 +86,64 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
         $this->assertEquals('%-03-04%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    public function testGetWhereReturnsCompositeExpression(): void
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $filter                    = ['field' => 'last_active'];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $dateOptionParameters = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        $dateDecorator->expects($this->once())
+            ->method('getWhere')
+            ->with($contactSegmentFilterCrate)
+            ->willReturn(CompositeExpression::and('expr1', 'expr2'));
+
+        $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
+
+        $this->assertInstanceOf(
+            CompositeExpression::class,
+            $filterDecorator->getWhere($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testGetWhereReturnsString(): void
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $filter                    = ['field' => 'last_active'];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        // Configure to return a string
+        $dateDecorator->expects($this->once())
+            ->method('getWhere')
+            ->willReturn('WHERE clause');
+
+        $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
+        $this->assertSame('WHERE clause', $filterDecorator->getWhere($contactSegmentFilterCrate));
+    }
+
+    public function testGetWhereReturnsNull(): void
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $filter                    = ['field' => 'last_active'];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        // Configure to return null
+        $dateDecorator->expects($this->once())
+            ->method('getWhere')
+            ->willReturn(null);
+
+        $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
+        $this->assertNull($filterDecorator->getWhere($contactSegmentFilterCrate));
     }
 }

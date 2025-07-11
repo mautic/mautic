@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,7 +17,6 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -36,7 +34,7 @@ class CompanyApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
     {
         $companyModel = $modelFactory->getModel('lead.company');
         \assert($companyModel instanceof CompanyModel);
@@ -46,31 +44,21 @@ class CompanyApiController extends CommonApiController
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
         $this->serializerGroups[] = 'companyDetails';
+        $this->serializerGroups[] = 'projectList';
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    /**
-     * If an existing company is matched, it'll be merged. Otherwise it'll be created.
-     *
-     * @return Response
-     */
-    public function newEntityAction(Request $request)
+    public function getNewEntity(array $params)
     {
-        // Check for an email to see if the lead already exists
-        $parameters = $request->request->all();
-
-        if (empty($parameters['force'])) {
-            $leadCompanyModel = $this->getModel('lead.company');
-            \assert($leadCompanyModel instanceof CompanyModel);
-            [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
-
-            if (count($companyEntities)) {
-                return $this->editEntityAction($request, $company['id']);
-            }
+        $leadCompanyModel = $this->getModel('lead.company');
+        \assert($leadCompanyModel instanceof CompanyModel);
+        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $leadCompanyModel);
+        if (count($companyEntities)) {
+            return $this->model->getEntity($company['id']);
         }
 
-        return parent::newEntityAction($request);
+        return $this->model->getEntity();
     }
 
     /**

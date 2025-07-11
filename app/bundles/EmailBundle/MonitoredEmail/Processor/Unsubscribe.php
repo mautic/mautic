@@ -22,7 +22,7 @@ class Unsubscribe implements ProcessorInterface
         private ContactFinder $contactFinder,
         private TranslatorInterface $translator,
         private LoggerInterface $logger,
-        private DoNotContactModel $doNotContact
+        private DoNotContactModel $doNotContact,
     ) {
     }
 

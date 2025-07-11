@@ -12,10 +12,9 @@ use PHPUnit\Framework\TestCase;
 class SchemaDefinitionTest extends TestCase
 {
     /**
-     * @dataProvider dataGetSchemaDefinition
-     *
      * @param mixed[] $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetSchemaDefinition')]
     public function testGetSchemaDefinition(string $alias, string $type, bool $isUnique, ?int $length, array $expected): void
     {
         Assert::assertSame($expected, SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique, $length));
@@ -25,7 +24,7 @@ class SchemaDefinitionTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function dataGetSchemaDefinition(): iterable
+    public static function dataGetSchemaDefinition(): iterable
     {
         foreach (['datetime', 'date', 'time', 'boolean'] as $type) {
             yield [
@@ -169,10 +168,9 @@ class SchemaDefinitionTest extends TestCase
     }
 
     /**
-     * @dataProvider dataGetFieldCharLengthLimit
-     *
      * @param mixed[] $schemaDefinition
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetFieldCharLengthLimit')]
     public function testGetFieldCharLengthLimit(array $schemaDefinition, ?int $expected): void
     {
         Assert::assertSame($expected, SchemaDefinition::getFieldCharLengthLimit($schemaDefinition));
@@ -181,7 +179,7 @@ class SchemaDefinitionTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function dataGetFieldCharLengthLimit(): iterable
+    public static function dataGetFieldCharLengthLimit(): iterable
     {
         yield [
             [

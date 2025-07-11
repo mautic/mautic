@@ -15,7 +15,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
-        private CompanyReportData $companyReportData
+        private CompanyReportData $companyReportData,
     ) {
     }
 

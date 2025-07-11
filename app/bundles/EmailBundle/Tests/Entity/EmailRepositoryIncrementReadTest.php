@@ -42,7 +42,7 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $this->repo->incrementRead(11, 21);
+        $this->repo->incrementRead(11, '21');
         $generatedSql = $this->queryBuilder->getSQL();
 
         // Assert that the generated SQL matches our expectations
@@ -57,7 +57,7 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $this->repo->incrementRead(11, 21, true);
+        $this->repo->incrementRead(11, '21', true);
         $generatedSql = $this->queryBuilder->getSQL();
 
         // Assert that the generated SQL matches our expectations
@@ -70,15 +70,13 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects($this->exactly(3))
             ->method('executeStatement')
-                ->will(
-                    $this->onConsecutiveCalls(
-                        $this->throwException(new DBALException()),
-                        $this->throwException(new DBALException()),
-                        1
-                    )
+                ->willReturnOnConsecutiveCalls(
+                    $this->throwException(new DBALException()),
+                    $this->throwException(new DBALException()),
+                    1
                 );
 
-        $this->repo->incrementRead(45, 616);
+        $this->repo->incrementRead(45, '616');
     }
 
     public function testUpCountWithFourErrors(): void
@@ -89,6 +87,6 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->will($this->throwException(new DBALException()));
 
         $this->expectException(DBALException::class);
-        $this->repo->incrementRead(45, 616);
+        $this->repo->incrementRead(45, '616');
     }
 }

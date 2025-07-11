@@ -44,15 +44,17 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             'campaignId'     => $campaign->getId(),
             'campaignAction' => 'add',
         ];
-
-        $this->client->request(Request::METHOD_POST, '/s/ajax', $payload, [], $this->createAjaxHeaders());
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($this->client->getResponse()->getContent(), true);
 
         // Ensure the contact 1 is a campaign 1 member now.
-        $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '1', 'manually_removed' => '0']], $this->getMembersForCampaign($campaign->getId()));
+        $this->assertSame(
+            [['lead_id' => (string) $contact->getId(), 'manually_added' => '1', 'manually_removed' => '0']],
+            $this->getMembersForCampaign($campaign->getId()),
+            $this->client->getResponse()->getContent()
+        );
 
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
@@ -65,7 +67,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             'campaignAction' => 'remove',
         ];
 
-        $this->client->request(Request::METHOD_POST, '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -108,10 +110,44 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCompanyLookupWithNoModelSet(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn', [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
         $response = $this->client->getResponse();
         Assert::assertSame(400, $response->getStatusCode());
         Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
+    }
+
+    public function testCompanyLookupWithLimit(): void
+    {
+        $company1 = new Company();
+        $company1->setName('Company 1');
+        $this->em->persist($company1);
+
+        $company2 = new Company();
+        $company2->setName('Company 2');
+        $this->em->persist($company2);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1');
+
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertIsArray($content);
+        Assert::assertCount(1, $content, 'The result should contain only one element');
+        Assert::assertSame('Company 1', $content[0]['text']);
+        Assert::assertSame($company1->getId(), (int) $content[0]['value']);
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1&start=1');
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertIsArray($content);
+        Assert::assertCount(1, $content, 'The result should contain only one element');
+        Assert::assertSame('Company 2', $content[0]['text']);
+        Assert::assertSame($company2->getId(), (int) $content[0]['value']);
     }
 
     public function testSegmentDependencyTree(): void
@@ -474,10 +510,11 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('non-admin-user');
         $user->setRole($role);
 
-        /** @var PasswordHasherInterface $encoder */
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        /** @var PasswordHasherInterface $hasher */
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
 
-        $user->setPassword($encoder->hash('mautic'));
+        $passwordNonAdmin = 'Maut1cR0cks!';
+        $user->setPassword($hasher->hash($passwordNonAdmin));
         $userRepository->saveEntity($user);
 
         /** @var User $nonAdminUser */
@@ -496,12 +533,13 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $leadRepository->saveEntities($nonAdminLeads);
         $this->em->clear();
 
-        // Logout admin.
-        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->logoutUser();
 
         // Check suggestions for a non admin user.
-        $this->loginUser('non-admin-user');
+        $this->client->loginUser($nonAdminUser, 'mautic');
         $this->client->setServerParameter('PHP_AUTH_USER', 'non-admin-user');
+        // Set the new password, because new authenticator system checks for it.
+        $this->client->setServerParameter('PHP_AUTH_PW', $passwordNonAdmin);
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
         $response = $this->client->getResponse();
         self::assertTrue($response->isOk());
@@ -515,10 +553,9 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider leadFieldOrderChoiceListProvider
-     *
      * @param string[] $expectedOptions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('leadFieldOrderChoiceListProvider')]
     public function testUpdateLeadFieldOrderChoiceListAction(string $object, string $group, array $expectedOptions): void
     {
         $payload = [
@@ -527,13 +564,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             'group'  => $group,
         ];
 
-        $this->client->request(
-            Request::METHOD_POST,
-            '/s/ajax',
-            $payload,
-            [],
-            $this->createAjaxHeaders()
-        );
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
 
         // Get the response HTML
         $response    = $this->client->getResponse();
@@ -566,7 +598,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function leadFieldOrderChoiceListProvider(): \Generator
+    public static function leadFieldOrderChoiceListProvider(): \Generator
     {
         yield ['lead', 'core', ['Fax', 'Website']];
         yield ['lead', 'social', ['Facebook', 'Foursquare', 'Instagram']];

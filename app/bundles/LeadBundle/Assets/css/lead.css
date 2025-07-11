@@ -16,7 +16,7 @@
     width: 125px;
 }
 
-.leadfield-list .fa-asterisk:hover, .leadfield-list .fa-eye:hover, .leadfield-list .fa-lock:hover, .leadfield-list .fa-list:hover {
+.leadfield-list i {
     color: #7D5B71;
 }
 
@@ -64,17 +64,8 @@
     margin-left:20px;
 }
 
-.selected-filters .btn-group {
-    margin-top:4px;
-}
-
-.selected-filters .btn-group .btn {
-    margin-right:4px;
-}
-
 .selected-filters .panel {
     margin-bottom:0;
-    margin-top:20px;
 }
 
 .selected-filters .panel.in-group {
@@ -242,19 +233,85 @@ ul.tag-cloud li {
     float:left;
 }
 
+.properties-form .form-group {
+    margin-bottom: 0;
+}
+
+.properties-form * {
+    width: min-content;
+}
+
+.filter--row select.form-control,
+.filter--row select.glue-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 15.6315L20.9679 10.8838L20.0321 9.11619L12 13.3685L3.9679 9.11619L3.03212 10.8838L12 15.6315Z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 10px;
+    background-position-y: center;
+
+    padding-right: 24px;
+    background-position-x: 84%;
+
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+}
+
+.filter--panel {
+    border-color: var(--border-subtle);
+}
+.filter--panel select:focus {
+    outline: 2px solid var(--focus);
+}
+
+.filter--panel select,
+.filter--panel input {
+    border: none;
+    background-color: transparent;
+    padding: var(--spacing-01) var(--spacing-06);
+    text-overflow: ellipsis;
+}
+
+.filter--panel select.form-control,
+.filter--panel input {
+    border: none;
+    padding: var(--spacing-01) var(--spacing-06);
+    text-overflow: ellipsis;
+}
+
+.filter--field-operator {
+    border-left: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-subtle);
+}
+
+.filter--field-name {
+    height: 40px;
+    background-color: var(--layer);
+}
+
+.filter--panel .help-block {
+    position: absolute;
+    bottom: -10px;
+    right: 18px;
+}
+
+.filter--panel select.form-control {
+    padding-right: 40px;
+    background-position-x: calc(100% - 20px);
+}
+
 .panel-companies .primary {
     color: #fdb933;
 }
 
 .building::before {
-    content: "\f1ad";
-    font-family: "FontAwesome";
+    content: "\eb08";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
 .user::before {
-    content: "\f007";
-    font-family: "FontAwesome";
+    content: "\f25b";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
@@ -296,6 +353,5 @@ ul.tag-cloud li {
     margin-right: 15px;
     margin-top: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
     font-size: 14px;
 }

@@ -72,7 +72,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
         $formCrawler = $crawler->filter('form[name=lead]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
 
         $form = $formCrawler->form();
         $form->setValues(
@@ -96,7 +96,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());
         $formCrawler = $crawler->filter('form[name=lead]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
 
         $form = $formCrawler->form();
         $form->setValues(

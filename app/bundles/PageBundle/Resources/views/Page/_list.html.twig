@@ -16,12 +16,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#pageTable',
-                        'routeBase': 'page',
-                        'templateButtons': {
-                            'delete': permissions['page:pages:deleteown'] or permissions['page:pages:deleteother'],
-                        },
+                    'checkall': 'true',
+                    'target': '#pageTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -96,13 +92,47 @@
                                 },
                                 'routeBase': 'page',
                                 'nameGetter': 'getTitle',
+                                'customButtons': {
+                                    'preview': {
+                                        'attr': {
+                                            'class': 'btn btn-ghost btn-sm btn-nospin',
+                                            'href': path('mautic_page_preview', {'id': item.id}),
+                                            'target': '_blank',
+                                            'data-toggle': '',
+                                        },
+                                        'iconClass': 'ri-external-link-line',
+                                        'btnText': 'mautic.core.open_link'|trans,
+                                        'priority': 100
+                                    },
+                                    'results': {
+                                        'attr': {
+                                            'class': 'btn btn-ghost btn-sm btn-nospin',
+                                            'href': path('mautic_page_results', {'objectId': item.id}),
+                                            'data-toggle': 'ajax',
+                                            'data-menu-link': 'mautic_form_index'
+                                        },
+                                        'iconClass': 'ri-bar-chart-line',
+                                        'btnText': 'mautic.form.form.results'|trans,
+                                        'priority': 80
+                                    }
+                                }|merge(not item.isPreferenceCenter ? {
+                                    'copy': {
+                                        'attr': {
+                                            'data-copy': url('mautic_page_public', {'slug': item.alias}),
+                                            'data-toggle': 'none',
+                                        },
+                                        'btnText': 'mautic.core.copy_page_link'|trans,
+                                        'iconClass': 'ri-clipboard-line',
+                                        'priority': 90
+                                    }
+                                } : {})
                         }) }}
                     </td>
                     <td>
                         {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'page.page'}) }}
                         <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                             {{ item.title }} ({{ item.alias }})
-                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter %}
+                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter or pageConfig.isDraftEnabled %}
                                 <span>
                                     {% if item.isVariant %}
                                         <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
@@ -119,15 +149,19 @@
                                             <i class="ri-settings-5-line"></i>
                                         </span>
                                     {% endif %}
+                                    {% if pageConfig.isDraftEnabled and item.hasDraft %}
+                                        <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
+                                    {% endif %}
                                 </span>
                             {% endif %}
                         </a>
+                        {{ customContent('page.name', _context) }}
+                        {{ include('@MauticProject/Modules/projects.html.twig') }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.hits }}</td>
                     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
@@ -159,5 +193,24 @@
         </div>
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'landing-page',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.page.contentblock.heading',
+                subheading: 'mautic.page.contentblock.subheading',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

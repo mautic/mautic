@@ -1,43 +1,39 @@
 <?php
 
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+
 $firewalls = [
     'install' => [
-        'pattern'   => '^/installer',
-        'anonymous' => true,
-        'lazy'      => true,
-        'context'   => 'mautic',
-        'security'  => false,
+        'pattern'  => '^/installer',
+        'lazy'     => true,
+        'context'  => 'mautic',
+        'security' => false,
     ],
     'dev' => [
-        'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
-        'security'  => true,
-        'anonymous' => true,
-        'lazy'      => true,
+        'pattern'  => '^/(_(profiler|wdt)|css|images|js)/',
+        'security' => true,
+        'lazy'     => true,
     ],
     'login' => [
-        'pattern'   => '^/s/login$',
-        'anonymous' => true,
-        'lazy'      => true,
-        'context'   => 'mautic',
+        'pattern' => '^/s/login$',
+        'lazy'    => true,
+        'context' => 'mautic',
     ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
-        'anonymous'          => true,
         'lazy'               => true,
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
     'saml_login' => [
-        'pattern'   => '^/s/saml/login$',
-        'anonymous' => true,
-        'lazy'      => true,
-        'context'   => 'mautic',
+        'pattern' => '^/s/saml/login$',
+        'lazy'    => true,
+        'context' => 'mautic',
     ],
     'saml_discovery' => [
-        'pattern'   => '^/saml/discovery$',
-        'anonymous' => true,
-        'lazy'      => true,
-        'context'   => 'mautic',
+        'pattern' => '^/saml/discovery$',
+        'lazy'    => true,
+        'context' => 'mautic',
     ],
     'oauth2_token' => [
         'pattern'  => '^/oauth/v2/token',
@@ -50,8 +46,7 @@ $firewalls = [
             'check_path' => '/oauth/v2/authorize_login_check',
             'login_path' => '/oauth/v2/authorize_login',
         ],
-        'anonymous' => true,
-        'lazy'      => true,
+        'lazy' => true,
     ],
     'api' => [
         'pattern'            => '^/api',
@@ -59,6 +54,7 @@ $firewalls = [
         'mautic_plugin_auth' => true,
         'stateless'          => true,
         'http_basic'         => true,
+        'entry_point'        => 'fos_oauth_server.security.entry_point',
     ],
     'main' => [
         'pattern'       => '^/(s/|elfinder|efconnect)',
@@ -69,16 +65,18 @@ $firewalls = [
             'user_creator'    => 'mautic.security.saml.user_creator',
             'username_mapper' => 'mautic.security.saml.username_mapper',
 
-            // Environment variables will overwrite these with the standard login URLs if SAML is disabled
-            'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
+            // If saml is disabled, these still must contain a proper saml login URLs.
+            // Otherwise, this prevents handling of the
+            // \LightSaml\SpBundle\Security\Http\Authenticator\SamlServiceProviderAuthenticator::supports
+            'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',
             'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'form_login' => [
-            'csrf_token_generator' => 'security.csrf.token_manager',
-            'success_handler'      => 'mautic.security.authentication_handler',
-            'failure_handler'      => 'mautic.security.authentication_handler',
-            'login_path'           => '/s/login',
-            'check_path'           => '/s/login_check',
+            'enable_csrf'     => true,
+            'success_handler' => 'mautic.security.authentication_handler',
+            'failure_handler' => 'mautic.security.authentication_handler',
+            'login_path'      => '/s/login',
+            'check_path'      => '/s/login_check',
         ],
         'logout' => [
             'path'   => '/s/logout',
@@ -91,19 +89,15 @@ $firewalls = [
             'domain'   => '%mautic.rememberme_domain%',
             'samesite' => 'lax',
         ],
-        'guard' => [
-            'authenticators' => [
-                'mautic.user.form_guard_authenticator',
-            ],
-        ],
-        'fos_oauth'     => true,
-        'context'       => 'mautic',
+        'entry_point' => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
+        'mautic_sso'  => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
+        'fos_oauth'   => true,
+        'context'     => 'mautic',
     ],
     'public' => [
-        'pattern'   => '^/',
-        'anonymous' => true,
-        'lazy'      => true,
-        'context'   => 'mautic',
+        'pattern' => '^/',
+        'lazy'    => true,
+        'context' => 'mautic',
     ],
 ];
 
@@ -119,8 +113,8 @@ $container->loadFromExtension(
                 'id' => 'mautic.user.provider',
             ],
         ],
-        'encoders' => [
-            Symfony\Component\Security\Core\User\User::class => [
+        'password_hashers' => [
+            Symfony\Component\Security\Core\User\UserInterface::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
@@ -134,12 +128,25 @@ $container->loadFromExtension(
         ],
         'firewalls'      => $firewalls,
         'access_control' => [
-            ['path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY'],
+            // First there should be URIs for login or definitely public ones.
+            ['path' => '^/installer', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            ['path' => '^/(_(profiler|wdt)|css|images|js)/', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            ['path' => '^/s/login$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            ['path' => '^/s/sso_login', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            ['path' => '^/s/saml/login$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            ['path' => '^/saml/discovery$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            ['path' => '^/oauth/v2/authorize', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            // Second should be URIs that are defined as non-public.
+            ['path' => '^/api', 'roles' => AuthenticatedVoter::IS_AUTHENTICATED_FULLY],
+            ['path' => '^/(s/|elfinder|efconnect)', 'roles' => AuthenticatedVoter::IS_AUTHENTICATED],
+            // Last the URIs that are none of the above.
+            ['path' => '^/', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
         ],
     ]
 );
 
 $container->setParameter('mautic.saml_idp_entity_id', '%env(MAUTIC_SAML_ENTITY_ID)%');
+$container->setParameter('mautic.saml_enabled', '%env(bool:MAUTIC_SAML_ENABLED)%');
 $container->loadFromExtension(
     'light_saml_symfony_bridge',
     [
@@ -148,6 +155,7 @@ $container->loadFromExtension(
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',
+            'request'  => Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore::class,
         ],
     ]
 );

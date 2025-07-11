@@ -16,7 +16,7 @@ class FocusListType extends AbstractType
     private $repo;
 
     public function __construct(
-        protected FocusModel $focusModel
+        protected FocusModel $focusModel,
     ) {
         $this->repo       = $this->focusModel->getRepository();
     }
@@ -50,10 +50,7 @@ class FocusListType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

@@ -18,7 +18,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @param string $channel
      *
-     * @return \Mautic\LeadBundle\Entity\DoNotContact[]
+     * @return DoNotContact[]
      */
     public function getEntriesByLeadAndChannel(Lead $lead, $channel)
     {

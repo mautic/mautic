@@ -79,11 +79,11 @@ class ContactStep extends \AcceptanceTester
     {
         $I = $this;
         // Click the dropdown button for bulk actions
-        $xpathDropdownButton = '//*[@id="leadTable"]/thead/tr/th[1]/div/div/button/i';
+        $xpathDropdownButton = '//button[@id="core-options"]';
         $I->waitForElementClickable($xpathDropdownButton, 10);
         $I->click($xpathDropdownButton);
         // Select the desired option from the dropdown menu
-        $xpathOption = "//*[@id='leadTable']/thead/tr/th[1]/div/div/ul/li[$option]/a/span";
+        $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li[$option]";
         $I->waitForElementClickable($xpathOption, 10);
         $I->click($xpathOption);
     }

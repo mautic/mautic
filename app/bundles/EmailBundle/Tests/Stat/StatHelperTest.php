@@ -21,28 +21,25 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
 
         $mockStatRepository->expects($this->once())
             ->method('deleteStats')
-            ->withConsecutive([[1, 2, 3, 4, 5]]);
+            ->with([1, 2, 3, 4, 5]);
 
         $statHelper = new StatHelper($emailStatmodel);
 
-        $mockEmail = $this->getMockBuilder(Email::class)
-            ->getMock();
+        $mockEmail = $this->createMock(Email::class);
         $mockEmail->method('getId')
             ->willReturn(15);
 
         $counter = 1;
         while ($counter <= 5) {
-            $stat = $this->getMockBuilder(Stat::class)
-                ->getMock();
+            $stat = $this->createMock(Stat::class);
 
             $stat->method('getId')
-                ->willReturn($counter);
+                ->willReturn((string) $counter);
 
             $stat->method('getEmail')
                 ->willReturn($mockEmail);
 
-            $lead = $this->getMockBuilder(Lead::class)
-                ->getMock();
+            $lead = $this->createMock(Lead::class);
 
             $lead->method('getId')
                 ->willReturn($counter * 10);

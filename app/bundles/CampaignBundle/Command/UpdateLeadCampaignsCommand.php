@@ -11,12 +11,18 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:campaigns:rebuild',
+    description: 'Rebuild campaigns based on contact segments.',
+    aliases: ['mautic:campaigns:update']
+)]
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private int $runLimit = 0;
@@ -32,7 +38,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         private LoggerInterface $logger,
         private FormatterHelper $formatterHelper,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -40,8 +46,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:rebuild')
-            ->setAliases(['mautic:campaigns:update'])
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
@@ -121,6 +125,30 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this->quiet      = (bool) $input->getOption('quiet');
         $this->output     = ($this->quiet) ? new NullOutput() : $output;
         $excludeCampaigns = $input->getOption('exclude');
+
+        if (is_numeric($id)) {
+            $id = (int) $id;
+        }
+
+        if (is_numeric($maxThreads)) {
+            $maxThreads = (int) $maxThreads;
+        }
+
+        if (is_numeric($threadId)) {
+            $threadId = (int) $threadId;
+        }
+
+        if (is_numeric($contactMaxId)) {
+            $contactMaxId = (int) $contactMaxId;
+        }
+
+        if (is_numeric($contactMinId)) {
+            $contactMinId = (int) $contactMinId;
+        }
+
+        if (is_numeric($contactId)) {
+            $contactId = (int) $contactId;
+        }
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
@@ -207,6 +235,4 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->output->writeln('');
     }
-
-    protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

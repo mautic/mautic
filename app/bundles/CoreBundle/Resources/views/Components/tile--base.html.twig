@@ -1,0 +1,29 @@
+{% for tile in tiles %}
+    <div class="tile" id="tile-{{ loop.index }}">
+        {% if tile.content is defined %}
+            {{ tile.content|raw }}
+        {% endif %}
+
+        {% if tile.button is defined %}
+            {% set button = tile.button %}
+            {% if button.variant is defined %}
+                {% if button.variant != 'link' %}
+                    {% set button = button|merge({'variant': 'tertiary', 'wide': true}) %}
+                {% endif %}
+            {% else %}
+                {% set button = button|merge({'variant': 'tertiary', 'wide': true}) %}
+            {% endif %}
+
+            {# Add default class mt-md while preserving any existing classes #}
+            {% if button.attributes is defined and button.attributes.class is defined %}
+                {% set button = button|merge({'attributes': button.attributes|merge({'class': button.attributes.class ~ ' mt-md'})}) %}
+            {% elseif button.attributes is defined %}
+                {% set button = button|merge({'attributes': button.attributes|merge({'class': 'mt-md'})}) %}
+            {% else %}
+                {% set button = button|merge({'attributes': {'class': 'mt-md'}}) %}
+            {% endif %}
+
+            {% include '@MauticCore/Helper/button.html.twig' with {'buttons': [button]} %}
+        {% endif %}
+    </div>
+{% endfor %}

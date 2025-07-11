@@ -9,7 +9,7 @@ class TokenHelper
 {
     public function __construct(
         protected FormModel $formModel,
-        protected CorePermissions $security
+        protected CorePermissions $security,
     ) {
     }
 

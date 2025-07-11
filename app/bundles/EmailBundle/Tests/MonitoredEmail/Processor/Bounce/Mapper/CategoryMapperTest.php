@@ -4,29 +4,21 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce\Mapper;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\CategoryNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category as Definition;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(CategoryMapper::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(Definition::class)]
 class CategoryMapperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that the Category object is returned
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper::map
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the Category object is returned')]
     public function testCategoryIsMapped(): void
     {
         $category = CategoryMapper::map(Definition::ANTISPAM);
 
-        $this->assertInstanceOf(Category::class, $category);
+        $this->assertSame(Definition::ANTISPAM, $category->getCategory());
     }
 
-    /**
-     * @testdox Test that exception is thrown if a category is not found
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper::map
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that exception is thrown if a category is not found')]
     public function testExceptionIsThrownWithUnrecognizedCategory(): void
     {
         $this->expectException(CategoryNotFound::class);

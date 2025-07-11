@@ -6,6 +6,8 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -26,7 +28,8 @@ class ExportHelper
     public function __construct(
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
-        private FilePathResolver $filePathResolver
+        private FilePathResolver $filePathResolver,
+        private ProcessSignalService $processSignalService,
     ) {
     }
 
@@ -165,6 +168,8 @@ class ExportHelper
 
     /**
      * @param \Iterator<mixed> $data
+     *
+     * @throws SignalCaughtException
      */
     private function exportAsCsvIntoFile(\Iterator $data, string $fileName): string
     {
@@ -179,6 +184,9 @@ class ExportHelper
             }
 
             fputcsv($handler, $row);
+
+            // Check if signal caught here
+            $this->processSignalService->throwExceptionIfSignalIsCaught();
         }
 
         fclose($handler);

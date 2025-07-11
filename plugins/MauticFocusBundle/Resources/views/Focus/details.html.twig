@@ -6,9 +6,98 @@
 
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+    <div class="label__divider"></div>
+    {% if item.type is defined and item.type is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: ('mautic.focus.form.type.' ~ item.type),
+                icon: {
+                    'form': 'ri-survey-fill',
+                    'link': 'ri-link',
+                    'notice': 'ri-information-2-fill'
+                }[item.type],
+                color: 'high-contrast',
+                attributes: {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'title': 'mautic.focus.type'|trans
+                }
+            }]
+        } %}
+    {% endif %}
+
+    {% if item.style is defined and item.style is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: ('mautic.focus.style.' ~ item.style),
+                icon: {
+                    'modal': 'ri-window-2-fill',
+                    'notification': 'ri-notification-3-fill',
+                    'bar': 'ri-layout-bottom-2-fill',
+                    'page': 'ri-macbook-fill'
+                }[item.style],
+                color: 'blue',
+                attributes: {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'title': 'mautic.focus.style'|trans
+                }
+            }]
+        } %}
+    {% endif %}
+
+{% if item.properties.when is defined and item.properties.when is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            icon: {
+                'immediately': 'ri-flashlight-fill',
+                'scroll_slight': 'ri-mouse-fill',
+                'scroll_middle': 'ri-scroll-to-bottom-fill',
+                'scroll_bottom': 'ri-scroll-to-bottom-fill',
+                'leave': 'ri-picture-in-picture-exit-fill'
+            }[item.properties.when],
+            label: ('mautic.focus.form.when.' ~ item.properties.when ~ '.description'),
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{% if item.properties.frequency is defined and item.properties.frequency is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            icon: {
+                'everypage': 'ri-repeat-2-fill',
+                'once': 'ri-repeat-one-fill',
+                'q2min': 'ri-reset-left-line',
+                'q15min': 'replay-15-fill',
+                'hourly': 'ri-history-fill 24-hours-fill',
+                'daily': 'ri-calendar-schedule-fill'
+            }[item.properties.frequency],
+            label: ('mautic.focus.form.frequency.' ~ item.properties.frequency ~ '.description'),
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{% if item.properties.timeout is defined and item.properties.timeout is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: item.properties.timeout,
+            icon: 'ri-timer-fill',
+            color: 'blue',
+            attributes: {
+                'data-toggle': 'tooltip',
+                'data-placement': 'top',
+                'title': 'mautic.focus.form.timeout.description'|trans
+            }
+        }]
+    } %}
+{% endif %}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : item,
@@ -19,6 +108,8 @@
         'targetLabel': 'mautic.focus.focus_items'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': item.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig') }}
 {% endblock %}
 
 {% block actions %}
@@ -41,34 +132,18 @@
   <div class="box-layout">
       <!-- left section -->
       <div class="col-md-9 height-auto">
-          <div class="bg-auto">
+          <div>
               <!-- form detail header -->
-              {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
+              {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': item.description} %}
               <!--/ form detail header -->
 
               <!-- form detail collapseable -->
               <div class="collapse pr-md pl-md" id="focus-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}>
+                          <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
-                              <tr>
-                                  <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.focus.details.views'|trans }}</span>
-                                  </td>
-                                  <td data-focus-total-views-cell>
-                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.focus.details.unique_views'|trans }}</span>
-                                  </td>
-                                  <td data-focus-total-unique-views-cell>
-                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
-                                  </td>
-                              </tr>
                               </tbody>
                           </table>
                       </div>
@@ -77,11 +152,11 @@
               <!--/ form detail collapseable -->
           </div>
 
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- form detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                      <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span>
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span>
                         {{ 'mautic.core.details'|trans }}
                       </a>
                   </span>
@@ -92,6 +167,22 @@
               <div class="pa-md">
                   <div class="row">
                       <div class="col-sm-12">
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.focus.details.views',
+                                'value_attr': 'data-focus-total-views-cell',
+                                'value': '<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>',
+                                'tooltip': 'mautic.focus.details.views.tooltip',
+                                'icon': 'ri-eye-line',
+                            },
+                            {
+                                'title': 'mautic.focus.details.unique_views',
+                                'value_attr': 'data-focus-total-unique-views-cell',
+                                'value': '<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>',
+                                'tooltip': 'mautic.focus.details.unique_views.tooltip',
+                                'icon': 'ri-user-6-line',
+                            }
+                        ]}) }}
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-xs-4 va-m">
@@ -147,13 +238,26 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- form HTML -->
           <div class="pa-md">
-              <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
-                  <div class="panel-body">
-                      <h5 class="fw-sb mb-sm">{{ 'mautic.focus.install.header'|trans }}</h5>
-                      <p class="mb-sm">{{ 'mautic.focus.install.description'|trans }}</p>
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
-                  </div>
-              </div>
+              {% set aboveFoldContent %}
+                  <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
+                  {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                      pictogram: 'embed',
+                      size: 64,
+                      color: 'var(--icon-interactive)'
+                  } %}
+              {% endset %}
+
+              {% set belowFoldContent %}
+                  <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
+                  <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
+              {% endset %}
+
+              {{ include('@MauticCore/Components/tile--expandable-interactive.html.twig', {
+                  'tiles': [{
+                      'aboveFoldContent': aboveFoldContent,
+                      'belowFoldContent': belowFoldContent
+                  }]
+              }) }}
           </div>
           <!--/ form HTML -->
 

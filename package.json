@@ -10,6 +10,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@carbon/pictograms": "^12.50.0",
     "@ckeditor/ckeditor5-adapter-ckfinder": "^43.1.1",
     "@ckeditor/ckeditor5-alignment": "^43.1.1",
     "@ckeditor/ckeditor5-autoformat": "^43.1.1",
@@ -45,7 +46,6 @@
     "bootstrap": "^3.4.1",
     "chart.js": "^2.9.4",
     "chosen-js": "^1.8.7",
-    "codemirror": "^5.65.13",
     "dropzone": "^4.3.0",
     "jquery": "^3.7.0",
     "jquery-datetimepicker": "^2.5.21",
@@ -58,7 +58,6 @@
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.15.6",
     "jvectormap-next": "^3.1.1",
-    "modernizr": "^3.12.0",
     "moment": "^2.29.4",
     "mousetrap": "^1.6.5",
     "multiselect": "^0.9.12",
@@ -68,6 +67,6 @@
   },
   "scripts": {
     "build": "webpack --mode production  --config webpack.config.js",
-    "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js & npm run build"
+    "postinstall": "npm run build"
   }
 }

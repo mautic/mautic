@@ -5,12 +5,15 @@ namespace Mautic\SmsBundle\Entity;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Sms>
  */
 class SmsRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * Get a list of entities.
      *
@@ -23,7 +26,7 @@ class SmsRepository extends CommonRepository
             ->select($this->getTableAlias())
             ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
@@ -135,12 +138,22 @@ class SmsRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'sms_id',
+                    'sms_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -169,6 +182,7 @@ class SmsRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

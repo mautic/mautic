@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
+use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AssetControllerFunctionalTest extends AbstractAssetTest
+class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
 
@@ -45,6 +47,13 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $tableAlias = 'a.';
 
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
+    }
+
+    public function testAssetSizes(): void
+    {
+        $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
     }
 
     /**
@@ -108,9 +117,8 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 
     /**
      * @param array<string, string[]> $permission
-     *
-     * @dataProvider getValuesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getValuesProvider')]
     public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
     {
         $userCreator = $this->getUser($userCreatorUN);
@@ -129,12 +137,10 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->em->flush();
         $this->em->clear();
 
-        // Logout admin.
-        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->logoutUser();
 
-        $this->loginUser(self::SALES_USER);
+        $this->loginUser($userEditor);
 
-        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
         $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
         Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());
@@ -143,7 +149,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
     /**
      * @return \Generator<string, mixed[]>
      */
-    public function getValuesProvider(): \Generator
+    public static function getValuesProvider(): \Generator
     {
         yield 'The sales user with edit own permission can edits its own asset' => [
             'route'              => 'edit',
@@ -202,6 +208,67 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         ];
     }
 
+    public function testAssetUploadPathTraversal(): void
+    {
+        $client    = $this->client;
+        $container = $this->getContainer();
+
+        // Get CSRF token
+        $csrfToken = $container->get('security.csrf.token_manager')->getToken('mautic_ajax_post')->getValue();
+
+        // Create a temporary file
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_');
+        file_put_contents($tempFile, '111');
+
+        // Prepare the file for upload
+        $uploadedFile = new UploadedFile(
+            $tempFile,
+            'test.txt',
+            'text/plain',
+            null,
+            true
+        );
+
+        $tmpDir = 'tmp_'.substr(md5(uniqid()), 0, 13);
+        $client->request(
+            'POST',
+            '/s/_uploader/asset/upload',
+            ['tempId' => '../../'.$tmpDir],
+            ['file'   => $uploadedFile],
+            [
+                'HTTP_X-Requested-With' => 'XMLHttpRequest',
+                'HTTP_X-CSRF-Token'     => $csrfToken,
+            ]
+        );
+
+        $response = $client->getResponse();
+
+        // Assert response is successful
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        // Decode JSON response
+        $responseData = json_decode($response->getContent(), true);
+
+        // Assert the response contains expected keys
+        $this->assertArrayHasKey('tmpFileName', $responseData);
+
+        // Assert file was created in the correct directory
+        $expectedDir      = $container->getParameter('mautic.upload_dir').join('/', ['', 'tmp', $tmpDir]);
+        $expectedFilePath = join('/', [$expectedDir, $responseData['tmpFileName']]);
+        $this->assertFileExists($expectedFilePath);
+
+        // Clean up
+        if (file_exists($expectedFilePath)) {
+            unlink($expectedFilePath);
+        }
+        if (is_dir($expectedDir)) {
+            rmdir($expectedDir);
+        }
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
+        }
+    }
+
     private function getUser(string $username): User
     {
         $repository = $this->em->getRepository(User::class);
@@ -232,5 +299,90 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+    }
+
+    public function testPostRequestWithWrongTempNameAndOriginalFileNameFileExtension(): void
+    {
+        $response = $this->client->request(
+            Request::METHOD_GET,
+            '/s/assets/new',
+        );
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $form                              = $response->filter('form[name="asset"]')->form();
+        $data                              = $form->getPhpValues();
+        $data['asset']['tempName']         = 'image2.php';
+        $data['asset']['originalFileName'] = 'originalImage2.php';
+        $data['asset']['storageLocation']  = 'local';
+        $data['asset']['title']            = 'title';
+        $data['asset']['description']      = 'description';
+        $this->client->submit($form, $data);
+        preg_match_all('/Upload failed as the file extension, php/', $this->client->getResponse()->getContent(), $matches);
+        $this->assertCount(2, $matches[0]);
+        $this->assertStringContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+    }
+
+    public function testPostRequestWithWrongTempNameFileExtension(): void
+    {
+        $response = $this->client->request(
+            Request::METHOD_GET,
+            '/s/assets/new',
+        );
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $form                              = $response->filter('form[name="asset"]')->form();
+        $data                              = $form->getPhpValues();
+        $data['asset']['tempName']         = 'image2.php';
+        $data['asset']['originalFileName'] = 'originalImage2.png';
+        $data['asset']['storageLocation']  = 'local';
+        $data['asset']['title']            = 'title';
+        $data['asset']['description']      = 'description';
+        $this->client->submit($form, $data);
+        preg_match_all('/Upload failed as the file extension, php/', $this->client->getResponse()->getContent(), $matches);
+        $this->assertCount(1, $matches[0]);
+        $this->assertStringContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+    }
+
+    public function testPostResquetSuccessWithCorrectFileExtension(): void
+    {
+        $response = $this->client->request(
+            Request::METHOD_GET,
+            '/s/assets/new',
+        );
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $form                              = $response->filter('form[name="asset"]')->form();
+        $data                              = $form->getPhpValues();
+        $data['asset']['tempName']         = 'image.png';
+        $data['asset']['originalFileName'] = 'originalImage.png';
+        $data['asset']['storageLocation']  = 'local';
+        $data['asset']['title']            = 'title';
+        $data['asset']['description']      = 'description';
+        $this->client->submit($form, $data);
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertStringNotContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+    }
+
+    public function testAssetWithProject(): void
+    {
+        $asset = new Asset();
+        $asset->setTitle('test');
+        $asset->setAlias('test');
+        $this->em->persist($asset);
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['asset[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedAsset = $this->em->find(Asset::class, $asset->getId());
+        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

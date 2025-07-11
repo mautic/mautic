@@ -15,7 +15,7 @@ class TwilioCallback implements CallbackInterface
 {
     public function __construct(
         private ContactHelper $contactHelper,
-        private Configuration $configuration
+        private Configuration $configuration,
     ) {
     }
 
@@ -43,6 +43,9 @@ class TwilioCallback implements CallbackInterface
         return trim($request->get('Body'));
     }
 
+    /**
+     * @param InputBag<bool|float|int|string> $request
+     */
     private function validateRequest(InputBag $request): void
     {
         try {

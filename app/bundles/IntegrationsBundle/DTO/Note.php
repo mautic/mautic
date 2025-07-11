@@ -14,7 +14,7 @@ final class Note
 
     public function __construct(
         private string $note,
-        string $type
+        string $type,
     ) {
         if (!in_array($type, [self::TYPE_INFO, self::TYPE_WARNING])) {
             throw new \InvalidArgumentException(sprintf('Type value can be either "%s" or "%s".', self::TYPE_INFO, self::TYPE_WARNING));

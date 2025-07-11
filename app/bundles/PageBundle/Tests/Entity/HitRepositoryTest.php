@@ -15,7 +15,7 @@ class HitRepositoryTest extends MauticMysqlTestCase
 {
     private HitRepository $hitRepository;
 
-    private ?IpAddress $ipAddress;
+    private IpAddress $ipAddress;
 
     protected function setUp(): void
     {

@@ -7,7 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @extends AbstractType<mixed>
@@ -15,16 +15,17 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class DateRangeType extends AbstractType
 {
     public function __construct(
-        private SessionInterface $session,
-        private CoreParametersHelper $coreParametersHelper
+        private RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $session         = $this->requestStack->getSession();
         $humanFormat     = 'M j, Y';
-        $sessionDateFrom = $this->session->get('mautic.daterange.form.from');
-        $sessionDateTo   = $this->session->get('mautic.daterange.form.to');
+        $sessionDateFrom = $session->get('mautic.daterange.form.from');
+        $sessionDateTo   = $session->get('mautic.daterange.form.to');
         if (!empty($sessionDateFrom) && !empty($sessionDateTo)) {
             $defaultFrom = new \DateTime($sessionDateFrom);
             $defaultTo   = new \DateTime($sessionDateTo);
@@ -75,7 +76,7 @@ class DateRangeType extends AbstractType
             SubmitType::class,
             [
                 'label' => 'mautic.core.form.apply',
-                'attr'  => ['class' => 'btn btn-ghost btn-sm'],
+                'attr'  => ['class' => 'btn btn-ghost'],
             ]
         );
 
@@ -83,14 +84,11 @@ class DateRangeType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $this->session->set('mautic.daterange.form.from', $dateFrom->format($humanFormat));
-        $this->session->set('mautic.daterange.form.to', $dateTo->format($humanFormat));
+        $session->set('mautic.daterange.form.from', $dateFrom->format($humanFormat));
+        $session->set('mautic.daterange.form.to', $dateTo->format($humanFormat));
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'daterange';
     }

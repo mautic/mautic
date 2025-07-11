@@ -5,13 +5,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(DateTimeHelper::class)]
 class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox The guessTimezoneFromOffset returns correct values
-     *
-     * @covers \Mautic\CoreBundle\Helper\DateTimeHelper::guessTimezoneFromOffset
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void
     {
         $helper   = new DateTimeHelper();
@@ -53,6 +50,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testvalidateMysqlDateTimeUnitWillNotThrowExceptionOnExpectedUnit(): void
     {
+        $this->expectNotToPerformAssertions();
         DateTimeHelper::validateMysqlDateTimeUnit('s');
         DateTimeHelper::validateMysqlDateTimeUnit('i');
         DateTimeHelper::validateMysqlDateTimeUnit('H');
@@ -60,8 +58,6 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         DateTimeHelper::validateMysqlDateTimeUnit('W');
         DateTimeHelper::validateMysqlDateTimeUnit('m');
         DateTimeHelper::validateMysqlDateTimeUnit('Y');
-
-        $this->assertTrue(true, 'Just to avoid the risky test warning...');
     }
 
     public function testGetLocalTimezoneOffset(): void

@@ -165,7 +165,7 @@ class DetailsType extends AbstractType
         $resolver->setAllowedTypes('integration_object', [AbstractIntegration::class]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integration_details';
     }

@@ -162,17 +162,6 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
-            'mautic.integrations.sync.data_exchange.mautic.field_helper' => [
-                'class'     => Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.integrations.helper.variable_expresser',
-                    'mautic.channel.helper.channel_list',
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.integrations.internal.object_provider',
-                ],
-            ],
             'mautic.integrations.sync.sync_process.value_helper' => [
                 'class'     => Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper::class,
                 'arguments' => [],
@@ -235,6 +224,7 @@ return [
                     'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.sync.sync_process.value_helper',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
+                    'mautic.integrations.sync.notification.bulk_notification',
                 ],
             ],
             'mautic.integrations.sync.internal_process' => [
@@ -265,15 +255,6 @@ return [
                 'class'     => Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
-                ],
-            ],
-            'mautic.integrations.helper.sync_mapping' => [
-                'class'     => Mautic\IntegrationsBundle\Sync\Helper\MappingHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.integrations.repository.object_mapping',
-                    'mautic.integrations.internal.object_provider',
-                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.helper.relations' => [

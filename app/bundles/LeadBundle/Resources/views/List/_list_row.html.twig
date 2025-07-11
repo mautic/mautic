@@ -22,16 +22,17 @@
                 },
                 'routeBase': 'segment',
                 'langVar': 'lead.list',
-                'custom': [
-                    {
+                'customButtons': {
+                    'viewcontacts': {
                         'attr': {
                             'data-toggle': 'ajax',
                             'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias}),
                         },
-                        'icon': 'ri-team-line',
-                        'label': 'mautic.lead.list.view_contacts',
-                    },
-                ],
+                        'iconClass': 'ri-team-line',
+                        'btnText': 'mautic.lead.list.view_contacts'|trans,
+                        'priority': 100
+                    }
+                },
         }) }}
     </td>
     <td>
@@ -44,6 +45,7 @@
             {% else %}
                 {{ item.name }} ({{ item.alias }})
             {% endif %}
+            {{ include('@MauticProject/Modules/projects.html.twig') }}
             {% if not item.isGlobal and app.user.id != item.createdBy %}
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>
@@ -54,7 +56,7 @@
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
                        data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt}) }}">
-                    <i class="text-danger ri-error-warning-line-circle fs-14"></i></label>
+                    <i class="text-danger ri-error-warning-line fs-14"></i></label>
             {% endif %}
             {% if item.lastBuiltTime >= segmentBuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
@@ -64,17 +66,15 @@
             {% endif %}
             {{ customContent('segment.name', mauticTemplateVars) }}
         </div>
-        {% if item.description %}
-            <div class="text-muted mt-4">
-                <small>{{ item.description|purify }}</small>
-            </div>
-        {% endif %}
+        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+            'description': item.description
+        }) }}
     </td>
     <td class="visible-md visible-lg">
-        <a size="sm" class="label label-gray col-count"
-           data-id="{{ item.id }}"
-           href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
-           data-toggle="ajax">{{ 'mautic.lead.list.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}</a>
+        <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id }}">
+            <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
+                data-toggle="ajax">{{ (item.needsRebuild() ? 'mautic.lead.list.building' : 'mautic.lead.list.viewleads_count')|trans({'%count%': leadCounts[item.id]}) }}</a>
+        </span>
     </td>
     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
         {% if item.getDateAdded %}{{ dateToDate(item.dateAdded) }}{% endif %}

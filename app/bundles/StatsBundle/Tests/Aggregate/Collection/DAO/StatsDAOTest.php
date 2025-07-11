@@ -88,10 +88,6 @@ class StatsDAOTest extends TestCase
 
         $stats = $this->getStats()->getHours();
         $this->assertEquals($expected, array_keys($stats));
-
-        array_walk($stats, function ($stat): void {
-            $this->assertTrue(is_int($stat->getCount()));
-        });
     }
 
     private function getStats(): StatsDAO

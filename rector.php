@@ -12,11 +12,9 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromStrictScalarReturnsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
@@ -33,7 +31,6 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         '*/Test/*',
         '*/Tests/*',
-        '*.html.php',
 
         // Remove in M6 once the class is removed.
         __DIR__.'/app/bundles/CoreBundle/Helper/UTF8Helper.php',
@@ -61,12 +58,6 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
         ],
 
-        ReturnTypeFromStrictBoolReturnExprRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
-            // requires quite a refactoring
-            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
-        ],
-
         RemoveUnusedVariableAssignRector::class => [
             // unset variable to clear garbage collector
             __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
@@ -92,8 +83,6 @@ return static function (RectorConfig $rectorConfig): void {
         ],
 
         // handle later with full PHP 8.0 upgrade
-        Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
-        Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
         Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
 
         // handle later, case by case as lot of chnaged code
@@ -117,7 +106,6 @@ return static function (RectorConfig $rectorConfig): void {
     // Define what single rules will be applied
     $rectorConfig->rules([
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
 
         Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
         NumericReturnTypeFromStrictScalarReturnsRector::class,
@@ -127,14 +115,12 @@ return static function (RectorConfig $rectorConfig): void {
         ReturnTypeFromStrictParamRector::class,
         ReturnTypeFromStrictTernaryRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
-        BoolReturnTypeFromStrictScalarReturnsRector::class,
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
         TypedPropertyFromStrictSetUpRector::class,
         RemoveUnusedVariableAssignRector::class,
         RemoveUselessVarTagRector::class,
         SimplifyUselessVariableRector::class,
-        ReturnTypeFromStrictBoolReturnExprRector::class,
         ReturnTypeFromStrictConstantReturnRector::class,
         ReturnTypeFromReturnDirectArrayRector::class,
     ]);

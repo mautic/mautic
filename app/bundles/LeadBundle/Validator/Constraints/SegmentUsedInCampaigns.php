@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 
 class SegmentUsedInCampaigns extends Constraint
 {
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return static::CLASS_CONSTRAINT;
     }

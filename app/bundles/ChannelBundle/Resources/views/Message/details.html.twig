@@ -7,7 +7,7 @@
 	{{ item.getName() }}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : item,
@@ -18,6 +18,7 @@
         'targetLabel'     : 'mautic.channel.messages'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': item.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -43,7 +44,7 @@
         <div class="col-md-9 height-auto">
             <div>
                 <!-- form detail header -->
-                {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': item.description} %}
                 <!--/ form detail header -->
                 <!-- form detail collapseable -->
                 <div class="collapse pr-md pl-md" id="focus-details">
@@ -65,7 +66,7 @@
                 <!-- form detail collapseable toggler -->
                 <div class="hr-expand nm">
                         <span data-toggle="tooltip" title="{% trans %}mautic.core.details{% endtrans %}">
-                            <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
+                            <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
                         </span>
                 </div>
                 <!-- stats -->

@@ -21,9 +21,7 @@ class ShortenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->shortener = new Shortener($this->coreParametersHelper);
     }
@@ -85,7 +83,7 @@ class ShortenerTest extends TestCase
 
     public function testGetEnabledServices(): void
     {
-        $enabledService = new class() implements ShortenerServiceInterface {
+        $enabledService = new class implements ShortenerServiceInterface {
             public function shortenUrl(string $url): string
             {
                 return 'shortUrl';
@@ -102,7 +100,7 @@ class ShortenerTest extends TestCase
             }
         };
 
-        $disabledService = new class() implements ShortenerServiceInterface {
+        $disabledService = new class implements ShortenerServiceInterface {
             public function shortenUrl(string $url): string
             {
                 return 'shortUrl';

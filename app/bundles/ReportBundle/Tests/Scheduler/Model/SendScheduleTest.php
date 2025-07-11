@@ -119,16 +119,21 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
             ->with($this->report)
             ->willReturn('Message');
 
-        $this->fileHandler->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->withConsecutive(
-                ['/path/to/report.csv'],
-                ['/path/to/report.zip']
-            )
-            ->will($this->onConsecutiveCalls(
-                $this->throwException(new FileTooBigException()),
-                null
-            ));
+            ->with($this->callback(function ($arg) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('/path/to/report.csv', $arg);
+
+                    throw new FileTooBigException();
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('/path/to/report.zip', $arg);
+                }
+
+                return true;
+            }));
 
         $this->fileHandler->expects($this->once())
             ->method('zipIt')
@@ -181,9 +186,19 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
             ->with('path-to-a-file')
             ->willReturn('path-to-a-zip-file');
 
-        $this->fileHandler->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->withConsecutive(['path-to-a-file'], ['path-to-a-zip-file'])
+            ->with($this->callback(function ($arg) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('path-to-a-file', $arg);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('path-to-a-zip-file', $arg);
+                }
+
+                return true;
+            }))
             ->will($this->throwException(new FileTooBigException()));
 
         $this->mailHelperMock->expects($this->once())

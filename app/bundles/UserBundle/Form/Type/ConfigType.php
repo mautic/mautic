@@ -21,15 +21,15 @@ class ConfigType extends AbstractType
 {
     public function __construct(
         protected CoreParametersHelper $parameters,
-        protected TranslatorInterface $translator
+        protected TranslatorInterface $translator,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $samlEntityIdChoices = ['', $this->parameters->get('mautic.site_url')];
+        $samlEntityIdChoices = ['', rtrim($this->parameters->get('mautic.site_url'), '/')];
         if (!empty($this->parameters->get('mautic.subdomain_url'))) {
-            $samlEntityIdChoices[] = $this->parameters->get('mautic.subdomain_url');
+            $samlEntityIdChoices[] = rtrim($this->parameters->get('mautic.subdomain_url'), '/');
         }
         $builder->add('saml_idp_entity_id', ChoiceType::class,
             [
@@ -198,7 +198,7 @@ class ConfigType extends AbstractType
         $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'userconfig';
     }

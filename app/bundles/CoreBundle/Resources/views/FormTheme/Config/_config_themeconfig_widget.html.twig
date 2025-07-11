@@ -1,16 +1,99 @@
 {% block _config_themeconfig_widget %}
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ 'mautic.config.tab.themeconfig'|trans }}</h3>
-    </div>
-    <div class="panel-body">
-        {% for f in form.children %}
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.themeconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.themeconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <h3 class="pt-20">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
+            <div class="help-block mb-lg">
+                {{ 'mautic.user.account.appearance.accent_help'|trans }}
+                {% include '@MauticCore/Helper/toggletip.html.twig' with {
+                    title: 'mautic.user.account.appearance.accent_toggletip.title',
+                    content: 'mautic.user.account.appearance.accent_toggletip.content',
+                } %}
+            </div>
+            <div class="d-flex fw-wrap gap-lg mb-lg">
+                {{ include('@MauticCore/FormTheme/Config/accent.html.twig', {
+                    accents: [
+                        { id: '01' },
+                        { id: '02' },
+                        { id: '03' },
+                        { id: '04' },
+                        { id: '05' },
+                        { id: '06' },
+                        { id: '07' },
+                        { id: '08' },
+                        { id: '09' },
+                        { id: '10' },
+                        { id: '11' },
+                        { id: '12' },
+                        { id: '13' },
+                        { id: '14' },
+                        { id: '15' },
+                        { id: '16' },
+                        { id: '17' },
+                        { id: '18' },
+                        { id: '19' },
+                        { id: '20' },
+                        { id: '21' },
+                        { id: '22' },
+                        { id: '23' },
+                        { id: '24' },
+                        { id: '25' }
+                    ]
+                }) }}
+            </div>
+            <hr>
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(f) }}
+                <div class="col-xs-12">
+                    <div class="row form-group">
+    <div class="col-md-4">
+        <label class="control-label" for="config_themeconfig_theme" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.core.config.theme.rounded_corners.tooltip'|trans }}">
+{{ 'mautic.core.config.theme.rounded_corners'|trans }}<i class="ri-question-line ml-3"></i></label>
+
+
+</div>
+<div class="col-md-8">
+    <div class="radio-group radio-group--inline">
+        <div class="radio-option">
+            <input type="radio" id="rounded-corners-0" name="rounded-corners" value="false" data-attribute-toggle="rounded-corners" data-attribute-value="0" checked="">
+            <label for="rounded-corners-0">
+                <div class="rounded-corners-preview rounded-corners-preview--0"></div>
+            </label>
+        </div>
+        <div class="radio-option">
+            <input type="radio" id="rounded-corners-8" name="rounded-corners" value="true" data-attribute-toggle="rounded-corners" data-attribute-value="8">
+            <label for="rounded-corners-8">
+                <div class="rounded-corners-preview rounded-corners-preview--8"></div>
+            </label>
+        </div>
+        <div class="radio-option">
+            <input type="radio" id="rounded-corners-16" name="rounded-corners" value="true" data-attribute-toggle="rounded-corners" data-attribute-value="16">
+            <label for="rounded-corners-16">
+                <div class="rounded-corners-preview rounded-corners-preview--16"></div>
+            </label>
+        </div>
+        <div class="radio-option">
+            <input type="radio" id="rounded-corners-32" name="rounded-corners" value="true" data-attribute-toggle="rounded-corners" data-attribute-value="32">
+            <label for="rounded-corners-32">
+                <div class="rounded-corners-preview rounded-corners-preview--32"></div>
+            </label>
+        </div>
+        </div>
+    </div>
+</div>
+
+
                 </div>
             </div>
-        {% endfor %}
+            {% for f in form.children %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{ form_row(f) }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -175,13 +175,12 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider fieldValueProvider
-     *
      * @throws MappingException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldValueProvider')]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
 
         // Create a lead field.
         $selectField = new LeadField();
@@ -197,7 +196,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
 
-        $leadModel  = self::$container->get('mautic.lead.model.lead');
+        $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
 
         $fields = [
             'core' => [
@@ -249,7 +248,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<mixed>
      */
-    public function fieldValueProvider(): array
+    public static function fieldValueProvider(): array
     {
         return [
             'allowed_value'    => ['female', 'female'],

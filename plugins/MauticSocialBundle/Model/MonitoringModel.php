@@ -36,8 +36,6 @@ class MonitoringModel extends FormModel
      * @param object      $entity
      * @param string|null $action
      * @param mixed[]     $options
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

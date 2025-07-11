@@ -3,9 +3,8 @@
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -31,11 +30,10 @@ class FocusController extends AbstractStandardFormController
      * @phpstan-ignore-next-line
      */
     public function __construct(
-        private CacheProvider $cacheProvider,
+        private CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -43,9 +41,9 @@ class FocusController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getTemplateBase(): string
@@ -96,7 +94,7 @@ class FocusController extends AbstractStandardFormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        return parent::viewStandard($request, $objectId, 'focus', 'plugin.focus');
+        return parent::viewStandard($request, $objectId, 'focus', 'focus');
     }
 
     /**
@@ -208,7 +206,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getPostActionRedirectArguments(array $args, $action): array
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);
@@ -239,7 +237,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getEntityFormOptions()
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);

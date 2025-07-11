@@ -170,7 +170,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
             Mautic.stopIconSpinPostEvent();
         },
         error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
+            Mautic.processAjaxError(request, textStatus, errorThrown, null, target);
             Mautic.stopIconSpinPostEvent();
         },
         complete: function () {

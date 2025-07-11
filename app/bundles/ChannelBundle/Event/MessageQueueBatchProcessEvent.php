@@ -13,7 +13,7 @@ class MessageQueueBatchProcessEvent extends Event
     public function __construct(
         private array $messages,
         private $channel,
-        private $channelId
+        private $channelId,
     ) {
     }
 

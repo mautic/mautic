@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class ConfigType extends AbstractType
 {
     public function __construct(
-        private FieldList $fieldList
+        private FieldList $fieldList,
     ) {
     }
 
@@ -34,10 +34,7 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'social_config';
     }

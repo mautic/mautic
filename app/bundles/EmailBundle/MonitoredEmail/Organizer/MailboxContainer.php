@@ -22,7 +22,7 @@ class MailboxContainer
     protected $messages = [];
 
     public function __construct(
-        protected ConfigAccessor $config
+        protected ConfigAccessor $config,
     ) {
     }
 

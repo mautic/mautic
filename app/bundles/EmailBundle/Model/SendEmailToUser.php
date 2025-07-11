@@ -25,7 +25,7 @@ class SendEmailToUser
         private EmailModel $emailModel,
         private EventDispatcherInterface $dispatcher,
         private CustomFieldValidator $customFieldValidator,
-        private EmailValidator $emailValidator
+        private EmailValidator $emailValidator,
     ) {
     }
 

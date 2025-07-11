@@ -16,10 +16,13 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Helper\PageConfigInterface;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -46,7 +49,8 @@ class PageType extends AbstractType
         private PageModel $model,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        private ThemeHelperInterface $themeHelper
+        private ThemeHelperInterface $themeHelper,
+        private PageConfigInterface $pageConfig,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
@@ -67,6 +71,10 @@ class PageType extends AbstractType
             ]
         );
 
+        $html = $options['data']->getCustomHtml();
+        if ($this->pageConfig->isDraftEnabled() && !empty($options['data']->getId()) && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getHtml())) {
+            $html = $options['data']->getDraft()->getHtml();
+        }
         $builder->add(
             'customHtml',
             TextareaType::class,
@@ -80,13 +88,16 @@ class PageType extends AbstractType
                     'data-token-activator' => '{',
                     'rows'                 => '25',
                 ],
+                'data'     => $html,
             ]
         );
 
         $template = $options['data']->getTemplate() ?? 'blank';
         // If theme does not exist, set empty
         $template = $this->themeHelper->getCurrentTheme($template, 'page');
-
+        if ($this->pageConfig->isDraftEnabled() && !empty($options['data']->getId()) && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getTemplate())) {
+            $template = $options['data']->getDraft()->getTemplate();
+        }
         $builder->add(
             'template',
             ThemeListType::class,
@@ -271,11 +282,13 @@ class PageType extends AbstractType
                     'class'        => 'form-control',
                     'maxlength'    => 200,
                     'tooltip'      => 'mautic.page.form.redirecturl.help',
+                    'data-hide-on' => '{"page_redirectType":""}',
                     'data-toggle'  => 'field-lookup',
                     'data-action'  => 'page:fieldList',
                     'data-target'  => 'redirectUrl',
                     'data-options' => $redirectUrlDataOptions,
                 ],
+                'default_protocol' => null,
             ]
         );
 
@@ -302,6 +315,8 @@ class PageType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add(
             'language',
             LocaleType::class,
@@ -316,23 +331,74 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class, [
-            'pre_extra_buttons' => [
-                [
-                    'name'  => 'builder',
-                    'label' => 'mautic.core.builder',
-                    'attr'  => [
-                        'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-primary',
-                        'icon'    => 'ri-layout-line',
-                        'onclick' => "Mautic.launchBuilder('page');",
-                    ],
+        $extraButtons['pre_extra_buttons'] = [
+            [
+                'name'  => 'builder',
+                'label' => 'mautic.core.builder',
+                'attr'  => [
+                    'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-interactive',
+                    'icon'    => 'ri-layout-line',
+                    'onclick' => "Mautic.launchBuilder('page');",
                 ],
             ],
-        ]);
+        ];
+
+        $draftActionButtons = $this->getDraftActionButtons($options['data']);
+        if (!empty($draftActionButtons)) {
+            $extraButtons['post_extra_buttons'] = $draftActionButtons;
+        }
+        $builder->add('buttons',
+            FormButtonsType::class,
+            $extraButtons
+        );
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getDraftActionButtons(Page $page): array
+    {
+        $draftActionButtons = [];
+        if (!$this->pageConfig->isDraftEnabled() || empty($page->getId())) {
+            return $draftActionButtons;
+        }
+
+        if ($page->hasDraft()) {
+            $draftActionButtons[] = [
+                'name'  => 'apply_draft',
+                'label' => 'mautic.core.applydraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-primary btn-apply-draft btn-copy',
+                    'icon'    => 'fa fa-files-o text-success',
+                ],
+            ];
+            $draftActionButtons[] = [
+                'name'  => 'discard_draft',
+                'label' => 'mautic.core.discarddraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-primary btn-apply-draft btn-copy',
+                    'icon'    => 'fa fa-trash text-danger',
+                ],
+            ];
+        } else {
+            $draftActionButtons[] = [
+                'name'  => 'save_draft',
+                'label' => 'mautic.core.saveasdraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-primary btn-default text-primary btn-save-draft',
+                    'icon'    => 'fa fa-file text-success',
+                ],
+            ];
+        }
+
+        return $draftActionButtons;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

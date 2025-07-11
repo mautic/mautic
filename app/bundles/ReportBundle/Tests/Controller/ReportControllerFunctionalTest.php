@@ -27,7 +27,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        $pageModel = self::$container->get('mautic.page.model.page');
+        $pageModel = self::getContainer()->get('mautic.page.model.page');
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
         foreach ($res as $hit) {
@@ -305,7 +305,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactReportNotLikeExpression(): void
     {
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
         $payload = [
@@ -393,11 +393,10 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider scheduleProvider
-     *
      * @throws NotSupported
      * @throws MappingException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('scheduleProvider')]
     public function testScheduleEdit(string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
     {
         $report = new Report();
@@ -450,7 +449,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<mixed>[]
      */
-    public function scheduleProvider(): array
+    public static function scheduleProvider(): array
     {
         return [
             'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],

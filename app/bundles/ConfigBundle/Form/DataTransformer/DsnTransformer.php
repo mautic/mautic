@@ -20,7 +20,7 @@ class DsnTransformer implements DataTransformerInterface
         private CoreParametersHelper $coreParametersHelper,
         private EscapeTransformer $escapeTransformer,
         private string $configKey,
-        private bool $allowEmpty
+        private bool $allowEmpty,
     ) {
     }
 

@@ -14,7 +14,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
     public function __construct(
         private EmailModel $model,
         private EntityManager $em,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -27,7 +27,7 @@ class MembershipBuilder
         private MembershipManager $manager,
         private CampaignLeadRepository $campaignLeadRepository,
         private LeadRepository $leadRepository,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

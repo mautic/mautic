@@ -19,11 +19,11 @@ class TagEntityModelTransformer implements DataTransformerInterface
     public function __construct(
         private EntityManager $em,
         private $repository = '',
-        private $isArray = false
+        private $isArray = false,
     ) {
     }
 
-    public function reverseTransform($entity)
+    public function reverseTransform(mixed $entity): mixed
     {
         if (!$this->isArray) {
             if (is_null($entity) || !is_object($entity)) {
@@ -48,7 +48,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
     /**
      * @throws TransformationFailedException if object is not found
      */
-    public function transform($id)
+    public function transform(mixed $id): mixed
     {
         if (!$this->isArray) {
             if (!$id) {

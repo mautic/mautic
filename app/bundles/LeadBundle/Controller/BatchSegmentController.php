@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -25,7 +24,6 @@ class BatchSegmentController extends AbstractFormController
         private SegmentActionModel $segmentActionModel,
         private ListModel $segmentModel,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -33,9 +31,9 @@ class BatchSegmentController extends AbstractFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
-        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -43,7 +41,7 @@ class BatchSegmentController extends AbstractFormController
      */
     public function setAction(Request $request): JsonResponse
     {
-        $params     = $request->get('lead_batch', []);
+        $params     = $request->query->all()['lead_batch'] ?? $request->request->all()['lead_batch'] ?? [];
         $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($contactIds && is_array($contactIds)) {
@@ -81,7 +79,7 @@ class BatchSegmentController extends AbstractFormController
         $items = [];
 
         foreach ($lists as $list) {
-            $items[$list['name']] = $list['id'];
+            $items[$list['name'].' ('.$list['id'].')'] = $list['id'];
         }
 
         return $this->delegateView(

@@ -19,7 +19,7 @@ class FileHandler
     public function __construct(
         private FilePathResolver $filePathResolver,
         private FileProperties $fileProperties,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

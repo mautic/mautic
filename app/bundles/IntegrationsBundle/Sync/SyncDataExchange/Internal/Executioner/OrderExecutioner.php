@@ -24,7 +24,7 @@ class OrderExecutioner
         private EventDispatcherInterface $dispatcher,
         private ObjectProvider $objectProvider,
         private ReferenceResolverInterface $referenceResolver,
-        private FieldValidatorInterface $fieldValidator
+        private FieldValidatorInterface $fieldValidator,
     ) {
     }
 

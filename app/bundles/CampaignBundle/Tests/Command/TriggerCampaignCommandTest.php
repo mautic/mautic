@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
@@ -19,6 +20,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     protected function setUp(): void
     {
+        $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCacheCountInBackground' === $this->name();
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
@@ -529,13 +531,31 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertFalse(isset($tags['EmailNotOpen']));
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
+     */
+    public function testSegmentCacheCountInBackground(): void
+    {
+        // Execute the command again to trigger related events.
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
+
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(0, $count);
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
+    }
+
     public function testCampaignActionChangeMembership(): void
     {
         $campaign1 = $this->createCampaign('Campaign 1');
         $campaign2 = $this->createCampaign('Campaign 2');
         $lead      = $this->createLead('Lead');
         $this->createCampaignLead($campaign1, $lead);
-        $this->createCampaignLead($campaign2, $lead);
         $this->em->flush();
         $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
         $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
@@ -551,6 +571,39 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
         Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
         Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    public function testCampaignActionChangeMembershipRestartRotation(): void
+    {
+        $campaign1 = $this->createCampaign('Campaign 1');
+        // create campaign with restart allowed
+        $campaign2 = $this->createCampaign('Campaign 2');
+        $campaign2->setAllowRestart(true);
+        $this->em->persist($campaign2);
+
+        $lead      = $this->createLead('Lead');
+
+        // add lead to both campaigns
+        $this->createCampaignLead($campaign1, $lead);
+        $this->createCampaignLead($campaign2, $lead);
+        $this->em->flush();
+
+        // add action changeCampaigns to add the lead again to campaign2
+        $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
+        $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+
+        Assert::assertCount(2, $campaignLeads);
+        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+        Assert::assertSame(2, $campaignLeads[1]->getRotation()); // assert it's the second rotation
     }
 
     public function testCampaignActionAfterChangeMembership(): void

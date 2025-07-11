@@ -11,7 +11,7 @@ final class ConsoleOutput
          * Console exit code. 0 when everything went fine, or an error code.
          */
         public int $exitCode,
-        public string $output
+        public string $output,
     ) {
     }
 }

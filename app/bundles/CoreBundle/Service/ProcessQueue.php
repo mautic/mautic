@@ -24,7 +24,7 @@ final class ProcessQueue
     private \SplObjectStorage $processed;
 
     public function __construct(
-        private int $processLimit = 10
+        private int $processLimit = 10,
     ) {
         $this->pending      = new \SplQueue();
         $this->processing   = new \SplObjectStorage();

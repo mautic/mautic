@@ -25,7 +25,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected $useCleanupRollback   = false;
+    protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void
     {
@@ -72,7 +73,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_redirectpostactiontestform]');
 
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
 
         $form = $formCrawler->form();
 
@@ -263,7 +264,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => '',
@@ -284,8 +285,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // A contact should be created by the submission.
         $contact = $submission->getLead();
 
-        Assert::assertSame(null, $contact->getCountry());
-        Assert::assertSame(null, $contact->getState());
+        Assert::assertNull($contact->getCountry());
+        Assert::assertNull($contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -358,7 +359,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => 'Australia',
@@ -433,9 +434,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         // show just one text field
-        $this->assertSame(1, $formCrawler->filter('.mauticform-text')->count());
+        $this->assertCount(1, $formCrawler->filter('.mauticform-text'));
     }
 
     public function testAddContactToCampaignByForm(): void
@@ -490,7 +491,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[email]' => 'xx@xx.com',
@@ -505,7 +506,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     {
         $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
+        if ($this->connection->createSchemaManager()->tablesExist(["{$tablePrefix}form_results_1_submission"])) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
     }
@@ -543,7 +544,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => 'Australia',
@@ -560,6 +561,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // fetch form submissions as Admin User
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $submission     = $response['submissions'][0];
@@ -600,9 +602,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        /** @var PasswordHasherInterface $encoder */
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash($this->getUserPlainPassword()));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);
@@ -650,7 +652,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$form->getId()}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $htmlForm = $formCrawler->form();
         $htmlForm->setValues([
             'mauticform[company]' => 'Acquia',
@@ -718,7 +720,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler, $crawler->html());
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[f_all]' => 'test',
@@ -757,6 +759,572 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
     private function getUserPlainPassword(): string
     {
-        return 'test-pass';
+        return 'test-pass!23';
+    }
+
+    /**
+     * @param array<string, string> $submissionData
+     * @param array<string, string> $expectedData
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formFieldValuesMappingDataProvider')]
+    public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
+    {
+        $formPayload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'leadField'    => 'email',
+                    'mappedField'  => 'email',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Firstname',
+                    'type'         => 'text',
+                    'alias'        => 'firstname',
+                    'leadField'    => 'firstname',
+                    'mappedField'  => 'firstname',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Lastname',
+                    'type'         => 'text',
+                    'alias'        => 'lastname',
+                    'leadField'    => 'lastname',
+                    'mappedField'  => 'lastname',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Country',
+                    'type'         => 'country',
+                    'alias'        => 'country',
+                    'leadField'    => 'country',
+                    'mappedField'  => 'country',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Company name',
+                    'type'         => 'text',
+                    'alias'        => 'company_name',
+                    'leadField'    => 'company',
+                    'mappedField'  => 'company',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Company country',
+                    'type'         => 'text',
+                    'alias'        => 'company_country',
+                    'leadField'    => 'companycountry',
+                    'mappedField'  => 'companycountry',
+                    'mappedObject' => 'company',
+                ],
+                [
+                    'label'        => 'Company city',
+                    'type'         => 'text',
+                    'alias'        => 'company_city',
+                    'leadField'    => 'companycity',
+                    'mappedField'  => 'companycity',
+                    'mappedObject' => 'company',
+                ],
+                [
+                    'label'        => 'Message',
+                    'type'         => 'textarea',
+                    'alias'        => 'message',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+
+        $formData = [];
+        foreach ($submissionData as $key => $value) {
+            $formData["mauticform[{$key}]"] = $value;
+        }
+        $form->setValues($formData);
+
+        $this->client->submit($form);
+
+        // Get form submissions via API
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('total', $submissionsData);
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertGreaterThan(0, count($submissionsData['submissions']));
+
+        $latestSubmission = $submissionsData['submissions'][0];
+
+        // Check if the submission data matches
+        $this->assertArrayHasKey('results', $latestSubmission);
+        foreach ($expectedData as $key => $value) {
+            $this->assertArrayHasKey($key, $latestSubmission['results']);
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+        }
+
+        // Check contact details
+        $this->assertArrayHasKey('lead', $latestSubmission);
+        $contact = $latestSubmission['lead'];
+        $this->assertEquals($expectedData['email'], $contact['email']);
+        $this->assertEquals($expectedData['firstname'], $contact['firstname']);
+        $this->assertEquals($expectedData['lastname'], $contact['lastname']);
+        $this->assertEquals($expectedData['country'], $contact['country']);
+        $this->assertEquals($expectedData['company_name'], $contact['company']);
+
+        // Check submission metadata
+        $this->assertArrayHasKey('ipAddress', $latestSubmission);
+        $this->assertArrayHasKey('dateSubmitted', $latestSubmission);
+        $this->assertArrayHasKey('referer', $latestSubmission);
+
+        // Get contact companies
+        $this->client->request(Request::METHOD_GET, "/api/contacts/{$contact['id']}/companies");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $contactCompanies = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('total', $contactCompanies);
+        $this->assertArrayHasKey('companies', $contactCompanies);
+        $this->assertEquals(1, count($contactCompanies['companies']));
+
+        // Check company details
+        $this->assertEquals($expectedData['company_name'], $contactCompanies['companies'][0]['companyname']);
+        $this->assertEquals($expectedData['company_city'], $contactCompanies['companies'][0]['companycity']);
+        $this->assertEquals($expectedData['company_country'], $contactCompanies['companies'][0]['companycountry']);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    /**
+     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
+     */
+    public static function formFieldValuesMappingDataProvider(): array
+    {
+        return [
+            'normal_submission' => [
+                'submissionData' => [
+                    'email'           => 'john@example.com',
+                    'firstname'       => 'John',
+                    'lastname'        => 'Doe',
+                    'country'         => 'United States',
+                    'company_name'    => 'Acme Inc',
+                    'company_country' => 'United States',
+                    'company_city'    => 'New York',
+                    'message'         => 'Hello, this is a normal submission.',
+                ],
+                'expectedData' => [
+                    'email'           => 'john@example.com',
+                    'firstname'       => 'John',
+                    'lastname'        => 'Doe',
+                    'country'         => 'United States',
+                    'company_name'    => 'Acme Inc',
+                    'company_country' => 'United States',
+                    'company_city'    => 'New York',
+                    'message'         => 'Hello, this is a normal submission.',
+                ],
+            ],
+            'special_characters' => [
+                'submissionData' => [
+                    'email'           => 'jane@example.com',
+                    'firstname'       => 'Jane',
+                    'lastname'        => 'O\'Brien-Smith',
+                    'country'         => 'Ireland',
+                    'company_name'    => '"Super" R&D Company, Ltd.',
+                    'company_country' => 'Ireland',
+                    'company_city'    => 'Dublin',
+                    'message'         => 'Super & Special',
+                ],
+                'expectedData' => [
+                    'email'           => 'jane@example.com',
+                    'firstname'       => 'Jane',
+                    'lastname'        => 'O\'Brien-Smith',
+                    'country'         => 'Ireland',
+                    'company_name'    => '"Super" R&D Company, Ltd.',
+                    'company_country' => 'Ireland',
+                    'company_city'    => 'Dublin',
+                    'message'         => 'Super & Special',
+                ],
+            ],
+            'xss_attempt' => [
+                'submissionData' => [
+                    'email'           => 'hacker@evil.com',
+                    'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'country'         => 'Poland',
+                    'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'message'         => '<script>alert("XSS")</script>',
+                ],
+                'expectedData' => [
+                    'email'           => 'hacker@evil.com',
+                    'firstname'       => 'alert("XSS")',
+                    'lastname'        => 'alert("XSS")',
+                    'country'         => 'Poland',
+                    'company_name'    => 'alert("XSS")',
+                    'company_country' => 'alert("XSS")',
+                    'company_city'    => 'alert("XSS")',
+                    'message'         => 'alert("XSS")',
+                ],
+            ],
+            'sql_injection_attempt' => [
+                'submissionData' => [
+                    'email'           => 'sqlhacker@evil.com',
+                    'firstname'       => "Robert'; DROP TABLE users; --",
+                    'lastname'        => 'Tables',
+                    'country'         => 'United States',
+                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                    'company_country' => 'United States',
+                    'company_city'    => 'SQL City',
+                    'message'         => "Robert'; DROP TABLE messages; --",
+                ],
+                'expectedData' => [
+                    'email'           => 'sqlhacker@evil.com',
+                    'firstname'       => "Robert'; DROP TABLE users; --",
+                    'lastname'        => 'Tables',
+                    'country'         => 'United States',
+                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                    'company_country' => 'United States',
+                    'company_city'    => 'SQL City',
+                    'message'         => "Robert'; DROP TABLE messages; --",
+                ],
+            ],
+            'unicode_characters' => [
+                'submissionData' => [
+                    'email'           => 'unicode@example.com',
+                    'firstname'       => 'José',
+                    'lastname'        => 'Martínez',
+                    'country'         => 'Spain',
+                    'company_name'    => '株式会社スマイル',
+                    'company_country' => 'Japan',
+                    'company_city'    => '東京',
+                    'message'         => 'こんにちは、世界！',
+                ],
+                'expectedData' => [
+                    'email'           => 'unicode@example.com',
+                    'firstname'       => 'José',
+                    'lastname'        => 'Martínez',
+                    'country'         => 'Spain',
+                    'company_name'    => '株式会社スマイル',
+                    'company_country' => 'Japan',
+                    'company_city'    => '東京',
+                    'message'         => 'こんにちは、世界！',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, string> $submissionData
+     * @param array<string, string> $expectedData
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formCustomFieldsMappingDataProvider')]
+    public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
+    {
+        // Create new contact custom field
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', [
+            'label' => 'Animal',
+            'alias' => 'animal',
+            'type'  => 'text',
+        ]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('field', $response);
+        $contactCustomField = $response['field'];
+
+        // Create form
+        $formPayload = [
+            'name'        => 'Submission test form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'What kind of animal are you?',
+                    'type'         => 'text',
+                    'alias'        => 'animal',
+                    'leadField'    => 'animal',
+                    'mappedField'  => 'animal',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+
+        $formData = [];
+        foreach ($submissionData as $key => $value) {
+            $formData["mauticform[{$key}]"] = $value;
+        }
+        $form->setValues($formData);
+
+        $this->client->submit($form);
+
+        // Get form submissions via API
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('total', $submissionsData);
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertGreaterThan(0, count($submissionsData['submissions']));
+
+        $latestSubmission = $submissionsData['submissions'][0];
+
+        // Check if the submission data matches
+        $this->assertArrayHasKey('results', $latestSubmission);
+        foreach ($expectedData as $key => $value) {
+            $this->assertArrayHasKey($key, $latestSubmission['results']);
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+        }
+
+        // Check contact details
+        $this->assertArrayHasKey('lead', $latestSubmission);
+        $submissionContact = $latestSubmission['lead'];
+
+        // Get contact
+        $this->client->request(Request::METHOD_GET, "/api/contacts/{$submissionContact['id']}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $contactResponse = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('contact', $contactResponse);
+        $contact = $contactResponse['contact'];
+
+        $this->assertArrayHasKey('animal', $contact['fields']['core']);
+        $animalField = $contact['fields']['core']['animal'];
+        $this->assertEquals($expectedData['animal'], $animalField['value']);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $this->client->request(Request::METHOD_DELETE, "/api/fields/contact/{$contactCustomField['id']}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    /**
+     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
+     */
+    public static function formCustomFieldsMappingDataProvider(): array
+    {
+        return [
+            'simple_value' => [
+                'submissionData' => [
+                    'animal' => 'Dog',
+                ],
+                'expectedData' => [
+                    'animal' => 'Dog',
+                ],
+            ],
+            'special_characters' => [
+                'submissionData' => [
+                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
+                ],
+                'expectedData' => [
+                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
+                ],
+            ],
+            'xss_attempt' => [
+                'submissionData' => [
+                    'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                ],
+                'expectedData' => [
+                    'animal' => 'alert("XSS")',
+                ],
+            ],
+            'sql_injection' => [
+                'submissionData' => [
+                    'animal' => "Cat'; DROP TABLE animals; --",
+                ],
+                'expectedData' => [
+                    'animal' => "Cat'; DROP TABLE animals; --",
+                ],
+            ],
+            'unicode_and_emoji' => [
+                'submissionData' => [
+                    'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
+                ],
+                'expectedData' => [
+                    'animal' => '🐕 犬 🐈 猫',
+                ],
+            ],
+            'nested_tags' => [
+                'submissionData' => [
+                    'animal' => '<div><span>Text</span></div>',
+                ],
+                'expectedData' => [
+                    'animal' => 'Text',
+                ],
+            ],
+            'incomplete_tags' => [
+                'submissionData' => [
+                    'animal' => '<div><span>Text',
+                ],
+                'expectedData' => [
+                    'animal' => 'Text',
+                ],
+            ],
+            'null_byte' => [
+                'submissionData' => [
+                    'animal' => "Dog\x00Cat",
+                ],
+                'expectedData' => [
+                    'animal' => 'DogCat',
+                ],
+            ],
+            'javascript_protocol' => [
+                'submissionData' => [
+                    'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
+                ],
+                'expectedData' => [
+                    'animal' => 'Click me',
+                ],
+            ],
+            'css_expression' => [
+                'submissionData' => [
+                    'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
+                ],
+                'expectedData' => [
+                    'animal' => 'Test',
+                ],
+            ],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('htmlFieldSubmissionDataProvider')]
+    public function testHtmlReadOnlyFieldSubmission(string $submittedHtml, string $submittedEmail): void
+    {
+        // Create form with freehtml and email fields
+        // this field is read-only so we want to assure that no data is stored from this field
+        $formPayload = [
+            'name'        => 'Submission test form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'Your story',
+                    'type'         => 'freehtml',
+                    'alias'        => 'your_story',
+                    'properties'   => ['text' => ''],
+                ],
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'leadField'    => 'email',
+                    'mappedField'  => 'email',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $formId         = json_decode($clientResponse->getContent(), true)['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+
+        // Submit the form directly via POST
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'your_story' => $submittedHtml,
+                    'email'      => $submittedEmail,
+                    'formId'     => $formId,
+                ],
+            ]
+        );
+
+        // Verify submission
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse  = $this->client->getResponse();
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertCount(1, $submissionsData['submissions']);
+
+        // Verify submission results
+        $submission = $submissionsData['submissions'][0];
+        $this->assertArrayHasKey('results', $submission);
+
+        // Verify that your_story is always false
+        $this->assertArrayNotHasKey('your_story', $submission['results']);
+
+        // Verify that email is stored correctly
+        $this->assertArrayHasKey('email', $submission['results']);
+        $this->assertSame($submittedEmail, $submission['results']['email']);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function htmlFieldSubmissionDataProvider(): array
+    {
+        return [
+            'any_text' => [
+                '<div></div>',
+                'test1@test.com',
+            ],
+            'with_content' => [
+                '<div>Some content</div>',
+                'test2@test.com',
+            ],
+        ];
     }
 }

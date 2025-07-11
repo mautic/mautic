@@ -70,10 +70,7 @@ class KeysType extends AbstractType
         $resolver->setDefaults(['secret_keys' => [], 'is_published' => true]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integration_keys';
     }

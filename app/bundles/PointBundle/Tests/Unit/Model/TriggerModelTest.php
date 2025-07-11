@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -46,11 +45,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $triggerEventModel;
 
     /**
-     * @var MauticFactory|MockObject
-     */
-    private MockObject $mauticFactory;
-
-    /**
      * @var EventDispatcherInterface|MockObject
      */
     private MockObject $dispatcher;
@@ -83,7 +77,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
         $this->leadModel              = $this->createMock(LeadModel::class);
         $this->triggerEventModel      = $this->createMock(TriggerEventModel::class);
-        $this->mauticFactory          = $this->createMock(MauticFactory::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
         $this->translator             = $this->createMock(Translator::class);
@@ -93,7 +86,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->ipLookupHelper,
             $this->leadModel,
             $this->triggerEventModel,
-            $this->mauticFactory,
             $this->contactTracker,
             $this->entityManager,
             $this->createMock(CorePermissions::class),
@@ -126,49 +118,43 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->triggerEventRepository->expects($this->once())
             ->method('find')
             ->willReturn($triggerEvent);
+        $matcher = $this->exactly(2);
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('dispatch')
-            ->withConsecutive(
-                [
-                    $this->callback(
-                        // Emulate a subscriber:
-                        function (TriggerBuilderEvent $event) {
-                            // PHPUNIT calls this callback twice for unknown reason. We need to set it only once.
-                            if (array_key_exists('email.send_to_user', $event->getEvents())) {
-                                return true;
-                            }
-
-                            $event->addEvent(
-                                'email.send_to_user',
-                                [
-                                    'group'           => 'mautic.email.point.trigger',
-                                    'label'           => 'mautic.email.point.trigger.send_email_to_user',
-                                    'formType'        => \Mautic\EmailBundle\Form\Type\EmailToUserType::class,
-                                    'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
-                                    'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-                                    'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
-                                ]
-                            );
-
-                            return true;
+        $this->dispatcher->expects($matcher)
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher, $contact, $triggerEvent) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $callback = function (TriggerBuilderEvent $event) {
+                        // PHPUNIT calls this callback twice for unknown reason. We need to set it only once.
+                        if (array_key_exists('email.send_to_user', $event->getEvents())) {
+                            return;
                         }
-                    ),
-                    PointEvents::TRIGGER_ON_BUILD,
-                ],
-                // Ensure the event is triggered if the point trigger event has 'eventName' defined instead of 'callback'.
-                [
-                    $this->callback(
-                        function (TriggerExecutedEvent $event) use ($contact, $triggerEvent) {
-                            $this->assertSame($contact, $event->getLead());
-                            $this->assertSame($triggerEvent, $event->getTriggerEvent());
 
-                            return true;
-                        }
-                    ),
-                    EmailEvents::ON_SENT_EMAIL_TO_USER,
-                ]
-            );
+                        $event->addEvent(
+                            'email.send_to_user',
+                            [
+                                'group'           => 'mautic.email.point.trigger',
+                                'label'           => 'mautic.email.point.trigger.send_email_to_user',
+                                'formType'        => \Mautic\EmailBundle\Form\Type\EmailToUserType::class,
+                                'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
+                                'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+                                'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
+                            ]
+                        );
+                    };
+                    $callback($event);
+                    $this->assertSame(PointEvents::TRIGGER_ON_BUILD, $eventName);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $callback = function (TriggerExecutedEvent $event) use ($contact, $triggerEvent) {
+                        $this->assertSame($contact, $event->getLead());
+                        $this->assertSame($triggerEvent, $event->getTriggerEvent());
+                    };
+                    $callback($event);
+                    $this->assertSame(EmailEvents::ON_SENT_EMAIL_TO_USER, $eventName);
+                }
+
+                return $event;
+            });
 
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);
     }

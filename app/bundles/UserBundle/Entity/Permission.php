@@ -2,36 +2,71 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-class Permission implements CacheInvalidateInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "permission:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "permission:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Permission implements CacheInvalidateInterface, UuidInterface
 {
+    use UuidTrait;
+
     public const CACHE_NAMESPACE = 'Permission';
 
     /**
      * @var int
+     *
+     * @Groups({"permission:read", "role:read"})
      */
     protected $id;
 
     /**
      * @var string
+     *
+     * @Groups({"permission:read", "permission:write", "role:read"})
      */
     protected $bundle;
 
     /**
      * @var string
+     *
+     * @Groups({"permission:read", "permission:write", "role:read"})
      */
     protected $name;
 
     /**
      * @var Role
+     *
+     * @Groups({"permission:read", "permission:write", "role:read"})
      */
     protected $role;
 
     /**
      * @var int
+     *
+     * @Groups({"permission:read", "permission:write", "role:read"})
      */
     protected $bitwise;
 
@@ -59,6 +94,8 @@ class Permission implements CacheInvalidateInterface
             ->build();
 
         $builder->addField('bitwise', 'integer');
+
+        static::addUuidField($builder);
     }
 
     /**

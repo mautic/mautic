@@ -11,15 +11,13 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider delayDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
     public function testSubmitCampaignActionVariousDelayOptions(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $uri = '/s/campaigns/events/new?type=campaign.addremovelead&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
@@ -37,9 +35,10 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         Assert::assertSame($success, $responseData['success'], $response->getContent());
 
@@ -51,7 +50,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string,array<string|int>>
      */
-    public function delayDataProvider(): iterable
+    public static function delayDataProvider(): iterable
     {
         yield 'The immediate mode cannot be allowed otherwise the contacts will loop too fast for no reason' => [
             'immediate',
@@ -78,9 +77,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    /**
-     * @dataProvider delayDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
     public function testValidationViaCampaignApi(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $segment = new LeadList();
@@ -203,7 +200,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
-        Assert::assertSame($expectedStatusCode, $response->getStatusCode(), $response->getContent());
+        self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 
         if ($expectedString) {
             Assert::assertStringContainsString($expectedString, $response->getContent());

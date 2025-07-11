@@ -8,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 class Parser
 {
     public function __construct(
-        protected Message $message
+        protected Message $message,
     ) {
     }
 

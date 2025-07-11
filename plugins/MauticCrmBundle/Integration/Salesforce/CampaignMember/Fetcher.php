@@ -34,7 +34,7 @@ class Fetcher
     public function __construct(
         private IntegrationEntityRepository $repo,
         private Organizer $organizer,
-        private $campaignId
+        private $campaignId,
     ) {
         $this->fetchLeads();
         $this->fetchContacts();

@@ -65,7 +65,7 @@ class OrderDAO
         private \DateTimeInterface $syncDateTime,
         private $isFirstTimeSync,
         private $integration,
-        private array $options = []
+        private array $options = [],
     ) {
     }
 
@@ -130,7 +130,7 @@ class OrderDAO
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
         $integrationObjectId,
-        ?\DateTimeInterface $objectModifiedDate = null
+        ?\DateTimeInterface $objectModifiedDate = null,
     ): void {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();

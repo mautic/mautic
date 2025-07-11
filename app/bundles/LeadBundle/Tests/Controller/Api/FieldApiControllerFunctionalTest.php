@@ -13,13 +13,15 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @IgnoreAnnotation("covers")
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
-        $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->getName();
+        $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->name();
 
         parent::setUp();
     }
@@ -45,7 +47,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $fieldResponse  = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         Assert::assertTrue($fieldResponse['field']['isPublished']);
         Assert::assertGreaterThan(0, $fieldResponse['field']['id']);
         Assert::assertSame($payload['label'], $fieldResponse['field']['label']);
@@ -58,16 +60,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, '/api/fields/contact/'.$fieldResponse['field']['id'].'/delete', $payload);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful($clientResponse->getContent());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::saveEntity
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::newEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::editEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::deleteEntityAction
-     * @covers \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::execute
-     */
     public function testFieldApiEndpointsWithBackgroundProcessingEnabled(): void
     {
         $alias   = uniqid('field');
@@ -87,15 +82,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias);
+        $this->assertDeleteResponse($payload, $id, $alias, true);
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::saveEntity
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::newEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::editEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::deleteEntityAction
-     */
     public function testFieldApiEndpointsWithBackgroundProcessingDisabled(): void
     {
         $alias   = uniqid('field');
@@ -110,14 +99,13 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias);
+        $this->assertDeleteResponse($payload, $id, $alias, false);
     }
 
     /**
      * @param array<string, array<string, string>> $properties
-     *
-     * @dataProvider dataForCreatingNewBooleanFieldApiEndpoint
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
     public function testCreatingNewBooleanFieldApiEndpoint(array $properties, string $expectedMessage): void
     {
         $payload = [
@@ -143,7 +131,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, array<string, string>>>>
      */
-    public function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
+    public static function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
     {
         yield 'No properties' => [
             [
@@ -234,7 +222,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    private function assertDeleteResponse(array $payload, int $id, string $alias): void
+    private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
         $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
@@ -248,7 +236,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey($key, $response['field']);
 
             match ($key) {
-                'id'     => $this->assertNull($response['field'][$key]),
+                'id'     => $isBackground ? $this->assertEquals($value, $response['field'][$key]) : $this->assertNull($response['field'][$key]),
                 'alias'  => $this->assertEquals($alias, $response['field'][$key]),
                 'object' => $this->assertEquals('lead', $response['field'][$key]),
                 'type'   => $this->assertEquals('text', $response['field'][$key]),
@@ -272,6 +260,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isUniqueIdentifier'  => true,
             'isVisible'           => false,
             'isListable'          => false,
+            'isIndex'             => true, // Must be true, because if isUniqueIdentifier field is true the contact field *must* be indexed.
+            'charLengthLimit'     => 25,
             'properties'          => [],
         ];
     }
@@ -291,6 +281,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isUniqueIdentifier'  => false,
             'isVisible'           => true,
             'isListable'          => true,
+            'isIndex'             => false, // Can be false, if isUniqueIdentifier the field is *not* indexed.
+            'charLengthLimit'     => 50,
             'properties'          => [],
         ];
     }

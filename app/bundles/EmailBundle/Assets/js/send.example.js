@@ -2,7 +2,7 @@
  * Used in data-lookup-callback attr of form field in ExampleSendType
  * Take a look at https://github.com/twitter/typeahead.js/
  */
-Mautic.activateContactLookupField = function(fieldOptions, filterId) {
+Mautic.activateExampleContactLookupField = function(fieldOptions, filterId) {
 
     const lookupElementId = 'example_send_contact';
     const action          = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');
@@ -25,7 +25,7 @@ Mautic.activateContactLookupField = function(fieldOptions, filterId) {
 /**
  * Used in data-lookup-callback attr of form field in ExampleSendType
  */
-Mautic.updateContactLookupListFilter = function(field, item) {
+Mautic.updateExampleContactLookupListFilter = function(field, item) {
     if (item && item.id) {
         mQuery('#example_send_contact_id').val(item.id);
         mQuery(field).val(item.value);

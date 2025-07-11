@@ -11,7 +11,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 {
     public function __construct(
         protected DateDecorator $dateDecorator,
-        protected DateOptionParameters $dateOptionParameters
+        protected DateOptionParameters $dateOptionParameters,
     ) {
     }
 

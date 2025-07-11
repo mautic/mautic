@@ -3,9 +3,11 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -17,17 +19,21 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
+use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -36,10 +42,12 @@ use Symfony\Component\Routing\RouterInterface;
 class PublicController extends AbstractFormController
 {
     /**
+     * @param string $slug
+     *
      * @return Response
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function indexAction(
         Request $request,
@@ -47,6 +55,7 @@ class PublicController extends AbstractFormController
         CookieHelper $cookieHelper,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         $slug)
@@ -68,7 +77,11 @@ class PublicController extends AbstractFormController
                 if (null != $entity->getRedirectType()) {
                     $model->hitPage($entity, $request, $entity->getRedirectType());
 
-                    return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
+                    if ($entity->getRedirectUrl()) {
+                        return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
+                    } else {
+                        return $this->notFound();
+                    }
                 } else {
                     $model->hitPage($entity, $request, 401);
 
@@ -152,7 +165,7 @@ class PublicController extends AbstractFormController
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
                                 // if not the parent, show the specific variant already displayed to the visitor
-                                if ($variantCookie !== $entity->getId()) {
+                                if ((string) $variantCookie !== (string) $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
                                 } // otherwise proceed with displaying parent
                             }
@@ -220,6 +233,7 @@ class PublicController extends AbstractFormController
                         $lead,
                         $request
                     );
+                    \assert($translatedEntity instanceof Page);
 
                     if ($translationParent && $translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
@@ -244,22 +258,18 @@ class PublicController extends AbstractFormController
                  */
                 $template = $entity->getTemplate();
                 // all the checks pass so display the content
-                $slots   = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
-
-                $this->processSlots($slots, $entity);
 
                 // Add the GA code to the template assets
                 if (!empty($analytics)) {
-                    $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                    $assetsHelper->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+                $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
                 $response = $this->render(
                     $logicalName,
                     [
-                        'slots'    => $slots,
                         'content'  => $content,
                         'page'     => $entity,
                         'template' => $template,
@@ -277,19 +287,27 @@ class PublicController extends AbstractFormController
                 }
             }
 
-            $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $assetsHelper->addScript(
+                $router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'
             );
 
-            $event = new PageDisplayEvent($content, $entity);
+            $event = new PageDisplayEvent((string) $content, $entity);
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $request, 200, $lead, $query);
+            $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
 
-            return new Response($content);
+            $response = new Response($content);
+            if ($request->cookies->has('Blocked-Tracking')) {
+                /* @var DeviceTrackingService $deviceTrackingService */
+                $deviceTrackingService = $this->container->get('mautic.lead.service.device_tracking_service');
+                $deviceTrackingService->clearTrackingCookies();
+            }
+
+            return $response;
         }
 
         if (false !== $entity && $tracking404Model->isTrackable()) {
@@ -300,75 +318,71 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return mixed[]|JsonResponse|RedirectResponse|Response
      *
-     * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, CorePermissions $security, int $id)
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id, string $objectType = null)
     {
-        $contactId = (int) $request->query->get('contactId');
-
-        if ($contactId) {
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead.lead');
-            /** @var Lead $contact */
-            $contact = $leadModel->getEntity($contactId);
-        }
-
         /** @var PageModel $model */
         $model = $this->getModel('page');
         /** @var Page $page */
         $page = $model->getEntity($id);
 
-        if (!$page->getId()) {
+        if (!$page || !$page->getId()) {
             return $this->notFound();
         }
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $contactId = (int) $request->query->get('contactId');
+        if ($contactId) {
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            $contact   = $leadModel->getEntity($contactId);
+        }
+        $draftEnabled = $pageConfig->isDraftEnabled();
+        $analytics    = $analyticsHelper->getCode();
 
-        $BCcontent = $page->getContent();
-        $content   = $page->getCustomHtml();
+        $BCcontent     = $page->getContent();
+        $content       = $page->getCustomHtml();
+        $publicPreview = $page->isPublicPreview();
 
-        if (!$security->isAdmin()
-            && (
-                (!$page->isPublished())
-                || (!$security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
-                    $page->getCreatedBy()
-                )))
-        ) {
+        if ('draft' === $objectType && $draftEnabled && $page->hasDraft()) {
+            $content       = $page->getDraftContent();
+            $publicPreview = $page->getDraft()->isPublicPreview();
+        }
+
+        if (($security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$security->isAnonymous(
+        ) && !$security->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $page->getCreatedBy()
+        ))) {
             return $this->accessDenied();
         }
 
-        if ($contactId && (
-            !$security->isAdmin()
-            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-        )
-        ) {
+        if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother'
+        ))) {
+            // disallow displaying contact information
             return $this->accessDenied();
         }
 
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();
             // all the checks pass so display the content
-            $slots   = $this->factory->getTheme($template)->getSlots('page');
             $content = $page->getContent();
-
-            $this->processSlots($slots, $page);
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
-                $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                $assetsHelper->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
             $response = $this->render(
                 $logicalName,
                 [
-                    'slots'    => $slots,
                     'content'  => $content,
                     'page'     => $page,
                     'template' => $template,
@@ -378,7 +392,7 @@ class PublicController extends AbstractFormController
 
             $content = $response->getContent();
         } else {
-            $content = str_replace('</head>', $analytics.$this->renderView('@MauticPage/Page/preview_header.html.twig')."\n</head>", $content);
+            $content = str_replace('</head>', $analytics."\n</head>", $content);
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
@@ -416,7 +430,7 @@ class PublicController extends AbstractFormController
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
     ) {
         $notSuccessResponse = new JsonResponse(
             [
@@ -466,8 +480,8 @@ class PublicController extends AbstractFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
-        $redirectId
-    ): \Symfony\Component\HttpFoundation\RedirectResponse {
+        $redirectId,
+    ): RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -501,16 +515,19 @@ class PublicController extends AbstractFormController
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $ipLookupHelper->getIpAddress();
 
+        $isHitTrackable = false;
         if ($ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
+                /** @var LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
+
                 /** @var PageModel $pageModel */
                 $pageModel = $this->getModel('page');
 
                 try {
-                    $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
-
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it
                     // and process the request without it
@@ -519,11 +536,11 @@ class PublicController extends AbstractFormController
 
                     $request->request->set('ct', '');
                     $request->query->set('ct', '');
-                    $lead = $contactRequestHelper->getContactFromQuery();
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $lead           = $contactRequestHelper->getContactFromQuery();
+                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
 
-                $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+                $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
                 $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
@@ -543,93 +560,16 @@ class PublicController extends AbstractFormController
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
-        return $this->redirect($url);
-    }
+        $response =  $this->redirect($url);
+        $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
 
-    /**
-     * PreProcess page slots for public view.
-     *
-     * @deprecated - to be removed in 3.0
-     *
-     * @param array $slots
-     * @param Page  $entity
-     */
-    private function processSlots($slots, $entity): void
-    {
-        /** @var AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            // backward compatibility - if slotConfig array does not exist
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            if (isset($slotConfig['type']) && 'slideshow' == $slotConfig['type']) {
-                if (isset($content[$slot])) {
-                    $options = json_decode($content[$slot], true);
-                } else {
-                    $options = [
-                        'width'            => '100%',
-                        'height'           => '250px',
-                        'background_color' => 'transparent',
-                        'arrow_navigation' => false,
-                        'dot_navigation'   => true,
-                        'interval'         => 5000,
-                        'pause'            => 'hover',
-                        'wrap'             => true,
-                        'keyboard'         => true,
-                    ];
-                }
-
-                // Create sample slides for first time or if all slides were deleted
-                if (empty($options['slides'])) {
-                    $options['slides'] = [
-                        [
-                            'order'            => 0,
-                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
-                            'captionheader'    => 'Caption 1',
-                        ],
-                        [
-                            'order'            => 1,
-                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
-                            'captionheader'    => 'Caption 2',
-                        ],
-                    ];
-                }
-
-                // Order slides
-                usort(
-                    $options['slides'],
-                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
-                );
-
-                $options['slot']   = $slot;
-                $options['public'] = true;
-            } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
-                $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
-                $slotsHelper->set($slot, $value);
-            } else {
-                // Fallback for other types like html, text, textarea and all unknown
-                $value = $content[$slot] ?? '';
-                $slotsHelper->set($slot, $value);
-            }
-        }
-
-        $parentVariant = $entity->getVariantParent();
-        $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
-        $slotsHelper->set('pageTitle', $title);
+        return $response;
     }
 
     /**
      * Track video views.
      */
-    public function hitVideoAction(Request $request)
+    public function hitVideoAction(Request $request): JsonResponse|Response
     {
         // Only track XMLHttpRequests, because the hit should only come from there
         if ($request->isXmlHttpRequest()) {

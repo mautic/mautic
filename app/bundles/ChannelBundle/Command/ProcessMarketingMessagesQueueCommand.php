@@ -6,18 +6,27 @@ use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:messages:send',
+    description: 'Process sending of messages queue.',
+    aliases: [
+        'mautic:campaigns:messagequeue',
+        'mautic:campaigns:messages',
+    ]
+)]
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     public function __construct(
         private TranslatorInterface $translator,
         private MessageQueueModel $messageQueueModel,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -25,13 +34,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:messages:send')
-            ->setAliases(
-                [
-                    'mautic:campaigns:messagequeue',
-                    'mautic:campaigns:messages',
-                ]
-            )
             ->addOption(
                 '--channel',
                 '-c',
@@ -73,6 +75,4 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Process sending of messages queue.';
 }

@@ -4,19 +4,14 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(DsnParser::class)]
 class DsnParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that a BouncedEmail is returned from a dsn report
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a BouncedEmail is returned from a dsn report')]
     public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
@@ -30,19 +25,13 @@ DSN;
         $parser = new DsnParser();
         $bounce = $parser->getBounce($message);
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
         $this->assertEquals('sdfgsdfg@seznan.cz', $bounce->getContactEmail());
         $this->assertEquals(Category::DNS_UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());
         $this->assertTrue($bounce->isFinal());
     }
 
-    /**
-     * @testdox Test a Postfix BouncedEmail is returned from a dsn report
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test a Postfix BouncedEmail is returned from a dsn report')]
     public function testPostfixBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
@@ -59,18 +48,13 @@ DSN;
         $parser = new DsnParser();
         $bounce = $parser->getBounce($message);
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
         $this->assertEquals('aaaaaaaaaaaaa@yoursite.com', $bounce->getContactEmail());
         $this->assertEquals(Category::UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());
         $this->assertTrue($bounce->isFinal());
     }
 
-    /**
-     * @testdox Test that an exception is thrown if a bounce cannot be found in a dsn report
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exception is thrown if a bounce cannot be found in a dsn report')]
     public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);

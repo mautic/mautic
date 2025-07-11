@@ -22,7 +22,7 @@ class InternalObjectUpdateEvent extends Event
         /**
          * @var ObjectChangeDAO[]
          */
-        private array $updateObjects
+        private array $updateObjects,
     ) {
     }
 

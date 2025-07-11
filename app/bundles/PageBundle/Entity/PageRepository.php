@@ -3,12 +3,15 @@
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Page>
  */
 class PageRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     public function getEntities(array $args = [])
     {
         $select = ['p'];
@@ -141,7 +144,7 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('p.language', ":$unique"),
                     $q->expr()->like('p.language', ":$langUnique")
                 );
@@ -152,6 +155,16 @@ class PageRepository extends CommonRepository
                 $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'page_id',
+                    'page_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -181,6 +194,7 @@ class PageRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
             'mautic.page.searchcommand.isprefcenter',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

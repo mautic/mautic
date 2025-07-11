@@ -28,13 +28,20 @@
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': true,
                 },
                 'routeBase': 'contactfield',
                 'langVar': 'lead.field',
-            })
+            },
+            'bulk_actions': {
+                'langVar': 'lead.field',
+                'routeBase': 'contactfield',
+                'templateButtons': {
+                    'delete': permissions['lead:fields:full'],
+                },
+            },
         }) }}
         <div class="page-list">
   {% endif %}
@@ -46,14 +53,9 @@
               <tr>
                   <th class="col-leadfield-orderhandle"></th>
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                          'checkall': 'true',
-                          'target': '#leadFieldTable',
-                          'langVar': 'lead.field',
-                          'routeBase': 'contactfield',
-                          'templateButtons': {
-                              'delete': permissions['lead:fields:full'],
-                          },
-                  }) }}
+                    'checkall': 'true',
+                    'target': '#leadFieldTable',
+                }) }}
                   <th class="col-leadfield-label">{{ 'mautic.lead.field.label'|trans }}</th>
                   <th class="visible-md visible-lg col-leadfield-alias">{{ 'mautic.core.alias'|trans }}</th>
                   <th class="visible-md visible-lg col-leadfield-group">{{ 'mautic.lead.field.object'|trans }}</th>
@@ -66,14 +68,14 @@
               <tbody>
               {% for item in items %}
                   <tr id="field_{{ item.id }}">
-                      <td><i class="ri-xl ri-draggable text-muted"></i></td>
+                      <td><i class="ri-xl ri-draggable text-secondary"></i></td>
                       <td>
                           {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                   'item': item,
                                   'templateButtons': {
-                                      'edit': permissions['lead:fields:full'],
-                                      'clone': permissions['lead:fields:full'],
-                                      'delete': item.isFixed ? false : permissions['lead:fields:full'],
+                                      'edit': item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
+                                      'clone': item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
+                                      'delete': item.isFixed or item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
                                   },
                                   'routeBase': 'contactfield',
                                   'langVar': 'lead.field',
@@ -86,9 +88,10 @@
                                       'item': item,
                                       'model': 'lead.field',
                                       'disableToggle': item.disablePublishChange,
-                                      'aditionalLabel': item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : null,
+                                      'aditionalLabel': (item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : '') ~ (item.getColumnIsNotRemoved() ? 'mautic.lead.field.being_removed_in_background'|trans : ''),
                           }) }}
-                          <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}">{{ item.label }}</a>
+                          <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">{{ item.label }}</a>
+                          {{ customContent('lead.field.name', _context) }}
                       </span>
                       </td>
                       <td class="visible-md visible-lg">{{ item.alias }}</td>
@@ -116,7 +119,7 @@
                               <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
                           {% endif %}
                           {% if item.isIsIndex %}
-                              <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
+                              <i class="ri-menu-search-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
                           {% endif %}
                       </td>
                   </tr>

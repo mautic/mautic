@@ -30,7 +30,7 @@ class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
         $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[0]);
         $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[1]);
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getViewsCount&focusId={$focus->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getViewsCount&focusId={$focus->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
@@ -54,7 +54,7 @@ class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
         $focusModel->addStat($focus, Stat::TYPE_CLICK, $this->createHit($lead1), $lead1);
         $focusModel->addStat($focus, Stat::TYPE_CLICK, $this->createHit($lead2), $lead2);
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getClickThroughCount&focusId={$focus->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getClickThroughCount&focusId={$focus->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([

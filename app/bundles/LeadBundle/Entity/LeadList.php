@@ -8,15 +8,41 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class LeadList extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "segment:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "segment:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class LeadList extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+
     public const TABLE_NAME = 'lead_lists';
 
     /**
@@ -65,7 +91,7 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
+     * @var ArrayCollection<ListLead>
      */
     private $leads;
 
@@ -82,6 +108,7 @@ class LeadList extends FormEntity
     public function __construct()
     {
         $this->leads = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -90,7 +117,6 @@ class LeadList extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist')
             ->addIndex(['alias'], 'lead_list_alias');
 
         $builder->addIdColumns();
@@ -128,6 +154,9 @@ class LeadList extends FormEntity
             ->columnName('last_built_time')
             ->nullable()
             ->build();
+
+        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -169,6 +198,8 @@ class LeadList extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'leadList');
     }
 
     /**
@@ -274,10 +305,28 @@ class LeadList extends FormEntity
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated
         }
 
         return $this->filters;
+    }
+
+    public function needsRebuild(): bool
+    {
+        // Manual or unpublished segments never require rebuild
+        if (empty($this->getFilters()) || !$this->isPublished()) {
+            return false;
+        }
+
+        // A segment with filters requires rebuild if it was changed since the last build date, or was never built
+        if (null === $this->getLastBuiltDate()) {
+            return true;
+        }
+        if (null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp()) {
+            return true;
+        }
+
+        return false;
     }
 
     public function hasFilterTypeOf(string $type): bool
@@ -426,13 +475,11 @@ class LeadList extends FormEntity
         $this->setLastBuiltDate($now);
     }
 
+    /**
+     * @deprecated Initialisation is no longer necessary and lastBuiltDate is allowed to be null
+     */
     public function initializeLastBuiltDate(): void
     {
-        if ($this->getLastBuiltDate() instanceof \DateTime) {
-            return;
-        }
-
-        $this->setLastBuiltDateToCurrentDatetime();
     }
 
     public function getLastBuiltTime(): ?float

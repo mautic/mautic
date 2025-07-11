@@ -22,7 +22,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function __construct(
         private DynamicContentModel $dynamicContentModel,
         protected CacheProvider $cache,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -103,7 +103,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
         }
 
-        /** @var CacheItemInterface $item */
         $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
         $item->set($eventDetails);
         $item->expiresAfter(86400); // one day in seconds
@@ -127,6 +126,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         if ($dwc instanceof DynamicContent) {
             // Use translation if available
             list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+            \assert($dwc instanceof DynamicContent);
 
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);

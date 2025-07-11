@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class TimezoneResolver
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -28,7 +28,7 @@ class TimezoneResolver
          *
          * Later we use toLocalString() method - it gives us midnight in UTC for first condition and midnight in local timezone for second option.
          */
-        $timezone = $hasTimePart ? 'UTC' : $this->coreParametersHelper->get('default_timezone', 'UTC');
+        $timezone = $hasTimePart ? 'UTC' : $this->coreParametersHelper->get('default_timezone', 'UTC') ?? 'UTC';
 
         $date = new \DateTime('midnight today', new \DateTimeZone($timezone));
 

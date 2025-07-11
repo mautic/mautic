@@ -7,8 +7,8 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Mautic\UserBundle\Entity\User;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
@@ -26,12 +26,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    /**
-     * @param array<mixed> $data
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct(?string $name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
 
         $this->configParams += [
             'db_driver' => 'pdo_mysql',
@@ -59,6 +56,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->markDatabasePrepared();
         }
 
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $this->loginUser($user); // also creates session
+
         if ($this->useCleanupRollback) {
             $this->beforeBeginTransaction();
             $this->connection->beginTransaction();
@@ -70,6 +70,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     final protected function tearDown(): void
     {
+        date_default_timezone_set('UTC');
         $this->restoreLocalConfig();
         $customFieldsReset = $this->resetCustomFields();
         $this->beforeTearDown();
@@ -84,6 +85,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->insertRollbackCheckData();
             $this->connection->rollback();
         }
+
+        $this->afterRollback();
 
         if (!$this->useCleanupRollback || !$isTransactionActive || $customFieldsReset || !$this->wasRollbackSuccessful()) {
             $this->resetDatabase();
@@ -106,6 +109,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * Override this method to execute some logic right before the tearDown() is invoked.
      */
     protected function beforeTearDown(): void
+    {
+    }
+
+    /**
+     * Override this method to execute some logic right after the transaction ends.
+     */
+    protected function afterRollback(): void
     {
     }
 
@@ -136,20 +146,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
     }
 
-    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): KernelBrowser
-    {
-        // turn off rollback cleanup as this client creates a separate DB connection
-        $this->useCleanupRollback = false;
-
-        return self::createClient(
-            $this->clientOptions,
-            [
-                'PHP_AUTH_USER' => $username,
-                'PHP_AUTH_PW'   => $password,
-            ]
-        );
-    }
-
     /**
      * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
      * This may lead to corrupted data. Make sure you know what you are doing.
@@ -161,7 +157,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $prefix = MAUTIC_TABLE_PREFIX;
 
         foreach ($tables as $table) {
-            $this->connection->executeQuery("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+            $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         }
     }
 
@@ -170,9 +168,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function applySqlFromFile($file): void
     {
-        $connection = $this->connection;
-        $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
-        $envVars    = [
+        $command = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
+        $envVars = [
             'MYSQL_PWD'      => $this->connection->getParams()['password'],
             'db_host'        => $this->connection->getParams()['host'],
             'db_port'        => $this->connection->getParams()['port'],

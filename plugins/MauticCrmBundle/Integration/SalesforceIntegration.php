@@ -1146,6 +1146,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fromDate,
             $toDate
         ) : 0;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
         $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -1213,7 +1214,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // If there is still room - grab Mautic leads to create if the Lead object is enabled
             $sfEntityRecords = [];
-            if ('Lead' === $sfObject && (null === $limit || $limit > 0) && !empty($mauticLeadFieldString)) {
+            if ('Lead' === $sfObject && ($limit > 0) && !empty($mauticLeadFieldString)) {
                 try {
                     $sfEntityRecords = $this->getMauticContactsToCreate(
                         $checkEmailsInSF,
@@ -1606,7 +1607,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $limit,
         $fromDate,
         $toDate,
-        &$totalCount
+        &$totalCount,
     ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
@@ -1660,7 +1661,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount,
-        $progress = null
+        $progress = null,
     ) {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $leadsToCreate         = $integrationEntityRepo->findLeadsToCreate(
@@ -1732,7 +1733,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $object,
         &$entity,
         $objectId = null,
-        $sfRecord = null
+        $sfRecord = null,
     ): array {
         $body         = [];
         $updateEntity = [];
@@ -1841,13 +1842,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function prepareFieldsForPush($config): array
     {
-        $leadFields = array_unique(array_values($config['leadFields']));
+        $leadFields = array_unique(array_values($config['leadFields'] ?? []));
         $leadFields = array_combine($leadFields, $leadFields);
         unset($leadFields['mauticContactTimelineLink']);
         unset($leadFields['mauticContactIsContactableByEmail']);
 
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
-        $fieldKeys          = array_keys($config['leadFields']);
+        $fieldKeys          = array_keys($config['leadFields'] ?? []);
         $supportedObjects   = [];
         $objectFields       = [];
 
@@ -2100,7 +2101,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $objectFields,
         $mauticLeadFieldString,
         $sfEntityRecords,
-        $progress = null
+        $progress = null,
     ) {
         foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
             $skipObject = false;
@@ -2246,7 +2247,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$mauticData,
         &$checkEmailsInSF,
         &$processedLeads,
-        $objectFields
+        $objectFields,
     ) {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
@@ -2364,7 +2365,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // Pass in the whole config
             $fields = $fieldsToUpdate;
         } else {
-            $fields = array_flip($fieldsToUpdate);
+            $fields = array_flip($fieldsToUpdate ?? []);
         }
 
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
@@ -2509,11 +2510,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $sfObject
      * @param string $sfFieldString
      *
-     * @return mixed
-     *
      * @throws ApiErrorException
      */
-    public function getDncHistory($sfObject, $sfFieldString)
+    public function getDncHistory($sfObject, $sfFieldString): mixed
     {
         return $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
     }
@@ -2713,7 +2712,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'company'
         );
 
-        $totalCount = $totalToProcess = $totalToCreate + $totalToUpdate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
@@ -2754,7 +2754,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // If there is still room - grab Mautic companies to create if the Lead object is enabled
             $sfEntityRecords = [];
-            if ((null === $limit || $limit > 0) && !empty($mauticCompanyFieldString)) {
+            if (($limit > 0) && !empty($mauticCompanyFieldString)) {
                 $this->getMauticEntitesToCreate(
                     $checkCompaniesInSF,
                     $mauticCompanyFieldString,
@@ -2840,7 +2840,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$companiesToSync,
         $objectFields,
         $sfEntityRecords,
-        $progress = null
+        $progress = null,
     ) {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
             $syncCompany = false;
@@ -2929,7 +2929,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$mauticData,
         &$checkCompaniesInSF,
         &$processedCompanies,
-        $objectFields
+        $objectFields,
     ) {
         foreach ($checkCompaniesInSF as $key => $company) {
             if (!empty($company['integration_entity_id']) and array_key_exists($key, $processedCompanies)) {
@@ -2965,7 +2965,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount,
-        $internalEntity
+        $internalEntity,
     ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
@@ -2997,7 +2997,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount,
-        $progress = null
+        $progress = null,
     ) {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $entitiesToCreate      = $integrationEntityRepo->findLeadsToCreate(

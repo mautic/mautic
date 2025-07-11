@@ -200,7 +200,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-09-01 09:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertEquals('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -255,7 +255,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-09-01 11:00:00', $executionDate->format('Y-m-d H:i:s'));
+        // It is OK to set the execution date 15 seconds in the past. It means execute right now.
+        $this->assertEquals('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -343,45 +344,38 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with('campaign_time_wait_on_event_false')
             ->willReturn('PT1H');
+        $matcher = $this->exactly(3);
 
-        $this->dispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                [
-                    $this->callback(
-                        function (ScheduledEvent $event) use ($now) {
-                            // The first log was scheduled to 10 minutes.
-                            Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getLog()->getTriggerDate());
-                            Assert::assertLessThan($now->modify('+11 minutes'), $event->getLog()->getTriggerDate());
+        $this->dispatcher->expects($matcher)
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $callback = function (ScheduledEvent $event) use ($now) {
+                        // The first log was scheduled to 10 minutes.
+                        Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getLog()->getTriggerDate());
+                        Assert::assertLessThan($now->modify('+11 minutes'), $event->getLog()->getTriggerDate());
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED, $parameters[1]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $callback = function (ScheduledEvent $event) use ($now) {
+                        // The second log was not scheduled so the default interval is used.
+                        Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getLog()->getTriggerDate());
+                        Assert::assertLessThan($now->modify('+61 minutes'), $event->getLog()->getTriggerDate());
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED, $parameters[1]);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $callback = function (ScheduledBatchEvent $event) {
+                        Assert::assertCount(2, $event->getScheduled());
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
+                }
 
-                            return true;
-                        }
-                    ),
-                    CampaignEvents::ON_EVENT_SCHEDULED,
-                ],
-                [
-                    $this->callback(
-                        function (ScheduledEvent $event) use ($now) {
-                            // The second log was not scheduled so the default interval is used.
-                            Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getLog()->getTriggerDate());
-                            Assert::assertLessThan($now->modify('+61 minutes'), $event->getLog()->getTriggerDate());
-
-                            return true;
-                        }
-                    ),
-                    CampaignEvents::ON_EVENT_SCHEDULED,
-                ],
-                [
-                    $this->callback(
-                        function (ScheduledBatchEvent $event) {
-                            Assert::assertCount(2, $event->getScheduled());
-
-                            return true;
-                        }
-                    ),
-                    CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
-                ]
-            );
+                return $parameters[0];
+            });
 
         $scheduler         = new EventScheduler(
             $this->logger,

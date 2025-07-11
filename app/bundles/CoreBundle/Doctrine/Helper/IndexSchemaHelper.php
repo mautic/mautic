@@ -51,7 +51,7 @@ class IndexSchemaHelper
      */
     public function __construct(
         protected Connection $db,
-        protected $prefix
+        protected $prefix,
     ) {
         $this->sm = $this->db->createSchemaManager();
     }
@@ -63,7 +63,7 @@ class IndexSchemaHelper
      */
     public function setName($name)
     {
-        if (!$this->sm->tablesExist($this->prefix.$name)) {
+        if (!$this->sm->tablesExist([$this->prefix.$name])) {
             throw new SchemaException("Table $name does not exist!");
         }
 

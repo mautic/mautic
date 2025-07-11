@@ -6,19 +6,20 @@
 // Base styles
 // ---------------------
 .btn {
+  --btn-height: var(--spacing-08);
+  --btn-line-height: var(--btn-height);
   transition: var(--transition-all-productive);
   border: 1px solid transparent;
-  .outline();
-  border-radius: 20px;
   display: inline-flex;
   align-items: center;
-  height: var(--spacing-08);
-  line-height: var(--spacing-08);
+  height: var(--btn-height);
+  line-height: var(--btn-line-height);
   font-size: 14px;
   padding: 0 var(--spacing-05);
   gap: var(--spacing-03);
   justify-content: space-between;
   width: fit-content;
+  .outline();
   &:hover {
     border: 1px solid transparent;
   }
@@ -40,7 +41,7 @@
     > span {margin-right: 8px;}
   }
 
-  // reset font awesome width
+  // reset icon width
   i {
     min-width: 13px;
     order: 2;
@@ -89,14 +90,7 @@
     &.btn-info { color: @brand-info; }
   }
 
-  &.btn-block {width: 100%;}
-}
-
-.btn ~ .btn,
-.btn ~ .btn-group,
-.btn-group ~ .btn,
-.btn-group ~ .btn-group {
-  margin-left: 5px;
+  &.btn-block, &.btn-wide {width: 100%;}
 }
 
 // Hierarchycal buttons
@@ -145,12 +139,7 @@
 }
 
 /// Tertiary + automatic error fixes
-.btn-tertiary,
-.btn-tertiary + .dropdown-toggle,
-.btn-primary + .btn-primary:not(.dropdown-toggle),
-.btn-primary + .btn-primary + .btn-primary,
-.btn-primary + .btn-primary + .btn-secondary,
-.open > .btn-tertiary + .dropdown-toggle.btn-primary {
+.btn-tertiary {
   .button-variant(
     @background: transparent,
     @text-color: var(--button-tertiary),
@@ -192,7 +181,7 @@
     justify-content: space-between;
     gap: var(--spacing-07);
     width: 100%;
-    height: 100%;
+    height: var(--btn-line-height);
   }
 }
 
@@ -250,7 +239,6 @@
   padding: 0;
   align-items: center;
   aspect-ratio: 1 / 1;
-  border-radius: 20px;
 }
 
 .btn-toggletip {
@@ -260,12 +248,12 @@
 }
 
 // Standard sizes
-.btn-xs, .btn[size="xs"] { height: var(--spacing-06); line-height: var(--spacing-06); }
-.btn-sm, .btn[size="sm"] { height: var(--spacing-07); line-height: var(--spacing-07); }
-.btn-md, .btn[size="md"] { height: var(--spacing-08); line-height: var(--spacing-08); }
-.btn-lg, .btn[size="lg"] { height: var(--spacing-09); line-height: var(--spacing-09); }
-.btn-xl, .btn[size="xl"] { height: var(--spacing-10); line-height: var(--spacing-08); align-items: flex-start; }
-.btn-2xl, .btn[size="2xl"] { height: var(--spacing-11); line-height: var(--spacing-08); align-items: flex-start; }
+.btn-xs, .btn[size="xs"] { --btn-height: var(--spacing-06); }
+.btn-sm, .btn[size="sm"] { --btn-height: var(--spacing-07); }
+.btn-md, .btn[size="md"] { --btn-height: var(--spacing-08); }
+.btn-lg, .btn[size="lg"] { --btn-height: var(--spacing-09); }
+.btn-xl, .btn[size="xl"] { --btn-height: var(--spacing-10); --btn-line-height: var(--spacing-08); align-items: flex-start; }
+.btn-2xl, .btn[size="2xl"] { --btn-height: var(--spacing-11); --btn-line-height: var(--spacing-08); align-items: flex-start; }
 
 // Fix for outline
 .dropdown-toggle,
@@ -283,11 +271,14 @@
 // Make a button look and behave like a link
 .btn-link {
   font-weight: @btn-font-weight;
+  color: var(--link-primary);
   height: auto;
   line-height: normal;
   padding: 0;
   &:hover,
   &:focus { text-decoration: none; }
+
+  i { font-size: 18px; }
 }
 
 .btn-info {
@@ -315,12 +306,7 @@
         height: var(--spacing-10);
         width: var(--spacing-13);
         border-radius: 0;
-        &:first-child { border-radius: 0 0 0 calc(var(--border-radius-md) + 3px); }
-        &:last-child { border-radius: 0 0 calc(var(--border-radius-md) + 3px) 0; }
-        &:only-child {
-          border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
-          flex-grow: 1;
-        }
+        &:only-child { flex-grow: 1; }
       }
       .btn + .btn { margin: 0; }
       &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }

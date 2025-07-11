@@ -10,7 +10,7 @@ class CompanyReportData
 {
     public function __construct(
         private FieldModel $fieldModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

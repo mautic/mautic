@@ -1,36 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
 class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $mockListModel;
+    private MockObject&ListModel $mockListModel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $context;
+    private MockObject&ExecutionContext $context;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
+    private MockObject&RequestStack $requestStack;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Request
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $request;
+    private Request $request;
 
     private CircularDependencyValidator $validator;
 
@@ -41,7 +32,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel = $this->createMock(ListModel::class);
         $this->context       = $this->createMock(ExecutionContext::class);
         $this->requestStack  = $this->createMock(RequestStack::class);
-        $this->request       = $this->createMock(Request::class);
+        $this->request       = new Request();
 
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -154,21 +145,15 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 ->method('addViolation');
         }
 
-        $this->request->expects($this->once())
-            ->method('get')
-            ->with('_route_params')
-            ->willReturn([
-                'objectId' => $currentSegmentId,
-            ]);
+        $this->request->request->add(['_route_params' => ['objectId' => $currentSegmentId]]);
 
         return $this->validator;
     }
 
     /**
      * Verify a constraint message.
-     *
-     * @dataProvider validateDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
     public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)

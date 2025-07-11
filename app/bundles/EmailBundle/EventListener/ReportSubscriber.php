@@ -160,7 +160,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private StatRepository $statRepository,
         private EmailRepository $emailRepository,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private FieldsBuilder $fieldsBuilder
+        private FieldsBuilder $fieldsBuilder,
     ) {
     }
 
@@ -263,6 +263,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced');
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.sent.read.clicked.unsubscribed');
         $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
+        $event->addGraph($context, 'table', 'mautic.email.table.most.emails.table');
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
             // Ratios are not applicable for individual stats
@@ -569,7 +570,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
+                            'iconClass' => 'ri-flag-line',
                         ]
                     );
                     break;
@@ -608,7 +609,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             [
                                 'data'      => $chart->render(),
                                 'name'      => $g,
-                                'iconClass' => 'fa-flag-checkered',
+                                'iconClass' => 'ri-flag-line',
                             ]
                         );
                     }

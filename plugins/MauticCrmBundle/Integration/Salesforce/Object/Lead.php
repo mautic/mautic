@@ -9,7 +9,7 @@ class Lead
     public function __construct(
         private $id,
         private $campaignId,
-        private $isDeleted
+        private $isDeleted,
     ) {
     }
 

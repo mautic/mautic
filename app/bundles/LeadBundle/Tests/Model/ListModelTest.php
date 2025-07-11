@@ -86,10 +86,9 @@ class ListModelTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceTypeTestDataProvider
-     *
      * @param string|null $sourceType
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('sourceTypeTestDataProvider')]
     public function testGetSourceLists(array $getLookupResultsReturn, $sourceType, array $expected): void
     {
         $this->prepareMockForTestGetSourcesLists($getLookupResultsReturn);
@@ -122,7 +121,7 @@ class ListModelTest extends TestCase
                 $this->createMock(Translator::class),
                 $this->createMock(UserHelper::class),
                 $this->createMock(LoggerInterface::class)])
-            ->addMethods([])
+            ->onlyMethods([])
             ->getMock();
 
         $this->fixture = $mockListModel;
@@ -341,7 +340,7 @@ class ListModelTest extends TestCase
     {
         return new class($id) extends LeadList {
             public function __construct(
-                private int $id
+                private int $id,
             ) {
                 parent::__construct();
             }
@@ -357,7 +356,7 @@ class ListModelTest extends TestCase
     {
         return new class($id) extends Lead {
             public function __construct(
-                private int $id
+                private int $id,
             ) {
                 parent::__construct();
             }

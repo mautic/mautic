@@ -31,7 +31,6 @@ final class SegmentConfigTypeTest extends TestCase
     {
         $blockPrefix = $this->segmentConfigType->getBlockPrefix();
         $this->assertNotEmpty($blockPrefix);
-        $this->assertTrue(is_string($blockPrefix));
     }
 
     public function testThatBuildFormMethodAddsSegmentBuildAndRebuildTimeWarningOption(): void
@@ -59,17 +58,23 @@ final class SegmentConfigTypeTest extends TestCase
             ],
             'required' => false,
         ];
+        $matcher = $this->exactly(2);
 
-        $this->formBuilderInterface->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                ['segment_rebuild_time_warning',
-                    NumberType::class,
-                    $rebuildParameters, ],
-                ['segment_build_time_warning',
-                    NumberType::class,
-                    $buildParameters, ],
-            );
+        $this->formBuilderInterface->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $rebuildParameters, $buildParameters) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('segment_rebuild_time_warning', $parameters[0]);
+                    $this->assertSame(NumberType::class, $parameters[1]);
+                    $this->assertSame($rebuildParameters, $parameters[2]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('segment_build_time_warning', $parameters[0]);
+                    $this->assertSame(NumberType::class, $parameters[1]);
+                    $this->assertSame($buildParameters, $parameters[2]);
+                }
+
+                return $this->formBuilderInterface;
+            });
 
         $this->segmentConfigType->buildForm($this->formBuilderInterface, []);
     }

@@ -16,7 +16,7 @@ class ConfigIntegrationsHelper
     private array $integrations = [];
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper
+        private IntegrationsHelper $integrationsHelper,
     ) {
     }
 

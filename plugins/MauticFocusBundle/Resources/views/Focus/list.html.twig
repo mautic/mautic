@@ -10,16 +10,23 @@
 
 {% block content %}
   {% if isIndex %}
-    <div id="page-list-wrapper" class="panel panel-default">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
+            'searchHelp': 'mautic.focus.help.searchcommands',
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': permissions['focus:items:create'],
                 },
                 'routeBase': 'focus',
-            }),
+            },
+            'bulk_actions': {
+                'routeBase': 'focus',
+                'templateButtons': {
+                    'delete': permissions['focus:items:delete'],
+                },
+            },
             'quickFilters': [
                 {
                     'search': 'mautic.core.searchcommand.ispublished',

@@ -10,16 +10,14 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class EventControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider fieldAndValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
     public function testCreateContactConditionOnStateField(string $field, string $value): void
     {
         // Fetch the campaign condition form.
         $uri = '/s/campaigns/events/new?type=lead.field_value&eventType=condition&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -38,9 +36,10 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
@@ -81,9 +80,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
     public function testActionAtSpecificTimeWorkflow(): void
     {
         $uri = '/s/campaigns/events/new?type=lead.changepoints&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=no&anchorEventType=condition';
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -111,9 +110,10 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
@@ -130,9 +130,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         // GET EDIT FORM
         $uri = "/s/campaigns/events/edit/{$eventId}?campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=no&anchorEventType=condition";
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
 
         // FILL EDIT FORM
         $responseData = json_decode($response->getContent(), true);
@@ -160,9 +160,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertTrue($responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
@@ -180,9 +180,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
     public function testCloneWorkflow(): void
     {
         $uri = '/s/campaigns/events/new?type=lead.changepoints&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=no&anchorEventType=condition';
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -210,18 +210,19 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
         $eventId = $responseData['event']['id'];
 
         // CLONE EVENT
         $uri = "/s/campaigns/events/clone/{$eventId}?campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775";
-        $this->client->request('POST', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('POST', $uri);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
         $this->assertSame('campaignEventClone', $responseData['mauticContent']);
@@ -230,9 +231,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         // INSERT EVENT
         $uri = "/s/campaigns/events/insert/{$eventId}?campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775";
-        $this->client->request('POST', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('POST', $uri);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
         $this->assertSame('action', $responseData['eventType']);
@@ -246,9 +247,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Fetch the campaign action form.
         $uri = '/s/campaigns/events/new?type=email.send&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response
         $responseData = json_decode($response->getContent(), true);

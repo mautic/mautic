@@ -5,10 +5,11 @@ namespace Mautic\ReportBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
@@ -30,7 +31,7 @@ class ReportApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, protected UserHelper $userHelper)
     {
         $reportModel = $modelFactory->getModel('report');
         \assert($reportModel instanceof ReportModel);
@@ -41,22 +42,36 @@ class ReportApiController extends CommonApiController
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
      * Obtains a compiled report.
      *
      * @param int $id Report ID
-     *
-     * @return Response
      */
-    public function getEntityAction(Request $request, $id)
+    public function getEntityAction(Request $request, $id): Response
     {
-        $entity = $this->model->getEntity($id);
+        try {
+            if (!$this->security->isGranted($this->permissionBase.':view')) {
+                return $this->accessDenied();
+            }
+        } catch (PermissionException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
+
+        $entity        = $this->model->getEntity($id);
 
         if (!$entity instanceof $this->entityClass) {
             return $this->notFound();
+        }
+
+        if (
+            $this->security->checkPermissionExists($this->permissionBase.':viewother')
+            && !$this->security->isGranted($this->permissionBase.':viewother')
+            && $entity->getCreatedBy() !== $this->userHelper->getUser()->getId()
+        ) {
+            return $this->accessDenied();
         }
 
         $reportData = $this->model->getReportData($entity, $this->formFactory, $this->getOptionsFromRequest($request));

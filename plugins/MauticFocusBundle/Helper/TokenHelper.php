@@ -14,7 +14,7 @@ class TokenHelper
     public function __construct(
         protected FocusModel $model,
         protected RouterInterface $router,
-        protected CorePermissions $security
+        protected CorePermissions $security,
     ) {
     }
 
@@ -29,7 +29,7 @@ class TokenHelper
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $token = '{focus='.$id.'}';
-                $focus = $this->model->getEntity($id);
+                $focus = $this->model->getEntity((int) $id);
                 if (null !== $focus
                     && (
                         $focus->isPublished()

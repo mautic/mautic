@@ -20,7 +20,7 @@ class MenuBuilder
         private FactoryInterface $factory,
         private MatcherInterface $matcher,
         EventDispatcherInterface $dispatcher,
-        private MenuHelper $menuHelper
+        private MenuHelper $menuHelper,
     ) {
         $this->dispatcher = $dispatcher;
     }
@@ -86,6 +86,13 @@ class MenuBuilder
             $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
             $menuItems    = $event->getMenuItems();
+
+            //  Clean menu items: remove dropdown menu entry if empty (need to do it after all events are dispatched)
+            foreach ($menuItems['children'] as $key => $item) {
+                if (empty($item['route']) && empty($item['children'])) {
+                    unset($menuItems['children'][$key]);
+                }
+            }
 
             // KNP Menu explicitly requires a menu name since v3
             if (empty($menuItems['name'])) {

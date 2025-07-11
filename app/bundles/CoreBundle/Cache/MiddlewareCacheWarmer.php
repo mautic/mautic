@@ -16,7 +16,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     private \SplPriorityQueue $specs;
 
     public function __construct(
-        private string $env
+        private string $env,
     ) {
         $this->specs     = new \SplPriorityQueue();
     }
@@ -24,7 +24,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     /**
      * @inerhitDoc
      */
-    public function warmUp(string $cacheDirectory)
+    public function warmUp(string $cacheDirectory, ?string $buildDir = null): array
     {
         $this->cacheFile = sprintf('%s/middlewares.cache.php', $cacheDirectory);
         $this->createCacheFile($cacheDirectory);

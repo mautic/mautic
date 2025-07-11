@@ -19,7 +19,7 @@ class SegmentSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private ListModel $listModel,
         private SegmentUsedInCampaignsValidator $segmentUsedInCampaignsValidator,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

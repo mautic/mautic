@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 class ConfigExtension extends AbstractExtension
 {
     public function __construct(
-        private ConfigHelper $configHelper
+        private ConfigHelper $configHelper,
     ) {
     }
 

@@ -3,16 +3,12 @@
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(Parser::class)]
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that a bounce is found through DsnReport
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a bounce is found through DsnReport')]
     public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
@@ -27,14 +23,10 @@ DSN;
         $parser = new Parser($message);
         $bounce = $parser->parse();
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
+        $this->assertSame('sdfgsdfg@seznan.cz', $bounce->getContactEmail());
     }
 
-    /**
-     * @testdox Test that a bounce is found through body
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a bounce is found through body')]
     public function testBouncedEmailIsReturnedFromParsedBody(): void
     {
         $message            = new Message();
@@ -59,6 +51,6 @@ BODY;
         $parser = new Parser($message);
         $bounce = $parser->parse();
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
+        $this->assertSame('recipient@example.net', $bounce->getContactEmail());
     }
 }

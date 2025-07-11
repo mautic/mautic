@@ -8,7 +8,7 @@ final class ObjectCrate
 {
     public function __construct(
         private string $key,
-        private string $name
+        private string $name,
     ) {
     }
 

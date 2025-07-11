@@ -23,6 +23,7 @@ use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -464,6 +465,8 @@ class EmailType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $transformer = new IdToEntityModelTransformer(
             $this->em,
             \Mautic\AssetBundle\Entity\Asset::class,
@@ -492,12 +495,13 @@ class EmailType extends AbstractType
         $builder->add('sessionId', HiddenType::class);
         $builder->add('emailType', HiddenType::class);
 
+        $extraButtons                      = [];
         $extraButtons['pre_extra_buttons'] = [
             [
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin text-primary btn-builder',
+                    'class'   => 'btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder',
                     'icon'    => 'ri-layout-line',
                     'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                 ],
@@ -635,7 +639,7 @@ class EmailType extends AbstractType
         $view->vars['stages']    = $stageChoices;
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailform';
     }

@@ -175,9 +175,9 @@
 @btn-link-disabled-color:        @gray-light;
 
 // Allows for customizing button radius independently from global border radius
-@btn-border-radius-base:         32px;
-@btn-border-radius-large:        32px;
-@btn-border-radius-small:        32px;
+@btn-border-radius-base:         0px;
+@btn-border-radius-large:        0px;
+@btn-border-radius-small:        0px;
 
 
 //== Forms
@@ -210,11 +210,11 @@
 @input-color-placeholder:        var(--text-placeholder);
 
 //** Default `.form-control` height
-@input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);
+@input-height-base:              40px;
 //** Large `.form-control` height
-@input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2);
+@input-height-large:             48px;
 //** Small `.form-control` height
-@input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2);
+@input-height-small:             32px;
 
 //** `.form-group` margin
 @form-group-margin-bottom:       15px;
@@ -543,7 +543,7 @@
 //** Popover body background color
 @popover-bg:                          transparent;
 //** Popover maximum width
-@popover-max-width:                   276px;
+@popover-max-width:                   366px;
 //** Popover border color
 @popover-border-color:                rgba(0,0,0,.1);
 //** Popover fallback border color
@@ -678,20 +678,20 @@
 
 @list-group-disabled-text-color: @list-group-disabled-color;
 //** `.list-group-item` border color
-@list-group-border:             transparent;
+@list-group-border:             @hr-border;
 //** List group border radius
-@list-group-border-radius:      0px;
+@list-group-border-radius:      @border-radius-base;
 
 //** Background color of single list items on hover
 @list-group-hover-bg:           var(--layer-hover);
 //** Text color of active list items
-@list-group-active-color:       var(--text-inverse);
+@list-group-active-color:       var(--text-primary);
 //** Background color of active list items
-@list-group-active-bg:          var(--layer-selected-inverse);
+@list-group-active-bg:          @list-group-hover-bg;
 //** Border color of active list elements
 @list-group-active-border:      @hr-border;
 //** Text color for content within active list items
-@list-group-active-text-color:  var(--text-inverse);
+@list-group-active-text-color:  var(--text-primary);
 
 //** Text color of disabled list items
 @list-group-disabled-color:      var(--text-disabled);

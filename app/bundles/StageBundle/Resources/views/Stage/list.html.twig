@@ -9,16 +9,22 @@
 
 {% block content %}
 {% if isIndex %}
-<div id="page-list-wrapper" class="panel panel-default">
+<div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
         'action': currentRoute,
-        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'page_actions': {
             'templateButtons': {
                 'new': permissions['stage:stages:create'],
             },
             'routeBase': 'stage',
-        }),
+        },
+        'bulk_actions': {
+            'routeBase': 'stage',
+            'templateButtons': {
+                'delete': permissions['stage:stages:delete']
+            }
+        },
         'quickFilters': [
             {
                 'search': 'mautic.core.searchcommand.ispublished',
@@ -46,6 +52,7 @@
             }
         ]
     }) }}
+
     <div class="page-list">
         {{ block('listResults') }}
     </div>
@@ -64,11 +71,7 @@
                 {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'        : 'true',
-                        'target'          : '#stageTable',
-                        'routeBase'       : 'stage',
-                        'templateButtons' : {
-                            'delete' : permissions['stage:stages:delete'],
-                        },
+                        'target'          : '#stageTable'
                     }) -}}
                     {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
@@ -123,19 +126,15 @@
                             {% else %}
                                 {{ item.getName() }}
                             {% endif %}
+                            {{ customContent('stage.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
-                        {% if description %}
-                            <div class="text-muted mt-4">
-                                <small>{{ description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = category ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
@@ -155,7 +154,27 @@
             }) -}}
     </div>
     {% else %}
-        {{- include('@MauticCore/Helper/noresults.html.twig',
+        {% if searchValue is not empty %}
+            {{- include('@MauticCore/Helper/noresults.html.twig',
             {'tip' : 'mautic.stage.action.noresults.tip'}) -}}
+        {% else %}
+            <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+                {% set childContainer %}
+                    <div class="mt-32 mb-md">
+                        {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                            'pictogram': 'progress',
+                            'size': '80'
+                        } %}
+                    </div>
+                {% endset %}
+        
+                {{ include('@MauticCore/Components/content-block.html.twig', {
+                    heading: 'mautic.stage.contentblock.heading',
+                    subheading: 'mautic.stage.contentblock.subheading',
+                    copy: 'mautic.stage.contentblock.copy',
+                    childContainer: childContainer,
+                }) }}
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock %}

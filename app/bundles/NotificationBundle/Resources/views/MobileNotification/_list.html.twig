@@ -16,11 +16,7 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'routeBase': 'mobile_notification',
-                        'templateButtons': {
-                            'delete': permissions['notification:mobile_notifications:deleteown'] or permissions['notification:mobile_notifications:deleteother'],
-                        },
+                    'checkall': 'true',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -81,9 +77,9 @@
                             {% if 'template' == type %}
                                 {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'notification'}) }}
                             {% else %}
-                                <i class="ri-fw ri-lg ri-toggle-fill text-muted disabled"></i>
+                                <i class="ri-fw ri-lg ri-toggle-fill text-secondary disabled"></i>
                             {% endif %}
-                            <a href="{{ path('mautic_mobile_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
+                            <a href="{{ path('mautic_mobile_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                 {{ item.name }}
                                 {% if 'list' == type %}
                                     <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="ri-fw ri-list-check"></i></span>
@@ -92,10 +88,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats">
                         <span class="mt-xs label label-green"

@@ -84,9 +84,47 @@ class MatchFilterForLeadTraitTest extends TestCase
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
-    /**
-     * @dataProvider dateMatchTestProvider
-     */
+    public function testMatchFilterForLeadWithNumberType(): void
+    {
+        $this->lead['custom'] = '10.5';
+
+        $this->filter[0]['type']     = 'number';
+        $this->filter[0]['operator'] = OperatorOptions::EQUAL_TO;
+        $this->filter[0]['filter']   = '10.5';
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+
+        $this->filter[0]['operator'] = OperatorOptions::GREATER_THAN_OR_EQUAL;
+        $this->filter[0]['filter']   = '5.5';
+        $this->filter                = [
+            1 => [
+                'display'  => null,
+                'field'    => 'custom',
+                'filter'   => '11.5',
+                'glue'     => 'and',
+                'object'   => 'lead',
+                'operator' => OperatorOptions::LESS_THAN_OR_EQUAL,
+                'type'     => 'number',
+            ],
+        ];
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+
+        $this->filter[0]['operator'] = OperatorOptions::LESS_THAN_OR_EQUAL;
+        $this->filter[0]['filter']   = '5.5';
+        $this->filter                = [
+            1 => [
+                'display'  => null,
+                'field'    => 'custom',
+                'filter'   => '11.5',
+                'glue'     => 'or',
+                'object'   => 'lead',
+                'operator' => OperatorOptions::GREATER_THAN_OR_EQUAL,
+                'type'     => 'number',
+            ],
+        ];
+        $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateMatchTestProvider')]
     public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
         $filters = [
@@ -124,11 +162,10 @@ class MatchFilterForLeadTraitTest extends TestCase
     }
 
     /**
-     * @dataProvider dataForInNotInOperatorFilter
-     *
      * @param array<string,string> $fieldDetails
      * @param array<string,string> $filterDetails
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForInNotInOperatorFilter')]
     public function testCheckLeadValueIsInFilter(array $fieldDetails, array $filterDetails, bool $expected): void
     {
         $lead = [
@@ -156,15 +193,13 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @return iterable<string, string[]>
      */
-    public function segmentMembershipFilterProvider(): iterable
+    public static function segmentMembershipFilterProvider(): iterable
     {
         yield 'Classic Segment Membership Filter' => ['leadlist'];
         yield 'Static Segment Membership Filter' => ['leadlist_static'];
     }
 
-    /**
-     * @dataProvider segmentMembershipFilterProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('segmentMembershipFilterProvider')]
     public function testIsContactSegmentRelationshipValidEmpty(string $filterField): void
     {
         $lead['id'] = 1;
@@ -200,7 +235,7 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function dataForInNotInOperatorFilter(): iterable
+    public static function dataForInNotInOperatorFilter(): iterable
     {
         // field details, filter details, expected.
         yield [

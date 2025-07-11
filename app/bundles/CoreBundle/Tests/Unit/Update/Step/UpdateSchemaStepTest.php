@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateSchemaStepTest extends AbstractStepTest
+class UpdateSchemaStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject|TranslatorInterface
@@ -37,6 +38,11 @@ class UpdateSchemaStepTest extends AbstractStepTest
      */
     private MockObject $eventDispatcher;
 
+    /**
+     * @var MockObject&HelperSet
+     */
+    private MockObject $helperSet;
+
     private UpdateSchemaStep $step;
 
     protected function setUp(): void
@@ -44,8 +50,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
         parent::setUp();
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
-
         $this->kernel         = $this->createMock(KernelInterface::class);
+        $this->helperSet      = $this->createMock(HelperSet::class);
         $this->kernel
             ->method('getBundles')
             ->willReturn([]);
@@ -58,7 +64,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn([]);
+            ->willReturn($this->helperSet);
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')
@@ -78,16 +84,16 @@ class UpdateSchemaStepTest extends AbstractStepTest
         /** @var ContainerInterface|MockObject $container */
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->kernel],
                 ['event_dispatcher', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->eventDispatcher],
                 ['doctrine:migrations:migrate', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->migrateCommand],
-            ]));
+            ]);
         $container->method('hasParameter')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['console.command.ids', true],
-                ['console.laze_command.ids', false],
-            ]));
+                ['console.lazy_command.ids', false],
+            ]);
 
         $container->method('getParameter')
             ->with('console.command.ids')
@@ -152,7 +158,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
-            $this->assertTrue(true);
+            $this->expectNotToPerformAssertions();
         } catch (UpdateFailedException) {
             $this->fail('UpdateFailedException should not have been thrown');
         }

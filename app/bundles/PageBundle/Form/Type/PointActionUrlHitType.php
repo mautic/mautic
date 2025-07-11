@@ -120,7 +120,7 @@ class PointActionUrlHitType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointaction_urlhit';
     }

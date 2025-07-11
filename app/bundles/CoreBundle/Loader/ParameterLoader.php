@@ -23,10 +23,10 @@ class ParameterLoader
     /**
      * @var array<string, mixed>
      */
-    private static $defaultParameters = [];
+    private static array $defaultParameters = [];
 
     public function __construct(
-        private string $rootPath = __DIR__.'/../../../'
+        private string $rootPath = __DIR__.'/../../../',
     ) {
         $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 
@@ -137,7 +137,6 @@ class ParameterLoader
             ->in(__DIR__.'/../../../../plugins/*/Config')
             ->name('config.php');
 
-        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             /** @var array<string, mixed> $config */
             $config = include $file->getPathname();

@@ -42,7 +42,7 @@ class FormFieldGroupType extends AbstractType
         $this->addSortableList($builder, $options, 'optionlist', $data);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'formfield_group';
     }

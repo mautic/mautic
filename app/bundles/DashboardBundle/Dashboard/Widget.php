@@ -2,10 +2,11 @@
 
 namespace Mautic\DashboardBundle\Dashboard;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -13,12 +14,10 @@ class Widget
 {
     public const FORMAT_HUMAN = 'M j, Y';
 
-    public const FORMAT_MYSQL = 'Y-m-d';
-
     public function __construct(
         private DashboardModel $dashboardModel,
         private UserHelper $userHelper,
-        private Session $session
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -59,16 +58,16 @@ class Widget
             return;
         }
 
-        $dateRangeFilter = $request->get('daterange', []);
+        $dateRangeFilter = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
 
         if (!empty($dateRangeFilter['date_from'])) {
             $from = new \DateTime($dateRangeFilter['date_from']);
-            $this->session->set('mautic.daterange.form.from', $from->format(self::FORMAT_MYSQL));
+            $this->requestStack->getSession()->set('mautic.daterange.form.from', $from->format(DateTimeHelper::FORMAT_DB_DATE_ONLY));
         }
 
         if (!empty($dateRangeFilter['date_to'])) {
             $to = new \DateTime($dateRangeFilter['date_to']);
-            $this->session->set('mautic.daterange.form.to', $to->format(self::FORMAT_MYSQL));
+            $this->requestStack->getSession()->set('mautic.daterange.form.to', $to->format(DateTimeHelper::FORMAT_DB_DATE_ONLY));
         }
 
         $this->dashboardModel->clearDashboardCache();

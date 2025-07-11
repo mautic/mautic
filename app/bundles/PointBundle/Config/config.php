@@ -111,6 +111,8 @@ return [
     ],
 
     'categories' => [
-        'point' => null,
+        'point' => [
+            'class' => Mautic\PointBundle\Entity\Point::class,
+        ],
     ],
 ];

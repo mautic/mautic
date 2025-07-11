@@ -19,10 +19,9 @@ class FlashBag
     public const LEVEL_NOTICE    = 'notice';
 
     public function __construct(
-        private Session $session,
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
-        private NotificationModel $notificationModel
+        private NotificationModel $notificationModel,
     ) {
     }
 
@@ -46,12 +45,15 @@ class FlashBag
             $translatedMessage = $this->translator->trans($message, $messageVars, $domain);
         }
 
-        $this->session->getFlashBag()->add($level, $translatedMessage);
+        $session = $this->requestStack->getSession();
+        if ($session instanceof Session) {
+            $session->getFlashBag()->add($level, $translatedMessage);
+        }
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             $iconClass = match ($level) {
                 self::LEVEL_WARNING => 'text-warning ri-alert-line',
-                self::LEVEL_ERROR   => 'text-danger ri-error-warning-line-circle',
+                self::LEVEL_ERROR   => 'text-danger ri-error-warning-line',
                 default             => 'ri-information-2-line',
             };
 

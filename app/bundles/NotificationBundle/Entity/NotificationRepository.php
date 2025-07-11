@@ -22,7 +22,7 @@ class NotificationRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from(Notification::class, 'e', 'e.id');
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
@@ -76,7 +76,7 @@ class NotificationRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
