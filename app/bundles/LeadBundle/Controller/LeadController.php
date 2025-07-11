@@ -62,7 +62,7 @@ class LeadController extends FormController
     use FrequencyRuleTrait;
     use LeadBatchActionTrait;
 
-    protected const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+    protected const LOAD_RESULTS_IN_CHUNKS_OF = 100;
 
     /**
      * @param int $page

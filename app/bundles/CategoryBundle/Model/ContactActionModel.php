@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactActionModel
 {
-    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+    public const LOAD_RESULTS_IN_CHUNKS_OF = 100;
 
     public function __construct(
         private LeadModel $contactModel,

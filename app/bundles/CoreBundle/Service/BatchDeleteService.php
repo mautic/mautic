@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Tag;
 
 final class BatchDeleteService
 {
-    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+    public const LOAD_RESULTS_IN_CHUNKS_OF = 100;
 
     public function __construct(
         private readonly CorePermissions $security,

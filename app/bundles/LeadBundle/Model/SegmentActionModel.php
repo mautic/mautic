@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 class SegmentActionModel
 {
-    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+    public const LOAD_RESULTS_IN_CHUNKS_OF = 100;
 
     public function __construct(
         private LeadModel $contactModel,
