@@ -256,10 +256,7 @@ Mautic.getIntegrationFields = function(settings, page, el) {
             if (inModal) {
                 Mautic.stopModalLoadingBar(modalId);
             }
-        },
-        false,
-        false,
-        "GET"
+        }
     );
 };
 

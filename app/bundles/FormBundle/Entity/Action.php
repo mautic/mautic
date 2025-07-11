@@ -5,11 +5,35 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Action
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "action:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "action:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Action implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -83,6 +107,8 @@ class Action
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
+
+        static::addUuidField($builder);
     }
 
     /**

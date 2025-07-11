@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
@@ -45,31 +46,20 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->inactiveContactFinder = $this->getMockBuilder(InactiveContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
 
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(Translator::class);
 
-        $this->eventScheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventScheduler = $this->createMock(EventScheduler::class);
 
-        $this->inactiveHelper = $this->getMockBuilder(InactiveHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
-        $this->eventExecutioner = $this->getMockBuilder(EventExecutioner::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventExecutioner = $this->createMock(EventExecutioner::class);
     }
 
     public function testNoContactsFoundResultsInNothingExecuted(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection());
@@ -85,8 +75,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoEventsFoundResultsInNothingExecuted(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection([new Event()]));
@@ -104,8 +93,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     public function testNextBatchOfContactsAreExecuted(): void
     {
         $decision = new Event();
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection([$decision]));
@@ -138,8 +126,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testValidationExecutesNothingIfCampaignUnpublished(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(false);
@@ -163,8 +150,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testValidationEvaluatesFoundEvents(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
@@ -211,7 +197,8 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->eventScheduler,
             $this->inactiveHelper,
-            $this->eventExecutioner
+            $this->eventExecutioner,
+            $this->createMock(ProcessSignalService::class)
         );
     }
 }

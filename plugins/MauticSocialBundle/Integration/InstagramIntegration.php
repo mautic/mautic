@@ -133,7 +133,7 @@ class InstagramIntegration extends SocialIntegration
         return false;
     }
 
-    public function getFormType()
+    public function getFormType(): null
     {
         return null;
     }

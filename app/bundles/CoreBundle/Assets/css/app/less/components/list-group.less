@@ -124,7 +124,7 @@ label.list-group-item {
   }
 }
 
-.ds-list-group {
+.list {
   counter-reset: item;
   list-style-type: none;
   padding-inline-start: 35px;
@@ -139,47 +139,64 @@ label.list-group-item {
       border-top: 1px solid var(--border-subtle);
     }
 
-    &:before {
-      @marker-size: 16px;
+    .list__item__marker {
+      --list-marker-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       position: absolute;
-      background: var(--layer);
       border-radius: 50%;
-      left: -35px;
-      width: @marker-size;
-      height: @marker-size;
+      left: -30px;
+      width: var(--list-marker-size);
+      height: var(--list-marker-size);
       text-align: center;
-      line-height: @marker-size;
-      font-size: calc(@marker-size - 5px);
-      color: var(--icon-secondary);
+      line-height: var(--list-marker-size);
+      font-size: calc(var(--list-marker-size) - 6px);
       transition: var(--transition-all-productive);
-      top: 11.8px;
+      top: 11px;
       vertical-align: middle;
+
+      &.list__item__marker--neutral {
+        background: var(--layer);
+        color: var(--icon-secondary);
+      }
+
+      &.list__item__marker--brand {
+        background: var(--primary-20);
+        color: var(--primary-50);
+      }
     }
 
-    &:hover:before {
+    &:hover .list__item__marker {
       transform: scale(1.2);
     }
   }
 }
 
-.ds-list-alphabet {
-  > li:before {
-    content: counter(item, upper-alpha);
-  }
-}
-
-.ds-list-check {
-  > li:before {
-    content: "\EB7B";
-    font-family: 'remixicon';
-  }
-}
-
-.ds-list-none {
+.list--none {
   padding-inline-start: 0;
 }
 
-.ds-list-bullet {
-  list-style-type: disc;
+.list--unordered.list--bullets {
+  list-style-type: none;
   padding-inline-start: 18px;
+
+  .list__item {
+    padding: var(--spacing-01) 0;
+    border: none;
+  }
+
+  .list__item:before {
+    position: absolute;
+    content: "–";
+    inset-inline-start: calc(-1 * 1em);
+  }
 }
+
+.list--unordered.list--nested {
+  .list__item:before {
+    content: "▪";
+    inset-inline-start: calc(-1*0.75em);
+  }  
+}
+

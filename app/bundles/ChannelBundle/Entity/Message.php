@@ -8,11 +8,38 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
-class Message extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "message:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "channels"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "message:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Message extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+
     /**
      * @var ?int
      */
@@ -74,6 +101,9 @@ class Message extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
+
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'message_projects_xref', 'message_id');
     }
 
     public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
@@ -102,11 +132,14 @@ class Message extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'message');
     }
 
     public function __construct()
     {
         $this->channels = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     /**

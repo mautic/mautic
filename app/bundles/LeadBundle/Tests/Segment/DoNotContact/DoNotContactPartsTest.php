@@ -9,9 +9,7 @@ use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 
 class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider dataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
     public function testParts(string $field, string $channel, int $type): void
     {
         $doNotContactParts = new DoNotContactParts($field);

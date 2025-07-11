@@ -16,7 +16,7 @@
         <div class="subtitle footer">
             <p></p>
             <p></p>
-            <p>{{ "now"|date("Y") }} © All rights reserved.</p>
+            <p>{{ "now"|date("Y") }} © {brand=name}. All rights reserved.</p>
         </div>
     </div>
     <div class="sidebar--right"></div>
@@ -94,7 +94,7 @@
         background-attachment: scroll;
         background-size: cover;
         background-image: url({{ getAssetUrl('themes/'~template~'/assets/chris-lee-70l1tDAI6rM-unsplash.jpg', null, null, true) }});
-        border-radius: 20px;
+        border-radius: {{ getRoundedCorners('lg') }}px;
     }
 
     .sidebar--left .mauticform_wrapper {
@@ -158,7 +158,7 @@
             width: 40%;
             padding: 50px 0;
             align-self: stretch;
-            border-radius: 24px;
+            border-radius: {{ getRoundedCorners('lg') }}px;
         }
 
         .h3 {

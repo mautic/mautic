@@ -116,12 +116,16 @@ Mautic.configureDynamicContentAtWhoTokens = function() {
     }
 };
 
-Mautic.insertTextInEditor = function (obj, text) {
-    const ckEditor = ckEditors.get( obj[0] );
-    ckEditor.model.change( writer => {
-        writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
+Mautic.insertHtmlInEditor = function (obj, html) {
+    const ckEditor = ckEditors.get(obj[0]);
+    const viewFragment = ckEditor.data.processor.toView(html);
+    const modelFragment = ckEditor.data.toModel(viewFragment);
+
+    ckEditor.model.change(writer => {
+        const insertPosition = ckEditor.model.document.selection.getFirstPosition();
+        writer.insert(modelFragment, insertPosition);
     });
-}
+};
 
 Mautic.MentionLinks =  function (editor) {
 
@@ -242,8 +246,8 @@ Mautic.getCKEditorFonts = function(fonts) {
     const CKEditorFonts = [];
 
     for (let i = 0; i < fonts.length; i++) {
-        if ('undefined' != typeof fonts[i].name) {
-            CKEditorFonts.push(fonts[i].name);
+        if ('undefined' != typeof fonts[i].font) {
+            CKEditorFonts.push(fonts[i].font);
         }
     }
 

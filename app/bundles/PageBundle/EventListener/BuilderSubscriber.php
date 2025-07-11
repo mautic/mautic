@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -31,6 +32,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     private const descriptionRegex       = '{pagemetadescription}';
 
+    public const brandName                = '{brand=name}';
+
     public const segmentListRegex         = '{segmentlist}';
 
     public const categoryListRegex        = '{categorylist}';
@@ -54,15 +57,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private array $renderedContentCache = [];
 
-    public function __construct(
-        private TokenHelper $tokenHelper,
-        private IntegrationHelper $integrationHelper,
-        private PageModel $pageModel,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory,
-        private TranslatorInterface $translator,
-        private Connection $connection,
-        private Environment $twig,
-    ) {
+    public function __construct(private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
     public static function getSubscribedEvents(): array
@@ -139,6 +135,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                         static::langBarRegex      => $this->translator->trans('mautic.page.token.lang'),
                         static::shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
                         static::titleRegex        => $this->translator->trans('mautic.core.title'),
+                        static::brandName         => $this->translator->trans('mautic.core.token.brand_name'),
                         static::descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
                         static::segmentListRegex  => $this->translator->trans('mautic.page.form.segmentlist'),
                         static::categoryListRegex => $this->translator->trans('mautic.page.form.categorylist'),
@@ -190,12 +187,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
             static::langBarRegex,
             static::shareButtonsRegex,
             static::titleRegex,
+            static::brandName,
             static::descriptionRegex,
             static::successmessage,
         ], [
             str_contains($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
             str_contains($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
             str_contains($content, static::titleRegex) ? $page->getTitle() : '',
+            str_contains($content, static::brandName) ? $this->coreParametersHelper->get('brand_name') : '',
             str_contains($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
             str_contains($content, static::successmessage) ? $this->renderSuccessMessage() : '',
         ], $content);

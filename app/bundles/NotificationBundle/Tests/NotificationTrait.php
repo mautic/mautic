@@ -15,6 +15,14 @@ trait NotificationTrait
 {
     private MockHandler $transportMock;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->transportMock = $this->getMockHandler(static::getContainer());
+        $this->setupIntegration(static::getContainer(), $this->em, self::API_ID, self::REST_API_ID);
+    }
+
     private function getMockHandler(ContainerInterface $container): MockHandler
     {
         return $container->get(MockHandler::class);

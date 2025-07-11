@@ -1,5 +1,5 @@
 .tile {
-    --layout-density-padding-inline-local: 16px;
+    --layout-density-padding-inline-local: clamp(var(--layout-density-padding-inline-min), var(--layout-density-padding-inline, var(--layout-density-padding-inline-normal)), var(--layout-density-padding-inline-max));
     position: relative;
     display: flex;
     flex-grow: 1;
@@ -12,36 +12,76 @@
     outline: 2px solid transparent;
     outline-offset: -2px;
 
-    &.tile-clickable,
-    &.tile-selectable {
-        box-sizing: border-box;
-        padding: 0;
-        border: 1px solid transparent;
+    &.tile--clickable,
+    &.tile--selectable,
+    &.tile--expandable {
+        border: 1px solid var(--border-no-color);
         margin: 0;
         font-family: inherit;
-        font-size: 100%;
         vertical-align: baseline;
-        font-size: 0.875rem;
         font-weight: 400;
         line-height: 1.28572;
-        padding: var(--layout-density-padding-inline-local);
         cursor: pointer;
         transition: var(--transition-all-productive);
-        outline-color: transparent;
+        outline: 2px solid transparent;
+        outline-offset: -2px;
+        text-align: unset;
 
         &:hover { background: var(--layer-hover); }
         &:focus {
             outline-color: var(--focus, #4e5e9e);
-            outline-offset: -2px;
             text-decoration: none;
         }
 
-        .tile-icon { inset-block-end: var(--layout-density-padding-inline-local); }
+        .tile-icon { 
+            inset-block-end: var(--layout-density-padding-inline-local); 
+            inset-block-start: unset;
+        }
     }
 
-    &.tile-clickable {
+    &.tile--clickable {
         color: var(--text-primary, #161616);
         text-decoration: none;
+
+        .tile-icon { 
+            font-size: 20px;
+            color: var(--icon-interactive, #4e5e9e);
+            line-height: 1em;
+            aspect-ratio: 1 / 1;
+            display: inline-flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            margin-right: -3px;
+            margin-bottom: -3px;
+        }
+    }
+
+    &.tile--expandable,
+    &.tile--expandable--interactive {
+        padding-bottom: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    }
+
+    &.tile--expandable--interactive {
+        &:hover { 
+            background: var(--layer); 
+            cursor: default;
+        }
+    }
+
+    &.tile--expandable {
+        padding-bottom: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);    
+    }
+
+    &.tile--expandable,
+    &.tile--expandable--interactive {
+        padding-bottom: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);    
+    }
+
+    &.tile--expandable--interactive {
+        &:hover { 
+            background: var(--layer); 
+            cursor: default;
+        }
     }
 
     .tile-icon {
@@ -55,6 +95,61 @@
     }
 
     * { box-sizing: inherit; }
+}
+
+.tile__chevron {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    block-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    inline-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    inset-block-end: 0;
+    inset-inline-end: 0;
+}
+
+.tile__chevron svg {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    transition: var(--transition-all-productive);
+}
+
+.collapsed svg {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+.tile__chevron--interactive {
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: 100%;
+    vertical-align: baseline;
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: none;
+    cursor: pointer;
+    text-align: start;
+    inline-size: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    block-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    inline-size: calc(var(--layout-density-padding-inline-local)* 2 + 1rem);
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    transition: var(--transition-all-productive);
+}
+
+.tile__chevron--interactive:hover {
+    background-color: var(--layer-hover);
+    cursor: pointer;
 }
 
 .nav-tabs-contained + .tab-content {

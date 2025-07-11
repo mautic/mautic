@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Collector;
 
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollector;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Cache\CacheItem;
 
 final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&CacheProviderInterface
-     */
-    private MockObject $cacheProvider;
-
+    private MockObject&CacheProviderTagAwareInterface $cacheProvider;
     private AlreadyMappedFieldCollector $collector;
 
     protected function setup(): void
     {
         parent::setUp();
 
-        $this->cacheProvider = $this->createMock(CacheProviderInterface::class);
+        $this->cacheProvider = $this->createMock(CacheProviderTagAwareInterface::class);
         $this->collector     = new AlreadyMappedFieldCollector($this->cacheProvider);
     }
 

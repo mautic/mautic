@@ -51,7 +51,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
         $this->twilioTransport
             ->method('sendSMS')
-            ->will($this->returnValue('lol'));
+            ->willReturn('lol');
     }
 
     public function testAddTransport(): void

@@ -66,9 +66,8 @@ class MobileNotificationDetailsTypeTest extends TypeTestCase
     /**
      * @param array<int, string> $platforms
      * @param array<int, string> $settings
-     *
-     * @dataProvider platformProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('platformProvider')]
     public function testPlatformSelected(array $platforms, array $settings): void
     {
         $this->integrationSettings->method('getFeatureSettings')

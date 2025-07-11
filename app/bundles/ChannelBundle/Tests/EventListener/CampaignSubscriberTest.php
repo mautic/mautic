@@ -17,7 +17,6 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailListType;
@@ -62,9 +61,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher = new EventDispatcher();
 
-        $this->messageModel = $this->getMockBuilder(MessageModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->messageModel = $this->createMock(MessageModel::class);
 
         $this->messageModel->method('getChannels')
             ->willReturn(
@@ -110,23 +107,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->scheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->scheduler = $this->createMock(EventScheduler::class);
 
-        $factory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $contactTracker = $this->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactTracker = $this->createMock(ContactTracker::class);
 
         $this->legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $factory,
             $contactTracker
         );
 
@@ -137,9 +125,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->legacyDispatcher
         );
 
-        $this->eventCollector = $this->getMockBuilder(EventCollector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventCollector = $this->createMock(EventCollector::class);
 
         $this->eventCollector->method('getEventConfig')
             ->willReturnCallback(
@@ -177,9 +163,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(Translator::class);
 
         $campaignSubscriber = new CampaignSubscriber(
             $this->messageModel,
@@ -317,8 +301,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 'marketingMessage'    => '1',
             ]
         );
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
             ->willReturn(1);
 
@@ -332,8 +315,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private function getLogs()
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->method('getId')
             ->willReturn(1);
         $lead->expects($this->once())
@@ -357,8 +339,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $log->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->method('getId')
             ->willReturn(2);
         $lead2->expects($this->once())

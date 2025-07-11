@@ -192,14 +192,19 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($queryBuilderMock);
+        $matcher = $this->exactly(2);
 
-        $reportGeneratorEventMock->expects($this->exactly(2))
-            ->method('usesColumn')
-            ->withConsecutive(
-                [['u.first_name', 'u.last_name']],
-                ['i.ip_address']
-            )
-            ->willReturn(true);
+        $reportGeneratorEventMock->expects($matcher)
+            ->method('usesColumn')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(['u.first_name', 'u.last_name'], $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('i.ip_address', $parameters[0]);
+                }
+
+                return true;
+            });
 
         $reportUtmTagSubscriber->onReportGenerate($reportGeneratorEventMock);
     }
@@ -239,10 +244,19 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'utm')
             ->willReturn($queryBuilderMock);
+        $matcher = $this->any();
 
-        $queryBuilderMock->method('leftJoin')
-            ->withConsecutive(['utm', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = utm.lead_id'])
-            ->willReturn($queryBuilderMock);
+        $queryBuilderMock->expects($matcher)->method('leftJoin')
+            ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('utm', $parameters[0]);
+                    $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);
+                    $this->assertSame('l', $parameters[2]);
+                    $this->assertSame('l.id = utm.lead_id', $parameters[3]);
+                }
+
+                return $queryBuilderMock;
+            });
 
         return $queryBuilderMock;
     }

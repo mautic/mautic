@@ -11,12 +11,18 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:campaigns:rebuild',
+    description: 'Rebuild campaigns based on contact segments.',
+    aliases: ['mautic:campaigns:update']
+)]
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private int $runLimit = 0;
@@ -40,8 +46,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:rebuild')
-            ->setAliases(['mautic:campaigns:update'])
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
@@ -231,6 +235,4 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->output->writeln('');
     }
-
-    protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

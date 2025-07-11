@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -40,7 +39,6 @@ class FormController extends CommonFormController
         private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         private MappedObjectCollector $mappedObjectCollector,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -50,7 +48,7 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -734,9 +732,10 @@ class FormController extends CommonFormController
             // load existing fields into session
             $modifiedFields   = [];
             $existingFields   = $entity->getFields()->toArray();
+            $fieldMap         = [];
             $submitButton     = false;
 
-            foreach ($existingFields as $formField) {
+            foreach ($existingFields as $fieldId => $formField) {
                 // Check to see if the field still exists
 
                 if ('button' == $formField->getType()) {
@@ -752,7 +751,10 @@ class FormController extends CommonFormController
 
                 if (!$id) {
                     // Cloned entity
-                    $id = $field['id'] = $field['sessionId'] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    $id = $field['id'] = $field['sessionId'] = $fieldMap[$fieldId] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    if (isset($field['parent'])) {
+                        $field['parent'] = $fieldMap[$field['parent']];
+                    }
                 }
 
                 unset($field['form']);

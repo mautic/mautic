@@ -19,9 +19,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @dataProvider valueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('valueProvider')]
     public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result, string $operator = '='): void
     {
         $formPayload = [
@@ -159,7 +157,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
+        if ($this->connection->createSchemaManager()->tablesExist(["{$tablePrefix}form_results_1_test_form"])) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");
         }
     }

@@ -16,13 +16,9 @@ final class Version20241212090146 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema->hasTable($this->getPrefixedTableName(self::TABLE_NAME)),
-            "Table {$this->getPrefixedTableName(self::TABLE_NAME)} does not exist"
-        );
-
-        $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex($this->indexName),
-            "Index {$this->indexName} already exists"
+            fn (Schema $schema) => !$schema->hasTable($this->getPrefixedTableName(self::TABLE_NAME))
+                || $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex($this->indexName),
+            "Table {$this->getPrefixedTableName(self::TABLE_NAME)} does not exist or the index {$this->indexName} already exists."
         );
     }
 

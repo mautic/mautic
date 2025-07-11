@@ -506,7 +506,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     {
         $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
+        if ($this->connection->createSchemaManager()->tablesExist(["{$tablePrefix}form_results_1_submission"])) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
     }
@@ -763,11 +763,10 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider formFieldValuesMappingDataProvider
-     *
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formFieldValuesMappingDataProvider')]
     public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
     {
         $formPayload = [
@@ -921,13 +920,13 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{input: array<string, string>, expected: array<string, string>}>
+     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
      */
-    public function formFieldValuesMappingDataProvider(): array
+    public static function formFieldValuesMappingDataProvider(): array
     {
         return [
             'normal_submission' => [
-                'input' => [
+                'submissionData' => [
                     'email'           => 'john@example.com',
                     'firstname'       => 'John',
                     'lastname'        => 'Doe',
@@ -937,7 +936,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_city'    => 'New York',
                     'message'         => 'Hello, this is a normal submission.',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'email'           => 'john@example.com',
                     'firstname'       => 'John',
                     'lastname'        => 'Doe',
@@ -949,7 +948,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
             'special_characters' => [
-                'input' => [
+                'submissionData' => [
                     'email'           => 'jane@example.com',
                     'firstname'       => 'Jane',
                     'lastname'        => 'O\'Brien-Smith',
@@ -959,7 +958,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_city'    => 'Dublin',
                     'message'         => 'Super & Special',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'email'           => 'jane@example.com',
                     'firstname'       => 'Jane',
                     'lastname'        => 'O\'Brien-Smith',
@@ -971,7 +970,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
             'xss_attempt' => [
-                'input' => [
+                'submissionData' => [
                     'email'           => 'hacker@evil.com',
                     'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
                     'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
@@ -981,7 +980,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
                     'message'         => '<script>alert("XSS")</script>',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'email'           => 'hacker@evil.com',
                     'firstname'       => 'alert("XSS")',
                     'lastname'        => 'alert("XSS")',
@@ -993,7 +992,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
             'sql_injection_attempt' => [
-                'input' => [
+                'submissionData' => [
                     'email'           => 'sqlhacker@evil.com',
                     'firstname'       => "Robert'; DROP TABLE users; --",
                     'lastname'        => 'Tables',
@@ -1003,7 +1002,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_city'    => 'SQL City',
                     'message'         => "Robert'; DROP TABLE messages; --",
                 ],
-                'expected' => [
+                'expectedData' => [
                     'email'           => 'sqlhacker@evil.com',
                     'firstname'       => "Robert'; DROP TABLE users; --",
                     'lastname'        => 'Tables',
@@ -1015,7 +1014,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
             'unicode_characters' => [
-                'input' => [
+                'submissionData' => [
                     'email'           => 'unicode@example.com',
                     'firstname'       => 'José',
                     'lastname'        => 'Martínez',
@@ -1025,7 +1024,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_city'    => '東京',
                     'message'         => 'こんにちは、世界！',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'email'           => 'unicode@example.com',
                     'firstname'       => 'José',
                     'lastname'        => 'Martínez',
@@ -1040,11 +1039,10 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider formCustomFieldsMappingDataProvider
-     *
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formCustomFieldsMappingDataProvider')]
     public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
     {
         // Create new contact custom field
@@ -1148,97 +1146,95 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{input: array<string, string>, expected: array<string, string>}>
+     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
      */
-    public function formCustomFieldsMappingDataProvider(): array
+    public static function formCustomFieldsMappingDataProvider(): array
     {
         return [
             'simple_value' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => 'Dog',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'Dog',
                 ],
             ],
             'special_characters' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => 'Guinea-Pig & Hamster\'s "friend"',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'Guinea-Pig & Hamster\'s "friend"',
                 ],
             ],
             'xss_attempt' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'alert("XSS")',
                 ],
             ],
             'sql_injection' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => "Cat'; DROP TABLE animals; --",
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => "Cat'; DROP TABLE animals; --",
                 ],
             ],
             'unicode_and_emoji' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => '🐕 犬 🐈 猫',
                 ],
             ],
             'nested_tags' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => '<div><span>Text</span></div>',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'Text',
                 ],
             ],
             'incomplete_tags' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => '<div><span>Text',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'Text',
                 ],
             ],
             'null_byte' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => "Dog\x00Cat",
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'DogCat',
                 ],
             ],
             'javascript_protocol' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'Click me',
                 ],
             ],
             'css_expression' => [
-                'input' => [
+                'submissionData' => [
                     'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
                 ],
-                'expected' => [
+                'expectedData' => [
                     'animal' => 'Test',
                 ],
             ],
         ];
     }
 
-    /**
-     * @dataProvider htmlFieldSubmissionDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('htmlFieldSubmissionDataProvider')]
     public function testHtmlReadOnlyFieldSubmission(string $submittedHtml, string $submittedEmail): void
     {
         // Create form with freehtml and email fields
@@ -1318,7 +1314,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<string, array{0: string, 1: string}>
      */
-    public function htmlFieldSubmissionDataProvider(): array
+    public static function htmlFieldSubmissionDataProvider(): array
     {
         return [
             'any_text' => [

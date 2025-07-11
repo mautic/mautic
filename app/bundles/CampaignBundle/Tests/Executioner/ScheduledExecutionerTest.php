@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -45,25 +46,15 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->repository = $this->getMockBuilder(LeadEventLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repository = $this->createMock(LeadEventLogRepository::class);
 
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(Translator::class);
 
-        $this->executioner = $this->getMockBuilder(EventExecutioner::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->executioner = $this->createMock(EventExecutioner::class);
 
-        $this->scheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->scheduler = $this->createMock(EventScheduler::class);
 
-        $this->contactFinder = $this->getMockBuilder(ScheduledContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contactFinder = $this->createMock(ScheduledContactFinder::class);
     }
 
     public function testNoEventsResultInEmptyResults(): void
@@ -75,8 +66,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->repository->expects($this->never())
             ->method('getScheduled');
 
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -91,8 +81,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCounts')
             ->willReturn([1 => 2, 2 => 2]);
 
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
 
         $event = new Event();
         $event->setCampaign($campaign);
@@ -155,8 +144,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCounts')
             ->willReturn([1 => 2, 2 => 2]);
 
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
 
         $event = new Event();
         $event->setCampaign($campaign);
@@ -215,13 +203,11 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testSpecificEventsAreExecuted(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->method('isPublished')
             ->willReturn(true);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $event = $this->createMock(Event::class);
         $event->method('getId')
             ->willReturn(1);
         $event->method('getCampaign')
@@ -277,8 +263,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCounts')
             ->willReturn([1 => 2]);
 
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
 
         $event = new Event();
         $event->setCampaign($campaign);
@@ -320,13 +305,19 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->scheduler->expects($this->exactly(2))
             ->method('shouldSchedule')
             ->willReturn(true);
+        $matcher = $this->exactly(2);
 
-        $this->scheduler->expects($this->exactly(2))
-            ->method('reschedule')
-            ->withConsecutive(
-                [$log1, $oneMinuteDateTime],
-                [$log2, $twoMinuteDateTime]
-            );
+        $this->scheduler->expects($matcher)
+            ->method('reschedule')->willReturnCallback(function (...$parameters) use ($matcher, $log1, $oneMinuteDateTime, $log2, $twoMinuteDateTime) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($log1, $parameters[0]);
+                    $this->assertSame($oneMinuteDateTime, $parameters[1]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($log2, $parameters[0]);
+                    $this->assertSame($twoMinuteDateTime, $parameters[1]);
+                }
+            });
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -337,13 +328,11 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testSpecificEventsAreScheduled(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->method('isPublished')
             ->willReturn(true);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $event = $this->createMock(Event::class);
         $event->method('getId')
             ->willReturn(1);
         $event->method('getCampaign')
@@ -409,14 +398,12 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testSpecificEventsWithUnpublishedCamapign(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(false);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $event = $this->createMock(Event::class);
         $event->method('getId')
             ->willReturn(1);
         $event->method('getCampaign')
@@ -476,7 +463,8 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->executioner,
             $this->scheduler,
-            $this->contactFinder
+            $this->contactFinder,
+            $this->createMock(ProcessSignalService::class)
         );
     }
 }

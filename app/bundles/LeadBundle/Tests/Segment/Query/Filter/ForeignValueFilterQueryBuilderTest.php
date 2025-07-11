@@ -63,7 +63,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQuery(): iterable
+    public static function dataApplyQuery(): iterable
     {
         yield ['regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url REGEXP '.com$')"];
         yield ['notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url NOT REGEXP '.com$')"];
@@ -78,9 +78,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         yield ['endsWith', '.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url LIKE '%.com')"];
     }
 
-    /**
-     * @dataProvider dataApplyQuery
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -109,17 +107,16 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQueryAdditionalFilters(): iterable
+    public static function dataApplyQueryAdditionalFilters(): iterable
     {
         yield ['in', [1, 2], 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par2.lead_id FROM __PREFIX__lead_categories par2 WHERE par2.category_id IN (1, 2))'];
         yield ['notIn', [1, 2], 'SELECT 1 FROM __PREFIX__leads l WHERE NOT EXISTS(SELECT NULL FROM __PREFIX__lead_categories par2 WHERE (par2.lead_id = l.id) AND (par2.category_id IN (1, 2)))'];
     }
 
     /**
-     * @dataProvider dataApplyQueryAdditionalFilters
-     *
      * @param array<string, mixed> $parameterValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryAdditionalFilters')]
     public function testApplyQueryAdditionalFilters(string $operator, array $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -146,7 +143,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQueryWithBatchFilters(): iterable
+    public static function dataApplyQueryWithBatchFilters(): iterable
     {
         yield [['minId' => 1, 'maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url REGEXP '.com$'))"];
         yield [['minId' => 1], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url REGEXP '.com$'))"];
@@ -190,10 +187,9 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider dataApplyQueryWithBatchFilters
-     *
      * @param array<string, mixed> $batchLimiters
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryWithBatchFilters')]
     public function testApplyQueryWithBatchFilters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -222,7 +218,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQueryAdditionalFiltersWithBatchLimiters(): iterable
+    public static function dataApplyQueryAdditionalFiltersWithBatchLimiters(): iterable
     {
         yield [['minId' => 1, 'maxId' => 2], 'in', [1, 2], 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par2.lead_id FROM __PREFIX__lead_categories par2 WHERE (par2.lead_id BETWEEN 1 and 2) AND (par2.category_id IN (1, 2)))'];
         yield [['minId' => 1], 'in', [1, 2], 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par2.lead_id FROM __PREFIX__lead_categories par2 WHERE (par2.lead_id >= 1) AND (par2.category_id IN (1, 2)))'];
@@ -231,11 +227,10 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider dataApplyQueryAdditionalFiltersWithBatchLimiters
-     *
      * @param array<string, mixed> $batchLimiters
      * @param array<string, mixed> $parameterValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryAdditionalFiltersWithBatchLimiters')]
     public function testApplyQueryAdditionalFiltersWithBatchLimiters(array $batchLimiters, string $operator, array $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);

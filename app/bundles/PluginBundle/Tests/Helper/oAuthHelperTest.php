@@ -11,9 +11,8 @@ final class oAuthHelperTest extends TestCase
 {
     /**
      * @param array<int, string> $headers
-     *
-     * @dataProvider dataForHashSensitiveHeaderData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForHashSensitiveHeaderData')]
     public function testHashSensitiveHeaderData(string $authorization, array $headers): void
     {
         $hashedHeaders = oAuthHelper::sanitizeHeaderData($headers);
@@ -24,7 +23,7 @@ final class oAuthHelperTest extends TestCase
     /**
      * @return \Generator<string, array<int, string|array<int, string>>>
      */
-    public function dataForHashSensitiveHeaderData(): \Generator
+    public static function dataForHashSensitiveHeaderData(): \Generator
     {
         yield 'For Bearer' => [
             'Bearer',

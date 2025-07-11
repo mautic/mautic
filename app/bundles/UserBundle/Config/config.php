@@ -6,6 +6,7 @@ return [
             'mautic.user_management' => [
                 'id'        => 'mautic_user_management_root',
                 'priority'  => 17,
+                'access'    => ['user:users:view', 'user:roles:view'],
             ],
             'mautic.user.users' => [
                 'access'    => 'user:users:view',
@@ -219,7 +220,7 @@ return [
             ],
             'mautic.security.user_token_setter' => [
                 'class'     => Mautic\UserBundle\Security\UserTokenSetter::class,
-                'arguments' => ['mautic.user.repository', 'security.token_storage'],
+                'arguments' => ['mautic.user.model.user', 'security.token_storage'],
             ],
             'mautic.user.model.user_token_service' => [
                 'class'     => Mautic\UserBundle\Model\UserToken\UserTokenService::class,

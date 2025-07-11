@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
+use Mautic\LeadBundle\Entity\LeadField;
 
 /**
  * Used to manipulate the schema of an existing table.
@@ -155,6 +156,25 @@ class ColumnSchemaHelper
     }
 
     /**
+     * @throws SchemaException
+     * @throws \OutOfRangeException
+     */
+    public function updateColumnLength(string $column, int $length): ColumnSchemaHelper
+    {
+        if (empty($column)) {
+            throw new SchemaException('The column name is should not be empty/missing.');
+        }
+
+        if ($length < 1 || $length > LeadField::MAX_VARCHAR_LENGTH) {
+            throw new \OutOfRangeException('Column length should be between 1 and 191.');
+        }
+
+        $this->toTable->modifyColumn($column, ['length' => $length]);
+
+        return $this;
+    }
+
+    /**
      * Drops a column from table.
      *
      * @return $this
@@ -213,7 +233,7 @@ class ColumnSchemaHelper
      */
     public function checkTableExists($table, $throwException = false): bool
     {
-        if (!$this->sm->tablesExist($table)) {
+        if (!$this->sm->tablesExist([$table])) {
             if ($throwException) {
                 throw new SchemaException("Table $table does not exist!");
             } else {

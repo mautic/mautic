@@ -190,7 +190,7 @@ return [
             ],
             'mautic.form.collector.already.mapped.field' => [
                 'class'     => Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
-                'arguments' => ['mautic.cache.provider'],
+                'arguments' => ['mautic.cache.provider_tag_aware'],
             ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,

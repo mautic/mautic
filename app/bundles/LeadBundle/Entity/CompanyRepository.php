@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait;
+    use ProjectRepositoryTrait;
 
     /**
      * @var array
@@ -168,6 +170,20 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $returnParameter         = true;
         $command                 = $filter->command;
 
+        if (in_array($command, [
+            $this->translator->trans('mautic.project.searchcommand.name'),
+            $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'),
+        ])) {
+            return $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'company_id',
+                'company_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            );
+        }
+
         if (in_array($command, $this->availableSearchFields)) {
             $expr = $q->expr()->like($this->getTableAlias().".$command", ":$unique");
         }
@@ -199,7 +215,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getSearchCommands(): array
     {
-        $commands = $this->getStandardSearchCommands();
+        $commands = array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
         if (!empty($this->availableSearchFields)) {
             $commands = array_merge($commands, $this->availableSearchFields);
         }
@@ -401,8 +417,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param string $valueColumn
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
-    {
+    public function getAjaxSimpleList(
+        CompositeExpression $expr = null,
+        array $parameters = [],
+        $labelColumn = null,
+        $valueColumn = 'id',
+        int $limit = 10,
+        int $start = 0,
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $alias = $prefix = $this->getTableAlias();
@@ -455,6 +477,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
                 ->setParameter('true', true, 'boolean');
+        }
+
+        if ($limit > 0) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
         }
 
         return $q->executeQuery()->fetchAllAssociative();

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -15,11 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class PointActionHelperTest extends TestCase
 {
-    /**
-     * @var MockObject|MauticFactory
-     */
-    private $factory;
-
     /**
      * @var MockObject|EntityManagerInterface
      */
@@ -42,23 +36,19 @@ class PointActionHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        /** @phpstan-ignore-next-line */
-        $this->factory       = $this->createMock(MauticFactory::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->hitRepository = $this->createMock(HitRepository::class);
         $this->lead          = $this->createMock(Lead::class);
         $this->eventDetails  = $this->createMock(Hit::class);
 
-        $this->factory->method('getEntityManager')->willReturn($this->entityManager);
         $this->eventDetails->method('getLead')->willReturn($this->lead);
         $this->entityManager->method('getRepository')->willReturn($this->hitRepository);
     }
 
     /**
      * @param array<string, mixed> $action
-     *
-     * @dataProvider urlHitsActionDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('urlHitsActionDataProvider')]
     public function testValidateUrlPageHitsAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/ppk');
@@ -71,7 +61,8 @@ class PointActionHelperTest extends TestCase
         ]);
         $this->hitRepository->expects($this->never())->method('getLatestHit');
 
-        $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
+        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -79,7 +70,7 @@ class PointActionHelperTest extends TestCase
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function urlHitsActionDataProvider(): array
+    public static function urlHitsActionDataProvider(): array
     {
         return [
             'url_matches_first_hit' => [
@@ -125,9 +116,8 @@ class PointActionHelperTest extends TestCase
 
     /**
      * @param array<string, mixed> $action
-     *
-     * @dataProvider returnWithinActionDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('returnWithinActionDataProvider')]
     public function testValidateUrlReturnWithinAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/test/');
@@ -145,7 +135,8 @@ class PointActionHelperTest extends TestCase
         $latestHit->setTimestamp($threeHoursAgoTimestamp);
         $this->hitRepository->method('getLatestHit')->willReturn($latestHit);
 
-        $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
+        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -153,7 +144,7 @@ class PointActionHelperTest extends TestCase
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function returnWithinActionDataProvider(): array
+    public static function returnWithinActionDataProvider(): array
     {
         return [
             'valid_return_within' => [

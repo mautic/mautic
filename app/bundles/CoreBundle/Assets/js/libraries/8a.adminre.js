@@ -251,6 +251,26 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 $("[data-toggle~=popover]").popover({
                     sanitize: false
                 });
+                
+                var hideAllPopovers = function() {
+                    $("[data-toggle~=popover]").each(function() {
+                        var popover = $(this).data('bs.popover');
+                        if (popover && popover.tip().hasClass('in')) {
+                            $(this).popover('hide');
+                        }
+                    });
+                };
+                
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.popover').length && 
+                        !$(e.target).closest('[data-toggle="popover"]').length) {
+                        hideAllPopovers();
+                    }
+                });
+                
+                $(document).on('mouseenter', '[data-toggle="popover"][data-trigger="hover"]', function() {
+                    hideAllPopovers();
+                });
             },
 
             // @MISC: IE9 input placeholder support
@@ -348,10 +368,16 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 });
             })();
 
+            // @PLUGIN: SelectRow
+            // Self invoking
+            // ================================
             (function () {
                 var contextual,
-                    toggler = "[data-toggle~=selectrow]",
-                    target = $(toggler).data("target");
+                    toggler     = "[data-toggle~=selectrow]",
+                    target      = $(toggler).data("target");
+
+                // Track the last clicked checkbox for shift-click functionality
+                var lastCheckedBox = null;
 
                 // check on DOM ready
                 $(toggler).each(function () {
@@ -371,6 +397,33 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         selectrow(this, "unchecked");
                     }
                     updateToolbarState();
+                });
+
+                // Add shift-click functionality for range selection
+                $(document).on("click", toggler, function(e) {
+                    if (e.shiftKey && lastCheckedBox !== null) {
+                        var checkboxes = $(toggler);
+                        var startIndex = checkboxes.index(lastCheckedBox);
+                        var endIndex = checkboxes.index(this);
+
+                        // Determine the range of checkboxes to check/uncheck
+                        var start = Math.min(startIndex, endIndex);
+                        var end = Math.max(startIndex, endIndex);
+
+                        // Get the checked state from the clicked checkbox
+                        var isChecked = $(this).is(":checked");
+
+                        // Apply the same state to all checkboxes in range
+                        checkboxes.slice(start, end + 1).each(function() {
+                            // Only change if the current state is different
+                            if ($(this).prop("checked") !== isChecked) {
+                                $(this).prop("checked", isChecked).trigger("change");
+                            }
+                        });
+                    }
+
+                    // Update the last checked box reference
+                    lastCheckedBox = this;
                 });
 
                 // Core SelectRow function

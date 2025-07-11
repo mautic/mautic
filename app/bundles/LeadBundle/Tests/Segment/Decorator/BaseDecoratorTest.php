@@ -6,11 +6,9 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(BaseDecorator::class)]
 class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getField
-     */
     public function testGetField(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -28,9 +26,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('date_identified', $baseDecorator->getField($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getTable
-     */
     public function testGetTableLead(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -42,9 +37,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $baseDecorator->getTable($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getTable
-     */
     public function testGetTableCompany(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -56,9 +48,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(MAUTIC_TABLE_PREFIX.'companies', $baseDecorator->getTable($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
-     */
     public function testGetOperatorEqual(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
@@ -76,9 +65,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('eq', $baseDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
-     */
     public function testGetOperatorStartsWith(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
@@ -96,9 +82,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('like', $baseDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
-     */
     public function testGetOperatorEndsWith(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
@@ -116,9 +99,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('like', $baseDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
-     */
     public function testGetOperatorContainsWith(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
@@ -136,9 +116,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('like', $baseDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getQueryType
-     */
     public function testGetQueryType(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -148,9 +125,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('mautic.lead.query.builder.basic', $baseDecorator->getQueryType($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterHolder
-     */
     public function testGetParameterHolderSingle(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -160,9 +134,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(':argument', $baseDecorator->getParameterHolder($contactSegmentFilterCrate, 'argument'));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterHolder
-     */
     public function testGetParameterHolderArray(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -183,9 +154,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $baseDecorator->getParameterHolder($contactSegmentFilterCrate, $argument));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueBoolean(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -205,9 +173,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueNumber(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -220,9 +185,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(1.0, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueLikeNoPercent(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -236,9 +198,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueNotLike(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -252,9 +211,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueLikeWithOnePercent(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -268,9 +224,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('%Test string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueLikeWithTwoPercent(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -284,9 +237,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueStartsWith(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -300,9 +250,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueEndsWith(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -316,9 +263,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('%Test string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueContains(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -332,9 +276,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueContainsShouldNotBeEscaped(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -349,9 +290,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueRegex(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -365,9 +303,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Test \s string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueNotRegex(): void
     {
         $baseDecorator = $this->getDecorator();
@@ -381,9 +316,6 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Test \s string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
-     */
     public function testGetParameterValueMultiselect(): void
     {
         $baseDecorator = $this->getDecorator();

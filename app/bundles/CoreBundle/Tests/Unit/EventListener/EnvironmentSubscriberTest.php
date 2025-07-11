@@ -79,8 +79,7 @@ class EnvironmentSubscriberTest extends TestCase
             ->with('en_US');
         $sessionInterfaceMock->expects($this->once())
             ->method('set')
-            ->with('_locale')
-            ->willReturn('en_US');
+            ->with('_locale');
         $this->coreParametersHelperMock->expects($this->never())
             ->method('get')
             ->with('locale');
@@ -115,8 +114,7 @@ class EnvironmentSubscriberTest extends TestCase
             ->with('en_GB');
         $sessionInterfaceMock->expects($this->once())
             ->method('set')
-            ->with('_locale')
-            ->willReturn('en_GB');
+            ->with('_locale');
 
         $this->environmentSubscriber->onKernelRequestSetLocale($requestEventMock);
     }

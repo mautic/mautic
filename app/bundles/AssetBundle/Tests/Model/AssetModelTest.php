@@ -92,17 +92,15 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($this->cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
-        $this->deviceTrackingService = $this->getMockBuilder(DeviceTrackingServiceInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contactTracker  = $this->createMock(ContactTracker::class);
-        $this->entityManager   = $this->createMock(EntityManager::class);
-        $this->corePermissions = $this->createMock(CorePermissions::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->urlGenerator    = $this->createMock(UrlGeneratorInterface::class);
-        $this->translator      = $this->createMock(Translator::class);
-        $this->userHelper      = $this->createMock(UserHelper::class);
-        $this->logger          = $this->createMock(LoggerInterface::class);
+        $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
+        $this->contactTracker        = $this->createMock(ContactTracker::class);
+        $this->entityManager         = $this->createMock(EntityManager::class);
+        $this->corePermissions       = $this->createMock(CorePermissions::class);
+        $this->eventDispatcher       = $this->createMock(EventDispatcherInterface::class);
+        $this->urlGenerator          = $this->createMock(UrlGeneratorInterface::class);
+        $this->translator            = $this->createMock(Translator::class);
+        $this->userHelper            = $this->createMock(UserHelper::class);
+        $this->logger                = $this->createMock(LoggerInterface::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
@@ -173,25 +171,41 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('http://localhost');
 
         $request->server = $serverBag;
+        $matcher         = $this->exactly(6);
 
-        $request->expects($this->exactly(6))
-            ->method('get')
-            ->withConsecutive(
-                [$this->equalTo('utm_campaign')],
-                [$this->equalTo('utm_content')],
-                [$this->equalTo('utm_medium')],
-                [$this->equalTo('utm_source')],
-                [$this->equalTo('utm_term')],
-                [$this->equalTo('ct')]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'test_utm_campaign',
-                'test_utm_content',
-                'test_utm_medium',
-                'test_utm_source',
-                'test_utm_term',
-                false
-            );
+        $request->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals('utm_campaign', $parameters[0]);
+
+                    return 'test_utm_campaign';
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals('utm_content', $parameters[0]);
+
+                    return 'test_utm_content';
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals('utm_medium', $parameters[0]);
+
+                    return 'test_utm_medium';
+                }
+                if (4 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals('utm_source', $parameters[0]);
+
+                    return 'test_utm_source';
+                }
+                if (5 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals('utm_term', $parameters[0]);
+
+                    return 'test_utm_term';
+                }
+                if (6 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals('ct', $parameters[0]);
+
+                    return false;
+                }
+            });
 
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')

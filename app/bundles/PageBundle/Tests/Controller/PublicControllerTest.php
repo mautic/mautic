@@ -5,7 +5,6 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -44,6 +43,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(TrackingEvent::class)]
 class PublicControllerTest extends MauticMysqlTestCase
 {
     /**
@@ -169,59 +169,59 @@ class PublicControllerTest extends MauticMysqlTestCase
     {
         $pageEntityB = $this->createMock(Page::class);
         $pageEntityB->method('getId')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
         $pageEntityB->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $pageEntityB->method('getVariantHits')
-            ->will($this->returnValue($bCount));
+            ->willReturn($bCount);
         $pageEntityB->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $pageEntityB->method('isTranslation')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $pageEntityB->method('getContent')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $pageEntityB->method('getCustomHtml')
-            ->will($this->returnValue('pageB'));
+            ->willReturn('pageB');
         $pageEntityB->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '25']));
+            ->willReturn(['weight' => '25']);
 
         $pageEntityC = $this->createMock(Page::class);
         $pageEntityC->method('getId')
-            ->will($this->returnValue(3));
+            ->willReturn(3);
         $pageEntityC->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $pageEntityC->method('getVariantHits')
-            ->will($this->returnValue($cCount));
+            ->willReturn($cCount);
         $pageEntityC->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $pageEntityC->method('isTranslation')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $pageEntityC->method('getContent')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $pageEntityC->method('getCustomHtml')
-            ->will($this->returnValue('pageC'));
+            ->willReturn('pageC');
         $pageEntityC->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '25']));
+            ->willReturn(['weight' => '25']);
 
         $pageEntityA = $this->createMock(Page::class);
         $pageEntityA->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
         $pageEntityA->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $pageEntityA->method('getVariants')
-            ->will($this->returnValue([$pageEntityA, [2 => $pageEntityB, 3 => $pageEntityC]]));
+            ->willReturn([$pageEntityA, [2 => $pageEntityB, 3 => $pageEntityC]]);
         $pageEntityA->method('getVariantHits')
-            ->will($this->returnValue($aCount));
+            ->willReturn($aCount);
         $pageEntityA->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $pageEntityA->method('isTranslation')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $pageEntityA->method('getContent')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $pageEntityA->method('getCustomHtml')
-            ->will($this->returnValue('pageA'));
+            ->willReturn('pageA');
         $pageEntityA->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '50']));
+            ->willReturn(['weight' => '50']);
 
         $cookieHelper = $this->createMock(CookieHelper::class);
 
@@ -235,20 +235,20 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $mauticSecurity = $this->createMock(CorePermissions::class);
         $mauticSecurity->method('hasEntityAccess')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $analyticsHelper = new AnalyticsHelper($coreParametersHelper);
 
         $pageModel = $this->createMock(PageModel::class);
         $pageModel->method('getHitQuery')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $pageModel->method('getEntityBySlugs')
-            ->will($this->returnValue($pageEntityA));
+            ->willReturn($pageEntityA);
         $pageModel->method('hitPage')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->contactRequestHelper->method('getContactFromQuery')
-            ->will($this->returnValue(new Lead()));
+            ->willReturn(new Lead());
 
         $router = $this->createMock(Router::class);
 
@@ -256,13 +256,11 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['page', $pageModel],
-                        ['lead', $this->leadModel],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    ['page', $pageModel],
+                    ['lead', $this->leadModel],
+                ]
             );
 
         $container = $this->createMock(Container::class);
@@ -275,7 +273,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $router               = $this->createMock(RouterInterface::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $translator           = $this->createMock(Translator::class);
@@ -287,7 +284,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $controller = new PublicController(
             $doctrine,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,
@@ -324,11 +320,26 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
+        $matcher = self::exactly(3);
 
-        $this->modelFactory->expects(self::exactly(2))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->pageModel);
+        $this->modelFactory->expects($matcher)
+            ->method('getModel')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('page.redirect', $parameters[0]);
+
+                    return $this->redirectModel;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('lead', $parameters[0]);
+
+                    return $this->leadModel;
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('page', $parameters[0]);
+
+                    return $this->pageModel;
+                }
+            });
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -374,7 +385,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->request->query->set('ct', $clickTrough);
 
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $dispatcher           = $this->createMock(EventDispatcherInterface::class);
@@ -385,7 +395,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $controller = new PublicController(
             $doctrine,
-            $factory,
             $this->modelFactory,
             $userHelper,
             $coreParametersHelper,
@@ -422,11 +431,26 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
+        $matcher = self::exactly(3);
 
-        $this->modelFactory->expects(self::exactly(2))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->pageModel);
+        $this->modelFactory->expects($matcher)
+            ->method('getModel')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('page.redirect', $parameters[0]);
+
+                    return $this->redirectModel;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('lead', $parameters[0]);
+
+                    return $this->leadModel;
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('page', $parameters[0]);
+
+                    return $this->pageModel;
+                }
+            });
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -473,7 +497,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->request->query->set('ct', $clickThrough);
 
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $dispatcher           = $this->createMock(EventDispatcherInterface::class);
@@ -484,7 +507,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $controller = new PublicController(
             $doctrine,
-            $factory,
             $this->modelFactory,
             $userHelper,
             $coreParametersHelper,
@@ -509,10 +531,6 @@ class PublicControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @covers \Mautic\PageBundle\Event\TrackingEvent::getContact
-     * @covers \Mautic\PageBundle\Event\TrackingEvent::getResponse
-     * @covers \Mautic\PageBundle\Event\TrackingEvent::getRequest
-     *
      * @throws \Exception
      */
     public function testMtcTrackingEvent(): void
@@ -570,7 +588,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->willReturn($contact);
 
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $translator           = $this->createMock(Translator::class);
@@ -579,7 +596,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $publicController = new PublicController(
             $doctrine,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,
@@ -632,7 +648,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->willReturn(true);
 
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $dispatcher           = $this->createMock(EventDispatcherInterface::class);
@@ -642,7 +657,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $publicController = new PublicController(
             $doctrine,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,

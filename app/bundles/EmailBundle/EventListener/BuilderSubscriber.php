@@ -78,6 +78,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
             '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
             '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
+            '{brand=name}'       => $this->translator->trans('mautic.core.token.brand_name'),
             '{subject}'          => $this->translator->trans('mautic.email.subject'),
         ];
 
@@ -197,6 +198,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
+        $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
 
     public function convertUrlsToTokens(EmailSendEvent $event): void

@@ -1,7 +1,7 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauticContent %}asset{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
         {
             'item'            : activeAsset,
@@ -18,6 +18,8 @@
             'targetLabel': 'mautic.asset.assets'|trans
         }
     ) -}}
+    {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeAsset.category}) }}
+    {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeAsset}) }}
 {% endblock %}
 
 {% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}
@@ -50,7 +52,68 @@
         'entity': activeAsset,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
+
+    {# Asset type #}
+    {% if activeAsset.getFileType() is defined and activeAsset.getFileType() is not empty %}
+        {% set fileType = activeAsset.getFileType()|lower %}
+        {% set extensionGroups = activeAsset.getFileExtensions()|default([]) %}
+        {% set type = 'fallback' %}
+        {% for group, exts in extensionGroups %}
+            {% if fileType in exts %}
+                {% set type = group %}
+            {% endif %}
+        {% endfor %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: ('mautic.asset.type.' ~ type)|trans,
+                icon: activeAsset.getIconClass()|default(''),
+                color: 'high-contrast'
+            }]
+        } %}
+    {% endif %}
+
+    {# Disallow indexing #}
+    {% if activeAsset.getDisallow() is defined and activeAsset.getDisallow() == 1 %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: 'mautic.asset.tag.disallow.label'|trans,
+                icon: 'ri-eye-off-fill',
+                color: 'blue',
+                icon_only: true
+            }]
+        } %}
+    {% endif %}
+
+    {# Storage location #}
+    {% if activeAsset.getStorageLocation() is defined %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: ('mautic.asset.tag.storage.' ~ activeAsset.getStorageLocation())|trans,
+                icon: activeAsset.getStorageLocation() == 'local' ? 'ri-hard-drive-2-fill' : 'ri-cloud-fill',
+                color: 'blue',
+                icon_only: true
+            }]
+        } %}
+    {% endif %}
+
+    {# Language #}
+    {% if activeAsset.getLanguage() is defined and activeAsset.getLanguage() is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: activeAsset.getLanguage()|language_name|capitalize,
+                icon: 'ri-translate-2',
+                color: 'warm-gray',
+                attributes: {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'title': 'mautic.core.language'|trans
+                }
+            }]
+        } %}
+    {% endif %}
 {% endblock %}
+
 {% block content %}
 
 <!-- start: box layout -->
@@ -59,7 +122,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- asset detail header -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeAsset.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': activeAsset.description} %}
             <!--/ asset detail header -->
             <!-- asset detail collapseable -->
             <div class="collapse pr-md pl-md" id="asset-details">
@@ -114,18 +177,29 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% include '@MauticCore/Modules/stat--icon.html.twig' with {
+                            'stats': [
+                                {
+                                    'title': 'mautic.asset.asset.downloads.total',
+                                    'value': stats.downloads.total,
+                                    'tooltip': 'mautic.asset.asset.downloads.total.all_time',
+                                    'icon': 'ri-download-line'
+                                },
+                                {
+                                    'title': 'mautic.asset.asset.downloads.unique',
+                                    'value': stats.downloads.unique,
+                                    'tooltip': 'mautic.asset.asset.downloads.unique.all_time',
+                                    'icon': 'ri-user-6-line'
+                                }
+                            ]
+                        } %}
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-md-2 va-m">
+                                <div class="col-md-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="ri-download-line"></span>
                                         {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
                                     </h5>
-                                </div>
-                                <div class="col-md-2 va-m text-center">
-                                    <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.total'|trans({'count' : stats.downloads.total}) }}</span>
-                                    <span class="text-white dark-md fw-sb mb-xs">|</span>
-                                    <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.unique'|trans({'count' : stats.downloads.unique}) }}</span>
                                 </div>
                                 <div class="col-md-8 va-m">
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
@@ -177,7 +251,7 @@
                                 tooltip_placement: 'left',
                                 label: 'mautic.core.open_link',
                                 onclick: "window.open('" ~ assetDownloadUrl ~ "', '_blank')",
-                                variant: 'ghost'
+                                variant: 'ghost',
                             }
                         ]
                     } %}

@@ -1,7 +1,7 @@
 
 {
   "name": "mautic/recommended-project",
-  "description": "Project template for Mautic 4 projects with composer",
+  "description": "Project template for Mautic projects with Composer",
   "type": "project",
   "license": "GPL-2.0-or-later",
   "homepage": "https://www.mautic.org/mautic-releases",
@@ -75,7 +75,13 @@
     "mautic/theme-showcase": "*",
     "mautic/theme-simple-text": "*",
     "mautic/theme-survey": "*",
-    "mautic/theme-welcome": "*"
+    "mautic/theme-welcome": "*",
+    "mautic/theme-mono": "*",
+    "mautic/theme-blend": "*",
+    "mautic/theme-capture": "*",
+    "mautic/theme-chord": "*",
+    "mautic/theme-formscape": "*",
+    "mautic/theme-reachout": "*"
   },
   "scripts": {
     "post-install-cmd": [
@@ -103,7 +109,7 @@
         "url": "../app",
         "options": {
             "versions": {
-                "mautic/core-lib": "6.x-dev"
+                "mautic/core-lib": "7.x-dev"
             },
             "symlink": false
         }

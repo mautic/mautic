@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper;
 
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
+use Mautic\IntegrationsBundle\Exception\RequiredValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -73,7 +74,7 @@ class ValueHelper
             NormalizedValueDAO::EMAIL_TYPE, NormalizedValueDAO::DATE_TYPE, NormalizedValueDAO::DATETIME_TYPE, NormalizedValueDAO::BOOLEAN_TYPE => $this->normalizedValueDAO->getOriginalValue(),
             NormalizedValueDAO::INT_TYPE => 0,
             NormalizedValueDAO::DOUBLE_TYPE, NormalizedValueDAO::FLOAT_TYPE => 1.0,
-            default => throw new InvalidValueException("Required field can't be empty"),
+            default => throw new RequiredValueException("Required field can't be empty"),
         };
     }
 }

@@ -25,6 +25,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -207,6 +208,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $eventDispatcher;
 
+    /**
+     * @var MockObject|BotRatioHelper
+     */
+    private MockObject $botRatioHelperMock;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -241,6 +247,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->leadDeviceRepository     = $this->createMock(LeadDeviceRepository::class);
+        $this->botRatioHelperMock       = $this->createMock(BotRatioHelper::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -267,7 +274,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class),
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->botRatioHelperMock
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -278,110 +286,106 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testVariantEmailWeightsAreAppropriateForMultipleContacts(): void
     {
-        $this->mailHelper->method('getMailer')->will($this->returnValue($this->mailHelper));
-        $this->mailHelper->method('flushQueue')->will($this->returnValue(true));
-        $this->mailHelper->method('addTo')->will($this->returnValue(true));
-        $this->mailHelper->method('queue')->will($this->returnValue([true, []]));
-        $this->mailHelper->method('setEmail')->will($this->returnValue(true));
+        $this->mailHelper->method('getMailer')->willReturn($this->mailHelper);
+        $this->mailHelper->method('flushQueue')->willReturn(true);
+        $this->mailHelper->method('addTo')->willReturn(true);
+        $this->mailHelper->method('queue')->willReturn([true, []]);
+        $this->mailHelper->method('setEmail')->willReturn(true);
         $this->translator->expects($this->any())
             ->method('hasId')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         // Setup an email variant email
         $variantDate = new \DateTime();
         $this->emailEntity->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
         $this->emailEntity->method('getTemplate')
-            ->will($this->returnValue(''));
+            ->willReturn('');
         $this->emailEntity->method('getSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $this->emailEntity->method('getVariantSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $this->emailEntity->method('getVariantStartDate')
-            ->will($this->returnValue($variantDate));
+            ->willReturn($variantDate);
         $this->emailEntity->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $this->emailEntity->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->emailEntity->method('isVariant')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(
-                function () {
-                    $stat = new Stat();
-                    $stat->setEmail($this->emailEntity);
+            ->willReturnCallback(function () {
+                $stat = new Stat();
+                $stat->setEmail($this->emailEntity);
 
-                    return $stat;
-                }
-            ));
+                return $stat;
+            });
 
         $variantA = $this->createMock(Email::class);
         $variantA->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
         $variantA->method('getTemplate')
-            ->will($this->returnValue(''));
+            ->willReturn('');
         $variantA->method('getSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantA->method('getVariantSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantA->method('getVariantStartDate')
-            ->will($this->returnValue($variantDate));
+            ->willReturn($variantDate);
         $variantA->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $variantA->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantA->method('isVariant')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantA->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '25']));
+            ->willReturn(['weight' => '25']);
 
         $variantB = $this->createMock(Email::class);
         $variantB->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(3));
+            ->willReturn(3);
         $variantB->method('getTemplate')
-            ->will($this->returnValue(''));
+            ->willReturn('');
         $variantB->method('getSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantB->method('getVariantSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantB->method('getVariantStartDate')
-            ->will($this->returnValue($variantDate));
+            ->willReturn($variantDate);
         $variantB->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $variantB->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantB->method('isVariant')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantB->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '25']));
+            ->willReturn(['weight' => '25']);
 
         $this->emailEntity->method('getVariantChildren')
-            ->will($this->returnValue([$variantA, $variantB]));
+            ->willReturn([$variantA, $variantB]);
 
         $this->emailRepository->method('getDoNotEmailList')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->frequencyRepository->method('getAppliedFrequencyRules')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                        [Email::class, $this->emailRepository],
-                        [Stat::class, $this->statRepository],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [Email::class, $this->emailRepository],
+                    [Stat::class, $this->statRepository],
+                ]
             );
 
         $this->companyRepository->method('getCompaniesForContacts')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->companyModel->method('getRepository')
             ->willReturn($this->companyRepository);
@@ -423,103 +427,99 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testVariantEmailWeightsAreAppropriateForMultipleContactsSentOneAtATime(): void
     {
-        $this->mailHelper->method('getMailer')->will($this->returnValue($this->mailHelper));
-        $this->mailHelper->method('flushQueue')->will($this->returnValue(true));
-        $this->mailHelper->method('addTo')->will($this->returnValue(true));
-        $this->mailHelper->method('queue')->will($this->returnValue([true, []]));
-        $this->mailHelper->method('setEmail')->will($this->returnValue(true));
+        $this->mailHelper->method('getMailer')->willReturn($this->mailHelper);
+        $this->mailHelper->method('flushQueue')->willReturn(true);
+        $this->mailHelper->method('addTo')->willReturn(true);
+        $this->mailHelper->method('queue')->willReturn([true, []]);
+        $this->mailHelper->method('setEmail')->willReturn(true);
         $this->translator->expects($this->any())
             ->method('hasId')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         // Setup an email variant email
         $variantDate = new \DateTime();
         $this->emailEntity->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(1));
-        $this->emailEntity->method('getTemplate')->will($this->returnValue(''));
-        $this->emailEntity->method('getSentCount')->will($this->returnValue(0));
-        $this->emailEntity->method('getVariantSentCount')->will($this->returnValue(0));
-        $this->emailEntity->method('getVariantStartDate')->will($this->returnValue($variantDate));
-        $this->emailEntity->method('getTranslations')->will($this->returnValue([]));
-        $this->emailEntity->method('isPublished')->will($this->returnValue(true));
-        $this->emailEntity->method('isVariant')->will($this->returnValue(true));
+            ->willReturn(1);
+        $this->emailEntity->method('getTemplate')->willReturn('');
+        $this->emailEntity->method('getSentCount')->willReturn(0);
+        $this->emailEntity->method('getVariantSentCount')->willReturn(0);
+        $this->emailEntity->method('getVariantStartDate')->willReturn($variantDate);
+        $this->emailEntity->method('getTranslations')->willReturn([]);
+        $this->emailEntity->method('isPublished')->willReturn(true);
+        $this->emailEntity->method('isVariant')->willReturn(true);
 
         $this->mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(
-                function () {
-                    $stat = new Stat();
-                    $stat->setEmail($this->emailEntity);
+            ->willReturnCallback(function () {
+                $stat = new Stat();
+                $stat->setEmail($this->emailEntity);
 
-                    return $stat;
-                }
-            ));
+                return $stat;
+            });
 
         $variantA = $this->createMock(Email::class);
         $variantA->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
         $variantA->method('getTemplate')
-            ->will($this->returnValue(''));
+            ->willReturn('');
         $variantA->method('getSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantA->method('getVariantSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantA->method('getVariantStartDate')
-            ->will($this->returnValue($variantDate));
+            ->willReturn($variantDate);
         $variantA->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $variantA->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantA->method('isVariant')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantA->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '25']));
+            ->willReturn(['weight' => '25']);
 
         $variantB = $this->createMock(Email::class);
         $variantB->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(3));
+            ->willReturn(3);
         $variantB->method('getTemplate')
-            ->will($this->returnValue(''));
+            ->willReturn('');
         $variantB->method('getSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantB->method('getVariantSentCount')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $variantB->method('getVariantStartDate')
-            ->will($this->returnValue($variantDate));
+            ->willReturn($variantDate);
         $variantB->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $variantB->method('isPublished')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantB->method('isVariant')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $variantB->method('getVariantSettings')
-            ->will($this->returnValue(['weight' => '25']));
+            ->willReturn(['weight' => '25']);
 
         $this->emailEntity->method('getVariantChildren')
-            ->will($this->returnValue([$variantA, $variantB]));
+            ->willReturn([$variantA, $variantB]);
 
         $this->emailRepository->method('getDoNotEmailList')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->frequencyRepository->method('getAppliedFrequencyRules')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                        [Email::class, $this->emailRepository],
-                        [Stat::class, $this->statRepository],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [Email::class, $this->emailRepository],
+                    [Stat::class, $this->statRepository],
+                ]
             );
 
         $this->companyRepository->method('getCompaniesForContacts')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->companyModel->method('getRepository')
             ->willReturn($this->companyRepository);
@@ -563,21 +563,19 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->translator->expects($this->any())
             ->method('hasId')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->emailRepository->method('getDoNotEmailList')
-            ->will($this->returnValue([1 => 'someone@domain.com']));
+            ->willReturn([1 => 'someone@domain.com']);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [Email::class, $this->emailRepository],
-                        [Stat::class, $this->statRepository],
-                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [Email::class, $this->emailRepository],
+                    [Stat::class, $this->statRepository],
+                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                ]
             );
 
         // If it makes it to the point of calling getContactCompanies then DNC failed
@@ -585,9 +583,98 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository');
 
         $this->emailEntity->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $this->assertTrue(0 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataStatRecordExistance')]
+    public function testSendSegmentEmailToContact(bool $recordExist): void
+    {
+        $sendToContactModelMock  = $this->createMock(SendEmailToContact::class);
+        $emailModel              = new EmailModel(
+            $this->ipLookupHelper,
+            $this->themeHelper,
+            $this->mailboxHelper,
+            $this->mailHelper,
+            $this->leadModel,
+            $this->companyModel,
+            $this->trackableModel,
+            $this->userModel,
+            $this->messageModel,
+            $sendToContactModelMock,
+            $this->deviceTrackerMock,
+            $this->redirectRepositoryMock,
+            $this->cacheStorageHelperMock,
+            $this->contactTracker,
+            $this->doNotContact,
+            $this->statsCollectionHelper,
+            $this->corePermissions,
+            $this->entityManager,
+            $this->eventDispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
+            $this->emailStatModel,
+            $this->botRatioHelperMock
+        );
+
+        $contacts = [
+            1 => ['id' => 1, 'email' => 'someone@domain.com', 'stateExists' => $recordExist],
+            2 => ['id' => 2, 'email' => 'someone2@domain.com', 'stateExists' => false],
+        ];
+
+        $sendToContactModelMock
+            ->method('setEmail')
+            ->willReturn($sendToContactModelMock);
+
+        $this->companyRepository->method('getCompaniesForContacts')
+            ->willReturn([]);
+
+        $this->statRepository->method('checkContactSentEmail')
+            ->willReturnCallback(function () use ($contacts) {
+                $args = func_get_args();
+
+                return $contacts[$args[0]]['stateExists'];
+            });
+
+        $this->companyModel->method('getRepository')
+            ->willReturn($this->companyRepository);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturnMap(
+                [
+                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [Email::class, $this->emailRepository],
+                    [Stat::class, $this->statRepository],
+                ]
+            );
+
+        $email = new class extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+
+        $email->setEmailType('list');
+
+        $sendToContactModelMock->expects($this->exactly($recordExist ? 1 : 2))
+            ->method('setContact')
+            ->willReturn($sendToContactModelMock);
+
+        $sendToContactModelMock->expects($this->once())
+            ->method('getErrors')
+            ->willReturn(['Mailer error abc because of xyz']);
+
+        $sendToContactModelMock->expects($this->once())
+            ->method('getSentCounts')
+            ->willReturn([]);
+
+        $emailModel->sendEmail($email, $contacts);
     }
 
     /**
@@ -612,32 +699,30 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->translator->expects($this->any())
             ->method('hasId')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->emailRepository->method('getDoNotEmailList')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $this->frequencyRepository->method('getAppliedFrequencyRules')
-            ->will($this->returnValue([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]));
+            ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [Email::class, $this->emailRepository],
-                        [Stat::class, $this->statRepository],
-                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                        [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageQueueRepository::class)],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [Email::class, $this->emailRepository],
+                    [Stat::class, $this->statRepository],
+                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageQueueRepository::class)],
+                ]
             );
         $leadEntity = (new Lead())
             ->setEmail('someone@domain.com');
 
         $this->entityManager->expects($this->any())
             ->method('getReference')
-            ->will(
-                $this->returnValue($leadEntity)
+            ->willReturn(
+                $leadEntity
             );
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -680,11 +765,12 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class),
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->botRatioHelperMock
         );
 
         $this->emailEntity->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $result = $emailModel->sendEmail(
             $this->emailEntity,
@@ -723,19 +809,21 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity')
             ->with($this->isInstanceOf(Stat::class));
+        $matcher = $this->once();
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($matcher)
             ->method('persist')
-            ->withConsecutive(
-                [
-                    $this->callback(function ($statDevice) use ($stat, $ipAddress) {
-                        $this->assertInstanceOf(StatDevice::class, $statDevice);
-                        $this->assertSame($stat, $statDevice->getStat());
-                        $this->assertSame($ipAddress, $statDevice->getIpAddress());
-
-                        return true;
-                    }),
-                ]
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher, $stat, $ipAddress) {
+                    if (1 === $matcher->numberOfInvocations()) {
+                        $callback = function ($statDevice) use ($stat, $ipAddress) {
+                            $this->assertInstanceOf(StatDevice::class, $statDevice);
+                            $this->assertSame($stat, $statDevice->getStat());
+                            $this->assertSame($ipAddress, $statDevice->getIpAddress());
+                        };
+                        $callback($parameters[0]);
+                    }
+                }
             );
 
         $this->entityManager->expects($this->exactly(2))
@@ -745,6 +833,10 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->with(LeadDevice::class)
             ->willReturn($this->leadDeviceRepository);
+
+        $this->botRatioHelperMock->expects($this->once())
+            ->method('isHitByBot')
+            ->willReturn(false);
 
         $this->emailModel->hitEmail($stat, $request);
     }
@@ -778,28 +870,34 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with($contactDevice->getId())
             ->willReturn($contactDevice);
+        $matcher = $this->exactly(1);
 
-        $this->entityManager->expects($this->exactly(1))
+        $this->entityManager->expects($matcher)
             ->method('persist')
-            ->withConsecutive(
-                [
-                    $this->callback(function ($statDevice) use ($stat, $ipAddress) {
-                        $this->assertInstanceOf(StatDevice::class, $statDevice);
-                        $this->assertSame($stat, $statDevice->getStat());
-                        $this->assertSame($ipAddress, $statDevice->getIpAddress());
-
-                        return true;
-                    }),
-                ]
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher, $stat, $ipAddress) {
+                    if (1 === $matcher->numberOfInvocations()) {
+                        $callback = function ($statDevice) use ($stat, $ipAddress) {
+                            $this->assertInstanceOf(StatDevice::class, $statDevice);
+                            $this->assertSame($stat, $statDevice->getStat());
+                            $this->assertSame($ipAddress, $statDevice->getIpAddress());
+                        };
+                        $callback($parameters[0]);
+                    }
+                }
             );
 
-        $this->entityManager->expects($this->exactly(1))
+        $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->with(LeadDevice::class)
             ->willReturn($this->leadDeviceRepository);
 
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
+
+        $this->botRatioHelperMock->expects($this->once())
+            ->method('isHitByBot')
+            ->willReturn(false);
 
         $this->emailModel->hitEmail($stat, $request);
     }
@@ -905,14 +1003,12 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [Stat::class, $this->statRepository],
-                        [DoNotContactEntity::class, $doNotContactRepo],
-                        [\Mautic\PageBundle\Entity\Trackable::class, $trackableRepo],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [Stat::class, $this->statRepository],
+                    [DoNotContactEntity::class, $doNotContactRepo],
+                    [\Mautic\PageBundle\Entity\Trackable::class, $trackableRepo],
+                ]
             );
 
         $this->emailEntity->method('getLists')->willReturn($lists);
@@ -980,5 +1076,14 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);
         $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
+    }
+
+    /**
+     * @return iterable<int, bool[]>
+     */
+    public static function dataStatRecordExistance(): iterable
+    {
+        yield [true];
+        yield [false];
     }
 }

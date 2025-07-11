@@ -335,7 +335,7 @@ Mautic.leadlistOnLoad = function(container, response) {
 
         var bodyOverflow = {};
         mQuery('#' + prefix + '_filters').sortable({
-            items: '.panel',
+            items: '.filter--row',
             helper: function(e, ui) {
                 ui.children().each(function() {
                     if (mQuery(this).is(":visible")) {
@@ -446,6 +446,9 @@ Mautic.attachJsUiOnFilterForms = function() {
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
         }
+        mQuery('.chosen-search-input').on('keypress', function (event) {
+            if ( event.which === 13 ) event.preventDefault();
+        })
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -464,7 +467,7 @@ Mautic.reorderSegmentFilters = function() {
         prefix = parent.attr('id');
     }
 
-    const $filters = mQuery('#' + prefix + '_filters .panel');
+    const $filters = mQuery('#' + prefix + '_filters .filter--row');
 
     $filters.each(function() {
         const $filter = mQuery(this);
@@ -546,6 +549,8 @@ Mautic.convertLeadFilterInput = function(el) {
     Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
+
+        Mautic.ajaxifyForm('leadlist');
 
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
@@ -633,7 +638,6 @@ Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, r
 Mautic.addLeadListFilter = function (elId, elObj) {
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
-    var label = filterOption.text();
 
     // Create a new filter
 
@@ -641,6 +645,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
+    var label = filterOption.data('field-label');
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
@@ -662,11 +667,9 @@ Mautic.addLeadListFilter = function (elId, elObj) {
         prototype.find(".panel-heading .panel-glue").addClass('hide');
     }
 
-    if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
-    } else {
-        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
-    }
+    const filterTypeIcon = filterOption.data('field-icon');
+    prototype.find('.object-icon').removeClass('ri-shapes-line').addClass(filterTypeIcon);
+
     prototype.find(".inline-spacer").append(fieldObject);
 
     Mautic.segmentFilter().attachEvents(prototype);
@@ -701,7 +704,7 @@ Mautic.segmentFilter = function() {
     };
 
     const getFilterCount = function() {
-        return mQuery('.selected-filters').children('.segment-filter').length;
+        return mQuery('.selected-filters').children('.filter--row').length;
     };
 
     const showCopyBasedOnGlue = function($filter) {
@@ -782,6 +785,9 @@ Mautic.segmentFilter = function() {
             $glueWrapper.find('select').val('or');
             $glueWrapper.removeClass('hide');
         }
+
+        // Hide the "When" text in the cloned filter
+        $clone.find('.filter--condition-when').addClass('hide');
 
         const $filters = $origin.closest('.selected-filters');
 
@@ -1609,8 +1615,8 @@ Mautic.initUniqueIdentifierFields = function() {
 
 Mautic.updateFilterPositioning = function (el) {
     var $el       = mQuery(el);
-    var $parentEl = $el.closest('.panel');
-    var list      = $parentEl.parent().children('.panel');
+    var $parentEl = $el.closest('.filter--row');
+    var list      = $parentEl.parent().children('.filter--row');
     const isFirst = list.index($parentEl) === 0;
 
     if (isFirst) {
@@ -1627,13 +1633,9 @@ Mautic.updateFilterPositioning = function (el) {
 Mautic.setAsPrimaryCompany = function (companyId,leadId){
     Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
         if (response.success) {
-            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
-                mQuery('#company-' + response.oldPrimary).removeClass('primary');
-            } else {
-                mQuery('#company-' + response.oldPrimary).removeClass('primary');
-                mQuery('#company-' + response.newPrimary).addClass('primary');
-            }
-
+            // Update the company icon
+            mQuery('.panel-companies .ri-user-star-fill').removeClass('ri-user-star-fill');
+            mQuery('.panel-companies .contained-list-item__content[href$="/' + response.newPrimary + '"]').find('i').addClass('ri-user-star-fill');
         }
     });
 };

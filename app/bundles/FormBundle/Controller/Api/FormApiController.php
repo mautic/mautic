@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Entity\CommonEntity;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -49,7 +48,6 @@ class FormApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory,
     ) {
         $formModel = $modelFactory->getModel('form');
         \assert($formModel instanceof FormModel);
@@ -58,14 +56,14 @@ class FormApiController extends CommonApiController
         $this->entityClass      = Form::class;
         $this->entityNameOne    = 'form';
         $this->entityNameMulti  = 'forms';
-        $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails', 'projectList'];
 
         $this->dataInputMasks  = [
             'text'    => 'html',
             'message' => 'html',
         ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**

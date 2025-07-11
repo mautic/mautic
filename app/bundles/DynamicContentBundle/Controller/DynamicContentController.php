@@ -265,7 +265,7 @@ class DynamicContentController extends FormController
 
         $action       = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $method       = $request->getMethod();
-        $dwc          = $request->request->all['dwc'] ?? [];
+        $dwc          = $request->request->all()['dwc'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);

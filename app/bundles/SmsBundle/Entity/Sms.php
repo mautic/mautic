@@ -7,16 +7,42 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Sms extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "sms:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "sms:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Sms extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+
     /**
      * @var int
      */
@@ -95,6 +121,7 @@ class Sms extends FormEntity
     {
         $this->lists = new ArrayCollection();
         $this->stats = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     /**
@@ -148,6 +175,9 @@ class Sms extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'sms_projects_xref', 'sms_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -161,8 +191,8 @@ class Sms extends FormEntity
             )
         );
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Sms $sms, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (Sms $sms, ExecutionContextInterface $context): void {
                 $type = $sms->getSmsType();
                 if ('list' == $type) {
                     $validator  = $context->getValidator();
@@ -185,7 +215,7 @@ class Sms extends FormEntity
                     }
                 }
             },
-        ]));
+        ));
 
         $metadata->addConstraint(new EntityEvent());
     }
@@ -213,6 +243,8 @@ class Sms extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'sms');
     }
 
     protected function isChanged($prop, $val)

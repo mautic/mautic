@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
@@ -33,10 +34,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
-        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://default';
+        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->name() ? 'sync://' : 'in-memory://default';
 
         parent::setUp();
     }
@@ -402,9 +405,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    /**
-     * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
@@ -515,6 +516,59 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('Ahoy contact@an.email', $email->getSubject());
         Assert::assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
         Assert::assertSame('Your email is contact@an.email', $email->getTextBody());
+        Assert::assertCount(1, $email->getFrom());
+        Assert::assertSame($user->getName(), $email->getFrom()[0]->getName());
+        Assert::assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $email->getTo());
+        Assert::assertSame('', $email->getTo()[0]->getName());
+        Assert::assertSame($contact->getEmail(), $email->getTo()[0]->getAddress());
+        Assert::assertCount(1, $email->getReplyTo());
+        Assert::assertSame('', $email->getReplyTo()[0]->getName());
+        Assert::assertSame($replyTo, $email->getReplyTo()[0]->getAddress());
+    }
+
+    public function testEmailSendToContactHasCompany(): void
+    {
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+
+        $this->em->persist($company);
+
+        $contact     = $this->createContact('contact@an.email');
+        $this->createPrimaryCompanyForLead($contact, $company);
+        $this->em->flush();
+
+        $replyTo     = 'reply@mautic-community.test';
+
+        $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Send')->form();
+        $form->setValues(
+            [
+                'lead_quickemail[subject]'        => 'Ahoy {contactfield=email}',
+                'lead_quickemail[body]'           => 'Your email is <b>{contactfield=email}</b>. Company details: {contactfield=companyname}, {contactfield=companycity}.',
+                'lead_quickemail[replyToAddress]' => $replyTo,
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(1);
+
+        $email      = $this->getMailerMessage();
+        $userHelper = static::getContainer()->get(UserHelper::class);
+        $user       = $userHelper->getUser();
+
+        Assert::assertSame('Ahoy contact@an.email', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b>. Company details: Mautic, Pune.<img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        $expectedText = <<<EMAIL
+Your email is contact@an.email. Company details:
+Mautic, Pune.
+EMAIL;
+
+        Assert::assertSame($expectedText, $email->getTextBody());
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($user->getName(), $email->getFrom()[0]->getName());
         Assert::assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
@@ -823,6 +877,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         $leadCompanies = $form['lead[companies]']->getValue();
 
         Assert::assertCount($companyLimit, $leadCompanies);
+    }
+
+    public function testMax100CompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $companyLimit = 123;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+            ++$counter;
+        }
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+
+        // Get the select element for companies
+        $companySelect = $crawler->filter('select[name="lead[companies][]"]');
+
+        // Count the number of option elements within the select (- one option that is not a company)
+        $availableOptions = $companySelect->filter('option')->count() - 1;
+
+        // Assert that the number of available options is 100 (or your expected limit)
+        Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
     }
 
     public function testNonExitingContactIsRedirected(): void

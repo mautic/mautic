@@ -17,12 +17,12 @@ use PHPUnit\Framework\TestCase;
 class FieldValidatorTest extends TestCase
 {
     /**
-     * @var LeadFieldRepository|MockObject
+     * @var LeadFieldRepository&MockObject
      */
     private MockObject $leadFieldRepository;
 
     /**
-     * @var BulkNotification|MockObject
+     * @var BulkNotification&MockObject
      */
     private MockObject $bulkNotification;
 
@@ -97,13 +97,21 @@ class FieldValidatorTest extends TestCase
             $secondChangedObject,
         ];
 
-        $this->bulkNotification->expects($this->exactly(3))
+        $matcher = $this->exactly(3);
+
+        $this->bulkNotification->expects($matcher)
             ->method('addNotification')
-            ->withConsecutive(
-                $this->getNotificationAssertion("Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync. Your integration integration plugin may be configured improperly.", $firstChangedObject, 'company', 'length'),
-                $this->getNotificationAssertion("Custom field 'Time' of type 'time' did not match integration type 'date' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'time', 'type'),
-                $this->getNotificationAssertion("Custom field 'Number' of type 'number' did not match integration type 'url' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'number', 'type')
-            );
+            ->willReturnCallback(function (...$parameters) use ($matcher, $firstChangedObject, $secondChangedObject) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->getNotificationAssertion($parameters, "Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync. Your integration integration plugin may be configured improperly.", $firstChangedObject, 'company', 'length');
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->getNotificationAssertion($parameters, "Custom field 'Time' of type 'time' did not match integration type 'date' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'time', 'type');
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->getNotificationAssertion($parameters, "Custom field 'Number' of type 'number' did not match integration type 'url' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'number', 'type');
+                }
+            });
 
         $this->bulkNotification->expects($this->once())
             ->method('flush');
@@ -120,18 +128,16 @@ class FieldValidatorTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\Constraint\Constraint[]
+     * @param mixed[] $parameters
      */
-    private function getNotificationAssertion(string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): array
+    private function getNotificationAssertion(array $parameters, string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): void
     {
-        return [
-            $this->identicalTo($changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type),
-            $this->identicalTo($message),
-            $this->identicalTo($changedObject->getIntegration()),
-            $this->identicalTo(sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject())),
-            $this->identicalTo($changedObject->getObject()),
-            $this->identicalTo(0),
-            $this->identicalTo(sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId())),
-        ];
+        Assert::assertSame($parameters[0], $changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type);
+        Assert::assertSame($parameters[1], $message);
+        Assert::assertSame($parameters[2], $changedObject->getIntegration());
+        Assert::assertSame($parameters[3], sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject()));
+        Assert::assertSame($parameters[4], $changedObject->getObject());
+        Assert::assertSame($parameters[5], 0);
+        Assert::assertSame($parameters[6], sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId()));
     }
 }

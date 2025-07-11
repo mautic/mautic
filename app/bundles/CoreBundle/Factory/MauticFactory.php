@@ -2,8 +2,6 @@
 
 namespace Mautic\CoreBundle\Factory;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
@@ -16,7 +14,6 @@ class MauticFactory
      */
     public function __construct(
         private ModelFactory $modelFactory,
-        private ManagerRegistry $doctrine,
     ) {
     }
 
@@ -30,18 +27,5 @@ class MauticFactory
     public function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
-    }
-
-    /**
-     * Retrieves Doctrine EntityManager.
-     *
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        $manager = $this->doctrine->getManager();
-        \assert($manager instanceof EntityManager);
-
-        return $manager;
     }
 }

@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldExclusionStrategy;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -27,7 +26,7 @@ class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
     {
         $campaignEventModel = $modelFactory->getModel('campaign.event');
         \assert($campaignEventModel instanceof EventModel);
@@ -42,7 +41,7 @@ class EventApiController extends CommonApiController
         // Don't include campaign in children/parent arrays
         $this->addExclusionStrategy(new FieldExclusionStrategy(['campaign'], 1));
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**

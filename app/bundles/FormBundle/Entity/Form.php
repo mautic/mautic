@@ -9,12 +9,39 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Form extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "form:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "fields", "actions"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "form:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Form extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+
     /**
      * @var int
      */
@@ -102,10 +129,7 @@ class Form extends FormEntity
      */
     private Collection $submissions;
 
-    /**
-     * @var int
-     */
-    public $submissionCount;
+    public int $submission_count = 0;
 
     /**
      * @var string|null
@@ -141,6 +165,7 @@ class Form extends FormEntity
         $this->fields      = new ArrayCollection();
         $this->actions     = new ArrayCollection();
         $this->submissions = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -223,6 +248,9 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
+
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'form_projects_xref', 'form_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -312,6 +340,8 @@ class Form extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
     protected function isChanged($prop, $val)

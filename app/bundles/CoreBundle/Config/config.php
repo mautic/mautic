@@ -7,14 +7,6 @@ return [
                 'path'       => '/ajax',
                 'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
             ],
-            'mautic_core_update' => [
-                'path'       => '/update',
-                'controller' => 'Mautic\CoreBundle\Controller\UpdateController::indexAction',
-            ],
-            'mautic_core_update_schema' => [
-                'path'       => '/update/schema',
-                'controller' => 'Mautic\CoreBundle\Controller\UpdateController::schemaAction',
-            ],
             'mautic_core_form_action' => [
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
                 'controller' => 'Mautic\CoreBundle\Controller\FormController::executeAction',
@@ -506,11 +498,6 @@ return [
                 'tag'       => 'translation.loader',
                 'alias'     => 'mautic',
             ],
-            'mautic.tblprefix_subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber::class,
-                'tag'       => 'doctrine.event_subscriber',
-                'arguments' => '%mautic.db_table_prefix%',
-            ],
             'mautic.database.version.provider' => [
                 'class'     => Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
                 'arguments' => ['database_connection', 'mautic.helper.core_parameters'],
@@ -618,14 +605,6 @@ return [
             ],
             'mautic.helper.url' => [
                 'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
-            ],
-            'mautic.helper.export' => [
-                'class'     => Mautic\CoreBundle\Helper\ExportHelper::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.file_path_resolver',
-                ],
             ],
             'mautic.helper.composer' => [
                 'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
@@ -903,6 +882,9 @@ return [
         'tmp_path'                        => '%kernel.project_dir%/var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
+        'brand_name'                      => 'Your Brand (configurable)',
+        'primary_brand_color'             => '000000',
+        'rounded_corners'                 => '0',
         'db_driver'                       => 'pdo_mysql',
         'db_host'                         => '127.0.0.1',
         'db_port'                         => 3306,

@@ -39,35 +39,37 @@ final class FormFieldNumberTypeTest extends TypeTestCase
                 'precision' => 0,
             ],
         ];
+        $matcher = $this->exactly(2);
 
-        $this->formBuilder->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'placeholder',
-                    TextType::class,
-                    [
+        $this->formBuilder->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('placeholder', $parameters[0]);
+                    $this->assertSame(TextType::class, $parameters[1]);
+                    $this->assertSame([
                         'label'      => 'mautic.form.field.form.property_placeholder',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => ['class' => 'form-control'],
                         'required'   => false,
-                    ],
-                ],
-                [
-                    'precision',
-                    IntegerType::class,
-                    [
+                    ], $parameters[2]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('precision', $parameters[0]);
+                    $this->assertSame(IntegerType::class, $parameters[1]);
+                    $this->assertSame([
                         'label'      => 'mautic.form.field.form.number_precision',
                         'label_attr' => ['class' => 'control-label'],
                         'data'       => 0,
-                        'required'   => false,
                         'attr'       => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.form.field.form.number_precision.tooltip',
                         ],
-                    ],
-                ]
-            );
+                        'required'   => false,
+                    ], $parameters[2]);
+                }
+
+                return $this->formBuilder;
+            });
 
         $this->form->buildForm($this->formBuilder, $options);
     }

@@ -22,7 +22,7 @@ class FieldController extends FormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, FieldModel $fieldModel, $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
@@ -52,10 +52,19 @@ class FieldController extends FormController
 
         $session->set('mautic.lead.emailtoken.filter', $search);
 
-        $fields = $this->getModel('lead.field')->getEntities([
+        $fields = $fieldModel->getEntities([
             'start'      => $start,
             'limit'      => $limit,
-            'filter'     => ['string' => $search],
+            'filter'     => [
+                'string' => $search,
+                'force'  => [
+                    [
+                        'column' => 'f.columnIsNotRemoved',
+                        'value'  => false,
+                        'expr'   => 'eq',
+                    ],
+                ],
+            ],
             'orderBy'    => $orderBy,
             'orderByDir' => $orderByDir,
         ]);
@@ -295,7 +304,7 @@ class FieldController extends FormController
                         try {
                             $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                         } catch (AbortColumnUpdateException) {
-                            $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
+                            $flashMessage = $this->translator->trans('mautic.lead.field.update_pushed_to_background');
                         } catch (SchemaException $e) {
                             $flashMessage = $e->getMessage();
                             $form['alias']->addError(new FormError($e->getMessage()));

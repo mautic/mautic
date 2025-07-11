@@ -1,7 +1,6 @@
-const { Octokit } = require("@octokit/core");
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
 async function run() {
+  const { Octokit } = await import("@octokit/core");
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
   const githubContext = JSON.parse(process.env.GITHUB_CONTEXT);
   const issueID = githubContext.event.issue.number;
   const issueTitle = githubContext.event.issue.title;

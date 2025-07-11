@@ -2,21 +2,54 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
+use Mautic\LeadBundle\Validator\LeadFieldMinimumLength;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class LeadField extends FormEntity implements CacheInvalidateInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "leadfield:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "leadfield:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
-    public const CACHE_NAMESPACE    = 'LeadField';
+    use UuidTrait;
+
+    public const MAX_VARCHAR_LENGTH      = 191;
+    public const CACHE_NAMESPACE         = 'LeadField';
+    public const TYPES_SUPPORTING_LENGTH = [
+        'text',
+        'select',
+        'phone',
+        'url',
+        'email',
+    ];
 
     /**
      * @var int
@@ -112,18 +145,19 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     /**
      * The column in lead_fields table was not created yet if this property is true.
      * Entity cannot be published and we cannot work with it until column is created.
-     *
-     * @var bool
      */
-    private $columnIsNotCreated = false;
+    private bool $columnIsNotCreated = false;
+
+    /**
+     * The column in lead_fields table was not removed yet if this property is true.
+     */
+    private bool $columnIsNotRemoved = false;
 
     /**
      * This property contains an original value for $isPublished.
      * $isPublished is always set on false if $columnIsNotCreated is true.
-     *
-     * @var bool
      */
-    private $originalIsPublishedValue = false;
+    private bool $originalIsPublishedValue = false;
 
     /**
      * @var CustomFieldObject
@@ -223,10 +257,17 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ->option('default', false)
             ->build();
 
+        $builder->createField('columnIsNotRemoved', Types::BOOLEAN)
+            ->columnName('column_is_not_removed')
+            ->option('default', false)
+            ->build();
+
         $builder->createField('originalIsPublishedValue', 'boolean')
             ->columnName('original_is_published_value')
             ->option('default', false)
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -245,8 +286,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             'message' => 'mautic.lead.field.alias.unique',
         ]));
 
-        $metadata->addConstraint(new Assert\Callback([
-            'callback' => function (LeadField $field, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Assert\Callback(
+            function (LeadField $field, ExecutionContextInterface $context): void {
                 $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
 
                 if ($violations->count() > 0) {
@@ -255,7 +296,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
                         ->addViolation();
                 }
             },
-        ]));
+        ));
+
+        $metadata->addConstraint(new LeadFieldMinimumLength());
     }
 
     /**
@@ -790,18 +833,26 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->getId() ? false : true;
     }
 
-    /**
-     * @return bool
-     */
-    public function getColumnIsNotCreated()
+    public function getColumnIsNotCreated(): bool
     {
         return $this->columnIsNotCreated;
+    }
+
+    public function getColumnIsNotRemoved(): bool
+    {
+        return $this->columnIsNotRemoved;
     }
 
     public function setColumnIsNotCreated(): void
     {
         $this->columnIsNotCreated       = true;
         $this->originalIsPublishedValue = $this->getIsPublished();
+        $this->setIsPublished(false);
+    }
+
+    public function setColumnIsNotRemoved(): void
+    {
+        $this->columnIsNotRemoved = true;
         $this->setIsPublished(false);
     }
 
@@ -813,7 +864,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
     public function disablePublishChange(): bool
     {
-        return 'email' === $this->getAlias() || $this->getColumnIsNotCreated();
+        return 'email' === $this->getAlias() || $this->getColumnIsNotCreated() || $this->getColumnIsNotRemoved();
     }
 
     public function getOriginalIsPublishedValue(): bool
@@ -834,5 +885,10 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     public function setIsIndex(?bool $indexable): void
     {
         $this->isIndex = $indexable ?? false;
+    }
+
+    public function supportsLength(): bool
+    {
+        return in_array($this->type, self::TYPES_SUPPORTING_LENGTH);
     }
 }

@@ -91,13 +91,19 @@ class ClientTypeTest extends TestCase
 
         $cleanSubscriber    = new CleanFormSubscriber([]);
         $formExitSubscriber = new FormExitSubscriber('api.client', $options);
+        $matcher            = $this->exactly(2);
 
-        $this->builder->expects($this->exactly(2))
-            ->method('addEventSubscriber')
-            ->withConsecutive(
-                [$cleanSubscriber],
-                [$formExitSubscriber]
-            );
+        $this->builder->expects($matcher)
+            ->method('addEventSubscriber')->willReturnCallback(function (...$parameters) use ($matcher, $cleanSubscriber, $formExitSubscriber) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($cleanSubscriber, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($formExitSubscriber, $parameters[0]);
+                }
+
+                return $this->builder;
+            });
 
         $this->clientType->buildForm($this->builder, $options);
     }

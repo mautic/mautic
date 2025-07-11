@@ -6,15 +6,11 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(Parser::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail::class)]
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that an email is found inside a feedback report
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser::parse
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail::getContactEmail
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail::getUnsubscriptionAddress
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that an email is found inside a feedback report')]
     public function testThatReplyIsDetectedThroughTrackingPixel(): void
     {
         $message              = new Message();
@@ -31,11 +27,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test+unsubscribe@test.com', $unsubscribedEmail->getUnsubscriptionAddress());
     }
 
-    /**
-     * @testdox Test that an exeption is thrown if a unsubscription email is not found
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exeption is thrown if a unsubscription email is not found')]
     public function testExceptionIsThrownWithUnsubscribeNotFound(): void
     {
         $this->expectException(UnsubscriptionNotFound::class);

@@ -8,6 +8,7 @@ use MatthiasMullie\Minify;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,6 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to generate production assets.
  */
+#[AsCommand(
+    name: 'mautic:assets:generate',
+    description: 'Combines and minifies asset files into single production files'
+)]
 class GenerateProductionAssetsCommand extends Command
 {
     public function __construct(
@@ -32,8 +37,7 @@ class GenerateProductionAssetsCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('mautic:assets:generate')
-            ->setDescription('Combines and minifies asset files into single production files')
+        $this
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command Combines and minifies files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively. It allso runs the command elfinder:install internally to install ElFinder assets.
@@ -130,7 +134,23 @@ EOT
     {
         $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
         $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
+        $this->copyCarbonPictograms($nodeModulesDir);
     }
 
-    protected static $defaultDescription = 'Combines and minifies asset files into single production files';
+    /**
+     * Copy all pictogram SVGs from node_modules to the CoreBundle/Assets/pictograms directory.
+     */
+    private function copyCarbonPictograms(string $nodeModulesDir): void
+    {
+        $pictogramsSourceDir = "{$nodeModulesDir}/@carbon/pictograms/svg";
+        $coreBundleAssetsDir = $this->pathsHelper->getRootPath().'/app/bundles/CoreBundle/Assets/pictograms';
+
+        if (!$this->filesystem->exists($coreBundleAssetsDir)) {
+            $this->filesystem->mkdir($coreBundleAssetsDir, 0777);
+        }
+
+        if ($this->filesystem->exists($pictogramsSourceDir)) {
+            $this->filesystem->mirror($pictogramsSourceDir, $coreBundleAssetsDir, null, ['override' => true, 'delete' => true]);
+        }
+    }
 }

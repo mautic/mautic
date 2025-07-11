@@ -33,7 +33,7 @@
     {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : entity,
@@ -44,6 +44,7 @@
         'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': entity.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -96,7 +97,7 @@
                     {% endif %}
                 {% endset %}
 
-                {% include '@MauticCore/Helper/description.html.twig' with { 'description': description } %}
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with { 'description': description } %}
               <!--/ page detail header -->
               <!-- page detail collapseable -->
               <div class="collapse pr-md pl-md" id="page-details">

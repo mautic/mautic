@@ -4,15 +4,11 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\FileHelper;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(FileHelper::class)]
 class FileHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Conversion of Bytes to Megebytes
-     *
-     * @covers       \Mautic\CoreBundle\Helper\FileHelper::convertBytesToMegabytes
-     *
-     * @dataProvider bytesToMegabytesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('bytesToMegabytesProvider')]
+    #[\PHPUnit\Framework\Attributes\TestDox('Conversion of Bytes to Megebytes')]
     public function testConversionFromBytesToMegabytes(int $byte, float $megabyte): void
     {
         $fileHelper = new FileHelper();
@@ -30,13 +26,8 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @testdox Conversion of Megebytes to Bytes
-     *
-     * @covers       \Mautic\CoreBundle\Helper\FileHelper::convertMegabytesToBytes
-     *
-     * @dataProvider megabytesToBytesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('megabytesToBytesProvider')]
+    #[\PHPUnit\Framework\Attributes\TestDox('Conversion of Megebytes to Bytes')]
     public function testConversionFromMegabytesToBytes(int $megabyte, int $byte): void
     {
         $fileHelper = new FileHelper();
@@ -53,13 +44,8 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @testdox Conversion of PHP size to Bytes
-     *
-     * @covers       \Mautic\CoreBundle\Helper\FileHelper::convertPHPSizeToBytes
-     *
-     * @dataProvider phpSizeToBytesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('phpSizeToBytesProvider')]
+    #[\PHPUnit\Framework\Attributes\TestDox('Conversion of PHP size to Bytes')]
     public function testConvertPHPSizeToBytes(string $phpSize, int $bytes): void
     {
         $fileHelper = new FileHelper();

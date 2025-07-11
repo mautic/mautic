@@ -400,7 +400,7 @@ class LeadRepository extends CommonRepository
                     $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
-            );
+            )->orderBy('ll.lead_id');
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
@@ -622,6 +622,7 @@ class LeadRepository extends CommonRepository
         ->andWhere("$leadCampaignAlias.manually_removed = :false")
         ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
         ->groupBy("$leadAlias.country")
+        ->orderBy("$leadAlias.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
         ->setParameter('false', false)
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))

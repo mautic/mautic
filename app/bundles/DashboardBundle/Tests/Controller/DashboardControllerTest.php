@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -80,7 +79,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->containerMock      = $this->createMock(Container::class);
 
         $doctrine                 = $this->createMock(ManagerRegistry::class);
-        $factory                  = $this->createMock(MauticFactory::class);
         $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
@@ -93,7 +91,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
             $doctrine,
-            $factory,
             $this->modelFactoryMock,
             $userHelper,
             $coreParametersHelper,
@@ -143,23 +140,15 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isMethod')
             ->willReturn(true);
 
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(true);
-
-        $this->requestMock->method('get')
-            ->withConsecutive(['name'])
-            ->willReturnOnConsecutiveCalls('mockName');
+        $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
+        $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['router'],
-                ['router']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->routerMock,
-                $this->routerMock
-            );
+            ->method('get')->willReturnCallback(function (...$parameters) {
+                $this->assertSame('router', $parameters[0]);
+
+                return $this->routerMock;
+            });
 
         $this->routerMock->expects($this->any())
             ->method('generate')
@@ -178,8 +167,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
 
-        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
-        $this->expectException(\LogicException::class);
         $this->controller->saveAction($this->requestMock);
     }
 
@@ -196,9 +183,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->requestMock->method('get')
-            ->withConsecutive(['name'])
-            ->willReturnOnConsecutiveCalls('mockName');
+        $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->once())
             ->method('get')
@@ -218,8 +203,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.error.save');
 
-        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
-        $this->expectException(\LogicException::class);
         $this->controller->saveAction($this->requestMock);
     }
 

@@ -12,15 +12,42 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "campaign:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "events", "lists", "forms", "fields", "actions"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "campaign:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface, UuidInterface
 {
+    use UuidTrait;
+
     use OptimisticLockTrait;
+    use ProjectTrait;
 
     public const TABLE_NAME = 'campaigns';
     /**
@@ -88,6 +115,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->leads  = new ArrayCollection();
         $this->lists  = new ArrayCollection();
         $this->forms  = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public function __clone()
@@ -150,6 +178,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder->addNullableField('deleted', 'datetime');
 
         self::addVersionField($builder);
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -203,6 +233,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'campaign');
     }
 
     public function convertToArray(): array

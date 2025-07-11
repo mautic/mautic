@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -266,7 +267,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen($newValue) > 0 || $overwriteWithBlank)) {
+                    if ($curValue !== $newValue && (strlen((string) $newValue) > 0 || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -610,7 +611,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     );
                 }
 
-                $results = $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+                $results = $this->getRepository()->getAjaxSimpleList(
+                    $composite,
+                    ['filterVar' => $filterVal.'%'],
+                    $column,
+                    'id',
+                    $limit,
+                    $start
+                );
 
                 break;
         }
@@ -814,6 +822,25 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
+        \assert($company instanceof Company);
+
+        if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
+            return $company;
+        }
+
+        if ($company->isNew()) {
+            $granted = $this->security->isGranted('lead:leads:create');
+        } else {
+            $granted = $this->security->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $company->getPermissionUser()
+            );
+        }
+
+        if (!$granted) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+        }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
@@ -828,7 +855,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['dateModified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
-            $userRepo      = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class);
+            $userRepo      = $this->em->getRepository(User::class);
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
             if (null !== $createdByUser) {
                 $company->setCreatedBy($createdByUser);
@@ -837,7 +864,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
-            $userRepo       = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class);
+            $userRepo       = $this->em->getRepository(User::class);
             $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
             if (null !== $modifiedByUser) {
                 $company->setModifiedBy($modifiedByUser);
@@ -846,7 +873,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['modifiedByUser']);
 
         if (null !== $owner) {
-            $company->setOwner($this->em->getReference(\Mautic\UserBundle\Entity\User::class, $owner));
+            $company->setOwner($this->em->getReference(User::class, $owner));
         }
 
         $fieldData = $this->getFieldData($fields, $data);
@@ -964,5 +991,17 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         if (null !== $companyLead) {
             $this->getCompanyLeadRepository()->detachEntity($companyLead);
         }
+    }
+
+    /**
+     * @param mixed[] $fields
+     * @param mixed[] $data
+     */
+    private function existDataForUpdate(array $fields, array $data): bool
+    {
+        $updateData = $this->getFieldData($fields, $data);
+        $uniqueData = $this->companyDeduper->getUniqueData($updateData);
+
+        return (bool) array_diff_assoc($updateData, $uniqueData);
     }
 }

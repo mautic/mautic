@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
@@ -42,7 +41,6 @@ class CommonController extends AbstractController implements MauticController
      */
     public function __construct(
         protected ManagerRegistry $doctrine,
-        protected MauticFactory $factory,
         protected ModelFactory $modelFactory,
         UserHelper $userHelper,
         protected CoreParametersHelper $coreParametersHelper,
@@ -333,6 +331,7 @@ class CommonController extends AbstractController implements MauticController
 
         // Ajax call so respond with json
         $newContent = '';
+        $ignoreAjax = $request->get('ignoreAjax', false); // get the value here as the forward can overwrite it.
         if ($contentTemplate) {
             if ($forward) {
                 // the content is from another controller action so we must retrieve the response from it instead of
@@ -359,7 +358,7 @@ class CommonController extends AbstractController implements MauticController
 
         // there was a redirect within the controller leading to a double call of this function so just return the content
         // to prevent newContent from being json
-        if ($request->get('ignoreAjax', false)) {
+        if ($ignoreAjax) {
             return new Response($newContent, $code);
         }
 

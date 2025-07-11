@@ -5,7 +5,6 @@ namespace Mautic\ConfigBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -25,7 +24,6 @@ class SysinfoController extends FormController
         FormFieldHelper $fieldHelper,
         private SysinfoModel $sysinfoModel,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -35,7 +33,7 @@ class SysinfoController extends FormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

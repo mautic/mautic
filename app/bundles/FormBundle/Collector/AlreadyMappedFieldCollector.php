@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Collector;
 
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 
 /**
  * We need to store mapped fields in the form field builder so we could remove the used ones from the select box.
@@ -14,7 +14,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
     private const EXPIRATION_IN_SECONDS = 18000;
 
     public function __construct(
-        private CacheProviderInterface $cacheProvider,
+        private CacheProviderTagAwareInterface $cacheProvider,
     ) {
     }
 

@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\Serializer::class)]
 class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testEncodingCanBeDecoded(): void
@@ -14,9 +15,6 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
     }
 
-    /**
-     * @covers \Mautic\CoreBundle\Helper\Serializer::decode
-     */
     public function testObjectInArrayIsDetectedOrIgnored(): void
     {
         $this->expectException(\InvalidArgumentException::class);

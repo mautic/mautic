@@ -2,10 +2,9 @@
 
 /* Panel Styles */
 .panel2 {
-    border: 1px solid #ebedf0;
-    -webkit-box-shadow: 0px 1px 1px #f3f3f3;
-    box-shadow: 0px 1px 1px #f3f3f3;
-    margin: 0 25px 25px 25px;
+    --layout-density-padding-inline-local: 3px 6px;
+    -webkit-box-shadow: 0px 1px 1px #00000012;
+    box-shadow: 0px 1px 1px #00000012;
     zoom: 0.9;
 }
 .panel2 label {
@@ -21,9 +20,52 @@
 /* Form Field Wrapper */
 .form-field-wrapper {
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 .form-field-wrapper img {
     max-width: 100%;
+}
+
+.form-field-wrapper:has(> .panel2) {
+    margin: 0 25px 25px 25px;
+}
+
+/* Field Width Classes */
+.mauticform-full-width {
+    width: 100%;
+}
+
+.mauticform-three-quarters-width {
+    width: 75%;
+}
+
+.mauticform-two-thirds-width {
+    width: 66.66%;
+}
+
+.mauticform-half-width {
+    width: 50%;
+}
+
+.mauticform-one-third-width {
+    width: 33.33%;
+}
+
+.mauticform-one-quarter-width {
+    width: 25%;
+}
+
+
+/* Responsive adjustment for mobile */
+@media (max-width: 767px) {
+    .mauticform-three-quarters-width,
+    .mauticform-two-thirds-width,
+    .mauticform-half-width,
+    .mauticform-one-third-width,
+    .mauticform-one-quarter-width {
+        width: 100%;
+    }
 }
 
 /* Mautic Forms Fields and Actions */
@@ -91,8 +133,12 @@ textarea.form-html {
     max-width: 600px;
     margin: 10px auto;
 }
-.mauticform-innerform {}
-.mauticform-post-success {}
+.mauticform-innerform {
+    width: 100%;
+}
+.mauticform-post-success {
+    text-align: center;
+}
 .mauticform-name {
     font-weight: bold;
     font-size: 1.5em;
@@ -163,8 +209,14 @@ textarea.form-html {
     font-weight: normal;
     line-height: 1em;
 }
-.mauticform-checkboxgrp-checkbox {}
-.mauticform-radiogrp-row {}
+/* Checkbox group styling */
+.mauticform-checkboxgrp-checkbox {
+    margin-right: 5px;
+}
+/* Radio group row styling */
+.mauticform-radiogrp-row {
+    margin-bottom: 5px;
+}
 .mauticform-radiogrp-label {
     font-weight: normal;
 }

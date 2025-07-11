@@ -60,9 +60,7 @@ class DsnTest extends TestCase
         Assert::assertSame('10', $newDsn->getOption('timeout'));
     }
 
-    /**
-     * @dataProvider dataInvalidFromString
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidFromString')]
     public function testInvalidFromString(string $dsn, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -73,7 +71,7 @@ class DsnTest extends TestCase
     /**
      * @return iterable<string, array<string|string>>
      */
-    public function dataInvalidFromString(): iterable
+    public static function dataInvalidFromString(): iterable
     {
         yield 'DSN is invalid.' => [
             ':', 'The ":" DSN is invalid.',
@@ -98,9 +96,7 @@ class DsnTest extends TestCase
         Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=300&timeout=10', (string) Dsn::fromString('scheme://user:password@localhost:3300/path?ttl=300&timeout=10'));
     }
 
-    /**
-     * @dataProvider dataToString
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataToString')]
     public function testToString(Dsn $dsn, string $dsnString): void
     {
         Assert::assertSame($dsnString, (string) $dsn);
@@ -109,7 +105,7 @@ class DsnTest extends TestCase
     /**
      * @return iterable<string, array<Dsn|string>>
      */
-    public function dataToString(): iterable
+    public static function dataToString(): iterable
     {
         yield 'With host.' => [
             new Dsn('smtp', 'host'), 'smtp://host',
