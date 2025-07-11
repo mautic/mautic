@@ -7,10 +7,10 @@
     }}
     <body class="header-fixed pr-0">
         <nav aria-label="Skip links" class="skip-links">
-            <a href="#app-content" class="skip-link">Skip to main content</a>
-            <a href="#app-header" class="skip-link">Skip to settings</a>
-            <a href="#app-sidebar" class="skip-link">Skip to navigation</a>
-            <a href="#app-footer" class="skip-link">Skip to footer</a>
+            <a href="#app-content" class="skip-link">{{ 'mautic.dashboard.skip_link_main'|trans }}</a>
+            <a href="#app-header" class="skip-link">{{ 'mautic.dashboard.skip_link_settings'|trans }}</a>
+            <a href="#app-sidebar" class="skip-link">{{ 'mautic.dashboard.skip_link_navigation'|trans }}</a>
+            <a href="#app-footer" class="skip-link">{{ 'mautic.dashboard.skip_link_footer'|trans }}</a>
         </nav>
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
