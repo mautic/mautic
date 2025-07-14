@@ -108,8 +108,7 @@ if (!$container->getParameter('mautic.famework.csrf_protection')) {
 $container->loadFromExtension(
     'security',
     [
-        'enable_authenticator_manager' => true,
-        'providers'                    => [
+        'providers' => [
             'user_provider' => [
                 'id' => 'mautic.user.provider',
             ],

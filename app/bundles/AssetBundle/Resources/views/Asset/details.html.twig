@@ -19,6 +19,7 @@
         }
     ) -}}
     {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeAsset.category}) }}
+    {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeAsset}) }}
 {% endblock %}
 
 {% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}
@@ -51,6 +52,7 @@
         'entity': activeAsset,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {# Asset type #}
     {% if activeAsset.getFileType() is defined and activeAsset.getFileType() is not empty %}

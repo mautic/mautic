@@ -144,6 +144,7 @@
                                 {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                         {% if item.getDescription() is not empty %}
                             <div class="text-secondary mt-4">

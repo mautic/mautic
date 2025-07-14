@@ -153,6 +153,7 @@
                                 {{- item.name -}}
                                 {{- customContent('campaign.name', _context|merge({'item': item})) -}}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
 
                         {{ include('@MauticCore/Helper/description--inline.html.twig', {

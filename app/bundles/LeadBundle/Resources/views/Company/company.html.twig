@@ -28,6 +28,7 @@
         'targetLabel'     : 'mautic.lead.lead.companies'|trans
     }
 ) -}}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': company}) }}
 {% endblock %}
 
 {% block actions %}

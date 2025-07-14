@@ -4,6 +4,7 @@ namespace Mautic\WebhookBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,6 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to process queued webhook payloads.
  */
+#[AsCommand(
+    name: ProcessWebhookQueuesCommand::COMMAND_NAME,
+    description: 'Process queued webhook payloads'
+)]
 class ProcessWebhookQueuesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
@@ -25,7 +30,7 @@ class ProcessWebhookQueuesCommand extends Command
 
     protected function configure()
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption(
                 '--webhook-id',
                 '-i',
@@ -120,6 +125,4 @@ class ProcessWebhookQueuesCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Process queued webhook payloads';
 }

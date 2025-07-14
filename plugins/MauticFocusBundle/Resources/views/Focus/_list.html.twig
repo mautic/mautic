@@ -68,6 +68,7 @@
                             <a data-toggle="ajax" href="{{ path('mautic_focus_action', {'objectId': item.id, 'objectAction': 'view'}) }}">
                                 {{ item.name }}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                         {{ include('@MauticCore/Helper/description--inline.html.twig', {
                             'description': item.description

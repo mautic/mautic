@@ -18,7 +18,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
      *
      * @return string|null
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         return $value;
     }
@@ -30,7 +30,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (is_null($value)) {
             return '';

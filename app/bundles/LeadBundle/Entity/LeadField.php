@@ -286,8 +286,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
             'message' => 'mautic.lead.field.alias.unique',
         ]));
 
-        $metadata->addConstraint(new Assert\Callback([
-            'callback' => function (LeadField $field, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Assert\Callback(
+            function (LeadField $field, ExecutionContextInterface $context): void {
                 $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
 
                 if ($violations->count() > 0) {
@@ -296,7 +296,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
                         ->addViolation();
                 }
             },
-        ]));
+        ));
 
         $metadata->addConstraint(new LeadFieldMinimumLength());
     }

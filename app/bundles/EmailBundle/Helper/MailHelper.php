@@ -1065,7 +1065,7 @@ class MailHelper
     /**
      * Set Reply to for the current message we are sending. Can be in the middle of the sending loop.
      */
-    private function setMessageReplyTo(string $addresses, string $name = null): void
+    private function setMessageReplyTo(string $addresses, ?string $name = null): void
     {
         if (str_contains($addresses, ',')) {
             $addresses = explode(',', $addresses);
@@ -1601,7 +1601,7 @@ class MailHelper
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
      */
-    protected function queueAssetDownloadEntry($contactEmail = null, array $metadata = null)
+    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null)
     {
         if ($this->internalSend || empty($this->assets)) {
             return;
@@ -1946,7 +1946,7 @@ class MailHelper
         $this->from       = $this->systemFrom;
     }
 
-    private function setDefaultReplyTo($systemReplyToEmail = null, AddressDTO $systemFromEmail = null): void
+    private function setDefaultReplyTo($systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
     {
         $fromEmail = null;
         if ($systemFromEmail) {

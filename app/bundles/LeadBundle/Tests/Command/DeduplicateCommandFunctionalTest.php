@@ -119,7 +119,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(3, $contactRepository->count([]), $output->getDisplay());
     }
 
-    private function saveContact(string $email, string $phone = null): Lead
+    private function saveContact(string $email, ?string $phone = null): Lead
     {
         $contact = new Lead();
         $contact->setEmail($email);

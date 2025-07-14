@@ -322,7 +322,7 @@ class PublicController extends AbstractFormController
      *
      * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id, string $objectType = null)
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id, ?string $objectType = null)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page');

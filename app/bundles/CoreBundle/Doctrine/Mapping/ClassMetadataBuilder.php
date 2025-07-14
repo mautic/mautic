@@ -423,7 +423,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param mixed[] $flags
      * @param mixed[] $options
      */
-    public function addIndex(array $columns, $name, array $flags = null, array $options = null): self
+    public function addIndex(array $columns, $name, ?array $flags = null, ?array $options = null): self
     {
         $cm = $this->getClassMetadata();
 

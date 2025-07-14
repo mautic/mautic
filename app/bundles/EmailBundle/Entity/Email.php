@@ -504,8 +504,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addConstraint(new EmailLists());
         $metadata->addConstraint(new EntityEvent());
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Email $email, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (Email $email, ExecutionContextInterface $context): void {
                 if ($email->isVariant()) {
                     // Get a summation of weights
                     $parent   = $email->getVariantParent();
@@ -524,7 +524,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     }
                 }
             },
-        ]));
+        ));
     }
 
     /**
@@ -1135,7 +1135,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setUnsubscribeForm(Form $unsubscribeForm = null)
+    public function setUnsubscribeForm(?Form $unsubscribeForm = null)
     {
         $this->unsubscribeForm = $unsubscribeForm;
 
@@ -1153,7 +1153,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPreferenceCenter(Page $preferenceCenter = null)
+    public function setPreferenceCenter(?Page $preferenceCenter = null)
     {
         $this->preferenceCenter = $preferenceCenter;
 

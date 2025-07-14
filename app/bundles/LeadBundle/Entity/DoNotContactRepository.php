@@ -34,7 +34,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -142,7 +142,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getChannelList($channel, array $contacts = null): array
+    public function getChannelList($channel, ?array $contacts = null): array
     {
         // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
         if (is_array($contacts) && empty($contacts)) {

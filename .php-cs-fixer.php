@@ -46,7 +46,7 @@ return (new PhpCsFixer\Config())
         ],
         'Mautic/no_table_prefix_definition_in_tests'       => true,
         'multiline_whitespace_before_semicolons'           => true,
-        'nullable_type_declaration_for_default_null_value' => false, // Enforces potential BC breaks. Enable for Mautic 6.
+        'nullable_type_declaration_for_default_null_value' => true,
         'no_superfluous_phpdoc_tags'                       => [
             'allow_mixed' => true,
         ],

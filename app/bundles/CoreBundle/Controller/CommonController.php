@@ -116,7 +116,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array<string, string> $parameters
      */
-    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, Request $request = null): string
+    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
     {
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
             $event = $this->dispatcher->dispatch(
@@ -593,7 +593,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Renders notification info for ajax.
      */
-    protected function getNotificationContent(Request $request = null): array
+    protected function getNotificationContent(?Request $request = null): array
     {
         if (null === $request) {
             $request = $this->getCurrentRequest();
@@ -624,7 +624,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @deprecated Will be removed in Mautic 3.0 as unused.
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null): void
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, ?\DateTime $datetime = null): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');
@@ -671,7 +671,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
     {
         $data = new DataExporterHelper();
 
