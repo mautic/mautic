@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
@@ -17,6 +18,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -454,7 +456,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($firstEmail->getId(), $secondEmail->getVariantParent()->getId());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dwcTokenTypeDataProvider')]
+    #[DataProvider('dwcTokenTypeDataProvider')]
     public function testSaveEmailWithHtmlTypeDWC(string $type): void
     {
         $dwc            = $this->createDynamicContent($type);
@@ -525,7 +527,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param mixed[]|null $varientSetting
      */
-    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, LeadList $segment = null, ?array $varientSetting = []): Email
+    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, ?LeadList $segment = null, ?array $varientSetting = []): Email
     {
         $email = new Email();
         $email->setName($name);
@@ -640,5 +642,71 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($dynamicContent);
 
         return $dynamicContent;
+    }
+
+    /**
+     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
+     */
+    #[DataProvider('getEditEmailForTranslationProvider')]
+    public function testEditEmailForTranslation(
+        string $parentType,
+        string $childType,
+        string $parentField,
+        bool $useSegment,
+    ): void {
+        $segment = $useSegment ? $this->createSegment('Segment A', 'segment-a') : null;
+
+        $parentEmail = $this->createEmail('Parent Email', 'template', $parentType, 'blank', 'Test html', $segment);
+        $childEmail  = $this->createEmail('Child Email', 'template', $childType, 'blank', 'Test html', $segment);
+
+        $this->em->persist($parentEmail);
+        $this->em->persist($childEmail);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$childEmail->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Save')->form();
+        $form->setValues([
+            'emailform[name]'            => 'Child Email - Updated',
+            "emailform[$parentField]"    => $parentEmail->getId(),
+        ]);
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        /** @var Email $updatedChild */
+        $updatedChild      = $this->em->find(Email::class, $childEmail->getId());
+        $translationParent = $updatedChild->getTranslationParent();
+        \assert($translationParent instanceof Email || null === $translationParent);
+
+        $this->assertNotNull($translationParent, 'Translation parent should be set.');
+        $this->assertSame(
+            $parentEmail->getId(),
+            $translationParent->getId(),
+            'Child email should have the parent email set for translation.'
+        );
+    }
+
+    /**
+     * @return iterable<string, array{parentType: string, childType: string, parentField: string, useSegment: bool}>
+     */
+    public static function getEditEmailForTranslationProvider(): iterable
+    {
+        yield 'Segment email' => [
+            'parentType'   => 'list',
+            'childType'    => 'list',
+            'parentField'  => 'segmentTranslationParent',
+            'useSegment'   => true,
+        ];
+
+        yield 'Template email' => [
+            'parentType'   => 'template',
+            'childType'    => 'template',
+            'parentField'  => 'templateTranslationParent',
+            'useSegment'   => false,
+        ];
     }
 }

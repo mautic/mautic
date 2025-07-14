@@ -32,6 +32,7 @@
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
 {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activePage.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': activePage}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
@@ -55,6 +56,7 @@
         'entity': activePage,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {% set blueTags = [] %}
     {% set grayTags = [] %}

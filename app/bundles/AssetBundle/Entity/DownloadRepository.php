@@ -136,7 +136,7 @@ class DownloadRepository extends CommonRepository
     /**
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null): array
+    public function getDownloadCountsByPage($pageId, ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
@@ -176,7 +176,7 @@ class DownloadRepository extends CommonRepository
      *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null): array
+    public function getDownloadCountsByEmail($emailId, ?\DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();

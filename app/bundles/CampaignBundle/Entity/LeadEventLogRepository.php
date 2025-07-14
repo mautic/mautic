@@ -137,7 +137,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's upcoming events.
      */
-    public function getUpcomingEvents(array $options = null): array
+    public function getUpcomingEvents(?array $options = null): array
     {
         $leadIps = [];
 
@@ -213,9 +213,9 @@ class LeadEventLogRepository extends CommonRepository
         $excludeScheduled = false,
         $excludeNegative = true,
         $all = false,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
-        int $eventId = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
+        ?int $eventId = null,
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 

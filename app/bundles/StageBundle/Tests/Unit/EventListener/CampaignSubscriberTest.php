@@ -446,7 +446,7 @@ final class CampaignSubscriberTest extends TestCase
             /**
              * @param array<string, mixed> $parameters
              */
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans($id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

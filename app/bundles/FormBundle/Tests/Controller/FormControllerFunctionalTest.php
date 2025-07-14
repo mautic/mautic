@@ -657,6 +657,30 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
     }
 
+    public function testFormDetailsViewWithPreviewPanel(): void
+    {
+        // Create a form
+        $form = $this->createForm('Test Form Details', 'test_form_details');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // Request the form details view
+        $crawler = $this->client->request('GET', sprintf('/s/forms/view/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Check if preview panel exists
+        $previewPanel = $crawler->filter('div.panel.shd-none.bdr-rds-0.bdr-w-0.mt-sm.mb-0');
+
+        if ($previewPanel->count() > 0) {
+            // If preview panel exists, verify its structure
+            $panelHeading = $previewPanel->filter('.panel-heading .panel-title:contains("Preview")');
+            $this->assertCount(1, $panelHeading, 'Preview panel should have correct heading structure');
+
+            $panelBody = $previewPanel->filter('.panel-body.pt-xs');
+            $this->assertCount(1, $panelBody, 'Preview panel should have correct body structure');
+        }
+    }
+
     private function createForm(string $name, string $alias): Form
     {
         $form = new Form();

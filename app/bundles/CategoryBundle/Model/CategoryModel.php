@@ -59,7 +59,7 @@ class CategoryModel extends FormModel
         return 'getTitle';
     }
 
-    public function getPermissionBase(string $bundle = null): string
+    public function getPermissionBase(?string $bundle = null): string
     {
         if (null === $bundle) {
             $bundle = $this->requestStack->getCurrentRequest()->get('bundle');
@@ -131,7 +131,7 @@ class CategoryModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);

@@ -1329,7 +1329,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function fetchDncToMautic(Lead $lead = null, array $data): void
+    private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
         if (is_null($lead)) {
             return;

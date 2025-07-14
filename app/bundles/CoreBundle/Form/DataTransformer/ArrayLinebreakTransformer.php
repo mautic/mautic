@@ -14,7 +14,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function transform($array)
+    public function transform(mixed $array): mixed
     {
         if (null === $array) {
             return '';
@@ -28,7 +28,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      *
      * @return array<string>
      */
-    public function reverseTransform($string)
+    public function reverseTransform(mixed $string): mixed
     {
         if (!$string) {
             return [];

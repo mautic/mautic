@@ -178,6 +178,14 @@
                                         'btnText'   : 'mautic.asset.asset.preview'|trans,
                                         'iconClass' : 'ri-image-circle-line',
                                     },
+                                    1: {
+                                        'attr' : {
+                                            'data-copy' : url('mautic_asset_download', {'slug': item.getId() ~ ':' ~ item.getAlias()}),
+                                            'data-toggle' : 'none',
+                                        },
+                                        'btnText'   : 'mautic.core.copy_download_link'|trans,
+                                        'iconClass' : 'ri-clipboard-line',
+                                    },
                                 },
                             }
                         ) -}}
@@ -200,6 +208,7 @@
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
                             {{ customContent('asset.name', _context) }}
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}

@@ -7,6 +7,7 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,6 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to send a scheduled broadcast.
  */
+#[AsCommand(
+    name: 'mautic:broadcasts:send',
+    description: 'Process contacts pending to receive a channel broadcast.'
+)]
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
     public function __construct(
@@ -30,7 +35,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
 
     protected function configure()
     {
-        $this->setName('mautic:broadcasts:send')
+        $this
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
@@ -178,6 +183,4 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }

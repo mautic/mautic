@@ -162,7 +162,7 @@ class TriggerController extends FormController
      *
      * @param array<mixed> $triggerEvents
      */
-    public function newAction(Request $request, Trigger $entity = null, array $triggerEvents = []): Response
+    public function newAction(Request $request, ?Trigger $entity = null, array $triggerEvents = []): Response
     {
         /** @var TriggerModel $model */
         $model = $this->getModel('point.trigger');
