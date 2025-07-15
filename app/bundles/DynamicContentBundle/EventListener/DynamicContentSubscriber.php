@@ -172,8 +172,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $leadArray),
-                $this->pageTokenHelper->findPageTokens($content, $clickthrough),
-                $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
+                $this->pageTokenHelper->findPageTokens($content),
+                $this->assetTokenHelper->findAssetTokens($content),
                 $this->formTokenHelper->findFormTokens($content),
                 $this->focusTokenHelper->findFocusTokens($content)
             );
@@ -288,15 +288,16 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $content = preg_replace_callback(
             '/<([a-z0-9]+)[^>]*data-slot="dwc"[^>]*data-param-slot-name="([^"]+)"[^>]*>.*?<\/\1>/is',
             function ($matches) use ($dwcSlotContentForLead, &$index, $event, $lead) {
-                $slotName = $matches[2];
-                $token    = '{dwc_'.$slotName.'_'.$index.'}';
+                $slotName    = $matches[2];
+                $token       = '{dwc_'.$slotName.'_'.$index.'}';
+                $slotContent = $matches[0];
                 if (isset($dwcSlotContentForLead[$slotName])) {
                     $slotContent = '<div>'.$dwcSlotContentForLead[$slotName].'</div>';
-                } else {
-                    $slotContent = $this->dynamicContentHelper->replaceTokenInsideDWCContent(
-                        $matches[0], $event, $lead
-                    );
                 }
+
+                $slotContent = $this->dynamicContentHelper->replaceTokenInsideDWCContent(
+                    $slotContent, $event, $lead
+                );
 
                 $event->addToken($token, $slotContent);
                 ++$index;

@@ -139,6 +139,10 @@ class DynamicContentHelper
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $event);
         }
 
+        if ($event instanceof EmailSendEvent) {
+            return $content;
+        }
+
         $slot       = $dwc->getSlotName();
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
         $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
@@ -269,8 +273,8 @@ class DynamicContentHelper
         if (!empty($matches[1])) {
             $tokens = $this->getDwcTokensWithContent($matches[1], $lead, $event);
             foreach ($matches[1] as $key => $slotName) {
-                $content = isset($tokens[$slotName]) ? $tokens[$slotName] :
-                    $this->replaceTokenInsideDWCContent($matches[2][$key], $event, $lead);
+                $content = isset($tokens[$slotName]) ? $tokens[$slotName] : $matches[2][$key];
+                $content = $this->replaceTokenInsideDWCContent($content, $event, $lead);
 
                 $token          = '{dwc_subject_'.$slotName.'_'.$key.'}';
                 $plainText      = strip_tags($content);
