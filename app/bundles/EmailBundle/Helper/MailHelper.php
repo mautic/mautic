@@ -828,7 +828,8 @@ class MailHelper
                 }
 
                 if ($imageContent = file_get_contents($path)) {
-                    $this->message->embed($imageContent, md5($match));
+                    $contentType = mime_content_type($path);
+                    $this->message->embed($imageContent, md5($match),$contentType);
                     $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
                 }
             }
