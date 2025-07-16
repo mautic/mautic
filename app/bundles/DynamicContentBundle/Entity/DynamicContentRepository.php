@@ -2,7 +2,6 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
@@ -269,30 +268,34 @@ class DynamicContentRepository extends CommonRepository
             ->fetchAllAssociative();
     }
 
-    /**
-     * @throws Exception
-     */
     public function reorderDwc(int $currentOrder, int $newOrder, string $slotName): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('d')
+            ->from(DynamicContent::class, 'd')
+            ->where('d.slotName = :slotName');
+
         if ($currentOrder < $newOrder) {
-            $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content', 'd')
-                ->set('d.display_order', 'd.display_order - 1')
-                ->where('d.display_order > :currentOrder')
-                ->andWhere('d.display_order < :newOrder')
-                ->andWhere('d.slot_name = :slotName');
+            $qb->andWhere('d.displayOrder > :currentOrder')
+                ->andWhere('d.displayOrder < :newOrder');
         } else {
-            $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content', 'd')
-                ->set('d.display_order', 'd.display_order + 1')
-                ->where('d.display_order >= :newOrder')
-                ->andWhere('d.display_order < :currentOrder')
-                ->andWhere('d.slot_name = :slotName');
+            $qb->andWhere('d.displayOrder >= :newOrder')
+                ->andWhere('d.displayOrder < :currentOrder');
         }
 
-        $q->setParameter('currentOrder', $currentOrder)
+        $qb->setParameter('currentOrder', $currentOrder)
             ->setParameter('newOrder', $newOrder)
-            ->setParameter('slotName', $slotName)
-            ->executeQuery();
+            ->setParameter('slotName', $slotName);
+
+        $dynamicContents = $qb->getQuery()->getResult();
+        foreach ($dynamicContents as $dynamicContent) {
+            $newDisplayOrder = $currentOrder < $newOrder
+                ? $dynamicContent->getDisplayOrder() - 1
+                : $dynamicContent->getDisplayOrder() + 1;
+            $dynamicContent->setDisplayOrder($newDisplayOrder);
+            $this->_em->persist($dynamicContent);
+        }
+        $this->_em->flush();
     }
 
     public function getLastDisplayOrder(string $slotName): int
