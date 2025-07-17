@@ -56,7 +56,7 @@ class CompanyType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $score = isset($options['data']['score']) && is_numeric($options['data']['score']) ? (float)$options['data']['score'] : null;
+        $score = isset($options['data']['score']) && is_numeric($options['data']['score']) ? (float) $options['data']['score'] : null;
         $builder->add(
             'score',
             NumberType::class,
