@@ -41,6 +41,7 @@ class CampaignEventPointType extends AbstractType
             ]
         );
 
+        $score = isset($options['data']['score']) && is_numeric($options['data']['score']) ? (float)$options['data']['score'] : null;
         $builder->add(
             'score',
             NumberType::class,
@@ -50,6 +51,7 @@ class CampaignEventPointType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'scale'      => 0,
                 'required'   => true,
+                'data'       => $score,
             ]
         );
 

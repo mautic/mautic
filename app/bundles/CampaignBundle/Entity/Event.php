@@ -949,12 +949,12 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param string|int $channelId
+     * @param string|int|null $channelId
      */
     public function setChannelId($channelId): void
     {
         $this->isChanged('channelId', $channelId);
-        $this->channelId = (string) $channelId;
+        $this->channelId = null === $channelId ? null : (string) $channelId;
     }
 
     /**
