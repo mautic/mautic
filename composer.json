@@ -29,7 +29,7 @@
     "codeception/module-asserts": "^3.0",
     "codeception/module-db": "^3.1",
     "codeception/module-webdriver": "^4.0",
-    "friendsofphp/php-cs-fixer": "^3.14",
+    "friendsofphp/php-cs-fixer": "^3.84.0",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
     "liip/test-fixtures-bundle": "^2.6",
