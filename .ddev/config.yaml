@@ -1,5 +1,6 @@
 type: php
 docroot: ""
+name: mautic7
 php_version: "8.4"
 webserver_type: apache-fpm
 database:
