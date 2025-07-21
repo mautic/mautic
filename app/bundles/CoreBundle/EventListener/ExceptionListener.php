@@ -25,12 +25,12 @@ class ExceptionListener extends ErrorListener
     public function __construct(
         protected Router $router,
         $controller,
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct($controller, $logger);
     }
 
-    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null): void
+    public function onKernelException(ExceptionEvent $event, ?string $eventName = null, ?EventDispatcherInterface $eventDispatcher = null): void
     {
         $exception = $event->getThrowable();
 

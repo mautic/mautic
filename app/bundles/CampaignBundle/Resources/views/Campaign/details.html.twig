@@ -14,6 +14,7 @@
     'targetLabel': 'mautic.campaign.campaigns'|trans
   }) -}}
 {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': campaign.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': campaign}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
@@ -40,6 +41,7 @@
 
 {% block publishStatus %}
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
+  <div class="label__divider"></div>
   
   {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {

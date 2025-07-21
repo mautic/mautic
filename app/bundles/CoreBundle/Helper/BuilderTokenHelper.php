@@ -71,7 +71,7 @@ class BuilderTokenHelper
         $filter = '',
         $labelColumn = 'name',
         $valueColumn = 'id',
-        CompositeExpression $expr = null,
+        ?CompositeExpression $expr = null,
     ) {
         if (!$this->isConfigured) {
             throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');

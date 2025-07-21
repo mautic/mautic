@@ -326,7 +326,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -374,7 +374,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         Request $request,
         bool $viaBrowser = false,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDateTime = null,
+        ?\DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false,
     ): void {
         if (!$stat instanceof Stat) {
@@ -508,7 +508,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return array
      */
-    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);
@@ -656,7 +656,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param bool $includeVariants
      */
-    public function getEmailListStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
+    public function getEmailListStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -935,8 +935,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $maxContactId = null,
         $countWithMaxMin = false,
         $storeToCache = true,
-        int $maxThreads = null,
-        int $threadId = null,
+        ?int $maxThreads = null,
+        ?int $threadId = null,
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         $total      = $this->getRepository()->getEmailPendingLeads(
@@ -1017,11 +1017,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $lists = null,
         $limit = null,
         $batch = null,
-        OutputInterface $output = null,
+        ?OutputInterface $output = null,
         $minContactId = null,
         $maxContactId = null,
-        int $maxThreads = null,
-        int $threadId = null,
+        ?int $maxThreads = null,
+        ?int $threadId = null,
     ): array {
         // get the leads
         if (empty($lists)) {
@@ -1516,7 +1516,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function sendEmailToUser(
         Email $email,
         $users,
-        array $lead = null,
+        ?array $lead = null,
         array $tokens = [],
         array $assetAttachments = [],
         $saveStat = false,
@@ -2008,7 +2008,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array $filters
      * @param array $options
      */
-    public function getEmailStatList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getEmailStatList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2045,7 +2045,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array $filters
      * @param array $options
      */
-    public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getEmailList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();

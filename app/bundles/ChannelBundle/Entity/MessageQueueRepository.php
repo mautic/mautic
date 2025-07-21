@@ -62,7 +62,7 @@ class MessageQueueRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    public function getQueuedChannelCount($channel, array $ids = null): int
+    public function getQueuedChannelCount($channel, ?array $ids = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

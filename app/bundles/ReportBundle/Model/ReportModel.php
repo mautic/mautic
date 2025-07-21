@@ -142,7 +142,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -443,7 +443,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = []): array
+    public function getReportData(Report $entity, ?FormFactoryInterface $formFactory = null, array $options = []): array
     {
         // Clone dateFrom/dateTo because they handled separately in charts
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));

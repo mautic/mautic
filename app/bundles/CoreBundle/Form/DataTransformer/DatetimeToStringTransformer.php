@@ -24,7 +24,7 @@ class DatetimeToStringTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (empty($value)) {
             return null;
@@ -40,7 +40,7 @@ class DatetimeToStringTransformer implements DataTransformerInterface
      *
      * @return \DateTime
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         if (empty($value)) {
             return null;

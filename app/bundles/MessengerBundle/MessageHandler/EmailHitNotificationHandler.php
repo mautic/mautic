@@ -24,7 +24,7 @@ class EmailHitNotificationHandler
         $this->isSyncTransport = str_starts_with($parametersHelper->get('messenger_dsn_hit'), 'sync://');
     }
 
-    public function __invoke(EmailHitNotification $message, Acknowledger $ack = null): void
+    public function __invoke(EmailHitNotification $message, ?Acknowledger $ack = null): void
     {
         try {
             $this->emailModel->hitEmail(

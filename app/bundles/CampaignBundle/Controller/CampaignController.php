@@ -156,8 +156,8 @@ class CampaignController extends AbstractStandardFormController
         $objectId,
         $page = 1,
         $count = null,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ) {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);

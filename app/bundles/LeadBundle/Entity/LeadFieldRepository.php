@@ -108,7 +108,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return string[]
      */
-    public function getSearchableFieldAliases(string $object = null): array
+    public function getSearchableFieldAliases(?string $object = null): array
     {
         $fq = $this->createQueryBuilder($this->getTableAlias());
         $fq->select($this->getTableAlias().'.alias')

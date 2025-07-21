@@ -1,0 +1,83 @@
+{% if item.projects is not empty %}
+<div class="project-group d-inline-flex gap-3 mb-xs">
+{% for project in item.projects %}
+
+    {% set projectPopover %}
+        <header class="project-popover__header mt-xs">
+            <span class="project-popover__icon" aria-hidden="true"><i class="ri-archive-stack-line"></i></span>
+            <h2 class="project-popover__title type-heading-02 text-interactive">{{ project.name }}</h2>
+        </header>
+
+        <div class="project-popover__meta mb-md">
+            {% if project.dateModified is not empty %}
+                <span class="project-popover__meta-text type-label-01 text-secondary">
+                    {{ 'mautic.project.popover.updated.on'|trans({'%date%': project.dateModified.date|date}) }}
+                </span>
+            {% endif %}
+        </div>
+
+        <p class="project-popover__description type-body-compact-01 mb-md">
+            {{ project.description|striptags|slice(0, 150) ~ (project.description|length > 150 ? '...' : '') }}
+        </p>
+
+        <div class="project-popover__actions">
+            {% set buttons = [] %}
+            
+            {% if securityIsGranted('project:project:view') %}
+                {% set buttons = buttons|merge([
+                    {
+                        label: 'mautic.project.popover.view.details'|trans,
+                        href: path('mautic_project_action', {'objectAction': 'view', 'objectId': project.id}),
+                        icon: 'ri-arrow-right-line',
+                        variant: 'tertiary',
+                        size: 'sm',
+                        wide: true,
+                        attributes: {
+                            class: 'project-popover__action mb-xs'
+                        }
+                    }
+                ]) %}
+            {% endif %}
+            
+            {% if securityIsGranted('project:project:edit') %}
+                {% set buttons = buttons|merge([
+                    {
+                        label: 'mautic.project.popover.edit'|trans,
+                        href: path('mautic_project_action', {'objectAction': 'edit', 'objectId': project.id}),
+                        icon: 'ri-edit-line',
+                        variant: 'tertiary',
+                        size: 'sm',
+                        wide: true,
+                        attributes: {
+                            class: 'project-popover__action'
+                        }
+                    }
+                ]) %}
+            {% endif %}
+            
+            {% if buttons|length > 0 %}
+                {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: buttons
+                } %}
+            {% endif %}
+        </div>
+
+        <footer class="project-popover__footer type-label-01 text-placeholder mt-lg">
+            <span class="project-popover__footer-text">{{ 'mautic.project.popover.footer.label'|trans }}</span>
+        </footer>
+    {% endset %}
+
+        <div class="project-popover" data-toggle="popover" data-content='{{ projectPopover }}' data-html="true" data-container="body" data-placement="bottom" data-trigger="hover" data-delay='{"show": 300, "hide": 2000}'>
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                tags: [
+                    {
+                        label: project.name,
+                        color: 'brand',
+                        size: 'sm',
+                    }
+                ]
+            } %}
+        </div>
+        {% endfor %}
+</div>
+{% endif %}

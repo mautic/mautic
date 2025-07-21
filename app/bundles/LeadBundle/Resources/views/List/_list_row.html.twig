@@ -45,6 +45,7 @@
             {% else %}
                 {{ item.name }} ({{ item.alias }})
             {% endif %}
+            {{ include('@MauticProject/Modules/projects.html.twig') }}
             {% if not item.isGlobal and app.user.id != item.createdBy %}
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>

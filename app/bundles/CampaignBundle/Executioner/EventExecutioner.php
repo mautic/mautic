@@ -47,7 +47,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContact(Event $event, Lead $contact, Responses $responses = null, Counter $counter = null): void
+    public function executeForContact(Event $event, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
         if ($responses) {
             $this->responses = $responses;
@@ -64,7 +64,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContact(ArrayCollection $events, Lead $contact, Responses $responses = null, Counter $counter = null): void
+    public function executeEventsForContact(ArrayCollection $events, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
         if ($responses) {
             $this->responses = $responses;
@@ -84,7 +84,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, $isInactiveEvent = false): void
+    public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false): void
     {
         if (!$contacts->count()) {
             $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
@@ -104,7 +104,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeLogs(Event $event, ArrayCollection $logs, Counter $counter = null): void
+    public function executeLogs(Event $event, ArrayCollection $logs, ?Counter $counter = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId());
 
@@ -152,7 +152,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false): void
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, $isInactive = false): void
     {
         if (!$contacts->count()) {
             return;
@@ -264,7 +264,7 @@ class EventExecutioner
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
+    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, $isInactive = false)
     {
         $events = clone $events;
 
@@ -341,7 +341,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null): void
+    private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $actions         = $event->getChildrenByEventType(Event::TYPE_ACTION);
@@ -363,7 +363,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null): void
+    private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $conditions      = $event->getChildrenByEventType(Event::TYPE_CONDITION);
@@ -385,7 +385,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeBranchedEventsForContacts(Event $event, EvaluatedContacts $contacts, Counter $counter = null): void
+    private function executeBranchedEventsForContacts(Event $event, EvaluatedContacts $contacts, ?Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $this->executePositivePathEventsForContacts($event, $contacts->getPassed(), $childrenCounter);

@@ -6,6 +6,7 @@
 
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+    <div class="label__divider"></div>
     {% if item.type is defined and item.type is not empty %}
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [{
@@ -108,6 +109,7 @@
     }
 ) -}}
 {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': item.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig') }}
 {% endblock %}
 
 {% block actions %}

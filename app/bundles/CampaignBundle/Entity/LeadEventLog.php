@@ -226,7 +226,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setDateTriggered(\DateTimeInterface $dateTriggered = null)
+    public function setDateTriggered(?\DateTimeInterface $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
@@ -341,7 +341,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setTriggerDate(\DateTimeInterface $triggerDate = null)
+    public function setTriggerDate(?\DateTimeInterface $triggerDate = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
@@ -508,7 +508,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setFailedLog(FailedLeadEventLog $log = null)
+    public function setFailedLog(?FailedLeadEventLog $log = null)
     {
         $this->failedLog = $log;
 
