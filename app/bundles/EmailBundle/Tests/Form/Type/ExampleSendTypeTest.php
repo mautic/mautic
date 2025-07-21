@@ -129,9 +129,9 @@ class ExampleSendTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                  => 'form-control',
-                            'data-callback'          => 'activateContactLookupField',
+                            'data-callback'          => 'activateExampleContactLookupField',
                             'data-toggle'            => 'field-lookup',
-                            'data-lookup-callback'   => 'updateContactLookupListFilter',
+                            'data-lookup-callback'   => 'updateExampleContactLookupListFilter',
                             'data-chosen-lookup'     => 'lead:contactList',
                             'placeholder'            => 'startTyping',
                             'data-no-record-message' => 'nomatches',

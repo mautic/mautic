@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -1161,6 +1162,34 @@ class Asset extends FormEntity
             if (null === $object->getTitle()) {
                 $context->buildViolation('mautic.asset.asset.error.missing.title')
                     ->atPath('title')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
+            $parameters        = (new ParameterLoader())->getParameterBag();
+            $extensionsAllowed = $parameters->get('allowed_extensions');
+            $mimeTypesMap      = $parameters->get('allowed_mimetypes');
+            $mimeTypesAllowed  = array_intersect_key($mimeTypesMap, array_flip($extensionsAllowed));
+
+            $fileMimeType        = $object->getFileMimeType();
+            $fileExtension       = strtolower($object->getExtension() ?? '');
+            $lowercaseMimeTypes  = array_change_key_case($mimeTypesAllowed, CASE_LOWER);
+            $lowercaseMimeValues = array_map('strtolower', $mimeTypesAllowed);
+
+            if (!empty($fileMimeType) && array_key_exists($fileExtension, $lowercaseMimeTypes) && !in_array(strtolower($fileMimeType), $lowercaseMimeValues, true)) {
+                $context->buildViolation('mautic.asset.asset.error.invalid.mimetype', [
+                    '%fileMimetype%'=> $object->getFileMimeType(),
+                    '%mimetypes%'   => implode(', ', $mimeTypesAllowed),
+                ])->atPath('file')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
+
+            $fileType = $object->getExtension();
+            if (null !== $fileType && !in_array(strtolower($fileType), array_map('strtolower', $extensionsAllowed), true)) {
+                $context->buildViolation('mautic.asset.asset.error.file.extension', [
+                    '%fileExtension%'=> $object->getExtension(),
+                    '%extensions%'   => implode(', ', $extensionsAllowed),
+                ])->atPath('file')
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }

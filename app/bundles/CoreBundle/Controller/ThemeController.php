@@ -201,12 +201,36 @@ class ThemeController extends FormController
     public function batchDeleteAction(Request $request, ThemeHelperInterface $themeHelper)
     {
         $flashes = [];
+        $error   = [];
 
         if ('POST' === $request->getMethod()) {
             $themeNames = json_decode($request->query->get('ids', '{}'));
 
             foreach ($themeNames as $themeName) {
-                $flashes = $this->deleteTheme($themeHelper, $themeName);
+                $flash = $this->deleteTheme($themeHelper, $themeName)[0];
+
+                if ('error' === $flash['type']) {
+                    $error[] = $flash;
+                } else {
+                    $flashes[] = $flash;
+                }
+            }
+
+            if (count($flashes) > 1) {
+                $flashNumber = count($flashes);
+                unset($flashes);
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.core.theme.notice.batch_deleted',
+                    'msgVars' => [
+                        '%count%' => $flashNumber,
+                    ],
+                ];
+            }
+
+            if ($error) {
+                $flashes = array_merge($flashes, $error);
             }
         }
 

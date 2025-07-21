@@ -185,12 +185,10 @@ class MessageQueueModel extends FormModel
         foreach ($this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId) as $queue) {
             $counter += $this->processMessageQueue($queue);
             $event   = $queue->getEvent();
-            $lead    = $queue->getLead();
 
             if ($event) {
                 $this->em->detach($event);
             }
-            $this->em->detach($lead);
             $this->em->detach($queue);
         }
 

@@ -179,19 +179,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function applySqlFromFile($file): void
     {
-        $connection = $this->connection;
-        $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
-        $envVars    = [
-            'MYSQL_PWD'      => $this->connection->getParams()['password'],
-            'db_host'        => $this->connection->getParams()['host'],
-            'db_port'        => $this->connection->getParams()['port'],
-            'db_user'        => $this->connection->getParams()['user'],
-            'db_name'        => $this->connection->getParams()['dbname'],
-            'db_backup_file' => $file,
-        ];
+        $connectionParams = $this->connection->getParams();
+        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+        $command          = sprintf(
+            'mysql -h%s -P%s -u%s %s %s < %s',
+            escapeshellarg($connectionParams['host']),
+            escapeshellarg((string) $connectionParams['port']),
+            escapeshellarg($connectionParams['user']),
+            $password,
+            escapeshellarg($connectionParams['dbname']),
+            escapeshellarg($file)
+        );
 
         $process = Process::fromShellCommandline($command);
-        $process->run(null, $envVars);
+        $process->run();
 
         // executes after the command finishes
         if (!$process->isSuccessful()) {
@@ -278,19 +279,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
-        $connection = $this->connection;
-        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
-        $envVars    = [
-            'MYSQL_PWD'      => $this->connection->getParams()['password'],
-            'db_host'        => $this->connection->getParams()['host'],
-            'db_port'        => $this->connection->getParams()['port'],
-            'db_user'        => $this->connection->getParams()['user'],
-            'db_name'        => $this->connection->getParams()['dbname'],
-            'db_backup_file' => $sqlDumpFile,
-        ];
+        $connectionParams = $this->connection->getParams();
+        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+        $command          = sprintf(
+            'mysqldump --opt -h%s -P%s -u%s %s %s > %s',
+            escapeshellarg($connectionParams['host']),
+            escapeshellarg((string) $connectionParams['port']),
+            escapeshellarg($connectionParams['user']),
+            $password,
+            escapeshellarg($connectionParams['dbname']),
+            escapeshellarg($sqlDumpFile)
+        );
 
         $process = Process::fromShellCommandline($command);
-        $process->run(null, $envVars);
+        $process->run();
 
         // executes after the command finishes
         if (!$process->isSuccessful()) {
