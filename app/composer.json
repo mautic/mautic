@@ -25,7 +25,6 @@
     "ext-zip": "*",
     "ext-zlib": "*",
     "aws/aws-sdk-php": "~3.0",
-    "bandwidth-throttle/token-bucket": "^2.0",
     "barryvdh/elfinder-flysystem-driver": "^0.4.3",
     "beberlei/doctrineextensions": "^1.3",
     "bjeavons/zxcvbn-php": "^1.3",
@@ -88,7 +87,7 @@
     "symfony/mailer": "^7.3",
     "symfony/messenger": "^7.3",
     "symfony/mime": "^7.3",
-    "symfony/monolog-bridge": "^6.4",
+    "symfony/monolog-bridge": "^7.3",
     "symfony/monolog-bundle": "~3.10.0",
     "symfony/options-resolver": "^7.3",
     "symfony/polyfill-mbstring": "~1.0",
@@ -104,7 +103,7 @@
     "symfony/twig-bundle": "^7.3",
     "symfony/validator": "^7.3",
     "twilio/sdk": "^5.25",
-    "wikimedia/less.php": "^4.1"
+    "wikimedia/less.php": "^5.4"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0",

@@ -21,6 +21,7 @@
 - `noxlogic/ratelimit-bundle` see https://github.com/mautic/mautic/pull/14876
 - `symfony/amqp-messenger` see https://github.com/mautic/mautic/pull/14883
 - `php-amqplib/rabbitmq-bundle` see https://github.com/mautic/mautic/pull/14883
+- `bandwidth-throttle/token-bucket` see https://github.com/mautic/mautic/pull/15271
 
 ## BC breaks in the code
 
