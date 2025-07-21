@@ -106,10 +106,10 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
 
         $csvHeader = ['Custom Field Name', 'Custom Field Alias', 'Current Size', 'Suggested max size'];
 
-        fputcsv($file, $csvHeader);
+        fputcsv($file, $csvHeader, ',', '"', '\\');
 
         foreach ($rows as $line) {
-            fputcsv($file, $line);
+            fputcsv($file, $line, ',', '"', '\\');
         }
 
         fclose($file);

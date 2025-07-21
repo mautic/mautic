@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 
-class OptimisticLockSubscriber implements EventSubscriber
+#[AsDoctrineListener(Events::postUpdate)]
+class OptimisticLockSubscriber
 {
-    public function getSubscribedEvents(): array
-    {
-        return [
-            Events::postUpdate,
-        ];
-    }
-
     /**
      * If the object implements OptimisticLockInterface and is marked for incrementing the version, object's version column/field is incremented.
      */
@@ -54,7 +48,7 @@ class OptimisticLockSubscriber implements EventSubscriber
                 return "{$name} = :{$name}";
             }, $metadata->getIdentifierFieldNames())))
             ->setParameters($entityManager->getUnitOfWork()->getEntityIdentifier($object))
-            ->executeQuery();
+            ->executeStatement();
 
         $newVersion = (int) $connection->executeQuery('SELECT @newVersion')->fetchOne();
         $object->setVersion($newVersion);

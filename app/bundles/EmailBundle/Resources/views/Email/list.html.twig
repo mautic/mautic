@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        {{ include('@MauticCore/Helper/protip.html.twig', {
+        {{ include('@MauticCore/Modules/protip.html.twig', {
             tip: random(['mautic.protip.emails.unsubscribe', 'mautic.protip.emails.test', 'mautic.protip.emails.personalize', 'mautic.protip.emails.spam', 'mautic.protip.emails.cta'])
         }) }}
     {% else %}

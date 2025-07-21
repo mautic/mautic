@@ -52,7 +52,7 @@ class KickoffExecutioner implements ExecutionerInterface
      * @throws Exception\CannotProcessEventException
      * @throws NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;

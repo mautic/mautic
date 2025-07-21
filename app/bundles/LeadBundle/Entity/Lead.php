@@ -600,7 +600,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @return Lead
      */
-    public function setOwner(User $owner = null)
+    public function setOwner(?User $owner = null)
     {
         $this->isChanged('owner', $owner);
         $this->owner = $owner;
@@ -881,7 +881,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, Group $group = null): void
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, ?Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -1219,7 +1219,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return self
      */
-    public function setManipulator(LeadManipulator $manipulator = null)
+    public function setManipulator(?LeadManipulator $manipulator = null)
     {
         $this->manipulator = $manipulator;
 
@@ -1391,7 +1391,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @return Stage
      */
-    public function setStage(Stage $stage = null)
+    public function setStage(?Stage $stage = null)
     {
         $this->isChanged('stage', $stage);
         $this->stage = $stage;

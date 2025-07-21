@@ -98,7 +98,7 @@
 
 					{{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
-                    'orderBy'    : 'r.name',
+                    'orderBy'    : 'u.lastLogin',
                     'text'       : 'mautic.user.lastlogin',
                     'class'      : 'visible-md visible-lg col-user-lastlogin',
                 }) -}}

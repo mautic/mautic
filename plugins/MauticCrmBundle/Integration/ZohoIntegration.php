@@ -1107,7 +1107,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
-    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null): int
+    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {
         $rows = $response;
         if (isset($rows['data'][0])) {

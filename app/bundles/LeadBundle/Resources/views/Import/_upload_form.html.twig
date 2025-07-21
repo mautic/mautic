@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
         <div class="ml-lg mr-lg mt-md pa-lg">
-            <div class="panel panel-info">
+            <div class="panel panel-info mb-32">
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.import.start.instructions'|trans({'%size%': uploadMaxFilesize}) }}</div>
                 </div>
@@ -28,6 +28,22 @@
                     {{ form_end(form) }}
                 </div>
             </div>
+
+            {% if securityIsGranted('lead:lists:create') %}
+                {% include '@MauticCore/Components/card.html.twig' with {
+                    'type': 'feature',
+                    'image': {
+                        'src': 'app/bundles/LeadBundle/Assets/images/google-deepmind-KdjO4qoBb3E-unsplash.jpg',
+                        'alt': 'mautic.lead.import.segment.card.image.alt'|trans
+                    },
+                    'ctaType': 'new tab',
+                    'heading': 'mautic.lead.import.segment.card.heading'|trans,
+                    'href': path('mautic_segment_action', {'objectAction': 'new'}),
+                    'attributes': {
+                        'target': '_blank'
+                    }
+                } %}
+            {% endif %}
         </div>
     </div>
 </div>

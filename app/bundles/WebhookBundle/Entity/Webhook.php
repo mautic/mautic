@@ -281,7 +281,7 @@ class Webhook extends FormEntity
     /**
      * @return Webhook
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(?Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;

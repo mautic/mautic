@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -548,7 +549,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         }
 
         fclose($handle);
-        $result = array_map('str_getcsv', file($tmpFile));
+        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($tmpFile));
 
         $this->assertCount(1, $result);
         $this->assertSame($header, $result[0]);
