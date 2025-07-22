@@ -119,10 +119,7 @@ class CategoryType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class,
-            [
-                'apply_text' => false,
-            ]);
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

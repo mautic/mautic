@@ -55,6 +55,9 @@ class SortableListTransformer implements DataTransformerInterface
             return ['list' => []];
         }
 
+        // Reindex the array before processing
+        $array['list'] = array_values($array['list']);
+
         $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
 
         if (!$this->withLabels) {

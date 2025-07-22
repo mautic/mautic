@@ -10,6 +10,8 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +22,7 @@ class FieldController extends FormController
      *
      * @param int $page
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function indexAction(Request $request, $page = 1)
     {
@@ -109,16 +111,17 @@ class FieldController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, ?LeadField $entity = null)
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
         // retrieve the entity
-        $field = new LeadField();
+        $field = $entity instanceof LeadField ? $entity : new LeadField();
+
         /** @var FieldModel $model */
         $model = $this->getModel('lead.field');
         // set the return URL for post actions
@@ -210,7 +213,8 @@ class FieldController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $form->createView(),
+                    'form'      => $form->createView(),
+                    'leadField' => $entity,
                 ],
                 'contentTemplate' => '@MauticLead/Field/form.html.twig',
                 'passthroughVars' => [
@@ -227,7 +231,7 @@ class FieldController extends FormController
      *
      * @param bool|false $ignorePost
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
@@ -356,30 +360,34 @@ class FieldController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function cloneAction(Request $request, FieldAliasHelper $fieldAliasHelper, $objectId)
+    public function cloneAction(Request $request, FieldAliasHelper $fieldAliasHelper, FieldModel $fieldModel, $objectId): RedirectResponse|Response
     {
-        $model = $this->getModel('lead.field');
-        \assert($model instanceof FieldModel);
-        $entity = $model->getEntity($objectId);
+        $entity = $fieldModel->getEntity($objectId);
 
-        if (null != $entity) {
-            if (!$this->security->isGranted('lead:fields:full')) {
-                return $this->accessDenied();
-            }
-
-            $clone = clone $entity;
-            $clone->setId(null);
-            $clone->setIsPublished(false);
-            $clone->setIsFixed(false);
-            $fieldAliasHelper->makeAliasUnique($clone);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
+        if (!$entity) {
+            throw $this->createNotFoundException('Entity not found');
         }
 
-        return $this->editAction($request, $objectId);
+        $clone = clone $entity;
+
+        $fieldAliasHelper->makeAliasUnique($clone);
+
+        $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
+        $form      = $fieldModel->createForm($clone, $this->formFactory, $action);
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form'      => $form->createView(),
+                'leadField' => $clone,
+            ],
+            'contentTemplate' => '@MauticLead/Field/form.html.twig',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_contactfield_index',
+                'route'         => $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
+                'mauticContent' => 'leadfield',
+            ],
+        ]);
     }
 
     /**

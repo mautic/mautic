@@ -6,10 +6,40 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
-final class Version20211020114811 extends AbstractMauticMigration
+final class Version20211020114811 extends PreUpAssertionMigration
 {
+    private const COMPANIES_TABLE           = 'companies';
+    private const SYNC_OBJECT_MAPPING_TABLE = 'sync_object_mapping';
+
+    private const INDEX_COMPANY_MATCH         = MAUTIC_TABLE_PREFIX.'company_match';
+    private const INDEX_INTEGRATION_OBJECT    = MAUTIC_TABLE_PREFIX.'integration_object';
+    private const INDEX_INTEGRATION_REFERENCE = MAUTIC_TABLE_PREFIX.'integration_reference';
+
+    protected function preUpAssertions(): void
+    {
+        $this->skipAssertion(
+            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName(self::COMPANIES_TABLE))->hasIndex(self::INDEX_COMPANY_MATCH),
+            sprintf('The index %s does not exist in the %s table.', self::INDEX_COMPANY_MATCH, $this->getPrefixedTableName(self::COMPANIES_TABLE))
+        );
+
+        $this->skipAssertion(
+            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))->hasIndex(self::INDEX_INTEGRATION_OBJECT),
+            sprintf('The index %s does not exist in the %s table.', self::INDEX_INTEGRATION_OBJECT, $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))
+        );
+
+        $this->skipAssertion(
+            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))->hasIndex(self::INDEX_INTEGRATION_REFERENCE),
+            sprintf('The index %s does not exist in the %s table.', self::INDEX_INTEGRATION_REFERENCE, $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))
+        );
+
+        $this->skipAssertion(
+            fn () => empty($this->getTables()),
+            'No tables require character set conversion.'
+        );
+    }
+
     public function up(Schema $schema): void
     {
         $this->addSql('SET FOREIGN_KEY_CHECKS=0;');
@@ -23,50 +53,50 @@ final class Version20211020114811 extends AbstractMauticMigration
          * "Specified key was too long; max key length is 3072 bytes"
          */
 
-        $dropIndexQuery = 'DROP INDEX %s on %s';
+        $dropIndexQuery = 'DROP INDEX %s ON %s';
 
         $this->addSql(
             sprintf(
                 $dropIndexQuery,
-                $this->prefix.'company_match',
-                $this->getPrefixedTableName('companies')
+                self::INDEX_COMPANY_MATCH,
+                $this->getPrefixedTableName(self::COMPANIES_TABLE)
             )
         );
         $this->addSql(
             sprintf(
-                'CREATE INDEX %s on %s(`companyname`(191),`companycity`(191),`companycountry`(191),`companystate`(191))',
-                $this->prefix.'company_match',
-                $this->getPrefixedTableName('companies')
-            )
-        );
-
-        $this->addSql(
-            sprintf(
-                $dropIndexQuery,
-                $this->prefix.'integration_object',
-                $this->getPrefixedTableName('sync_object_mapping')
-            )
-        );
-        $this->addSql(
-            sprintf(
-                'CREATE INDEX %s on %s(`integration`(191),`integration_object_name`(191),`integration_object_id`(191), `integration_reference_id`(191))',
-                $this->prefix.'integration_object',
-                $this->getPrefixedTableName('sync_object_mapping')
+                'CREATE INDEX %s ON %s(`companyname`(191),`companycity`(191),`companycountry`(191),`companystate`(191))',
+                self::INDEX_COMPANY_MATCH,
+                $this->getPrefixedTableName(self::COMPANIES_TABLE)
             )
         );
 
         $this->addSql(
             sprintf(
                 $dropIndexQuery,
-                $this->prefix.'integration_reference',
-                $this->getPrefixedTableName('sync_object_mapping')
+                self::INDEX_INTEGRATION_OBJECT,
+                $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE)
             )
         );
         $this->addSql(
             sprintf(
-                'CREATE INDEX %s on %s(`integration`(191),`integration_object_name`(191), `integration_reference_id`(191), `integration_object_id`(191))',
-                $this->prefix.'integration_reference',
-                $this->getPrefixedTableName('sync_object_mapping')
+                'CREATE INDEX %s ON %s(`integration`(191),`integration_object_name`(191),`integration_object_id`(191), `integration_reference_id`(191))',
+                self::INDEX_INTEGRATION_OBJECT,
+                $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE)
+            )
+        );
+
+        $this->addSql(
+            sprintf(
+                $dropIndexQuery,
+                self::INDEX_INTEGRATION_REFERENCE,
+                $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE)
+            )
+        );
+        $this->addSql(
+            sprintf(
+                'CREATE INDEX %s ON %s(`integration`(191),`integration_object_name`(191), `integration_reference_id`(191), `integration_object_id`(191))',
+                self::INDEX_INTEGRATION_REFERENCE,
+                $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE)
             )
         );
 

@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -48,6 +49,18 @@ trait CreateTestEntitiesTrait
         $this->em->persist($campaign);
 
         return $campaign;
+    }
+
+    private function createPrimaryCompanyForLead(Lead $lead, Company $company, bool $isPrimary = true): CompanyLead
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary($isPrimary);
+        $this->em->persist($companyLead);
+
+        return $companyLead;
     }
 
     /**

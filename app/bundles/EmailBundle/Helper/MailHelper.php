@@ -389,6 +389,7 @@ class MailHelper
             try {
                 if (!$this->skip) {
                     $this->mailer->send($this->message);
+                    $this->message->clearMetadata();
                 }
                 $this->skip = false;
             } catch (TransportExceptionInterface $exception) {

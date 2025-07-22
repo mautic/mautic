@@ -210,8 +210,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
                 'mapped'      => false,
-                'data'        => '',
-                'placeholder' => ' x ',
+                'data'        => 0,
             ]
         );
 

@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -300,7 +301,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cached_data_timeout',
-            TextType::class,
+            NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -311,11 +312,12 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotBlank([
+                        'message' => 'mautic.core.value.required',
+                    ]),
+                    new GreaterThanOrEqual([
+                        'value' => 0,
+                    ]),
                 ],
             ]
         );
@@ -653,9 +655,9 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.core.config.response.headers.sts.expire_time',
                 'data'  => $options['data']['headers_sts_expire_time'] ?? 60,
                 'attr'  => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
-                    'min'          => 60,
+                    'class'          => 'form-control',
+                    'data-enable-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'min'            => 60,
                 ],
             ]
         );
@@ -667,9 +669,9 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.core.config.response.headers.sts.subdomains',
                 'data'  => (array_key_exists('headers_sts_subdomains', $options['data']) && !empty($options['data']['headers_sts_subdomains'])),
                 'attr'  => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
-                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'class'          => 'form-control',
+                    'tooltip'        => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
+                    'data-enable-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
                 ],
             ]
         );
@@ -681,9 +683,9 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.core.config.response.headers.sts.preload',
                 'data'  => (array_key_exists('headers_sts_preload', $options['data']) && !empty($options['data']['headers_sts_preload'])),
                 'attr'  => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.response.headers.sts.preload.tooltip',
-                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'class'          => 'form-control',
+                    'tooltip'        => 'mautic.core.config.response.headers.sts.preload.tooltip',
+                    'data-enable-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
                 ],
             ]
         );

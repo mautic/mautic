@@ -102,7 +102,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @var bool
      */
-    private $isCampaignBased = false;
+    private $isCampaignBased = true;
 
     /**
      * @var string|null

@@ -101,7 +101,7 @@ class InstallSchemaTest extends TestCase
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->connection->executeQuery($q);
+                    $this->connection->executeStatement($q);
                 } catch (\Exception $exception) {
                     $exceptions[] = $exception->getMessage();
                 }

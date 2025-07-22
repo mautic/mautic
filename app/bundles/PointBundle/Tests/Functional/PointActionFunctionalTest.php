@@ -59,6 +59,28 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $lead->getPoints());
     }
 
+    public function testPointActionEarlyReturnWhenNoPointsAvailable(): void
+    {
+        /** @var LeadModel $leadModel */
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+
+        $lead  = $this->createLead('jane@doe.email');
+        $email = $this->createEmail();
+
+        $trackingHash = 'tracking_hash_no_points_456';
+        $this->createEmailStat($lead, $email, $trackingHash);
+        // Note: No point actions created for email.open type
+
+        $initialPoints = $lead->getPoints();
+        $this->client->request('GET', '/email/'.$trackingHash.'.gif');
+
+        $lead = $leadModel->getEntity($lead->getId());
+
+        // Points should remain unchanged as no point actions are available
+        $this->assertEquals($initialPoints, $lead->getPoints());
+        $this->assertEquals(0, $lead->getPoints());
+    }
+
     private function createReadEmailAction(int $delta, Group $group = null): Point
     {
         $pointAction = new Point();

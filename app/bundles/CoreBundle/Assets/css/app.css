@@ -2000,6 +2000,9 @@ body > #app-wrapper {
 .app-sidebar .nav-sidebar > .nav .nav-heading:first-child {
   padding-top: 20px;
 }
+html.responsejs.sidebar-open-ltr .sidebar-left {
+  left: 0px;
+}
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
     left: 0;
@@ -6075,10 +6078,10 @@ input[style]:hover {
   box-shadow: none;
 }
 .form-control {
-  &:not(select) {
-    padding: var(--spacing-04) var(--spacing-05);
-  }
   color: var(--text-primary);
+}
+.form-control:not(select) {
+  padding: var(--spacing-04) var(--spacing-05);
 }
 .form-control + .help-text,
 .form-control + p {
@@ -6088,13 +6091,9 @@ input[style]:hover {
   padding: var(--spacing-01) var(--spacing-04);
 }
 .form-control[disabled],
+.form-control[readonly],
 fieldset[disabled] .form-control {
   color: var(--text-disabled);
-}
-.form-control[readonly]{
-  color: var(--text-primary);
-  background-color: var(--field);
-  border-color: var(--border-subtle);
 }
 .form-control[disabled] {
   cursor: not-allowed;
@@ -9628,7 +9627,7 @@ form[name="lead"] .contact-avatar {
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
-  background: var(--background-active);
+  background: var(--background);
   text-align: center;
 }
 .content-overlay {

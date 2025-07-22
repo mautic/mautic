@@ -218,7 +218,6 @@ class CategoryController extends AbstractFormController
         $cancelled  = $valid  = false;
         $method     = $request->getMethod();
         $inForm     = $this->getInFormValue($request, $method);
-        $showSelect = $request->get('show_bundle_select', false);
 
         // not found
         if (!$this->security->isGranted($model->getPermissionBase($bundle).':create')) {
@@ -229,7 +228,7 @@ class CategoryController extends AbstractFormController
             'objectAction' => 'new',
             'bundle'       => $bundle,
         ]);
-        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
         $form['inForm']->setData($inForm);
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {

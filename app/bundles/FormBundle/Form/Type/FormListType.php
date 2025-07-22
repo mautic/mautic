@@ -44,7 +44,7 @@ class FormListType extends AbstractType
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type']);
                 foreach ($forms as $form) {
-                    $choices[$form['name']] = $form['id'];
+                    $choices[$form['name'].' ('.$form['id'].')'] = $form['id'];
                 }
 
                 // sort by language
