@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 
@@ -14,7 +15,7 @@ final class Version20211209022550 extends AbstractMauticMigration
     public function postUp(Schema $schema): void
     {
         /** @var RoleModel $model */
-        $model = $this->container->get('mautic.model.factory')->getModel('user.role');
+        $model = $this->container->get(ModelFactory::class)->getModel('user.role');
 
         // Get all non admin roles.
         $roles = $model->getEntities([

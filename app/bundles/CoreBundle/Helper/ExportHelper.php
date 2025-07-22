@@ -179,11 +179,11 @@ class ExportHelper
 
         foreach ($data as $row) {
             if (!$headerSet) {
-                fputcsv($handler, array_keys($row));
+                CsvHelper::putCsv($handler, array_keys($row));
                 $headerSet = true;
             }
 
-            fputcsv($handler, $row);
+            CsvHelper::putCsv($handler, $row);
 
             // Check if signal caught here
             $this->processSignalService->throwExceptionIfSignalIsCaught();

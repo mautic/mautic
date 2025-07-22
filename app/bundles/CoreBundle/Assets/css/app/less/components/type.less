@@ -406,32 +406,3 @@ kbd {
   border: 1px solid #afb8c133;
   border-radius: 5px;
 }
-
-.tooltip-inner { padding: 12px; }
-.popover {
-  border-radius: 10px;
-  padding: 0;
-  border: 0;
-}
-.popover-title {
-  padding: 16px 16px 12px;
-  border-bottom: 1px solid var(--border-subtle);
-  font-weight: 600;
-  line-height: 1em;
-  font-size: calc(1em + 1px);
-  border-radius: 8px 8px 0 0;
-  .background-blur()
-}
-
-.popover-content {
-  padding: 12px 16px 16px;
-  border-radius: var(--border-radius-md);
-  background-color: var(--layer-02);
-}
-
-@media (min-width: 768px) {
-  .popover:has([class^="col-"]) {
-    max-width: 450px;
-    width: 450px;
-  }
-}

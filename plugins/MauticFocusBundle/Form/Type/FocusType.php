@@ -200,7 +200,7 @@ class FocusType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin',
                     'icon'    => 'ri-layout-line',
                     'onclick' => 'Mautic.launchFocusBuilder();',
                 ],

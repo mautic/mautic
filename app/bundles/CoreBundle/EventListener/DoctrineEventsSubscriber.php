@@ -2,12 +2,17 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class DoctrineEventsSubscriber implements EventSubscriber
+#[AsDoctrineListener(Events::loadClassMetadata)]
+#[AsDoctrineListener(ToolEvents::postGenerateSchema)]
+class DoctrineEventsSubscriber
 {
     private array $deprecatedEntityTables = [];
 
@@ -15,16 +20,9 @@ class DoctrineEventsSubscriber implements EventSubscriber
      * @param string $tablePrefix
      */
     public function __construct(
+        #[Autowire('%mautic.db_table_prefix%')]
         private $tablePrefix,
     ) {
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            'loadClassMetadata',
-            'postGenerateSchema',
-        ];
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void

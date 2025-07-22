@@ -121,8 +121,8 @@
 </div>
 {{ form_end(form) }}
 
-{% if form.vars.data.id is empty %}
-  <div id="field-templates" class="hide">
+{% if form.vars.data.id is empty and not (leadField is not null and leadField.getIsCloned()) %}
+    <div id="field-templates" class="hide">
       <div class="default_template_text">{{ defaultTextTemplate|raw }}</div>
       <div class="default_template_textarea">{{ defaultTextareaTemplate|raw }}</div>
       <div class="default_template_boolean">{{ defaultBoolTemplate|raw }}</div>
@@ -150,6 +150,6 @@
           'selectTemplate': selectTemplate,
           'type': 'lookup',
       }) }}
-  </div>
+    </div>
 {% endif %}
 {% endblock %}
