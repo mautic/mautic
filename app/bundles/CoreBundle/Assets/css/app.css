@@ -6626,7 +6626,9 @@ input[style]:hover {
   box-shadow: none;
 }
 .form-control {
-  padding: var(--spacing-04) var(--spacing-05);
+  &:not(select) {
+    padding: var(--spacing-04) var(--spacing-05);
+  }
   color: var(--text-primary);
 }
 .form-control + .help-text,
@@ -10363,7 +10365,7 @@ form[name="lead"] .contact-avatar {
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--background);
   text-align: center;
 }
 .content-overlay {
@@ -10687,17 +10689,6 @@ code:hover > .copy-icon {
 }
 .description-content {
   width: 388px;
-}
-.dropup.quick-help {
-  position: fixed;
-  z-index: 9999;
-  bottom: 15px;
-  right: 15px;
-}
-.dropdown-toggle.quick-help {
-  background-color: var(--background);
-  border: 1px solid var(--border-subtle);
-  box-shadow: rgba(0, 0, 0, 0.07) 0px -1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px, rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 8px 8px, rgba(0, 0, 0, 0.07) 0px 16px 16px;
 }
 .toggle {
   display: inline-block;

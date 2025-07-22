@@ -153,20 +153,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = [];
-        if ($lead instanceof Lead) {
-            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        }
-
-        $result = [];
-        foreach ($tokens as $token => $dwc) {
-            $result[$token] = '';
-            if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
-                $result[$token] = $dwc['content'];
-            }
-        }
-        $content = str_replace(array_keys($result), array_values($result), $content);
+        $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
@@ -191,6 +178,14 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         $content = $dom->saveHTML();
+
+        // These tokens need to be replaced after the content, because otherwise the replaced tokens will have encoded
+        // HTML entities, which do not conform the tests.
+        $result = [];
+        foreach ($tokens as $token => $dwc) {
+            $result[$token] = $dwc['content'];
+        }
+        $content = str_replace(array_keys($result), array_values($result), $content);
 
         $event->setContent($content);
     }

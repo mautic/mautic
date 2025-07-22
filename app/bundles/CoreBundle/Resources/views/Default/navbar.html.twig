@@ -77,8 +77,9 @@
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
-        {{ include('@MauticCore/Menu/profile.html.twig') }}
+        {{ include('@MauticCore/Menu/quick_help.html.twig') }}
         {{ menuRender('admin') }}
+        {{ include('@MauticCore/Menu/profile.html.twig') }}
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
     {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}

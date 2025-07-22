@@ -119,7 +119,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      *
      * It happens when there is an ampersand in the DWC content.
      */
-    public function testDecodeTokensWithAmpersand(): void
+    public function testDecodeTokensWithAmpersandDataAttribute(): void
     {
         $content = <<< HTML
 <!DOCTYPE html>
@@ -160,16 +160,82 @@ HTML;
             ->method('getContact')
             ->willReturn($contact);
 
+        $this->dynamicContentHelper->expects($this->never())
+            ->method('convertLeadToArray');
+
         $this->dynamicContentHelper->expects($this->once())
-            ->method('convertLeadToArray')
-            ->with($contact)
-            ->willReturn(['id' => 123, 'email' => 'john@doe.email']);
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([]);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('getDynamicContentForLead')
+            ->with('test-token', $contact)
+            ->willReturn($dwcContent);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->with($expected);
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    /**
+     * This test is ensuring this error won't happen again:.
+     *
+     * DOMDocumentFragment::appendXML(): Entity: line 1: parser error : xmlParseEntityRef: no name
+     *
+     * It happens when there is an ampersand in the DWC content.
+     */
+    public function testDecodeTokensWithAmpersandInlineDwc(): void
+    {
+        $content = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        {dwc=test-token}
+    </body>
+</html>
+
+HTML;
+
+        $expected = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="https://john.doe&son">Link</a>
+    </body>
+</html>
+
+HTML;
+        $dwcContent = '<a href="https://john.doe&son">Link</a>';
+        $event      = $this->createMock(PageDisplayEvent::class);
+        $contact    = new Lead();
+
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($contact);
+
+        $this->dynamicContentHelper->expects($this->never())
+            ->method('convertLeadToArray');
 
         $this->dynamicContentHelper->expects($this->once())
             ->method('findDwcTokens')
             ->with($content, $contact)
             ->willReturn([
-                'test-token'  => [
+                '{dwc=test-token}'  => [
                     'content' => $dwcContent,
                     'filters' => [
                         [
@@ -182,9 +248,8 @@ HTML;
                 ],
             ]);
 
-        $this->dynamicContentHelper->expects($this->once())
-            ->method('getDynamicContentForLead')
-            ->willReturn($dwcContent);
+        $this->dynamicContentHelper->expects($this->never())
+            ->method('getDynamicContentForLead');
 
         $event->expects($this->once())
             ->method('setContent')
