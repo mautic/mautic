@@ -17,7 +17,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         private AssetsHelper $assetsHelper,
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -98,10 +98,6 @@ MauticJS.replaceDynamicContent = function (params) {
                         if ((m[1]).search("/focus/") > 0) {
                             MauticJS.insertScript(m[1]);
                         }
-                    }
-
-                    if (dwcContent.search("fr-gatedvideo") > 0) {
-                        MauticJS.initGatedVideo();
                     }
                 }
             });

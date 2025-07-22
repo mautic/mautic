@@ -16,7 +16,7 @@
     width: 125px;
 }
 
-.leadfield-list .fa-asterisk:hover, .leadfield-list .fa-eye:hover, .leadfield-list .fa-lock:hover, .leadfield-list .fa-list:hover {
+.leadfield-list i {
     color: #7D5B71;
 }
 
@@ -239,14 +239,14 @@ ul.tag-cloud li {
 }
 
 .building::before {
-    content: "\f1ad";
-    font-family: "FontAwesome";
+    content: "\eb08";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
 .user::before {
-    content: "\f007";
-    font-family: "FontAwesome";
+    content: "\f25b";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 

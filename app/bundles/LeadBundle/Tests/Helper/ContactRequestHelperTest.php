@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
@@ -59,6 +61,16 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     private MockObject $logger;
 
     /**
+     * @var MockObject|StatRepository
+     */
+    private MockObject $statRepository;
+
+    /**
+     * @var MockObject|BotRatioHelper
+     */
+    private MockObject $botRatioHelper;
+
+    /**
      * @var MockObject|Lead
      */
     private MockObject $trackedContact;
@@ -72,15 +84,17 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->contactTracker       = $this->createMock(ContactTracker::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $this->requestStack         = $this->createMock(RequestStack::class);
-        $this->logger               = $this->createMock(Logger::class);
-        $this->dispatcher           = $this->createMock(EventDispatcher::class);
-        $this->trackedContact       = $this->createMock(Lead::class);
-        $this->contactMerger        = $this->createMock(ContactMerger::class);
+        $this->leadModel                = $this->createMock(LeadModel::class);
+        $this->contactTracker           = $this->createMock(ContactTracker::class);
+        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
+        $this->requestStack             = $this->createMock(RequestStack::class);
+        $this->logger                   = $this->createMock(Logger::class);
+        $this->dispatcher               = $this->createMock(EventDispatcher::class);
+        $this->trackedContact           = $this->createMock(Lead::class);
+        $this->contactMerger            = $this->createMock(ContactMerger::class);
+        $this->statRepository           = $this->createMock(StatRepository::class);
+        $this->botRatioHelper           = $this->createMock(BotRatioHelper::class);
 
         $this->trackedContact->method('getId')
             ->willReturn(1);
@@ -240,7 +254,9 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->requestStack,
             $this->logger,
             $this->dispatcher,
-            $this->contactMerger
+            $this->contactMerger,
+            $this->statRepository,
+            $this->botRatioHelper
         );
     }
 }

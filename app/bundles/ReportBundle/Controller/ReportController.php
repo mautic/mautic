@@ -156,7 +156,7 @@ class ReportController extends FormController
     /**
      * Deletes the entity.
      *
-     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
+     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
     public function deleteAction(Request $request, $objectId)
     {
@@ -216,10 +216,8 @@ class ReportController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);
@@ -580,7 +578,7 @@ class ReportController extends FormController
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'view', 'objectId' => $objectId]);
 
         // Get the date range filter values from the request of from the session
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
 
         if (!empty($dateRangeValues['date_from'])) {
             $from = new \DateTime($dateRangeValues['date_from']);
@@ -705,7 +703,7 @@ class ReportController extends FormController
      * @param array<mixed> $postActionVars
      * @param array<mixed> $permissions
      *
-     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
+     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
     private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, ReportModel $model, string $modelName)
     {
@@ -792,7 +790,7 @@ class ReportController extends FormController
                 function () use ($model, $entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
-                    $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);
+                    $options['limit']           = (int) $this->coreParametersHelper->get('report_export_batch_size', 1000);
                     $options['page']            = 1;
                     $handle                     = fopen('php://output', 'r+');
                     $batchTotals                = [];

@@ -11,7 +11,7 @@ use Mautic\SmsBundle\EventListener\StopSubscriber;
 class StopSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DoNotContact
+     * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContactModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $doNotContactModel;
 

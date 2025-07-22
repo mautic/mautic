@@ -17,6 +17,8 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
 {
     public function testPointActionReadEmail(): void
     {
+        $this->logoutUser();
+
         /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
 
@@ -35,6 +37,8 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
 
     public function testPointActionWithGroupReadEmail(): void
     {
+        $this->logoutUser();
+
         /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
 
@@ -52,6 +56,28 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals($pointAction->getDelta(), $groupScore->getScore());
         // group point action shouldn't update main contact points
+        $this->assertEquals(0, $lead->getPoints());
+    }
+
+    public function testPointActionEarlyReturnWhenNoPointsAvailable(): void
+    {
+        /** @var LeadModel $leadModel */
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+
+        $lead  = $this->createLead('jane@doe.email');
+        $email = $this->createEmail();
+
+        $trackingHash = 'tracking_hash_no_points_456';
+        $this->createEmailStat($lead, $email, $trackingHash);
+        // Note: No point actions created for email.open type
+
+        $initialPoints = $lead->getPoints();
+        $this->client->request('GET', '/email/'.$trackingHash.'.gif');
+
+        $lead = $leadModel->getEntity($lead->getId());
+
+        // Points should remain unchanged as no point actions are available
+        $this->assertEquals($initialPoints, $lead->getPoints());
         $this->assertEquals(0, $lead->getPoints());
     }
 
@@ -73,7 +99,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     private function createEmailStat(
         Lead $lead,
         Email $email,
-        string $trackingHash
+        string $trackingHash,
     ): Stat {
         /** @var StatRepository $statRepository */
         $statRepository = static::getContainer()->get('mautic.email.repository.stat');
@@ -90,7 +116,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createLead(
-        string $email
+        string $email,
     ): Lead {
         $lead = new Lead();
         $lead->setEmail($email);
@@ -115,7 +141,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createGroup(
-        string $name
+        string $name,
     ): Group {
         $group = new Group();
         $group->setName($name);

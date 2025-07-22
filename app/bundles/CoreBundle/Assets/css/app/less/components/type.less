@@ -109,7 +109,8 @@ h1, h2, h3, h4, h5, h6,
 .text-muted, .text-secondary { color: var(--text-secondary); }
 .text-placeholder { color: var(--text-placeholder); }
 .text-white { .text-emphasis-variants(#fff); }
-.text-primary { color: var(--interactive) }
+.text-primary { color: var(--text-primary) }
+.text-interactive { color: var(--interactive) }
 .text-success { .text-emphasis-variants(@brand-success); }
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
@@ -141,9 +142,9 @@ blockquote {
     position: absolute;
     top: -1px;
     margin-left: -25px;
-    font-family: "FontAwesome";
+    font-family: "remixicon";
     font-size: 18px;
-    content: "\f10d";
+    content: "\EC51";
     color: @gray-lighter;
   }
 
@@ -151,9 +152,9 @@ blockquote {
     position: absolute;
     bottom: -1px;
     margin-left: 5px;
-    font-family: "FontAwesome";
+    font-family: "remixicon";
     font-size: 18px;
-    content: "\f10e";
+    content: "\EC52";
     color: @gray-lighter;
   }
 }

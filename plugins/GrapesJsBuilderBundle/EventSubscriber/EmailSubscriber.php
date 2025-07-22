@@ -21,7 +21,7 @@ class EmailSubscriber implements EventSubscriberInterface
         private Config $config,
         private GrapesJsBuilderModel $grapesJsBuilderModel,
         private EmailModel $emailModel,
-        private EmailConfigInterface $emailConfig
+        private EmailConfigInterface $emailConfig,
     ) {
     }
 

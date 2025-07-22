@@ -318,7 +318,9 @@ return [
         ],
     ],
     'categories' => [
-        'segment' => null,
+        'segment' => [
+            'class' => Mautic\LeadBundle\Entity\LeadList::class,
+        ],
     ],
     'services' => [
         'events' => [
@@ -448,34 +450,15 @@ return [
                 'class'     => Mautic\LeadBundle\Deduplicate\ContactDeduper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
+                    'mautic.lead.field.fields_with_unique_identifier',
                     'mautic.lead.merger',
                     'mautic.lead.repository.lead',
-                ],
-            ],
-            'mautic.company.deduper' => [
-                'class'     => Mautic\LeadBundle\Deduplicate\CompanyDeduper::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.repository.company',
                 ],
             ],
             'mautic.lead.helper.primary_company' => [
                 'class'     => Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
                 'arguments' => [
                     'mautic.lead.repository.company_lead',
-                ],
-            ],
-            'mautic.lead.helper.contact_request_helper' => [
-                'class'     => Mautic\LeadBundle\Helper\ContactRequestHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.tracker.contact',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.ip_lookup',
-                    'request_stack',
-                    'monolog.logger.mautic',
-                    'event_dispatcher',
-                    'mautic.lead.merger',
                 ],
             ],
             'mautic.lead.validator.length' => [
@@ -521,21 +504,6 @@ return [
                     '@service_container',
                     'mautic.lead.model.lead_segment_decorator_factory',
                     'event_dispatcher',
-                ],
-            ],
-            'mautic.tracker.contact' => [
-                'class'     => Mautic\LeadBundle\Tracker\ContactTracker::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.service.contact_tracking_service',
-                    'mautic.tracker.device',
-                    'mautic.security',
-                    'monolog.logger.mautic',
-                    'mautic.helper.ip_lookup',
-                    'request_stack',
-                    'mautic.helper.core_parameters',
-                    'event_dispatcher',
-                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.tracker.device' => [

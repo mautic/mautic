@@ -22,7 +22,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         LeadEventLogRepository $eventLogRepository,
         private UserHelper $userHelper,
         Translator $translator,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
     ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
@@ -93,7 +93,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 
             $log = new LeadEventLog();
             $log->setUserId($user->getId())
-                ->setUserName($user->getUsername() ?: $this->translator->trans('mautic.core.system'))
+                ->setUserName($user->getUserIdentifier() ?: $this->translator->trans('mautic.core.system'))
                 ->setLead($contact)
                 ->setBundle('lead')
                 ->setAction($action)

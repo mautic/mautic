@@ -17,7 +17,6 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailListType;
@@ -56,9 +55,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LegacyEventDispatcher
-     */
     private LegacyEventDispatcher $legacyDispatcher;
 
     protected function setUp(): void
@@ -117,10 +113,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $factory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $contactTracker = $this->getMockBuilder(ContactTracker::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -129,7 +121,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $factory,
             $contactTracker
         );
 

@@ -1,0 +1,16 @@
+{% if showMore is defined %}
+    <a href="{{ url('mautic_point.group_index', {'search': searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+    </a>
+{% else %}
+    <a href="{{ url('mautic_point.group_action', {'objectAction': 'edit', 'objectId': item.id}) }}">
+        <span class="fw-sb">{{ item.name }}</span>
+        <span class="ml-4 mr-sm">#{{ item.id }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': item,
+            'status': 'active',
+            'simplified': 'true'
+        }) -}}
+    </a>
+    <div class="clearfix"></div>
+{% endif %}

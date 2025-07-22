@@ -18,7 +18,7 @@ class FieldMergerHelper
 
     public function __construct(
         private ConfigFormSyncInterface $integrationObject,
-        private array $currentFieldMappings
+        private array $currentFieldMappings,
     ) {
     }
 

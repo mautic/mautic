@@ -16,7 +16,7 @@ class ProcessFetchEmailCommand extends Command
 {
     public function __construct(
         private CoreParametersHelper $parametersHelper,
-        private Fetcher $fetcher
+        private Fetcher $fetcher,
     ) {
         parent::__construct();
     }
@@ -43,6 +43,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit     = $input->getOption('message-limit');
+        $limit     = null === $limit ? null : (int) $limit;
         $mailboxes = $this->parametersHelper->get('monitored_email');
         unset($mailboxes['general']);
         $mailboxes = array_keys($mailboxes);

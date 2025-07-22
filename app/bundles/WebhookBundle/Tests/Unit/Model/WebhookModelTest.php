@@ -213,8 +213,8 @@ class WebhookModelTest extends TestCase
 
     public function testProcessWebhook(): void
     {
-        $webhook = new class() extends Webhook {
-            public function getId(): ?int
+        $webhook = new class extends Webhook {
+            public function getId(): int
             {
                 return 1;
             }
@@ -224,7 +224,7 @@ class WebhookModelTest extends TestCase
         $event = new Event();
         $event->setEventType('mautic.email_on_send');
 
-        $queue = new class() extends WebhookQueue {
+        $queue = new class extends WebhookQueue {
             public function getId(): int
             {
                 return 1;
@@ -267,8 +267,8 @@ class WebhookModelTest extends TestCase
 
     public function testMinAndMaxQueueIdWhenNoneIsSet(): void
     {
-        $webhook = new class() extends Webhook {
-            public function getId(): ?int
+        $webhook = new class extends Webhook {
+            public function getId(): int
             {
                 return 1;
             }
@@ -308,8 +308,8 @@ class WebhookModelTest extends TestCase
 
     public function testMinAndMaxQueueIdWhenBothSet(): void
     {
-        $webhook = new class() extends Webhook {
-            public function getId(): ?int
+        $webhook = new class extends Webhook {
+            public function getId(): int
             {
                 return 1;
             }

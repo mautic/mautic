@@ -277,7 +277,7 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
-    const segmentCountElem = mQuery('a.col-count');
+    const segmentCountElem = mQuery('span.col-count');
 
     if (segmentCountElem.length) {
         segmentCountElem.each(function() {
@@ -288,7 +288,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                 'lead:getLeadCount',
                 {id: id},
                 function (response) {
-                    elem.html(response.html);
+                    elem.className = response.className;
+                    elem.children('a').html(response.html);
                 },
                 false,
                 true,
@@ -1109,14 +1110,14 @@ Mautic.setPreferredChannel = function(channel) {
     mQuery( '#frequency_' + channel ).slideToggle();
     mQuery( '#frequency_' + channel ).removeClass('hide');
     if (mQuery('#' + channel)[0].checked) {
-        mQuery('#is-contactable-' + channel).removeClass('text-muted');
+        mQuery('#is-contactable-' + channel).removeClass('text-secondary');
         mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
         mQuery('#preferred_' + channel).prop("disabled" , false);
         mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
         mQuery('#lead_contact_frequency_rules_contact_pause_start_date_' + channel).prop("disabled" , false);
         mQuery('#lead_contact_frequency_rules_contact_pause_end_date_' + channel).prop("disabled" , false);
     } else {
-        mQuery('#is-contactable-' + channel).addClass('text-muted');
+        mQuery('#is-contactable-' + channel).addClass('text-secondary');
         mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
         mQuery('#preferred_' + channel).prop("disabled" , true);
         mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
@@ -1397,11 +1398,7 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
-            mQuery(bodyEl).froalaEditor('html.set', response.body);
-        } else {
-            ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
-        }
+        ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
 
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);

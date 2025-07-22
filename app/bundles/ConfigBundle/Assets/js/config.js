@@ -50,7 +50,7 @@ Mautic.observeConfigTabs = function() {
     }
 
     var parameters = Mautic.parseQuery(window.location.search.substr(1));
-    if ('undefiend' != typeof parameters['tab']) {
+    if ('undefined' != typeof parameters['tab']) {
         mQuery('#config_coreconfig_last_shown_tab').val(parameters['tab']);
         mQuery('a[data-toggle="tab"]').each(function (i, tab) {
             if (mQuery(tab).attr('href') == ('#' + parameters['tab'])) {

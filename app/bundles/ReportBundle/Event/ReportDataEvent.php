@@ -12,7 +12,7 @@ class ReportDataEvent extends AbstractReportEvent
         Report $report,
         private array $data,
         $totalResults,
-        private array $options
+        private array $options,
     ) {
         $this->context      = $report->getSource();
         $this->report       = $report;

@@ -12,7 +12,7 @@ class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AssetsHelper $assetsHelper,
-        private IntegrationHelper $integrationHelper
+        private IntegrationHelper $integrationHelper,
     ) {
     }
 

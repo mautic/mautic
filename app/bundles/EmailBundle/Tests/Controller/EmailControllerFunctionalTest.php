@@ -23,10 +23,11 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function setUp(): void
     {
-        $this->configParams['mailer_from_name']      = 'Mautic Admin';
-        $this->configParams['mailer_from_email']     = 'admin@email.com';
-        $this->configParams['mailer_custom_headers'] = ['x-global-custom-header' => 'value123'];
-        $this->clientOptions                         = ['debug' => true];
+        $this->configParams['disable_trackable_urls'] = false;
+        $this->configParams['mailer_from_name']       = 'Mautic Admin';
+        $this->configParams['mailer_from_email']      = 'admin@email.com';
+        $this->configParams['mailer_custom_headers']  = ['x-global-custom-header' => 'value123'];
+        $this->clientOptions                          = ['debug' => true];
 
         parent::setUp();
     }
@@ -47,7 +48,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200');
+        $this->assertResponseIsSuccessful('Return code must be 200');
         $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('Test User', $clientResponse->getContent());
@@ -68,7 +69,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
     /**
@@ -334,6 +335,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
+        $this->setCsrfHeader();
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
             'id'         => $email->getId(),
             'pending'    => 2,
@@ -543,7 +545,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             'template' => $email->getId(),
         ];
 
-        $this->client->request('GET', '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', '/s/ajax', $payload);
         $clientResponse = $this->client->getResponse();
 
         $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
@@ -554,5 +556,47 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
         $this->assertNotEmpty($response['body']);
+    }
+
+    /**
+     * Test email name length validation (190 character limit).
+     */
+    public function testEmailNameLengthValidation(): void
+    {
+        $longName = str_repeat('a', Email::MAX_NAME_SUBJECT_LENGTH + 1); // 191 characters
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue($longName);
+        $form['emailform[subject]']->setValue('Valid Subject');
+        $form['emailform[emailType]']->setValue('template');
+
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        $this->assertStringContainsString('Email name maximum length is 190 characters', $response->getContent());
+    }
+
+    /**
+     * Test email subject length validation (190 character limit).
+     */
+    public function testEmailSubjectLengthValidation(): void
+    {
+        $longSubject = str_repeat('b', Email::MAX_NAME_SUBJECT_LENGTH + 1); // 191 characters
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue('Valid Name');
+        $form['emailform[subject]']->setValue($longSubject);
+        $form['emailform[emailType]']->setValue('template');
+
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        $this->assertStringContainsString('Email subject maximum length is 190 characters', $response->getContent());
     }
 }

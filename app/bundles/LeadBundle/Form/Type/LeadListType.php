@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class LeadListType extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel
+        private ListModel $segmentModel,
     ) {
     }
 
@@ -42,18 +42,12 @@ class LeadListType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadlist_choices';
     }

@@ -10,7 +10,7 @@ final class PasswordStrengthValidateEvent extends Event
 {
     public function __construct(
         public bool $isValid,
-        public string $password
+        public string $password,
     ) {
     }
 }

@@ -42,7 +42,7 @@ class DynamicContentApiController extends CommonController
         DynamicContentHelper $helper,
         DeviceTrackingServiceInterface $deviceTrackingService,
         ContactRequestHelper $contactRequestHelper,
-        $objectAlias
+        $objectAlias,
     ): Response {
         /** @var PageModel $pageModel */
         $pageModel = $this->getModel('page');

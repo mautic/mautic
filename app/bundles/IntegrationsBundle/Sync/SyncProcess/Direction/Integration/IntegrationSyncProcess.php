@@ -29,7 +29,7 @@ class IntegrationSyncProcess
     public function __construct(
         private SyncDateHelper $syncDateHelper,
         private MappingHelper $mappingHelper,
-        private ObjectChangeGenerator $objectChangeGenerator
+        private ObjectChangeGenerator $objectChangeGenerator,
     ) {
     }
 

@@ -283,7 +283,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     var wasPublished = mQuery(el).hasClass('ri-toggle-fill');
     var element = mQuery(el);
 
-    element.removeClass('fa-toggle-on fa-toggle-off').addClass('ri-spin ri-loader-3-line');
+    element.removeClass('ri-toggle-fill ri-toggle-line').addClass('ri-spin ri-loader-3-line');
 
     //destroy tooltips so it can be regenerated
     element.tooltip('destroy');

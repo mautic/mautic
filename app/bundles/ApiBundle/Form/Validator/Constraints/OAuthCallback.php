@@ -8,7 +8,7 @@ class OAuthCallback extends Constraint
 {
     public $message = 'The callback URL is invalid.';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return OAuthCallbackValidator::class;
     }

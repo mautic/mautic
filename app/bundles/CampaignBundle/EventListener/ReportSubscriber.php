@@ -15,7 +15,7 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
     public function __construct(
-        private CompanyReportData $companyReportData
+        private CompanyReportData $companyReportData,
     ) {
     }
 

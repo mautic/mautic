@@ -44,6 +44,8 @@ final class EmailClickTrackingTest extends MauticMysqlTestCase
         $this->em->persist($page);
         $this->em->flush();
 
+        $this->logoutUser();
+
         $this->client->request(Request::METHOD_GET, '/test-page?&ct=YToxOntzOjQ6InN0YXQiO3M6MjI6IjY3MTY3ZjU3YTRjMDUyNjU5MzYwOTEiO30%3D');
         Assert::assertTrue($this->client->getResponse()->isSuccessful());
 

@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -91,7 +90,6 @@ class CampaignController extends AbstractStandardFormController
         private EventCollector $eventCollector,
         private DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -99,9 +97,9 @@ class CampaignController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         private RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getPermissions(): array
@@ -159,7 +157,7 @@ class CampaignController extends AbstractStandardFormController
         $page = 1,
         $count = null,
         \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null
+        \DateTimeInterface $dateTo = null,
     ) {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
@@ -699,7 +697,7 @@ class CampaignController extends AbstractStandardFormController
         } elseif ('new' === $action && empty($sessionId)) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->requestStack->getCurrentRequest()->request->has('campaign')) {
-                $campaign  = $this->requestStack->getCurrentRequest()->request->get('campaign') ?? [];
+                $campaign  = $this->requestStack->getCurrentRequest()->request->all()['campaign'] ?? [];
                 $sessionId = $campaign['sessionId'] ?? $sessionId;
             }
         } elseif ('edit' === $action) {
@@ -935,6 +933,9 @@ class CampaignController extends AbstractStandardFormController
                 $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
                 $this->prepareCampaignEventsForEdit($entity, $objectId, true);
 
+                $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
+                $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -946,6 +947,7 @@ class CampaignController extends AbstractStandardFormController
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
                         'campaignEvents'  => $events,
+                        'showEmailStats'  => $showEmailStats,
                     ]
                 );
                 break;
@@ -1062,10 +1064,7 @@ class CampaignController extends AbstractStandardFormController
         $this->getCurrentRequest()->getSession()->set('mautic.campaign.'.$sessionId.'.events.canvassettings', $canvasSettings);
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getSessionCanvasSettings($sessionId)
+    protected function getSessionCanvasSettings($sessionId): mixed
     {
         return $this->getCurrentRequest()->getSession()->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
     }
@@ -1085,8 +1084,8 @@ class CampaignController extends AbstractStandardFormController
         } else {
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateToPlusOne);
         }
 
         return [
@@ -1104,7 +1103,7 @@ class CampaignController extends AbstractStandardFormController
         array &$events,
         int $leadCount,
         array $campaignLogCounts,
-        array $campaignLogCountsProcessed
+        array $campaignLogCountsProcessed,
     ): void {
         foreach ($events as &$event) {
             $event['logCountForPending'] =

@@ -21,7 +21,7 @@ class UntrackableUrlsEvent extends Event
      * @param mixed $content
      */
     public function __construct(
-        private $content
+        private $content,
     ) {
     }
 

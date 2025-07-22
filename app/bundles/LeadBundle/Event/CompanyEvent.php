@@ -14,7 +14,7 @@ class CompanyEvent extends CommonEvent
     public function __construct(
         Company $company,
         $isNew = false,
-        protected $score = 0
+        protected $score = 0,
     ) {
         $this->entity = $company;
         $this->isNew  = $isNew;

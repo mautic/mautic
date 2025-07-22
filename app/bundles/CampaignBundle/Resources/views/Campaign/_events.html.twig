@@ -30,10 +30,10 @@
                 </span>
                 </div>
                     <div class="col-md-5 va-m">
-                    <h5 class="fw-sb text-primary mb-xs">
+                    <h5 class="fw-sb text-interactive mb-xs">
                         {{ event.name }}
                         {% if event.eventType is defined and 'action' != event.eventType %}
-                          <small class="text-muted">{{ event.percent }}%</small>
+                          <small class="text-secondary">{{ event.percent }}%</small>
                         {% endif %}
 
                     </h5>

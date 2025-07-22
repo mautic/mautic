@@ -11,9 +11,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that an email is found inside a feedback report
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\RepliedEmail::getStatHash()
      */
     public function testThatReplyIsDetectedThroughTrackingPixel(): void
     {
@@ -32,9 +29,6 @@ BODY;
 
     /**
      * @testdox Test that an email is found inside a feedback report
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\RepliedEmail::getStatHash()
      */
     public function testThatReplyIsDetectedThroughTrackingPixelWithUnsubcribeLink(): void
     {
@@ -53,8 +47,6 @@ BODY;
 
     /**
      * @testdox Test that an exeption is thrown if the hash is not found
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
      */
     public function testExceptionIsThrownWithHashNotFound(): void
     {

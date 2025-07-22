@@ -16,12 +16,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#pageTable',
-                        'routeBase': 'page',
-                        'templateButtons': {
-                            'delete': permissions['page:pages:deleteown'] or permissions['page:pages:deleteother'],
-                        },
+                    'checkall': 'true',
+                    'target': '#pageTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -122,6 +118,7 @@
                                 </span>
                             {% endif %}
                         </a>
+                        {{ customContent('page.name', _context) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}

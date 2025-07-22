@@ -16,7 +16,7 @@ final class PackageDetail
         public GitHubInfo $githubInfo,
         public int $monthlyDownloads,
         public int $dailyDownloads,
-        public \DateTimeInterface $time
+        public \DateTimeInterface $time,
     ) {
     }
 

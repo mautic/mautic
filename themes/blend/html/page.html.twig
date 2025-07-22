@@ -1,0 +1,216 @@
+{% extends "@themes/"~template~"/html/base.html.twig" %}
+
+{% block content %}
+<div class="sidebars">
+    <div class="sidebar--left">
+        <img class="logo--medium" src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+        <div class="h3">
+            <p>Download your material</p>
+        </div>
+        <div class="subtitle subtitle--header">
+            <p>Just a quick form below ↓</p>
+        </div>
+        <div style="padding: 10px;">
+            <p>{form=INSERT_FORM_ID_HERE}</p>
+        </div>
+        <div class="subtitle subtitle--footer">
+            <p>I understand that I can unsubscribe at any time. By clicking "submit" above, I consent to allow {brand=name} to store and process the personal information submitted above to provide me the content requested. Security and privacy matter to us. For more info, please review our <a href="https://">privacy policy</a></p>
+        </div>
+    </div>
+    <div class="sidebar--right">
+        <div><p>To replace the background:<br>Click on it<br>→ Find "Decorations" in the menu<br>→ Select "Background"<br>→ Click "Image"<br>→ Select the new image</p></div>
+        <div class="quote--text">
+            <p>"Use this space to highlight what's truly important for your audience."</p>
+        </div>
+        <div class="quote--author">
+            <p>Michelle Cox</p>
+        </div>
+        <div class="quote--position">
+            <p>Founder, CEO</p>
+        </div>
+    </div>
+</div>
+<style>
+    @font-face {
+    font-family: 'Inter';
+    src: url("{{ getAssetUrl('themes/'~template~'/assets/InterDisplay-Medium.woff2', null, null, true) }}") format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    }
+
+    @font-face {
+    font-family: 'Inter';
+    src: url("{{ getAssetUrl('themes/'~template~'/assets/InterDisplay-ExtraBold.woff2', null, null, true) }}") format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+    }
+
+    * {
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    p {
+        margin: 0;
+        padding: 0;
+        line-height: 1.4em;
+    }
+
+    .sidebars {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        gap: 20px;
+    }
+
+    .sidebar--left {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        background-color: #f5f6f4;
+        padding: 65px 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        box-sizing: border-box;
+        font-size: 12px;
+    }
+
+    .sidebar--right {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        width: 100%;
+        max-width: 100%;
+        min-width: 290px;
+        height: auto;
+        min-height: 200px;
+        margin: 0;
+        padding: 100px 25px;
+        background-repeat: repeat;
+        background-position: center center;
+        background-attachment: scroll;
+        background-size: cover;
+        background-image: url({{ getAssetUrl('themes/'~template~'/assets/mymind-3dmu0gu23uc-unsplash.jpg', null, null, true) }});
+        border-radius: 44px 0px 44px 0px;
+    }
+
+    .sidebar--left .mauticform_wrapper {
+        margin: 0;
+    }
+
+    .h3 {
+        padding: 0 10px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        display: flex;
+        font-size: 27px;
+        max-width: fit-content;
+        font-weight: bold;
+        font-feature-settings: "cv10" 1, "cv06" 1, "cv11" 1, "ss08" 1, "ss07" 1, "ss02" 1, "dlig" 1, "calt" 1, "cv12" 1, "cv13" 1;
+    }
+
+    .h3 p {
+        line-height: 1em;
+    }
+
+    .subtitle {
+        padding: 0 10px;
+        font-size: 13px;
+        color: #525252;
+        margin: 0;
+        display: flex;
+        width: 100%;
+        max-width: fit-content;
+    }
+
+    .subtitle.subtitle--header {
+        margin-bottom: 40px;
+    }
+
+    .subtitle.subtitle--footer {
+        margin-top: 60px;
+    }
+
+    .quote--text {
+        font-size: 30px;
+        font-weight: bold;
+        font-feature-settings: "cv10" 1, "cv06" 1, "cv11" 1, "ss08" 1, "ss07" 1, "ss02" 1, "dlig" 1, "calt" 1, "cv12" 1, "cv13" 1;
+    }
+
+    .quote--author {
+        font-size: 18px;
+        font-weight: bold;
+        padding-bottom: 0;
+        margin-top: 10px;
+    }
+
+    .quote--position {
+        opacity: 0.7;
+        font-size: 14px;
+        padding-top: 0;
+    }
+
+    .logo--medium {
+        padding: 0 10px;
+        height: 50px;
+        width: fit-content;
+    }
+
+    /* Media Queries for Larger Screens */
+
+    /* Tablet and Up */
+    @media (min-width: 768px) {
+        .sidebars {
+            flex-direction: row;
+            justify-content: end;
+            flex-wrap: nowrap;
+            padding: 40px;
+        }
+
+        .sidebar--left {
+            min-width: 350px;
+            max-width: 420px;
+            padding: 50px 35px;
+        }
+
+        .sidebar--right {
+            width: 50%;
+            padding: 50px;
+            align-self: stretch;
+        }
+
+        .quote--text {
+            font-size: 50px;
+        }
+
+        .h3 {
+            font-size: 37px;
+        }
+
+        .subtitle {
+            max-width: fit-content;
+        }
+    }
+    /* Desktop and Up */
+    @media (min-width: 1200px) {
+        .sidebars {
+            gap: 100px;
+            padding: 40px;
+        }
+    }
+</style>
+{% endblock %}

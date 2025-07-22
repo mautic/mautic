@@ -145,7 +145,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('addColumn');
 
         $dbalException = new class('message', 1118) extends \Exception implements \Doctrine\DBAL\Driver\Exception {
-            public function getSQLState()
+            public function getSQLState(): string
             {
                 return 'some SQL state';
             }

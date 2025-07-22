@@ -7,7 +7,7 @@ use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -27,7 +27,6 @@ class CategoryController extends AbstractFormController
     public function __construct(
         private FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -35,9 +34,9 @@ class CategoryController extends AbstractFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
-        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -219,7 +218,6 @@ class CategoryController extends AbstractFormController
         $cancelled  = $valid  = false;
         $method     = $request->getMethod();
         $inForm     = $this->getInFormValue($request, $method);
-        $showSelect = $request->get('show_bundle_select', false);
 
         // not found
         if (!$this->security->isGranted($model->getPermissionBase($bundle).':create')) {
@@ -230,7 +228,7 @@ class CategoryController extends AbstractFormController
             'objectAction' => 'new',
             'bundle'       => $bundle,
         ]);
-        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
         $form['inForm']->setData($inForm);
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {
@@ -491,16 +489,24 @@ class CategoryController extends AbstractFormController
                 return $this->isLocked($postActionVars, $entity, 'category.category');
             }
 
-            $model->deleteEntity($entity);
+            try {
+                $model->deleteEntity($entity);
 
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $entity->getTitle(),
-                    '%id%'   => $objectId,
-                ],
-            ];
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.core.notice.deleted',
+                    'msgVars' => [
+                        '%name%' => $entity->getTitle(),
+                        '%id%'   => $objectId,
+                    ],
+                ];
+            } catch (RecordCanNotBeDeletedException $exception) {
+                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
+                $flashes[]                      = [
+                    'type' => 'notice',
+                    'msg'  => $exception->getMessage(),
+                ];
+            }
         } // else don't do anything
 
         return $this->postActionRedirect(
@@ -514,10 +520,8 @@ class CategoryController extends AbstractFormController
      * Deletes a group of entities.
      *
      * @param string $bundle
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request, $bundle)
+    public function batchDeleteAction(Request $request, $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -544,7 +548,8 @@ class CategoryController extends AbstractFormController
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
-            // Loop over the IDs to perform access checks pre-delete
+            // Loop over the IDs to perform access checks and delete
+            $deletedExceptions = [];
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
@@ -559,20 +564,30 @@ class CategoryController extends AbstractFormController
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);
                 } else {
-                    $deleteIds[] = $objectId;
+                    try {
+                        // Delete everything we are able to
+                        $model->deleteEntity($entity);
+                        $deleteIds[] = $objectId;
+                    } catch (RecordCanNotBeDeletedException $exception) {
+                        $deletedExceptions[] = $exception;
+                    }
                 }
             }
 
-            // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.category.notice.batch_deleted',
                     'msgVars' => [
-                        '%count%' => count($entities),
+                        '%count%' => count($deleteIds),
                     ],
+                ];
+            }
+
+            foreach ($deletedExceptions as $deletedException) {
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => $deletedException->getMessage(),
                 ];
             }
         } // else don't do anything
@@ -588,7 +603,7 @@ class CategoryController extends AbstractFormController
     {
         $inForm = $request->get('inForm', 0);
         if (Request::METHOD_POST == $method) {
-            $category_form = $request->request->get('category_form');
+            $category_form = $request->request->all()['category_form'] ?? [];
             $inForm        = $category_form['inForm'] ?? 0;
         }
 

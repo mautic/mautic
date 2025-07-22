@@ -60,10 +60,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param int|null $companyId
-     *
-     * @return $this;
      */
-    public function setCompanyId($companyId)
+    public function setCompanyId($companyId): self
     {
         $this->companyId = $companyId;
 
@@ -80,10 +78,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param int|null $campaignId
-     *
-     * @return $this;
      */
-    public function setCampaignId($campaignId)
+    public function setCampaignId($campaignId): self
     {
         $this->campaignId = $campaignId;
 
@@ -100,10 +96,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param int|null $segmentId
-     *
-     * @return $this;
      */
-    public function setSegmentId($segmentId)
+    public function setSegmentId($segmentId): self
     {
         $this->segmentId = $segmentId;
 
@@ -118,10 +112,7 @@ class EmailStatOptions extends FetchOptions
         return $this->filters;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFilters(array $filters)
+    public function setFilters(array $filters): self
     {
         $this->filters = $filters;
 
@@ -135,10 +126,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param bool $canViewOthers
-     *
-     * @return $this
      */
-    public function setCanViewOthers($canViewOthers)
+    public function setCanViewOthers($canViewOthers): self
     {
         $this->canViewOthers = $canViewOthers;
 

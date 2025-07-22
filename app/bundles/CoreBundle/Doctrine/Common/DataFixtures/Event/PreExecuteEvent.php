@@ -12,7 +12,7 @@ class PreExecuteEvent extends Event
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private int $purgeMode
+        private int $purgeMode,
     ) {
     }
 

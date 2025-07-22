@@ -21,7 +21,7 @@ class ConfigType extends AbstractType
 {
     public function __construct(
         protected CoreParametersHelper $parameters,
-        protected TranslatorInterface $translator
+        protected TranslatorInterface $translator,
     ) {
     }
 
@@ -198,7 +198,7 @@ class ConfigType extends AbstractType
         $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'userconfig';
     }

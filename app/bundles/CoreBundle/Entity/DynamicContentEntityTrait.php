@@ -36,6 +36,8 @@ trait DynamicContentEntityTrait
 
     /**
      * @var array
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $dynamicContent = [];
 

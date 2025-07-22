@@ -13,7 +13,7 @@ class ReportGraphEvent extends AbstractReportEvent
     public function __construct(
         Report $report,
         private array $requestedGraphs,
-        private QueryBuilder $queryBuilder
+        private QueryBuilder $queryBuilder,
     ) {
         $this->report          = $report;
         $this->context         = $report->getSource();

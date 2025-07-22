@@ -14,7 +14,7 @@ class FuzzyEvidence implements JudgementModeInterface
      */
     public static function adjudicate(
         InformationChangeRequestDAO $leftChangeRequest,
-        InformationChangeRequestDAO $rightChangeRequest
+        InformationChangeRequestDAO $rightChangeRequest,
     ): InformationChangeRequestDAO {
         try {
             return BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);

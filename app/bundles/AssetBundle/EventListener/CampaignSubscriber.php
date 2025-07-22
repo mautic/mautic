@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private RealTimeExecutioner $realTimeExecutioner
+        private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 

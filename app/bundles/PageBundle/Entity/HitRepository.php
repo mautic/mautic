@@ -71,11 +71,14 @@ class HitRepository extends CommonRepository
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
 
         if ($leadId) {
-            $query->where('h.lead_id = '.(int) $leadId);
+            $query->where('h.lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->like('p.title', $query->expr()->literal('%'.$options['search'].'%')));
+            $query->andWhere(
+                $query->expr()->like('p.title', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         $query->leftjoin('h', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id');
@@ -93,7 +96,7 @@ class HitRepository extends CommonRepository
     public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
     {
         $query = $this->createQueryBuilder('h');
-        $query->select('count(distinct(h.trackingId)) as "hitCount"');
+        $query->select('count(distinct(h.trackingId)) as hitCount');
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
         if (null != $sourceId) {
@@ -101,7 +104,8 @@ class HitRepository extends CommonRepository
                 $query->andWhere($query->expr()->in('h.sourceId', ':sourceIds'))
                     ->setParameter('sourceIds', $sourceId);
             } else {
-                $query->andWhere($query->expr()->eq('h.sourceId', (int) $sourceId));
+                $query->andWhere('h.sourceId = :sourceId')
+                ->setParameter('sourceId', $sourceId);
             }
         }
 
@@ -110,7 +114,8 @@ class HitRepository extends CommonRepository
                 ->setParameter('date', $fromDate);
         }
 
-        $query->andWhere($query->expr()->eq('h.code', (int) $code));
+        $query->andWhere('h.code = :code')
+        ->setParameter('code', $code);
 
         return $query->getQuery()->getArrayResult();
     }
@@ -356,7 +361,7 @@ class HitRepository extends CommonRepository
                 )
             );
 
-        if (isset($options['fromDate']) && null !== $options['fromDate']) {
+        if (isset($options['fromDate'])) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(

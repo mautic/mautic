@@ -5,12 +5,17 @@ namespace Mautic\CategoryBundle\Tests\Controller;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private TranslatorInterface $translator;
+
     /**
      * Create two new categories.
      *
@@ -40,6 +45,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
                 ->setBundle($categoryData['bundle']);
             $model->saveEntity($category);
         }
+
+        $this->translator = static::getContainer()->get('translator');
     }
 
     /**
@@ -78,7 +85,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $crawler->addHtmlContent($html);
         $saveButton = $crawler->selectButton('category_form[buttons][save]');
         $form       = $saveButton->form();
-        $form['category_form[bundle]']->setValue('category');
+        $form['category_form[bundle]']->setValue('global');
         $form['category_form[title]']->setValue('Test');
         $form['category_form[isPublished]']->setValue('1');
         $form['category_form[inForm]']->setValue('1');
@@ -109,5 +116,110 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
         $this->assertStringContainsString('is currently checked out by', $this->client->getResponse()->getContent());
+    }
+
+    public function testTypeFieldPersistsAfterValidationFailure(): void
+    {
+        $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
+        $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
+        $html                   = $clientResponse['newContent'];
+        $crawler->addHtmlContent($html);
+        $saveButton = $crawler->selectButton('category_form[buttons][save]');
+        $form       = $saveButton->form();
+        $form['category_form[bundle]']->setValue('global');
+        $form['category_form[title]']->setValue('');
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $clientResponse = $this->client->getResponse();
+        $body           = json_decode($clientResponse->getContent(), true);
+        $this->assertNotEmpty($crawler->filter('select#category_form_bundle')->count(), 'The "Type" (bundle) field should remain visible after validation failure.');
+    }
+
+    public function testDeleteUsedInStage(): void
+    {
+        $category = new Category();
+        $category->setIsPublished(true);
+        $category->setTitle('Category for stage');
+        $category->setDescription('Category for stage');
+        $category->setBundle('global');
+        $category->setAlias('category-for-stage');
+        $this->em->persist($category);
+
+        $stage = new Stage();
+        $stage->setName('test for category');
+        $stage->setCategory($category);
+        $stage->setDescription('Random Stage Description');
+        $stage->setWeight(10);
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        $expectedErrorMessage = $this->translator->trans(
+            'mautic.category.is_in_use.delete',
+            [
+                '%entities%'      => 'Stage Id: '.$stage->getId(),
+                '%categoryName%'  => $category->getTitle(),
+            ],
+            'validators'
+        );
+
+        $this->client->request('POST', 's/categories/category/delete/'.$category->getId(), [], [], [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ]);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            $clientResponse->getStatusCode(),
+            $clientResponse->getContent()
+        );
+        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+
+        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+    }
+
+    public function testBatchDeleteUsedInStage(): void
+    {
+        $category = new Category();
+        $category->setIsPublished(true);
+        $category->setTitle('Category for stage');
+        $category->setDescription('Category for stage');
+        $category->setBundle('global');
+        $category->setAlias('category-for-stage');
+        $this->em->persist($category);
+
+        $stage = new Stage();
+        $stage->setName('test for category');
+        $stage->setCategory($category);
+        $stage->setDescription('Random Stage Description');
+        $stage->setWeight(10);
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        $expectedErrorMessage = $this->translator->trans(
+            'mautic.category.is_in_use.delete',
+            [
+                '%entities%'      => 'Stage Id: '.$stage->getId(),
+                '%categoryName%'  => $category->getTitle(),
+            ],
+            'validators'
+        );
+
+        $parameters = 'ids=["'.$category->getId().'"]';
+        $this->client->request('POST', 's/categories/category/batchDelete?'.$parameters, [], [], [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ]);
+
+        $clientResponse = $this->client->getResponse();
+
+        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+
+        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
     }
 }

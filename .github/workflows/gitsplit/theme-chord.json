@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-chord",
+            "directory": "themes/chord",
+            "target": "git@github.com:mautic/theme-chord.git"
+        }
+    ]
+}

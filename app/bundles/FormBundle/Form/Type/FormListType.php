@@ -61,10 +61,7 @@ class FormListType extends AbstractType
         $resolver->setDefined(['form_type']);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

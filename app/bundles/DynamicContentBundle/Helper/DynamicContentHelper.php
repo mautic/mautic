@@ -32,7 +32,7 @@ class DynamicContentHelper
         protected DynamicContentModel $dynamicContentModel,
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
-        protected LeadModel $leadModel
+        protected LeadModel $leadModel,
     ) {
     }
 
@@ -143,7 +143,7 @@ class DynamicContentHelper
                     if ($dwc->getIsCampaignBased()) {
                         continue;
                     }
-                    $content                   = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
+                    $content                   = $lead ? $this->getDynamicContentSlotForLead($dwc->getSlotName(), $lead) : '';
                     $tokens[$token]['content'] = $content;
                     $tokens[$token]['filters'] = $dwc->getFilters();
                 }

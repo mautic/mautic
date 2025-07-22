@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -28,7 +29,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -60,7 +62,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -111,7 +114,8 @@ class AuditLogRepository extends CommonRepository
             ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -184,7 +188,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+        $query->orderBy('al.dateAdded', Order::Descending->value)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
@@ -257,6 +261,6 @@ class AuditLogRepository extends CommonRepository
         $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
         $conn       = $this->getEntityManager()->getConnection();
 
-        return $conn->executeQuery($sql)->rowCount();
+        return $conn->executeStatement($sql);
     }
 }

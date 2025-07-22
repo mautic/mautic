@@ -1,0 +1,45 @@
+{% extends '@MauticForm/Action/base_form_action.html.twig' %}
+
+{% set footerContent %}
+    {% if action.properties.score is defined %}
+        <!-- Add to company points -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': 'mautic.form.form.change_points_by'|trans({'%value%': action.properties.score}),
+                'color': action.properties.score < 0 ? 'red' : (action.properties.score == 0 ? 'warm-gray' : 'green'),
+                'icon': 'ri-bar-chart-2-fill'
+            }]
+        } %}
+    {% endif %}
+
+    {% if action.properties.points is defined %}
+        <!-- Add to contact points -->
+        {% set operatorKey = 'mautic.lead.lead.submitaction.operator_' ~ action.properties.operator %}
+        {% set operatorLabel = operatorKey|trans %}
+
+        {% set pointGroup = getEntity('Mautic\\PointBundle\\Entity\\Group', action.properties.group) %}
+        {% set groupName = pointGroup ? pointGroup.name : '' %}
+
+        {% set label = 'mautic.form.field.points.operation'|trans({
+            '%operator%': operatorLabel,
+            '%points%': action.properties.points,
+            '%group%': groupName
+        })|capitalize %}
+
+        {% set color = action.properties.operator in ['plus', 'times'] ? 'green' : 'red' %}
+
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: label,
+                    icon: 'ri-bar-chart-2-fill',
+                    color: color
+                }
+            ]
+        } %}
+    {% endif %}
+{% endset %}
+
+{% block action_label %}
+    {{ footerContent|raw }}
+{% endblock %}

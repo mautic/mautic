@@ -57,10 +57,7 @@ class LookupType extends AbstractType
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'clearbit_lookup';
     }

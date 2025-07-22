@@ -45,7 +45,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $fieldResponse  = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         Assert::assertTrue($fieldResponse['field']['isPublished']);
         Assert::assertGreaterThan(0, $fieldResponse['field']['id']);
         Assert::assertSame($payload['label'], $fieldResponse['field']['label']);
@@ -58,7 +58,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, '/api/fields/contact/'.$fieldResponse['field']['id'].'/delete', $payload);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful($clientResponse->getContent());
     }
 
     /**

@@ -29,17 +29,9 @@ trait BuilderModelTrait
                 case 'abTestWinnerCriteria':
                     $components[$requested] = $event->getAbTestWinnerCriteria();
                     break;
-                case 'slotTypes':
-                    $components[$requested] = $event->getSlotTypes();
-                    break;
-                case 'sections':
-                    $components[$requested] = $event->getSections();
-                    break;
                 default:
                     $components['tokens']               = $event->getTokens();
                     $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
-                    $components['slotTypes']            = $event->getSlotTypes();
-                    $components['sections']             = $event->getSections();
                     break;
             }
         }

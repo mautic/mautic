@@ -8,7 +8,7 @@ final class Maintainer
 {
     public function __construct(
         public string $name,
-        public string $avatar
+        public string $avatar,
     ) {
     }
 

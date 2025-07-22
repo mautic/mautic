@@ -18,7 +18,7 @@ class LeadListSubscriber implements EventSubscriberInterface
     public function __construct(
         private IntegrationHelper $helper,
         private ListModel $listModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

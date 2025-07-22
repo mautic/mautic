@@ -19,7 +19,7 @@ class TokenSubscriber implements EventSubscriberInterface
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private PrimaryCompanyHelper $primaryCompanyHelper,
-        private LeadListRepository $segmentRepository
+        private LeadListRepository $segmentRepository,
     ) {
     }
 

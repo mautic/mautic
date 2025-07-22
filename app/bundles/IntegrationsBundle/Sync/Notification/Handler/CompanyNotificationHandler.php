@@ -15,7 +15,7 @@ class CompanyNotificationHandler implements HandlerInterface
     public function __construct(
         private Writer $writer,
         private UserNotificationHelper $userNotificationHelper,
-        private CompanyHelper $companyHelper
+        private CompanyHelper $companyHelper,
     ) {
     }
 

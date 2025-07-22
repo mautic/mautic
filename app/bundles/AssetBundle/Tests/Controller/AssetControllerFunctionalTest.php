@@ -48,6 +48,13 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
+    public function testAssetSizes(): void
+    {
+        $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
+    }
+
     /**
      * Preview action should return the file content.
      */
@@ -130,12 +137,10 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->em->flush();
         $this->em->clear();
 
-        // Logout admin.
-        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->logoutUser();
 
-        $this->loginUser(self::SALES_USER);
+        $this->loginUser($userEditor);
 
-        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
         $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
         Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());

@@ -3,7 +3,9 @@
 namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -33,7 +35,7 @@ class PluginModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -95,7 +97,7 @@ class PluginModel extends FormModel
     /**
      * Loads all installed Plugin entities from database.
      *
-     * @return array
+     * @return Plugin[]
      */
     public function getInstalledPlugins()
     {
@@ -108,6 +110,8 @@ class PluginModel extends FormModel
 
     /**
      * Returns metadata for all plugins.
+     *
+     * @return array<string, array<class-string, ClassMetadata>>
      */
     public function getPluginsMetadata(): array
     {
@@ -131,6 +135,10 @@ class PluginModel extends FormModel
 
     /**
      * Returns all tables of installed plugins.
+     *
+     * @param array<string, array<class-string, ClassMetadata>> $pluginsMetadata
+     *
+     * @return array<string, array<int, Table>>
      */
     public function getInstalledPluginTables(array $pluginsMetadata): array
     {

@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class TrackingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private StatRepository $statRepository
+        private StatRepository $statRepository,
     ) {
     }
 

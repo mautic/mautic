@@ -23,12 +23,19 @@
         'searchValue': searchValue,
         'action': currentRoute,
         'filters': filters|default([]),
-        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'page_actions': {
             'templateButtons': {'new': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')]},
             'routeBase': 'segment',
             'langVar': 'lead.list',
             'tooltip': 'mautic.lead.lead.segment.add.help',
-        }),
+        },
+        'bulk_actions': {
+          'langVar': 'lead.list',
+          'routeBase': 'segment',
+          'templateButtons': {
+              'delete': permissions['lead:lists:deleteother'],
+          },
+        },
         'quickFilters': [
             {
                 'search': 'mautic.core.searchcommand.ismine',

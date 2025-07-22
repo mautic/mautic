@@ -1,0 +1,31 @@
+{% for i in 1..7 %}
+    {% set formatted_id = '%02d'|format(i) %}
+    <div class="accent">
+        <input type="radio" id="accent-{{ formatted_id }}" name="accent" value="{{ formatted_id }}"
+                class="hide" data-attribute-toggle="accent" data-attribute-value="{{ formatted_id }}" {% if formatted_id == configGetParameter('accent', '01') %}checked{% endif %}>
+        <label for="accent-{{ formatted_id }}" class="accent-color ma-0 bdr-rds-circle" style="background-color: var(--accent{{ formatted_id }});"></label>
+    </div>
+{% endfor %}
+
+<!-- Dropdown for additional colors -->
+<div class="dropdown">
+    <a class="label label-warm-gray accent-dropdown"
+            style="height: 28px;" type="button" id="dropdownMoreColors" data-toggle="dropdown"
+            aria-expanded="false">
+            <span>More</span>
+        <i class="ri-add-line"></i>
+    </a>
+    <div class="dropdown-menu pa-md" aria-labelledby="dropdownMoreColors">
+        <div class="d-flex fw-wrap gap-lg">
+            {% for i in 8..accents|length %}
+                {% set formatted_id = '%02d'|format(i) %}
+                <div class="d-inline-flex">
+                    <input type="radio" id="accent-{{ formatted_id }}" name="accent" value="{{ formatted_id }}"
+                            class="hide" data-attribute-toggle="accent" data-attribute-value="{{ formatted_id }}" {% if formatted_id == configGetParameter('accent', '01') %}checked{% endif %}>
+                    <label for="accent-{{ formatted_id }}" class="accent-color ma-0 bdr-rds-circle" style="background-color: var(--accent{{ formatted_id }});"></label>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>

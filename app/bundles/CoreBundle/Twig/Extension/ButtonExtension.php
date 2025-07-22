@@ -17,7 +17,7 @@ class ButtonExtension extends AbstractExtension
         protected ButtonHelper $buttonHelper,
         protected RequestStack $requestStack,
         protected UrlGeneratorInterface $router,
-        protected TranslatorInterface $translator
+        protected TranslatorInterface $translator,
     ) {
     }
 
@@ -104,7 +104,7 @@ class ButtonExtension extends AbstractExtension
         array $editAttr = [],
         array $routeVars = [],
         $item = null,
-        ?string $tooltip = null
+        ?string $tooltip = null,
     ): void {
         foreach ($templateButtons as $action => $enabled) {
             if (!$enabled) {

@@ -15,7 +15,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
     public function __construct(
         private NotificationHelper $notificationHelper,
         private IntegrationHelper $integrationHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

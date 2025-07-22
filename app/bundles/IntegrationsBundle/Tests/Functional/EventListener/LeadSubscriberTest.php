@@ -29,7 +29,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         static::getContainer()->set(
             'mautic.integrations.helper.sync_integrations',
-            new class() extends SyncIntegrationsHelper {
+            new class extends SyncIntegrationsHelper {
                 public function __construct()
                 {
                 }
@@ -39,7 +39,10 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
                     return true;
                 }
 
-                public function getEnabledIntegrations()
+                /**
+                 * @return array<int,string>
+                 */
+                public function getEnabledIntegrations(): array
                 {
                     return ['unicorn'];
                 }

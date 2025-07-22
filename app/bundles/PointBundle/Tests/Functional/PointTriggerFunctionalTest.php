@@ -143,7 +143,7 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createGroup(
-        string $name
+        string $name,
     ): Group {
         $group = new Group();
         $group->setName($name);
@@ -154,7 +154,7 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
     private function leadHasTag(
         Lead $lead,
-        string $tagName
+        string $tagName,
     ): bool {
         /** @var Tag $tag */
         foreach ($lead->getTags() as $tag) {

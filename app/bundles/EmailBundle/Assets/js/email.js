@@ -352,22 +352,13 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var textarea      = itemContainer.find('.editor');
     var firstInput    = itemContainer.find('input[type="text"]').first();
 
-    if (mauticFroalaEnabled && textarea.hasClass('legacy-builder')) {
-        textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-            // Set custom buttons with separator between them.
-            toolbarSticky: false,
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-            heightMin: 100
-        }));
-    }
-
     if (Mautic.internalDynamicContentItemCreateListeners) {
         Mautic.internalDynamicContentItemCreateListeners.forEach(function(callback) {
             callback(textarea);
         });
     }
 
-    tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('fa-plus text-success');
+    tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('ri-add-line text-success');
     newTab.find('a').tab('show');
 
     firstInput.focus();
@@ -426,15 +417,6 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
             $this.trigger('chosen:updated');
         }
     });
-
-    if (mauticFroalaEnabled && altTextarea.hasClass('legacy-builder')) {
-        altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-            // Set custom buttons with separator between them.
-            toolbarSticky: false,
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-            heightMin: 100
-        }));
-    }
 
     if (Mautic.internalDynamicContentFilterCreateListeners) {
         Mautic.internalDynamicContentFilterCreateListeners.forEach(function(callback) {

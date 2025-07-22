@@ -16,7 +16,7 @@ class ContactColumnsDictionary
     public function __construct(
         protected FieldModel $fieldModel,
         private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

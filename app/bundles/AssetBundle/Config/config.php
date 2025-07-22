@@ -49,7 +49,9 @@ return [
     ],
 
     'categories' => [
-        'asset' => null,
+        'asset' => [
+            'class' => Mautic\AssetBundle\Entity\Asset::class,
+        ],
     ],
 
     'services' => [
@@ -64,7 +66,6 @@ return [
         'others' => [
             'mautic.asset.upload.error.handler' => [
                 'class'     => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
-                'arguments' => 'mautic.factory',
             ],
             // Override the DropzoneController
             'oneup_uploader.controller.dropzone.class' => [

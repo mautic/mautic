@@ -90,7 +90,7 @@ class ContentPreviewSettingsType extends AbstractType
         FormBuilderInterface $builder,
         string $type,
         array $variants,
-        int $objectId
+        int $objectId,
     ): void {
         if (!count($variants['children'])) {
             return;

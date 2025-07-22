@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -94,7 +95,7 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('a.language', ":$unique"),
                     $q->expr()->like('a.language', ":$langUnique")
                 );
@@ -199,7 +200,7 @@ class AssetRepository extends CommonRepository
         $q->where($this->getTableAlias().'.category = :categoryId');
         $q->andWhere($this->getTableAlias().'.isPublished = TRUE');
         $q->setParameter('categoryId', $categoryId);
-        $q->orderBy($this->getTableAlias().'.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
+        $q->orderBy($this->getTableAlias().'.dateAdded', Order::Descending->value);
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();

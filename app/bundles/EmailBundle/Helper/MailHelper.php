@@ -2,11 +2,15 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
@@ -19,10 +23,13 @@ use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -33,6 +40,7 @@ use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 class MailHelper
@@ -61,13 +69,6 @@ class MailHelper
      * @var TransportInterface
      */
     protected $transport;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    protected ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * @var bool|MauticMessage
@@ -104,10 +105,7 @@ class MailHelper
      */
     protected $internalSend = false;
 
-    /**
-     * @var null
-     */
-    protected $idHash;
+    protected ?string $idHash = null;
 
     /**
      * @var bool
@@ -236,14 +234,23 @@ class MailHelper
     private array $embedImagesReplaces = [];
 
     public function __construct(
-        private MauticFactory $factory,
         private MailerInterface $mailer,
         private FromEmailHelper $fromEmailHelper,
         private CoreParametersHelper $coreParametersHelper,
         private Mailbox $mailbox,
         private LoggerInterface $logger,
         private MailHashHelper $mailHashHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private Environment $twig,
+        private ThemeHelper $themeHelper,
+        private PathsHelper $pathsHelper,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
+        private EntityManagerInterface $entityManager,
+        private ModelFactory $modelFactory, // Can not inject EmailModel due to circular reference between MailHelper and EmailModel (even through other classes, like UserModel, SendEmailToContact)
+        private AssetModel $assetModel,
+        private TrackableModel $trackableModel,
+        private RedirectModel $redirectModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -266,8 +273,6 @@ class MailHelper
     }
 
     /**
-     * Mirrors previous MauticFactory functionality.
-     *
      * @param bool $cleanSlate
      *
      * @return $this
@@ -277,18 +282,6 @@ class MailHelper
         $this->reset($cleanSlate);
 
         return $this;
-    }
-
-    /**
-     * Mirrors previous MauticFactory functionality.
-     *
-     * @param bool $cleanSlate
-     *
-     * @return $this
-     */
-    public function getSampleMailer($cleanSlate = true)
-    {
-        return $this->getMailer($cleanSlate);
     }
 
     /**
@@ -360,6 +353,10 @@ class MailHelper
                     $tokens['{signature}'] = $ownerSignature;
                 }
 
+                if ($brandName = $this->coreParametersHelper->get('brand_name')) {
+                    $tokens['{brand=name}'] = $brandName;
+                }
+
                 // Set metadata if applicable
                 foreach ($this->queuedRecipients as $email => $name) {
                     $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
@@ -392,6 +389,7 @@ class MailHelper
             try {
                 if (!$this->skip) {
                     $this->mailer->send($this->message);
+                    $this->message->clearMetadata();
                 }
                 $this->skip = false;
             } catch (TransportExceptionInterface $exception) {
@@ -538,7 +536,7 @@ class MailHelper
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
                     $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
                 } else {
-                    $this->setMessageFrom($this->getFrom());
+                    $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -696,10 +694,8 @@ class MailHelper
      */
     public function attachAsset($asset): void
     {
-        $model = $this->factory->getModel('asset');
-
         if (!$asset instanceof Asset) {
-            $asset = $model->getEntity($asset);
+            $asset = $this->assetModel->getEntity($asset);
 
             if (null == $asset) {
                 return;
@@ -707,7 +703,7 @@ class MailHelper
         }
 
         if ($asset->isPublished()) {
-            $asset->setUploadDir($this->factory->getParameter('upload_dir'));
+            $asset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
             $this->assets[$asset->getId()] = $asset;
         }
     }
@@ -723,10 +719,6 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->twig) {
-            $this->twig = $this->factory->getTwig();
-        }
-
         $content = $this->twig->render($template, $vars);
 
         unset($vars);
@@ -833,7 +825,7 @@ class MailHelper
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
                 if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
                     $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
-                    $path = $this->factory->getSystemPath('root', true).$path;
+                    $path = $this->pathsHelper->getSystemPath('root', true).$path;
                 }
 
                 if ($imageContent = file_get_contents($path)) {
@@ -869,10 +861,8 @@ class MailHelper
 
     /**
      * Set to address(es).
-     *
-     * @return bool
      */
-    public function setTo($addresses, $name = null)
+    public function setTo($addresses, $name = null): bool
     {
         $name = $this->cleanName($name);
 
@@ -909,10 +899,8 @@ class MailHelper
      *
      * @param string      $address
      * @param string|null $name
-     *
-     * @return bool
      */
-    public function addTo($address, $name = null)
+    public function addTo($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients();
 
@@ -938,34 +926,56 @@ class MailHelper
     }
 
     /**
-     * Set CC address(es).
+     * Helper method to set CC or BCC recipients.
      *
-     * @param array<string,?string> $addresses
-     * @param ?string               $name
-     *
-     * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
-     *
-     * @return bool
+     * @param string                    $type      Type of recipient (cc or bcc)
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
      */
-    public function setCc($addresses, $name = null)
+    private function setRecipients(string $type, $addresses, $name = null): bool
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'cc');
+        $this->checkBatchMaxRecipients(count($addresses), $type);
 
         try {
-            $ccAddresses = [];
-            // The email addresses are stored in the array keys not the values
-            // The name of the CC is passed in the function and not in the array
-            foreach ($addresses as $address => $noName) {
-                $ccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
+            $recipientAddresses = [];
+
+            foreach ($addresses as $key => $value) {
+                // Check if we have an indexed array (numeric keys)
+                if (is_numeric($key)) {
+                    $address     = $value;
+                    $addressName = $name;
+                } else {
+                    // We have an associative array (email => name)
+                    $address     = $key;
+                    $addressName = $value ?: $name; // Use provided name or default
+                }
+
+                $recipientAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
             }
-            $this->message->cc(...$ccAddresses);
+
+            if ('cc' === $type) {
+                $this->message->cc(...$recipientAddresses);
+            } else {
+                $this->message->bcc(...$recipientAddresses);
+            }
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e, 'cc');
+            $this->logError($e, $type);
 
             return false;
         }
+    }
+
+    /**
+     * Set CC address(es).
+     *
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
+     */
+    public function setCc($addresses, $name = null): bool
+    {
+        return $this->setRecipients('cc', $addresses, $name);
     }
 
     /**
@@ -973,10 +983,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addCc($address, $name = null)
+    public function addCc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'cc');
 
@@ -994,33 +1002,12 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param array<string,?string> $addresses
-     * @param ?string               $name
-     *
-     * //TODO: same bug for the name as the one we have in setCc
-     *
-     * @return bool
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
      */
-    public function setBcc($addresses, $name = null)
+    public function setBcc($addresses, $name = null): bool
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'bcc');
-
-        try {
-            $bccAddresses = [];
-            // The email addresses are stored in the array keys not the values
-            // The name of the Bcc is passed in the function and not in the array
-            foreach ($addresses as $address => $noName) {
-                $bccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
-            }
-
-            $this->message->bcc(...$bccAddresses);
-
-            return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'bcc');
-
-            return false;
-        }
+        return $this->setRecipients('bcc', $addresses, $name);
     }
 
     /**
@@ -1028,10 +1015,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addBcc($address, $name = null)
+    public function addBcc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'bcc');
 
@@ -1229,13 +1214,12 @@ class MailHelper
 
     /**
      * @param bool  $allowBcc            Honor BCC if set in email
-     * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
      * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, $allowBcc = true, $assetAttachments = [], $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1266,20 +1250,9 @@ class MailHelper
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
         if (empty($customHtml) && $template) {
-            if (empty($slots)) {
-                $slots    = $this->factory->getTheme($template)->getSlots('email');
-            }
-
-            if (isset($slots[$template])) {
-                $slots = $slots[$template];
-            }
-
-            $this->processSlots($slots, $email);
-
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+            $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
-                'slots'    => $slots,
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
@@ -1456,9 +1429,15 @@ class MailHelper
             }
         }
 
-        $request = $this->factory->getRequest();
+        $request = $this->requestStack->getMainRequest();
+        if (null !== $request) {
+            $baseUrl = $request->getSchemeAndHttpHost().$request->getBasePath();
+        } else {
+            $baseUrl = $this->coreParametersHelper->get('site_url');
+        }
+
         $parser  = new PlainTextHelper([
-            'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
+            'base_url' => $baseUrl,
         ]);
 
         $this->plainText = $parser->setHtml($content)->getText();
@@ -1481,10 +1460,6 @@ class MailHelper
      */
     public function dispatchSendEvent(): void
     {
-        if (null == $this->dispatcher) {
-            $this->dispatcher = $this->factory->getDispatcher();
-        }
-
         if (null === $this->bodyInitial) {
             $this->bodyInitial = $this->body;
         }
@@ -1606,11 +1581,9 @@ class MailHelper
 
         // Create a download entry if there is an Asset attachment
         if (!empty($this->assetStats)) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
-            $assetModel = $this->factory->getModel('asset');
             foreach ($this->assets as $asset) {
                 foreach ($this->assetStats as $stat) {
-                    $assetModel->trackDownload(
+                    $this->assetModel->trackDownload(
                         $asset,
                         null,
                         200,
@@ -1618,7 +1591,7 @@ class MailHelper
                     );
                 }
 
-                $assetModel->upDownloadCount($asset, count($this->assetStats), true);
+                $this->assetModel->upDownloadCount($asset, count($this->assetStats), true);
             }
         }
 
@@ -1680,17 +1653,12 @@ class MailHelper
 
         if ($this->email) {
             // Get a Trackable which is channel aware
-            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-            $trackableModel = $this->factory->getModel('page.trackable');
-            $trackable      = $trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
+            $trackable = $this->trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
 
             return $trackable->getRedirect();
         }
 
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
-
-        return $redirectModel->getRedirectByUrl($url);
+        return $this->redirectModel->getRedirectByUrl($url);
     }
 
     /**
@@ -1712,7 +1680,7 @@ class MailHelper
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference(Lead::class, $this->lead['id']));
+                $stat->setLead($this->entityManager->getReference(Lead::class, $this->lead['id']));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1733,7 +1701,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
+                $stat->setList($this->entityManager->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1747,8 +1715,8 @@ class MailHelper
 
         $stat->setTokens($this->getTokens());
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
+        $emailModel = $this->modelFactory->getModel(EmailModel::class);
+        \assert($emailModel instanceof EmailModel);
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = $emailExists ? $this->email->getId() : md5($this->subject.$this->body['content']);
@@ -1774,7 +1742,7 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->entityManager->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1843,27 +1811,6 @@ class MailHelper
         }
 
         return $monitoredEmail;
-    }
-
-    /**
-     * @param Email $entity
-     */
-    public function processSlots($slots, $entity): void
-    {
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value = $content[$slot] ?? '';
-            $slotsHelper->set($slot, $value);
-        }
     }
 
     /**
@@ -2160,14 +2107,6 @@ class MailHelper
 
     public function dispatchPreSendEvent(): void
     {
-        if (null === $this->dispatcher) {
-            $this->dispatcher = $this->factory->getDispatcher();
-        }
-
-        if (empty($this->dispatcher)) {
-            return;
-        }
-
         $event = new EmailSendEvent($this);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
 

@@ -61,7 +61,7 @@
 			{% for sso in integrations %}
 				<a href="{{ path('mautic_sso_login', {'integration' : sso.getName()}) }}" class="list-group-item">
 					<img class="pull-left mr-xs" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
-					<p class="list-group-item-text">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
+					<p class="list-group-item-heading">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
 				</a>
 			{% endfor %}
 		</ul>

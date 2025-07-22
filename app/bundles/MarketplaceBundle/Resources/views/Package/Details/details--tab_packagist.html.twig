@@ -1,0 +1,29 @@
+<!-- Packagist -->
+<table class="table table-hover mb-0">
+    <tr>
+        <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+        <td>
+            <a href="{{ packageDetail.packageBase.url|escape }}" target="_blank" rel="noopener noreferrer" >
+                {{ packageDetail.packageBase.name|escape }}
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.total.downloads{% endtrans %}</th>
+        <td>{{ packageDetail.packageBase.downloads|escape }}</td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.monthly.downloads{% endtrans %}</th>
+        <td>{{ packageDetail.monthlyDownloads|escape }}</td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.daily.downloads{% endtrans %}</th>
+        <td>{{ packageDetail.dailyDownloads|escape }}</td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.create.date{% endtrans %}</th>
+        <td title="{{ dateToText(packageDetail.time) }}">
+            {{ dateToDate(packageDetail.time) }}
+        </td>
+    </tr>
+</table>

@@ -20,7 +20,7 @@ final class AvatarHelper
         private AssetsHelper $assetsHelper,
         private PathsHelper $pathsHelper,
         private GravatarHelper $gravatarHelper,
-        private DefaultAvatarHelper $defaultAvatarHelper
+        private DefaultAvatarHelper $defaultAvatarHelper,
     ) {
     }
 
@@ -101,8 +101,6 @@ final class AvatarHelper
 
     /**
      * @deprecated Use DefaultAvatarHelper::getDefaultAvatar instead of it
-     *
-     * @param bool|false $absolute
      */
     public function getDefaultAvatar(bool $absolute = false): string
     {

@@ -4,17 +4,17 @@
         <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
     </a>
   {%- else -%}
-    <a href="{{ url('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}) }}" data-toggle="ajax">
-      <span class="fw-sb">{{- form.name -}}</span>
-      <span class="ml-4 mr-sm">#{{ form.getId() }}</span>
+    <a href="{{ url('mautic_form_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+      <span class="fw-sb">{{- item.name -}}</span>
+      <span class="ml-4 mr-sm">#{{ item.id }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
-            'entity': form,
+            'entity': item,
             'status': 'available',
             'simplified': 'true'
         }) -}}
       <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.form.form.resultcount'|trans }}" data-placement="left">
         <i class="ri-file-list-2-line mr-2"></i>
-        {{- form.resultCount -}}
+        {{- item.resultCount -}}
       </span>
     </a>
   {%- endif -%}

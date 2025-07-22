@@ -45,7 +45,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private StageModel $stageModel,
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
     ) {
         $this->translator    = $translator;
     }

@@ -13,7 +13,7 @@ class LeadFieldSaver
 {
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,
-        private FieldSaveDispatcher $fieldSaveDispatcher
+        private FieldSaveDispatcher $fieldSaveDispatcher,
     ) {
     }
 

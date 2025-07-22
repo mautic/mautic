@@ -8,10 +8,7 @@ use Mautic\PluginBundle\Entity\Integration;
 
 trait ConfigurationTrait
 {
-    /**
-     * @var Integration
-     */
-    private $integration;
+    private ?Integration $integration = null;
 
     public function getIntegrationConfiguration(): Integration
     {
@@ -28,6 +25,6 @@ trait ConfigurationTrait
      */
     public function hasIntegrationConfiguration(): bool
     {
-        return !empty($this->integration);
+        return null !== $this->integration;
     }
 }

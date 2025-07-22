@@ -22,7 +22,7 @@ final class CacheProvider implements CacheProviderInterface
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private ContainerInterface $container
+        private ContainerInterface $container,
     ) {
     }
 

@@ -19,7 +19,7 @@ class BroadcastExecutioner
         private SmsModel $smsModel,
         private BroadcastQuery $broadcastQuery,
         private TranslatorInterface $translator,
-        private LeadRepository $leadRepository
+        private LeadRepository $leadRepository,
     ) {
     }
 

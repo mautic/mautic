@@ -130,7 +130,7 @@ class FromEmailHelper
         return $signature;
     }
 
-    private function getFrom(?Email $email): AddressDTO
+    public function getFrom(?Email $email): AddressDTO
     {
         if ($email && $email->getFromAddress()) {
             return new AddressDTO($email->getFromAddress(), $email->getFromName());

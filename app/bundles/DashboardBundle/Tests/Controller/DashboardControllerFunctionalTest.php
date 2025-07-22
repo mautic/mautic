@@ -13,6 +13,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -41,7 +42,10 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
         $this->assertResponseIsSuccessful();
 
-        $content = $this->client->getResponse()->getContent();
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $content = $response->getContent();
         Assert::assertJson($content);
 
         $data = json_decode($content, true);
@@ -117,7 +121,10 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
         $this->assertResponseIsSuccessful();
 
-        $content = $this->client->getResponse()->getContent();
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $content = $response->getContent();
         Assert::assertJson($content);
 
         $data = json_decode($content, true);
@@ -153,7 +160,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $contactModel->saveEntity($contact);
         $contactModel->deleteEntity($contact);
         $this->em->clear();
-        $this->client->request('GET', "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}");
         $this->assertResponseIsSuccessful();
         $printResponse = fn () => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
         Assert::assertStringContainsString('created', $printResponse());

@@ -14,13 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UpdateSchemaStep implements StepInterface
 {
-    private ?object $kernel;
+    private object $kernel;
 
     public function __construct(
         private TranslatorInterface $translator,
-        ContainerInterface $container
+        ContainerInterface $container,
     ) {
-        $this->kernel     = $container->get('kernel');
+        $this->kernel = $container->get('kernel');
     }
 
     public function getOrder(): int

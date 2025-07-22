@@ -17,7 +17,7 @@ class SchedulerEntity implements SchedulerInterface
         private $isScheduled,
         private $scheduleUnit,
         private $scheduleDay,
-        private $scheduleMonthFrequency
+        private $scheduleMonthFrequency,
     ) {
     }
 

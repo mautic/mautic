@@ -19,7 +19,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
     public function __construct(
         private DateHelper $dateHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -60,7 +60,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'iplookup_download_data_store_button';
     }

@@ -214,7 +214,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->translatorMock->expects($this->once())
             ->method('trans')
             ->with('mautic.report.schedule.email.message_file_linked')
-            ->willReturn('The message', ['%report_name%' => 'Report ABC', '%link%' => 'absolute/link']);
+            ->willReturn('The message');
 
         $this->assertSame('The message', $this->messageSchedule->getMessageForLinkedFile($report));
     }

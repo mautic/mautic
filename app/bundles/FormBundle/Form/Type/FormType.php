@@ -86,9 +86,10 @@ class FormType extends AbstractType
         );
 
         $builder->add('template', ThemeListType::class, [
-            'feature'     => 'form',
-            'placeholder' => ' ',
-            'attr'        => [
+            'include_code_mode' => false,
+            'feature'           => 'form',
+            'placeholder'       => ' ',
+            'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.form.template.help',
             ],
@@ -219,7 +220,7 @@ class FormType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'mauticform';
     }

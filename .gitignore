@@ -28,9 +28,7 @@
 
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/**/*.css
-/app/bundles/CoreBundle/Assets/css/libraries/Froala/plugins/*.css
 !/app/bundles/CoreBundle/Assets/css/libraries/builder.css
-!/app/bundles/CoreBundle/Assets/css/libraries/froala/plugins/gated_video.css
 !/app/bundles/CoreBundle/Assets/css/*.css
 
 /app/cache/*
@@ -129,15 +127,12 @@ tests/**/*.sql
 !/themes/aurora
 !/themes/blank
 !/themes/cards
-!/themes/coffee
 !/themes/confirmme
 !/themes/fresh-center
 !/themes/fresh-fixed
 !/themes/fresh-left
 !/themes/fresh-wide
 !/themes/goldstar
-!/themes/Mauve
-!/themes/nature
 !/themes/neopolitan
 !/themes/oxygen
 !/themes/skyline

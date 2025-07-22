@@ -19,7 +19,7 @@ class LeadManipulator
         private $bundleName = null,
         private $objectName = null,
         private $objectId = null,
-        private $objectDescription = null
+        private $objectDescription = null,
     ) {
     }
 

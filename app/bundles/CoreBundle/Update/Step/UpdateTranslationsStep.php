@@ -14,7 +14,7 @@ final class UpdateTranslationsStep implements StepInterface
     public function __construct(
         private TranslatorInterface $translator,
         private LanguageHelper $languageHelper,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

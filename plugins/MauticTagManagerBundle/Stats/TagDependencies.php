@@ -18,7 +18,7 @@ class TagDependencies
         private ListModel $listModel,
         private ActionModel $actionModel,
         private TriggerEventModel $triggerEventModel,
-        private ReportModel $reportModel
+        private ReportModel $reportModel,
     ) {
     }
 

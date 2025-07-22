@@ -50,7 +50,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->loginOtherUser($nonAdminUser->getUserIdentifier());
+        $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(Request::METHOD_GET, '/s/emails/view/'.$email->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -92,7 +92,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->loginOtherUser($nonAdminUser->getUserIdentifier());
+        $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(Request::METHOD_GET, '/s/emails/view/'.$email->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());

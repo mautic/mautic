@@ -39,7 +39,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private RealTimeExecutioner $realTimeExecutioner,
         private SendEmailToUser $sendEmailToUser,
         private TranslatorInterface $translator,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
     ) {
     }
 
@@ -294,8 +294,17 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if (MailHelper::EMAIL_TYPE_MARKETING == $type) {
+            $statRepository = $this->emailModel->getStatRepository();
             // Determine if this lead has received the email before and if so, don't send it again
-            $stats = $this->emailModel->getStatRepository()->getSentCountForContacts($contactIds, $emailId);
+            $stats = $statRepository->getSentCountForContacts($contactIds, $emailId);
+
+            // Merge stats from variant children
+            foreach ($email->getVariantChildren() as $child) {
+                $stats = array_merge(
+                    $stats,
+                    $statRepository->getSentCountForContacts($contactIds, $child->getId())
+                );
+            }
 
             foreach ($stats as $contactId => $sentCount) {
                 /** @var LeadEventLog $log */

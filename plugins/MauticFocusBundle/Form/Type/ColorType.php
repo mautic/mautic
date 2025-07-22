@@ -74,7 +74,7 @@ class ColorType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'focus_color';
     }

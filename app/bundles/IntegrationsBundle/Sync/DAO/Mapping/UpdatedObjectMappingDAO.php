@@ -21,7 +21,7 @@ class UpdatedObjectMappingDAO
         private $integration,
         private $integrationObjectName,
         private $integrationObjectId,
-        \DateTimeInterface $objectModifiedDate
+        \DateTimeInterface $objectModifiedDate,
     ) {
         $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(
             $objectModifiedDate->format('Y-m-d H:i:s'),

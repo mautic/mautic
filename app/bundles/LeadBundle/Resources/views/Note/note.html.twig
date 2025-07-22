@@ -22,7 +22,7 @@ Variables:
             <div class="d-flex jc-space-between ai-center mb-md fw-wrap fw-nowrap-lg">
                 <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
                 <div class="d-flex fg-1 ai-center jc-space-between jc-end-lg gap-sm">
-                    <span class="small text-muted">{{ dateToFullConcat(note.dateTime) }}</span>
+                    <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
                     <div class="pull-right btn-group">
                         {% if permissions['edit'] %}
                         {% include '@MauticCore/Helper/button.html.twig' with {

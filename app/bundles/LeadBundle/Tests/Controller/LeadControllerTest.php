@@ -2,11 +2,13 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
@@ -29,10 +31,11 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
@@ -332,17 +335,11 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
-
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getInternalResponse()->getContent();
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, strlen($content) > 10000);
+        $this->assertTrue(strlen($content) > 10000, $content);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void
@@ -853,6 +850,38 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         // Assert that the number of available options is 100 (or your expected limit)
         Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
+
+        // Create a company that will not be visible initially on the list
+        $lastCompany = new Company();
+        $lastCompany->setName('XYZTestCompany');
+        $this->em->persist($lastCompany);
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setFirstname('John');
+        $contact->setLastname('Doe');
+        $contact->setEmail('john.doe@example.com');
+        $contact->setCompany($lastCompany);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $companyLead = new CompanyLead();
+        $companyLead->setLead($contact);
+        $companyLead->setCompany($lastCompany);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(true);
+        $this->em->persist($companyLead);
+        $this->em->flush();
+
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());
+        $pageContent = $crawler->html();
+
+        // Assure that the last company is present in the contact edit view
+        Assert::assertStringContainsString(
+            $lastCompany->getName(),
+            $pageContent,
+            'The hidden company should appear in the contact edit view.'
+        );
     }
 
     public function testNonExitingContactIsRedirected(): void
@@ -886,9 +915,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         ];
 
         $uri = "/s/contacts/contactGroupPoints/{$contact->getId()}";
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
+        $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -903,9 +932,10 @@ class LeadControllerTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
+        $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
 
         $scores = $contact->getGroupScores();
         $this->assertCount(2, $scores);
@@ -960,7 +990,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request(Request::METHOD_GET, '/s/contacts/batchDnc', [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
         Assert::assertTrue($this->client->getResponse()->isOk());
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Save')->form();
@@ -1003,16 +1033,12 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $this->loadFixtures([LoadLeadData::class]);
 
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
-        $content = ob_get_contents();
-        ob_end_clean();
+        $content = $this->client->getInternalResponse()->getContent();
 
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, strlen($content) > 10000);
+        $this->assertTrue(strlen($content) > 10000, $content);
 
         /** @var AuditLog $auditLog */
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
@@ -1037,5 +1063,39 @@ class LeadControllerTest extends MauticMysqlTestCase
             ],
             $auditLog->getDetails()['args']
         );
+    }
+
+    public function testEmailSendToContactHasCompany(): void
+    {
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+        $this->em->persist($company);
+
+        $contact     = $this->createContact('contact@an.email');
+        $this->createPrimaryCompanyForLead($contact, $company);
+        $this->em->flush();
+
+        $replyTo     = 'reply@mautic-community.test';
+
+        $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
+
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Send')->form();
+        $form->setValues(
+            [
+                'lead_quickemail[subject]'        => 'Ahoy {contactfield=email}',
+                'lead_quickemail[body]'           => 'Your email is <b>{contactfield=email}</b>. Company details: {contactfield=companyname}, {contactfield=companycity}.',
+                'lead_quickemail[replyToAddress]' => $replyTo,
+            ]
+        );
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(1);
+
+        $email      = $this->getMailerMessage();
+
+        Assert::assertSame('Ahoy contact@an.email', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b>. Company details: Mautic, Pune.<img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
     }
 }

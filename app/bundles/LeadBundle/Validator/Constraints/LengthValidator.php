@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\LengthValidator as SymfonyLengthVali
 
 class LengthValidator extends SymfonyLengthValidator
 {
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (is_array($value)) {
             $value = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, $value);

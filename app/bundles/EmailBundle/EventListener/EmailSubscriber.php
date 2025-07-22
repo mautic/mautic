@@ -32,7 +32,7 @@ class EmailSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private TranslatorInterface $translator,
         private EntityManager $entityManager,
-        private EmailDraftModel $emailDraftModel
+        private EmailDraftModel $emailDraftModel,
     ) {
     }
 

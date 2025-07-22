@@ -213,7 +213,7 @@ class LeadSubscriberTest extends CommonMocks
             'eventId'    => $eventType.'.'.$leadEventLogId,
             'eventLabel' => [
                 'label' => $focusName,
-                'href'  => null,
+                'href'  => '',
             ],
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,

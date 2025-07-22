@@ -17,7 +17,7 @@ class MessageSendType extends AbstractType
 {
     public function __construct(
         protected RouterInterface $router,
-        protected MessageModel $messageModel
+        protected MessageModel $messageModel,
     ) {
     }
 

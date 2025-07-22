@@ -8,7 +8,6 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -67,9 +66,8 @@ class CommonApiController extends FetchCommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
     ) {
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
@@ -410,7 +408,18 @@ class CommonApiController extends FetchCommonApiController
             $errors[$key] = $formResponse;
         }
 
-        $this->doctrine->getManager()->detach($entity);
+        $lastEntityIndex = -1;
+        foreach ($entities as $index => $moreEntities) {
+            if ($moreEntities !== $entity) {
+                continue;
+            }
+
+            $lastEntityIndex = $index;
+        }
+
+        if (-1 === $lastEntityIndex || $lastEntityIndex === $key) {
+            $this->doctrine->getManager()->detach($entity);
+        }
 
         $this->inBatchMode = false;
     }
