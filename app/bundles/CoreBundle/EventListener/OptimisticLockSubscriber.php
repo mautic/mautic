@@ -48,7 +48,7 @@ class OptimisticLockSubscriber
                 return "{$name} = :{$name}";
             }, $metadata->getIdentifierFieldNames())))
             ->setParameters($entityManager->getUnitOfWork()->getEntityIdentifier($object))
-            ->executeQuery();
+            ->executeStatement();
 
         $newVersion = (int) $connection->executeQuery('SELECT @newVersion')->fetchOne();
         $object->setVersion($newVersion);

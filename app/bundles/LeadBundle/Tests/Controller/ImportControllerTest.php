@@ -287,7 +287,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $fieldRepository->saveEntity($phoneField);
     }
 
-    private function createLead(string $email = null, string $firstName = ''): Lead
+    private function createLead(?string $email = null, string $firstName = ''): Lead
     {
         $lead = new Lead();
         if (!empty($email)) {

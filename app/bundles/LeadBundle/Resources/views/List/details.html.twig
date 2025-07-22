@@ -28,7 +28,7 @@
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
 }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': list.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': list.category}) }}
 {{ include('@MauticProject/Modules/projects.html.twig', {'item': list}) }}
 {% endblock %}
 
@@ -97,7 +97,7 @@
 {% endblock %}
 
 {% block content %}
-{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadList') %}
+{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadlist') %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->

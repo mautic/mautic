@@ -63,7 +63,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'file' => [],
     ];
 
-    public function __construct(Translator $translator, ValidatorInterface $validator = null)
+    public function __construct(Translator $translator, ?ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
 
@@ -81,18 +81,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
-    }
-
-    /**
-     * @param array $customFields
-     *
-     * @deprecated  to be removed in 3.0; use getChoiceList($customFields = []) instead
-     *
-     * @return array
-     */
-    public function getList($customFields = [])
-    {
-        return $this->getChoiceList($customFields);
     }
 
     public function getTypes(): array

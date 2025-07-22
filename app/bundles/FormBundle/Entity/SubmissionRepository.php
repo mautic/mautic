@@ -286,7 +286,8 @@ class SubmissionRepository extends CommonRepository
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = '.(int) $options['leadId']);
+            $query->andWhere('fs.lead_id = :leadId')
+                ->setParameter('leadId', $options['leadId']);
         }
 
         if (!empty($options['id'])) {
@@ -296,8 +297,8 @@ class SubmissionRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('f.name', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+                $query->expr()->like('f.name', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted'], null, 'fs.id');
@@ -350,7 +351,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * @return mixed[]
      */
-    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null): array
+    public function getSubmissionCountsByPage($pageId, ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(s.tracking_id)) as count, s.page_id as id, p.title as name, p.variant_hits as total')
@@ -380,7 +381,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null): array
+    public function getSubmissionCountsByEmail($emailId, ?\DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to form submission tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();

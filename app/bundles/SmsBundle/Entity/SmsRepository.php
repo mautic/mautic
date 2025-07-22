@@ -36,18 +36,6 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @depreacated The method is replaced by getPublishedBroadcastsIterable
-     *
-     * @param numeric|null $id
-     *
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
-     */
-    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
-    {
-        return $this->getPublishedBroadcastsQuery($id)->iterate();
-    }
-
-    /**
      * @return iterable<Sms>
      */
     public function getPublishedBroadcastsIterable(?int $id = null): iterable

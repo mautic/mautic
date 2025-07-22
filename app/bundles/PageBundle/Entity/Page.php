@@ -685,7 +685,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      *
      * @return Page
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(?Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;

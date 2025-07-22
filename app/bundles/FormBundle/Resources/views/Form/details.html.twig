@@ -27,7 +27,7 @@
     'langVar': 'form',
     'targetLabel': 'mautic.form.forms'|trans
 }) }}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeForm.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activeForm.category}) }}
 {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeForm}) }}
 {% endblock %}
 
@@ -292,7 +292,7 @@
         <div class="pa-md">
             {% set aboveFoldContent %}
                 <h4 class="fw-b mb-lg">{{ 'mautic.form.form.header.copy'|trans }}</h4>
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     pictogram: 'embed',
                     size: 64,
                     color: 'var(--icon-interactive)'
@@ -330,11 +330,10 @@
                 } %}
             {% endset %}
 
-            {{ include('@MauticCore/Components/tile--expandable-interactive.html.twig', {
-                'tiles': [{
-                    'aboveFoldContent': aboveFoldContent,
-                    'belowFoldContent': belowFoldContent
-                }]
+            {{ include('@MauticCore/Components/tile.html.twig', {
+                'type': 'expandable-interactive',
+                'aboveFoldContent': aboveFoldContent,
+                'belowFoldContent': belowFoldContent
             }) }}
         </div>
         <!--/ form HTML -->

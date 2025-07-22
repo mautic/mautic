@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
@@ -48,9 +49,10 @@ final class PluginAuthenticator extends AbstractAuthenticator
         \assert(null === $authenticatingService || is_string($authenticatingService));
         $token = new PluginToken($this->firewallName, $authenticatingService);
 
-        $user          = null;
-        $response      = null;
-        $authenticated = false;
+        $user               = null;
+        $response           = null;
+        $authenticated      = false;
+        $authenticatedToken = null;
 
         // Try authenticating with a plugin
         if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
@@ -73,6 +75,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 $eventToken            = $authEvent->getToken();
                 $authenticatingService = $authEvent->getAuthenticatingService();
 
+                // Return passport with the token set in the event, if the event set a different token.
                 if ($eventToken !== $token) {
                     return new SelfValidatingPassport(
                         new UserBadge($eventToken->getUserIdentifier(), function () use ($eventToken): UserInterface {
@@ -82,7 +85,15 @@ final class PluginAuthenticator extends AbstractAuthenticator
                     );
                 }
 
+                // Set the user in the token.
                 $user = $authEvent->getUser();
+
+                if (null === $user) {
+                    throw new \RuntimeException('User must be set in the authenticated token.');
+                }
+
+                $authenticatedToken = $eventToken;
+                $authenticatedToken->setUser($user);
             }
 
             $response = $authEvent->getResponse();
@@ -93,8 +104,14 @@ final class PluginAuthenticator extends AbstractAuthenticator
             }
         }
 
+        // The check is intended to catch: Plugin authenticator must be authenticated and have $user. oAuth should have a response.
         if (!$user instanceof User && !$authenticated && null === $response) {
             throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
+        }
+
+        // Otherwise if the plugin authenticator has a response, then pass it to the Symfony.
+        if (null === $user && !$authenticated && null !== $response) {
+            throw new LazyResponseException($response);
         }
 
         return new SelfValidatingPassport(
@@ -108,7 +125,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
                     return $this->userProvider->loadUserByIdentifier($userIdentifier);
                 }
             ),
-            [new PluginBadge(null, $response, $authenticatingService)]
+            [new PluginBadge($authenticatedToken, $response, $authenticatingService)]
         );
     }
 
@@ -119,7 +136,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $userBadge = $passport->getBadge(UserBadge::class);
         \assert($userBadge instanceof UserBadge);
 
-        // A custom token has been set by the plugin so just return it
+        // A custom token has not been set by the plugin, so create a new one. Mainly used for oAuth.
         if (null === $token = $pluginBadge->getPreAuthenticatedToken()) {
             $user  = $userBadge->getUser();
             $token = new PluginToken(

@@ -64,6 +64,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use UuidTrait;
     use ProjectTrait;
 
+    public const MAX_NAME_SUBJECT_LENGTH = 190;
+
     /**
      * @var int
      *
@@ -448,6 +450,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addPropertyConstraint(
+            'name',
+            new Length(
+                [
+                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
+                    'maxMessage' => 'mautic.email.name.length',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
             'subject',
             new NotBlank(
                 [
@@ -460,7 +472,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             'subject',
             new Length(
                 [
-                    'max'        => 190,
+                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
                     'maxMessage' => 'mautic.email.subject.length',
                 ]
             )
@@ -1135,7 +1147,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setUnsubscribeForm(Form $unsubscribeForm = null)
+    public function setUnsubscribeForm(?Form $unsubscribeForm = null)
     {
         $this->unsubscribeForm = $unsubscribeForm;
 
@@ -1153,7 +1165,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPreferenceCenter(Page $preferenceCenter = null)
+    public function setPreferenceCenter(?Page $preferenceCenter = null)
     {
         $this->preferenceCenter = $preferenceCenter;
 

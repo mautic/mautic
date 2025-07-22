@@ -566,7 +566,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      *
      * @return User
      */
-    public function setRole(Role $role = null)
+    public function setRole(?Role $role = null)
     {
         $this->isChanged('role', $role);
         $this->role = $role;

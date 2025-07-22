@@ -38,7 +38,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
     /**
      * @param array<mixed> $parameters
      */
-    public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }

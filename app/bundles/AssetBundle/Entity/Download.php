@@ -235,7 +235,7 @@ class Download
      *
      * @return Download
      */
-    public function setAsset(Asset $asset = null)
+    public function setAsset(?Asset $asset = null)
     {
         $this->asset = $asset;
 

@@ -901,6 +901,38 @@ EMAIL;
 
         // Assert that the number of available options is 100 (or your expected limit)
         Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
+
+        // Create a company that will not be visible initially on the list
+        $lastCompany = new Company();
+        $lastCompany->setName('XYZTestCompany');
+        $this->em->persist($lastCompany);
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setFirstname('John');
+        $contact->setLastname('Doe');
+        $contact->setEmail('john.doe@example.com');
+        $contact->setCompany($lastCompany);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $companyLead = new CompanyLead();
+        $companyLead->setLead($contact);
+        $companyLead->setCompany($lastCompany);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(true);
+        $this->em->persist($companyLead);
+        $this->em->flush();
+
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());
+        $pageContent = $crawler->html();
+
+        // Assure that the last company is present in the contact edit view
+        Assert::assertStringContainsString(
+            $lastCompany->getName(),
+            $pageContent,
+            'The hidden company should appear in the contact edit view.'
+        );
     }
 
     public function testNonExitingContactIsRedirected(): void

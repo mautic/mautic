@@ -47,6 +47,10 @@ class TokenPermissions
             $this->setPermissionsOnUser($user);
         }
 
+        if (null === $user) {
+            throw new \RuntimeException('The user should be either already set in the token, or come from assignRoleFromToken.');
+        }
+
         $token->setUser($user);
 
         if ($token instanceof TokenInterface) {

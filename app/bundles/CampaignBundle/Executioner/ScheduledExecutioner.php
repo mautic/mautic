@@ -58,7 +58,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
     {
         $this->campaign   = $campaign;
         $this->limiter    = $limiter;
@@ -90,7 +90,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function executeByIds(array $logIds, OutputInterface $output = null, ?\DateTime $now = null)
+    public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null)
     {
         $now           = $now ?? $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
