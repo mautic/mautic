@@ -110,52 +110,49 @@
     {% else %}
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
-                <div class="mt-32 mb-md">
+                <div class="mt-32 mb-96">
                     {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'pilot-test',
                         'size': '80'
                     } %}
                 </div>
+                {% set dwcFeaturesContainer %}
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            {{ include('@MauticCore/Components/content-item.html.twig', {
+                                type: 'pictogram',
+                                pictogram: 'condition--builder',
+                                heading: 'mautic.dwc.contentblock.emails.heading'|trans,
+                                copy: 'mautic.dwc.contentblock.emails.copy'|trans,
+                            }) }}
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            {{ include('@MauticCore/Components/content-item.html.twig', {
+                                type: 'pictogram',
+                                pictogram: 'flow--chart',
+                                heading: 'mautic.dwc.contentblock.websites.heading'|trans,
+                                copy: 'mautic.dwc.contentblock.websites.copy'|trans,
+                            }) }}
+                        </div>
+                    </div>
+                    {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                        type: 'default',
+                        eyebrow: 'mautic.dwc.contentblock.faq.eyebrow'|trans,
+                        heading: 'mautic.dwc.contentblock.faq.heading'|trans,
+                        copy: 'mautic.dwc.contentblock.faq.copy'|trans,
+                    }) }}
+                {% endset %}
+                {{ include('@MauticCore/Components/content-group.html.twig', {
+                    heading: 'mautic.dwc.contentblock.supported_mediums.heading'|trans,
+                    childContainer: dwcFeaturesContainer,
+                }) }}
             {% endset %}
+
             {{ include('@MauticCore/Components/content-block.html.twig', {
                 heading: 'mautic.dwc.contentblock.heading'|trans,
                 subheading: 'mautic.dwc.contentblock.subheading'|trans,
-                copy: 'mautic.dwc.contentblock.copy'|trans,
                 childContainer: childContainer,
-            }) }}
-
-            {{ include('@MauticCore/Components/content-item-row.html.twig', {
-                type: 'default',
-                eyebrow: 'mautic.focus.onboarding.eyebrow',
-                heading: 'mautic.focus.onboarding.purpose.heading',
-                copy: 'mautic.focus.onboarding.purpose.copy',
-            }) }}
-            
-            {% set emailDwcFeaturesContainer %}
-            <div class="row">
-                <div class="col-sm-6 col-xs-12">
-                    {{ include('@MauticCore/Components/content-item.html.twig', {
-                        type: 'pictogram',
-                        pictogram: 'web--banners',
-                        heading: 'Email',
-                        copy: 'Conditionally pick a variation of the content to send based on contact information. Once sent, it can\'t dynamically update the email already on the contact\'s inbox.',
-                    }) }}
-                </div>
-                <div class="col-sm-6 col-xs-12">
-                    {{ include('@MauticCore/Components/content-item.html.twig', {
-                        type: 'pictogram',
-                        pictogram: 'design-and-development--01',
-                        heading: 'Websites',
-                        copy: 'Display contact information and automatically update the same medium seen by the contact previously as soon as their details change.',
-                    }) }}
-                </div>
-            </div>
-            {% endset %}
-
-            {{ include('@MauticCore/Components/content-group.html.twig', {
-                heading: 'Emails with Dynamic Content',
-                childContainer: emailDwcFeaturesContainer,
-            }) }}
+            }) }}            
         </div>
     {% endif %}
 {% endif %}
