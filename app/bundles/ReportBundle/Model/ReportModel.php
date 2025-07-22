@@ -496,8 +496,15 @@ class ReportModel extends FormModel
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
-        $orderBy    = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderby', '');
-        $orderByDir = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
+        $session    = $this->getSession();
+        $orderBy    = '';
+        $orderByDir = 'ASC';
+        // make sure to use the session if it's started. Otherwise this is impossible to test:
+        // Failed to start the session because headers have already been sent by "/var/www/html/vendor/phpunit/phpunit/src/Util/Printer.php" at line 104.
+        if ($session->isStarted()) {
+            $orderBy    = $session->get('mautic.report.'.$entity->getId().'.orderby', $orderBy);
+            $orderByDir = $session->get('mautic.report.'.$entity->getId().'.orderbydir', $orderByDir);
+        }
 
         $dataOptions = [
             'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
@@ -515,7 +522,10 @@ class ReportModel extends FormModel
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         // set what page currently on so that we can return here after form submission/cancellation
-        $this->getSession()->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        $session = $this->getSession();
+        if ($session->isStarted()) {
+            $session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        }
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
@@ -572,7 +582,9 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->getSession()->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                if ($session->isStarted()) {
+                    $limit = $session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                }
                 if (!empty($options['limit'])) {
                     $limit      = $options['limit'];
                     $reportPage = $options['page'];

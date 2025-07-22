@@ -60,10 +60,11 @@ class UploadSubscriber implements EventSubscriberInterface
      */
     public function onUploadValidation(ValidationEvent $event): void
     {
-        $file       = $event->getFile();
-        $mimetypes  = $this->coreParametersHelper->get('allowed_mimetypes');
-        $extensions = array_keys($mimetypes);
-        $maxSize    = $this->assetModel->getMaxUploadSize('B');
+        $file                = $event->getFile();
+        $extensions          = $this->coreParametersHelper->get('allowed_extensions');
+        $configuredMimeTypes = $this->coreParametersHelper->get('allowed_mimetypes');
+        $allowedMimeTypes    = array_intersect_key($configuredMimeTypes, array_flip($extensions));
+        $maxSize             = $this->assetModel->getMaxUploadSize('B');
 
         if (null === $file) {
             return;
@@ -81,10 +82,12 @@ class UploadSubscriber implements EventSubscriberInterface
             throw new ValidationException($e->getMessage());
         }
 
-        try {
-            $this->checkMimeType($file->getMimeType(), $mimetypes, 'mautic.asset.asset.error.file.mimetype');
-        } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage());
+        if (array_key_exists(strtolower($file->getExtension()), array_change_key_case($configuredMimeTypes, CASE_LOWER))) {
+            try {
+                $this->checkMimeType($file->getMimeType(), $allowedMimeTypes, 'mautic.asset.asset.error.file.mimetype');
+            } catch (FileInvalidException $e) {
+                throw new ValidationException($e->getMessage());
+            }
         }
     }
 
