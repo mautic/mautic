@@ -20,7 +20,8 @@
             'customButtons' : []
         }) -}}
     {% endif %}
-    {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': email.category}) }}
+    {{ include('@MauticCore/Modules/category--inline.html.twig', {'category': email.category}) }}
+    {{ include('@MauticProject/Modules/projects.html.twig', {'item': email}) }}
 {% endblock %}
 
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
@@ -105,6 +106,7 @@
         'entity': email,
         'status': email.getPublishUp() is not null ? 'sending' : 'available'
     }) -}}
+    <div class="label__divider"></div>
 
         {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
             {
@@ -312,6 +314,48 @@
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
               {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
+              <!-- some stats -->
+              <div class="pt-15 pl-15 pr-15">
+                  <div class="row">
+                      <div class="col-sm-12">
+                        {% if securityIsGranted('lead:leads:viewown') %}
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                                {
+                                    'title': 'mautic.email.stat.sent',
+                                    'value': email.getSentCount(true),
+                                    'tooltip': 'mautic.email.stat.sent.tooltip',
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.getId()}),
+                                    'icon': 'ri-mail-unread-line'
+                                },
+                                {
+                                    'title': 'mautic.email.stat.read',
+                                    'value': email.getReadCount(true),
+                                    'desc': email.getReadPercentage(true) ~ '%',
+                                    'tooltip': 'mautic.email.stat.read.tooltip',
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_read'|trans) ~ ':' ~ email.getId()}),
+                                    'icon': 'ri-mail-open-line'
+                                },
+                                {
+                                    'title': 'mautic.email.stat.queued',
+                                    'value': email.getQueuedCount(),
+                                    'tooltip': 'mautic.email.stat.queued.tooltip',
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.getId()}),
+                                    'icon': 'ri-mail-send-line'
+                                },
+                                {
+                                    'title': 'mautic.email.stat.pending',
+                                    'value': email.getPendingCount(),
+                                    'tooltip': 'mautic.email.stat.leadcount.tooltip',
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.getId()}),
+                                    'icon': 'ri-more-fill'
+                                }
+                            ]}) }}
+                        {% endif %}
+                      </div>
+                  </div>
+              </div>
+              <!--/ stats -->
+
               <div class="stats-menu pl-md mt-lg">
                   <!-- tabs controls -->
                   <ul class="nav nav-tabs nav-tabs-contained">
@@ -337,39 +381,6 @@
 
               <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                   <div class="tab-pane active bdr-w-0" id="stats-container">
-                    {% if securityIsGranted('lead:leads:viewown') %}
-                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
-                            {
-                                'title': 'mautic.email.stat.sent',
-                                'value': email.getSentCount(true),
-                                'tooltip': 'mautic.email.stat.sent.tooltip',
-                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.getId()}),
-                                'icon': 'ri-mail-unread-line'
-                            },
-                            {
-                                'title': 'mautic.email.stat.read',
-                                'value': email.getReadCount(true),
-                                'desc': email.getReadPercentage(true) ~ '%',
-                                'tooltip': 'mautic.email.stat.read.tooltip',
-                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_read'|trans) ~ ':' ~ email.getId()}),
-                                'icon': 'ri-mail-open-line'
-                            },
-                            {
-                                'title': 'mautic.email.stat.queued',
-                                'value': email.getQueuedCount(),
-                                'tooltip': 'mautic.email.stat.queued.tooltip',
-                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.getId()}),
-                                'icon': 'ri-mail-send-line'
-                            },
-                            {
-                                'title': 'mautic.email.stat.pending',
-                                'value': email.getPendingCount(),
-                                'tooltip': 'mautic.email.stat.leadcount.tooltip',
-                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.getId()}),
-                                'icon': 'ri-more-fill'
-                            }
-                        ]}) }}
-                    {% endif %}
                       <div id="emailGraphStats"
                            data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
                       >
@@ -450,6 +461,13 @@
               {% endif %}
               <!--/ #translation-container -->
           </div>
+          {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
+              'entity': email,
+              'routeBase': 'email',
+              'showVariants': showVariants,
+              'showTranslations': showTranslations,
+              'allowAbTest': allowAbTest
+          }) }}
       </div>
       <!--/ left section -->
 

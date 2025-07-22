@@ -219,7 +219,7 @@ class TweetStat
     /**
      * @param mixed $tweet
      */
-    public function setTweet(Tweet $tweet = null): void
+    public function setTweet(?Tweet $tweet = null): void
     {
         $this->tweet = $tweet;
     }
@@ -235,7 +235,7 @@ class TweetStat
     /**
      * @param mixed $lead
      */
-    public function setLead(TheLead $lead = null): void
+    public function setLead(?TheLead $lead = null): void
     {
         $this->lead = $lead;
     }

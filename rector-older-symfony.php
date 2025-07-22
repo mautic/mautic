@@ -4,19 +4,11 @@ declare(strict_types=1);
 
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Symfony\Set\SymfonySetList;
-use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
-    ]);
-
-    $rectorConfig->skip([
-        ContainerGetToConstructorInjectionRector::class => [
-            // Requires quite a refactoring
-            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
-        ],
     ]);
 
     $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/dev/appAppKernelDevDebugContainer.xml');

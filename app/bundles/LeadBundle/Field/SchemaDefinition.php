@@ -19,7 +19,7 @@ class SchemaDefinition
      * Use a static function so that it's accessible from DoctrineSubscriber
      * without causing a circular service injection error.
      */
-    public static function getSchemaDefinition(string $alias, string $type, bool $isUnique = false, int $length = null): array
+    public static function getSchemaDefinition(string $alias, string $type, bool $isUnique = false, ?int $length = null): array
     {
         $options = ['notnull' => false];
 
@@ -96,7 +96,7 @@ class SchemaDefinition
     /**
      * Get the MySQL database type based on the field type.
      */
-    public function getSchemaDefinitionNonStatic(string $alias, string $type, bool $isUnique = false, int $length = null): array
+    public function getSchemaDefinitionNonStatic(string $alias, string $type, bool $isUnique = false, ?int $length = null): array
     {
         return self::getSchemaDefinition($alias, $type, $isUnique, $length);
     }

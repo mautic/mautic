@@ -31,7 +31,8 @@
     'routeBase': 'page',
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activePage.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activePage.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': activePage}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
@@ -55,6 +56,7 @@
         'entity': activePage,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {% set blueTags = [] %}
     {% set grayTags = [] %}
@@ -221,26 +223,27 @@
               <!--/ #translation-container -->
           </div>
           <!--/ end: tab-content -->
-          {% elseif allowAbTest %}
-          <div class="pa-md">
-              <div class="text-center">
-                    {% include '@MauticCore/Helper/button.html.twig' with {
-                        buttons: [
-                            {
-                                label: 'mautic.core.ab_test.create',
-                                variant: 'tertiary',
-                                href: path('mautic_page_action', {'objectAction': 'abtest', 'objectId': activePage.id}),
-                                icon: 'ri-arrow-right-s-line',
-                                attributes: {
-                                    'class': 'create-abtest-link',
-                                    'data-toggle': 'ajax'
-                                }
-                            }
-                        ]
-                    } %}
-              </div>
-          </div>
           {% endif %}
+          
+          {% set additionalCards = [{
+              heading: 'mautic.page.results.view',
+              copy: (not showVariants and not showTranslations) ? 'mautic.page.results.view.description' : null,
+              pictogram: 'data--set',
+              href: path('mautic_page_results', {'objectId': activePage.id}),
+              attributes: {
+                  'data-toggle': 'ajax',
+                  'data-menu-link': 'mautic_form_index'
+              }
+          }] %}
+          
+          {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
+              'entity': activePage,
+              'routeBase': 'page',
+              'showVariants': showVariants,
+              'showTranslations': showTranslations,
+              'allowAbTest': allowAbTest,
+              'additionalCards': additionalCards
+          }) }}
       </div>
       <!--/ left section -->
 
@@ -249,31 +252,16 @@
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-              <div class="panel-heading">
-                  <div class="panel-title">{{ 'mautic.page.url'|trans }}</div>
-              </div>
               <div class="panel-body pt-xs">
-                  <div class="input-group">
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                             readonly
-                             value="{{ pageUrl|e }}"/>
-                      <span class="input-group-btn">
-                        {% include '@MauticCore/Helper/button.html.twig' with {
-                            buttons: [
-                                {
-                                    label: 'mautic.core.open_link',
-                                    variant: 'ghost',
-                                    icon_only: true,
-                                    icon: 'ri-external-link-line',
-                                    onclick: 'window.open("' ~ pageUrl ~ '", "_blank");',
-                                    attributes: {
-                                        'class': 'btn-nospin'
-                                    }
-                                }
-                            ]
-                        } %}
-                      </span>
-                  </div>
+                  {% include '@MauticCore/Components/card.html.twig' with {
+                      type: 'link',
+                      href: pageUrl,
+                      ctaType: 'new tab',
+                      heading: 'mautic.core.open_link',
+                      attributes: {
+                          'target': '_blank'
+                      }
+                  } %}
               </div>
           </div>
           {% endif %}

@@ -78,7 +78,7 @@
                         }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {% set group = item.group %}
@@ -110,7 +110,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
             <div class="mb-md">
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     'pictogram': 'user--insights',
                     'size': '80'
                 } %}

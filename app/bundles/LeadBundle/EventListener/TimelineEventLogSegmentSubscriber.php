@@ -77,7 +77,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null): void
+    private function writeEntries(array $contacts, LeadList $segment, $action, ?\DateTime $date = null): void
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];

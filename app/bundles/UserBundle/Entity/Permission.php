@@ -161,7 +161,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
      *
      * @return Permission
      */
-    public function setRole(Role $role = null)
+    public function setRole(?Role $role = null)
     {
         $this->role = $role;
 

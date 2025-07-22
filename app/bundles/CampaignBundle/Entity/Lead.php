@@ -232,7 +232,7 @@ class Lead
     /**
      * @return Lead
      */
-    public function setDateLastExited(\DateTime $dateLastExited = null)
+    public function setDateLastExited(?\DateTime $dateLastExited = null)
     {
         $this->dateLastExited = $dateLastExited;
 

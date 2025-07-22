@@ -242,7 +242,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @return Company
      */
-    public function setOwner(User $owner = null)
+    public function setOwner(?User $owner = null)
     {
         $this->isChanged('owner', $owner);
         $this->owner = $owner;

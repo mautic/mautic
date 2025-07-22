@@ -29,7 +29,7 @@ class RestrictionHelper
      * @param FormInterface<mixed> $childType
      * @param FormInterface<mixed> $parentType
      */
-    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null): void
+    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, ?array $restrictedFields = null): void
     {
         if (null === $restrictedFields) {
             $restrictedFields = $this->restrictedFields;

@@ -79,7 +79,7 @@
                             {% else %}
                                 <i class="ri-fw ri-lg ri-toggle-fill text-secondary disabled"></i>
                             {% endif %}
-                            <a href="{{ path('mautic_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
+                            <a href="{{ path('mautic_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                 {{ item.name }}
                                 {% if 'list' == type %}
                                     <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="ri-fw ri-list-check"></i></span>
@@ -89,7 +89,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats">
                         <span class="mt-xs label label-green"
