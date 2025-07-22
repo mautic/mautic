@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.sms.concise', 'mautic.protip.sms.timesensitive', 'mautic.protip.sms.compliance'])
     }) }}
     {% else %}
@@ -170,7 +170,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                         {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
@@ -197,7 +197,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mt-32 mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'mobile--chat',
                         'size': '80'
                     } %}

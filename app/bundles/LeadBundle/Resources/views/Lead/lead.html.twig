@@ -561,10 +561,9 @@
                     </div>
                 {% endset %}
                 
-                {% include '@MauticCore/Components/tile--base.html.twig' with {
-                    'tiles': [{
-                        'content': tagContent
-                    }]
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'base',
+                    'content': tagContent
                 } %}
             {% else %}
                 {# Use tile--expandable-interactive for more than 8 tags #}
@@ -613,11 +612,10 @@
                     </div>
                 {% endset %}
                 
-                {% include '@MauticCore/Components/tile--expandable-interactive.html.twig' with {
-                    'tiles': [{
-                        'aboveFoldContent': aboveContent,
-                        'belowFoldContent': belowContent
-                    }]
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'expandable-interactive',
+                    'aboveFoldContent': aboveContent,
+                    'belowFoldContent': belowContent
                 } %}
             {% endif %}
         </div>
@@ -646,10 +644,9 @@
             </div>
             {% endset %}
 
-            {{ include('@MauticCore/Components/tile--base.html.twig', {
-                'tiles': [{
-                    'content': tileContent
-                }]
+            {{ include('@MauticCore/Components/tile.html.twig', {
+                'type': 'base',
+                'content': tileContent
             }) }}
         </div>
         <div class="pa-sm">
@@ -678,7 +675,7 @@
                         </div>
                     {% endset %}
                     
-                    {% include '@MauticCore/Components/tile--base.html.twig' with {'tiles': [{'content': content}]} %}
+                    {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
                 {% else %}
                     {% set aboveContent %}
                         <div class="d-flex jc-space-between">
@@ -716,8 +713,10 @@
                         </div>
                     {% endset %}
                     
-                    {% include '@MauticCore/Components/tile--expandable-interactive.html.twig' with {
-                        'tiles': [{'aboveFoldContent': aboveContent, 'belowFoldContent': belowContent}]
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        'type': 'expandable-interactive',
+                        'aboveFoldContent': aboveContent,
+                        'belowFoldContent': belowContent
                     } %}
                 {% endif %}
             {% else %}
@@ -730,7 +729,7 @@
                 <div class="clearfix"></div>
                 {% endset %}
                 
-                {% include '@MauticCore/Components/tile--base.html.twig' with {'tiles': [{'content': content}]} %}
+                {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
             {% endif %}
         </div>
 

@@ -224,32 +224,6 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection|LeadEventLog[] $logs
-     * @param string                         $error
-     *
-     * @deprecated as not used
-     */
-    public function recordLogsWithError(ArrayCollection $logs, $error): void
-    {
-        @trigger_error('EventExecutioner::recordLogsWithError() is deprecated in Mautic:4 and is removed from Mautic:5 as unused', E_USER_DEPRECATED);
-
-        foreach ($logs as $log) {
-            $log->appendToMetadata(
-                [
-                    'failed' => 1,
-                    'reason' => $error,
-                ]
-            );
-
-            $log->setIsScheduled(false);
-        }
-
-        // Save updated log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
-    }
-
-    /**
      * @return \DateTimeInterface
      */
     public function getExecutionDate()

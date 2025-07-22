@@ -188,6 +188,8 @@ class Field implements UuidInterface
      */
     private $mappedField;
 
+    public ?int $deletedId;
+
     /**
      * Reset properties on clone.
      */

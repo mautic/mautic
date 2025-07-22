@@ -162,7 +162,7 @@
 
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg" title="{{ item.dateAdded ? dateToFullConcat(item.dateAdded) : '' }}">
                         {{ item.dateAdded ? dateToDate(item.dateAdded) : '' }}
@@ -194,7 +194,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mt-32 mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'ibm--automation-platform',
                         'size': '80'
                     } %}
@@ -216,7 +216,7 @@
         </div>
     </div>
 
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.campaigns.reengagement', 'mautic.protip.campaigns.survey', 'mautic.protip.campaigns.crosssell', 'mautic.protip.campaigns.onboarding'])
     }) }}
   {% endif %}

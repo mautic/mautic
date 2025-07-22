@@ -499,7 +499,7 @@ class Stat
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getTokens()
     {
