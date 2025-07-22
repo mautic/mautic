@@ -1,0 +1,30 @@
+<div class="mt-32 mb-48">
+    {% if heading is defined %}
+    <div aria-level="3" class="content-block__heading type-fluid-heading-04 mb-32">{{ heading|trans }}</div>
+    {% endif %}
+    
+    {% if copy is defined %}
+        {% if copy is iterable %}
+            {% for item in copy %}
+                <div class="content-block__copy type-body-02 mb-lg">{{ item|trans }}</div>
+            {% endfor %}
+        {% else %}
+            <div class="content-block__copy type-body-02 mb-lg">{{ copy|trans }}</div>
+        {% endif %}
+    {% endif %}
+    
+    {% if childContainer is defined %}
+        {{ childContainer }}
+    {% endif %}
+    
+    {% if cta is defined and cta %}
+    <div class="mt-32">
+        {% set cta = cta|merge({
+            'variant': 'link',
+            'icon': 'ri-arrow-right-line',
+            'href': cta.link
+        }) %}
+        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
+    </div>
+    {% endif %}
+</div>

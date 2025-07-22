@@ -89,7 +89,7 @@ class MergeRecord
     /**
      * @return MergeRecord
      */
-    public function setDateAdded(\DateTime $dateAdded = null)
+    public function setDateAdded(?\DateTime $dateAdded = null)
     {
         if (null === $dateAdded) {
             $dateAdded = new \DateTime();

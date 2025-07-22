@@ -164,7 +164,7 @@ class SchemaHelper
         // Execute drop queries
         foreach ($sql as $q) {
             try {
-                $this->db->executeQuery($q);
+                $this->db->executeStatement($q);
             } catch (\Exception $exception) {
                 $this->db->close();
 

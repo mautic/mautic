@@ -158,7 +158,6 @@ class FormRepository extends CommonRepository
                     'form_id',
                     'form_projects_xref',
                     $this->getTableAlias(),
-                    $unique,
                     $filter->string,
                     $filter->not
                 );
@@ -198,7 +197,8 @@ class FormRepository extends CommonRepository
             ->setParameter('formId', $form->getId());
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = '.(int) $options['leadId']);
+            $query->andWhere('fs.lead_id = :leadId')
+                ->setParameter('leadId', $options['leadId']);
         }
 
         if (!empty($options['formId'])) {

@@ -1,0 +1,29 @@
+<div class="modal fade" id="{{ id }}" {% if preventCloseOnClickOutside is defined and preventCloseOnClickOutside %}data-backdrop="static"{% endif %} tabindex="-1" role="dialog" aria-label="{% if modalLabel is defined %}{{ modalLabel }}{% else %}{{ modalAriaLabel }}{% endif %}" aria-modal="true">
+    <div class="modal-dialog modal-{{ size|default('md') }}">
+        <div class="modal-content">
+            <div class="modal-header {% if type == 'expressive' %}pr-32 pl-32 pt-32 pb-0{% endif %}">
+                <button type="button" aria-label="{{ closeButtonLabel|default('mautic.core.close'|trans) }}" class="modal-close-button close" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="{{ closeButtonLabel|default('mautic.core.close'|trans) }}"><span>&times;</span></button>
+                
+                {% if modalLabel is defined %}
+                    <div class="modal-header__label type-label-01">{{ modalLabel }}</div>
+                {% endif %}
+
+                {% if modalHeading is defined %}
+                    <h2 class="modal-header__heading type-heading-03">{{ modalHeading }}</h2>
+                {% endif %}
+            </div>
+            <div class="modal-body{% if isFullWidth is defined and isFullWidth and type != 'expressive' %} pa-0{% endif %}{% if type == 'expressive' %} pr-32 pl-32{% endif %}{% if hasScrollingContent is defined and hasScrollingContent %} modal-scroll-content{% endif %}"{% if modalLabel is defined %} aria-label="{{ modalLabel }}"{% else %} aria-label="{{ modalAriaLabel }}"{% endif %} tabindex="0">
+                <div class="modal-body-content">
+                    {{ modalContent|raw }}
+                </div>
+            </div>
+            {% if buttons is defined and buttons is not empty %}
+                <div class="modal-footer pa-0">
+                    <div class="modal-form-buttons">
+                        {% include '@MauticCore/Helper/button.html.twig' with {'buttons': buttons} %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

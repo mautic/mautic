@@ -1,0 +1,58 @@
+{# Common blocks #}
+{% set common_header_content %}
+    {% if eyebrow is defined %}
+        <div class="content-item__eyebrow type-label-01 text-secondary mb-xs">{{ eyebrow|trans }}</div>
+    {% endif %}
+    <div class="content-item__heading type-heading-03 mb-32">{{ heading|trans }}</div>
+{% endset %}
+
+{% set common_footer_content %}
+    <div class="content-item__copy type-body-02 mb-lg">{{ copy|trans }}</div>
+    {% if cta is defined and cta %}
+        {% set cta = cta|merge({'variant': 'link', 'icon': 'ri-arrow-right-line', 'href': cta.link}) %}
+        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
+    {% endif %}
+{% endset %}
+
+{% set common_image_content %}
+    {% if image is defined %}
+        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-32">
+    {% endif %}
+{% endset %}
+
+<div class="row">
+    <hr class="mt-32">
+
+    {# === MEDIA TYPE === #}
+    {% if type == 'media' %}
+        <div class="col-sm-4 col-xs-12 mb-xs">
+            {{ common_header_content }}
+            {{ common_footer_content }}
+        </div>
+        <div class="col-sm-8 col-xs-12 mb-64">
+            {{ common_image_content }}
+        </div>
+
+    {# === FEATURED TYPE === #}
+    {% elseif type == 'featured' %}
+        <div class="col-sm-4 col-xs-12 mb-xs">
+            {{ common_header_content }}
+        </div>
+        <div class="col-sm-8 col-xs-12">
+            {{ common_footer_content }}
+        </div>
+        <div class="col-xs-12 mb-64">
+            {{ common_image_content }}
+        </div>
+
+    {# === DEFAULT TYPE === #}
+    {% else %}
+        <div class="col-sm-4 col-xs-12 mb-xs">
+            {{ common_header_content }}
+        </div>
+        <div class="col-sm-8 col-xs-12 mb-64">
+            {{ common_footer_content }}
+            {{ common_image_content }}
+        </div>
+    {% endif %}
+</div>

@@ -63,6 +63,18 @@ class PageModel extends FormModel implements GlobalSearchInterface
     use BuilderModelTrait;
 
     /**
+     * We have to limit length of some fields
+     * to store them in the database.
+     */
+    private const MAX_FIELD_LENGTH = 191;
+
+    /**
+     * An encoding to use to calculate
+     * length of a field.
+     */
+    private const STRING_ENCODING = 'UTF-8';
+
+    /**
      * @var bool
      */
     protected $catInUrl;
@@ -231,7 +243,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -376,7 +388,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [], \DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
@@ -443,7 +455,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $userAgent);
 
-        $hit->setTrackingId($trackedDevice->getTrackingId());
+        $hit->setTrackingId($this->limitString($trackedDevice->getTrackingId()));
         $hit->setDeviceStat($trackedDevice);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
@@ -502,7 +514,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null,
+        ?\DateTimeInterface $hitDate = null,
     ): void {
         // Store Page/Redirect association
         if ($page) {
@@ -524,10 +536,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     $channel   = $clickthrough['channel'][0];
                     $channelId = (int) $clickthrough['channel'][1];
                 }
-                $hit->setSource($channel);
+                $hit->setSource($this->limitString($channel));
                 $hit->setSourceId($channelId);
             } elseif (!empty($clickthrough['source'])) {
-                $hit->setSource($clickthrough['source'][0]);
+                $hit->setSource($this->limitString($clickthrough['source'][0]));
                 $hit->setSourceId($clickthrough['source'][1]);
             }
 
@@ -554,7 +566,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $hit->setReferer($query['page_referrer']);
         }
         if (isset($query['page_language'])) {
-            $hit->setPageLanguage($query['page_language']);
+            $hit->setPageLanguage($this->limitString($query['page_language']));
         }
 
         if ($pageTitle = $query['page_title'] ?? ($page instanceof Page ? $page->getTitle() : false)) {
@@ -564,7 +576,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             $query['page_title'] = $pageTitle;
-            $hit->setUrlTitle($pageTitle);
+            $hit->setUrlTitle($this->limitString($pageTitle));
         }
 
         $hit->setQuery($query);
@@ -594,7 +606,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         if (!empty($page)) {
             if ($page instanceof Page) {
-                $hit->setPageLanguage($page->getLanguage());
+                $hit->setPageLanguage($this->limitString($page->getLanguage()));
 
                 $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
@@ -636,11 +648,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
         // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
         if ($ipAddress && $details = $ipAddress->getIpDetails()) {
-            $hit->setCountry($details['country']);
-            $hit->setRegion($details['region']);
-            $hit->setCity($details['city']);
-            $hit->setIsp($details['isp']);
-            $hit->setOrganization($details['organization']);
+            $hit->setCountry($this->limitString($details['country']));
+            $hit->setRegion($this->limitString($details['region']));
+            $hit->setCity($this->limitString($details['city']));
+            $hit->setIsp($this->limitString($details['isp']));
+            $hit->setOrganization($this->limitString($details['organization']));
         }
 
         if (!$hit->getReferer()) {
@@ -648,7 +660,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-        $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
+        $hit->setRemoteHost($this->limitString($request->server->get('REMOTE_HOST')));
 
         $this->setUtmTags($hit, $lead);
 
@@ -742,7 +754,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -755,7 +767,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null): array
+    public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -953,7 +965,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param bool  $canViewOthers
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -982,7 +994,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param bool  $canViewOthers
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
@@ -1203,5 +1215,25 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         return $query;
+    }
+
+    /**
+     * This function limits $value to desired length.
+     *
+     * @param mixed $value The string to limit or other value to return as-is
+     *
+     * @return mixed The limited string or the original value if not a string
+     */
+    private function limitString($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        if (self::MAX_FIELD_LENGTH >= mb_strwidth($value, self::STRING_ENCODING)) {
+            return $value;
+        }
+
+        return rtrim(mb_strimwidth($value, 0, self::MAX_FIELD_LENGTH, '', self::STRING_ENCODING));
     }
 }

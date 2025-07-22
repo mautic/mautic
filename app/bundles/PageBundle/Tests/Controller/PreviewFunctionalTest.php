@@ -240,7 +240,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createPage(
-        DynamicContent $dynamicContent = null,
+        ?DynamicContent $dynamicContent = null,
         string $defaultContent = '',
         bool $isPublished = true,
         bool $publicPreview = true,

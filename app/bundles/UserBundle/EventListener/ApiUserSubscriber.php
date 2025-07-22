@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
-use FOS\OAuthServerBundle\Security\Authentication\Token\OAuthToken;
 use FOS\OAuthServerBundle\Security\Authenticator\Passport\Badge\AccessTokenBadge;
+use FOS\OAuthServerBundle\Security\Authenticator\Token\OAuthToken;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;

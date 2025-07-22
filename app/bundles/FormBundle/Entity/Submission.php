@@ -213,7 +213,7 @@ class Submission
      *
      * @return Submission
      */
-    public function setIpAddress(IpAddress $ipAddress = null)
+    public function setIpAddress(?IpAddress $ipAddress = null)
     {
         $this->ipAddress = $ipAddress;
 
@@ -255,7 +255,7 @@ class Submission
      *
      * @return Submission
      */
-    public function setPage(Page $page = null)
+    public function setPage(?Page $page = null)
     {
         $this->page = $page;
 
@@ -283,7 +283,7 @@ class Submission
     /**
      * @return $this
      */
-    public function setLead(Lead $lead = null)
+    public function setLead(?Lead $lead = null)
     {
         $this->lead = $lead;
 

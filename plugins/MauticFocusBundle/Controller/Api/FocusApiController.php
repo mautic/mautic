@@ -42,6 +42,12 @@ class FocusApiController extends CommonApiController
             'html'   => 'html',
             'editor' => 'html',
         ];
+        $this->serializerGroups = [
+            'focusDetails',
+            'categoryList',
+            'publishDetails',
+            'projectList',
+        ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

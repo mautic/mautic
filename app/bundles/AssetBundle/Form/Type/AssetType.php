@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -151,6 +152,8 @@ class AssetType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add('language', LocaleType::class, [
             'label'      => 'mautic.core.language',
             'label_attr' => ['class' => 'control-label'],
@@ -197,15 +200,14 @@ class AssetType extends AbstractType
         if (empty($object)) {
             return;
         }
-        $parameters       = (new ParameterLoader())->getParameterBag();
-        $mimeTypesAllowed = $parameters->get('allowed_mimetypes');
-        $extensions       = array_keys($mimeTypesAllowed);
-        $fileName         = $object;
+        $parameters = (new ParameterLoader())->getParameterBag();
+        $extensions = $parameters->get('allowed_extensions');
+        $fileName   = $object;
         if (!is_string($object) && $object instanceof Asset) {
             $fileName = $object->getOriginalFileName();
         }
         $fileExtension    = pathinfo($fileName, PATHINFO_EXTENSION);
-        if (!in_array($fileExtension, $extensions, true)) {
+        if (!in_array(strtolower($fileExtension), array_map('strtolower', $extensions), true)) {
             $context->buildViolation('mautic.asset.asset.error.file.extension', [
                 '%fileExtension%'=> $fileExtension,
                 '%extensions%'   => implode(', ', $extensions),

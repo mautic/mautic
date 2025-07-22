@@ -29,7 +29,7 @@ trait TimelineTrait
         $serializedColumns = [],
         $dateTimeColumns = [],
         $resultsParserCallback = null,
-        string $secondaryOrdering = null,
+        ?string $secondaryOrdering = null,
     ) {
         if (!empty($options['unitCounts'])) {
             [$tablePrefix, $column] = explode('.', $timestampColumn);

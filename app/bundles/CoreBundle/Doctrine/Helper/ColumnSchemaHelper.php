@@ -233,7 +233,7 @@ class ColumnSchemaHelper
      */
     public function checkTableExists($table, $throwException = false): bool
     {
-        if (!$this->sm->tablesExist($table)) {
+        if (!$this->sm->tablesExist([$table])) {
             if ($throwException) {
                 throw new SchemaException("Table $table does not exist!");
             } else {
