@@ -22,7 +22,7 @@ class NotificationRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from(Notification::class, 'e', 'e.id');
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 

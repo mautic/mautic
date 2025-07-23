@@ -76,6 +76,8 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentCountIsCorrect(): void
     {
+        $this->testSymfonyCommand('mautic:segments:update', ['--env' => 'test']);
+
         // purposively not using dataProvider here to avoid loading fixtures with each segment
         foreach ($this->provideSegments() as $segmentAlias => $expectedCount) {
             $reference       = $this->getReference($segmentAlias);

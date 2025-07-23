@@ -88,7 +88,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
-    private function createAndLoginUser(string $permission = null): User
+    private function createAndLoginUser(?string $permission = null): User
     {
         // Create non-admin role
         $role = $this->createRole();

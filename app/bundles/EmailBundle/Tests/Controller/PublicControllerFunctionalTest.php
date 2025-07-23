@@ -321,7 +321,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws ORMException
      */
-    protected function getStat(Form $form = null, Lead $lead = null, Page $preferenceCenter = null): Stat
+    protected function getStat(?Form $form = null, ?Lead $lead = null, ?Page $preferenceCenter = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';

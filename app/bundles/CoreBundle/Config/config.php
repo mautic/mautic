@@ -498,11 +498,6 @@ return [
                 'tag'       => 'translation.loader',
                 'alias'     => 'mautic',
             ],
-            'mautic.tblprefix_subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber::class,
-                'tag'       => 'doctrine.event_subscriber',
-                'arguments' => '%mautic.db_table_prefix%',
-            ],
             'mautic.database.version.provider' => [
                 'class'     => Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
                 'arguments' => ['database_connection', 'mautic.helper.core_parameters'],

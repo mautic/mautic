@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,6 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to import data.
  */
+#[AsCommand(
+    name: ImportCommand::COMMAND_NAME,
+    description: 'Imports data to Mautic'
+)]
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
@@ -35,7 +40,7 @@ class ImportCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
             ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(
@@ -130,8 +135,6 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Imports data to Mautic';
 
     private function logError(Import $import, \Exception $exception): void
     {

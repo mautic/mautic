@@ -173,7 +173,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
-    private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
+    private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);

@@ -38,7 +38,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.email.model.send_email_to_user', Mautic\EmailBundle\Model\SendEmailToUser::class);
     $services->alias('mautic.email.model.send_email_to_contacts', Mautic\EmailBundle\Model\SendEmailToContact::class);
     $services->alias('mautic.email.model.transport_callback', Mautic\EmailBundle\Model\TransportCallback::class);
-    $services->alias('mautic.email.helper.request.storage', Mautic\EmailBundle\Helper\RequestStorageHelper::class);  /** @phpstan-ignore-line as the service is deprecated */
     $services->alias('mautic.email.repository.email', Mautic\EmailBundle\Entity\EmailRepository::class);
     $services->alias('mautic.email.repository.emailReply', Mautic\EmailBundle\Entity\EmailReplyRepository::class);
     $services->alias('mautic.email.repository.stat', Mautic\EmailBundle\Entity\StatRepository::class);

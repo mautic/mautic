@@ -119,7 +119,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      *
      * It happens when there is an ampersand in the DWC content.
      */
-    public function testDecodeTokensWithAmpersand(): void
+    public function testDecodeTokensWithAmpersandDataAttribute(): void
     {
         $content = <<< HTML
 <!DOCTYPE html>

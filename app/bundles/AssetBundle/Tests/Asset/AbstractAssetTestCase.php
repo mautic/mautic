@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\Tests\Asset;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 abstract class AbstractAssetTestCase extends MauticMysqlTestCase
@@ -98,7 +99,7 @@ abstract class AbstractAssetTestCase extends MauticMysqlTestCase
         ];
 
         foreach ($initialList as $line) {
-            fputcsv($file, $line);
+            CsvHelper::putCsv($file, $line);
         }
 
         fclose($file);

@@ -77,7 +77,7 @@
                         }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {{ item.group.name|default('mautic.point.group.form.nogroup'|trans) }}
@@ -106,7 +106,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
             <div class="mb-md">
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     'pictogram': 'react-to-data',
                     'size': '80'
                 } %}
@@ -121,7 +121,7 @@
 
             {% set triggersUseContainer %}
             <div class="mb-md">
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     'pictogram': 'construct',
                     'size': '64'
                 } %}

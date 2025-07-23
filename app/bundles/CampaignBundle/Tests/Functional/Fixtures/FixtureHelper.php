@@ -51,7 +51,7 @@ final class FixtureHelper
         return $campaign;
     }
 
-    public function createCampaignWithScheduledEvent(Campaign $campaign, int $interval = 1, string $intervalUnit = 'd', \DateTimeInterface $hour = null): Event
+    public function createCampaignWithScheduledEvent(Campaign $campaign, int $interval = 1, string $intervalUnit = 'd', ?\DateTimeInterface $hour = null): Event
     {
         if (!$campaign->getId()) {
             $this->em->flush();
