@@ -585,16 +585,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ('variantSettings' == $prop) {
-            $tmpValue = [];
-            foreach ($this->getSettingsKeys() as $key) {
-                if (array_key_exists($key, $val)) {
-                    $tmpValue[$key] = $val[$key];
-                }
-            }
-            $val = $tmpValue;
-        }
-
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -1360,13 +1350,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function listsChangedAdd(string $property, ?int $id): void
     {
         $this->initListChanges($property);
-        $this->changes[$property][1] = array_unique(array_merge($this->changes[$property][1], [$id]));
+        $this->recordListChanges($property, array_unique(array_merge($this->changes[$property][1], [$id])));
     }
 
     private function listsChangedRemove(string $property, ?int $id): void
     {
         $this->initListChanges($property);
-        $this->changes[$property][1] = array_diff($this->changes[$property][1], [$id]);
+        $this->recordListChanges($property, array_diff($this->changes[$property][1], [$id]));
     }
 
     public function getDraft(): ?EmailDraft
@@ -1428,7 +1418,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private function recordListChanges(string $property, array $ids): void
     {
-        if (array_diff($this->changes[$property][0], $ids)) {
+        $oldList = array_unique($this->changes[$property][0]);
+        sort($oldList);
+
+        $currentList = array_unique($ids);
+        sort($currentList);
+
+        if ($oldList !== $currentList) {
             $this->changes[$property][1] = $ids;
         } else {
             unset($this->changes[$property]);

@@ -152,7 +152,7 @@ class AuditLogRepository extends CommonRepository
      * Get array of objects which belongs to the object.
      *
      * @param string|null $object
-     * @param string|null $id
+     * @param int|string|null $id
      * @param int         $limit
      *
      * @return array

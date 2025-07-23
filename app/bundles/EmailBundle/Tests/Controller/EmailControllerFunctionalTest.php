@@ -6,18 +6,22 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
@@ -419,7 +423,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testAbTestAction(): void
     {
         $segment        = $this->createSegment('Segment B', 'segment-B');
-        $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
+        $varientSetting = ['weight' => 100, 'winnerCriteria' => 'email.openrate'];
         $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
         $this->em->flush();
 
@@ -429,7 +433,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form           = $buttonCrawler->form();
         $form['emailform[subject]']->setValue('Email B Subject var 2');
         $form['emailform[name]']->setValue('Email B var 2');
-        $form['emailform[variantSettings][weight]']->setValue((string) $varientSetting['totalWeight']);
+        $form['emailform[variantSettings][weight]']->setValue((string) $varientSetting['weight']);
         $form['emailform[variantSettings][winnerCriteria]']->setValue($varientSetting['winnerCriteria']);
         $form['emailform[isPublished]']->setValue('1');
 
@@ -477,6 +481,71 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         } else {
             $this->assertStringContainsString($errString, $this->client->getResponse()->getContent());
         }
+    }
+
+    public function testEmailAuditLogs(): void
+    {
+        $segmentA = $this->createSegment('Segment A', 'segment-A');
+        $segmentB = $this->createSegment('Segment B', 'segment-B');
+
+        $variantSetting = ['weight' => 100, 'winnerCriteria' => 'email.openrate'];
+        $email    = $this->createEmail('Parent Email', 'Parent Email Subject', 'list', 'blank', 'Test html', $segmentA, $variantSetting);
+        //$this->em->flush();
+
+        // request for email clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/abtest/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[subject]']->setValue('Variant Email Subject');
+        $form['emailform[name]']->setValue('Variant Email');
+        $form['emailform[variantSettings][weight]']->setValue((string) $variantSetting['weight']);
+        $form['emailform[variantSettings][winnerCriteria]']->setValue($variantSetting['winnerCriteria']);
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $emails);
+
+        $parentEmail  = $emails[0];
+        $variantEmail = $emails[1];
+
+        Assert::assertSame($email->getId(), $parentEmail->getId());
+        Assert::assertEquals($parentEmail->getId(), $variantEmail->getVariantParent()->getId());
+
+        /** @var AuditLogRepository $auditLogRepository */
+        $auditLogRepository = $this->em->getRepository(AuditLog::class);
+        $parentEmailLogs = $auditLogRepository->getLogForObject('email', $parentEmail->getId());
+        Assert::assertCount(1, $parentEmailLogs);
+
+        $variantEmailLogs = $auditLogRepository->getLogForObject('email', $variantEmail->getId());
+        Assert::assertCount(1, $variantEmailLogs);
+
+        // Edit the email and change segment and audit log should only have segment change logs
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$parentEmail->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+
+        /** @var ChoiceFormField $listField */
+        $listField = $form['emailform[lists]'];
+        $listField->setValue([$segmentB->getId()]);
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $parentEmailLogs = $auditLogRepository->getLogForObject('email', $parentEmail->getId());
+        Assert::assertCount(2, $parentEmailLogs);
+
+        // Edit the variant email and save it without making any changes. This time,
+        // there shouldn't be a new entry recorded in the audit_log.
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$variantEmail->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $variantEmailLogs = $auditLogRepository->getLogForObject('email', $variantEmail->getId());
+        Assert::assertCount(1, $variantEmailLogs);
     }
 
     /**
@@ -537,7 +606,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         if (!empty($segment)) {
             $email->addList($segment);
         }
-        $this->em->persist($email);
+
+        /** @var EmailModel $emailModel */
+        $emailModel = self::getContainer()->get('mautic.email.model.email');
+        $emailModel->saveEntity($email);
 
         return $email;
     }
