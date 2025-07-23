@@ -1,0 +1,16 @@
+{% macro render_nested_list(items, level=0) %}
+    {% if items is iterable %}
+        <ul class="list list--unordered list--bullets{% if level > 0 %} list--nested{% endif %}">
+            {% for item in items %}
+                <li class="list__item">
+                    <span class="list__item__label">{{ item.label|trans }}</span>
+                </li>
+                {% if item.children is defined and item.children is iterable %}
+                    {{ _self.render_nested_list(item.children, level + 1) }}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
+
+{{ _self.render_nested_list(items) }}

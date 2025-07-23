@@ -26,7 +26,7 @@
             'iconClass': 'ri-spy-line',
         }]) %}
     {% endif %}
-    <div id="page-list-wrapper" class="panel panel-default">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {%- set pageButtons = [] %}
 {% if permissions['lead:leads:create'] %}
     {% set pageButtons = pageButtons|merge([{

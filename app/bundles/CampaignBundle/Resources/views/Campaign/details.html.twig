@@ -40,6 +40,17 @@
 
 {% block publishStatus %}
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
+  
+  {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.campaign.allow_restart'|trans,
+            icon: 'ri-restart-fill',
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -49,7 +60,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- campaign detail header -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': campaign.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': campaign.description} %}
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->

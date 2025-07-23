@@ -92,6 +92,40 @@
                                 },
                                 'routeBase': 'page',
                                 'nameGetter': 'getTitle',
+                                'customButtons': {
+                                    'preview': {
+                                        'attr': {
+                                            'class': 'btn btn-ghost btn-sm btn-nospin',
+                                            'href': path('mautic_page_preview', {'id': item.id}),
+                                            'target': '_blank',
+                                            'data-toggle': '',
+                                        },
+                                        'iconClass': 'ri-external-link-line',
+                                        'btnText': 'mautic.core.open_link'|trans,
+                                        'priority': 100
+                                    },
+                                    'results': {
+                                        'attr': {
+                                            'class': 'btn btn-ghost btn-sm btn-nospin',
+                                            'href': path('mautic_page_results', {'objectId': item.id}),
+                                            'data-toggle': 'ajax',
+                                            'data-menu-link': 'mautic_form_index'
+                                        },
+                                        'iconClass': 'ri-bar-chart-line',
+                                        'btnText': 'mautic.form.form.results'|trans,
+                                        'priority': 80
+                                    }
+                                }|merge(not item.isPreferenceCenter ? {
+                                    'copy': {
+                                        'attr': {
+                                            'data-copy': url('mautic_page_public', {'slug': item.alias}),
+                                            'data-toggle': 'none',
+                                        },
+                                        'btnText': 'mautic.core.copy_page_link'|trans,
+                                        'iconClass': 'ri-clipboard-line',
+                                        'priority': 90
+                                    }
+                                } : {})
                         }) }}
                     </td>
                     <td>
@@ -158,5 +192,24 @@
         </div>
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'landing-page',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.page.contentblock.heading',
+                subheading: 'mautic.page.contentblock.subheading',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

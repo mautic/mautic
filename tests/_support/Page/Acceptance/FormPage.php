@@ -7,7 +7,7 @@ namespace Page\Acceptance;
 class FormPage
 {
     public static string $URL                                   = '/s/forms/new';
-    public static string $FORM_TYPE                             = "//div[@class='modal-dialog']//h3[contains(text(), 'Standalone form')]/ancestor::div[contains(@class, 'panel')]//button[contains(@onclick, \"selectFormType('standalone')\")]";
+    public static string $FORM_TYPE                             = "//button[contains(@class, 'tile--clickable')]//h3[contains(text(), 'Standalone form')]/ancestor::button";
 
     public static string $FORM_NAME                             = 'Send Result';
     public static string $FORM_POST_ACTION_PROPERTY             = 'Thanks';

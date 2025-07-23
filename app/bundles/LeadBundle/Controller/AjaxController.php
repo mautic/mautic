@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
@@ -35,6 +36,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+    use SegmentFilterIconTrait;
 
     public function userListAction(Request $request): JsonResponse
     {

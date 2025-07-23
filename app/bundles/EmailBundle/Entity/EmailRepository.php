@@ -574,7 +574,6 @@ class EmailRepository extends CommonRepository
                     'email_id',
                     'email_projects_xref',
                     $this->getTableAlias(),
-                    $unique,
                     $filter->string,
                     $filter->not
                 );
