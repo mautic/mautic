@@ -1426,7 +1426,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param array<integer> $ids
+     * @param array<int> $ids
      */
     private function recordListChanges(string $property, array $ids): void
     {
