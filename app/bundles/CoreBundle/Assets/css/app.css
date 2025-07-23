@@ -9248,6 +9248,81 @@ lesshat-selector { -lh-property: 0 ;
 .h-640 {
   height: 640px;
 }
+.min-h-4 {
+  min-height: 4px;
+}
+.min-h-8 {
+  min-height: 8px;
+}
+.min-h-12 {
+  min-height: 12px;
+}
+.min-h-16 {
+  min-height: 16px;
+}
+.min-h-24 {
+  min-height: 24px;
+}
+.min-h-32 {
+  min-height: 32px;
+}
+.min-h-40 {
+  min-height: 40px;
+}
+.min-h-48 {
+  min-height: 48px;
+}
+.min-h-56 {
+  min-height: 56px;
+}
+.min-h-64 {
+  min-height: 64px;
+}
+.min-h-80 {
+  min-height: 80px;
+}
+.min-h-96 {
+  min-height: 96px;
+}
+.min-h-112 {
+  min-height: 112px;
+}
+.min-h-128 {
+  min-height: 128px;
+}
+.min-h-144 {
+  min-height: 144px;
+}
+.min-h-160 {
+  min-height: 160px;
+}
+.min-h-192 {
+  min-height: 192px;
+}
+.min-h-224 {
+  min-height: 224px;
+}
+.min-h-256 {
+  min-height: 256px;
+}
+.min-h-288 {
+  min-height: 288px;
+}
+.min-h-320 {
+  min-height: 320px;
+}
+.min-h-384 {
+  min-height: 384px;
+}
+.min-h-448 {
+  min-height: 448px;
+}
+.min-h-512 {
+  min-height: 512px;
+}
+.min-h-640 {
+  min-height: 640px;
+}
 .no-focus.form-control,
 .form-control .no-focus {
   border-color: transparent;
@@ -11209,6 +11284,10 @@ code:hover > .copy-icon {
 }
 .modal.fade .modal-dialog {
   animation: modal-fade var(--duration-productive) var(--easing-standard-productive);
+}
+.chart-no-data {
+  background-color: var(--layer);
+  width: 100%;
 }
 .toggle {
   display: inline-block;
