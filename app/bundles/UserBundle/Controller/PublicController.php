@@ -31,6 +31,13 @@ class PublicController extends FormController
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
+                /**
+                 * Calculation of time to standardize fix response for vulnerability
+                 * Users enumeration - forgot password. Constant response time is 1s.
+                 */
+                $desiredTime = 1.0;
+                $startTime   = microtime(true);
+
                 try {
                     if (null !== $user) {
                         $model->sendResetEmail($user);
@@ -38,6 +45,13 @@ class PublicController extends FormController
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');
                 } catch (\Exception) {
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
+                }
+
+                $endTime       = microtime(true);
+                $executionTime = $endTime - $startTime;
+
+                if ($executionTime < $desiredTime) {
+                    usleep((int) (($desiredTime - $executionTime) * 1000000));
                 }
 
                 return $this->redirectToRoute('login');

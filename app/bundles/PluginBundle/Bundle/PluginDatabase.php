@@ -47,12 +47,12 @@ class PluginDatabase
             // Check if the query is a DDL statement
             if (self::isDDLStatement($q)) {
                 // Execute DDL statements outside of a transaction
-                $connection->executeQuery($q);
+                $connection->executeStatement($q);
             } else {
                 // For non-DDL statements, use transactions
                 try {
                     $connection->beginTransaction();
-                    $connection->executeQuery($q);
+                    $connection->executeStatement($q);
                     $connection->commit();
                 } catch (\Exception $e) {
                     // Rollback only for non-DDL statements
@@ -92,7 +92,7 @@ class PluginDatabase
         $db->beginTransaction();
         try {
             foreach ($dropQueries as $q) {
-                $db->executeQuery($q);
+                $db->executeStatement($q);
             }
 
             $db->commit();

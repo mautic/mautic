@@ -97,7 +97,8 @@ class LeadEventLogRepository extends CommonRepository
                         ->setParameter('eventType', 'decision');
 
         if ($leadId) {
-            $query->where('ll.lead_id = '.(int) $leadId);
+            $query->where('ll.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['scheduledState'])) {
@@ -123,12 +124,12 @@ class LeadEventLogRepository extends CommonRepository
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
                 $query->expr()->or(
-                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
+                    $query->expr()->like('e.name', ':search'),
+                    $query->expr()->like('e.description', ':search'),
+                    $query->expr()->like('c.name', ':search'),
+                    $query->expr()->like('c.description', ':search')
                 )
-            );
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate'], null, 'll.id');
@@ -156,7 +157,8 @@ class LeadEventLogRepository extends CommonRepository
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
-            ->where($query->expr()->eq('ll.is_scheduled', 1));
+            ->where($query->expr()->eq('ll.is_scheduled', 1))
+            ->andWhere('ll.trigger_date > NOW()');
 
         if (isset($options['lead'])) {
             /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
@@ -170,7 +172,7 @@ class LeadEventLogRepository extends CommonRepository
 
         if (isset($options['type'])) {
             $query->andwhere('e.type = :type')
-                  ->setParameter('type', $options['type']);
+            ->setParameter('type', $options['type']);
         }
 
         if (isset($options['eventType'])) {
@@ -365,30 +367,27 @@ class LeadEventLogRepository extends CommonRepository
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
 
         if (isset($options['channel'])) {
-            $query->andwhere("e.channel = '".$options['channel']."'");
+            $query->andWhere('e.channel = '.$query->expr()->literal($options['channel']));
         }
 
         if (isset($options['channelId'])) {
-            $query->andwhere('e.channel_id = '.(int) $options['channelId']);
+            $query->andWhere('e.channel_id = '.(int) $options['channelId']);
         }
 
         if (isset($options['type'])) {
-            $query->andwhere("e.type = '".$options['type']."'");
+            $query->andWhere('e.type = '.$query->expr()->literal($options['type']));
         }
 
         if (isset($options['logChannel'])) {
-            $query->andwhere("ll.channel = '".$options['logChannel']."'");
+            $query->andWhere('ll.channel = '.$query->expr()->literal($options['logChannel']));
         }
 
         if (isset($options['logChannelId'])) {
-            $query->andwhere('ll.channel_id = '.(int) $options['logChannelId']);
+            $query->andWhere('ll.channel_id = '.(int) $options['logChannelId']);
         }
 
-        if (!isset($options['is_scheduled'])) {
-            $query->andWhere($query->expr()->eq('ll.is_scheduled', 0));
-        } else {
-            $query->andWhere($query->expr()->eq('ll.is_scheduled', 1));
-        }
+        $isScheduled = isset($options['is_scheduled']) ? 1 : 0;
+        $query->andWhere('ll.is_scheduled = '.$isScheduled);
 
         return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
     }
@@ -627,7 +626,7 @@ SQL;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
-            $deleteEntries = $conn->executeQuery($sql, [$campaignId], [Types::INTEGER])->rowCount();
+            $deleteEntries = $conn->executeStatement($sql, [$campaignId], [Types::INTEGER]);
         }
     }
 
@@ -641,7 +640,7 @@ SQL;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
-            $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
+            $deleteEntries = $conn->executeStatement($sql, [$eventIds], [ArrayParameterType::INTEGER]);
         }
     }
 
@@ -660,5 +659,22 @@ SQL;
         }
 
         return false;
+    }
+
+    public function deleteAnonymousContacts(): int
+    {
+        $conn           = $this->getEntityManager()->getConnection();
+        $tableName      = $this->getTableName();
+        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
+        $tempTableName  = 'to_delete';
+        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
+        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select id AS lead_id from %s where date_identified is null;', $tempTableName, $leadsTableName));
+        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::LOG_DELETE_BATCH_SIZE);
+        $deletedRecordCount= 0;
+        while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
+            $deletedRecordCount += $deletedRows;
+        }
+
+        return $deletedRecordCount;
     }
 }

@@ -475,13 +475,6 @@ class LeadList extends FormEntity implements UuidInterface
         $this->setLastBuiltDate($now);
     }
 
-    /**
-     * @deprecated Initialisation is no longer necessary and lastBuiltDate is allowed to be null
-     */
-    public function initializeLastBuiltDate(): void
-    {
-    }
-
     public function getLastBuiltTime(): ?float
     {
         return $this->lastBuiltTime;

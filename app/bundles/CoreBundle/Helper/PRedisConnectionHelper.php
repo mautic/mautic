@@ -9,10 +9,9 @@ use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
 use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
 use Predis\Client;
 use Predis\Cluster\ClusterStrategy;
-use Predis\Connection\Aggregate\PredisCluster;
-use Predis\Connection\Aggregate\RedisCluster;
-use Predis\Connection\Aggregate\SentinelReplication;
-use Predis\Profile\RedisProfile;
+use Predis\Connection\Cluster\PredisCluster;
+use Predis\Connection\Cluster\RedisCluster;
+use Predis\Connection\Replication\SentinelReplication;
 
 /**
  * Helper functions for simpler operations with arrays.
@@ -92,7 +91,7 @@ class PRedisConnectionHelper
         $replication = $inputOptions['replication'] ?? null;
 
         if ('sentinel' === $replication) {
-            $inputOptions['aggregate'] = fn () => fn ($sentinels, $options): SentinelReplication => new SentinelReplication(
+            $inputOptions['aggregate'] = fn ($sentinels, $options): SentinelReplication => new SentinelReplication(
                 $options->service,
                 $sentinels,
                 $options->connections,
@@ -100,13 +99,19 @@ class PRedisConnectionHelper
             );
         }
 
-        $client  = new Client($endpoints, $inputOptions);
-        $profile = $client->getProfile();
-        \assert($profile instanceof RedisProfile);
+        $inputOptions['commands'] = array_merge(
+            $inputOptions['commands'] ?? [],
+            [Unlink::ID => Unlink::class]
+        );
 
-        if (!$profile->getCommandClass(Unlink::ID)) {
-            $profile->defineCommand(Unlink::ID, Unlink::class);
+        // Convert single-endpoint array to string to avoid Predis 3 aggregate connection error
+        // This is to maintain compatibility with Predis 3 which expects a string for single endpoint
+        // or an array of endpoints for multiple connections.
+        if (1 === count($endpoints) && is_string(reset($endpoints))) {
+            $endpoints = reset($endpoints);
         }
+
+        $client  = new Client($endpoints, $inputOptions);
 
         $connection = $client->getConnection();
 

@@ -25,7 +25,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
 
 <div class="campaign-event-type">
     {% if event['eventType'] == 'decision' %}
-    <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1">
+    <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1 pa-sm">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         <span class="campaign-event-name label label-info ml-5 mr-5 ellipsis">
@@ -58,7 +58,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
         </div>
 
     {% elseif event['eventType'] == 'condition' %}
-    <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1">
+    <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1 pa-sm">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             <span class="campaign-event-name label label-warning ml-5 mr-5 ellipsis">

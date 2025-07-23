@@ -463,3 +463,14 @@
     max-height: 150px;
     overflow-y: auto;
 }
+
+
+/* Text overflow handling for campaign source widget */
+.list-campaign-source .campaign-event-name {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+}

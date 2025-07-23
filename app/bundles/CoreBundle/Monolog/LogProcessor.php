@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Monolog;
 
+use Monolog\LogRecord;
+
 class LogProcessor
 {
-    /**
-     * @param array<string, mixed> $record
-     *
-     * @return array<string, mixed>
-     */
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
-        $record['extra']['hostname'] = gethostname();
-        $record['extra']['pid']      = getmypid();
+        $record->extra['hostname'] = gethostname();
+        $record->extra['pid']      = getmypid();
 
         return $record;
     }

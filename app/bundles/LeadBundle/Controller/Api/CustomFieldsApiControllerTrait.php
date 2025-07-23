@@ -208,25 +208,6 @@ trait CustomFieldsApiControllerTrait
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
     }
 
-    /**
-     * @param string $object
-     *
-     * @deprecated since Mautic 5.2, to be removed in 6.0 with no replacement.
-     *
-     * @return void
-     */
-    protected function setCleaningRules($object = 'lead')
-    {
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getFieldListWithProperties($object);
-        foreach ($fields as $field) {
-            if (!empty($field['properties']['allowHtml'])) {
-                $this->dataInputMasks[$field['alias']]  = 'html'; /** @phpstan-ignore-line this is accessing a property from the parent class. Terrible. Refactor for M6. */
-            }
-        }
-    }
-
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function setRequestStack(RequestStack $requestStack): void
     {

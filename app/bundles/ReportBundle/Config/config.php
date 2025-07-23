@@ -138,8 +138,6 @@ return [
                 'class'     => Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.file_properties',
-                    'mautic.helper.core_parameters',
                     'router',
                 ],
             ],

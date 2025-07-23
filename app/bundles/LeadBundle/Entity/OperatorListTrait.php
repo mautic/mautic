@@ -207,9 +207,6 @@ trait OperatorListTrait
         return array_flip($choices);
     }
 
-    /**
-     * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
-     */
     protected function normalizeType(mixed $type): mixed
     {
         if (null === $type) {

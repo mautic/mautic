@@ -83,18 +83,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
 
-    /**
-     * @param array $customFields
-     *
-     * @deprecated  to be removed in 3.0; use getChoiceList($customFields = []) instead
-     *
-     * @return array
-     */
-    public function getList($customFields = [])
-    {
-        return $this->getChoiceList($customFields);
-    }
-
     public function getTypes(): array
     {
         return $this->types;

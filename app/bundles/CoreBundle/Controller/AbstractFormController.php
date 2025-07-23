@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Controller;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
@@ -24,15 +25,25 @@ abstract class AbstractFormController extends CommonController
             if (null !== $entity && null !== $entity->getCheckedOutBy()) {
                 $model->unlockEntity($entity);
             }
-            $returnUrl = urldecode($request->get('returnUrl'));
-            if (empty($returnUrl)) {
+
+            $currentUrl = $request->getUri();
+            $returnUrl  = urldecode($request->get('returnUrl'));
+
+            if (!filter_var($returnUrl, FILTER_VALIDATE_URL)) {
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
+            } else {
+                $currentHost = parse_url($currentUrl, PHP_URL_HOST);
+                $returnHost  = parse_url($returnUrl, PHP_URL_HOST);
+
+                if ($currentHost !== $returnHost) {
+                    $returnUrl = $this->generateUrl('mautic_dashboard_index');
+                }
             }
 
             $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
-                    '%name%' => urldecode($request->get('name')),
+                    '%name%' => htmlspecialchars(urldecode($request->get('name')), ENT_QUOTES, 'UTF-8'),
                 ]
             );
 
@@ -50,7 +61,7 @@ abstract class AbstractFormController extends CommonController
      * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|array
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {

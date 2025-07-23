@@ -113,8 +113,8 @@ class StatRepository extends CommonRepository
 
         if ($leadId) {
             $query->andWhere(
-                $query->expr()->eq('s.lead_id', (int) $leadId)
-            );
+                $query->expr()->eq('s.lead_id', ':leadId')
+            )->setParameter('leadId', $leadId);
         }
 
         if (!empty($options['basic_select'])) {
