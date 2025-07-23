@@ -491,8 +491,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $segmentB = $this->createSegment('Segment B', 'segment-B');
 
         $variantSetting = ['weight' => 100, 'winnerCriteria' => 'email.openrate'];
-        $email    = $this->createEmail('Parent Email', 'Parent Email Subject', 'list', 'blank', 'Test html', $segmentA, $variantSetting);
-        //$this->em->flush();
+        $email          = $this->createEmail('Parent Email', 'Parent Email Subject', 'list', 'blank', 'Test html', $segmentA, $variantSetting);
+        // $this->em->flush();
 
         // request for email clone
         $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/abtest/{$email->getId()}");
@@ -518,7 +518,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         /** @var AuditLogRepository $auditLogRepository */
         $auditLogRepository = $this->em->getRepository(AuditLog::class);
-        $parentEmailLogs = $auditLogRepository->getLogForObject('email', $parentEmail->getId());
+        $parentEmailLogs    = $auditLogRepository->getLogForObject('email', $parentEmail->getId());
         Assert::assertCount(1, $parentEmailLogs);
 
         $variantEmailLogs = $auditLogRepository->getLogForObject('email', $variantEmail->getId());
