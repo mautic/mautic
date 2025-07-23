@@ -392,7 +392,7 @@ class FormSubscriber implements EventSubscriberInterface
      * @param array<mixed>               $tokens
      * @param array<string, string|null> $to
      */
-    private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
+    private function setMailer(array $config, array $tokens, array $to, ?Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
 

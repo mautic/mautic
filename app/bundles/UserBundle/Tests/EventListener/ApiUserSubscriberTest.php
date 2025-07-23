@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use FOS\OAuthServerBundle\Model\AccessToken;
-use FOS\OAuthServerBundle\Security\Authentication\Token\OAuthToken;
 use FOS\OAuthServerBundle\Security\Authenticator\Passport\Badge\AccessTokenBadge;
+use FOS\OAuthServerBundle\Security\Authenticator\Token\OAuthToken;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\EventListener\ApiUserSubscriber;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;

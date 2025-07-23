@@ -609,7 +609,7 @@ class Hit
      *
      * @return Hit
      */
-    public function setPage(Page $page = null)
+    public function setPage(?Page $page = null)
     {
         $this->page = $page;
 

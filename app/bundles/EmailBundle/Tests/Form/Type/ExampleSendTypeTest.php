@@ -143,6 +143,7 @@ class ExampleSendTypeTest extends TestCase
                             'placeholder'            => 'startTyping',
                             'data-no-record-message' => 'nomatches',
                         ],
+                        'required' => false,
                     ], $parameters[2]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {

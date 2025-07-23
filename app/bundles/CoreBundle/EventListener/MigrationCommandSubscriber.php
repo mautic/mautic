@@ -60,7 +60,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
             $output->writeln("<info>++</info> adding generated column <comment>{$generatedColumn->getColumnName()}</comment>");
             $output->writeln("<comment>-></comment> {$generatedColumn->getAlterTableSql()}");
 
-            $this->connection->executeQuery($generatedColumn->getAlterTableSql());
+            $this->connection->executeStatement($generatedColumn->getAlterTableSql());
 
             $duration = (string) $stopwatch->stop($generatedColumn->getColumnName());
             $output->writeln("<info>++</info> generated column added ({$duration})");

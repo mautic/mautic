@@ -40,6 +40,41 @@ class FieldControllerTest extends MauticMysqlTestCase
         $this->assertNotNull($field);
     }
 
+    public function testCloneFieldSubmission(): void
+    {
+        $field = new LeadField();
+        $field->setLabel('Field to be cloned');
+        $field->setAlias('field_to_be_cloned');
+        $field->setType('text');
+
+        $this->em->getRepository(LeadField::class)->saveEntity($field);
+        $this->em->clear();
+
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => 'field_to_be_cloned']);
+        $this->assertNotNull($field);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/clone/'.$field->getId());
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertSelectorTextContains('h1', 'New Custom Field');
+
+        $form = $crawler->selectButton('Save & Close')->form();
+        $form['leadfield[label]']->setValue('Cloned Field');
+
+        $this->client->submit($form);
+        $this->assertResponseStatusCodeSame(200);
+
+        $clonedField = $this->em->getRepository(LeadField::class)->findOneBy(['label' => 'Cloned Field']);
+        $this->assertNotNull($clonedField);
+        $this->assertNotEquals($field->getId(), $clonedField->getId());
+    }
+
+    public function testCloneNonExistentField(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/contacts/fields/clone/9999');
+        $this->assertResponseStatusCodeSame(404);
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]
     public function testMaxCharLengthFieldValidationOnStringTypeWhenAddingCustomFieldFailure(string $label, string $type): void
     {
