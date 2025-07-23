@@ -2,14 +2,15 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
@@ -22,8 +23,11 @@ use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -32,6 +36,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -77,6 +82,8 @@ class MailHelper
     protected ?string $replyTo = null;
 
     protected ?string $systemReplyTo = null;
+
+    protected int $addressLengthLimit;
 
     /**
      * @var string
@@ -227,7 +234,6 @@ class MailHelper
     private array $embedImagesReplaces = [];
 
     public function __construct(
-        private MauticFactory $factory,
         private MailerInterface $mailer,
         private FromEmailHelper $fromEmailHelper,
         private CoreParametersHelper $coreParametersHelper,
@@ -237,10 +243,14 @@ class MailHelper
         private RouterInterface $router,
         private Environment $twig,
         private ThemeHelper $themeHelper,
-        private SlotsHelper $slotsHelper,
         private PathsHelper $pathsHelper,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
+        private EntityManagerInterface $entityManager,
+        private ModelFactory $modelFactory, // Can not inject EmailModel due to circular reference between MailHelper and EmailModel (even through other classes, like UserModel, SendEmailToContact)
+        private AssetModel $assetModel,
+        private TrackableModel $trackableModel,
+        private RedirectModel $redirectModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -250,6 +260,7 @@ class MailHelper
         $systemFromName     = $this->cleanName(
             $coreParametersHelper->get('mailer_from_name')
         );
+        $this->addressLengthLimit = (int) $coreParametersHelper->get('mailer_address_length_limit');
         $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
@@ -262,8 +273,6 @@ class MailHelper
     }
 
     /**
-     * Mirrors previous MauticFactory functionality.
-     *
      * @param bool $cleanSlate
      *
      * @return $this
@@ -273,18 +282,6 @@ class MailHelper
         $this->reset($cleanSlate);
 
         return $this;
-    }
-
-    /**
-     * Mirrors previous MauticFactory functionality.
-     *
-     * @param bool $cleanSlate
-     *
-     * @return $this
-     */
-    public function getSampleMailer($cleanSlate = true)
-    {
-        return $this->getMailer($cleanSlate);
     }
 
     /**
@@ -354,6 +351,10 @@ class MailHelper
 
                 if ($ownerSignature = $this->fromEmailHelper->getSignature()) {
                     $tokens['{signature}'] = $ownerSignature;
+                }
+
+                if ($brandName = $this->coreParametersHelper->get('brand_name')) {
+                    $tokens['{brand=name}'] = $brandName;
                 }
 
                 // Set metadata if applicable
@@ -534,7 +535,7 @@ class MailHelper
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
                     $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
                 } else {
-                    $this->setMessageFrom($this->getFrom());
+                    $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -692,10 +693,8 @@ class MailHelper
      */
     public function attachAsset($asset): void
     {
-        $model = $this->factory->getModel('asset');
-
         if (!$asset instanceof Asset) {
-            $asset = $model->getEntity($asset);
+            $asset = $this->assetModel->getEntity($asset);
 
             if (null == $asset) {
                 return;
@@ -703,7 +702,7 @@ class MailHelper
         }
 
         if ($asset->isPublished()) {
-            $asset->setUploadDir($this->factory->getParameter('upload_dir'));
+            $asset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
             $this->assets[$asset->getId()] = $asset;
         }
     }
@@ -905,7 +904,16 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $this->message->addTo((new AddressDTO($address, $name))->toMailerAddress());
+            $fullAddress          = (new AddressDTO($address, $name))->toMailerAddress();
+            $encodedAddressLength = strlen((new MailboxListHeader('To', [$fullAddress]))->getBodyAsString());
+
+            if ($encodedAddressLength > $this->addressLengthLimit) {
+                // When encoded address with name length doesn't meet the limit, use only the email
+                $shortAddress = (new AddressDTO($address))->toMailerAddress();
+                $this->message->addTo($shortAddress);
+            } else {
+                $this->message->addTo($fullAddress);
+            }
             $this->queuedRecipients[$address] = $name;
 
             return true;
@@ -917,32 +925,56 @@ class MailHelper
     }
 
     /**
-     * Set CC address(es).
+     * Helper method to set CC or BCC recipients.
      *
-     * @param array<string,?string> $addresses
-     * @param ?string               $name
-     *
-     * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
+     * @param string                    $type      Type of recipient (cc or bcc)
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
      */
-    public function setCc($addresses, $name = null): bool
+    private function setRecipients(string $type, $addresses, $name = null): bool
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'cc');
+        $this->checkBatchMaxRecipients(count($addresses), $type);
 
         try {
-            $ccAddresses = [];
-            // The email addresses are stored in the array keys not the values
-            // The name of the CC is passed in the function and not in the array
-            foreach ($addresses as $address => $noName) {
-                $ccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
+            $recipientAddresses = [];
+
+            foreach ($addresses as $key => $value) {
+                // Check if we have an indexed array (numeric keys)
+                if (is_numeric($key)) {
+                    $address     = $value;
+                    $addressName = $name;
+                } else {
+                    // We have an associative array (email => name)
+                    $address     = $key;
+                    $addressName = $value ?: $name; // Use provided name or default
+                }
+
+                $recipientAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
             }
-            $this->message->cc(...$ccAddresses);
+
+            if ('cc' === $type) {
+                $this->message->cc(...$recipientAddresses);
+            } else {
+                $this->message->bcc(...$recipientAddresses);
+            }
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e, 'cc');
+            $this->logError($e, $type);
 
             return false;
         }
+    }
+
+    /**
+     * Set CC address(es).
+     *
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
+     */
+    public function setCc($addresses, $name = null): bool
+    {
+        return $this->setRecipients('cc', $addresses, $name);
     }
 
     /**
@@ -969,31 +1001,12 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param array<string,?string> $addresses
-     * @param ?string               $name
-     *
-     * //TODO: same bug for the name as the one we have in setCc
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
      */
     public function setBcc($addresses, $name = null): bool
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'bcc');
-
-        try {
-            $bccAddresses = [];
-            // The email addresses are stored in the array keys not the values
-            // The name of the Bcc is passed in the function and not in the array
-            foreach ($addresses as $address => $noName) {
-                $bccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
-            }
-
-            $this->message->bcc(...$bccAddresses);
-
-            return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'bcc');
-
-            return false;
-        }
+        return $this->setRecipients('bcc', $addresses, $name);
     }
 
     /**
@@ -1200,13 +1213,12 @@ class MailHelper
 
     /**
      * @param bool  $allowBcc            Honor BCC if set in email
-     * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
      * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, $allowBcc = true, $assetAttachments = [], $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1237,20 +1249,9 @@ class MailHelper
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
         if (empty($customHtml) && $template) {
-            if (empty($slots)) {
-                $slots    = $this->themeHelper->getTheme($template)->getSlots('email');
-            }
-
-            if (isset($slots[$template])) {
-                $slots = $slots[$template];
-            }
-
-            $this->processSlots($this->slotsHelper, $slots, $email);
-
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
-                'slots'    => $slots,
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
@@ -1579,11 +1580,9 @@ class MailHelper
 
         // Create a download entry if there is an Asset attachment
         if (!empty($this->assetStats)) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
-            $assetModel = $this->factory->getModel('asset');
             foreach ($this->assets as $asset) {
                 foreach ($this->assetStats as $stat) {
-                    $assetModel->trackDownload(
+                    $this->assetModel->trackDownload(
                         $asset,
                         null,
                         200,
@@ -1591,7 +1590,7 @@ class MailHelper
                     );
                 }
 
-                $assetModel->upDownloadCount($asset, count($this->assetStats), true);
+                $this->assetModel->upDownloadCount($asset, count($this->assetStats), true);
             }
         }
 
@@ -1653,17 +1652,12 @@ class MailHelper
 
         if ($this->email) {
             // Get a Trackable which is channel aware
-            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-            $trackableModel = $this->factory->getModel('page.trackable');
-            $trackable      = $trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
+            $trackable = $this->trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
 
             return $trackable->getRedirect();
         }
 
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
-
-        return $redirectModel->getRedirectByUrl($url);
+        return $this->redirectModel->getRedirectByUrl($url);
     }
 
     /**
@@ -1685,7 +1679,7 @@ class MailHelper
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference(Lead::class, $this->lead['id']));
+                $stat->setLead($this->entityManager->getReference(Lead::class, $this->lead['id']));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1706,7 +1700,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
+                $stat->setList($this->entityManager->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1720,8 +1714,8 @@ class MailHelper
 
         $stat->setTokens($this->getTokens());
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
+        $emailModel = $this->modelFactory->getModel(EmailModel::class);
+        \assert($emailModel instanceof EmailModel);
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = $emailExists ? $this->email->getId() : md5($this->subject.$this->body['content']);
@@ -1747,7 +1741,7 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->entityManager->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1816,24 +1810,6 @@ class MailHelper
         }
 
         return $monitoredEmail;
-    }
-
-    /**
-     * @param Email $entity
-     */
-    public function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
-    {
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value = $content[$slot] ?? '';
-            $slotsHelper->set($slot, $value);
-        }
     }
 
     /**

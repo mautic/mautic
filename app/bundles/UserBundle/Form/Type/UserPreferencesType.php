@@ -27,20 +27,6 @@ class UserPreferencesType extends AbstractType
             ]
         );
 
-        // Accent
-        $builder->add(
-            'accent',
-            HiddenType::class,
-            [
-                'label'      => 'mautic.user.preferences.accent',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-                'required' => false,
-            ]
-        );
-
         // Reduce Transparency
         $builder->add(
             'reduce_transparency',

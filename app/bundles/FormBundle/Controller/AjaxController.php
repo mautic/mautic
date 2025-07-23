@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -26,7 +25,6 @@ class AjaxController extends CommonAjaxController
         private FieldCollectorInterface $fieldCollector,
         private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -36,7 +34,7 @@ class AjaxController extends CommonAjaxController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function reorderFieldsAction(Request $request, string $name = 'fields'): JsonResponse
@@ -161,7 +159,9 @@ class AjaxController extends CommonAjaxController
             $type    = 'error';
         }
 
-        $data = array_merge($responseData, ['message' => $message, 'type' => $type, 'success' => $success]);
+        $data = is_array($responseData)
+            ? array_merge($responseData, ['message' => $message, 'type' => $type, 'success' => $success])
+            : [];
 
         return $this->sendJsonResponse($data);
     }

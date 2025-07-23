@@ -44,6 +44,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formTheme'         => '@MauticEmail/FormTheme/FormAction/_formaction_properties_useremail_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
+            'template'          => '@MauticEmail/Action/email.html.twig',
         ]);
 
         $event->addSubmitAction('email.send.lead', [
@@ -54,6 +55,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
             'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',
             'eventName'       => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'        => '@MauticEmail/Action/email.html.twig',
         ]);
     }
 

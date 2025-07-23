@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -15,11 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class PointActionHelperTest extends TestCase
 {
-    /**
-     * @var MockObject|MauticFactory
-     */
-    private $factory;
-
     /**
      * @var MockObject|EntityManagerInterface
      */
@@ -42,14 +36,11 @@ class PointActionHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        /** @phpstan-ignore-next-line */
-        $this->factory       = $this->createMock(MauticFactory::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->hitRepository = $this->createMock(HitRepository::class);
         $this->lead          = $this->createMock(Lead::class);
         $this->eventDetails  = $this->createMock(Hit::class);
 
-        $this->factory->method('getEntityManager')->willReturn($this->entityManager);
         $this->eventDetails->method('getLead')->willReturn($this->lead);
         $this->entityManager->method('getRepository')->willReturn($this->hitRepository);
     }
@@ -71,7 +62,8 @@ class PointActionHelperTest extends TestCase
         ]);
         $this->hitRepository->expects($this->never())->method('getLatestHit');
 
-        $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
+        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -145,7 +137,8 @@ class PointActionHelperTest extends TestCase
         $latestHit->setTimestamp($threeHoursAgoTimestamp);
         $this->hitRepository->method('getLatestHit')->willReturn($latestHit);
 
-        $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
+        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }

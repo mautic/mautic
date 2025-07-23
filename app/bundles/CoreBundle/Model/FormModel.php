@@ -132,27 +132,44 @@ class FormModel extends AbstractCommonModel
     public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
-        $batchSize = 20;
-        $i         = 0;
-        foreach ($entities as $entity) {
+        $batchSize             = 20;
+        $entitiesPreSaveParams = [];
+        foreach ($entities as &$entity) {
             $isNew = $this->isNewEntity($entity);
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
-            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            $this->getRepository()->saveEntity($entity, false);
-            if (0 === ++$i % $batchSize) {
+            // Pre save single dispatcher
+            $preEvent                = $this->dispatchEventFromBatch('pre_save', $entity, $isNew);
+            $entitiesPreSaveParams[] = ['entity' => $entity, 'isNew' => $isNew, 'event' => $preEvent];
+        }
+
+        // Pre save batch dispatcher
+        $preBatchEvent = $this->dispatchBatchEvent('pre_batch_save', $entitiesPreSaveParams);
+
+        // Saving in batches
+        $loops = 0;
+        foreach ($entitiesPreSaveParams as $entityPreSaveParams) {
+            $this->getRepository()->saveEntity($entityPreSaveParams['entity'], false);
+            if (0 === ++$loops % $batchSize) {
                 $this->em->flush();
             }
         }
-
-        $this->em->flush();
-
-        // Dispatch post events after everything has been flushed
-        foreach ($entities as $entity) {
-            $this->dispatchEvent('post_save', $entity, $isNew, $event);
+        if (0 !== $loops % $batchSize) {
+            $this->em->flush();
         }
+
+        // Dispatch after flush
+        $entitiesPostSaveParams = [];
+        foreach ($entitiesPreSaveParams as &$entityParams) {
+            // Post save single dispatcher after flush
+            $postEvent                = $this->dispatchEventFromBatch('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
+            $entitiesPostSaveParams[] = ['entity' => $entityParams['entity'], 'isNew' => $entityParams['isNew'], 'event' => $postEvent];
+        }
+
+        // Post save batch dispatcher
+        $this->dispatchBatchEvent('post_batch_save', $entitiesPostSaveParams, $preBatchEvent);
     }
 
     /**
@@ -348,6 +365,24 @@ class FormModel extends AbstractCommonModel
     {
         // ...
 
+        return $event;
+    }
+
+    /**
+     * Dispatches events for child classes.
+     */
+    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, Event $event = null): ?Event
+    {
+        return $this->dispatchEvent($action, $entity, $isNew, $event);
+    }
+
+    /**
+     * Dispatches batch events for child classes.
+     *
+     * @param mixed[] $entitiesBatchParams
+     */
+    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, Event $event = null): ?Event
+    {
         return $event;
     }
 

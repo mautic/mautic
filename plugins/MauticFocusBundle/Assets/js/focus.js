@@ -171,17 +171,6 @@ Mautic.focusOnLoad = function () {
         });
 
         Mautic.focusInitViewportSwitcher();
-
-        mQuery('#focus_editor').on('froalaEditor.contentChanged', function (e, editor) {
-            var content = editor.html.get();
-
-            if (content.indexOf('{focus_form}') !== -1) {
-                Mautic.focusUpdatePreview();
-            } else {
-                mQuery('.mf-content').html(content);
-            }
-
-        });
     } else {
         Mautic.initDateRangePicker();
     }

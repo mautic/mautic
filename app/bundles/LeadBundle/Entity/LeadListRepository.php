@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -622,5 +623,191 @@ SQL;
                 ]
             )
             ->fetchFirstColumn();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getAllSegments(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('title', 'title');
+        $rsm->addScalarResult('item_id', 'item_id');
+        $rsm->addScalarResult('is_published', 'is_published');
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            ll.name as title, 
+            ll.id as item_id,
+            ll.is_published as is_published
+            FROM '.MAUTIC_TABLE_PREFIX.'lead_lists ll', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getCampaignEntryPoints(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getEmailIncludeExcludeList(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'email_list_xref 
+            GROUP BY leadlist_id', $rsm);
+
+        $included = $query->getResult();
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'email_list_excluded 
+            GROUP BY leadlist_id', $rsm);
+
+        $excluded = $query->getResult();
+
+        return array_merge($included, $excluded);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getCampaignChangeSegmentAction(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('properties', 'properties');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            properties 
+        FROM '.MAUTIC_TABLE_PREFIX.'campaign_events ce 
+        WHERE ce.type = \'lead.changelist\'', $rsm);
+
+        $segmentIds = [];
+        foreach ($query->getResult() as $property) {
+            $property       = unserialize($property['properties']);
+            $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
+        }
+
+        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFilterSegmentsAction(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('filters', 'filters');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            filters 
+        FROM '.MAUTIC_TABLE_PREFIX.'lead_lists', $rsm);
+
+        $childSegmentIds = [];
+
+        foreach ($query->getResult() as $rowFilters) {
+            $segmentMembershipFilters = array_filter(
+                unserialize($rowFilters['filters']),
+                fn (array $filter) => 'leadlist' === $filter['type']
+            );
+
+            foreach ($segmentMembershipFilters as $filter) {
+                if (is_array($filter['properties']['filter'])) {
+                    foreach ($filter['properties']['filter'] as $childSegmentId) {
+                        $childSegmentIds[] = ['item_id' => (string) $childSegmentId];
+                    }
+                }
+            }
+        }
+
+        return $childSegmentIds;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getLeadListLeads(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getNotificationIncludedList(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'push_notification_list_xref
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getSMSIncludedList(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('item_id', 'item_id');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            leadlist_id as item_id
+        FROM '.MAUTIC_TABLE_PREFIX.'sms_message_list_xref
+            GROUP BY leadlist_id', $rsm);
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFormAction(): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('properties', 'properties');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT 
+            properties 
+        FROM '.MAUTIC_TABLE_PREFIX.'form_actions fa 
+        WHERE fa.type = \'lead.changelist\'', $rsm);
+
+        $segmentIds = [];
+        foreach ($query->getResult() as $property) {
+            $property       = unserialize($property['properties']);
+            $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
+        }
+
+        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
     }
 }

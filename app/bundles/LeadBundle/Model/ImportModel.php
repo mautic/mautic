@@ -476,8 +476,8 @@ class ImportModel extends FormModel
     public function initEventLog(Import $import, $lineNumber): LeadEventLog
     {
         $eventLog = new LeadEventLog();
-        $eventLog->setUserId($import->getCreatedBy())
-            ->setUserName($import->getCreatedByUser())
+        $eventLog->setUserId($import->getModifiedBy())
+            ->setUserName($import->getModifiedByUser())
             ->setBundle($import->getObject())
             ->setObject('import')
             ->setObjectId($import->getId())

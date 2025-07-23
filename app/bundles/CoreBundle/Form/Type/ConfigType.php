@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -300,7 +301,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cached_data_timeout',
-            TextType::class,
+            NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -311,11 +312,12 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotBlank([
+                        'message' => 'mautic.core.value.required',
+                    ]),
+                    new GreaterThanOrEqual([
+                        'value' => 0,
+                    ]),
                 ],
             ]
         );
@@ -597,19 +599,6 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add(
-            'load_froala_assets',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.core.config.load.froala.assets',
-                'data'  => (array_key_exists('load_froala_assets', $options['data']) && !empty($options['data']['load_froala_assets'])),
-                'attr'  => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.load.froala.assets.tooltip',
                 ],
             ]
         );

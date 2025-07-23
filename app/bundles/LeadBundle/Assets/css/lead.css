@@ -64,14 +64,6 @@
     margin-left:20px;
 }
 
-.selected-filters .btn-group {
-    margin-top:4px;
-}
-
-.selected-filters .btn-group .btn {
-    margin-right:4px;
-}
-
 .selected-filters .panel {
     margin-bottom:0;
     margin-top:20px;
@@ -247,14 +239,14 @@ ul.tag-cloud li {
 }
 
 .building::before {
-    content: "\f1ad";
-    font-family: "FontAwesome";
+    content: "\eb08";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
 .user::before {
-    content: "\f007";
-    font-family: "FontAwesome";
+    content: "\f25b";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 

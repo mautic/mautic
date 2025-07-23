@@ -1,0 +1,267 @@
+{% extends "@themes/"~template~"/html/base.html.twig" %}
+
+{% block content %}
+<div class="sidebars">
+    <div class="sidebar--left">
+        <div class="company-wrapper">
+            <img class="logo--small" src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+            <div class="company-name">
+                <p>{brand=name}</p>
+            </div>
+        </div>
+        <div class="h3">
+            <p>Chat with us</p>
+        </div>
+        <div class="subtitle">
+            <p>Speak to our team via live chat</p>
+        </div>
+        <div class="icon-list">
+            <div class="icon-row"><img src="{{ getAssetUrl('themes/'~template~'/assets/chat-1-line.png', null, null, true) }}"
+                    class="icon-img">
+                <p>Start a live chat</p>
+            </div>
+            <div class="icon-row"><img src="{{ getAssetUrl('themes/'~template~'/assets/mail-send-line.png', null, null, true) }}"
+                    class="icon-img">
+                <p class="icon-label"></p>
+                <p class="icon-label"></p>
+                <p>Shoot us an email</p>
+                <p></p>
+                <p></p>
+            </div>
+            <div class="icon-row"><img src="{{ getAssetUrl('themes/'~template~'/assets/twitter-x-line.png', null, null, true) }}"
+                    class="icon-img">
+                <p class="icon-label"></p>
+                <p>Message us on X</p>
+                <p></p>
+            </div>
+        </div>
+        <div class="h3">
+            <p></p>
+            <p>Call us</p>
+            <p></p>
+        </div>
+        <div class="subtitle">
+            <p></p>
+            <p>Call our team Mon-Fri from 8am to 5pm (UTC-3).</p>
+            <p></p>
+        </div>
+        <div class="icon-list">
+            <div class="icon-row"><img src="{{ getAssetUrl('themes/'~template~'/assets/phone-line.png', null, null, true) }}"
+                    class="icon-img">
+                <p class="icon-label"></p>
+                <p>+1 (555) 000-0000</p>
+                <p></p>
+            </div>
+        </div>
+        <div class="h3">
+            <p></p>
+            <p>Visit us</p>
+            <p></p>
+        </div>
+        <div class="subtitle">
+            <p></p>
+            <p></p>
+            <p>Chat with us in person at our Melbourne HQ.</p>
+        </div>
+        <div class="icon-list">
+            <div class="icon-row"><img src="{{ getAssetUrl('themes/'~template~'/assets/map-pin-2-line.png', null, null, true) }}"
+                    class="icon-img">
+                <p></p>
+                <p>100 Smith Street, Collingwood VIC 3066</p>
+                <p></p>
+            </div>
+            <div class="icon-row"><img src="{{ getAssetUrl('themes/'~template~'/assets/map-pin-2-line.png', null, null, true) }}"
+                    class="icon-img">
+                <p></p>
+                <p>128 Clarence Street, Sydney NSW 2000</p>
+                <p></p>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar--right">
+        <div class="logo--big">
+            <div class="gjs-cell"><img src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+            </div>
+        </div>
+        <div>
+            <p>{form=INSERT_FORM_ID_HERE}</p>
+        </div>
+    </div>
+</div>
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: sans-serif;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    p {
+        margin: 0;
+        padding: 0;
+        line-height: 1.4em;
+    }
+
+    p a {
+        color: black;
+        text-decoration: none;
+    }
+
+    .sidebars {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        min-height: 100vh;
+        padding: 10px;
+        gap: 20px;
+    }
+
+    .sidebar--left {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        background-color: #fafafa;
+        border-radius: 12px;
+        padding: 25px 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        box-sizing: border-box;
+    }
+
+    .sidebar--right {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        padding: 60px 25px 20px;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .sidebar--right .mauticform_wrapper {
+        margin: 0;
+    }
+
+    .company-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        max-width: fit-content;
+    }
+
+    .company-name {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .h3 {
+        padding: 0 10px;
+        margin-top: 45px;
+        margin-bottom: 5px;
+        display: flex;
+        font-weight: 700;
+        font-size: 17px;
+        max-width: fit-content;
+    }
+
+    .subtitle {
+        padding: 0 10px;
+        font-size: 13px;
+        color: #525252;
+        margin: 0;
+        display: flex;
+        width: 100%;
+        max-width: fit-content;
+    }
+
+    .icon-list {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .icon-row {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        line-height: 1em;
+        min-height: 35px;
+        font-size: 14px;
+        background-color: transparent;
+        transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+        flex-grow: 1;
+        padding: 12px 10px;
+        border-radius: 8px;
+        max-width: 100%;
+        margin-bottom: 2px;
+    }
+
+    .icon-img {
+        margin: 0 8px 0 0;
+        width: 20px;
+        height: 20px;
+    }
+
+    .icon-row:hover {
+        background-color: #e9e9e9;
+    }
+
+    .logo--small {
+        padding: 0 10px;
+        height: 25px;
+        width: fit-content;
+    }
+
+    .logo--big {
+        height: 100px;
+        width: fit-content;
+    }
+
+    /* Media Queries for Larger Screens */
+
+    /* Tablet and Up */
+    @media (min-width: 768px) {
+        .sidebars {
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 100px;
+        }
+
+        .sidebar--left {
+            width: 30%;
+            min-width: 350px;
+            max-width: fit-content;
+            padding: 50px 15px;
+        }
+
+        .sidebar--right {
+            width: 30%;
+            padding: 50px 0;
+            min-width: 290px;
+        }
+
+        .h3 {
+            font-size: 17px;
+        }
+
+        .subtitle {
+            max-width: fit-content;
+        }
+
+        .icon-row {
+            padding: 6px 15px;
+            margin-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}

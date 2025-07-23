@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-formscape",
+            "directory": "themes/formscape",
+            "target": "git@github.com:mautic/theme-formscape.git"
+        }
+    ]
+}

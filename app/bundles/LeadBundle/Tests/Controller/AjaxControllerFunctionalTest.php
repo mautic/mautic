@@ -116,6 +116,40 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
+    public function testCompanyLookupWithLimit(): void
+    {
+        $company1 = new Company();
+        $company1->setName('Company 1');
+        $this->em->persist($company1);
+
+        $company2 = new Company();
+        $company2->setName('Company 2');
+        $this->em->persist($company2);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1');
+
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertIsArray($content);
+        Assert::assertCount(1, $content, 'The result should contain only one element');
+        Assert::assertSame('Company 1', $content[0]['text']);
+        Assert::assertSame($company1->getId(), (int) $content[0]['value']);
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1&start=1');
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertIsArray($content);
+        Assert::assertCount(1, $content, 'The result should contain only one element');
+        Assert::assertSame('Company 2', $content[0]['text']);
+        Assert::assertSame($company2->getId(), (int) $content[0]['value']);
+    }
+
     public function testSegmentDependencyTree(): void
     {
         $segmentA = new LeadList();
