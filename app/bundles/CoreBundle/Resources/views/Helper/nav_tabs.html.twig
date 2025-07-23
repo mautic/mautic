@@ -22,7 +22,7 @@
     {% if tab.renderTag is defined and tab.renderTag %}
         {% set tagData = tab.renderTag|merge({'color': 'primary', 'size': 'sm'}) %}
         <div class="tabs__nav-item-tag{% if variant == 'line' and isDismissable %} mr-8{% elseif variant == 'line' %} ml-8{% elseif variant == 'contained' %} ml-12{% endif %}">
-            {% include '@MauticCore/Components/tag.html.twig' with {'tags': [tagData]} %}
+            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tagData]} %}
         </div>
     {% endif %}
 {% endmacro %}
