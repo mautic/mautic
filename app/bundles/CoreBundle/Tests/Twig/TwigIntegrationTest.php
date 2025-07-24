@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use Mautic\CoreBundle\Twig\Extension\ClassExtension;
 use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Twig\Extension\ExtensionInterface;
@@ -17,6 +18,11 @@ use Twig\Extension\ExtensionInterface;
 /**
  * @see https://twig.symfony.com/doc/2.x/advanced.html#functional-tests
  */
+/**
+ * Temporary workaround for Twig test deprecations.
+ * Remove after upgrading to twig/twig 4.0.
+ */
+#[IgnoreDeprecations]
 class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
     /**
