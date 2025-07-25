@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -55,6 +54,7 @@ class PublicController extends AbstractFormController
         ThemeHelper $themeHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
+        DeviceTrackingServiceInterface $deviceTrackingService,
         $slug)
     {
         /** @var PageModel $model */
@@ -299,8 +299,6 @@ class PublicController extends AbstractFormController
 
             $response = new Response($content);
             if ($request->cookies->has('Blocked-Tracking')) {
-                /* @var DeviceTrackingService $deviceTrackingService */
-                $deviceTrackingService = $this->container->get('mautic.lead.service.device_tracking_service');
                 $deviceTrackingService->clearTrackingCookies();
             }
 
@@ -349,8 +347,8 @@ class PublicController extends AbstractFormController
             && (
                 (!$page->isPublished())
                 || (!$security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
+                    'page:pages:viewown',
+                    'page:pages:viewother',
                     $page->getCreatedBy()
                 )))
         ) {

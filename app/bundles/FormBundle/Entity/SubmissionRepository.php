@@ -286,7 +286,8 @@ class SubmissionRepository extends CommonRepository
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = '.(int) $options['leadId']);
+            $query->andWhere('fs.lead_id = :leadId')
+                ->setParameter('leadId', $options['leadId']);
         }
 
         if (!empty($options['id'])) {
@@ -296,8 +297,8 @@ class SubmissionRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('f.name', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+                $query->expr()->like('f.name', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted'], null, 'fs.id');

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -1378,7 +1379,7 @@ class LeadController extends FormController
     /**
      * @param int $objectId
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0): JsonResponse|Response
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, LeadModel $leadModel, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -1427,6 +1428,9 @@ class LeadController extends FormController
                 $email['from'] = $lead->getOwner()->getEmail();
             }
         }
+
+        // Hydrate contacts with company profile fields
+        $leadFields = $emailModel->enrichedContactWithCompanies($leadFields);
 
         // Check if lead has a bounce status
         $dnc    = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
