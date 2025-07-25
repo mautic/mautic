@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
@@ -198,20 +197,6 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedCompanyData, $companyData);
     }
 
-<<<<<<< HEAD
-    private function setSecurity(CompanyModel $companyModel): void
-    {
-        $security = $this->createMock(CorePermissions::class);
-        $security->method('hasEntityAccess')
-            ->willReturn(true);
-        $security->method('isGranted')
-            ->willReturn(true);
-
-        $reflection = new \ReflectionClass($companyModel);
-        $property   = $reflection->getProperty('security');
-        $property->setAccessible(true);
-        $property->setValue($companyModel, $security);
-=======
     public function testImportCompanyWithUserReferenceFields(): void
     {
         $user = $this->createMock(User::class);
@@ -297,6 +282,5 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($user->getId(), $company->getCreatedBy());
         $this->assertSame($user->getId(), $company->getModifiedBy());
         $this->assertSame($user, $company->getOwner());
->>>>>>> 5726ce20d9 (test: add test for get Repository and importCompany with notOverwrite option)
     }
 }
