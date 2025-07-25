@@ -361,7 +361,7 @@ class FormModel extends AbstractCommonModel
      * @param object $entity
      * @param bool   $isNew
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         // ...
 
@@ -371,7 +371,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      */
-    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, Event $event = null): ?Event
+    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchEvent($action, $entity, $isNew, $event);
     }
@@ -381,7 +381,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param mixed[] $entitiesBatchParams
      */
-    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, Event $event = null): ?Event
+    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
     {
         return $event;
     }

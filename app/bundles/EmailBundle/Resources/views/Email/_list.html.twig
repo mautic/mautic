@@ -144,6 +144,7 @@
                                 {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                         {% if item.getDescription() is not empty %}
                             <div class="text-secondary mt-4">
@@ -152,7 +153,7 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
@@ -218,7 +219,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mt-32 mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'mail--verse',
                         'size': '80'
                     } %}

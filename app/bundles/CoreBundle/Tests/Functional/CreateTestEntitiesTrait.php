@@ -19,7 +19,7 @@ use Mautic\UserBundle\Entity\User;
 
 trait CreateTestEntitiesTrait
 {
-    private function createLead(string $firstName, string $lastName = '', string $emailId = '', User $createdBy = null): Lead
+    private function createLead(string $firstName, string $lastName = '', string $emailId = '', ?User $createdBy = null): Lead
     {
         $lead = new Lead();
         $lead->setFirstname($firstName);

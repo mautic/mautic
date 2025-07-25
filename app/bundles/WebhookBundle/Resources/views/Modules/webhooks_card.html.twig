@@ -1,0 +1,16 @@
+<div class="col-lg-12">
+    <h3 class="mt-80 mb-md">{{ 'mautic.webhook.card.interesting'|trans }}</h3>
+    {% include '@MauticCore/Components/card.html.twig' with {
+        'type': 'feature--large',
+        'aspectRatio': '2:1',
+        'ctaType': 'local',
+        'image': {'src': 'app/bundles/WebhookBundle/Assets/images/google-deepmind-erunoELfh50-unsplash.jpg', 'alt': 'mautic.webhook.card.image.alt'|trans},
+        'eyebrow': 'mautic.webhook.webhooks'|trans,
+        'heading': 'mautic.webhook.card.heading'|trans,
+        'copy': 'mautic.webhook.card.copy'|trans,
+        'href': path('mautic_webhook_index'),
+        'attributes': {
+            'data-toggle': 'ajax',
+        }
+    } %}
+</div>

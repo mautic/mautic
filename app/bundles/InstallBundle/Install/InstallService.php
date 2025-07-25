@@ -171,7 +171,7 @@ class InstallService
         return $this->translateMessages($messages);
     }
 
-    public function saveConfiguration($params, StepInterface $step = null, $clearCache = false): array
+    public function saveConfiguration($params, ?StepInterface $step = null, $clearCache = false): array
     {
         if ($step instanceof StepInterface) {
             $params = $step->update($step);

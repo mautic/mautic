@@ -304,6 +304,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $themeHelper,
             $this->createMock(Tracking404Model::class),
             $router,
+            $this->createMock(DeviceTrackingServiceInterface::class),
             '/page/a',
         );
 

@@ -878,7 +878,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    private function createCampaignWithPointEvents(array $contactIds, int $pointGroup = null): Campaign
+    private function createCampaignWithPointEvents(array $contactIds, ?int $pointGroup = null): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName('Test Update contact');

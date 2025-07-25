@@ -28,7 +28,8 @@
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
 }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': list.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': list.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': list}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ list.name }}{% endblock %}
@@ -48,8 +49,8 @@
 
 {% block publishStatus %}
   {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': list}) -}}
-
-    {# Dynamic/Static segment tag - must be first #}
+  <div class="label__divider"></div>
+    {# Dynamic/Static segment tag #}
     {% set segmentType = list.filters is defined and list.filters|length > 0 ? 'dynamic' : 'static' %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [
@@ -96,7 +97,7 @@
 {% endblock %}
 
 {% block content %}
-{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadList') %}
+{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadlist') %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
@@ -169,7 +170,7 @@
                                     }) }}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': stats,
                                       'chartType': 'line',

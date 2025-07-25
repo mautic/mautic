@@ -16,7 +16,7 @@ interface TranslationEntityInterface
      *
      * @return mixed
      */
-    public function setTranslationParent(TranslationEntityInterface $parent = null);
+    public function setTranslationParent(?TranslationEntityInterface $parent = null);
 
     /**
      * Set this entity as a main content (remove translation parent).

@@ -397,10 +397,12 @@ class EmailType extends AbstractType
                     !empty($data['variantParent'])
                 );
 
-                if (isset($data['emailType']) && 'list' == $data['emailType']) {
-                    $data['translationParent'] = $data['segmentTranslationParent'] ?? null;
-                } else {
-                    $data['translationParent'] = $data['templateTranslationParent'] ?? null;
+                $emailType = $data['emailType'] ?? null;
+
+                if ('list' === $emailType && isset($data['segmentTranslationParent'])) {
+                    $data['translationParent'] = $data['segmentTranslationParent'];
+                } elseif (isset($data['templateTranslationParent'])) {
+                    $data['translationParent'] = $data['templateTranslationParent'];
                 }
 
                 $event->setData($data);
@@ -501,7 +503,7 @@ class EmailType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin text-interactive btn-builder',
                     'icon'    => 'ri-layout-line',
                     'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                 ],

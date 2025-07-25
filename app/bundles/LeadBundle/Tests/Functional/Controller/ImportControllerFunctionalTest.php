@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
@@ -311,7 +312,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $file    = fopen($tmpFile, 'wb');
 
         foreach ($this->csvRows as $line) {
-            fputcsv($file, $line);
+            CsvHelper::putCsv($file, $line);
         }
 
         fclose($file);
@@ -329,7 +330,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         return $tag;
     }
 
-    private function createLead(string $email = null): Lead
+    private function createLead(?string $email = null): Lead
     {
         $lead = new Lead();
         if (!empty($email)) {

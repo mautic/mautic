@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
@@ -77,7 +78,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->export($reportDataResult, $this->file);
 
         fclose($this->file);
-        $result = array_map('str_getcsv', file($this->tmpFile));
+        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $expected = [
             [
@@ -190,7 +191,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->export($reportDataResult, $this->file);
 
         fclose($this->file);
-        $result = array_map('str_getcsv', file($this->tmpFile));
+        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $expectedHeaders                                  = ['ID', 'Name', 'SUM Read', 'AVG Read', 'COUNT Contact ID'];
         $expectedTotals                                   = $reportDataResult->getTotalsToExport($this->formatterHelperMock);
@@ -213,7 +214,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->putTotals($expected, $this->file);
         fclose($this->file);
 
-        $result = array_map('str_getcsv', file($this->tmpFile));
+        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $this->assertCount(1, $result);
         $this->assertSame('Totals', $result[0][0]);
@@ -229,7 +230,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->putHeader($reportDataResult, $this->file);
         fclose($this->file);
 
-        $result = array_map('str_getcsv', file($this->tmpFile));
+        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $this->assertCount(1, $result);
         $this->assertSame(array_values($expected), array_values($result[0]));

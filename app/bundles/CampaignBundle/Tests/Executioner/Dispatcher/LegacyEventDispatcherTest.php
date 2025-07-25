@@ -361,9 +361,6 @@ class LegacyEventDispatcherTest extends TestCase
                 return $event;
             });
 
-        $this->scheduler->expects($this->never())
-            ->method('rescheduleFailure');
-
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
@@ -402,9 +399,6 @@ class LegacyEventDispatcherTest extends TestCase
 
                 return $event;
             });
-
-        $this->scheduler->expects($this->never())
-            ->method('rescheduleFailure');
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }

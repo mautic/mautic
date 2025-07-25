@@ -129,10 +129,7 @@ class Form extends FormEntity implements UuidInterface
      */
     private Collection $submissions;
 
-    /**
-     * @var int
-     */
-    public $submissionCount;
+    public int $submission_count = 0;
 
     /**
      * @var string|null
@@ -168,6 +165,7 @@ class Form extends FormEntity implements UuidInterface
         $this->fields      = new ArrayCollection();
         $this->actions     = new ArrayCollection();
         $this->submissions = new ArrayCollection();
+        $this->noIndex     = true;
         $this->initializeProjects();
     }
 

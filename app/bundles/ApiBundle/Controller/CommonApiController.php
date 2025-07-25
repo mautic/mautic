@@ -408,7 +408,18 @@ class CommonApiController extends FetchCommonApiController
             $errors[$key] = $formResponse;
         }
 
-        $this->doctrine->getManager()->detach($entity);
+        $lastEntityIndex = -1;
+        foreach ($entities as $index => $moreEntities) {
+            if ($moreEntities !== $entity) {
+                continue;
+            }
+
+            $lastEntityIndex = $index;
+        }
+
+        if (-1 === $lastEntityIndex || $lastEntityIndex === $key) {
+            $this->doctrine->getManager()->detach($entity);
+        }
 
         $this->inBatchMode = false;
     }

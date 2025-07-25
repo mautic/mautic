@@ -10,10 +10,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\SchedulerRepository;
+use Mautic\ReportBundle\Model\ReportFileWriter;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -397,9 +401,10 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
      * @throws MappingException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('scheduleProvider')]
-    public function testScheduleEdit(string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
+    public function testScheduleEdit(?string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
     {
         $report = new Report();
+        $report->setToAddress('test@test.com');
         $report->setName('Checking for schedule change');
         $report->setDescription('<b>This is a report</b>');
         $report->setSource('leads');
@@ -452,6 +457,11 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     public static function scheduleProvider(): array
     {
         return [
+            'null_to_now'      => [null, null, null, SchedulerEnum::UNIT_NOW, null, null],
+            'null_to_daily'    => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null],
+            'null_to_weekly'   => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
+            'null_to_monthly'  => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST],
+
             'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
             'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'],
 
@@ -511,6 +521,77 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'/export/html');
         $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+    }
+
+    public function testDelayedTransport(): void
+    {
+        $reportName = 'Checking for schedule change';
+
+        $report    = new Report();
+        $toAddress = 'test@test.com';
+        $report->setToAddress($toAddress);
+        $report->setName($reportName);
+        $report->setDescription('<b>This is a report</b>');
+        $report->setSource('leads');
+        $report->setIsScheduled(true);
+
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
+
+        $crawler = $this->client->request(Request::METHOD_GET, 's/reports/edit/'.$report->getId());
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['report[scheduleUnit]']->setValue(SchedulerEnum::UNIT_NOW);
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+
+        $schedulerRepository = self::getContainer()->get(SchedulerRepository::class);
+        \assert($schedulerRepository instanceof SchedulerRepository);
+        $scheduler = $schedulerRepository->getSchedulerByReport($report);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        self::assertTrue($this->client->getResponse()->isOk());
+
+        // Find save & close button
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        $form->setValues(
+            [
+                'config[messengerconfig][messenger_dsn_email][scheme]' => 'doctrine',
+                'config[messengerconfig][messenger_dsn_email][host]'   => 'default',
+            ]
+        );
+
+        $this->client->submit($form);
+        self::assertTrue($this->client->getResponse()->isOk());
+
+        while ($scheduler->getScheduleDate() > new \DateTime()) {
+            // This ugly thing is needed, because \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::computeScheduler
+            // plans the schedule with the "ceil" of seconds. E.g. now is 12:32:11, the schedule will be 12:33:00.
+            usleep(100);
+        }
+
+        $this->testSymfonyCommand('mautic:reports:scheduler');
+
+        $reportFileWriter = self::getContainer()->get(ReportFileWriter::class);
+        \assert($reportFileWriter instanceof ReportFileWriter);
+
+        $csvPath = $reportFileWriter->getFilePath($scheduler);
+        self::assertFileExists($csvPath);
+
+        // Pretend Mautic has created a ZIP file as in \Mautic\ReportBundle\Scheduler\Model\FileHandler::zipIt
+        $zipPath      = str_replace('.csv', '.zip', $csvPath);
+        $bytesWritten = file_put_contents($zipPath, 'ZIP');
+        self::assertNotFalse($bytesWritten);
+        self::assertFileExists($zipPath);
+
+        $queuedMessage = self::getMailerMessagesByToAddress($toAddress);
+
+        self::assertCount(1, $queuedMessage);
+        self::assertFileExists($csvPath);
+        self::assertFileExists($zipPath);
     }
 
     /**

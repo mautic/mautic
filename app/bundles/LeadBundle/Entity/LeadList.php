@@ -252,7 +252,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(Category $category = null): LeadList
+    public function setCategory(?Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -473,13 +473,6 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $now = (new DateTimeHelper())->getUtcDateTime();
         $this->setLastBuiltDate($now);
-    }
-
-    /**
-     * @deprecated Initialisation is no longer necessary and lastBuiltDate is allowed to be null
-     */
-    public function initializeLastBuiltDate(): void
-    {
     }
 
     public function getLastBuiltTime(): ?float

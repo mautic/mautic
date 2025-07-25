@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Security\Authentication\Token\Permissions;
 
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\OAuthServerBundle\Model\TokenInterface as OAuthTokenInterface;
-use FOS\OAuthServerBundle\Security\Authentication\Token\OAuthToken;
+use FOS\OAuthServerBundle\Security\Authenticator\Token\OAuthToken;
 use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\UserBundle\Entity\PermissionRepository;
@@ -45,6 +45,10 @@ class TokenPermissions
 
         if (null !== $user) {
             $this->setPermissionsOnUser($user);
+        }
+
+        if (null === $user) {
+            throw new \RuntimeException('The user should be either already set in the token, or come from assignRoleFromToken.');
         }
 
         $token->setUser($user);
