@@ -780,6 +780,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'emailValidator', $mockEmailValidator);
 
