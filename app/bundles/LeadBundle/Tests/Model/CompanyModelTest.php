@@ -123,7 +123,6 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $companyModel->method('getFieldData')->willReturn(['companyfield' => 'xxx']);
-        $this->setSecurity($companyModel);
 
         return $companyModel;
     }
@@ -228,11 +227,16 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         // Create the CompanyModel with constructor injection
         $companyModel = new class($entityManager, $this->leadFieldModel, $this->companyDeduper, $userHelper, $dispatcher) extends CompanyModel {
-            private $entity;
+            private Company $entity;
 
             // Override constructor to accept only what we need
-            public function __construct($em, $leadFieldModel, $companyDeduper, $userHelper, $dispatcher)
-            {
+            public function __construct(
+                \Doctrine\ORM\EntityManager $em,
+                FieldModel $leadFieldModel,
+                CompanyDeduper $companyDeduper,
+                UserHelper $userHelper,
+                \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+            ) {
                 $this->em             = $em;
                 $this->leadFieldModel = $leadFieldModel;
                 $this->companyDeduper = $companyDeduper;
@@ -248,7 +252,10 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             }
 
             // Override fetchCompanyFields with test data
-            public function fetchCompanyFields()
+            /**
+             * @return array<int, array<string, mixed>>
+             */
+            public function fetchCompanyFields(): array
             {
                 return [
                     [
@@ -260,7 +267,13 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             }
 
             // Override getFieldData with test data
-            public function getFieldData($fields, $data): array
+            /**
+             * @param array<string, mixed> $fields
+             * @param array<string, mixed> $data
+             *
+             * @return array<string, mixed>
+             */
+            public function getFieldData(array $fields, array $data): array
             {
                 return ['companyfield' => 'xxx'];
             }
