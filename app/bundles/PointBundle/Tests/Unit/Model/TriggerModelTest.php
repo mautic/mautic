@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -46,11 +45,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $triggerEventModel;
 
     /**
-     * @var MauticFactory|MockObject
-     */
-    private MockObject $mauticFactory;
-
-    /**
      * @var EventDispatcherInterface|MockObject
      */
     private MockObject $dispatcher;
@@ -83,7 +77,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
         $this->leadModel              = $this->createMock(LeadModel::class);
         $this->triggerEventModel      = $this->createMock(TriggerEventModel::class);
-        $this->mauticFactory          = $this->createMock(MauticFactory::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
         $this->translator             = $this->createMock(Translator::class);
@@ -93,7 +86,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->ipLookupHelper,
             $this->leadModel,
             $this->triggerEventModel,
-            $this->mauticFactory,
             $this->contactTracker,
             $this->entityManager,
             $this->createMock(CorePermissions::class),

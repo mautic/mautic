@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -67,8 +66,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->emailMock        = $this->createMock(Email::class);
 
         $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
-        $doctrine               = $this->createMock(ManagerRegistry::class);
-        $factory                = $this->createMock(MauticFactory::class);
         $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $userHelper             = $this->createMock(UserHelper::class);
         $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
@@ -80,7 +77,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->controller = new AjaxController(
             $this->managerRegistry,
-            $factory,
             $this->modelFactoryMock,
             $userHelper,
             $coreParametersHelper,

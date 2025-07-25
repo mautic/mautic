@@ -3,7 +3,6 @@
 namespace Mautic\PointBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -31,20 +30,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @extends CommonFormModel<Point>
  */
-class PointModel extends CommonFormModel implements GlobalSearchInterface
+class PointModel extends CommonFormModel implements GlobalSearchInterface, ResetInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
+    private array $actions = [];
+
     public function __construct(
         protected RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
-        /**
-         * @deprecated https://github.com/mautic/mautic/issues/8229
-         */
-        protected MauticFactory $mauticFactory,
         private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
@@ -148,19 +149,17 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getPointActions()
     {
-        static $actions;
-
-        if (empty($actions)) {
+        if ([] === $this->actions) {
             // build them
-            $actions = [];
-            $event   = new PointBuilderEvent($this->translator);
+            $this->actions = [];
+            $event         = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::POINT_ON_BUILD);
-            $actions['actions'] = $event->getActions();
-            $actions['list']    = $event->getActionList();
-            $actions['choices'] = $event->getActionChoices();
+            $this->actions['actions'] = $event->getActions();
+            $this->actions['list']    = $event->getActionList();
+            $this->actions['choices'] = $event->getActionChoices();
         }
 
-        return $actions;
+        return $this->actions;
     }
 
     /**
@@ -233,15 +232,18 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->mauticFactory, // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 
             $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
 
             if (is_callable($callback)) {
+                $object = null;
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    if (is_object($callback[0])) {
+                        $object = $callback[0];
+                    }
                 } elseif (str_contains($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
@@ -251,17 +253,14 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface
 
                 $pass = [];
                 foreach ($reflection->getParameters() as $param) {
-                    if ('factory' === $param->getName()) {
-                        @\trigger_error('Using "factory" parameter is deprecated. Use dependency injection instead. Usage of "factory" parameter will be removed in 6.0.', \E_USER_DEPRECATED);
-                    }
-
                     if (isset($args[$param->getName()])) {
                         $pass[] = $args[$param->getName()];
                     } else {
                         $pass[] = null;
                     }
                 }
-                $pointsChange = $reflection->invokeArgs($this, $pass);
+
+                $pointsChange = $reflection->invokeArgs($object, $pass);
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
@@ -360,5 +359,10 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return array_unique($pointActionIds);
+    }
+
+    public function reset(): void
+    {
+        $this->actions = [];
     }
 }

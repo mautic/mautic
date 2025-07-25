@@ -22,7 +22,7 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^5.0"
+    "mautic/core-lib": "^6.0"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",
@@ -63,9 +63,6 @@
     "mautic/plugin-social": "self.version",
     "mautic/plugin-zapier": "self.version",
     "mautic/plugin-tagmanager": "self.version",
-    "mautic/theme-coffee": "self.version",
-    "mautic/theme-mauve": "self.version",
-    "mautic/theme-nature": "self.version",
     "mautic/theme-aurora": "self.version",
     "mautic/theme-blank": "self.version",
     "mautic/theme-brienz": "self.version",
@@ -98,7 +95,13 @@
     "mautic/theme-simple-text": "self.version",
     "mautic/theme-survey": "self.version",
     "mautic/theme-trulypersonal": "self.version",
-    "mautic/theme-welcome": "self.version"
+    "mautic/theme-welcome": "self.version",
+    "mautic/theme-mono": "self.version",
+    "mautic/theme-blend": "self.version",
+    "mautic/theme-capture": "self.version",
+    "mautic/theme-chord": "self.version",
+    "mautic/theme-formscape": "self.version",
+    "mautic/theme-reachout": "self.version"
   },
   "autoload": {
     "psr-4": {
@@ -111,7 +114,7 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "5.0.0-dev"
+            "mautic/core-lib": "6.0.0-dev"
         }
       }
     },

@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileController extends AjaxController
 {
-    public const EDITOR_FROALA   = 'froala';
-
     public const EDITOR_CKEDITOR = 'ckeditor';
 
     protected $imageMimes = [
@@ -37,7 +35,7 @@ class FileController extends AjaxController
      */
     public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
     {
-        $editor   = $request->get('editor', 'froala');
+        $editor   = $request->get('editor');
         $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {

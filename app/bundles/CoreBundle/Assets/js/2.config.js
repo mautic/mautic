@@ -34,3 +34,37 @@ Mautic.getIpLookupFormConfig = function() {
         mQuery('#ip_lookup_attribution').html(response.attribution);
     }, false, false, "GET");
 };
+
+Mautic.configOnLoad = function(container) {
+    /**
+     * Manages accent color selection functionality.
+     */
+    if (mQuery('#config_themeconfig_accent').length) {
+        document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+            const hiddenInput = document.getElementById('config_themeconfig_accent');
+
+            if (hiddenInput && hiddenInput.value) {
+                const correspondingRadio = document.querySelector(
+                    `input[name="accent"][data-attribute-value="${hiddenInput.value}"]`
+                );
+                if (correspondingRadio) correspondingRadio.checked = true;
+            } else if (radio.checked) {
+                if (hiddenInput) {
+                    hiddenInput.value = radio.dataset.attributeValue;
+                }
+            }
+        });
+
+        // Handle radio button changes - update hidden input
+        document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    const hiddenInput = document.getElementById('config_themeconfig_accent');
+                    if (hiddenInput) {
+                        hiddenInput.value = this.dataset.attributeValue;
+                    }
+                }
+            });
+        });
+    }
+};

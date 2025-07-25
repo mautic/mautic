@@ -169,17 +169,7 @@ HTML;
             ->method('findDwcTokens')
             ->with($content, $contact)
             ->willReturn([
-                'test-token'  => [
-                    'content' => $dwcContent,
-                    'filters' => [
-                        [
-                            'field'    => 'email',
-                            'operator' => '!empty',
-                            'filter'   => '',
-                            'type'     => 'email',
-                        ],
-                    ],
-                ],
+                '{dwc=test-token}' => $dwcContent
             ]);
 
         $this->dynamicContentHelper->expects($this->once())

@@ -13,6 +13,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectSyncSkippedException;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -117,9 +118,10 @@ class MauticSyncProcess
      */
     public function getSyncOrder(ReportDAO $syncReport): OrderDAO
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
+        $orderDAO = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
+
         foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationObjects         = $syncReport->getObjects($integrationObjectName);
             $mappedInternalObjectsNames = $this->mappingManualDAO->getMappedInternalObjectsNames($integrationObjectName);
@@ -153,7 +155,7 @@ class MauticSyncProcess
                         );
 
                         if ($objectChange->shouldSync()) {
-                            $syncOrder->addObjectChange($objectChange);
+                            $orderDAO->addObjectChange($objectChange);
                         }
                     } catch (ObjectDeletedException) {
                         DebugLogger::log(
@@ -165,11 +167,21 @@ class MauticSyncProcess
                             ),
                             self::class.':'.__FUNCTION__
                         );
+                    } catch (ObjectSyncSkippedException $exception) {
+                        DebugLogger::log(
+                            $this->mappingManualDAO->getIntegration(),
+                            sprintf(
+                                'Integration to Mautic; the %s object with ID %s is skipped and thus not synced with message: '.$exception->getMessage(),
+                                $integrationObject->getObject(),
+                                $integrationObject->getObjectId()
+                            ),
+                            __CLASS__.':'.__FUNCTION__
+                        );
                     }
                 }
             }
         }
 
-        return $syncOrder;
+        return $orderDAO;
     }
 }

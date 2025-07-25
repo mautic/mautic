@@ -111,7 +111,9 @@ return [
         ],
     ],
     'categories' => [
-        'email' => null,
+        'email' => [
+            'class' => Mautic\EmailBundle\Entity\Email::class,
+        ],
     ],
     'services' => [
         'other' => [
@@ -261,6 +263,7 @@ return [
         'mailer_from_email'              => 'email@yoursite.com',
         'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
+        'mailer_address_length_limit'    => 320,
         'mailer_append_tracking_pixel'   => true,
         'mailer_convert_embed_images'    => false,
         'mailer_custom_headers'          => [],
@@ -325,5 +328,13 @@ return [
         'theme_email_default'                                               => 'blank',
         'mailer_memory_msg_limit'                                           => 100,
         Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML          => false,
+        'bot_helper_bot_ratio_threshold'                                    => 0.6,
+        'bot_helper_time_email_threshold'                                   => 2, // seconds
+        'bot_helper_blocked_user_agents'                                    => [
+            // Example of real-world user agents used by bots:
+            'Googlebot/2.1 (+http://www.google.com/bot.html)',
+            'LinkedInBot/1.0 (compatible; Mozilla/5.0; Jakarta Commons-HttpClient/3.1 +http://www.linkedin.com)',
+        ],
+        'bot_helper_blocked_ip_addresses'                                   => [],
     ],
 ];

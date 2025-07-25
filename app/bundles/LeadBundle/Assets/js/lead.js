@@ -277,7 +277,7 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
-    const segmentCountElem = mQuery('a.col-count');
+    const segmentCountElem = mQuery('span.col-count');
 
     if (segmentCountElem.length) {
         segmentCountElem.each(function() {
@@ -288,7 +288,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                 'lead:getLeadCount',
                 {id: id},
                 function (response) {
-                    elem.html(response.html);
+                    elem.className = response.className;
+                    elem.children('a').html(response.html);
                 },
                 false,
                 true,
@@ -1397,11 +1398,7 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
-            mQuery(bodyEl).froalaEditor('html.set', response.body);
-        } else {
-            ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
-        }
+        ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
 
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);

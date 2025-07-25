@@ -7,6 +7,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,8 +16,28 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class LeadField extends FormEntity implements CacheInvalidateInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "leadfield:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "leadfield:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
+    use UuidTrait;
     public const CACHE_NAMESPACE    = 'LeadField';
 
     /**
@@ -107,7 +129,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
      */
     private $properties = [];
 
-    private ?bool $isIndex = false;
+    private bool $isIndex = false;
 
     /**
      * The column in lead_fields table was not created yet if this property is true.
@@ -180,6 +202,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
         $builder->createField('isShortVisible', 'boolean')
             ->columnName('is_short_visible')
+            ->nullable(false)
+            ->option('default', false)
             ->build();
 
         $builder->createField('isListable', 'boolean')
@@ -191,7 +215,12 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ->build();
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
-        $builder->addNullableField('isIndex', 'boolean', 'is_index');
+
+        $builder->createField('isIndex', 'boolean')
+            ->columnName('is_index')
+            ->option('default', false)
+            ->nullable(false)
+            ->build();
 
         $builder->createField('charLengthLimit', 'integer')
             ->columnName('char_length_limit')
@@ -220,6 +249,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ->columnName('original_is_published_value')
             ->option('default', false)
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -599,15 +630,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->getIsVisible();
     }
 
-    /**
-     * Set isShortVisible.
-     *
-     * @param bool $isShortVisible
-     *
-     * @return LeadField
-     */
-    public function setIsShortVisible($isShortVisible)
+    public function setIsShortVisible(?bool $isShortVisible): self
     {
+        $isShortVisible = $isShortVisible ?? false;
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
 
@@ -830,8 +855,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->isIndex;
     }
 
-    public function setIsIndex(bool $indexable): void
+    public function setIsIndex(?bool $indexable): void
     {
-        $this->isIndex = $indexable;
+        $this->isIndex = $indexable ?? false;
     }
 }

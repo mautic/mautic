@@ -1,0 +1,47 @@
+{% extends '@MauticForm/Action/base_form_action.html.twig' %}
+
+{% set footerContent %}
+    {% if action.properties.asset is defined %}
+        {% if action.properties.asset is null and action.properties.category is defined %}
+            <!-- Using last asset from category -->
+            {% set category = getEntity('Mautic\\CategoryBundle\\Entity\\Category', action.properties.category) %}
+            {% set categoryName = category ? category.title : '' %}
+
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                tags: [
+                    {
+                        label: 'mautic.form.field.asset.use_category'|trans({'%category_name%': categoryName}),
+                        icon: 'ri-folder-line',
+                        color: 'warm-gray',
+                        attributes: {
+                        href: path('mautic_asset_index'),
+                        'target': '_blank'
+                    }
+                    }
+                ]
+            } %}
+        {% elseif action.properties.asset is not null %}
+            <!-- Specific asset selected -->
+            {% set asset = getEntity('Mautic\\AssetBundle\\Entity\\Asset', action.properties.asset) %}
+            {% if asset %}
+                {% include '@MauticCore/Helper/_tag.html.twig' with {
+                    tags: [
+                        {
+                            label: asset.title,
+                            icon: 'ri-file-line',
+                            color: 'warm-gray',
+                            attributes: securityIsGranted('asset:assets:viewother') ? {
+                            href: path('mautic_asset_action', {'objectAction': 'view', 'objectId': asset.id}),
+                            'target': '_blank'
+                        } : {}
+                        }
+                    ]
+                } %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endset %}
+
+{% block action_label %}
+    {{ footerContent|raw }}
+{% endblock %}

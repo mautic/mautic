@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -406,67 +408,78 @@ class FieldType extends AbstractType
             );
         }
 
-        if ($addMappedFieldList) {
-            $mappedObject = $options['data']['mappedObject'] ?? 'contact';
-            $mappedField  = $options['data']['mappedField'] ?? null;
-            $builder->add(
-                'mappedObject',
-                ChoiceType::class,
-                [
-                    'choices'    => $this->objectCollector->getObjects()->toChoices(),
-                    'label'      => 'mautic.form.field.form.mapped.object',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'    => 'form-control',
-                        'tooltip'  => 'mautic.form.field.help.mapped.object',
-                        'onchange' => 'Mautic.fetchFieldsOnObjectChange();',
-                    ],
-                    'required' => false,
-                    'data'     => $mappedObject,
-                ]
-            );
+        $func = function (FormEvent $event) use ($addMappedFieldList, $type) {
+            $fieldData = $event->getData();
+            $form      = $event->getForm();
 
-            $fields       = $this->fieldCollector->getFields($mappedObject);
-            $mappedFields = $this->mappedFieldCollector->getFields((string) $options['data']['formId'], $mappedObject);
-            $fields       = $fields->removeFieldsWithKeys($mappedFields, (string) $mappedField);
+            if ($addMappedFieldList) {
+                $mappedObject = $fieldData['mappedObject'] ?? 'contact';
+                $mappedField  = $fieldData['mappedField'] ?? null;
+                $form->add(
+                    'mappedObject',
+                    ChoiceType::class,
+                    [
+                        'choices'    => $this->objectCollector->getObjects()->toChoices(),
+                        'label'      => 'mautic.form.field.form.mapped.object',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'    => 'form-control',
+                            'tooltip'  => 'mautic.form.field.help.mapped.object',
+                            'onchange' => 'Mautic.fetchFieldsOnObjectChange();',
+                        ],
+                        'required' => false,
+                        'data'     => $mappedObject,
+                    ]
+                );
 
-            $builder->add(
-                'mappedField',
-                ChoiceType::class,
-                [
-                    'choices'     => $fields->toChoices(),
-                    'choice_attr' => function ($val) use ($fields): array {
-                        try {
-                            $field = $fields->getFieldByKey($val);
-                            if ($field->isListType()) {
-                                return ['data-list-type' => 1];
+                $fields       = $this->fieldCollector->getFields($mappedObject);
+                $mappedFields = [];
+                if (in_array('formId', $fieldData)) {
+                    $mappedFields = $this->mappedFieldCollector->getFields((string) $fieldData['formId'], $mappedObject);
+                }
+                $fields = $fields->removeFieldsWithKeys($mappedFields, (string) $mappedField);
+
+                $form->add(
+                    'mappedField',
+                    ChoiceType::class,
+                    [
+                        'choices'     => $fields->toChoices(),
+                        'choice_attr' => function ($val) use ($fields): array {
+                            try {
+                                $field = $fields->getFieldByKey($val);
+                                if ($field->isListType()) {
+                                    return ['data-list-type' => 1];
+                                }
+                            } catch (FieldNotFoundException) {
                             }
-                        } catch (FieldNotFoundException) {
-                        }
 
-                        return [];
-                    },
-                    'label'      => 'mautic.form.field.form.mapped.field',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.mapped.field',
-                    ],
-                    'required' => false,
-                    'data'     => $mappedField ?? (empty($options['data']['id']) ? $this->getDefaultMappedField((string) $type) : ''),
-                ]
-            );
+                            return [];
+                        },
+                        'label'      => 'mautic.form.field.form.mapped.field',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.form.field.help.mapped.field',
+                        ],
+                        'required' => false,
+                        'data'     => $mappedField ?? (empty($fieldData['id']) ? $this->getDefaultMappedField((string) $type) : ''),
+                    ]
+                );
 
-            $builder->add(
-                'originalMappedField',
-                HiddenType::class,
-                [
-                    'label'    => false,
-                    'required' => false,
-                    'data'     => $mappedField,
-                ]
-            );
-        }
+                $form->add(
+                    'originalMappedField',
+                    HiddenType::class,
+                    [
+                        'label'    => false,
+                        'required' => false,
+                        'data'     => $mappedField,
+                    ]
+                );
+            }
+        };
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
 
         $builder->add('type', HiddenType::class);
 

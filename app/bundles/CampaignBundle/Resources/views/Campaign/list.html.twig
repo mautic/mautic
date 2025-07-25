@@ -142,13 +142,13 @@
                     </td>
                     <td>
                         <div>
-                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                          {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                               'item': item,
                               'model': 'campaign',
                               'onclick': item.onclickMethod,
                               'attributes': item.dataAttributes,
                               'transKeys': item.translationKeysDataAttributes,
-                          }) -}}
+                          }) }}
                             <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                 {{- item.name -}}
                                 {{- customContent('campaign.name', _context|merge({'item': item})) -}}

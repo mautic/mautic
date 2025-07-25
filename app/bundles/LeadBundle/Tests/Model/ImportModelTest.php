@@ -28,6 +28,8 @@ class ImportModelTest extends StandardImportTestHelper
         $entity   = $this->initImportEntity();
         $entity->setCreatedBy($userId)
             ->setCreatedByUser($userName)
+            ->setModifiedBy($userId)
+            ->setModifiedByUser($userName)
             ->setOriginalFile($fileName);
         $log = $model->initEventLog($entity, $line);
 

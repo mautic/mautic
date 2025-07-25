@@ -132,7 +132,7 @@
                       <td>
                           <div>
                           {% if securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.createdBy) %}
-                              <a href="{{ url('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                              <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                 {% if fields.core.companyname is defined %}
                                   {{ fields.core.companyname.value|purify }}
                                 {% endif %}
@@ -178,7 +178,7 @@
                   'page': page,
                   'limit': limit,
                   'menuLinkId': 'mautic_company_index',
-                  'baseUrl': url('mautic_company_index'),
+                  'baseUrl': path('mautic_company_index'),
                   'sessionVar': 'company',
           }) }}
       </div>

@@ -6,12 +6,35 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 
-class Field
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "field:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "field:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Field implements UuidInterface
 {
+    use UuidTrait;
+
     public const TABLE_NAME = 'form_fields';
 
     /**
@@ -220,6 +243,7 @@ class Field
         $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
         $builder->addNullableField('mappedObject', Types::STRING, 'mapped_object');
         $builder->addNullableField('mappedField', Types::STRING, 'mapped_field');
+        static::addUuidField($builder);
     }
 
     /**

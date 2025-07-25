@@ -68,7 +68,9 @@ input[style] {
 }
 
 .form-control {
-  padding: var(--spacing-04) var(--spacing-05);
+  &:not(select) {
+    padding: var(--spacing-04) var(--spacing-05);
+  }
   color: var(--text-primary);
 
   +.help-text,

@@ -235,10 +235,10 @@ class SubmissionModel extends CommonFormModel
                         } elseif (is_callable($params['valueFilter'])) {
                             $value = call_user_func_array($params['valueFilter'], [$f, $value]);
                         } else {
-                            $value = InputHelper::_($value, 'clean');
+                            $value = InputHelper::_($value, 'string');
                         }
                     } else {
-                        $value = InputHelper::_($value, 'clean');
+                        $value = InputHelper::_($value, 'string');
                     }
                 }
             } elseif (!empty($value)) {
@@ -1086,7 +1086,9 @@ class SubmissionModel extends CommonFormModel
             $companyChangeLog                      = null;
             if ($leadAdded) {
                 $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
-            } elseif ($companyEntity instanceof Company) {
+            }
+
+            if ($companyEntity instanceof Company) {
                 $this->companyModel->setFieldValues($companyEntity, $companyFieldMatches);
                 $this->companyModel->saveEntity($companyEntity);
             }

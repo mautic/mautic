@@ -27,6 +27,8 @@ class ConfigThemeSubscriber implements EventSubscriberInterface
                 'parameters' => [
                     'theme'                           => $event->getParametersFromConfig('MauticCoreBundle')['theme'],
                     'theme_import_allowed_extensions' => $event->getParametersFromConfig('MauticCoreBundle')['theme_import_allowed_extensions'],
+                    'brand_name'                      => $event->getParametersFromConfig('MauticCoreBundle')['brand_name'] ?? '',
+                    'primary_brand_color'             => $event->getParametersFromConfig('MauticCoreBundle')['primary_brand_color'] ?? '000000',
                 ],
             ]
         );

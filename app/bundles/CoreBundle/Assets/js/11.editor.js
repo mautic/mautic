@@ -7,62 +7,34 @@ Mautic.imageUploadURL = mauticBaseUrl + 's/file/upload';
 Mautic.imageManagerDeleteURL = mauticBaseUrl + 's/file/delete';
 Mautic.elfinderURL = mauticBaseUrl + 'elfinder';
 
-
 /**
- * Activate Froala options
- */
-Mautic.activateGlobalFroalaOptions = function() {
-
-    if (!mauticFroalaEnabled) {
-        return;
-    }
-
-    Mautic.basicFroalaOptions = {
-        enter: mQuery.FroalaEditor.ENTER_BR,
-        imageUploadURL: Mautic.imageUploadURL,
-        imageManagerLoadURL: Mautic.imageManagerLoadURL,
-        imageManagerDeleteURL: Mautic.imageManagerDeleteURL,
-        imageDefaultWidth: 0,
-        pastePlain: true,
-        htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
-        htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'allowfullscreen', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'frameborder', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'mozallowfullscreen', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'webkitallowfullscreen', 'width', 'wrap', 'mautic:disable-tracking'],
-        htmlRemoveTags: []
-    };
-
-    // Set the Froala license key
-    mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
-};
-
-/**
- * Initialize AtWho dropdown in a Froala editor.
+ * Initialize AtWho dropdown.
  *
  * @param element jQuery element
  * @param method  method to get the tokens from
- * @param froala  Froala Editor
  */
-Mautic.initAtWho = function(element, method, froala) {
+Mautic.initAtWho = function(element, method) {
     // Avoid to request the tokens if not necessary
     if (Mautic.builderTokensRequestInProgress) {
         // Wait till previous request finish
         var intervalID = setInterval(function(){
             if (!Mautic.builderTokensRequestInProgress) {
                 clearInterval(intervalID);
-                Mautic.configureAtWho(element, method, froala);
+                Mautic.configureAtWho(element, method);
             }
         }, 500);
     } else {
-        Mautic.configureAtWho(element, method, froala);
+        Mautic.configureAtWho(element, method);
     }
 };
 
 /**
- * Initialize AtWho dropdown in a Froala editor.
+ * Initialize AtWho dropdown.
  *
  * @param element jQuery element
  * @param method  method to get the tokens from
- * @param froala  Froala Editor
  */
-Mautic.configureAtWho = function(element, method, froala) {
+Mautic.configureAtWho = function(element, method) {
     Mautic.getTokens(method, function(tokens) {
         element.atwho('destroy');
 
@@ -81,17 +53,6 @@ Mautic.configureAtWho = function(element, method, froala) {
             }),
             acceptSpaceBar: true
         });
-
-        if (froala) {
-            froala.events.on('keydown', function (e) {
-                if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB ||
-                    e.which == mQuery.FroalaEditor.KEYCODE.ENTER ||
-                    e.which == mQuery.FroalaEditor.KEYCODE.SPACE) &&
-                    froala.$el.atwho('isSelecting')) {
-                    return false;
-                }
-            }, true);
-        }
     });
 };
 
@@ -281,8 +242,8 @@ Mautic.getCKEditorFonts = function(fonts) {
     const CKEditorFonts = [];
 
     for (let i = 0; i < fonts.length; i++) {
-        if ('undefined' != typeof fonts[i].name) {
-            CKEditorFonts.push(fonts[i].name);
+        if ('undefined' != typeof fonts[i].font) {
+            CKEditorFonts.push(fonts[i].font);
         }
     }
 

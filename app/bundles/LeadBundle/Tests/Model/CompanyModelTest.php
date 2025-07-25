@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
@@ -120,6 +121,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $companyModel->method('getFieldData')->willReturn(['companyfield' => 'xxx']);
+        $this->setSecurity($companyModel);
 
         return $companyModel;
     }
@@ -191,5 +193,19 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame($expectedCompanyFields, $companyFields);
         $this->assertSame($expectedCompanyData, $companyData);
+    }
+
+    private function setSecurity(CompanyModel $companyModel): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('hasEntityAccess')
+            ->willReturn(true);
+        $security->method('isGranted')
+            ->willReturn(true);
+
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }

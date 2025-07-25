@@ -173,10 +173,22 @@ class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
 
-        $this->coreParametersHelper->expects($this->exactly(4))
+        $this->coreParametersHelper->expects($this->exactly(5))
             ->method('get')
-            ->withConsecutive(['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
-            ->willReturnOnConsecutiveCalls($unsubscribeTokenizedText, 'Just a text', 'Signature', 'jan.kozak@acquia.com');
+            ->withConsecutive(
+                ['unsubscribe_text'],
+                ['webview_text'],
+                ['default_signature_text'],
+                ['mailer_from_name'],
+                ['brand_name']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $unsubscribeTokenizedText,
+                'Just a text',
+                'Signature',
+                'jan.kozak@acquia.com',
+                'ACME'
+            );
 
         $this->translator->expects($this->never())
             ->method('trans')

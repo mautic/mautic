@@ -149,7 +149,7 @@
         'templateButtons': {
             'delete': (permissions['lead:leads:deleteown'] or permissions['lead:leads:deleteother'])
         },
-        'customButtons': bulkActionsCustom|default(''),
+        'customButtons': bulkActionsCustom|default([]),
         'routeBase': 'contact',
         'langVar': 'lead.lead',
     },

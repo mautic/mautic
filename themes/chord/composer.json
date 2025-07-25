@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-chord",
+  "description": "Chord",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": ">=4.0"
+  }
+}

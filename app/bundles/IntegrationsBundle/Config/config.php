@@ -224,6 +224,7 @@ return [
                     'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.sync.sync_process.value_helper',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
+                    'mautic.integrations.sync.notification.bulk_notification',
                 ],
             ],
             'mautic.integrations.sync.internal_process' => [

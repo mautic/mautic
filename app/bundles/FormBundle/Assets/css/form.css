@@ -2,10 +2,9 @@
 
 /* Panel Styles */
 .panel2 {
-    border: 1px solid #ebedf0;
-    -webkit-box-shadow: 0px 1px 1px #f3f3f3;
-    box-shadow: 0px 1px 1px #f3f3f3;
-    margin: 0 25px 25px 25px;
+    --layout-density-padding-inline-local: 3px 6px;
+    -webkit-box-shadow: 0px 1px 1px #00000012;
+    box-shadow: 0px 1px 1px #00000012;
     zoom: 0.9;
 }
 .panel2 label {
@@ -24,6 +23,10 @@
 }
 .form-field-wrapper img {
     max-width: 100%;
+}
+
+.form-field-wrapper:has(> .panel2) {
+    margin: 0 25px 25px 25px;
 }
 
 /* Mautic Forms Fields and Actions */
