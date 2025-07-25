@@ -1253,16 +1253,14 @@ class LeadModel extends FormModel
         $company                       = null;
         [$companyFields, $companyData] = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
-        if (true === $skipIfExists && empty($lead->getCompany()) || false === $skipIfExists) {
-            if (!empty($companyData)) {
-                $company = $this->companyModel->importCompany(
-                    array_flip($companyFields),
-                    $companyData,
-                    null,
-                    true,
-                    $skipIfExists
-                );
-            }
+        if (!empty($companyData) && (true === $skipIfExists && empty($lead->getCompany()) || false === $skipIfExists)) {
+            $company = $this->companyModel->importCompany(
+                array_flip($companyFields),
+                $companyData,
+                null,
+                true,
+                $skipIfExists
+            );
         }
 
         foreach (array_keys($companyFields) as $companyField) { // Remove company fields from lead fields import data
