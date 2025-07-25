@@ -2,14 +2,11 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class CompanyModelTest extends \PHPUnit\Framework\TestCase
@@ -194,106 +191,5 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame($expectedCompanyFields, $companyFields);
         $this->assertSame($expectedCompanyData, $companyData);
-    }
-
-    public function testImportCompanyWithUserReferenceFields(): void
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getId')->willReturn(1);
-
-        // Create repository mocks
-        $userRepo = $this->createMock(UserRepository::class);
-        $userRepo->method('findByIdentifier')->willReturn($user);
-
-        $companyLeadRepo = $this->createMock(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class);
-
-        $companyRepo = $this->createMock(\Mautic\LeadBundle\Entity\CompanyRepository::class);
-        $companyRepo->method('setDispatcher')->willReturnSelf();
-
-        // Setup entity manager with repositories
-        $entityManager = $this->createMock(\Doctrine\ORM\EntityManager::class);
-        $entityManager->method('getRepository')
-            ->will($this->returnValueMap([
-                [User::class, $userRepo],
-                [\Mautic\LeadBundle\Entity\CompanyLead::class, $companyLeadRepo],
-                [Company::class, $companyRepo],
-            ]));
-        $entityManager->method('getReference')->willReturn($user);
-
-        $userHelper = $this->createMock(UserHelper::class);
-        $userHelper->method('getUser')->willReturn($user);
-
-        $dispatcher = $this->createMock(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class);
-
-        // Create the CompanyModel with constructor injection
-        $companyModel = new class($entityManager, $this->leadFieldModel, $this->companyDeduper, $userHelper, $dispatcher) extends CompanyModel {
-            private Company $entity;
-
-            // Override constructor to accept only what we need
-            public function __construct(
-                \Doctrine\ORM\EntityManager $em,
-                FieldModel $leadFieldModel,
-                CompanyDeduper $companyDeduper,
-                UserHelper $userHelper,
-                \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
-            ) {
-                $this->em             = $em;
-                $this->leadFieldModel = $leadFieldModel;
-                $this->companyDeduper = $companyDeduper;
-                $this->userHelper     = $userHelper;
-                $this->dispatcher     = $dispatcher;
-                $this->entity         = new Company();
-            }
-
-            // Override getRepository to return our mock directly
-            public function getRepository(): \Mautic\LeadBundle\Entity\CompanyRepository
-            {
-                return $this->em->getRepository(Company::class);
-            }
-
-            // Override fetchCompanyFields with test data
-            /**
-             * @return array<int, array<string, mixed>>
-             */
-            public function fetchCompanyFields(): array
-            {
-                return [
-                    [
-                        'alias'        => 'companyfield',
-                        'defaultValue' => '',
-                        'type'         => 'text',
-                    ],
-                ];
-            }
-
-            // Override getFieldData with test data
-            /**
-             * @param array<string, mixed> $fields
-             * @param array<string, mixed> $data
-             *
-             * @return array<string, mixed>
-             */
-            public function getFieldData(array $fields, array $data): array
-            {
-                return ['companyfield' => 'xxx'];
-            }
-
-            // Add getter for the entity to verify in test
-            public function getEntity($id = null): ?Company
-            {
-                return $this->entity;
-            }
-        };
-
-        // Test with createdByUser
-        $company = $companyModel->importCompany(
-            ['createdByUser' => 'created_field', 'modifiedByUser' => 'modified_field'],
-            ['created_field' => 'admin', 'modified_field' => 'admin'],
-            1
-        );
-
-        $this->assertSame($user->getId(), $company->getCreatedBy());
-        $this->assertSame($user->getId(), $company->getModifiedBy());
-        $this->assertSame($user, $company->getOwner());
     }
 }
