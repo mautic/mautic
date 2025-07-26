@@ -21,7 +21,7 @@ export default class AssetService {
    */
   getDeletePath() {
     return this.deletePath;
-  };
+  }
 
 
   /**
