@@ -83,17 +83,17 @@ html {
 .gjs-layer-title,
 .gjs-sm-sector .gjs-sm-title {
   font-weight: lighter;
-  background-color: rgba(0,0,0,.1);
+  background-color: rgba(0, 0, 0, 0.1);
   letter-spacing: 1px;
   padding: 9px 10px 9px 20px;
-  border-bottom: 1px solid rgba(0,0,0,.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
   text-align: left;
   position: relative;
   cursor: pointer;
 }
 
 .gjs-sm-properties {
-  font-size: .75rem;
+  font-size: 0.75rem;
   padding: 10px 5px;
   display: flex;
   flex-wrap: wrap;
@@ -101,7 +101,6 @@ html {
   box-sizing: border-box;
   width: 100%;
 }
-
 
 .gjs-clm-tags .gjs-clm-tag {
   border: 1px solid #707070;
@@ -306,7 +305,7 @@ html {
   color: #373d49;
 }
 
-.gjs-two-bg{
+.gjs-two-bg {
   color: #dae5e6;
 }
 
@@ -354,14 +353,17 @@ html {
 }
 
 .anim-spin {
-  animation: 0.5s linear 0s normal none infinite running spin; }
+  animation: 0.5s linear 0s normal none infinite running spin;
+}
 
 @keyframes spin {
   0% {
-    transform: rotate(0deg); }
+    transform: rotate(0deg);
+  }
   100% {
-    transform: rotate(360deg); } }
-
+    transform: rotate(360deg);
+  }
+}
 
 /* CKEditor styles */
 .cke-modal .ck-editor .ck-content {
