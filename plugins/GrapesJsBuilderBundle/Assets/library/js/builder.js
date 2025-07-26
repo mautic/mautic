@@ -31,7 +31,7 @@ function launchBuilderGrapesjs(formName) {
   builder.initGrapesJS(formName);
 
   // trigger show event on DOM element
-  $builder.trigger('builder:show', [builder.editor])
+  $builder.trigger('builder:show', [builder.editor]);
   // trigger show event on editor instance
   builder.editor.trigger('show');
 
