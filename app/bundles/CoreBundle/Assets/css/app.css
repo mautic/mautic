@@ -6626,10 +6626,10 @@ input[style]:hover {
   box-shadow: none;
 }
 .form-control {
-  &:not(select) {
-    padding: var(--spacing-04) var(--spacing-05);
-  }
   color: var(--text-primary);
+}
+.form-control:not(select) {
+  padding: var(--spacing-04) var(--spacing-05);
 }
 .form-control + .help-text,
 .form-control + p {
@@ -9871,7 +9871,7 @@ lesshat-selector { -lh-property: 0 ;
   width: 30%;
   height: 100%;
   padding: 15px;
-  background-color: var(--layer, #d5d4d4);
+  background-color: #d5d4d4;
   overflow-y: auto;
 }
 .builder-content {

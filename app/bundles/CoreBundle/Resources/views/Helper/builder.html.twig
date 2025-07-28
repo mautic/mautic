@@ -83,9 +83,9 @@
                 </div>
                 <div class="panel-body">
                     {% if slots is defined and slots is iterable %}
-                        <div id="slot-type-container" class="col-md-12">
+                        <div id="slot-type-container">
                             {% for slotKey, slot in slots %}
-                                <div class="slot-type-handle btn btn-ghost btn-lg btn-nospin" data-slot-type="{{ slotKey }}">
+                                <div class="slot-type-handle" data-slot-type="{{ slotKey }}">
                                     <i class="fa fa-{{ slot.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ slot.header|raw }}</span>
@@ -108,9 +108,9 @@
                 </div>
                 <div class="panel-body">
                     {% if sections is defined and sections is iterable %}
-                        <div id="section-type-container" class="col-md-12">
+                        <div id="section-type-container">
                             {% for sectionKey, section in sections %}
-                                <div class="section-type-handle btn btn-ghost btn-lg btn-nospin" data-section-type="{{ sectionKey }}">
+                                <div class="section-type-handle" data-section-type="{{ sectionKey }}">
                                     <i class="fa fa-{{ section.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ section.header }}</span>

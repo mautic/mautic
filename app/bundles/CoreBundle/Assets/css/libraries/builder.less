@@ -1,3 +1,5 @@
+@import "../app/less/variables";
+
 //Froala
 @import "froala/froala_editor";
 //@import "froala/froala_style";
@@ -36,14 +38,14 @@ div[data-slot-focus] {
     margin: 0;
     padding: 0;
     position: absolute;
-    border: 1px solid var(--primary-60);
+    border: 1px solid @mautic-primary;
     z-index: 1;
 }
 
 div[data-section-focus] {
     content: '';
     position: absolute;
-    border: 1px solid var(--primary-60);
+    border: 1px solid @mautic-secondary;
 }
 
 div[data-section-focus="top"] {
@@ -120,9 +122,9 @@ div[data-slot-toolbar] {
     z-index: 10;
     cursor: pointer;
     cursor: move;
-    background-color: var(--primary-60);
-    border-left: 1px solid var(--primary-60);
-    border-right: 1px solid var(--primary-60);
+    background-color: @mautic-primary;
+    border-left: 1px solid @mautic-primary;
+    border-right: 1px solid @mautic-primary;
     padding-top:2px;
 }
 
@@ -171,11 +173,11 @@ div[data-slot^="image"] img {
 }
 
 div[data-slot].ui-sortable-helper {
-    border: 1px solid var(--primary-60);
+    border: 1px solid @mautic-primary;
 }
 
 .slot-placeholder {
-    border: 2px dotted var(--primary-60);
+    border: 2px dotted @mautic-primary;
 }
 
 [data-slot="text"] {
@@ -183,7 +185,7 @@ div[data-slot].ui-sortable-helper {
         padding: initial;
 
         .fr-toolbar {
-            border-top: 2px solid var(--primary-60);
+            border-top: 2px solid @mautic-primary;
             position: absolute;
             left: -15px;
             bottom: initial !important;
@@ -218,27 +220,48 @@ div[data-slot].ui-sortable-helper {
     }
 }
 
-.slot-type-handle.btn, .section-type-handle.btn {
-    float: left;
-    width: 111px;
-    margin: 2px;
-    height: 75px;
-    padding-left:5px;
-    padding-right:5px;
-    text-align:center;
-    word-wrap: break-word;
+#slot-type-container,
+#section-type-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(111px, 1fr));
+    gap: 4px;
+    padding: 10px;
 }
 
-.slot-type-handle.ui-draggable-dragging, .section-type-handle.ui-draggable-dragging{
+.slot-type-handle,
+.section-type-handle {
+    width: 100%;
+    height: 75px;
+    padding: 10px 5px;
+    text-align: center;
+    word-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
     color: #5d6c7c;
     background-color: #f5f5f5;
-    border-color: #d3d3d3;
-    padding: 10px 16px;
-    font-size: 16px;
+    border: 1px solid #d3d3d3;
+    font-size: 14px;
     line-height: 1.25;
     border-radius: 4px;
     margin: 2px;
-    text-align: center;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #e8e8e8;
+        border-color: #c1c1c1;
+    }
+
+    i {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .slot-caption {
+        font-size: 14px;
+    }
 }
 
 .theme-list {
