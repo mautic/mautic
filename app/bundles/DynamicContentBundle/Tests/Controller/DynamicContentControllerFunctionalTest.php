@@ -44,40 +44,12 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->submitFormAndAssertNoNestingValidation($crawler);
     }
 
-    public function testNoNestingValidationNewAction(): void
-    {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
-        Assert::assertTrue($this->client->getResponse()->isOk());
-
-        $this->submitFormAndAssertNoNestingValidation($crawler);
-    }
-
     public function testForbiddenNewAction(): void
     {
         $this->createAndLoginUser();
         $this->client->request(Request::METHOD_GET, '/s/dwc/new');
 
         Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
-    }
-
-    public function testNoNestingValidationEditAction(): void
-    {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
-        Assert::assertTrue($this->client->getResponse()->isOk());
-
-        $buttonCrawler = $crawler->selectButton('Save');
-        $form          = $buttonCrawler->form();
-        $form->setValues([
-            'dwc[name]'    => 'Some name',
-            'dwc[content]' => 'Some content',
-        ]);
-        $crawler = $this->client->submit($form);
-
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertStringNotContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
-        Assert::assertStringContainsString('Edit Dynamic Content', $crawler->text());
-
-        $this->submitFormAndAssertNoNestingValidation($crawler);
     }
 
     public function testNoNestingValidationEditAction(): void
@@ -217,20 +189,6 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-    }
-
-    private function submitFormAndAssertNoNestingValidation(Crawler $crawler): void
-    {
-        $buttonCrawler = $crawler->selectButton('Save');
-        $form          = $buttonCrawler->form();
-        $form->setValues([
-            'dwc[name]'    => 'Some name',
-            'dwc[content]' => 'Some {dwc=slotname}',
-        ]);
-        $crawler = $this->client->submit($form);
-
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
     }
 
     private function submitFormAndAssertNoNestingValidation(Crawler $crawler): void

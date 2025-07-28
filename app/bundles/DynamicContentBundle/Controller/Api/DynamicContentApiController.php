@@ -50,7 +50,7 @@ class DynamicContentApiController extends CommonApiController
         $entity->setSlotName($parameters['slotName']);
         $entity->setIsCampaignBased($parameters['isCampaignBased']);
 
-        return $this->processForm($entity, $parameters, 'POST');
+        return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
     public function editEntityAction(Request $request, $id)
@@ -84,6 +84,6 @@ class DynamicContentApiController extends CommonApiController
         $entity->setSlotName($parameters['slotName']);
         $entity->setIsCampaignBased($parameters['isCampaignBased']);
 
-        return $this->processForm($entity, $parameters, $method);
+        return $this->processForm($request, $entity, $parameters, $method);
     }
 }

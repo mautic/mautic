@@ -108,8 +108,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dynamicContentModel,
             $this->security,
             $this->contactTracker,
-            $this->companyLeadRepositoryMock,
-            $this->segmentRepository,
+            $this->companyLeadRepositoryMock
         );
     }
 

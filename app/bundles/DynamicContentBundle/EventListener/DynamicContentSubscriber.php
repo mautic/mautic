@@ -17,7 +17,6 @@ use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -45,7 +44,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private ContactTracker $contactTracker,
         private CompanyLeadRepository $companyLeadRepository,
-        private LeadListRepository $segmentRepository,
     ) {
     }
 

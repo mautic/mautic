@@ -128,13 +128,12 @@ class DynamicContentController extends FormController
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-        $form         = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         if (isset($dwc['slotName'])) {
             $entity->setSlotName($dwc['slotName']);
         }
 
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;

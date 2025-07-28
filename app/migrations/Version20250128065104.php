@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250128065104 extends PreUpAssertionMigration
 {
-    private const TABLE_NAME = 'dynamic_content';
+    protected const TABLE_NAME = 'dynamic_content';
 
     protected function preUpAssertions(): void
     {
