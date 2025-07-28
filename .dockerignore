@@ -1,0 +1,66 @@
+# Development files
+.git
+.gitignore
+.github
+.ddev
+.vscode
+.idea
+
+# Documentation
+README.md
+DOCKER.md
+LICENSE.txt
+MAINTAINERS.md
+RELEASE_LEADS.md
+SECURITY.md
+UPGRADE-*.md
+
+# Test files
+tests/
+codeception.yml
+phpstan*.neon
+phpstan-bootstrap.php
+phpunit.xml*
+
+# Build files
+build/
+node_modules/
+Gruntfile.js
+package*.json
+tsconfig.json
+webpack.config.js
+
+# Runtime files
+var/cache/*
+var/logs/*
+var/tmp/*
+var/spool/*
+
+# Configuration files that should not be in image
+config/local.php
+config/parameters.php
+.env
+.env.*
+
+# Composer
+composer.phar
+vendor/bin/
+
+# Development tools
+ecs.php
+rector*.php
+codecov.yml
+funding.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Media uploads (these should be mounted as volumes)
+media/files/*
+media/images/*
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore

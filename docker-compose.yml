@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  mautic:
+    build: .
+    container_name: mautic
+    restart: unless-stopped
+    environment:
+      - MAUTIC_URL=http://localhost:8000
+      - MAUTIC_DB_HOST=db
+      - MAUTIC_DB_PORT=3306
+      - MAUTIC_DB_NAME=mautic
+      - MAUTIC_DB_USER=mautic
+      - MAUTIC_DB_PASSWORD=mautic_password
+      - MAUTIC_ADMIN_USERNAME=admin
+      - MAUTIC_ADMIN_PASSWORD=admin123
+      - MAUTIC_ADMIN_EMAIL=admin@example.com
+      - MAUTIC_ADMIN_FIRSTNAME=Admin
+      - MAUTIC_ADMIN_LASTNAME=User
+      - PHP_MEMORY_LIMIT=512M
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_UPLOAD_MAX_FILESIZE=256M
+      - PHP_POST_MAX_SIZE=256M
+    ports:
+      - "8000:80"
+    volumes:
+      - mautic_config:/var/www/html/config
+      - mautic_var:/var/www/html/var
+      - mautic_media:/var/www/html/media
+    depends_on:
+      - db
+    networks:
+      - mautic-network
+
+  db:
+    image: mariadb:10.11
+    container_name: mautic_db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=mautic
+      - MYSQL_USER=mautic
+      - MYSQL_PASSWORD=mautic_password
+    volumes:
+      - mautic_db:/var/lib/mysql
+    networks:
+      - mautic-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mautic_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - mautic_redis:/data
+    networks:
+      - mautic-network
+
+volumes:
+  mautic_config:
+  mautic_var:
+  mautic_media:
+  mautic_db:
+  mautic_redis:
+
+networks:
+  mautic-network:
+    driver: bridge
