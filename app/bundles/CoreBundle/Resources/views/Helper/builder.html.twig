@@ -116,7 +116,7 @@
                                     <span class="slot-caption">{{ section.header }}</span>
                                     <!-- section template: "{{ section.content }}" -->
                                     <script type="text/html">
-                                        {{- include(section.content, with_context=false)|e -}}
+                                        {{- include(section.content, with_context=false) -}}
                                     </script>
                                 </div>
                             {% endfor %}
