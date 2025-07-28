@@ -70,11 +70,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private string $type = TypeList::HTML;
 
     /**
-     * @Groups({"dynamicContent:read", "dynamicContent:write"})
-     */
-    private string $type = TypeList::HTML;
-
-    /**
      * @var string|null
      */
     private $description;

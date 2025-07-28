@@ -210,30 +210,6 @@ class DynamicContentRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        return $qb->execute()->fetchAllAssociative();
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getSlotNamesList(string $search = '', int $limit = 10, int $start = 0): array
-    {
-        $qb = $this->_em->getConnection()->createQueryBuilder();
-        $qb->select('distinct slot_name')
-            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content')
-            ->where('is_published = :true')
-            ->setParameter('true', true, 'boolean');
-
-        if (!empty($search)) {
-            $qb->andWhere($qb->expr()->like('slot_name', self::SEARCH))
-                ->setParameter('search', "{$search}%");
-        }
-
-        if (!empty($limit)) {
-            $qb->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
         return $qb->executeQuery()->fetchAllAssociative();
     }
 
@@ -280,7 +256,7 @@ class DynamicContentRepository extends CommonRepository
             ->where('slot_name = :slot_name')
             ->orderBy('display_order')
             ->setParameter('slot_name', $slotName)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -307,7 +283,7 @@ class DynamicContentRepository extends CommonRepository
         $q->setParameter('currentOrder', $currentOrder)
             ->setParameter('newOrder', $newOrder)
             ->setParameter('slotName', $slotName)
-            ->execute();
+            ->executeQuery();
     }
 
     public function getLastDisplayOrder(string $slotName): int
@@ -317,7 +293,7 @@ class DynamicContentRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content')
             ->where('slot_name = :slot_name')
             ->setParameter('slot_name', $slotName)
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
     }
 }

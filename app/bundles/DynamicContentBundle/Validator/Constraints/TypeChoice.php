@@ -14,10 +14,7 @@ final class TypeChoice extends Choice
      */
     public const ERROR_MESSAGE = '{{ value }} is an invalid type. Allowed values are [%s, %s]';
 
-    /**
-     * @var string
-     */
-    public $message;
+    public string $message;
 
     public function __construct($options = null)
     {

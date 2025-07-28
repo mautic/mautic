@@ -11,10 +11,10 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -36,9 +36,9 @@ class DynamicContentApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function newEntityAction()
+    public function newEntityAction(Request $request)
     {
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         /** @var DynamicContent $entity */
         $entity     = $this->getNewEntity($parameters);
@@ -53,12 +53,12 @@ class DynamicContentApiController extends CommonApiController
         return $this->processForm($entity, $parameters, 'POST');
     }
 
-    public function editEntityAction($id)
+    public function editEntityAction(Request $request, $id)
     {
         /** @var DynamicContent|null $entity */
         $entity     = $this->model->getEntity($id);
-        $parameters = $this->request->request->all();
-        $method     = $this->request->getMethod();
+        $parameters = $request->request->all();
+        $method     = $request->getMethod();
 
         if (null === $entity || !$entity->getId()) {
             if ('PATCH' === $method) {

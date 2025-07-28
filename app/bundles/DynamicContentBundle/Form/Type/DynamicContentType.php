@@ -409,30 +409,6 @@ class DynamicContentType extends AbstractType
                 'rows'                 => 15,
                 'data-editor-enable'   => $enableEditor,
                 'data-editor-class'    => $editorClass,
-                'data-token-callback'  => 'email:getBuilderTokens',
-                'data-token-activator' => '{',
-            ],
-            'required' => false,
-        ]);
-    }
-
-    /**
-     * @param FormInterface<FormInterface> $form
-     */
-    private function addContentField(FormInterface $form, ?string $type): void
-    {
-        $enableEditor = TypeList::HTML === $type;
-        $editorClass  = 'editor editor-advanced editor-builder-tokens';
-
-        $form->add('content', TextareaType::class, [
-            'label'      => 'mautic.dynamicContent.form.content',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'tooltip'              => 'mautic.dynamicContent.form.content.help',
-                'class'                => 'form-control'.($enableEditor ? ' '.$editorClass : ''),
-                'rows'                 => 15,
-                'data-editor-enable'   => $enableEditor,
-                'data-editor-class'    => $editorClass,
                 'data-token-callback'  => 'dynamicContent:getBuilderTokens',
                 'data-token-activator' => '{',
             ],
