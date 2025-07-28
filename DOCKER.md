@@ -10,14 +10,19 @@ This directory contains Docker configuration files for running Mautic in a conta
    cd mautic
    ```
 
-2. **Copy environment file:**
+2. **Copy and configure environment file:**
    ```bash
    cp .env.example .env
+   # IMPORTANT: Edit .env and change ALL default passwords
+   nano .env
    ```
 
-3. **Edit environment variables (optional):**
+3. **⚠️ SECURITY: Update default passwords in .env file:**
    ```bash
-   nano .env
+   # Generate secure passwords (examples):
+   MYSQL_ROOT_PASSWORD=$(openssl rand -base64 32)
+   MYSQL_PASSWORD=$(openssl rand -base64 32)
+   MAUTIC_ADMIN_PASSWORD=$(openssl rand -base64 16)
    ```
 
 4. **Start the services:**
@@ -202,11 +207,64 @@ docker-compose exec mautic tail -f /var/log/apache2/error.log
 
 ## Security Considerations
 
+⚠️ **CRITICAL: Change all default passwords before deployment**
+
+### Pre-deployment Security Checklist
+
+1. **Generate Strong Passwords**:
+   ```bash
+   # Generate secure random passwords
+   MYSQL_ROOT_PASSWORD=$(openssl rand -base64 32)
+   MYSQL_PASSWORD=$(openssl rand -base64 32)
+   MAUTIC_ADMIN_PASSWORD=$(openssl rand -base64 16)
+   ```
+
+2. **Environment Variables**: Never commit actual passwords to version control
+   - Use `.env` file for local development
+   - Use Docker secrets or external secret management in production
+   - Ensure `.env` is in `.gitignore`
+
+3. **Database Security**:
+   - Change default database passwords
+   - Use strong, randomly generated passwords
+   - Consider using Docker secrets for production
+
+4. **Network Security**:
+   - Use HTTPS in production with proper SSL/TLS certificates
+   - Configure proper firewall rules
+   - Limit database access to Mautic container only
+
+5. **Container Security**:
+   - Run containers as non-root user where possible
+   - Keep Docker images updated
+   - Use Docker secrets for sensitive data
+   - Regular security scanning of images
+
+### Production Security Setup
+
+```bash
+# Example production setup with secrets
+docker secret create mysql_root_password mysql_root_pwd.txt
+docker secret create mysql_password mysql_pwd.txt
+docker secret create mautic_admin_password mautic_admin_pwd.txt
+
+# Use in docker-compose.prod.yml
+secrets:
+  mysql_root_password:
+    external: true
+  mysql_password:
+    external: true
+```
+
+### Additional Security Measures
+
 1. **Change Default Passwords**: Update all default passwords in `.env`
 2. **Use HTTPS in Production**: Configure SSL/TLS certificates
 3. **Regular Updates**: Keep Mautic and Docker images updated
 4. **Backup Strategy**: Implement regular backups of volumes
 5. **Network Security**: Use proper firewall rules and network isolation
+6. **Monitoring**: Set up security monitoring and alerting
+7. **Access Control**: Implement proper user access controls
 
 ## Production Deployment
 

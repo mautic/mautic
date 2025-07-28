@@ -1,0 +1,27 @@
+# Docker Compose Override Example
+# Copy this to docker-compose.override.yml for development
+# This file demonstrates safe environment variable usage
+
+version: '3.9'
+
+services:
+  mautic:
+    environment:
+      # Override with .env file variables
+      - MAUTIC_URL=${MAUTIC_URL:-http://localhost:8000}
+      - MAUTIC_DB_PASSWORD=${MYSQL_PASSWORD}
+      - MAUTIC_ADMIN_PASSWORD=${MAUTIC_ADMIN_PASSWORD}
+    # Development-specific volumes (uncomment if needed)
+    # volumes:
+    #   - .:/var/www/html
+    #   - mautic_config:/var/www/html/config
+    #   - mautic_var:/var/www/html/var
+    #   - mautic_media:/var/www/html/media
+
+  db:
+    environment:
+      # Use environment variables for all credentials
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}

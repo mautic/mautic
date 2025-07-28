@@ -17,7 +17,7 @@ ENV MAUTIC_VERSION=7.x \
     MAUTIC_DB_PASSWORD="" \
     MAUTIC_DB_TABLE_PREFIX="" \
     MAUTIC_ADMIN_USERNAME="admin" \
-    MAUTIC_ADMIN_PASSWORD="mautic" \
+    MAUTIC_ADMIN_PASSWORD="" \
     MAUTIC_ADMIN_EMAIL="admin@example.com" \
     MAUTIC_ADMIN_FIRSTNAME="Admin" \
     MAUTIC_ADMIN_LASTNAME="User" \
@@ -137,6 +137,15 @@ RUN { \
     echo '# Check if Mautic is already installed'; \
     echo 'if [ ! -f config/local.php ]; then'; \
     echo '  echo "Installing Mautic..."'; \
+    echo '  # Validate required environment variables'; \
+    echo '  if [ -z "$MAUTIC_ADMIN_PASSWORD" ]; then'; \
+    echo '    echo "ERROR: MAUTIC_ADMIN_PASSWORD environment variable is required"'; \
+    echo '    exit 1'; \
+    echo '  fi'; \
+    echo '  if [ -z "$MAUTIC_DB_PASSWORD" ]; then'; \
+    echo '    echo "ERROR: MAUTIC_DB_PASSWORD environment variable is required"'; \
+    echo '    exit 1'; \
+    echo '  fi'; \
     echo '  php bin/console mautic:install \'; \
     echo '    --db_driver=pdo_mysql \'; \
     echo '    --db_host="$MAUTIC_DB_HOST" \'; \

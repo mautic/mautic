@@ -6,9 +6,18 @@
 .vscode
 .idea
 
+# Security files
+.env
+.env.*
+secrets/
+*.key
+*.pem
+*.p12
+
 # Documentation
 README.md
 DOCKER.md
+SECURITY.docker.md
 LICENSE.txt
 MAINTAINERS.md
 RELEASE_LEADS.md
