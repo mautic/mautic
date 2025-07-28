@@ -23,13 +23,6 @@ class TokenReplacementEvent extends CommonEvent
     protected $tokens = [];
 
     /**
-     * Whatever the calling code wants to make available to the consumers.
-     *
-     * @var mixed
-     */
-    protected $passthrough;
-
-    /**
      * @param CommonEntity|string|null $content
      * @param Lead|mixed[]|null        $lead
      * @param mixed                    $passthrough

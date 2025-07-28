@@ -109,10 +109,9 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider dataProviderWhileAdding
-     *
      * @param array<string, int> $expectedOrder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderWhileAdding')]
     public function testReOrderingNewDwcViaApi(string $orderValue, array $expectedOrder): void
     {
         $this->createDynamicContent('DC-1', 'slot-Name', 0);
@@ -151,10 +150,9 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider dataProviderWhileEditing
-     *
      * @param array<string, int> $expectedOrder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderWhileEditing')]
     public function testReOrderingForExistingDwcViaApi(string $orderValue, array $expectedOrder, bool $switchInitialOrder): void
     {
         $dwc1 = $this->createDynamicContent('DC-1', 'slot-Name', 0);

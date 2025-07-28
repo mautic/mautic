@@ -14,10 +14,9 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
     use DynamicContentReOrderingTrait;
 
     /**
-     * @dataProvider dataProviderWhileAdding
-     *
      * @param array<string, int> $expectedOrder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderWhileAdding')]
     public function testReorderingDynamicContentWhileAdding(string $orderValue, array $expectedOrder): void
     {
         $this->createDynamicContent('DC-1', 'slot-Name', 0);
@@ -55,10 +54,9 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider dataProviderWhileEditing
-     *
      * @param array<string, int> $expectedOrder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderWhileEditing')]
     public function testReorderingDynamicContentWhileEditing(string $orderValue, array $expectedOrder, bool $switchInitialOrder): void
     {
         $dwc1 = $this->createDynamicContent('DC-1', 'slot-Name', 0);
@@ -88,7 +86,7 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/dwc/delete/'.$dwc->getId());
         $this->assertResponseIsSuccessful();
 
-        $dwcRepo = self::$container->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
+        $dwcRepo = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
         $dwcList = $dwcRepo->getDynamicContentBySlotName('slot-Name-1');
 
         Assert::assertEquals(3, count($dwcList));

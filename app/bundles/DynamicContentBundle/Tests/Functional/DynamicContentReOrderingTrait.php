@@ -9,14 +9,14 @@ use PHPUnit\Framework\Assert;
 
 trait DynamicContentReOrderingTrait
 {
-    public function dataProviderWhileAdding(): \Generator
+    public static function dataProviderWhileAdding(): \Generator
     {
         yield ['0', ['DC-4' => 1, 'DC-1' => 2, 'DC-2' => 3, 'DC-3' => 4]]; // Put at beginning
         yield ['3', ['DC-1' => 1, 'DC-2' => 2, 'DC-3' => 3, 'DC-4' => 4]]; // Put at end
         yield ['1', ['DC-1' => 1, 'DC-4' => 2, 'DC-2' => 3, 'DC-3' => 4]]; // Put in middle
     }
 
-    public function dataProviderWhileEditing(): \Generator
+    public static function dataProviderWhileEditing(): \Generator
     {
         yield ['0', ['DC-4' => 1, 'DC-1' => 2, 'DC-2' => 3, 'DC-3' => 4], false]; // Put at beginning
         yield ['4', ['DC-2' => 1, 'DC-3' => 2, 'DC-4' => 3, 'DC-1' => 4], true]; // Put at end
@@ -47,7 +47,7 @@ trait DynamicContentReOrderingTrait
             ->setSlotName($slotName)
             ->setDisplayOrder($order);
 
-        $model = self::$container->get('mautic.dynamicContent.model.dynamicContent');
+        $model = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent');
         $model->saveEntity($dwc);
 
         return $dwc;
@@ -58,7 +58,7 @@ trait DynamicContentReOrderingTrait
      */
     private function assertDynamicContentOrder(string $slotName, array $expectedOrder): void
     {
-        $dwcRepo     = self::$container->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
+        $dwcRepo     = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
         $dwcList     = $dwcRepo->getDynamicContentBySlotName($slotName);
         $actualOrder = array_column($dwcList, 'display_order', 'name');
         Assert::assertEquals($expectedOrder, $actualOrder, print_r($actualOrder, true));

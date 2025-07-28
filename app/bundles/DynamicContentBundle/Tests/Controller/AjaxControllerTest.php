@@ -38,7 +38,7 @@ class AjaxControllerTest extends MauticMysqlTestCase
             ->setDisplayOrder(1)
             ->setFilters($filters);
 
-        $model = self::$container->get('mautic.dynamicContent.model.dynamicContent');
+        $model = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent');
         $model->saveEntity($dwc);
     }
 
@@ -65,9 +65,9 @@ class AjaxControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=dynamicContent:getBuilderTokens');
         $tokens = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('tokens', $tokens);
-        //verify email token is available
+        // verify email token is available
         $this->assertArrayHasKey('{contactfield=email}', $tokens['tokens']);
-        //verify page token is available
+        // verify page token is available
         $this->assertArrayHasKey('{form='.$form->getId().'}', $tokens['tokens']);
     }
 
