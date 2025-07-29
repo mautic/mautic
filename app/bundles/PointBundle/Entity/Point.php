@@ -38,6 +38,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    public const ENTITY_NAME = 'point';
 
     /**
      * @var int

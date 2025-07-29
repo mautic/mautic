@@ -588,4 +588,16 @@ class InputHelper
     {
         return preg_replace('/\x00|<[^>]*>?/', '', $string);
     }
+
+    /**
+     * Strip disallowed HTML tags from a string.
+     *
+     * @param string[] $allowedTags
+     */
+    public static function stripTags(string $input, array $allowedTags = []): string
+    {
+        $allowed = implode('', array_map(fn ($tag) => "<$tag>", $allowedTags));
+
+        return strip_tags($input, $allowed);
+    }
 }

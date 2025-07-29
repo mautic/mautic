@@ -818,9 +818,11 @@ Mautic.onPageUnload = function (container, response) {
 
         if (ckEditors.size > 0) {
             ckEditors.forEach(function(value, key, map){
-                map.get(key).destroy()
-            })
-            ckEditors.clear();
+                if (container === '#app-content' || container === 'body' || mQuery(container).find(key).length > 0 || mQuery(key).closest(container).length > 0) {
+                    map.get(key).destroy();
+                    map.delete(key);
+                }
+            });
         }
 
         mQuery(container + " input[data-toggle='color']").each(function() {

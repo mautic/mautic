@@ -47,9 +47,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     use UuidTrait;
 
     use OptimisticLockTrait;
+
     use ProjectTrait;
 
-    public const TABLE_NAME = 'campaigns';
+    public const TABLE_NAME  = 'campaigns';
+    public const ENTITY_NAME = 'campaign';
     /**
      * @var int
      */

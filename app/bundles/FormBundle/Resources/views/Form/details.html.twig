@@ -194,7 +194,7 @@
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
                             </div>
                         </div>
