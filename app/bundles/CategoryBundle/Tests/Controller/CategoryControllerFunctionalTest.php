@@ -165,11 +165,12 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        $this->client->request('POST', 's/categories/category/delete/'.$category->getId(), [], [], [
-            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
-        ]);
+        $this->client->request('POST',
+            's/categories/category/delete/'.$category->getId(),
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
 
         $clientResponse = $this->client->getResponse();
         $this->assertSame(
@@ -210,11 +211,11 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $parameters = 'ids=["'.$category->getId().'"]';
-        $this->client->request('POST', 's/categories/category/batchDelete?'.$parameters, [], [], [
-            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
-        ]);
+        $this->client->request('POST',
+            's/categories/category/batchDelete?'.$parameters,
+            [],
+            [],
+            $this->createAjaxHeaders());
 
         $clientResponse = $this->client->getResponse();
 

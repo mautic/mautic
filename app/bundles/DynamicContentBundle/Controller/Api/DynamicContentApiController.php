@@ -47,8 +47,8 @@ class DynamicContentApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $entity->setSlotName($parameters['slotName']);
-        $entity->setIsCampaignBased($parameters['isCampaignBased']);
+        $entity->setSlotName($parameters['slotName'] ?? null);
+        $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
 
         return $this->processForm($request, $entity, $parameters, 'POST');
     }
@@ -69,8 +69,8 @@ class DynamicContentApiController extends CommonApiController
             // PUT can create a new entity if it doesn't exist
             /** @var DynamicContent $entity */
             $entity = $this->model->getEntity();
-            $entity->setSlotName($parameters['slotName']);
-            $entity->setIsCampaignBased($parameters['isCampaignBased']);
+            $entity->setSlotName($parameters['slotName'] ?? null);
+            $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
 
             if (!$this->checkEntityAccess($entity, 'create')) {
                 return $this->accessDenied();
@@ -81,8 +81,8 @@ class DynamicContentApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $entity->setSlotName($parameters['slotName']);
-        $entity->setIsCampaignBased($parameters['isCampaignBased']);
+        $entity->setSlotName($parameters['slotName'] ?? null);
+        $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
 
         return $this->processForm($request, $entity, $parameters, $method);
     }

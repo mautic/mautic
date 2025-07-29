@@ -23,6 +23,8 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         $this->createDynamicContent('DC-2', 'slot-Name', 1);
         $this->createDynamicContent('DC-3', 'slot-Name', 2);
 
+        $crawler = $this->client->request('GET', '/s/dwc/new');
+        $form    = $crawler->selectButton('Save')->form();
         $payload = [
             'dwc' => [
                 'name'            => 'DC-4',
@@ -43,7 +45,7 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
                         'operator' => '=',
                     ],
                 ],
-                '_token' => $this->getCsrfToken('dwc'),
+                '_token' => $form->getValues()['dwc[_token]'],
             ],
         ];
 
