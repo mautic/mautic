@@ -13,7 +13,6 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -75,10 +74,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
 
     private DynamicContentSubscriber $subscriber;
-    /**
-     * @var CompanyModel|(CompanyModel&MockObject)|MockObject
-     */
-    private MockObject $companyModel;
 
     protected function setUp(): void
     {
@@ -95,7 +90,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
         $this->security                  = $this->createMock(CorePermissions::class);
         $this->contactTracker            = $this->createMock(ContactTracker::class);
-        $this->companyModel              = $this->createMock(CompanyModel::class);
         $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
         $this->subscriber                = new DynamicContentSubscriber(
             $this->trackableModel,
@@ -229,11 +223,6 @@ HTML;
                 'company'   => 'Doe Corp',
                 'email'     => 'john@doe.com',
             ]);
-
-        $this->companyModel
-            ->expects($this->once())
-            ->method('getCompanyLeadRepository')
-            ->willReturn($this->companyLeadRepositoryMock);
 
         $this->companyLeadRepositoryMock->expects($this->once())
             ->method('getPrimaryCompanyByLeadId')

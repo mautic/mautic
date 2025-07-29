@@ -16,7 +16,7 @@ final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    protected function slotNameListAction(Request $request): JsonResponse
+    public function slotNameListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
 
