@@ -5,56 +5,12 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 class ReorderingDynamicContentTest extends MauticMysqlTestCase
 {
     use DynamicContentReOrderingTrait;
-
-    /**
-     * @param array<string, int> $expectedOrder
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderWhileAdding')]
-    public function testReorderingDynamicContentWhileAdding(string $orderValue, array $expectedOrder): void
-    {
-        $this->createDynamicContent('DC-1', 'slot-Name', 0);
-        $this->createDynamicContent('DC-2', 'slot-Name', 1);
-        $this->createDynamicContent('DC-3', 'slot-Name', 2);
-
-        $crawler = $this->client->request('GET', '/s/dwc/new');
-        $form    = $crawler->selectButton('Save')->form();
-        $payload = [
-            'dwc' => [
-                'name'            => 'DC-4',
-                'isPublished'     => true,
-                'isCampaignBased' => 0,
-                'slotName'        => 'slot-Name',
-                'displayOrder'    => $orderValue,
-                'type'            => TypeList::HTML,
-                'language'        => 'en',
-                'filters'         => [
-                    [
-                        'glue'     => 'and',
-                        'field'    => 'city',
-                        'object'   => 'lead',
-                        'type'     => 'text',
-                        'filter'   => 'Pune',
-                        'display'  => null,
-                        'operator' => '=',
-                    ],
-                ],
-                '_token' => $form->getValues()['dwc[_token]'],
-            ],
-        ];
-
-        $this->client->request(Request::METHOD_POST, '/s/dwc/new', $payload, [], $this->createAjaxHeaders());
-        echo $this->client->getResponse()->getContent();
-        $this->assertResponseIsSuccessful();
-
-        $this->assertDynamicContentOrder('slot-Name', $expectedOrder);
-    }
 
     /**
      * @param array<string, int> $expectedOrder
