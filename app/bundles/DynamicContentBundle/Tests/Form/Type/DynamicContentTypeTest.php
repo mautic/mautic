@@ -124,34 +124,13 @@ class DynamicContentTypeTest extends TestCase
         $formBuilderInterfaceMock->expects($matcher)
             ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $formBuilderInterfaceMock) {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
-                    $callback = function ($listener) {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::PRE_SUBMIT, $parameters);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
-                    $callback = function ($listener) {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::PRE_SET_DATA, $parameters);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::POST_SUBMIT, $parameters[0]);
-                    $callback = function ($listener) {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::POST_SUBMIT, $parameters);
                 }
 
                 return $formBuilderInterfaceMock;
@@ -166,34 +145,13 @@ class DynamicContentTypeTest extends TestCase
             ->method('addEventListener')
             ->willReturnCallback(function (...$parameters) use ($matcher) {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
-                    $callback = function ($listener) {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::PRE_SUBMIT, $parameters);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
-                    $callback = function ($listener) {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::PRE_SET_DATA, $parameters);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::POST_SUBMIT, $parameters[0]);
-                    $callback = function ($listener) {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::POST_SUBMIT, $parameters);
                 }
             });
 
@@ -203,6 +161,21 @@ class DynamicContentTypeTest extends TestCase
             ->willReturn($formBuilderInterfaceMock);
 
         $dynamicContentType->buildForm($formBuilderInterfaceMock, $options);
+    }
+
+    /**
+     * @param mixed[] $parameters
+     */
+    private function assertFormEvent(string $event, array $parameters): void
+    {
+        $this->assertSame($event, $parameters[0]);
+        $callback = function ($listener) {
+            $reflection = new \ReflectionFunction($listener);
+            $parameters = $reflection->getParameters();
+
+            return FormEvent::class === (string) $parameters[0]->getType();
+        };
+        $this->assertTrue($callback($parameters[1]));
     }
 
     /**

@@ -74,13 +74,13 @@ class AjaxControllerTest extends MauticMysqlTestCase
     private function createForm(): Form
     {
         $field = new Field();
-        $field->setAlias('test');
-        $field->setLabel('test');
+        $field->setAlias('dwc-test-alias');
+        $field->setLabel('dwc-test');
         $field->setType('text');
 
         $form = new Form();
-        $form->setName('Test form');
-        $form->setAlias('test-form');
+        $form->setName('Test form- dwc');
+        $form->setAlias('test-form-dwc');
         $form->addField(0, $field);
         $field->setForm($form);
 
