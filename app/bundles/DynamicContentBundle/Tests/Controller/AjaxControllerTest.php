@@ -86,6 +86,7 @@ class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->em->persist($field);
         $this->em->persist($form);
+        $this->em->flush();
 
         return $form;
     }
