@@ -50,6 +50,7 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(Request::METHOD_POST, '/s/dwc/new', $payload, [], $this->createAjaxHeaders());
+        echo $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
 
         $this->assertDynamicContentOrder('slot-Name', $expectedOrder);
