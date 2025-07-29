@@ -33,10 +33,9 @@ final class AjaxController extends CommonAjaxController
         $slotName             = InputHelper::clean($request->query->get('slotName'));
         $includeDefaultOption = InputHelper::clean($request->query->get('includeDefaultOption'));
 
-        $translator = $this->get('translator');
         if ($includeDefaultOption) {
-            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.placeholder')]   = '';
-            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.default.order')] = 0;
+            $displayOrderArray[$this->translator->trans('mautic.dynamicContent.choose.placeholder')]   = '';
+            $displayOrderArray[$this->translator->trans('mautic.dynamicContent.choose.default.order')] = 0;
         }
 
         if (!empty($slotName)) {
