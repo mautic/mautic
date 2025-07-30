@@ -226,6 +226,19 @@ input[type="radio"].mauticform-radiogrp-radio {
     vertical-align: -3px;
     margin-right: 4px;
 }
+/* Boolean field styling - reuse radio group */
+.mauticform-boolean-row {
+    margin-bottom: 5px;
+}
+.mauticform-boolean-label {
+    font-weight: normal;
+}
+input[type="radio"].mauticform-boolean-radio {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+    margin-right: 4px;
+}
 
 /* Mautic Form Button Styles */
 .mauticform-button-wrapper .mauticform-button,

@@ -1,0 +1,17 @@
+{#
+    This field relies on the `group.html.twig` implementation.
+#}
+{{- include([theme|default('') ~ 'group.html.twig', '@MauticForm/Field/group.html.twig'], {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+        'type': 'radio',
+        'list': {
+            '0': field.properties.no|default('mautic.core.form.no'|trans),
+            '1': field.properties.yes|default('mautic.core.form.yes'|trans)
+        },
+        'mappedFields': mappedFields|default([]),
+}) -}}

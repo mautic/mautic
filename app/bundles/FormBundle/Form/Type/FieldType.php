@@ -141,6 +141,8 @@ class FieldType extends AbstractType
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
+                case 'boolean':
+                    break;
             }
         }
 
@@ -658,6 +660,16 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'boolean':
+                    $builder->add(
+                        'properties',
+                        FormFieldBooleanType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
                 case 'file':
                     if (!isset($propertiesData['public'])) {
                         $propertiesData['public'] = false;
@@ -701,6 +713,7 @@ class FieldType extends AbstractType
             'email'         => 'email',
             'country'       => 'country',
             'tel'           => 'phone',
+            'boolean'       => 'boolean',
             'companyLookup' => 'company',
             default         => '',
         };

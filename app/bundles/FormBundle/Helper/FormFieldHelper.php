@@ -50,6 +50,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'pagebreak' => [],
         'password'  => [],
         'radiogrp'  => [],
+        'boolean'   => [],
         'select'    => [],
         'tel'       => [],
         'text'      => [],
