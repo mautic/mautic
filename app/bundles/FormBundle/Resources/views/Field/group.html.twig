@@ -238,7 +238,7 @@
             'type': type,
             'value': listValue|e,
     }) %}
-    {% if field.defaultValue == listValue %}
+    {% if field.defaultValue == listValue and noDefaultValue is not defined %}
       {% set listInputAttributes = listInputAttributes|merge({
               'checked': 'checked',
       }) %}

@@ -120,4 +120,35 @@ class BooleanFieldTemplateTest extends MauticMysqlTestCase
         $this->assertStringContainsString('value="0"', $html);
         $this->assertStringContainsString('value="1"', $html);
     }
+
+    public function testBooleanFieldTemplateNoDefaultSelection(): void
+    {
+        $twig = static::getContainer()->get('twig');
+        
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setLabel('Test Boolean Field');
+        $field->setAlias('test_boolean');
+        $field->setProperties([
+            'yes' => 'Custom Yes',
+            'no' => 'Custom No',
+        ]);
+
+        $html = $twig->render('@MauticForm/Field/boolean.html.twig', [
+            'field' => $field,
+            'id' => 'test',
+            'formId' => 1,
+            'formName' => 'test_form',
+        ]);
+
+        // Should contain both options but no option should be pre-selected
+        $this->assertStringContainsString('Custom Yes', $html);
+        $this->assertStringContainsString('Custom No', $html);
+        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringContainsString('value="1"', $html);
+        
+        // Verify that no option is pre-selected (no "checked" attribute)
+        $this->assertStringNotContainsString('checked="checked"', $html);
+        $this->assertStringNotContainsString('checked', $html);
+    }
 } 

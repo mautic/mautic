@@ -1147,6 +1147,12 @@ class SubmissionModel extends CommonFormModel
         // boolean field normalization
         if ('boolean' === $f->getType()) {
             foreach ($value as $key => $item) {
+                // Handle empty values - return empty string for no selection
+                if (empty($item) || $item === null || $item === '') {
+                    $value[$key] = '';
+                    continue;
+                }
+                
                 // Convert string values to proper boolean values
                 if (in_array($item, ['1', 'true', 'yes'], true)) {
                     $value[$key] = '1';

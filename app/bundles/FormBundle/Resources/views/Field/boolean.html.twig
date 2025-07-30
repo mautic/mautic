@@ -16,6 +16,8 @@
 {# Force the isBooleanList flag to true for boolean fields #}
 {% set isBooleanList = true %}
 
+{% set noDefaultValue = true %}
+
 {{- include([theme|default('') ~ 'group.html.twig', '@MauticForm/Field/group.html.twig'], {
         'field': field,
         'fields': fields|default([]),
@@ -26,5 +28,6 @@
         'type': 'radio',
         'list': list,
         'isBooleanList': isBooleanList,
+        'noDefaultValue': noDefaultValue,
         'mappedFields': mappedFields|default([]),
 }) -}}
