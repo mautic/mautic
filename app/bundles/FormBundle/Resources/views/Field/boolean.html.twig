@@ -1,6 +1,21 @@
 {#
     This field relies on the `group.html.twig` implementation.
 #}
+{% set yesLabel = field.properties.yes|default('mautic.core.form.yes'|trans) %}
+{% set noLabel = field.properties.no|default('mautic.core.form.no'|trans) %}
+{% set list = {} %}
+
+{% if noLabel is not empty %}
+    {% set list = list|merge({'0': noLabel}) %}
+{% endif %}
+
+{% if yesLabel is not empty %}
+    {% set list = list|merge({'1': yesLabel}) %}
+{% endif %}
+
+{# Force the isBooleanList flag to true for boolean fields #}
+{% set isBooleanList = true %}
+
 {{- include([theme|default('') ~ 'group.html.twig', '@MauticForm/Field/group.html.twig'], {
         'field': field,
         'fields': fields|default([]),
@@ -9,9 +24,7 @@
         'formId': formId|default(0),
         'formName': formName|default(''),
         'type': 'radio',
-        'list': {
-            '0': field.properties.no|default('mautic.core.form.no'|trans),
-            '1': field.properties.yes|default('mautic.core.form.yes'|trans)
-        },
+        'list': list,
+        'isBooleanList': isBooleanList,
         'mappedFields': mappedFields|default([]),
 }) -}}

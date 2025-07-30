@@ -1144,8 +1144,27 @@ class SubmissionModel extends CommonFormModel
     {
         $value = !is_array($value) ? [$value] : $value;
 
+        // boolean field normalization
+        if ('boolean' === $f->getType()) {
+            foreach ($value as $key => $item) {
+                // Convert string values to proper boolean values
+                if (in_array($item, ['1', 'true', 'yes'], true)) {
+                    $value[$key] = '1';
+                } elseif (in_array($item, ['0', 'false', 'no'], true)) {
+                    $value[$key] = '0';
+                } else {
+                    // For custom labels, map to boolean values based on field properties
+                    $properties = $f->getProperties();
+                    if (isset($properties['yes']) && $item === $properties['yes']) {
+                        $value[$key] = '1';
+                    } elseif (isset($properties['no']) && $item === $properties['no']) {
+                        $value[$key] = '0';
+                    }
+                }
+            }
+        }
         // select and multiselect normalization
-        if ($properties = $f->getProperties()['list'] ?? null) {
+        elseif ($properties = $f->getProperties()['list'] ?? null) {
             foreach ($value as $key => $item) {
                 $value[$key] = CustomFieldValueHelper::setValueFromPropertiesList($properties, $item);
             }

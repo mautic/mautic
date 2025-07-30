@@ -50,7 +50,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'pagebreak' => [],
         'password'  => [],
         'radiogrp'  => [],
-        'boolean'   => [],
+        'boolean'   => [
+            'filter' => 'int',
+        ],
         'select'    => [],
         'tel'       => [],
         'text'      => [],
@@ -202,6 +204,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'radiogrp':
+            case 'boolean':
                 $value = $this->sanitizeValue($value);
                 if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio_'.$alias.'(.*?)"(.*?)value="'.$value.'"(.*?)\/?>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio_'.$alias.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]

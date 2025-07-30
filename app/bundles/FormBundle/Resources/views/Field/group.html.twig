@@ -129,7 +129,7 @@
 {# Setup list parsing #}
 {%- if list is defined or field.properties.syncList is defined or field.properties.list is defined or field.properties.optionList is defined -%}
   {%- set parseList = [] -%}
-  {%- set isBooleanList = false -%}
+  {%- set isBooleanList = (field.type == 'boolean') -%}
 
   {%- if
         (field.properties.syncList is defined and field.properties.syncList is not empty) and
