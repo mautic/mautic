@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -19,6 +20,8 @@ use Symfony\Component\Console\Command\Command;
 
 final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     protected $useCleanupRollback = false; // This should be here, because test is changing DDL of the leads table.
 
     public function testFailWhenSegmentDoesNotExist(): void
@@ -146,8 +149,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($tag3);
         $this->em->flush();
 
-        $contact = new Lead();
-        $contact->setEmail('halusky@bramborak.makovec');
+        $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
 
         if (in_array(1, $addTagsToContact, true)) {
             $contact->addTag($tag1);
@@ -175,28 +177,25 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
             $tagSegment[] = $tag3->getId();
         }
 
-        $segment = new LeadList();
-        $segment->setName('Test segment');
-        $segment->setPublicName('Test segment');
-        $segment->setAlias('test-segment');
-        $segment->setFilters([
+        $segment = $this->createSegment(
+            'test-segment',
             [
-                'glue'     => 'and',
-                'field'    => 'tags',
-                'object'   => 'lead',
-                'type'     => 'tags',
-                'filter'   => $tagSegment,
-                'display'  => null,
-                'operator' => $filter,
-            ],
-        ]);
+                [
+                    'glue'     => 'and',
+                    'field'    => 'tags',
+                    'object'   => 'lead',
+                    'type'     => 'tags',
+                    'filter'   => $tagSegment,
+                    'display'  => null,
+                    'operator' => $filter,
+                ],
+            ]
+        );
 
         $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
 
         $segment->setLastBuiltDate($longTimeAgo);
 
-        $this->em->persist($contact);
-        $this->em->persist($segment);
         $this->em->flush();
         $this->em->clear();
 
@@ -205,9 +204,6 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
-
-        /** @var LeadList $segment */
-        $segment = $this->em->find(LeadList::class, $segment->getId());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
@@ -220,7 +216,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
     public static function provideIncludeExclude(): \Generator
     {
-        yield 'include any' => [OperatorOptions::INCLUDING_ANY, '1', [1, 2], [1, 2, 3]];
+        yield 'include any with match' => [OperatorOptions::INCLUDING_ANY, '1', [1, 2], [1, 2, 3]];
+        yield 'include any no match' => [OperatorOptions::INCLUDING_ANY, 0, [1, 2], [3]];
         yield 'exclude any with match' => [OperatorOptions::EXCLUDING_ANY, 0, [1, 2], [1, 2, 3]];
         yield 'exclude any no match' => [OperatorOptions::EXCLUDING_ANY, '1', [2], [1, 3]];
         yield 'include all no match' => [OperatorOptions::INCLUDING_ALL, 0, [1, 2], [1, 2, 3]];
@@ -272,8 +269,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $contact = new Lead();
-        $contact->setEmail('halusky@bramborak.makovec');
+        $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
 
         $contactValue = [];
         if (in_array(1, $addFieldsToContact, true)) {
@@ -307,27 +303,25 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
             $segmentValue[] = 'makovec';
         }
 
-        $segment = new LeadList();
-        $segment->setName('Test segment');
-        $segment->setPublicName('Test segment');
-        $segment->setAlias('test-segment');
-        $segment->setFilters([
+        $segment = $this->createSegment(
+            'test-segment',
             [
-                'glue'     => 'and',
-                'field'    => $fieldAlias,
-                'object'   => 'lead',
-                'type'     => 'multiselect',
-                'filter'   => $segmentValue,
-                'display'  => null,
-                'operator' => $filter,
-            ],
-        ]);
+                [
+                    'glue'     => 'and',
+                    'field'    => $fieldAlias,
+                    'object'   => 'lead',
+                    'type'     => 'multiselect',
+                    'filter'   => $segmentValue,
+                    'display'  => null,
+                    'operator' => $filter,
+                ],
+            ]
+        );
 
         $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
 
         $segment->setLastBuiltDate($longTimeAgo);
 
-        $this->em->persist($segment);
         $this->em->flush();
         $this->em->clear();
 
@@ -337,15 +331,92 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadList $segment */
-        $segment = $this->em->find(LeadList::class, $segment->getId());
-
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
         Assert::assertSame(
             $expected,
             $leadListRepository->getLeadCount([$segment->getId()])
+        );
+    }
+
+    /**
+     * @param int|string $expected
+     * @param array<int> $addSegmentsToContact
+     * @param array<int> $addSegmentsToSegment
+     *
+     * @dataProvider provideIncludeExclude
+     */
+    public function testSegmentIncludeExclude(string $filter, $expected, array $addSegmentsToContact, array $addSegmentsToSegment): void
+    {
+        $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
+
+        $segmentA = $this->createSegment('A', []);
+        $segmentB = $this->createSegment('B', []);
+        $segmentC = $this->createSegment('C', []);
+
+        $this->em->flush();
+
+        if (in_array(1, $addSegmentsToContact, true)) {
+            $this->createListLead($segmentA, $contact);
+        }
+
+        if (in_array(2, $addSegmentsToContact, true)) {
+            $this->createListLead($segmentB, $contact);
+        }
+
+        if (in_array(3, $addSegmentsToContact, true)) {
+            $this->createListLead($segmentC, $contact);
+        }
+
+        $filteredSegments = [];
+
+        if (in_array(1, $addSegmentsToSegment, true)) {
+            $filteredSegments[] = $segmentA->getId();
+        }
+
+        if (in_array(2, $addSegmentsToSegment, true)) {
+            $filteredSegments[] = $segmentB->getId();
+        }
+
+        if (in_array(3, $addSegmentsToSegment, true)) {
+            $filteredSegments[] = $segmentC->getId();
+        }
+
+        $segmentD = $this->createSegment(
+            'D',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'leadlist',
+                    'object'   => 'lead',
+                    'type'     => 'leadlist',
+                    'filter'   => $filteredSegments,
+                    'display'  => null,
+                    'operator' => $filter,
+                ],
+            ]
+        );
+
+        $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
+
+        $segmentD->setLastBuiltDate($longTimeAgo);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        Assert::assertEquals($longTimeAgo, $segmentD->getLastBuiltDate());
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+
+        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        Assert::assertSame(
+            $expected,
+            $leadListRepository->getLeadCount([$segmentD->getId()])
         );
     }
 }
