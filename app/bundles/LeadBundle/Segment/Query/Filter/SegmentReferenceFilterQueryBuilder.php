@@ -4,11 +4,13 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
@@ -44,14 +46,16 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
         $segmentIds      = $filter->getParameterValue();
 
         if (!is_array($segmentIds)) {
-            $segmentIds = [intval($segmentIds)];
+            $segmentIds = [(int) $segmentIds];
         }
 
-        $orLogic = [];
+        $logic = [];
+
+        $filterArray      = $filter->contactSegmentFilterCrate->getArray();
+        $originalOperator = $filterArray['operator'];
+        $exclusion        = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
         foreach ($segmentIds as $segmentId) {
-            $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
-
             /** @var LeadList $contactSegment */
             $contactSegment = $this->entityManager->getRepository(LeadList::class)->find($segmentId);
             if (!$contactSegment) {
@@ -88,16 +92,27 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expression = $queryBuilder->expr()->exists($segmentQueryBuilder->getSQL());
             }
 
-            if (!$exclusion && count($segmentIds) > 1) {
-                $orLogic[] = $expression;
-            } else {
-                $queryBuilder->addLogic($expression, $filter->getGlue());
-            }
+            $logic[] = $expression;
         }
 
-        if (count($orLogic)) {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), $filter->getGlue());
+        /**
+         * The "exists" is controlled by the $exclusion above.
+         * Including all: and(exists)
+         * Excluding all: not(and(exists))
+         * Including any: or(exists)
+         * Excluding any: and(not exists).
+         */
+        if (OperatorOptions::INCLUDING_ANY !== $originalOperator) {
+            $logic = new CompositeExpression(CompositeExpression::TYPE_AND, $logic);
+        } else {
+            $logic = new CompositeExpression(CompositeExpression::TYPE_OR, $logic);
         }
+
+        if (OperatorOptions::EXCLUDING_ALL === $originalOperator) {
+            $logic = (string) new Expr\Func('NOT', (string) $logic);
+        }
+
+        $queryBuilder->addLogic($logic, $filter->getGlue());
 
         return $queryBuilder;
     }
