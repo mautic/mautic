@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\ReportBundle\Entity\Report;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -208,41 +209,13 @@ class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function createDwcReport(array $reportData): int
     {
-        // Navigate to new report page
-        $report        = $this->client->request(Request::METHOD_GET, '/s/reports/new');
-        $buttonCrawler = $report->selectButton('Save & Close');
-        $form          = $buttonCrawler->form();
+        $report = new Report();
+        $report->setName($reportData['name']);
+        $report->setSource($reportData['source']);
+        $report->setColumns($reportData['columns']);
+        $this->em->persist($report);
+        $this->em->flush();
 
-        // Set initial values
-        $form->setValues([
-            'report[name]'   => $reportData['name'],
-            'report[source]' => $reportData['source'],
-        ]);
-
-        // Submit the form
-        $report   = $this->client->submit($form);
-        $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
-
-        // Get the ID of the new report
-        $viewUrl  = $report->getUri();
-        $reportId = (int) basename(parse_url($viewUrl, PHP_URL_PATH));
-
-        // Edit the report to add columns
-        $report        = $this->client->request(Request::METHOD_GET, '/s/reports/edit/'.$reportId);
-        $buttonCrawler = $report->selectButton('Save & Close');
-        $form          = $buttonCrawler->form();
-
-        // Set columns
-        $form->setValues([
-            'report[columns]' => $reportData['columns'],
-        ]);
-
-        // Submit the edit form
-        $report   = $this->client->submit($form);
-        $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
-
-        return $reportId;
+        return $report->getId();
     }
 }
