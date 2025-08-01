@@ -33,7 +33,7 @@ class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var DynamicContentHelper $dynamicContentHelper */
-        $dynamicContentHelper = self::$container->get('mautic.helper.dynamicContent');
+        $dynamicContentHelper = self::getContainer()->get('mautic.helper.dynamicContent');
 
         $content = '<body><div>{dwc=test_slot}{/dwc}</div></body>';
         $tokens  = $dynamicContentHelper->findDwcTokens($content);
