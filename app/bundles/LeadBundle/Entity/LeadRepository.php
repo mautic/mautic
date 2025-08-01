@@ -940,6 +940,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.dnc'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.dnc', [], null, 'en_US'):
+                $anyKeyword   = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any');
+                $anyKeywordEn = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any', [], null, 'en_US');
+                $sq           = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+                    ->where($q->expr()->eq('l.id', 'dnc.lead_id'));
+
+                if ($string === $anyKeyword || $string === $anyKeywordEn) {
+                    $returnParameter = false;
+                } else {
+                    $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
+                    $returnParameter = true;
+                }
+                $expr           = $q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL());
+                $filter->strict = true;
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
@@ -1001,6 +1019,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.sms_sent',
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
+            'mautic.lead.lead.searchcommand.dnc',
         ];
 
         if (!empty($this->availableSearchFields)) {
