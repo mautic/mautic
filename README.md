@@ -346,6 +346,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ElPollero"><img src="https://avatars.githubusercontent.com/u/130322184?v=4?s=100" width="100px;" alt="ElPollero"/><br /><sub><b>ElPollero</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ElPollero" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://pelbox.com"><img src="https://avatars.githubusercontent.com/u/6670191?v=4?s=100" width="100px;" alt="Gagandeep Singh"/><br /><sub><b>Gagandeep Singh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pelbox" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/PedroLoureiro1"><img src="https://avatars.githubusercontent.com/u/116733776?v=4?s=100" width="100px;" alt="PedroLoureiro1"/><br /><sub><b>PedroLoureiro1</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=PedroLoureiro1" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/OlgaMarchuk"><img src="https://avatars.githubusercontent.com/u/219189660?v=4?s=100" width="100px;" alt="OlgaMarchuk"/><br /><sub><b>OlgaMarchuk</b></sub></a><br /><a href="#userTesting-OlgaMarchuk" title="User Testing">📓</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/stone-creator"><img src="https://avatars.githubusercontent.com/u/1327019?v=4?s=100" width="100px;" alt="Stone-creator"/><br /><sub><b>Stone-creator</b></sub></a><br /><a href="#userTesting-stone-creator" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>

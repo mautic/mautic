@@ -43,7 +43,7 @@ class CustomFieldHelper
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value, DateTimeHelper $dateTimeHelper = null)
+    public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null)
     {
         if (null === $value || is_array($value)) {
             // do not transform null and array values
@@ -92,7 +92,7 @@ class CustomFieldHelper
      *
      * @return mixed[]
      */
-    public static function fieldsValuesTransformer(array $fields, array $values, DateTimeHelper $dateTimeHelper = null): array
+    public static function fieldsValuesTransformer(array $fields, array $values, ?DateTimeHelper $dateTimeHelper = null): array
     {
         foreach ($values as $alias => &$value) {
             if (!empty($fields[$alias]) && is_array($fields[$alias])) {

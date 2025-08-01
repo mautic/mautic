@@ -172,7 +172,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof CampaignLead) {
             return null;
@@ -531,7 +531,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed
      */
-    public function getLeadCampaigns(Lead $lead = null, $forList = false)
+    public function getLeadCampaigns(?Lead $lead = null, $forList = false)
     {
         static $campaigns = [];
 
@@ -746,7 +746,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param int  $limit
      * @param bool $maxLeads
      */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null): int
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, ?OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 

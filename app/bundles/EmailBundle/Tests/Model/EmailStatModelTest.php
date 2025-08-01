@@ -46,7 +46,7 @@ final class EmailStatModelTest extends TestCase
                 parent::__construct();
             }
 
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 switch ($this->dispatchMethodCounter) {
                     case 0:

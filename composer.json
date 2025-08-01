@@ -21,7 +21,7 @@
         "source": "https://github.com/mautic/mautic"
     },
   "require": {
-    "composer/installers": "^1.11",
+    "composer/installers": "^2.3",
     "mautic/core-lib": "^7.0"
   },
   "require-dev": {
@@ -32,7 +32,7 @@
     "friendsofphp/php-cs-fixer": "^3.14",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
-    "liip/test-fixtures-bundle": "^2.6",
+    "liip/test-fixtures-bundle": "^3.5",
     "mautic/transifex": "^5.0",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.0",
@@ -42,12 +42,12 @@
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpunit": "^10.0",
     "rector/rector": "2.0",
-    "symfony/browser-kit": "~6.4.0",
-    "symfony/dom-crawler": "~6.4.0",
-    "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~6.4.0",
-    "symfony/var-dumper": "~6.4.0",
-    "symfony/web-profiler-bundle": "~6.4.0",
+    "symfony/browser-kit": "^7.3",
+    "symfony/dom-crawler": "^7.3",
+    "symfony/maker-bundle": "^1.64",
+    "symfony/phpunit-bridge": "^7.3",
+    "symfony/var-dumper": "^7.3",
+    "symfony/web-profiler-bundle": "^7.3",
     "symplify/easy-coding-standard": "^12.0.13"
   },
   "replace": {

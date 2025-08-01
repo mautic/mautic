@@ -44,7 +44,7 @@ final class DoNotContactSubscriber implements EventSubscriberInterface
             );
         } else {
             $this->doNotContact->addDncForContact(
-                $doNotContactAddEvent->getLead()->getId(),
+                $doNotContactAddEvent->getLead(),
                 $doNotContactAddEvent->getChannel(),
                 $doNotContactAddEvent->getReason(),
                 $doNotContactAddEvent->getComments(),

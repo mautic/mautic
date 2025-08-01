@@ -19,7 +19,7 @@ return [
                 'id'        => Mautic\ProjectBundle\Controller\ProjectController::ROUTE_INDEX,
                 'route'     => Mautic\ProjectBundle\Controller\ProjectController::ROUTE_INDEX,
                 'access'    => Mautic\ProjectBundle\Security\Permissions\ProjectPermissions::CAN_VIEW,
-                'iconClass' => 'ri-folder-2-fill',
+                'iconClass' => 'ri-archive-stack-fill',
                 'priority'  => 1,
             ],
         ],

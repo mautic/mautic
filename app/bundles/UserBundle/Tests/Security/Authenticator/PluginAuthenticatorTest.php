@@ -151,6 +151,7 @@ class PluginAuthenticatorTest extends TestCase
             ->with($authEvent)
             ->willReturnCallback(static function (AuthenticationEvent $event) use ($authenticatedIntegration, $authenticatedUser): AuthenticationEvent {
                 $event->setIsAuthenticated($authenticatedIntegration, $authenticatedUser, false);
+                $event->getToken()->setUser($authenticatedUser);
 
                 return $event;
             });
@@ -177,7 +178,7 @@ class PluginAuthenticatorTest extends TestCase
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
         \assert($pluginBadge instanceof PluginBadge);
-        self::assertNull($pluginBadge->getPreAuthenticatedToken());
+        self::assertEquals(new PluginToken($firewallName, $integration, $authenticatedUser), $pluginBadge->getPreAuthenticatedToken());
         self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
 

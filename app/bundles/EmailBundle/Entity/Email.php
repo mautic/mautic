@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -36,26 +35,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "email:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "asset", "page", "translationChildren", "unsubscribeForm", "fields", "actions", "lists", "preferenceCenter", "assetAttachments"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "email:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use VariantEntityTrait;
@@ -63,6 +42,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use DynamicContentEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+
+    public const ENTITY_NAME = 'email';
+
+    public const MAX_NAME_SUBJECT_LENGTH = 190;
 
     /**
      * @var int
@@ -448,6 +431,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addPropertyConstraint(
+            'name',
+            new Length(
+                [
+                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
+                    'maxMessage' => 'mautic.email.name.length',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
             'subject',
             new NotBlank(
                 [
@@ -460,7 +453,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             'subject',
             new Length(
                 [
-                    'max'        => 190,
+                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
                     'maxMessage' => 'mautic.email.subject.length',
                 ]
             )
@@ -504,8 +497,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addConstraint(new EmailLists());
         $metadata->addConstraint(new EntityEvent());
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Email $email, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (Email $email, ExecutionContextInterface $context): void {
                 if ($email->isVariant()) {
                     // Get a summation of weights
                     $parent   = $email->getVariantParent();
@@ -524,7 +517,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     }
                 }
             },
-        ]));
+        ));
     }
 
     /**
@@ -1135,7 +1128,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setUnsubscribeForm(Form $unsubscribeForm = null)
+    public function setUnsubscribeForm(?Form $unsubscribeForm = null)
     {
         $this->unsubscribeForm = $unsubscribeForm;
 
@@ -1153,7 +1146,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPreferenceCenter(Page $preferenceCenter = null)
+    public function setPreferenceCenter(?Page $preferenceCenter = null)
     {
         $this->preferenceCenter = $preferenceCenter;
 

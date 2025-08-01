@@ -52,7 +52,7 @@ $container->loadFromExtension('framework', [
     'form'            => null,
     'csrf_protection' => true,
     'validation'      => [
-        'enable_annotations' => false,
+        'enable_attributes' => false,
     ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [

@@ -12,30 +12,12 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "field:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "field:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Field implements UuidInterface
 {
     use UuidTrait;
 
-    public const TABLE_NAME = 'form_fields';
+    public const TABLE_NAME  = 'form_fields';
+    public const ENTITY_NAME = 'form_field';
 
     /**
      * @var int
@@ -187,6 +169,8 @@ class Field implements UuidInterface
      * @var string|null
      */
     private $mappedField;
+
+    public ?int $deletedId;
 
     /**
      * Reset properties on clone.
@@ -849,7 +833,7 @@ class Field implements UuidInterface
      *
      * @param array|null $submissions
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
+    public function showForContact($submissions = null, ?Lead $lead = null, ?Form $form = null, ?DisplayManager $displayManager = null): bool
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {

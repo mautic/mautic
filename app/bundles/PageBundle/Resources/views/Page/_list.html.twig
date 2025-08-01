@@ -115,7 +115,17 @@
                                         'btnText': 'mautic.form.form.results'|trans,
                                         'priority': 80
                                     }
-                                }
+                                }|merge(not item.isPreferenceCenter ? {
+                                    'copy': {
+                                        'attr': {
+                                            'data-copy': url('mautic_page_public', {'slug': item.alias}),
+                                            'data-toggle': 'none',
+                                        },
+                                        'btnText': 'mautic.core.copy_page_link'|trans,
+                                        'iconClass': 'ri-clipboard-line',
+                                        'priority': 90
+                                    }
+                                } : {})
                         }) }}
                     </td>
                     <td>
@@ -148,9 +158,10 @@
                             {% endif %}
                         </a>
                         {{ customContent('page.name', _context) }}
+                        {{ include('@MauticProject/Modules/projects.html.twig') }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.hits }}</td>
                     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
@@ -188,7 +199,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'landing-page',
                         'size': '80'
                     } %}

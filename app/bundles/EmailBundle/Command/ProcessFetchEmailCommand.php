@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,6 +13,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI command to check for messages.
  */
+#[AsCommand(
+    name: 'mautic:email:fetch',
+    description: 'Fetch and process monitored email.',
+    aliases: [
+        'mautic:emails:fetch',
+    ]
+)]
 class ProcessFetchEmailCommand extends Command
 {
     public function __construct(
@@ -24,12 +32,6 @@ class ProcessFetchEmailCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:email:fetch')
-            ->setAliases(
-                [
-                    'mautic:emails:fetch',
-                ]
-            )
             ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.')
             ->setHelp(
                 <<<'EOT'
@@ -57,6 +59,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Fetch and process monitored email.';
 }

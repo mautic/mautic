@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
@@ -146,7 +147,8 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->executioner,
             $this->scheduler,
             $this->createMock(ProcessSignalService::class),
-            $this->coreParametersHelper
+            $this->coreParametersHelper,
+            $this->createMock(EventDispatcherInterface::class),
         );
     }
 }

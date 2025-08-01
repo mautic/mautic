@@ -7,6 +7,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -279,7 +280,7 @@ class ImportModel extends FormModel
         while ($batchSize && !$file->eof()) {
             $string = $file->current();
             $file->next();
-            $data = str_getcsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
+            $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
@@ -592,7 +593,7 @@ class ImportModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);
@@ -637,7 +638,7 @@ class ImportModel extends FormModel
      *
      * @param string $msg
      */
-    protected function logDebug($msg, Import $import = null)
+    protected function logDebug($msg, ?Import $import = null)
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

@@ -12,7 +12,7 @@
     {% set variant = button.variant is defined ? button.variant : default_variants[loop.index0] %}
     {% set icon_only = button.icon_only is defined and button.icon_only ? 'btn-icon' : '' %}
     {% set danger_modifier = button.danger is defined and button.danger ? 'btn-danger' : '' %}
-    {% set wide_modifier = button.wide is defined and button.wide ? 'btn-block' : '' %}
+    {% set wide_modifier = button.wide is defined and button.wide ? 'btn-wide' : '' %}
     {% set spin = button.spin is defined and button.spin ? '' : 'btn-nospin' %}
     {% set button_classes = ['btn', 'btn-' ~ variant] %}
 

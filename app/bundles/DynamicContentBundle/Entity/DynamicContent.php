@@ -27,32 +27,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "dynamicContent:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "translationChildren"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "dynamicContent:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use FiltersEntityTrait;
     use UuidTrait;
+
+    public const ENTITY_NAME = 'dynamic_content';
 
     /**
      * @var int
@@ -227,8 +209,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $metadata->addConstraint(new SlotNameType());
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (self $dwc, ExecutionContextInterface $context): void {
                 if (!$dwc->getIsCampaignBased()) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
@@ -264,7 +246,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     }
                 }
             },
-        ]));
+        ));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

@@ -79,4 +79,18 @@ class LeadFieldTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($leadField->disablePublishChange());
     }
+
+    public function testClone(): void
+    {
+        $leadField = new LeadField();
+        $leadField->setLabel('Test value for custom field 4');
+        $leadField->setAlias('test_value_for_custom_field_4');
+
+        $clonedField = clone $leadField;
+
+        $this->assertEquals($leadField->getLabel(), $clonedField->getLabel());
+        $this->assertEquals($leadField->getAlias(), $clonedField->getAlias());
+        $this->assertEquals(0, $clonedField->getOrder());
+        $this->assertTrue($clonedField->getIsCloned());
+    }
 }
