@@ -32,10 +32,9 @@ class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider reportDataProvider
-     *
      * @param mixed[] $reportData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('reportDataProvider')]
     public function testDynamicContentReportFunctionality(array $reportData, bool $isPage): void
     {
         // Create the report
@@ -95,7 +94,7 @@ class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
      *
      * @return iterable<string, mixed[]>
      */
-    public function reportDataProvider(): iterable
+    public static function reportDataProvider(): iterable
     {
         yield 'Standard DWC Page Report' => [
             [
