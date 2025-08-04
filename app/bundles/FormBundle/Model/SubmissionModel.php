@@ -457,7 +457,7 @@ class SubmissionModel extends CommonFormModel
 
                         // build the data rows
                         foreach ($results as $k => $s) {
-                            $row = $this->getExportRow($s, $viewOnlyFields);
+                            $row = $this->getExportRow($s, $viewOnlyFields, $form);
                             $this->putCsvExportRow($handle, $row);
 
                             // free memory
@@ -504,7 +504,7 @@ class SubmissionModel extends CommonFormModel
                             // build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
-                                $row = $this->getExportRow($s, $viewOnlyFields);
+                                $row = $this->getExportRow($s, $viewOnlyFields, $form);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
@@ -686,7 +686,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    private function getExportRow(array $values, array $viewOnlyFields = []): array
+    private function getExportRow(array $values, array $viewOnlyFields = [], ?Form $form = null): array
     {
         $row = [
             $values['id'],
@@ -701,7 +701,17 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
+            $value = htmlspecialchars_decode($r['value'], ENT_QUOTES);
+            
+            // Handle boolean fields
+            if ($form && $r['type'] === 'boolean') {
+                $field = $form->getFields()->get($k2);
+                if ($field) {
+                    $value = $this->getBooleanLabel($value, $field);
+                }
+            }
+            
+            $row[] = $value;
             // free memory
             unset($values['results'][$k2]);
         }
@@ -1177,5 +1187,35 @@ class SubmissionModel extends CommonFormModel
         }
 
         return implode(', ', $value);
+    }
+
+    /**
+     * Convert boolean field value to its corresponding label.
+     */
+    private function getBooleanLabel(string $value, Field $field): string
+    {
+        if ($field->getType() !== 'boolean') {
+            return $value;
+        }
+
+        $properties = $field->getProperties();
+        
+        // Map the value to the appropriate label
+        if ($value === '1' || $value === 'true' || $value === 'yes') {
+            return $properties['yes'] ?? 'Yes';
+        } elseif ($value === '0' || $value === 'false' || $value === 'no') {
+            return $properties['no'] ?? 'No';
+        }
+        
+        // If the value matches one of the custom labels exactly, return it
+        if (isset($properties['yes']) && $value === $properties['yes']) {
+            return $properties['yes'];
+        }
+        if (isset($properties['no']) && $value === $properties['no']) {
+            return $properties['no'];
+        }
+        
+        // Fallback to the original value
+        return $value;
     }
 }
