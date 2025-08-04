@@ -661,6 +661,14 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'boolean':
+                    // Ensure default values are translated
+                    if (!isset($propertiesData['yes'])) {
+                        $propertiesData['yes'] = $this->translator->trans('mautic.core.form.yes');
+                    }
+                    if (!isset($propertiesData['no'])) {
+                        $propertiesData['no'] = $this->translator->trans('mautic.core.form.no');
+                    }
+                    
                     $builder->add(
                         'properties',
                         FormFieldBooleanType::class,
