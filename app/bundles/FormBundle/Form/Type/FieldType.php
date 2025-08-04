@@ -662,14 +662,9 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'boolean':
-                    $isNewField = empty($propertiesData) || !$update;
-                    if ($isNewField) {
-                        if (!isset($propertiesData['yes'])) {
-                            $propertiesData['yes'] = $this->translator->trans('mautic.core.form.yes');
-                        }
-                        if (!isset($propertiesData['no'])) {
-                            $propertiesData['no'] = $this->translator->trans('mautic.core.form.no');
-                        }
+                    if (empty($options['data']['id']) && empty($propertiesData)) {
+                        $propertiesData['yes'] = $this->translator->trans('mautic.core.form.yes');
+                        $propertiesData['no']  = $this->translator->trans('mautic.core.form.no');
                     }
 
                     $builder->add(
