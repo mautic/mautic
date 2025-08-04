@@ -149,15 +149,15 @@ class BooleanFieldTest extends MauticMysqlTestCase
 
         // Test checkbox checked (submitted)
         $result = $normalizeValueMethod->invoke($submissionModel, ['1'], $field);
-        $this->assertEquals('1', $result);
+        $this->assertEquals(true, $result);
 
         // Test checkbox unchecked (not submitted)
         $result = $normalizeValueMethod->invoke($submissionModel, [''], $field);
-        $this->assertEquals('0', $result);
+        $this->assertEquals(false, $result);
 
         // Test checkbox unchecked (empty array)
         $result = $normalizeValueMethod->invoke($submissionModel, [], $field);
-        $this->assertEquals('0', $result);
+        $this->assertEquals(false, $result);
     }
 
     public function testNormalizeValueCheckboxModeOnlyNoLabel(): void
@@ -176,15 +176,15 @@ class BooleanFieldTest extends MauticMysqlTestCase
 
         // Test checkbox checked (submitted)
         $result = $normalizeValueMethod->invoke($submissionModel, ['0'], $field);
-        $this->assertEquals('0', $result);
+        $this->assertEquals(true, $result);
 
         // Test checkbox unchecked (not submitted)
         $result = $normalizeValueMethod->invoke($submissionModel, [''], $field);
-        $this->assertEquals('1', $result);
+        $this->assertEquals(false, $result);
 
         // Test checkbox unchecked (empty array)
         $result = $normalizeValueMethod->invoke($submissionModel, [], $field);
-        $this->assertEquals('1', $result);
+        $this->assertEquals(false, $result);
     }
 
 

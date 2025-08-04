@@ -269,8 +269,8 @@ class SubmissionModel extends CommonFormModel
                     $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
                     
                     if (($onlyYesLabel || $onlyNoLabel) && empty($value)) {
-                        // For checkbox mode, unchecked means negative value
-                        $leadValue = '0';
+                        // For checkbox mode, unchecked means false
+                        $leadValue = false;
                     }
                 }
 
@@ -1162,7 +1162,7 @@ class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    private function normalizeValue($value, Field $f): string
+    private function normalizeValue($value, Field $f): string|bool
     {
         $value = !is_array($value) ? [$value] : $value;
 
@@ -1176,14 +1176,11 @@ class SubmissionModel extends CommonFormModel
             if ($onlyYesLabel || $onlyNoLabel) {
                 // Checkbox mode - if value is empty or not submitted, it means unchecked
                 if (empty($value) || (count($value) === 1 && ($value[0] === null || $value[0] === ''))) {
-                    // For only yes label, unchecked = negative (0)
-                    // For only no label, unchecked = positive (1) - because unchecked means "yes" (positive)
-                    return $onlyYesLabel ? '0' : '1';
+                    // For checkbox mode, unchecked means false
+                    return false;
                 } else {
-                    // Checkbox is checked - return the value that was submitted
-                    // For only yes label, checked = positive (1)
-                    // For only no label, checked = negative (0)
-                    return $onlyYesLabel ? '1' : '0';
+                    // Checkbox is checked - return true
+                    return true;
                 }
             } else {
                 // Radio mode - normal boolean processing

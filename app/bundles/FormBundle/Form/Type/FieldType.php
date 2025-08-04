@@ -236,29 +236,15 @@ class FieldType extends AbstractType
         }
 
         if ($addDefaultValue) {
-            $defaultValueOptions = [
-                'label'      => 'mautic.core.defaultvalue',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
-            ];
-
-            // For boolean fields, set defaultValue based on properties
-            if ('boolean' === $type && !empty($options['data']['properties'])) {
-                $properties = $options['data']['properties'];
-                $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
-                $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
-                
-                if ($onlyYesLabel || $onlyNoLabel) {
-                    // For checkbox mode, set defaultValue to '0' (unchecked = negative)
-                    $defaultValueOptions['data'] = '0';
-                }
-            }
-
             $builder->add(
                 'defaultValue',
                 ('textarea' == $type) ? TextareaType::class : TextType::class,
-                $defaultValueOptions
+                [
+                    'label'      => 'mautic.core.defaultvalue',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                ]
             );
         }
 

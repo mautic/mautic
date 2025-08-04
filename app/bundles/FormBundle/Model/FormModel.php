@@ -196,18 +196,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                     $field->$func($v);
                 }
             }
-
-            // Set defaultValue for boolean fields in checkbox mode
-            if ($field->getType() === 'boolean' && !empty($field->getProperties())) {
-                $properties = $field->getProperties();
-                $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
-                $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
-                
-                if ($onlyYesLabel || $onlyNoLabel) {
-                    // For checkbox mode, set defaultValue to '0' (unchecked = negative)
-                    $field->setDefaultValue('0');
-                }
-            }
             $field->setForm($entity);
             $field->setSessionId($key);
             if (!$field->getParent()) {

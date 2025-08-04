@@ -39,7 +39,7 @@
 {# Force the isBooleanList flag to true for boolean fields #}
 {% set isBooleanList = true %}
 
-{# For checkbox mode, allow defaultValue to be used #}
+{# Set noDefaultValue based on mode #}
 {% if isCheckboxMode %}
     {% set noDefaultValue = false %}
 {% else %}
