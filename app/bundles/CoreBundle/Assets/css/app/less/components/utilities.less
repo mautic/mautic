@@ -411,6 +411,10 @@
 
 .pi-16, .pi-md { padding-inline: var(--spacing-05) !important; }
 .mi-16, .mi-md { margin-inline: var(--spacing-05) !important; }
+.pi-neg-local { padding-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.mi-neg-local { margin-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.ma-neg-local { margin: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+
 
 //fixed widths
 .w-44 {width: 44px;}
@@ -441,6 +445,33 @@
 .h-448 { height: 448px; }
 .h-512 { height: 512px; }
 .h-640 { height: 640px; }
+
+// Fixed min-heights
+.min-h-4 { min-height: 4px; }
+.min-h-8 { min-height: 8px; }
+.min-h-12 { min-height: 12px; }
+.min-h-16 { min-height: 16px; }
+.min-h-24 { min-height: 24px; }
+.min-h-32 { min-height: 32px; }
+.min-h-40 { min-height: 40px; }
+.min-h-48 { min-height: 48px; }
+.min-h-56 { min-height: 56px; }
+.min-h-64 { min-height: 64px; }
+.min-h-80 { min-height: 80px; }
+.min-h-96 { min-height: 96px; }
+.min-h-112 { min-height: 112px; }
+.min-h-128 { min-height: 128px; }
+.min-h-144 { min-height: 144px; }
+.min-h-160 { min-height: 160px; }
+.min-h-192 { min-height: 192px; }
+.min-h-224 { min-height: 224px; }
+.min-h-256 { min-height: 256px; }
+.min-h-288 { min-height: 288px; }
+.min-h-320 { min-height: 320px; }
+.min-h-384 { min-height: 384px; }
+.min-h-448 { min-height: 448px; }
+.min-h-512 { min-height: 512px; }
+.min-h-640 { min-height: 640px; }
 
 // disable focus ring
 // ---------------------------------------------
@@ -680,6 +711,11 @@
   .fo-5-lg { order: 5; }
 }
 
+// Aspect ratio
+.ar-16-9 { aspect-ratio: 16 / 9; }
+.ar-2-1 { aspect-ratio: 2 / 1; }
+.ar-1-1 { aspect-ratio: 1 / 1; }
+
 // Animations
 // Slide in
 
@@ -732,3 +768,10 @@
   from { transform: translateX(20px) scale(0.95); opacity: 0; }
   to   { transform: translateX(0) scale(1); opacity: 1; }
 }
+
+/// Aspect ratio
+.as-1-1 { aspect-ratio: 1 / 1; }
+.as-2-1 { aspect-ratio: 2 / 1; }
+.as-3-2 { aspect-ratio: 3 / 2; }
+.as-4-3 { aspect-ratio: 4 / 3; }
+.as-16-9 { aspect-ratio: 16 / 9; }

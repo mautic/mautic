@@ -104,7 +104,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);

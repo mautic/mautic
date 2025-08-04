@@ -36,15 +36,16 @@ class InputHelperTest extends TestCase
         $unicode = '<a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>';
 
         $samples = [
-            $outlookXML                     => $outlookXML,
-            $html5Doctype                   => $html5Doctype,
-            $html5DoctypeWithContent        => $html5DoctypeWithContent,
-            $html5DoctypeWithUnicodeContent => $html5DoctypeWithUnicodeContent,
-            $xhtml1Doctype                  => $xhtml1Doctype,
-            $cdata                          => $cdata,
-            $script                         => $script,
-            $unicode                        => $unicode,
-            '<applet>content</applet>'      => 'content',
+            $outlookXML                             => $outlookXML,
+            $html5Doctype                           => $html5Doctype,
+            $html5DoctypeWithContent                => $html5DoctypeWithContent,
+            $html5DoctypeWithUnicodeContent         => $html5DoctypeWithUnicodeContent,
+            $xhtml1Doctype                          => $xhtml1Doctype,
+            $cdata                                  => $cdata,
+            $script                                 => $script,
+            $unicode                                => $unicode,
+            '<applet>content</applet>'              => 'content',
+            '<p>👍</p>'                             => '<p>👍</p>',
         ];
 
         foreach ($samples as $sample => $expected) {

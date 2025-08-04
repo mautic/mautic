@@ -243,7 +243,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -388,7 +388,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [], \DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
@@ -514,7 +514,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null,
+        ?\DateTimeInterface $hitDate = null,
     ): void {
         // Store Page/Redirect association
         if ($page) {
@@ -754,7 +754,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -767,7 +767,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null): array
+    public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -965,7 +965,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param bool  $canViewOthers
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -994,7 +994,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param bool  $canViewOthers
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

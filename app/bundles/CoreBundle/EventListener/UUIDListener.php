@@ -4,27 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Ramsey\Uuid\Uuid;
 
-class UUIDListener implements EventSubscriber
+#[AsDoctrineListener(Events::prePersist)]
+class UUIDListener
 {
     public function __construct(private EntityManagerInterface $em)
     {
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [
-            Events::prePersist,
-        ];
     }
 
     /**

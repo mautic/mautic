@@ -165,8 +165,16 @@
             'label': 'mautic.lead.lead.searchcommand.isunowned.label',
             'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
             'icon': 'ri-user-unfollow-line'
+        },
+        {
+            'search': (('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)),
+            'label': 'mautic.lead.lead.searchcommand.dnc.label',
+            'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
+            'icon': 'ri-prohibited-line'
         }
-    ]
+    ],
+    toolbarOptionsLabel: 'mautic.lead.import_export',
+    toolbarOptionsIcon: 'ri-arrow-up-down-fill ri-1x'
 }) -}}
 <div class="btn-group ml-5 sr-only ">
     <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">

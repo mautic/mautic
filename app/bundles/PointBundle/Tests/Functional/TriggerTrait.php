@@ -11,7 +11,7 @@ trait TriggerTrait
     private function createTrigger(
         string $name,
         int $points = 0,
-        Group $group = null,
+        ?Group $group = null,
         bool $triggerExistingLeads = false,
     ): Trigger {
         $trigger = new Trigger();

@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
@@ -41,7 +42,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testContactsGridForValidPermissions(): void
     {
-        $nonAdminUser = $this->setupCampaignData(38);
+        $nonAdminUser = $this->setupCampaignData(38, 0);
 
         $this->loginOtherUser($nonAdminUser);
 
@@ -62,7 +63,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testContactsGridWhenIncompleteValidPermissions(): void
     {
-        $nonAdminUser = $this->setupCampaignData();
+        $nonAdminUser = $this->setupCampaignData(2, 0);
 
         $this->loginOtherUser($nonAdminUser);
 
@@ -79,7 +80,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws NotSupported
      */
-    private function setupCampaignData(int $bitwise = 2): User
+    private function setupCampaignData(int $bitwise, int $export): User
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->em->getRepository(User::class);
@@ -94,8 +95,9 @@ class CampaignControllerTest extends MauticMysqlTestCase
             'role'       => [
                 'name'        => 'perm_non_admin',
                 'permissions' => [
-                    'lead:leads'         => $bitwise,
-                    'campaign:campaigns' => 2,
+                    'lead:leads'             => $bitwise,
+                    'campaign:campaigns'     => 2,
+                    'campaign:export:enable' => $export,
                 ],
             ],
         ]);
@@ -234,5 +236,154 @@ class CampaignControllerTest extends MauticMysqlTestCase
         }
 
         return $events;
+    }
+
+    public function testExportAction(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.zip', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testBatchExportAction(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024);
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request(
+            'GET',
+            '/s/campaigns/batchExport',
+            [
+                'filetype' => 'zip',
+                'ids'      => json_encode([$this->campaign->getId()]),
+            ]
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
+    }
+
+    public function testExportActionAccessDenied(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 0);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testExportActionCampaignNotFound(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(38, 1024);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/999999'); // Non-existent campaign ID
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+    }
+
+    public function testExportFileNotCreated(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(38, 1024); // Ensures export permission
+
+        // Mock the ExportHelper to simulate file creation failure
+        $exportHelperMock = $this->createMock(ExportHelper::class);
+        $exportHelperMock->method('writeToZipFile')->willReturn('');
+
+        // Inject the mock into the container
+        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response        = $this->client->getResponse();
+        $responseContent = $response->getContent();
+
+        // Assert the response status and content
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertJson($responseContent);
+
+        $responseData = json_decode($responseContent, true);
+
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertStringContainsString('Export file could not be created', $responseData['error']);
+
+        $this->assertArrayHasKey('flashes', $responseData);
+    }
+
+    public function testBatchExportAccessDenied(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(0, 0); // No permissions for view or export
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/batchExport');
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testBatchExportCampaignQuery(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024); // Ensure view permissions
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/batchExport', [
+            'ids' => json_encode([]), // Empty IDs to trigger query
+        ]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function testBatchExportFileNotCreated(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024); // Ensure view and export permissions
+
+        // Mock the ExportHelper to simulate file creation failure
+        $exportHelperMock = $this->createMock(ExportHelper::class);
+        $exportHelperMock->method('writeToZipFile')->willReturn('/invalid/path/to/file.zip');
+
+        // Use the test container to replace the service with the mock
+        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/batchExport', [
+            'ids' => json_encode([$this->campaign->getId()]),
+        ]);
+
+        $response        = $this->client->getResponse();
+        $responseContent = $response->getContent();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertJson($responseContent);
+
+        $responseData = json_decode($responseContent, true);
+
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertStringContainsString('Export file could not be created', $responseData['error']);
     }
 }

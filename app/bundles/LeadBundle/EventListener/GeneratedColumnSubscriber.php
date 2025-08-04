@@ -10,11 +10,14 @@ use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
+    use SegmentFilterIconTrait;
+
     public function __construct(
         private ListModel $segmentModel,
         private TranslatorInterface $translator,
@@ -63,7 +66,8 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
                     ],
                 ]
             ),
-            'object' => 'lead',
+            'object'    => 'lead',
+            'iconClass' => $this->getSegmentFilterIcon('generated_email_domain'),
         ]);
     }
 }

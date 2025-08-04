@@ -44,6 +44,7 @@
 
 {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
     'searchValue': searchValue,
+    'searchHelp': 'mautic.company.help.searchcommands',
     'action': currentRoute,
     'page_actions': {
         'templateButtons': {'new': permissions['lead:leads:create']},
@@ -63,7 +64,9 @@
             'tooltip': 'mautic.core.searchcommand.ismine.description',
             'icon': 'ri-user-line'
         }
-    ]
+    ],
+    toolbarOptionsLabel: 'mautic.lead.import_export',
+    toolbarOptionsIcon: 'ri-arrow-up-down-fill ri-1x'
 }) -}}
     <div class="page-list">
   {% endif %}
@@ -142,6 +145,7 @@
                                 {{ fields.core.companyname.value|purify }}
                               {% endif %}
                           {% endif %}
+                          {{ include('@MauticProject/Modules/projects.html.twig') }}
                           </div>
                       </td>
                       <td>
@@ -189,7 +193,7 @@
       <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
         {% set childContainer %}
           <div class="mb-32">
-              {% include '@MauticCore/Helper/pictogram.html.twig' with {
+              {% include '@MauticCore/Components/pictogram.html.twig' with {
                   'pictogram': 'organization',
                   'size': '80'
               } %}

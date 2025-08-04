@@ -18,7 +18,7 @@ interface VariantEntityInterface
      *
      * @return mixed
      */
-    public function setVariantParent(VariantEntityInterface $parent = null);
+    public function setVariantParent(?VariantEntityInterface $parent = null);
 
     /**
      * Set this entity as a main content (remove translation parent).

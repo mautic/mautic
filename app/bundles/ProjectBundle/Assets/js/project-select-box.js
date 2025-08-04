@@ -67,3 +67,26 @@ mQuery(document).on('chosen:no_results', 'select', function (event) {
         new ProjectSelectBox($select);
     }
 });
+
+// Handle entity selection modal opening for project details
+mQuery(document).on('change', '#project-entity-selector, #entity-type-selector', function(event) {
+    const $select = mQuery(this);
+    const $selectedOption = $select.find('option:selected');
+    
+    if ($selectedOption.val() && $selectedOption.data('href')) {
+        // Get the URL and header from data attributes
+        const url = $selectedOption.data('href');
+        const header = $selectedOption.data('header');
+        
+        // Use Mautic's loadAjaxModal function
+        Mautic.loadAjaxModal('#MauticSharedModal', url, 'GET', header);
+        
+        // Reset the select to placeholder after opening modal
+        $select.val('');
+        
+        // Update chosen if it's a chosen select
+        if ($select.hasClass('chosen-select')) {
+            $select.trigger('chosen:updated');
+        }
+    }
+});

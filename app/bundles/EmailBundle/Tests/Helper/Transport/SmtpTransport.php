@@ -22,7 +22,7 @@ class SmtpTransport implements TransportInterface
         $this->transports['main'] = $this;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Email) {
             $this->sentMessage = clone $message;

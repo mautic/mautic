@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -2014,10 +2015,6 @@ class LeadController extends FormController
 
         $fileType = $request->get('filetype', 'csv');
 
-        if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
-            return $this->contactExportCSVScheduler($dispatcher, $permissions);
-        }
-
         /** @var LeadModel $model */
         $model      = $this->getModel('lead');
         $session    = $request->getSession();
@@ -2063,7 +2060,31 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
+        // First, get the total count without creating the iterator
+        $totalContacts      = $model->getEntities($args)['count'];
+        $contactExportLimit = $this->coreParametersHelper->get('contact_export_limit', 0);
+        // Check if export limit is exceeded
+        if ($contactExportLimit > 0 && $totalContacts > $contactExportLimit) {
+            $messageVars = [
+                '%limit%' => number_format($contactExportLimit),
+                '%total%' => number_format($totalContacts),
+            ];
+            $this->addFlashMessage('mautic.lead.export.limit.exceeded', $messageVars, FlashBag::LEVEL_ERROR);
+            $response['message'] = $this->translator->trans('mautic.lead.export.limit.exceeded', $messageVars, 'flashes');
+            $response['flashes'] = $this->getFlashContent();
+
+            return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
+        }
+
+        if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
+            return $this->contactExportCSVScheduler($dispatcher, $permissions);
+        }
+
+        $iterator = new IteratorExportDataModel(
+            $model,
+            $args,
+            fn ($contact) => $exportHelper->parseLeadToExport($contact)
+        );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
         $details['total'] = $iterator->getTotal();

@@ -1,0 +1,39 @@
+<div class="lead-stats row-no-gutters gap-sm fw-nowrap-lg mb-sm">
+    {% for stat in stats %}
+    <div class="col-xs-12 col-lg-3">
+        {% set tileContent %}
+            <div class="d-flex fd-column jc-space-between {% if stats|length == 4 %}ar-2-1{% endif %} fg-1">
+                <span class="text-secondary mb-lg ellipsis">
+                    {{ stat.title|trans }}
+                    {% if stat.tooltip is defined %}
+                        <i class="ri-information-line ml-3" data-toggle="tooltip" title="{{ stat.tooltip|trans }}"></i>
+                    {% endif %}
+                </span>
+                <span class="d-flex lh-1 ai-center jc-space-between fs-40">
+                    <div class="fw-b {% if stat.link is defined and stat.value != 0 and stat.value != '0%' %}text-interactive{% endif %}" {% if stat.value_attr is defined %}{{ stat.value_attr|raw }}{% endif %}>{% if stat.value == 0 or stat.value == '0%' %}--{% else %}{{ stat.value|raw }}{% endif %}</div>
+                    {% if stat.icon is defined and stat.icon and (stat.link is not defined or stat.value == 0) %}
+                        <i class="{{ stat.icon }} fs-22" aria-hidden="true"></i>
+                    {% endif %}
+                </span>
+                {% if stat.desc is defined %}
+                    <span class="text-secondary small mt-md ellipsis">{{ stat.desc|trans }}</span>
+                {% endif %}
+            </div>  
+        {% endset %}
+
+        {% if stat.link is defined and stat.value != 0 %}
+            {% include '@MauticCore/Components/tile.html.twig' with {
+                type: 'clickable',
+                content: tileContent,
+                href: stat.link,
+                icon: stat.icon|default('ri-arrow-right-line'),
+                attributes: {'data-toggle': 'ajax'}
+            } %}
+        {% else %}
+            {% include '@MauticCore/Components/tile.html.twig' with {
+                content: tileContent
+            } %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

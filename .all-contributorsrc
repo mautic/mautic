@@ -1580,6 +1580,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "OlgaMarchuk",
+      "name": "OlgaMarchuk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/219189660?v=4",
+      "profile": "https://github.com/OlgaMarchuk",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "stone-creator",
+      "name": "Stone-creator",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1327019?v=4",
+      "profile": "https://github.com/stone-creator",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,

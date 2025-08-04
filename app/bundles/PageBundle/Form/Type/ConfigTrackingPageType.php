@@ -14,14 +14,6 @@ class ConfigTrackingPageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [
-            'label' => 'mautic.page.config.form.track.by.tracking.url',
-            'data'  => isset($options['data']['track_by_tracking_url']) ? (bool) $options['data']['track_by_tracking_url'] : true,
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.tracking.url.tooltip',
-            ],
-        ]);
-
         $builder->add(
             'anonymize_ip',
             YesNoButtonGroupType::class,

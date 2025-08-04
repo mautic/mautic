@@ -357,7 +357,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -602,7 +602,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param array $options
      */
-    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')

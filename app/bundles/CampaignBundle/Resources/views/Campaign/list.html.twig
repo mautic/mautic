@@ -9,6 +9,22 @@
 {% block content %}
   {% if isIndex %}
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
+        {%- set pageButtons = [] %}
+        {% if permissions['campaign:campaigns:create'] %}
+            {% if permissions['campaign:imports:create'] %}
+                {% set pageButtons = pageButtons|merge([
+                    {
+                        'attr': {
+                            'href': path('mautic_campaign_import_action', {'objectAction': 'new'}),
+                            'data-toggle': '0',
+                        },
+                        'iconClass': 'ri-import-line',
+                        'btnText': 'mautic.campaign.campaign.import',
+                    }
+                ]) %}
+            {% endif %}
+        {% endif %}
+
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
@@ -26,6 +42,7 @@
                 },
                 'routeBase': 'campaign',
                 'langVar': 'campaign.campaigns',
+                'customButtons': pageButtons,
             },
             'bulk_actions': {
                 'routeBase': 'campaign',
@@ -131,6 +148,7 @@
                                 item.createdBy
                               ),
                           'clone': permissions['campaign:campaigns:create'],
+                          'export': enableExportPermission,
                           'delete': securityHasEntityAccess(
                                 permissions['campaign:campaigns:deleteown'],
                                 permissions['campaign:campaigns:deleteother'],
@@ -153,6 +171,7 @@
                                 {{- item.name -}}
                                 {{- customContent('campaign.name', _context|merge({'item': item})) -}}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
 
                         {{ include('@MauticCore/Helper/description--inline.html.twig', {
@@ -161,7 +180,7 @@
 
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg" title="{{ item.dateAdded ? dateToFullConcat(item.dateAdded) : '' }}">
                         {{ item.dateAdded ? dateToDate(item.dateAdded) : '' }}
@@ -193,7 +212,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mt-32 mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'ibm--automation-platform',
                         'size': '80'
                     } %}
@@ -215,7 +234,7 @@
         </div>
     </div>
 
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.campaigns.reengagement', 'mautic.protip.campaigns.survey', 'mautic.protip.campaigns.crosssell', 'mautic.protip.campaigns.onboarding'])
     }) }}
   {% endif %}

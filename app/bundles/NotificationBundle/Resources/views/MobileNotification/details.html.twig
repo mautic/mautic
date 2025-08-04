@@ -26,7 +26,7 @@
         'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
     }
 ) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': notification.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -76,6 +76,18 @@
               <div class="pa-md">
                   <div class="row">
                       <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.mobile_sent',
+                                'value': notification.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
+                                }),
+                                'icon': 'ri-smartphone-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 va-m">
@@ -88,7 +100,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -136,21 +148,6 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- activity feed -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}, with_context=false) }}
-
-          {% if security.isGranted('lead:leads:viewown') %}
-          {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
-              title: 'mautic.core.useful_links',
-              items: [
-                  {
-                      label: 'mautic.lead.lead.contacts.mobile_sent'|trans,
-                      link: path('mautic_contact_index', {
-                          'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
-                      }),
-                      icon: 'ri-smartphone-line'
-                  }
-              ]
-          } %}
-          {% endif %}
       </div>
       <!--/ right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />

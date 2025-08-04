@@ -548,7 +548,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $response['lists']);
     }
 
-    private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
+    private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();
         $segment->setName($name)->setPublicName($name)->setAlias($alias)->setFilters($filters);

@@ -11,12 +11,14 @@ use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
@@ -41,6 +43,7 @@ class KickoffExecutioner implements ExecutionerInterface
         private EventScheduler $scheduler,
         private ProcessSignalService $processSignalService,
         private CoreParametersHelper $coreParametersHelper,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -52,7 +55,7 @@ class KickoffExecutioner implements ExecutionerInterface
      * @throws Exception\CannotProcessEventException
      * @throws NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -178,6 +181,7 @@ class KickoffExecutioner implements ExecutionerInterface
             $this->limiter->setBatchMinContactId($batchMinContactId);
             // Get the next batch
             $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
+            $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
         }
     }
 }

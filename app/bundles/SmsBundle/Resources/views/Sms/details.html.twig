@@ -20,7 +20,8 @@
         'targetLabel': 'mautic.sms.smses'|trans
     }
 ) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': sms.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': sms.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': sms}) }}
 {% endblock %}
 
 {% block actions %}
@@ -52,6 +53,7 @@
     'entity': sms,
     'status': sms.getPublishUp() is not null ? 'sending' : 'available'
 }) -}}
+<div class="label__divider"></div>
 {% set tags = [
     {
         color: 'warm-gray',
@@ -112,6 +114,18 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.sms_sent',
+                                'value': sms.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.sms_sent'|trans) ~ ':' ~ sms.id
+                                }),
+                                'icon': 'ri-message-2-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
@@ -124,7 +138,7 @@
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : entityViews, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                             </div>
                         </div>
@@ -173,21 +187,6 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- activity feed -->
         {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
-
-        {% if security.isGranted('lead:leads:viewown') %}
-        {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
-            title: 'mautic.core.useful_links',
-            items: [
-                {
-                    label: 'mautic.lead.lead.contacts.sms_sent'|trans,
-                    link: path('mautic_contact_index', {
-                        'search': ('mautic.lead.lead.searchcommand.sms_sent'|trans) ~ ':' ~ sms.id
-                    }),
-                    icon: 'ri-message-2-line'
-                }
-            ]
-        } %}
-        {% endif %}
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ sms.getId() }}" />

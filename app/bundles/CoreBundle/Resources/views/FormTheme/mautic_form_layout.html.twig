@@ -206,11 +206,11 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {% if errors|length > 1 %}
         <ul>
             {% for error in errors %}
-                <li>{{ error.getMessage()|escape }}</li>
+                <li class="alert alert-danger">{{ error.getMessage()|escape }}</li>
             {% endfor %}
         </ul>
     {% else %}
-        {{ (errors|first).getMessage()|escape }}
+        <div class="alert alert-danger">{{ (errors|first).getMessage()|escape }}</div>
     {% endif %}
     </div>
 {% endif %}

@@ -9,36 +9,38 @@
   {% set filterType = form.field.vars.value %}
   {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue and false == first %}
   {% set isBehavior = fields.behaviors[filterType].label is defined %}
-  {% set class = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'ri-building-2-line' : 'ri-user-6-fill' %}
 
   {% if isBehavior %}
       {% set object = 'behaviors' %}
   {% else %}
-      {% set object = (form.vars.data.object is defined) ? form.vars.data.object : 'lead' %}
+      {% set object = form.vars.data.object|default('') %}
   {% endif %}
+  {% set objectIconClass = 'company' == object ? 'ri-building-2-line' : 'ri-user-6-fill' %}
+  {% set filterTypeIconClass = fields[object][filterType]['iconClass']|default('') %}
 
   {% if isPrototype or fields[object][filterType].label is defined %}
 
-      <div class="filter--row mb-md segment-filter d-flex fw-nowrap ai-center gap-sm {% if inGroup %}in-group{% endif %}" id="{{ id }}">
+      <div class="filter--row segment-filter d-flex fw-nowrap ai-center gap-sm {% if inGroup %}in-group{% endif %}" id="{{ id }}">
             <span class="filter--condition-when fw-sb{% if '0' != form.vars.name %} hide{% endif %}">{{ 'mautic.lead.list.form.glue.when'|trans }}</span>
             <div class="filter--condition panel-glue d-flex ai-center gap-xs pl-0{% if '0' == form.vars.name %} hide{% endif %}">
                 <i class="ri-draggable ri-1x text-primary"></i>
                 {{ form_widget(form.glue) }}
             </div>
 
-            <div class="filter--panel panel fg-0">
-                <div class="d-flex ai-center fw-nowrap">
+            <div class="filter--panel panel">
+                <div class="d-flex fw-nowrap">
                     <div class="filter--field-name d-flex ai-center pr-lg pl-lg" size="lg">
-                        <i class="object-icon {{ class }}" aria-hidden="true"></i>
-                        <span>{% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+                        {% set objectLabel = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
+                        <i class="object-icon {{ filterTypeIconClass }}" aria-hidden="true"></i>
+                        <span> {% if isPrototype %}__label__{% else %}{{ 'mautic.lead_list.filter.field.label'|trans({'%object%': objectLabel, '%field%': fields[object][filterType]['label'] })|raw}}{% endif %}</span>
                     </div>
 
-                    <div class="filter--field-operator">
+                    <div class="filter--field-operator fs-0">
                         {{ form_widget(form.operator) }}
                     </div>
 
                     {% set hasErrors = (form.properties.vars.errors|length > 0) %}
-                    <div class="filter--field-properties {% if hasErrors %}has-error{% endif %}">
+                    <div class="filter--field-properties fg-1 {% if hasErrors %}has-error{% endif %}">
                         <div class="properties-form">
                             {{ form_widget(form.properties) }}
                         </div>

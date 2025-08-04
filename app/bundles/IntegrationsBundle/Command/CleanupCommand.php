@@ -5,26 +5,23 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Command;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: CleanupCommand::NAME,
+    description: 'Delete records from field changes which are invalid'
+)]
 class CleanupCommand extends Command
 {
-    protected static $defaultDescription = 'Delete records from field changes which are invalid';
-    public const NAME                    = 'mautic:integrations:cleanup';
+    public const NAME = 'mautic:integrations:cleanup';
 
     public function __construct(private FieldChangeRepository $fieldChangeRepository)
     {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName(self::NAME);
-
-        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

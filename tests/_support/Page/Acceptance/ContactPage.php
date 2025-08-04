@@ -39,7 +39,7 @@ class ContactPage
     // Import
     public static $chooseFileButton       = '#lead_import_file';
     public static $uploadButton           = '#lead_import_start';
-    public static $importModal            = '#app-content > div > div.row > div > div > div > div.panel-body';
+    public static $importModal            = '#app-content > div > div.row.animation--slide-in-up > div > div > div.row > div > div';
     public static $importForm             = '#app-content > div > div.ml-lg.mr-lg.mt-md.pa-lg > form > div:nth-child(2) > div.panel-body';
     public static $importFormFields       = '#app-content > div > div.ml-lg.mr-lg.mt-md.pa-lg > form > div:nth-child(2) > div.panel-body > div:nth-child(1) > div > div > label';
     public static $firstName              = '#lead_field_import_firstname_chosen';
@@ -48,7 +48,7 @@ class ContactPage
     public static $company                = '#lead_field_import_company_chosen';
     public static $country                = '#lead_field_import_country_chosen';
     public static $importInBrowser        = '#lead_field_import_buttons_save_toolbar';
-    public static $importProgressComplete = '#leadImportProgressComplete > div > div > div.panel-heading';
+    public static $importProgressComplete = '#leadImportProgressComplete';
 
     // Campaigns
     public static $campaignsModalAddOption     = '//*[@id="lead_batch_add_chosen"]/ul/li/input';

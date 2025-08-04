@@ -76,7 +76,7 @@ trait VariantModelTrait
      *
      * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
-    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null): bool
+    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], ?\DateTime $variantStartDate = null): bool
     {
         $isVariant = $entity->isVariant();
 
@@ -123,7 +123,7 @@ trait VariantModelTrait
      * @param bool  $resetVariants
      * @param array $relatedIds
      */
-    protected function postVariantSaveEntity(VariantEntityInterface $entity, $resetVariants = false, $relatedIds = [], \DateTime $variantStartDate = null)
+    protected function postVariantSaveEntity(VariantEntityInterface $entity, $resetVariants = false, $relatedIds = [], ?\DateTime $variantStartDate = null)
     {
         // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
         if ($parent = $entity->getVariantParent()) {
@@ -136,7 +136,7 @@ trait VariantModelTrait
         }
     }
 
-    protected function resetVariants($entity, $relatedIds = null, \DateTime $variantStartDate = null)
+    protected function resetVariants($entity, $relatedIds = null, ?\DateTime $variantStartDate = null)
     {
         $repo = $this->getRepository();
 

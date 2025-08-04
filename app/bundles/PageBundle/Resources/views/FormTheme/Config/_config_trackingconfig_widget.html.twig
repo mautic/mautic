@@ -18,7 +18,7 @@
             <div class="row">
                 <hr>
                 {% for name, f in form.children %}
-                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'do_not_track_404_anonymous'] %}
+                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'do_not_track_404_anonymous'] %}
                         <div class="col-xs-12">
                             {{ form_row(f) }}
                             {% if name == 'anonymize_ip' %}

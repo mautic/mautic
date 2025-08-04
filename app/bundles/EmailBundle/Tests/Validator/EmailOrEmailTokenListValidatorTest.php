@@ -56,7 +56,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return $id;
             }
@@ -68,7 +68,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 parent::__construct();
             }
 
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return $event;
             }
