@@ -1156,7 +1156,7 @@ class SubmissionModel extends CommonFormModel
     {
         $value = !is_array($value) ? [$value] : $value;
 
-        // boolean field normalization
+        // boolean field normalization for checkbox mode only
         if ('boolean' === $f->getType()) {
             $properties   = $f->getProperties();
             $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
@@ -1168,28 +1168,6 @@ class SubmissionModel extends CommonFormModel
                     return false;
                 } else {
                     return true;
-                }
-            } else {
-                // Radio mode - convert to string values
-                foreach ($value as $key => $item) {
-                    if (null === $item || '' === $item) {
-                        $value[$key] = '';
-                        continue;
-                    }
-
-                    // Convert string values to proper boolean values
-                    if (in_array($item, ['1', 'true', 'yes'], true)) {
-                        $value[$key] = '1';
-                    } elseif (in_array($item, ['0', 'false', 'no'], true)) {
-                        $value[$key] = '0';
-                    } else {
-                        // For custom labels, map to boolean values based on field properties
-                        if (isset($properties['yes']) && $item === $properties['yes']) {
-                            $value[$key] = '1';
-                        } elseif (isset($properties['no']) && $item === $properties['no']) {
-                            $value[$key] = '0';
-                        }
-                    }
                 }
             }
         }
