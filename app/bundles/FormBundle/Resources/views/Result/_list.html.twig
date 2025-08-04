@@ -118,26 +118,48 @@
                               {% set field = form.fields|filter(f => f.alias == key)|first %}
                               {% if field %}
                                   {% set properties = field.properties %}
-                                  {% if r.value == '1' or r.value == 'true' or r.value == 'yes' %}
-                                  <div class="label label-green label-icon mr-xs" size="sm">
-                                      <i class="ri-check-line"></i>
-                                    </div>
-                                    {{ (properties.yes ?? 'Yes')|e }}
-                                  {% elseif r.value == '0' or r.value == 'false' or r.value == 'no' %}
-                                  <div class="label label-red label-icon mr-xs" size="sm">
-                                      <i class="ri-close-line"></i>
-                                    </div>
-                                    {{ (properties.no ?? 'No')|e }}
+                                    {% if r.value == '1' or r.value == 'true' or r.value == 'yes' %}
+                                        {% set tags = [{
+                                            'label': 'mautic.form.field.boolean.selected_option',
+                                            'color': 'green',
+                                            'icon': 'ri-check-line',
+                                            'icon_only': true,
+                                            'size': 'sm',
+                                            'attributes': {'class': 'mr-xs'}
+                                        }] %}
+                                      {{ include('@MauticCore/Helper/_tag.html.twig', {'tags': tags}) }}
+                                      {{ (properties.yes ?? 'mautic.form.field.boolean.selected_option')|trans|e }}
+                                    {% elseif r.value == '0' or r.value == 'false' or r.value == 'no' %}
+                                        {% set tags = [{
+                                            'label': 'mautic.form.field.boolean.selected_option',
+                                            'color': 'red',
+                                            'icon': 'ri-close-line',
+                                            'icon_only': true,
+                                            'size': 'sm',
+                                            'attributes': {'class': 'mr-xs'}
+                                        }] %}
+                                      {{ include('@MauticCore/Helper/_tag.html.twig', {'tags': tags}) }}
+                                      {{ (properties.no ?? 'mautic.form.field.boolean.selected_option')|trans|e }}
                                   {% elseif properties.yes is defined and r.value == properties.yes %}
-                                  <div class="label label-green label-icon mr-xs" size="sm">
-                                      <i class="ri-check-line"></i>
-                                    </div>
-                                    {{ properties.yes|e }}
+                                      {% set tags = [{
+                                          'label': 'mautic.form.field.boolean.checked',
+                                          'color': 'green',
+                                          'icon': 'ri-check-line',
+                                          'size': 'sm',
+                                          'attributes': {'class': 'mr-xs'}
+                                      }] %}
+                                      {{ include('@MauticCore/Helper/_tag.html.twig', {'tags': tags}) }}
+                                      {{ properties.yes|e }}
                                   {% elseif properties.no is defined and r.value == properties.no %}
-                                  <div class="label label-red label-icon mr-xs" size="sm">
-                                      <i class="ri-close-line"></i>
-                                    </div>
-                                    {{ properties.no|e }}
+                                      {% set tags = [{
+                                          'label': 'mautic.form.field.boolean.unchecked',
+                                          'color': 'red',
+                                          'icon': 'ri-close-line',
+                                          'size': 'sm',
+                                          'attributes': {'class': 'mr-xs'}
+                                      }] %}
+                                      {{ include('@MauticCore/Helper/_tag.html.twig', {'tags': tags}) }}
+                                      {{ properties.no|e }}
                                   {% else %}
                                       {{ r.value|e }}
                                   {% endif %}
