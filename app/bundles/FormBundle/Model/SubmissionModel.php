@@ -1156,25 +1156,40 @@ class SubmissionModel extends CommonFormModel
 
         // boolean field normalization
         if ('boolean' === $f->getType()) {
-            foreach ($value as $key => $item) {
-                // Handle empty values - return empty string for no selection
-                if ($item === null || $item === '') {
-                    $value[$key] = '';
-                    continue;
-                }
-                
-                // Convert string values to proper boolean values
-                if (in_array($item, ['1', 'true', 'yes'], true)) {
-                    $value[$key] = '1';
-                } elseif (in_array($item, ['0', 'false', 'no'], true)) {
-                    $value[$key] = '0';
+            // Check if this is a checkbox mode (only one label set)
+            $properties = $f->getProperties();
+            $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
+            $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
+            
+            if ($onlyYesLabel || $onlyNoLabel) {
+                // Checkbox mode - if value is empty or not submitted, it means unchecked (negative)
+                if (empty($value) || (count($value) === 1 && ($value[0] === null || $value[0] === ''))) {
+                    return $onlyYesLabel ? '0' : '1'; // For only yes label, unchecked = negative (0)
                 } else {
-                    // For custom labels, map to boolean values based on field properties
-                    $properties = $f->getProperties();
-                    if (isset($properties['yes']) && $item === $properties['yes']) {
+                    // Checkbox is checked - return positive value
+                    return $onlyYesLabel ? '1' : '0'; // For only yes label, checked = positive (1)
+                }
+            } else {
+                // Radio mode - normal boolean processing
+                foreach ($value as $key => $item) {
+                    // Handle empty values - return empty string for no selection
+                    if ($item === null || $item === '') {
+                        $value[$key] = '';
+                        continue;
+                    }
+                    
+                    // Convert string values to proper boolean values
+                    if (in_array($item, ['1', 'true', 'yes'], true)) {
                         $value[$key] = '1';
-                    } elseif (isset($properties['no']) && $item === $properties['no']) {
+                    } elseif (in_array($item, ['0', 'false', 'no'], true)) {
                         $value[$key] = '0';
+                    } else {
+                        // For custom labels, map to boolean values based on field properties
+                        if (isset($properties['yes']) && $item === $properties['yes']) {
+                            $value[$key] = '1';
+                        } elseif (isset($properties['no']) && $item === $properties['no']) {
+                            $value[$key] = '0';
+                        }
                     }
                 }
             }

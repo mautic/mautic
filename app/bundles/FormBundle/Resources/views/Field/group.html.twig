@@ -260,10 +260,21 @@
       {% endif %}
     {% endif %}
     
-    {% if field.defaultValue == listValue and noDefaultValue is not defined %}
-      {% set listInputAttributes = listInputAttributes|merge({
-              'checked': 'checked',
-      }) %}
+    {# Handle checkbox mode for boolean fields #}
+    {% if field.type == 'boolean' and isCheckboxMode is defined and isCheckboxMode %}
+      {# For checkbox mode, we need to handle the checked state differently #}
+      {% if field.defaultValue == listValue and noDefaultValue is not defined %}
+        {% set listInputAttributes = listInputAttributes|merge({
+                'checked': 'checked',
+        }) %}
+      {% endif %}
+    {% else %}
+      {# For radio mode, use the original logic #}
+      {% if field.defaultValue == listValue and noDefaultValue is not defined %}
+        {% set listInputAttributes = listInputAttributes|merge({
+                'checked': 'checked',
+        }) %}
+      {% endif %}
     {% endif %}
 
     {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}

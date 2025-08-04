@@ -67,16 +67,21 @@ class BooleanFieldTest extends MauticMysqlTestCase
             'no' => '',
         ]);
 
-        // Test with boolean value '1'
+        // This field has only yes label, so it's in checkbox mode
+        // Test with boolean value '1' (checked)
         $result = $normalizeValueMethod->invoke($submissionModel, '1', $field);
         $this->assertEquals('1', $result);
 
-        // Test with custom label that matches 'yes' property
+        // Test with custom label that matches 'yes' property (checked)
         $result = $normalizeValueMethod->invoke($submissionModel, 'Custom Yes', $field);
         $this->assertEquals('1', $result);
 
-        // Test with empty 'no' property - should still work with standard values
-        $result = $normalizeValueMethod->invoke($submissionModel, '0', $field);
+        // Test with empty value (unchecked checkbox)
+        $result = $normalizeValueMethod->invoke($submissionModel, '', $field);
+        $this->assertEquals('0', $result);
+
+        // Test with null value (unchecked checkbox)
+        $result = $normalizeValueMethod->invoke($submissionModel, null, $field);
         $this->assertEquals('0', $result);
     }
 
@@ -103,5 +108,82 @@ class BooleanFieldTest extends MauticMysqlTestCase
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'false', $field);
         $this->assertEquals('0', $result);
+    }
+
+    public function testNormalizeValueWithEmptySubmission(): void
+    {
+        $submissionModel = static::getContainer()->get('mautic.form.model.submission');
+        $reflection = new ReflectionClass($submissionModel);
+        $normalizeValueMethod = $reflection->getMethod('normalizeValue');
+        $normalizeValueMethod->setAccessible(true);
+
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setProperties([
+            'yes' => 'Custom Yes',
+            'no' => 'Custom No',
+        ]);
+
+        // Test empty submission
+        $result = $normalizeValueMethod->invoke($submissionModel, '', $field);
+        $this->assertEquals('', $result);
+
+        // Test null submission
+        $result = $normalizeValueMethod->invoke($submissionModel, null, $field);
+        $this->assertEquals('', $result);
+    }
+
+    public function testNormalizeValueCheckboxModeOnlyYesLabel(): void
+    {
+        $submissionModel = static::getContainer()->get('mautic.form.model.submission');
+        $reflection = new ReflectionClass($submissionModel);
+        $normalizeValueMethod = $reflection->getMethod('normalizeValue');
+        $normalizeValueMethod->setAccessible(true);
+
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setProperties([
+            'yes' => 'I wanna receive comm',
+            'no' => '', // Empty negative label
+        ]);
+
+        // Test checkbox checked (submitted)
+        $result = $normalizeValueMethod->invoke($submissionModel, ['1'], $field);
+        $this->assertEquals('1', $result);
+
+        // Test checkbox unchecked (not submitted)
+        $result = $normalizeValueMethod->invoke($submissionModel, [''], $field);
+        $this->assertEquals('0', $result);
+
+        // Test checkbox unchecked (empty array)
+        $result = $normalizeValueMethod->invoke($submissionModel, [], $field);
+        $this->assertEquals('0', $result);
+    }
+
+    public function testNormalizeValueCheckboxModeOnlyNoLabel(): void
+    {
+        $submissionModel = static::getContainer()->get('mautic.form.model.submission');
+        $reflection = new ReflectionClass($submissionModel);
+        $normalizeValueMethod = $reflection->getMethod('normalizeValue');
+        $normalizeValueMethod->setAccessible(true);
+
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setProperties([
+            'yes' => '', // Empty positive label
+            'no' => 'I do not want to receive comm',
+        ]);
+
+        // Test checkbox checked (submitted)
+        $result = $normalizeValueMethod->invoke($submissionModel, ['0'], $field);
+        $this->assertEquals('0', $result);
+
+        // Test checkbox unchecked (not submitted)
+        $result = $normalizeValueMethod->invoke($submissionModel, [''], $field);
+        $this->assertEquals('1', $result);
+
+        // Test checkbox unchecked (empty array)
+        $result = $normalizeValueMethod->invoke($submissionModel, [], $field);
+        $this->assertEquals('1', $result);
     }
 } 

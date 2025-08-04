@@ -184,4 +184,107 @@ class BooleanFieldTemplateTest extends MauticMysqlTestCase
         // Verify that both options have the base radio class
         $this->assertStringContainsString('mauticform-radiogrp-radio', $html);
     }
+
+    public function testBooleanFieldTemplateCheckboxMode(): void
+    {
+        $twig = static::getContainer()->get('twig');
+        
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setLabel('Test Boolean Field');
+        $field->setAlias('test_boolean');
+        $field->setProperties([
+            'yes' => 'I wanna receive comm',
+            'no' => '', // Empty negative label
+        ]);
+
+        $html = $twig->render('@MauticForm/Field/boolean.html.twig', [
+            'field' => $field,
+            'id' => 'test',
+            'formId' => 1,
+            'formName' => 'test_form',
+        ]);
+
+        // Verify that it renders as a checkbox (not radio)
+        $this->assertStringContainsString('type="checkbox"', $html);
+        $this->assertStringNotContainsString('type="radio"', $html);
+        
+        // Verify that the label is present
+        $this->assertStringContainsString('I wanna receive comm', $html);
+        
+        // Verify that only one option is rendered
+        $this->assertStringContainsString('value="1"', $html);
+        $this->assertStringNotContainsString('value="0"', $html);
+        
+        // Verify checkbox-specific classes
+        $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
+    }
+
+    public function testBooleanFieldTemplateCheckboxModeOnlyNoLabel(): void
+    {
+        $twig = static::getContainer()->get('twig');
+        
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setLabel('Test Boolean Field');
+        $field->setAlias('test_boolean');
+        $field->setProperties([
+            'yes' => '', // Empty positive label
+            'no' => 'I do not want to receive comm',
+        ]);
+
+        $html = $twig->render('@MauticForm/Field/boolean.html.twig', [
+            'field' => $field,
+            'id' => 'test',
+            'formId' => 1,
+            'formName' => 'test_form',
+        ]);
+
+        // Verify that it renders as a checkbox (not radio)
+        $this->assertStringContainsString('type="checkbox"', $html);
+        $this->assertStringNotContainsString('type="radio"', $html);
+        
+        // Verify that the label is present
+        $this->assertStringContainsString('I do not want to receive comm', $html);
+        
+        // Verify that only one option is rendered
+        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringNotContainsString('value="1"', $html);
+        
+        // Verify checkbox-specific classes
+        $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
+    }
+
+    public function testBooleanFieldTemplateCheckboxModeSubmissionSimulation(): void
+    {
+        $twig = static::getContainer()->get('twig');
+        
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setLabel('Test Boolean Field');
+        $field->setAlias('test_boolean');
+        $field->setProperties([
+            'yes' => 'I wanna receive comm',
+            'no' => '', // Empty negative label
+        ]);
+
+        $html = $twig->render('@MauticForm/Field/boolean.html.twig', [
+            'field' => $field,
+            'id' => 'test',
+            'formId' => 1,
+            'formName' => 'test_form',
+        ]);
+
+        // Verify that it renders as a checkbox
+        $this->assertStringContainsString('type="checkbox"', $html);
+        $this->assertStringContainsString('value="1"', $html);
+        $this->assertStringContainsString('I wanna receive comm', $html);
+        
+        // Verify that the name attribute includes [] for checkbox
+        $this->assertStringContainsString('name="mauticform[test_boolean][]"', $html);
+        
+        // Verify checkbox-specific classes
+        $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
+        $this->assertStringContainsString('mauticform-boolean-positive', $html);
+    }
 } 
