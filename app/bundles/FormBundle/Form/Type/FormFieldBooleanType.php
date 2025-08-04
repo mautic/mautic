@@ -17,7 +17,7 @@ class FormFieldBooleanType extends AbstractType
             'label'      => 'mautic.form.field.boolean.yes_label',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
-            'data'       => $options['data']['yes'] ?? 'mautic.core.form.yes',
+            'data'       => $options['data']['yes'] ?? '',
             'required'   => false,
         ]);
 
@@ -25,7 +25,7 @@ class FormFieldBooleanType extends AbstractType
             'label'      => 'mautic.form.field.boolean.no_label',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
-            'data'       => $options['data']['no'] ?? 'mautic.core.form.no',
+            'data'       => $options['data']['no'] ?? '',
             'required'   => false,
         ]);
     }
