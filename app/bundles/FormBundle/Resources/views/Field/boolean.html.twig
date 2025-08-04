@@ -4,24 +4,19 @@
 {% set yesLabel = field.properties.yes is defined ? field.properties.yes : ('mautic.core.form.yes'|trans) %}
 {% set noLabel = field.properties.no is defined ? field.properties.no : ('mautic.core.form.no'|trans) %}
 
-{# Check if only one label is set (checkbox mode) #}
 {% set onlyYesLabel = yesLabel is not empty and noLabel is empty %}
 {% set onlyNoLabel = noLabel is not empty and yesLabel is empty %}
 
-{# Build the list with explicit key-value pairs to ensure boolean keys are preserved #}
 {% set list = {} %}
 {% if onlyYesLabel %}
-    {# Checkbox mode - only positive label, unchecked = negative, checked = positive #}
     {% set list = {'1': yesLabel} %}
     {% set inputType = 'checkbox' %}
     {% set isCheckboxMode = true %}
 {% elseif onlyNoLabel %}
-    {# Checkbox mode - only negative label, unchecked = negative, checked = positive #}
     {% set list = {'0': noLabel} %}
     {% set inputType = 'checkbox' %}
     {% set isCheckboxMode = true %}
 {% else %}
-    {# Radio mode - both labels or default labels #}
     {% if noLabel is not empty %}
         {% set list = {'0': noLabel} %}
     {% endif %}
@@ -36,7 +31,6 @@
     {% set isCheckboxMode = false %}
 {% endif %}
 
-{# Force the isBooleanList flag to true for boolean fields #}
 {% set isBooleanList = true %}
 
 {{- include([theme|default('') ~ 'group.html.twig', '@MauticForm/Field/group.html.twig'], {

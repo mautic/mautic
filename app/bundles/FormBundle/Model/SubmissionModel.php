@@ -262,19 +262,15 @@ class SubmissionModel extends CommonFormModel
             if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
-                // For boolean fields in checkbox mode, handle unchecked state
                 if ('boolean' === $f->getType() && !empty($f->getProperties())) {
                     $properties   = $f->getProperties();
                     $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
                     $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
 
                     if (($onlyYesLabel || $onlyNoLabel) && empty($value)) {
-                        // For checkbox mode, unchecked behavior depends on label type
                         if ($onlyNoLabel) {
-                            // Negative label - unchecked means true (opposite of negative)
                             $leadValue = true;
                         } else {
-                            // Positive label - unchecked means false
                             $leadValue = false;
                         }
                     }
@@ -1162,9 +1158,8 @@ class SubmissionModel extends CommonFormModel
     {
         $value = !is_array($value) ? [$value] : $value;
 
-        // boolean field normalization - always return boolean values
+        // boolean field normalization
         if ('boolean' === $f->getType()) {
-            // If value is empty or not submitted, it means unchecked/false
             if (empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]))) {
                 return false;
             } else {
