@@ -1148,7 +1148,7 @@ class SubmissionModel extends CommonFormModel
         if ('boolean' === $f->getType()) {
             foreach ($value as $key => $item) {
                 // Handle empty values - return empty string for no selection
-                if (empty($item) || $item === null || $item === '') {
+                if ($item === null || $item === '') {
                     $value[$key] = '';
                     continue;
                 }

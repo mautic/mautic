@@ -63,10 +63,10 @@ class BooleanFieldTemplateTest extends MauticMysqlTestCase
             'formName' => 'test_form',
         ]);
 
-        // Should contain both options: "No" (default) with value="0" and "Custom Yes" with value="1"
+        // Should only contain the "Custom Yes" option since "no" label is blank
         $this->assertStringContainsString('Custom Yes', $html);
-        $this->assertStringContainsString('No', $html);
-        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringNotContainsString('No', $html);
+        $this->assertStringNotContainsString('value="0"', $html);
         $this->assertStringContainsString('value="1"', $html);
     }
 
@@ -90,11 +90,11 @@ class BooleanFieldTemplateTest extends MauticMysqlTestCase
             'formName' => 'test_form',
         ]);
 
-        // Should contain both options: "Custom No" with value="0" and "Yes" (default) with value="1"
+        // Should only contain the "Custom No" option since "yes" label is blank
         $this->assertStringContainsString('Custom No', $html);
-        $this->assertStringContainsString('Yes', $html);
+        $this->assertStringNotContainsString('Yes', $html);
         $this->assertStringContainsString('value="0"', $html);
-        $this->assertStringContainsString('value="1"', $html);
+        $this->assertStringNotContainsString('value="1"', $html);
     }
 
     public function testBooleanFieldTemplateWithDefaultLabels(): void

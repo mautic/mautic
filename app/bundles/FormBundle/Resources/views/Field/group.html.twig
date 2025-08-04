@@ -200,7 +200,8 @@
   {%- endif -%}
 
   {%- if isBooleanList -%}
-    {%- set list = formFieldParseBooleanList(parseList) -%}
+    {# For boolean fields, preserve the original list structure to maintain boolean keys #}
+    {%- set list = parseList -%}
   {%- else -%}
     {%- set list = formFieldParseList(parseList) -%}
   {%- endif -%}

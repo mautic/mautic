@@ -1,16 +1,20 @@
 {#
     This field relies on the `group.html.twig` implementation.
 #}
-{% set yesLabel = field.properties.yes|default('mautic.core.form.yes'|trans) %}
-{% set noLabel = field.properties.no|default('mautic.core.form.no'|trans) %}
+{% set yesLabel = field.properties.yes is defined ? field.properties.yes : ('mautic.core.form.yes'|trans) %}
+{% set noLabel = field.properties.no is defined ? field.properties.no : ('mautic.core.form.no'|trans) %}
+
+{# Build the list with explicit key-value pairs to ensure boolean keys are preserved #}
 {% set list = {} %}
-
 {% if noLabel is not empty %}
-    {% set list = list|merge({'0': noLabel}) %}
+    {% set list = {'0': noLabel} %}
 {% endif %}
-
 {% if yesLabel is not empty %}
-    {% set list = list|merge({'1': yesLabel}) %}
+    {% if noLabel is not empty %}
+        {% set list = list|merge({'1': yesLabel}) %}
+    {% else %}
+        {% set list = {'1': yesLabel} %}
+    {% endif %}
 {% endif %}
 
 {# Force the isBooleanList flag to true for boolean fields #}
@@ -30,4 +34,4 @@
         'isBooleanList': isBooleanList,
         'noDefaultValue': noDefaultValue,
         'mappedFields': mappedFields|default([]),
-}) -}}
+    }) -}}
