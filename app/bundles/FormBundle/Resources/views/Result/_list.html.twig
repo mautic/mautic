@@ -119,13 +119,25 @@
                               {% if field %}
                                   {% set properties = field.properties %}
                                   {% if r.value == '1' or r.value == 'true' or r.value == 'yes' %}
-                                      {{ (properties.yes ?? 'Yes')|e }}
+                                  <div class="label label-green label-icon mr-xs" size="sm">
+                                      <i class="ri-check-line"></i>
+                                    </div>
+                                    {{ (properties.yes ?? 'Yes')|e }}
                                   {% elseif r.value == '0' or r.value == 'false' or r.value == 'no' %}
-                                      {{ (properties.no ?? 'No')|e }}
+                                  <div class="label label-red label-icon mr-xs" size="sm">
+                                      <i class="ri-close-line"></i>
+                                    </div>
+                                    {{ (properties.no ?? 'No')|e }}
                                   {% elseif properties.yes is defined and r.value == properties.yes %}
-                                      {{ properties.yes|e }}
+                                  <div class="label label-green label-icon mr-xs" size="sm">
+                                      <i class="ri-check-line"></i>
+                                    </div>
+                                    {{ properties.yes|e }}
                                   {% elseif properties.no is defined and r.value == properties.no %}
-                                      {{ properties.no|e }}
+                                  <div class="label label-red label-icon mr-xs" size="sm">
+                                      <i class="ri-close-line"></i>
+                                    </div>
+                                    {{ properties.no|e }}
                                   {% else %}
                                       {{ r.value|e }}
                                   {% endif %}
