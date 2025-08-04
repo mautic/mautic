@@ -62,7 +62,7 @@ class BooleanFieldTest extends MauticMysqlTestCase
             'no'  => '',
         ]);
 
-        // This field has only yes label, so it's in checkbox mode
+        // This field has only yes label, so it's in checkbox mode (positive label)
         // Test with boolean value '1' (checked)
         $result = $normalizeValueMethod->invoke($submissionModel, '1', $field);
         $this->assertEquals(true, $result);
@@ -176,15 +176,15 @@ class BooleanFieldTest extends MauticMysqlTestCase
             'no'  => 'I do not want to receive comm',
         ]);
 
-        // Test checkbox checked (submitted)
+        // Test checkbox checked (submitted) - any submitted value = true
         $result = $normalizeValueMethod->invoke($submissionModel, ['0'], $field);
         $this->assertEquals(true, $result);
 
-        // Test checkbox unchecked (not submitted)
+        // Test checkbox unchecked (not submitted) - empty = false
         $result = $normalizeValueMethod->invoke($submissionModel, [''], $field);
         $this->assertEquals(false, $result);
 
-        // Test checkbox unchecked (empty array)
+        // Test checkbox unchecked (empty array) - empty = false
         $result = $normalizeValueMethod->invoke($submissionModel, [], $field);
         $this->assertEquals(false, $result);
     }

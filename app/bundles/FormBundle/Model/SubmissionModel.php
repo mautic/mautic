@@ -269,8 +269,14 @@ class SubmissionModel extends CommonFormModel
                     $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
 
                     if (($onlyYesLabel || $onlyNoLabel) && empty($value)) {
-                        // For checkbox mode, unchecked means false
-                        $leadValue = false;
+                        // For checkbox mode, unchecked behavior depends on label type
+                        if ($onlyNoLabel) {
+                            // Negative label - unchecked means true (opposite of negative)
+                            $leadValue = true;
+                        } else {
+                            // Positive label - unchecked means false
+                            $leadValue = false;
+                        }
                     }
                 }
 
