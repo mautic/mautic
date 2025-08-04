@@ -39,13 +39,6 @@
 {# Force the isBooleanList flag to true for boolean fields #}
 {% set isBooleanList = true %}
 
-{# Set noDefaultValue based on mode #}
-{% if isCheckboxMode %}
-    {% set noDefaultValue = false %}
-{% else %}
-    {% set noDefaultValue = true %}
-{% endif %}
-
 {{- include([theme|default('') ~ 'group.html.twig', '@MauticForm/Field/group.html.twig'], {
         'field': field,
         'fields': fields|default([]),
@@ -56,7 +49,6 @@
         'type': inputType,
         'list': list,
         'isBooleanList': isBooleanList,
-        'noDefaultValue': noDefaultValue,
         'isCheckboxMode': isCheckboxMode|default(false),
         'mappedFields': mappedFields|default([]),
     }) -}}
