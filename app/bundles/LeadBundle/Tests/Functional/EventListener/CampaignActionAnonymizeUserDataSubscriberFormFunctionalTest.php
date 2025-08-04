@@ -173,8 +173,8 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         Assert::assertSame(0, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
         Assert::assertStringContainsString($nameEvent, $responseData['newContent']);
         Assert::assertStringContainsString('The field(s) can&#039;t be both deleted and anonymized: ', $responseData['newContent']);
-        Assert::assertStringContainsString('<li>First Name</li>', $responseData['newContent']);
-        Assert::assertStringContainsString('<li>Last Name</li>', $responseData['newContent']);
+        Assert::assertStringContainsString('>First Name</li>', $responseData['newContent']);
+        Assert::assertStringContainsString('>Last Name</li>', $responseData['newContent']);
     }
 
     public function testAnonymizeUserDataActionInvalidWithEmptyFields(): void
