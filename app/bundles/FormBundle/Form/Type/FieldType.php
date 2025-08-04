@@ -142,6 +142,7 @@ class FieldType extends AbstractType
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
                 case 'boolean':
+                    $addDefaultValue = false;
                     break;
             }
         }
