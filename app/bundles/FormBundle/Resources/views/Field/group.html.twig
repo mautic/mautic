@@ -263,14 +263,14 @@
     {# Handle checkbox mode for boolean fields #}
     {% if field.type == 'boolean' and isCheckboxMode is defined and isCheckboxMode %}
       {# For checkbox mode, we need to handle the checked state differently #}
-      {% if field.defaultValue == listValue and noDefaultValue is not defined %}
+      {% if field.defaultValue == listValue and (noDefaultValue is not defined or noDefaultValue == false) %}
         {% set listInputAttributes = listInputAttributes|merge({
                 'checked': 'checked',
         }) %}
       {% endif %}
     {% else %}
       {# For radio mode, use the original logic #}
-      {% if field.defaultValue == listValue and noDefaultValue is not defined %}
+      {% if field.defaultValue == listValue and (noDefaultValue is not defined or noDefaultValue == false) %}
         {% set listInputAttributes = listInputAttributes|merge({
                 'checked': 'checked',
         }) %}

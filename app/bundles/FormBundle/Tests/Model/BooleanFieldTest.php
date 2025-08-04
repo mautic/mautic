@@ -186,4 +186,8 @@ class BooleanFieldTest extends MauticMysqlTestCase
         $result = $normalizeValueMethod->invoke($submissionModel, [], $field);
         $this->assertEquals('1', $result);
     }
+
+
+
+
 } 

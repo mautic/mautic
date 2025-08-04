@@ -262,6 +262,18 @@ class SubmissionModel extends CommonFormModel
             if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
+                // For boolean fields in checkbox mode, handle unchecked state
+                if ($f->getType() === 'boolean' && !empty($f->getProperties())) {
+                    $properties = $f->getProperties();
+                    $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
+                    $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
+                    
+                    if (($onlyYesLabel || $onlyNoLabel) && empty($value)) {
+                        // For checkbox mode, unchecked means negative value
+                        $leadValue = '0';
+                    }
+                }
+
                 $leadFieldMatches[$mappedField] = $leadValue;
             }
 
@@ -1162,12 +1174,16 @@ class SubmissionModel extends CommonFormModel
             $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
             
             if ($onlyYesLabel || $onlyNoLabel) {
-                // Checkbox mode - if value is empty or not submitted, it means unchecked (negative)
+                // Checkbox mode - if value is empty or not submitted, it means unchecked
                 if (empty($value) || (count($value) === 1 && ($value[0] === null || $value[0] === ''))) {
-                    return $onlyYesLabel ? '0' : '1'; // For only yes label, unchecked = negative (0)
+                    // For only yes label, unchecked = negative (0)
+                    // For only no label, unchecked = positive (1) - because unchecked means "yes" (positive)
+                    return $onlyYesLabel ? '0' : '1';
                 } else {
-                    // Checkbox is checked - return positive value
-                    return $onlyYesLabel ? '1' : '0'; // For only yes label, checked = positive (1)
+                    // Checkbox is checked - return the value that was submitted
+                    // For only yes label, checked = positive (1)
+                    // For only no label, checked = negative (0)
+                    return $onlyYesLabel ? '1' : '0';
                 }
             } else {
                 // Radio mode - normal boolean processing
