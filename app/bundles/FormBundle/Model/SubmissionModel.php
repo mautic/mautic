@@ -263,11 +263,11 @@ class SubmissionModel extends CommonFormModel
                 $leadValue = $value;
 
                 // For boolean fields in checkbox mode, handle unchecked state
-                if ($f->getType() === 'boolean' && !empty($f->getProperties())) {
-                    $properties = $f->getProperties();
+                if ('boolean' === $f->getType() && !empty($f->getProperties())) {
+                    $properties   = $f->getProperties();
                     $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
-                    $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
-                    
+                    $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
+
                     if (($onlyYesLabel || $onlyNoLabel) && empty($value)) {
                         // For checkbox mode, unchecked means false
                         $leadValue = false;
@@ -469,7 +469,7 @@ class SubmissionModel extends CommonFormModel
 
                         // build the data rows
                         foreach ($results as $k => $s) {
-                            $row = $this->getExportRow($s, $viewOnlyFields, $form);
+                            $row = $this->getExportRow($s, $viewOnlyFields);
                             $this->putCsvExportRow($handle, $row);
 
                             // free memory
@@ -516,7 +516,7 @@ class SubmissionModel extends CommonFormModel
                             // build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
-                                $row = $this->getExportRow($s, $viewOnlyFields, $form);
+                                $row = $this->getExportRow($s, $viewOnlyFields);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
@@ -698,7 +698,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    private function getExportRow(array $values, array $viewOnlyFields = [], ?Form $form = null): array
+    private function getExportRow(array $values, array $viewOnlyFields = []): array
     {
         $row = [
             $values['id'],
@@ -713,17 +713,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            $value = htmlspecialchars_decode($r['value'], ENT_QUOTES);
-            
-            // Handle boolean fields
-            if ($form && $r['type'] === 'boolean') {
-                $field = $form->getFields()->get($k2);
-                if ($field) {
-                    $value = $this->getBooleanLabel($value, $field);
-                }
-            }
-            
-            $row[] = $value;
+            $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
             // free memory
             unset($values['results'][$k2]);
         }
@@ -1168,29 +1158,25 @@ class SubmissionModel extends CommonFormModel
 
         // boolean field normalization
         if ('boolean' === $f->getType()) {
-            // Check if this is a checkbox mode (only one label set)
-            $properties = $f->getProperties();
+            $properties   = $f->getProperties();
             $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
-            $onlyNoLabel = !empty($properties['no']) && empty($properties['yes']);
-            
+            $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
+
             if ($onlyYesLabel || $onlyNoLabel) {
                 // Checkbox mode - if value is empty or not submitted, it means unchecked
-                if (empty($value) || (count($value) === 1 && ($value[0] === null || $value[0] === ''))) {
-                    // For checkbox mode, unchecked means false
+                if (empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]))) {
                     return false;
                 } else {
-                    // Checkbox is checked - return true
                     return true;
                 }
             } else {
-                // Radio mode - normal boolean processing
+                // Radio mode - convert to string values
                 foreach ($value as $key => $item) {
-                    // Handle empty values - return empty string for no selection
-                    if ($item === null || $item === '') {
+                    if (null === $item || '' === $item) {
                         $value[$key] = '';
                         continue;
                     }
-                    
+
                     // Convert string values to proper boolean values
                     if (in_array($item, ['1', 'true', 'yes'], true)) {
                         $value[$key] = '1';
@@ -1207,43 +1193,14 @@ class SubmissionModel extends CommonFormModel
                 }
             }
         }
+
         // select and multiselect normalization
-        elseif ($properties = $f->getProperties()['list'] ?? null) {
+        if ($properties = $f->getProperties()['list'] ?? null) {
             foreach ($value as $key => $item) {
                 $value[$key] = CustomFieldValueHelper::setValueFromPropertiesList($properties, $item);
             }
         }
 
         return implode(', ', $value);
-    }
-
-    /**
-     * Convert boolean field value to its corresponding label.
-     */
-    private function getBooleanLabel(string $value, Field $field): string
-    {
-        if ($field->getType() !== 'boolean') {
-            return $value;
-        }
-
-        $properties = $field->getProperties();
-        
-        // Map the value to the appropriate label
-        if ($value === '1' || $value === 'true' || $value === 'yes') {
-            return $properties['yes'] ?? 'Yes';
-        } elseif ($value === '0' || $value === 'false' || $value === 'no') {
-            return $properties['no'] ?? 'No';
-        }
-        
-        // If the value matches one of the custom labels exactly, return it
-        if (isset($properties['yes']) && $value === $properties['yes']) {
-            return $properties['yes'];
-        }
-        if (isset($properties['no']) && $value === $properties['no']) {
-            return $properties['no'];
-        }
-        
-        // Fallback to the original value
-        return $value;
     }
 }
