@@ -83,6 +83,13 @@
         ]),
         'style': 'width: ' ~ field.fieldWidth
 }) %}
+
+{# Add boolean-specific class for boolean fields #}
+{% if field.type == 'boolean' %}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|merge(['mauticform-boolean']),
+  }) %}
+{% endif %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
 
@@ -239,6 +246,20 @@
             'type': type,
             'value': listValue|e,
     }) %}
+    
+    {# Add boolean-specific classes for positive/negative options #}
+    {% if field.type == 'boolean' %}
+      {% if listValue == '1' %}
+        {% set listInputAttributes = listInputAttributes|merge({
+                'class': listInputAttributes.class|default([])|merge(['mauticform-boolean-positive']),
+        }) %}
+      {% elseif listValue == '0' %}
+        {% set listInputAttributes = listInputAttributes|merge({
+                'class': listInputAttributes.class|default([])|merge(['mauticform-boolean-negative']),
+        }) %}
+      {% endif %}
+    {% endif %}
+    
     {% if field.defaultValue == listValue and noDefaultValue is not defined %}
       {% set listInputAttributes = listInputAttributes|merge({
               'checked': 'checked',

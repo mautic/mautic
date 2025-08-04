@@ -151,4 +151,37 @@ class BooleanFieldTemplateTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('checked="checked"', $html);
         $this->assertStringNotContainsString('checked', $html);
     }
+
+    public function testBooleanFieldTemplateCssClasses(): void
+    {
+        $twig = static::getContainer()->get('twig');
+        
+        $field = new Field();
+        $field->setType('boolean');
+        $field->setLabel('Test Boolean Field');
+        $field->setAlias('test_boolean');
+        $field->setProperties([
+            'yes' => 'Custom Yes',
+            'no' => 'Custom No',
+        ]);
+
+        $html = $twig->render('@MauticForm/Field/boolean.html.twig', [
+            'field' => $field,
+            'id' => 'test',
+            'formId' => 1,
+            'formName' => 'test_form',
+        ]);
+
+        // Verify that the container has the boolean-specific class
+        $this->assertStringContainsString('mauticform-boolean', $html);
+        
+        // Verify that the positive option has the positive class
+        $this->assertStringContainsString('mauticform-boolean-positive', $html);
+        
+        // Verify that the negative option has the negative class
+        $this->assertStringContainsString('mauticform-boolean-negative', $html);
+        
+        // Verify that both options have the base radio class
+        $this->assertStringContainsString('mauticform-radiogrp-radio', $html);
+    }
 } 
