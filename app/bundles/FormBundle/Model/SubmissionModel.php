@@ -1156,19 +1156,13 @@ class SubmissionModel extends CommonFormModel
     {
         $value = !is_array($value) ? [$value] : $value;
 
-        // boolean field normalization for checkbox mode only
+        // boolean field normalization - always return boolean values
         if ('boolean' === $f->getType()) {
-            $properties   = $f->getProperties();
-            $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
-            $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
-
-            if ($onlyYesLabel || $onlyNoLabel) {
-                // Checkbox mode - if value is empty or not submitted, it means unchecked
-                if (empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]))) {
-                    return false;
-                } else {
-                    return true;
-                }
+            // If value is empty or not submitted, it means unchecked/false
+            if (empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]))) {
+                return false;
+            } else {
+                return true;
             }
         }
 

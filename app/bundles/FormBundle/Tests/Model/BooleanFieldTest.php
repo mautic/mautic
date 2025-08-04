@@ -21,24 +21,31 @@ class BooleanFieldTest extends MauticMysqlTestCase
             'no'  => 'Custom No',
         ]);
 
-        // Radio mode (both labels) - should return original values without conversion
+        // Boolean fields should always return boolean values, regardless of labels
         $result = $normalizeValueMethod->invoke($submissionModel, '1', $field);
-        $this->assertEquals('1', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, '0', $field);
-        $this->assertEquals('0', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'Custom Yes', $field);
-        $this->assertEquals('Custom Yes', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'Custom No', $field);
-        $this->assertEquals('Custom No', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'true', $field);
-        $this->assertEquals('true', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'false', $field);
-        $this->assertEquals('false', $result);
+        $this->assertEquals(true, $result);
+
+        // Empty/null values should return false
+        $result = $normalizeValueMethod->invoke($submissionModel, '', $field);
+        $this->assertEquals(false, $result);
+
+        $result = $normalizeValueMethod->invoke($submissionModel, null, $field);
+        $this->assertEquals(false, $result);
     }
 
     public function testBooleanFieldWithBlankLabels(): void
@@ -84,18 +91,25 @@ class BooleanFieldTest extends MauticMysqlTestCase
         $field->setType('boolean');
         $field->setProperties([]);
 
-        // No custom properties means radio mode - should return original values
+        // Boolean fields should always return boolean values, regardless of properties
         $result = $normalizeValueMethod->invoke($submissionModel, '1', $field);
-        $this->assertEquals('1', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, '0', $field);
-        $this->assertEquals('0', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'true', $field);
-        $this->assertEquals('true', $result);
+        $this->assertEquals(true, $result);
 
         $result = $normalizeValueMethod->invoke($submissionModel, 'false', $field);
-        $this->assertEquals('false', $result);
+        $this->assertEquals(true, $result);
+
+        // Empty/null values should return false
+        $result = $normalizeValueMethod->invoke($submissionModel, '', $field);
+        $this->assertEquals(false, $result);
+
+        $result = $normalizeValueMethod->invoke($submissionModel, null, $field);
+        $this->assertEquals(false, $result);
     }
 
     public function testNormalizeValueWithEmptySubmission(): void
@@ -112,13 +126,13 @@ class BooleanFieldTest extends MauticMysqlTestCase
             'no'  => 'Custom No',
         ]);
 
-        // Radio mode - empty submission should return empty string
+        // Boolean fields - empty submission should return false
         $result = $normalizeValueMethod->invoke($submissionModel, '', $field);
-        $this->assertEquals('', $result);
+        $this->assertEquals(false, $result);
 
-        // Radio mode - null submission should return empty string
+        // Boolean fields - null submission should return false
         $result = $normalizeValueMethod->invoke($submissionModel, null, $field);
-        $this->assertEquals('', $result);
+        $this->assertEquals(false, $result);
     }
 
     public function testNormalizeValueCheckboxModeOnlyYesLabel(): void
