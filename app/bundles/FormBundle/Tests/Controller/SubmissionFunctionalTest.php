@@ -1327,4 +1327,132 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ],
         ];
     }
+
+    public function testCustomFieldLabelDisplayInFormBuilder(): void
+    {
+        // Create a custom boolean field with a specific name
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', [
+            'label' => 'My Custom Boolean Field',
+            'alias' => 'custom_boolean_field',
+            'type'  => 'boolean',
+            'properties' => [
+                'yes' => 'Yes',
+                'no'  => 'No',
+            ],
+        ]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('field', $response);
+        $contactCustomField = $response['field'];
+
+        // Create a form with the custom field mapped
+        $formPayload = [
+            'name'        => 'Custom Field Test Form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'Test Boolean Field',
+                    'type'         => 'boolean',
+                    'alias'        => 'test_boolean',
+                    'mappedField'  => 'custom_boolean_field',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Test that the form builder displays the correct field label
+        // This tests the _labels.html.twig template functionality
+        $this->client->request(Request::METHOD_GET, "/s/forms/field/new?type=boolean&tmpl=field&formId={$formId}&inBuilder=1");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Get the form field configuration to verify the mapping
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        
+        $formData = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('form', $formData);
+        $form = $formData['form'];
+        
+        // Find the boolean field and verify its mapping
+        $booleanField = null;
+        foreach ($form['fields'] as $field) {
+            if ($field['type'] === 'boolean') {
+                $booleanField = $field;
+                break;
+            }
+        }
+        
+        $this->assertNotNull($booleanField, 'Boolean field should exist in the form');
+        $this->assertEquals('custom_boolean_field', $booleanField['mappedField']);
+        $this->assertEquals('contact', $booleanField['mappedObject']);
+
+        // Submit the form to test the mapping works correctly
+        $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_customfieldtestform]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+
+        // Submit with a value
+        $form->setValues([
+            'mauticform[test_boolean]' => '1',
+        ]);
+
+        $this->client->submit($form);
+
+        // Verify the submission was successful
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertGreaterThan(0, count($submissionsData['submissions']));
+
+        $latestSubmission = $submissionsData['submissions'][0];
+        $this->assertArrayHasKey('results', $latestSubmission);
+        $this->assertArrayHasKey('test_boolean', $latestSubmission['results']);
+        $this->assertEquals('1', $latestSubmission['results']['test_boolean']);
+
+        // Verify the contact was created with the custom field value
+        $this->assertArrayHasKey('lead', $latestSubmission);
+        $submissionContact = $latestSubmission['lead'];
+
+        $this->client->request(Request::METHOD_GET, "/api/contacts/{$submissionContact['id']}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        
+        $contactResponse = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('contact', $contactResponse);
+        $contact = $contactResponse['contact'];
+
+        // Verify the custom field is properly mapped in the contact
+        $this->assertArrayHasKey('custom_boolean_field', $contact['fields']['core']);
+        $customField = $contact['fields']['core']['custom_boolean_field'];
+        $this->assertEquals('1', $customField['value']);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $this->client->request(Request::METHOD_DELETE, "/api/fields/contact/{$contactCustomField['id']}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
 }
