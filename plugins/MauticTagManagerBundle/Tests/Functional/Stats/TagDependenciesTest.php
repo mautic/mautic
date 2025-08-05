@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\HttpFoundation\Response;
 
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
@@ -97,6 +98,16 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $content        = $clientResponse->getContent();
         $searchIds      = join(',', [$report->getId()]);
         $this->assertStringContainsString("href=\"/s/reports?search=ids:{$searchIds}\"", $content);
+    }
+
+    public function testTagUsageInReportsEmpty(): void
+    {
+        $tag         = $this->createTag('TagA');
+        $this->createReportWithTagEmpty();
+        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $clientResponse = $this->client->getResponse();
+        // check that the page loads without errors
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
     private function createTag(string $tagName): Tag
@@ -384,6 +395,29 @@ final class TagDependenciesTest extends MauticMysqlTestCase
                 'dynamic'   => null,
                 'condition' => 'in',
                 'value'     => [$tagId],
+            ],
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        return $report;
+    }
+
+    private function createReportWithTagEmpty(): Report
+    {
+        $report = new Report();
+        $report->setName('Contact report');
+        $report->setSource('leads');
+        $report->setColumns([
+            'l.id',
+        ]);
+        $report->setFilters([
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'dynamic'   => null,
+                'condition' => 'empty',
+                'value'     => null,
             ],
         ]);
         $this->em->persist($report);

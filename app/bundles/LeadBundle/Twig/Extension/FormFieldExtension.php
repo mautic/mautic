@@ -16,8 +16,18 @@ final class FormFieldExtension extends AbstractExtension
             new TwigFunction('leadFieldCountryChoices', [FormFieldHelper::class, 'getCountryChoices']),
             new TwigFunction('leadFieldRegionChoices', [FormFieldHelper::class, 'getRegionChoices']),
             new TwigFunction('leadFieldTimezonesChoices', [FormFieldHelper::class, 'getTimezonesChoices']),
-            new TwigFunction('leadFieldLocaleChoices', [FormFieldHelper::class, 'getLocaleChoices']),
+            new TwigFunction('leadFieldLocaleChoices', [$this, 'getLeadFieldLocaleChoices']),
             new TwigFunction('leadFormFieldParseListForChoices', [FormFieldHelper::class, 'parseListForChoices']),
         ];
+    }
+
+    /**
+     * Get locale choices with proper key=>value.
+     *
+     * @return array<string, string>
+     */
+    public function getLeadFieldLocaleChoices(): array
+    {
+        return array_flip(FormFieldHelper::getLocaleChoices());
     }
 }

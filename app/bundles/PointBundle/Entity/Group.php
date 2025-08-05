@@ -6,12 +6,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Group extends FormEntity
+class Group extends FormEntity implements UuidInterface
 {
-    public const TABLE_NAME = 'point_groups';
+    use UuidTrait;
+
+    public const TABLE_NAME  = 'point_groups';
+    public const ENTITY_NAME = 'point_group';
 
     private ?int $id             = null;
 
@@ -28,6 +33,8 @@ class Group extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(GroupRepository::class);
+
+        static::addUuidField($builder);
 
         $builder->addIdColumns();
     }

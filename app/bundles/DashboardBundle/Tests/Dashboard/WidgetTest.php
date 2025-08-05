@@ -9,7 +9,6 @@ use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Entity\Widget as WidgetEntity;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\UserBundle\Entity\User;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -75,8 +74,8 @@ class WidgetTest extends TestCase
 
         $widget->setCreatedBy(self::USER_ID);
         $filter = [
-            'dateFrom' => new Date(),
-            'dateTo'   => new Date(),
+            'dateFrom' => new \DateTime(),
+            'dateTo'   => new \DateTime(),
         ];
 
         $this->dashboardModel->expects(self::once())

@@ -29,7 +29,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -61,7 +62,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -112,7 +114,8 @@ class AuditLogRepository extends CommonRepository
             ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -258,6 +261,6 @@ class AuditLogRepository extends CommonRepository
         $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
         $conn       = $this->getEntityManager()->getConnection();
 
-        return $conn->executeQuery($sql)->rowCount();
+        return $conn->executeStatement($sql);
     }
 }

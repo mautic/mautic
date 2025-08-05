@@ -18,25 +18,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "leadfield:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "leadfield:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -50,11 +31,14 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         'url',
         'email',
     ];
+    public const ENTITY_NAME        = 'lead_field';
 
     /**
      * @var int
      */
     private $id;
+
+    private bool $isCloned = false;
 
     /**
      * @var string
@@ -166,7 +150,10 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id         = null;
+        $this->isCloned   = true;
+        $this->order      =  0;
+        $this->isFixed    = false;
 
         parent::__clone();
     }
@@ -350,6 +337,11 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getIsCloned(): bool
+    {
+        return $this->isCloned;
     }
 
     /**

@@ -18,7 +18,7 @@
             'targetLabel': 'mautic.asset.assets'|trans
         }
     ) -}}
-    {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeAsset.category}) }}
+    {{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activeAsset.category}) }}
     {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeAsset}) }}
 {% endblock %}
 
@@ -143,7 +143,7 @@
                                 <td>{{ activeAsset.getSize() }}</td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.asset.asset.path.relative{% endtrans %}</span></td>
+                                <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.asset.asset.url{% endtrans %}</span></td>
                                 <td>{{ assetDownloadUrl }}</td>
                             </tr>
                             <tr>
@@ -205,7 +205,7 @@
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : stats.downloads.timeStats, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                             </div>
                         </div>
@@ -216,18 +216,6 @@
         </div>
 
         {{ customContent('details.stats.graph.below', _context) }}
-
-        <!-- start: tab-content -->
-        <div class="tab-content pa-md preview-detail">
-            {{- include('@MauticAsset/Asset/preview.html.twig',
-                {
-                    'activeAsset' : activeAsset,
-                    'assetDownloadUrl' : url(
-                    'mautic_asset_action',
-                    {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
-                )}) -}}
-        </div>
-        <!--/ end: tab-content -->
     </div>
     <!--/ left section -->
 
@@ -235,28 +223,24 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
         <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-            <div class="panel-heading">
-                <div class="panel-title">{% trans %}mautic.asset.asset.url{% endtrans %}</div>
-            </div>
             <div class="panel-body pt-xs">
-                <div class="input-group">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                           readonly value="{{ assetDownloadUrl|escape }}"/>
-                <span class="input-group-btn">
-                    {% include '@MauticCore/Helper/button.html.twig' with {
-                        buttons: [
-                            {
-                                icon: 'ri-external-link-line',
-                                icon_only: true,
-                                tooltip_placement: 'left',
-                                label: 'mautic.core.open_link',
-                                onclick: "window.open('" ~ assetDownloadUrl ~ "', '_blank')",
-                                variant: 'ghost',
-                            }
-                        ]
-                    } %}
-                </span>
-                </div>
+                {% include '@MauticCore/Components/card.html.twig' with {
+                type: 'link',
+                href: assetDownloadUrl,
+                ctaType: 'external',
+                heading: 'mautic.core.open_link',
+                attributes: {
+                    'target': '_blank'
+                }
+            } %}
+            {{- include('@MauticAsset/Modules/preview.html.twig',
+            {
+                'variant': 'dialog',
+                'activeAsset' : activeAsset,
+                'assetDownloadUrl' : url(
+                'mautic_asset_action',
+                {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
+            )}) -}}
             </div>
         </div>
         <!--/ preview URL -->

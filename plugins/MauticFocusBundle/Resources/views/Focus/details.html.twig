@@ -108,7 +108,7 @@
         'targetLabel': 'mautic.focus.focus_items'|trans
     }
 ) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': item.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': item.category}) }}
 {{ include('@MauticProject/Modules/projects.html.twig') }}
 {% endblock %}
 
@@ -195,7 +195,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -240,7 +240,7 @@
           <div class="pa-md">
               {% set aboveFoldContent %}
                   <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
-                  {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                  {% include '@MauticCore/Components/pictogram.html.twig' with {
                       pictogram: 'embed',
                       size: 64,
                       color: 'var(--icon-interactive)'
@@ -252,11 +252,10 @@
                   <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
               {% endset %}
 
-              {{ include('@MauticCore/Components/tile--expandable-interactive.html.twig', {
-                  'tiles': [{
-                      'aboveFoldContent': aboveFoldContent,
-                      'belowFoldContent': belowFoldContent
-                  }]
+              {{ include('@MauticCore/Components/tile.html.twig', {
+                  'type': 'expandable-interactive',
+                  'aboveFoldContent': aboveFoldContent,
+                  'belowFoldContent': belowFoldContent,
               }) }}
           </div>
           <!--/ form HTML -->

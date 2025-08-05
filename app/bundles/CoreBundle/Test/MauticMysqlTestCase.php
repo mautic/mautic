@@ -142,7 +142,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->executeQuery(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 

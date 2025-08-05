@@ -65,8 +65,10 @@ class PublicController extends CommonFormController
                 $content = $copy->getBody();
 
                 // Replace tokens
-                $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
+                if (is_array($tokens)) {
+                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                    $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
+                }
             } else {
                 $subject = '';
                 $content = '';
@@ -479,6 +481,7 @@ class PublicController extends CommonFormController
         if (null === $emailEntity) {
             return $this->notFound();
         }
+
         $publicPreview = $emailEntity->isPublicPreview();
         $draftEnabled  = $emailConfig->isDraftEnabled();
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
@@ -544,13 +547,15 @@ class PublicController extends CommonFormController
 
         // Prepare contact
         if ($contactId) {
+            // We have one from request parameter
+            /** @var LeadModel $leadModel */
             $contact = $leadModel->getRepository()->getLead($contactId);
             $contact = $model->enrichedContactWithCompanies($contact);
         } else {
             // Make fake contact.
+            /** @var FakeContactHelper $fakeLeadHelper */
             $contact = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
         }
-
         // Generate and replace tokens
         $event = new EmailSendEvent(
             null,

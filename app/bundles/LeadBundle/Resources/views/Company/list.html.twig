@@ -64,7 +64,9 @@
             'tooltip': 'mautic.core.searchcommand.ismine.description',
             'icon': 'ri-user-line'
         }
-    ]
+    ],
+    toolbarOptionsLabel: 'mautic.lead.import_export',
+    toolbarOptionsIcon: 'ri-arrow-up-down-fill ri-1x'
 }) -}}
     <div class="page-list">
   {% endif %}
@@ -191,7 +193,7 @@
       <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
         {% set childContainer %}
           <div class="mb-32">
-              {% include '@MauticCore/Helper/pictogram.html.twig' with {
+              {% include '@MauticCore/Components/pictogram.html.twig' with {
                   'pictogram': 'organization',
                   'size': '80'
               } %}

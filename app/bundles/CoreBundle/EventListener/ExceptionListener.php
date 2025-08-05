@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -42,6 +43,15 @@ class ExceptionListener extends ErrorListener
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
 
             return;
+        }
+
+        // The authentication wraps a response in the LazyResponseException @see \Symfony\Component\Security\Http\Event\LazyResponseEvent::setResponse
+        if ($exception instanceof LazyResponseException) {
+            $response = $exception->getResponse();
+
+            if ($response instanceof RedirectResponse) {
+                return;
+            }
         }
 
         // Check for exceptions we don't want to handle

@@ -197,6 +197,9 @@ class ListController extends FormController
      */
     public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false)
     {
+        if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
+            return $this->accessDenied();
+        }
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
@@ -803,16 +806,17 @@ class ListController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'logs'           => $logs,
-                'usageStats'     => $segmentDependencies->getChannelsIds($list->getId()),
-                'campaignStats'  => $segmentCampaignShare->getCampaignList($list->getId()),
-                'stats'          => $segmentContactsLineChartData,
-                'list'           => $list,
-                'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
-                'permissions'    => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
-                'security'       => $this->security,
-                'dateRangeForm'  => $dateRangeForm->createView(),
-                'events'         => [
+                'logs'               => $logs,
+                'usageStats'         => $segmentDependencies->getChannelsIds($list->getId()),
+                'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
+                'stats'              => $segmentContactsLineChartData,
+                'list'               => $list,
+                'segmentCount'       => $listModel->getRepository()->getLeadCount($list->getId()),
+                'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
+                'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
+                'security'           => $this->security,
+                'dateRangeForm'      => $dateRangeForm->createView(),
+                'events'             => [
                     'filters' => $filters,
                     'types'   => [
                         'manually_added'   => $this->translator->trans('mautic.segment.contact.manually.added'),

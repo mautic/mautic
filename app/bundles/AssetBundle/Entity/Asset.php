@@ -2,7 +2,6 @@
 
 namespace Mautic\AssetBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -22,30 +21,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "asset:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "asset:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+
     use ProjectTrait;
+
+    public const ENTITY_NAME = 'asset';
 
     /**
      * @var int|null
@@ -1241,11 +1223,17 @@ class Asset extends FormEntity implements UuidInterface
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
-            $loader           = new ParameterLoader();
-            $parameters       = $loader->getParameterBag();
-            $mimeTypesAllowed = $parameters->get('allowed_mimetypes');
+            $parameters        = (new ParameterLoader())->getParameterBag();
+            $extensionsAllowed = $parameters->get('allowed_extensions');
+            $mimeTypesMap      = $parameters->get('allowed_mimetypes');
+            $mimeTypesAllowed  = array_intersect_key($mimeTypesMap, array_flip($extensionsAllowed));
 
-            if (!empty($object->getFileMimeType()) && !in_array($object->getFileMimeType(), $mimeTypesAllowed)) {
+            $fileMimeType        = $object->getFileMimeType();
+            $fileExtension       = strtolower($object->getExtension() ?? '');
+            $lowercaseMimeTypes  = array_change_key_case($mimeTypesAllowed, CASE_LOWER);
+            $lowercaseMimeValues = array_map('strtolower', $mimeTypesAllowed);
+
+            if (!empty($fileMimeType) && array_key_exists($fileExtension, $lowercaseMimeTypes) && !in_array(strtolower($fileMimeType), $lowercaseMimeValues, true)) {
                 $context->buildViolation('mautic.asset.asset.error.invalid.mimetype', [
                     '%fileMimetype%'=> $object->getFileMimeType(),
                     '%mimetypes%'   => implode(', ', $mimeTypesAllowed),
@@ -1254,9 +1242,8 @@ class Asset extends FormEntity implements UuidInterface
                     ->addViolation();
             }
 
-            $extensionsAllowed = array_keys($mimeTypesAllowed);
-            $fileType          = $object->getExtension();
-            if (null !== $object->getExtension() && !in_array($fileType, $extensionsAllowed)) {
+            $fileType = $object->getExtension();
+            if (null !== $fileType && !in_array(strtolower($fileType), array_map('strtolower', $extensionsAllowed), true)) {
                 $context->buildViolation('mautic.asset.asset.error.file.extension', [
                     '%fileExtension%'=> $object->getExtension(),
                     '%extensions%'   => implode(', ', $extensionsAllowed),

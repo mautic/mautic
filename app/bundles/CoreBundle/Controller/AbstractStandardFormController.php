@@ -1115,6 +1115,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     null,
                     true
                 ),
+                'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted($entity::ENTITY_NAME.':export:enable', 'MATCH_ONE'),
             ],
             'contentTemplate' => $this->getTemplateName('details.html.twig'),
             'passthroughVars' => [

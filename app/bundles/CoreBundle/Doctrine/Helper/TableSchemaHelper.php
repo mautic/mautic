@@ -130,7 +130,7 @@ class TableSchemaHelper
                     throw new SchemaException('A column is missing required name key.');
                 }
 
-                if (!isset($columns[$column['name']])) {
+                if (!in_array($column['name'], $columnsAdded, true)) {
                     $type       = $column['type'] ?? 'text';
                     $colOptions = $column['options'] ?? [];
 

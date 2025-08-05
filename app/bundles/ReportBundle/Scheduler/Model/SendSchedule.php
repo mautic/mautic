@@ -58,10 +58,6 @@ class SendSchedule
         $this->mailer->parsePlainText($message);
         $this->mailer->send(true);
 
-        $this->fileHandler->delete($csvFilePath);
-
-        if (!empty($zipFilePath)) {
-            $this->fileHandler->delete($zipFilePath);
-        }
+        // Attachment file removal will be done in \Mautic\MessengerBundle\MessageHandler\RemoveReportAttachmentHandler
     }
 }

@@ -124,7 +124,7 @@ class EventController extends CommonFormController
                     $success = 1;
 
                     // form is valid so process the data
-                    $keyId = 'new'.hash('sha1', uniqid((string) mt_rand()));
+                    $keyId = 'new'.bin2hex(random_bytes(32));
 
                     // save the properties to session
                     $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified');

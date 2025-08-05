@@ -348,6 +348,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/PedroLoureiro1"><img src="https://avatars.githubusercontent.com/u/116733776?v=4?s=100" width="100px;" alt="PedroLoureiro1"/><br /><sub><b>PedroLoureiro1</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=PedroLoureiro1" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/OlgaMarchuk"><img src="https://avatars.githubusercontent.com/u/219189660?v=4?s=100" width="100px;" alt="OlgaMarchuk"/><br /><sub><b>OlgaMarchuk</b></sub></a><br /><a href="#userTesting-OlgaMarchuk" title="User Testing">📓</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/stone-creator"><img src="https://avatars.githubusercontent.com/u/1327019?v=4?s=100" width="100px;" alt="Stone-creator"/><br /><sub><b>Stone-creator</b></sub></a><br /><a href="#userTesting-stone-creator" title="User Testing">📓</a></td>
+    </tr>
   </tbody>
 </table>
 
