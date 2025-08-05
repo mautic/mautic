@@ -151,7 +151,7 @@ class StatRepository extends CommonRepository
      *
      * @param array $notificationIds
      */
-    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($notificationIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')

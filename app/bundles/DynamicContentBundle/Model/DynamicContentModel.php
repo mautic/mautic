@@ -82,7 +82,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '=',
-        int $skipId = null): bool
+        ?int $skipId = null): bool
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -211,7 +211,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);

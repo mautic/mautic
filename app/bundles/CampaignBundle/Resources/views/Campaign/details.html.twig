@@ -13,14 +13,29 @@
     'routeBase': 'campaign',
     'targetLabel': 'mautic.campaign.campaigns'|trans
   }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': campaign.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': campaign.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': campaign}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
+    {% set buttons = [] %}
+
+    {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy) and enableExportPermission is not empty%}
+        {% set buttons = buttons|merge([{
+            'attr': {
+                'data-toggle': 'download',
+                'href': path('mautic_campaign_action', {'objectAction': 'export', 'objectId': campaign.id}),
+            },
+            'btnText': 'mautic.core.export'|trans,
+            'iconClass': 'ri-export-line',
+        }]) %}
+    {% endif %}
+
   {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
+    'customButtons': buttons,
     'templateButtons': {
         'edit': securityHasEntityAccess(
             permissions['campaign:campaigns:editown'],
@@ -40,6 +55,7 @@
 
 {% block publishStatus %}
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
+  <div class="label__divider"></div>
   
   {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {

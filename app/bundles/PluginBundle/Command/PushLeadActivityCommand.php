@@ -3,12 +3,20 @@
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:integration:pushleadactivity',
+    description: 'Push lead activity to integration.',
+    aliases: [
+        'mautic:integration:pushactivity',
+    ]
+)]
 class PushLeadActivityCommand extends Command
 {
     public function __construct(
@@ -21,12 +29,6 @@ class PushLeadActivityCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:integration:pushleadactivity')
-            ->setAliases(
-                [
-                    'mautic:integration:pushactivity',
-                ]
-            )
             ->addOption(
                 '--integration',
                 '-i',
@@ -87,6 +89,4 @@ class PushLeadActivityCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Push lead activity to integration.';
 }

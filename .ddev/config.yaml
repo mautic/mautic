@@ -1,6 +1,6 @@
 type: php
 docroot: ""
-php_version: "8.3"
+php_version: "8.4"
 webserver_type: apache-fpm
 database:
     type: mariadb

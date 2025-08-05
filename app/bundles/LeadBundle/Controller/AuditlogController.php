@@ -49,9 +49,10 @@ class AuditlogController extends CommonController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'   => $lead,
-                    'page'   => $page,
-                    'events' => $events,
+                    'lead'                   => $lead,
+                    'page'                   => $page,
+                    'events'                 => $events,
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
                 ],
                 'passthroughVars' => [
                     'route'         => false,

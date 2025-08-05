@@ -30,7 +30,7 @@ class LeadPermissions extends AbstractPermissions
         ];
 
         $this->addExtendedPermissions('leads', false);
-        $this->addExtendedPermissions('lists', false);
+        $this->addExtendedPermissions('lists');
         $this->addStandardPermissions('imports');
         $this->addCustomPermission('export', ['enable' => 1024]);
     }
@@ -44,7 +44,7 @@ class LeadPermissions extends AbstractPermissions
     {
         $this->addExtendedFormFields($this->getName(), 'leads', $builder, $data, false);
 
-        $this->addExtendedFormFields('lead', 'lists', $builder, $data, false);
+        $this->addExtendedFormFields('lead', 'lists', $builder, $data);
 
         $builder->add(
             'lead:fields',

@@ -101,18 +101,6 @@ class EventScheduler
         $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
-    /**
-     * @deprecated since Mautic 3. To be removed in Mautic 4. Use rescheduleFailures instead.
-     */
-    public function rescheduleFailure(LeadEventLog $log): void
-    {
-        try {
-            $this->reschedule($log, $this->getRescheduleDate($log));
-        } catch (IntervalNotConfiguredException) {
-            // Do not reschedule if an interval was not configured.
-        }
-    }
-
     public function rescheduleFailures(ArrayCollection $logs): void
     {
         if (!$logs->count()) {
@@ -137,7 +125,7 @@ class EventScheduler
     /**
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
+    public function getExecutionDateTime(Event $event, ?\DateTimeInterface $compareFromDateTime = null, ?\DateTime $comparedToDateTime = null): \DateTimeInterface
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();

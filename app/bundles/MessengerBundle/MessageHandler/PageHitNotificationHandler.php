@@ -32,7 +32,7 @@ class PageHitNotificationHandler
     /**
      * @throws InvalidPayloadException
      */
-    public function __invoke(PageHitNotification $message, Acknowledger $ack = null): void
+    public function __invoke(PageHitNotification $message, ?Acknowledger $ack = null): void
     {
         $parsed = $this->parseMessage($message);
         $this->pageModel->processPageHit(...$parsed);

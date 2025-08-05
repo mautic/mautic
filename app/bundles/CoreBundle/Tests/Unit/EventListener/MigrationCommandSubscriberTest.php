@@ -154,7 +154,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => new \stdClass()]);
 
         $this->connection->expects($this->once())
-            ->method('executeQuery');
+            ->method('executeStatement');
 
         $this->subscriber->addGeneratedColumns($this->event);
     }

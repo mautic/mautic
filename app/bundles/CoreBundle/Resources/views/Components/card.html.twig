@@ -1,0 +1,216 @@
+{% set ctaIcons = {
+    'local': 'ri-arrow-right-line',
+    'jump': 'ri-arrow-down-line',
+    'external': 'ri-external-link-line',
+    'new tab': 'ri-window-2-line',
+    'download': 'ri-download-line',
+    'video': 'ri-play-fill',
+    'pdf': 'ri-file-pdf-2-line',
+    'blog': 'ri-article-line',
+    'modal': 'ri-rectangle-line',
+    'email': 'ri-mail-line',
+    'schedule': 'ri-calendar-line',
+    'chat': 'ri-chat-1-line',
+    'call': 'ri-phone-line'
+} %}
+
+{% set type = type|default('default') %}
+{% set aspectRatio = aspectRatio|default(type == 'link' ? '2:1' : '4:3') %}
+{% set ctaType = ctaType|default('local') %}
+
+{% set common_image_content %}
+    {% if image is defined %}
+        <div class="card__image-wrapper d-flex">
+            <img class="image__img {% if type == 'static' or type == 'default' %}as-4-3{% endif %}" src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}">
+        </div>
+    {% endif %}
+{% endset %}
+
+{% set common_eyebrow_content %}
+    {% if eyebrow is defined %}
+        <div class="card__eyebrow-wrapper type-label-02 text-secondary mb-8">{{ eyebrow|trans }}</div>
+    {% endif %}
+{% endset %}
+
+{% set common_heading_content %}
+    {% if heading is defined %}
+        <div class="card__heading-wrapper">
+            <h3 class="card-heading {% if type == 'feature--large' %}type-fluid-heading-04{% else %}type-heading-0{{ type == 'link' ? '2' : '3' }}{% endif %} {% if type == 'feature--large' %}mb-32{% elseif type != 'pictogram' and type != 'link' %}mb-64{% endif %}">{{ heading|trans }}</h3>
+        </div>
+    {% endif %}
+{% endset %}
+
+{% set common_copy_content %}
+    {% if copy is defined %}
+        <div class="card__copy type-body-02 pr-32 mb-32 {% if type == 'pictogram' %}mt-32{% endif %}">{{ copy|trans }}</div>
+    {% endif %}
+{% endset %}
+
+{% set common_tags_content %}
+    {% if tags is defined %}
+        <div class="mt-16">
+            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': tags} %}
+        </div>
+    {% endif %}
+{% endset %}
+
+{% set common_pictogram_content %}
+    {% if type == 'pictogram' and pictogram is defined %}
+        <div class="card__pictogram-wrapper mt-a">
+            {% include '@MauticCore/Components/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
+        </div>
+    {% endif %}
+{% endset %}
+
+    {# === STATIC TYPE === #}
+    {% if type == 'static' %}
+        {% set cardContent %}
+            {{ common_image_content }}
+            <div class="card__wrapper" aspect-ratio="{{ aspectRatio }}">
+                <div class="card__content">
+                    {{ common_eyebrow_content }}
+                    {{ common_heading_content }}
+                    {{ common_copy_content }}
+                    {{ common_tags_content }}
+                    <div class="card__footer-wrapper">
+                        {% if cta is defined %}
+                            {% include '@MauticCore/Helper/button.html.twig' with {'buttons': [cta|merge({'variant': 'link', 'icon': 'ri-arrow-right-line', 'attributes': {'class': 'type-body-02'}})]} %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'base',
+            content: cardContent,
+            className: 'card pa-0' ~ (disabled is defined ? ' tile--disabled' : ''),
+        } %}
+
+    {# === LOGO TYPE === #}
+    {% elseif type == 'logo' %}
+        {% set cardContent %}
+            {{ common_image_content }}
+            <div class="card__wrapper">
+                <div class="card__content">
+                    {{ common_eyebrow_content }}
+                    {{ common_heading_content }}
+                    {{ common_copy_content }}
+                    {{ common_tags_content }}
+                </div>
+            </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'clickable',
+            content: cardContent,
+            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            icon: ctaIcons[ctaType],
+            href: href,
+        } %}
+
+    {# === LINK TYPE === #}
+    {% elseif type == 'link' %}
+        {% set cardContent %}
+            <div class="card__wrapper" aspect-ratio="2:1">
+                <div class="card__content">
+                    {{ common_heading_content }}
+                    {{ common_copy_content }}
+                </div>
+            </div>
+            
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'clickable',
+            content: cardContent,
+            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            icon: ctaIcons[ctaType],
+            href: href,
+        } %}
+
+    {# === PICTOGRAM TYPE === #}
+    {% elseif type == 'pictogram' %}
+        {% set cardContent %}
+            <div class="card__wrapper d-flex fd-column">
+                <div class="card__content d-flex fd-column fg-1 pb-64">
+                    {{ common_heading_content }}
+                    {{ common_copy_content }}
+                    {{ common_pictogram_content }}
+                </div>
+            </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'clickable',
+            content: cardContent,
+            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            icon: ctaIcons[ctaType],
+            href: href,
+        } %}
+
+    {# === DEFAULT TYPE === #}
+    {% elseif type == 'default' %}
+        {% set cardContent %}
+            {{ common_image_content }}
+            <div class="card__wrapper {{ aspectRatio }}">
+                <div class="card__content">
+                    {{ common_eyebrow_content }}
+                    {{ common_heading_content }}
+                    {{ common_copy_content }}
+                    {{ common_tags_content }}
+                </div>
+            </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'clickable',
+            content: cardContent,
+            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            href: href,
+        } %}
+
+    {# === FEATURE TYPE === #}
+    {% elseif type == 'feature' %}
+        {% set cardContent %}
+        <div class="d-flex fd-column fd-row-md">
+            <div class="d-flex fg-1 fs-1 fb-0 as-1-1">
+                {{ common_image_content }}
+            </div>
+            <div class="fg-1 fs-1 fb-0">
+            <div class="card__wrapper as-1-1">
+                <div class="card__content">
+                    {{ common_heading_content }}
+                </div>
+            </div>
+            </div>
+        </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'clickable',
+            content: cardContent,
+            className: 'card pa-0 card--link',
+            href: href,
+        } %}
+
+        {# === FEATURE TYPE === #}
+    {% elseif type == 'feature--large' %}
+        {% set cardContent %}
+        <div class="d-flex fd-column fd-row-lg">
+            <div class="d-flex fg-1 fs-1 fb-0 as-1-1">
+                {{ common_image_content }}
+            </div>
+            <div class="fg-1 fs-1 fb-0">
+            <div class="card__wrapper as-1-1">
+                <div class="card__content pa-32">
+                    {{ common_eyebrow_content }}
+                    {{ common_heading_content }}
+                    {{ common_copy_content }}
+                </div>
+            </div>
+            </div>
+        </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {
+            type: 'clickable',
+            content: cardContent,
+            className: 'card pa-0 card--link',
+            href: href,
+            icon: ctaIcons[ctaType],
+        } %}
+    {% endif %}

@@ -418,7 +418,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @param string $valueColumn
      */
     public function getAjaxSimpleList(
-        CompositeExpression $expr = null,
+        ?CompositeExpression $expr = null,
         array $parameters = [],
         $labelColumn = null,
         $valueColumn = 'id',
@@ -539,7 +539,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @return Company[]
      */
-    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null): array
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
     {
         $results = $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.*', $companyId, $limit);
 

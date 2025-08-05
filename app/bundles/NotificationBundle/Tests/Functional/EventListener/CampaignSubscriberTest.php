@@ -511,7 +511,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         string $expectedMethod = 'GET',
         string $expectedUri = '',
         int $status = 200,
-        string $body = null,
+        ?string $body = null,
     ): callable {
         return static function (RequestInterface $request) use ($expectedData, $expectedMethod, $expectedUri, $status, $body) {
             Assert::assertSame($expectedMethod, $request->getMethod());

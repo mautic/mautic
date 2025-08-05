@@ -105,28 +105,6 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createMock(Translator::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
-    public function testDeprecatedMethodOtherwiseItLowersCodeCoverageAsItsNoLongerUsed(): void
-    {
-        $deprecationTriggered = false;
-        $errorHandler         = function (int $errorNumber, string $errorMessage) use (&$deprecationTriggered): bool {
-            if (E_USER_DEPRECATED === $errorNumber && 'EventExecutioner::recordLogsWithError() is deprecated in Mautic:4 and is removed from Mautic:5 as unused' === $errorMessage) {
-                $deprecationTriggered = true;
-            }
-
-            // returning false let the normal error handler continue
-            return false;
-        };
-
-        $this->eventLogger->expects($this->once())->method('persistCollection')->willReturn($this->eventLogger);
-
-        set_error_handler($errorHandler);
-        $this->getEventExecutioner()->recordLogsWithError(new ArrayCollection([]), 'some message'); // @phpstan-ignore-line as recordLogsWithError() is deprecated
-        restore_error_handler();
-
-        $this->assertTrue($deprecationTriggered, 'Deprecation should be triggered');
-    }
-
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
     {
         $campaign = new Campaign();

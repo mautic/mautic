@@ -4,31 +4,28 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class CacheInvalidateSubscriber implements EventSubscriber
+#[AsDoctrineListener(Events::postPersist)]
+#[AsDoctrineListener(Events::postUpdate)]
+#[AsDoctrineListener(Events::postRemove)]
+class CacheInvalidateSubscriber
 {
     private const ACTION_PERSIST = 'persist';
     private const ACTION_UPDATE  = 'update';
     private const ACTION_REMOVE  = 'remove';
 
-    public function __construct(private Configuration $ormConfiguration)
-    {
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            Events::postPersist,
-            Events::postUpdate,
-            Events::postRemove,
-        ];
+    public function __construct(
+        #[Autowire(service: 'doctrine.orm.default_configuration')]
+        private Configuration $ormConfiguration,
+    ) {
     }
 
     public function postPersist(LifecycleEventArgs $args): void

@@ -59,7 +59,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      *
      * @return MauticMessage[]
      */
-    public static function getMailerMessages(string $transport = null): array
+    public static function getMailerMessages(?string $transport = null): array
     {
         $messages = parent::getMailerMessages($transport);
 
@@ -73,7 +73,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * Overloading the method from MailerAssertionsTrait to get better typehint.
      */
-    public static function getMailerMessage(int $index = 0, string $transport = null): ?MauticMessage
+    public static function getMailerMessage(int $index = 0, ?string $transport = null): ?MauticMessage
     {
         return self::getMailerMessages($transport)[$index] ?? null;
     }
@@ -81,7 +81,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @return MauticMessage[]
      */
-    public static function getMailerMessagesByToAddress(string $toAddress, string $transport = null): array
+    public static function getMailerMessagesByToAddress(string $toAddress, ?string $transport = null): array
     {
         return array_values(array_filter(self::getMailerMessages($transport), fn (MauticMessage $mauticMessage) => $mauticMessage->getTo()[0]->getAddress() === $toAddress));
     }
@@ -169,7 +169,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @param array<mixed,mixed> $params
      */
-    protected function testSymfonyCommand(string $name, array $params = [], Command $command = null): CommandTester
+    protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester
     {
         $kernel      = static::getContainer()->get('kernel');
         $application = new Application($kernel);

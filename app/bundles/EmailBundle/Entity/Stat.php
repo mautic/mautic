@@ -283,7 +283,7 @@ class Stat
         return $this->email;
     }
 
-    public function setEmail(Email $email = null): void
+    public function setEmail(?Email $email = null): void
     {
         $this->email = $email;
     }
@@ -342,7 +342,7 @@ class Stat
         return $this->lead;
     }
 
-    public function setLead(Lead $lead = null): void
+    public function setLead(?Lead $lead = null): void
     {
         $this->lead = $lead;
     }
@@ -499,7 +499,7 @@ class Stat
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getTokens()
     {

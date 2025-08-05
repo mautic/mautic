@@ -66,7 +66,7 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
-    public function getBuilderTokensAction(Request $request, EventDispatcherInterface $eventDispatcher = null): JsonResponse
+    public function getBuilderTokensAction(Request $request, ?EventDispatcherInterface $eventDispatcher = null): JsonResponse
     {
         $query  = $request->get('query', '');
         $tokens = $this->getBuilderTokens($query);

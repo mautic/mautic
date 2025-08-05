@@ -89,7 +89,7 @@ trait TranslationEntityTrait
     /**
      * @return $this
      */
-    public function setTranslationParent(TranslationEntityInterface $parent = null)
+    public function setTranslationParent(?TranslationEntityInterface $parent = null)
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('translationParent', $parent);

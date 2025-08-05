@@ -96,19 +96,6 @@ class LeadSubscriber implements EventSubscriberInterface
                             }
                         }
 
-                        /* @deprecated - BC support to be removed in 3.0 */
-                        // Allow a custom template if applicable
-                        if (method_exists($channelModel, 'getPageHitLeadTimelineTemplate')) {
-                            $template = $channelModel->getPageHitLeadTimelineTemplate($hit);
-                        }
-                        if (method_exists($channelModel, 'getPageHitLeadTimelineLabel')) {
-                            $eventTypeName = $channelModel->getPageHitLeadTimelineLabel($hit);
-                        }
-                        if (method_exists($channelModel, 'getPageHitLeadTimelineIcon')) {
-                            $icon = $channelModel->getPageHitLeadTimelineIcon($hit);
-                        }
-                        /* end deprecation */
-
                         if (!empty($hit['sourceId'])) {
                             if ($source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {
                                 $hit['sourceName']  = $source['name'];
