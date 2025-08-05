@@ -15,10 +15,10 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
-    <div class="col-md-9 height-auto bdr-r">
+    <div class="col-md-8 col-lg-9 height-auto bdr-r">
         <div class="pa-md">
 	        <div class="row">
-		        <div class="col-md-6">
+		        <div class="col-lg-6">
 					<div class="col-md-7 pl-0">
 						{{ form_row(form.storageLocation) }}
 					</div>
@@ -62,35 +62,38 @@
 			        <div id="storage-remote"{% if startOnLocal %} class="hide"{% endif %}>
 						{{ form_row(form.remotePath) }}
 			        </div>
+					<div>
+						{{ form_row(form.title) }}
+					</div>
+					<div>
+						{{ form_row(form.alias) }}
+					</div>
+					<div>
+						{{ form_row(form.description) }}
+					</div>
 		    	</div>
-		    	<div class="col-md-6">
-		    		<div class="row">
-				    	<div class="form-group col-xs-12 preview">
-				    		{{- include('@MauticAsset/Asset/preview.html.twig', {
+		    	<div class="col-lg-6">
+		    		<div class="tile jc-center">
+				    	<div class="form-group col-xs-12 ">
+				    		{{- include('@MauticAsset/Modules/preview.html.twig', {
+								'variant': 'interactive',
 								'activeAsset' : activeAsset,
 								'assetDownloadUrl' : url('mautic_asset_action',
                                 {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
                             )}) -}}
 			    		</div>
-		    		</div>
+					</div>
 		    	</div>
 		    </div>
 		    <div class="row">
-				<div class="col-md-6">
-					{{ form_row(form.title) }}
-				</div>
-				<div class="col-md-6">
-					{{ form_row(form.alias) }}
-				</div>
+
 			</div>
             <div class="row">
-                <div class="col-xs-12">
-					{{ form_row(form.description) }}
-                </div>
+                
             </div>
 		</div>
 	</div>
- 	<div class="col-md-3 height-auto">
+ 	<div class="col-md-4 col-lg-3 height-auto">
 		<div class="pr-lg pl-lg pt-md pb-md">
 			{{ form_row(form.category) }}
 			{{ form_row(form.projects) }}

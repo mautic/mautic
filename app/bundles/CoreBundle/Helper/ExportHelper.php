@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
@@ -12,7 +13,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -30,6 +34,7 @@ class ExportHelper
         private CoreParametersHelper $coreParametersHelper,
         private FilePathResolver $filePathResolver,
         private ProcessSignalService $processSignalService,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -183,6 +188,7 @@ class ExportHelper
                 $headerSet = true;
             }
 
+            $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
             CsvHelper::putCsv($handler, $row);
 
             // Check if signal caught here
@@ -224,5 +230,60 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
+    }
+
+    public function downloadAsZip(string $filePath, string $fileName): BinaryFileResponse
+    {
+        return new BinaryFileResponse(
+            $filePath,
+            Response::HTTP_OK,
+            [
+                'Content-Type'        => 'application/zip',
+                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+                'Expires'             => 0,
+                'Cache-Control'       => 'must-revalidate',
+                'Pragma'              => 'public',
+            ]
+        );
+    }
+
+    /**
+     * @param array<string|int, string> $assetList
+     */
+    public function writeToZipFile(string $jsonOutput, array $assetList, string $path): string
+    {
+        if ('' === $path) {
+            $tempDir      = sys_get_temp_dir();
+            $jsonFilePath = sprintf('%s/entity_data.json', $tempDir);
+            $zipFilePath  = sprintf('%s/entity_data.zip', $tempDir);
+        } else {
+            $jsonFilePath = sprintf('%s/entity_data.json', $path);
+            $zipFilePath  = sprintf('%s/entity_data.zip', $path);
+        }
+
+        if (file_exists($jsonFilePath)) {
+            unlink($jsonFilePath);
+        }
+
+        if (file_exists($zipFilePath)) {
+            unlink($zipFilePath);
+        }
+
+        file_put_contents($jsonFilePath, $jsonOutput);
+
+        $zip = new \ZipArchive();
+        if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
+            $zip->addFile($jsonFilePath, 'entity_data.json');
+            foreach ($assetList as $assetPath) {
+                if (file_exists($assetPath)) {
+                    $zip->addFile($assetPath, 'assets/'.basename($assetPath));
+                }
+            }
+
+            $zip->close();
+            @unlink($jsonFilePath);
+        }
+
+        return $zipFilePath;
     }
 }

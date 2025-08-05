@@ -10,10 +10,14 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -361,6 +365,98 @@ class CampaignApiController extends CommonApiController
 
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
 
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Get a list of events.
+     */
+    public function exportCampaignAction(Request $request, int $campaignId): Response
+    {
+        // Check if the campaign exists
+        $campaign = $this->model->getEntity($campaignId);
+        if (!$campaign) {
+            return $this->notFound();
+        }
+
+        // Check if user has permission to export campaigns
+        if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        // Dispatch event to collect campaign data for export
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $campaignId);
+        $this->dispatcher->dispatch($event);
+        $data = $event->getEntities();
+
+        // Prepare response
+        $view = $this->view([$data], Response::HTTP_OK);
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    public function importCampaignAction(Request $request, UserHelper $userHelper, ImportHelper $importHelper): Response
+    {
+        // Check if user has permission to import campaigns
+        if (!$this->security->isGranted('campaign:imports:create')) {
+            return $this->accessDenied();
+        }
+
+        // Decode request JSON
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data[0][Campaign::ENTITY_NAME])) {
+            $files = $request->files->all();
+
+            if (1 !== count($files)) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_zip_file', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile->isValid()) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.upload_failed', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            if ('zip' !== strtolower($uploadedFile->getClientOriginalExtension())) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_upload_file_format', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            $zipPath = $uploadedFile->getPathname();
+
+            if (!file_exists($zipPath)) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.uploaded_file_no_exist', [], 'messages')], Response::HTTP_INTERNAL_SERVER_ERROR)
+                );
+            }
+
+            try {
+                $data = $importHelper->readZipFile($zipPath);
+            } catch (\RuntimeException $e) {
+                unlink($zipPath);
+
+                return $this->handleView(
+                    $this->view(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST)
+                );
+            }
+        }
+        $importHelper->recursiveRemoveEmailaddress($data);
+        $userId = $userHelper->getUser()->getId();
+
+        foreach ($data as $entity) {
+            $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+            $this->dispatcher->dispatch($event);
+        }
+        $view = $this->view([$this->translator->trans('mautic.campaign.campaign.import.finished', [], 'messages')], Response::HTTP_CREATED);
         $this->setSerializationContext($view);
 
         return $this->handleView($view);

@@ -7,5 +7,5 @@
   "minimum_mariadb_version": "10.11.0",
   "show_php_version_warning_if_under": "8.2.0",
   "minimum_mautic_version": "5.0.0",
-  "announcement_url": "https://github.com/mautic/mautic/releases/tag/6.0.3"
+  "announcement_url": "https://github.com/mautic/mautic/releases/tag/7.0.0-alpha"
 }

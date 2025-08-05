@@ -132,6 +132,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     'type'           => 'datetime',
                     'groupByFormula' => 'DATE('.$hitPrefix.'date_left)',
                 ],
+                $hitPrefix.'time_spent' => [
+                    'label'   => 'mautic.page.report.hits.time_spent',
+                    'type'    => 'string',
+                    'formula' => 'IF('.$hitPrefix.'date_left IS NOT NULL, SEC_TO_TIME(TIMESTAMPDIFF(SECOND, '.$hitPrefix.'date_hit, '.$hitPrefix.'date_left)), \'\')',
+                ],
                 $hitPrefix.'country' => [
                     'label' => 'mautic.page.report.hits.country',
                     'type'  => 'string',

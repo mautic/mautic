@@ -2,7 +2,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -24,32 +23,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "page:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "translationChildren"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "page:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    public const ENTITY_NAME = 'page';
 
     public const TABLE_NAME = 'pages';
 

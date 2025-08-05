@@ -22,16 +22,16 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $decoratorFactory        = $this->createMock(DecoratorFactory::class);
 
         $filterDecorator = $this->createMock(FilterDecoratorInterface::class);
-        $decoratorFactory->expects($this->exactly(4))
+        $decoratorFactory->expects($this->exactly(6))
             ->method('getDecoratorForFilter')
             ->willReturn($filterDecorator);
 
-        $filterDecorator->expects($this->exactly(4))
+        $filterDecorator->expects($this->exactly(6))
             ->method('getQueryType')
             ->willReturn('MyQueryTypeId');
 
         $filterQueryBuilder = $this->createMock(FilterQueryBuilderInterface::class);
-        $container->expects($this->exactly(4))
+        $container->expects($this->exactly(6))
             ->method('get')
             ->with('MyQueryTypeId')
             ->willReturn($filterQueryBuilder);
@@ -78,11 +78,29 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
                 ],
                 'merged_property' => [],
             ],
+            [
+                'glue'     => 'and',
+                'field'    => 'city',
+                'object'   => 'lead',
+                'type'     => 'text',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => 'empty',
+            ],
+            [
+                'glue'     => 'and',
+                'field'    => 'city',
+                'object'   => 'lead',
+                'type'     => 'text',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
         ]);
 
         $contactSegmentFilters = $contactSegmentFilterFactory->getSegmentFilters($leadList);
 
         $this->assertInstanceOf(ContactSegmentFilters::class, $contactSegmentFilters);
-        $this->assertCount(4, $contactSegmentFilters);
+        $this->assertCount(6, $contactSegmentFilters);
     }
 }

@@ -40,6 +40,8 @@ class Event implements ChannelInterface, UuidInterface
 
     public const TABLE_NAME = 'campaign_events';
 
+    public const ENTITY_NAME = 'campaign_event';
+
     public const TYPE_DECISION  = 'decision';
 
     public const TYPE_ACTION    = 'action';
