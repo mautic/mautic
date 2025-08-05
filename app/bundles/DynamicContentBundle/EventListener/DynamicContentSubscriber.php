@@ -388,6 +388,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $tokens = [];
         preg_match_all(self::TOKEN_REGEX, strip_tags($content), $matches);
 
+        if (empty($matches[1])) {
+            return $tokens;
+        }
+        
         foreach ($matches[1] as $match) {
             $tokens[] = trim($match);
         }
