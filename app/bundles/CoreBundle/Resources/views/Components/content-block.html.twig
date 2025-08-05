@@ -21,16 +21,16 @@
         {{ childContainer|raw }}
     {% endif %}
     
+    {% if cta is defined and cta %}
     <div class="mt-32">
-        {% if cta is defined and cta %}
         {% set cta = cta|merge({
             'variant': 'link',
             'icon': 'ri-arrow-right-line',
             'href': cta.link
         }) %}
         {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
-        {% endif %}
     </div>
+    {% endif %}
     
     {% if hasBorder is defined and hasBorder %}
     <hr class="mt-64">

@@ -3,7 +3,9 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -15,10 +17,13 @@ use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -26,17 +31,17 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -96,8 +101,10 @@ class CampaignController extends AbstractStandardFormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
+        private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
+        private EntityManager $em,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -123,24 +130,147 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): JsonResponse|RedirectResponse
     {
         return $this->batchDeleteStandard($request);
     }
 
-    /**
-     * Clone an entity.
-     *
-     * @return JsonResponse|RedirectResponse|Response
-     */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): JsonResponse|RedirectResponse|Response
     {
         return $this->cloneStandard($request, $objectId);
+    }
+
+    /**
+     * @param array<int, mixed> $assetList
+     */
+    private function handleExportDownload(
+        ExportHelper $exportHelper,
+        string $jsonOutput,
+        array $assetList,
+        string $exportFileName,
+    ): JsonResponse|BinaryFileResponse {
+        $filePath = $exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+        if (!file_exists($filePath)) {
+            $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
+            $this->addFlashMessage('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], FlashBag::LEVEL_ERROR);
+
+            return new JsonResponse([
+                'error'   => $this->translator->trans('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ], 400);
+        }
+
+        return $exportHelper->downloadAsZip($filePath, $exportFileName);
+    }
+
+    public function exportAction(ExportHelper $exportHelper, CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
+    {
+        if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            $this->logger->error('Access denied for campaign export', ['user' => $this->user->getId()]);
+
+            return $this->accessDenied();
+        }
+
+        $campaign = $campaignModel->getEntity($objectId);
+
+        if (empty($campaign)) {
+            $this->logger->error('Campaign not found for export', ['objectId' => $objectId]);
+
+            return $this->notFound();
+        }
+
+        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
+        $event = $this->dispatcher->dispatch($event);
+        $data  = $event->getEntities();
+
+        $jsonOutput = json_encode([$data], JSON_PRETTY_PRINT);
+
+        $assetListEvent = new AssetExportListEvent([$data]);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
+        return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
+    }
+
+    public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response
+    {
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+                'campaign:campaigns:viewown',
+                'campaign:campaigns:viewother',
+                'campaign:campaigns:create',
+                'campaign:campaigns:editown',
+                'campaign:campaigns:editother',
+                'campaign:campaigns:deleteown',
+                'campaign:campaigns:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['campaign:campaigns:viewown'] && !$permissions['campaign:campaigns:viewother']) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        $session     = $request->getSession();
+        $filter      = $session->get('mautic.campaign.filter', '');
+        $orderByDir  = $session->get('mautic.campaign.orderbydir', 'ASC');
+
+        $ids            = $request->get('ids');
+        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+        $objectIds      = json_decode($ids, true);
+
+        if (empty($ids)) {
+            $repo = $this->em->getRepository(Campaign::class);
+            $repo->setTranslator($this->translator);
+
+            $args = [
+                'filter'           => $filter,
+                'orderBy'          => 'c.id',
+                'orderByDir'       => $orderByDir,
+                'ignore_paginator' => true, // to get full result, not paginated
+            ];
+
+            // Query campaigns
+            $campaigns = $repo->getEntities($args);
+
+            // Get campaign IDs
+            $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
+        }
+        $allData = [];
+
+        if (empty($objectIds)) {
+            $this->addFlashMessage('mautic.campaign.error.export.no_campaigns_selected', [], FlashBag::LEVEL_WARNING);
+
+            return new JsonResponse([
+                'error'   => $this->translator->trans('mautic.campaign.error.export.no_campaigns_selected', [], 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ], 400);
+        }
+
+        foreach ($objectIds as $objectId) {
+            $event = new EntityExportEvent(Campaign::ENTITY_NAME, (int) $objectId);
+            $event = $this->dispatcher->dispatch($event);
+            $data  = $event->getEntities();
+
+            if (!empty($data)) {
+                $allData[] = $data;
+            }
+        }
+
+        $assetListEvent = new AssetExportListEvent($allData);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
+        $jsonOutput = json_encode($allData, JSON_PRETTY_PRINT);
+
+        return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
     /**
@@ -263,22 +393,15 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * Deletes the entity.
-     *
-     * @return JsonResponse|RedirectResponse
-     */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse|RedirectResponse
     {
         return $this->deleteStandard($request, $objectId);
     }
 
     /**
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|RedirectResponse|Response
     {
         return $this->editStandard($request, $objectId, $ignorePost);
     }
@@ -306,6 +429,8 @@ class CampaignController extends AbstractStandardFormController
                 'campaign:campaigns:publish',
                 'campaign:campaigns:publishown',
                 'campaign:campaigns:publishother',
+                'campaign:imports:view',
+                'campaign:imports:create',
             ],
             'RETURN_ARRAY',
             null,
@@ -371,21 +496,22 @@ class CampaignController extends AbstractStandardFormController
         $session->set('mautic.campaign.page', $page);
 
         $viewParameters = [
-            'permissionBase'  => $this->getPermissionBase(),
-            'mauticContent'   => $this->getJsLoadMethodPrefix(),
-            'sessionVar'      => $this->getSessionBase(),
-            'actionRoute'     => $this->getActionRoute(),
-            'indexRoute'      => $this->getIndexRoute(),
-            'tablePrefix'     => $model->getRepository()->getTableAlias(),
-            'modelName'       => $this->getModelName(),
-            'translationBase' => $this->getTranslationBase(),
-            'searchValue'     => $search,
-            'items'           => $items,
-            'totalItems'      => $count,
-            'page'            => $page,
-            'limit'           => $limit,
-            'permissions'     => $permissions,
-            'tmpl'            => $request->get('tmpl', 'index'),
+            'permissionBase'        => $this->getPermissionBase(),
+            'mauticContent'         => $this->getJsLoadMethodPrefix(),
+            'sessionVar'            => $this->getSessionBase(),
+            'actionRoute'           => $this->getActionRoute(),
+            'indexRoute'            => $this->getIndexRoute(),
+            'tablePrefix'           => $model->getRepository()->getTableAlias(),
+            'modelName'             => $this->getModelName(),
+            'translationBase'       => $this->getTranslationBase(),
+            'searchValue'           => $search,
+            'items'                 => $items,
+            'totalItems'            => $count,
+            'page'                  => $page,
+            'limit'                 => $limit,
+            'permissions'           => $permissions,
+            'tmpl'                  => $request->get('tmpl', 'index'),
+            'enableExportPermission'=> $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE'),
         ];
 
         return $this->delegateView(
@@ -525,12 +651,7 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * View a specific campaign.
-     *
-     * @return JsonResponse|Response
-     */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         return $this->viewStandard($request, $objectId, $this->getModelName(), null, null, 'campaign');
     }
