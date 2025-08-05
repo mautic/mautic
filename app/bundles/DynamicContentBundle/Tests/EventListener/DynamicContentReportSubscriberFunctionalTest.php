@@ -29,6 +29,10 @@ class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $sqlMode = $this->em->getConnection()->executeQuery('SELECT @@sql_mode AS sql_mode')->fetchOne();
+        if (str_contains($sqlMode, 'ONLY_FULL_GROUP_BY')) {
+            $this->markTestSkipped('Test skipped because ONLY_FULL_GROUP_BY is enabled in sql_mode.');
+        }
         $this->setupTestEntities();
     }
 
