@@ -61,6 +61,10 @@
                         'class': 'col-project-name'
                     }) }}
 
+                    <th class="visible-md visible-lg col-project-entities-count">
+                        {{ 'mautic.project.list.thead.project.count'|trans }}
+                    </th>
+
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'projects',
                         'orderBy': 'p.dateAdded',
@@ -113,6 +117,11 @@
                                     <small>{{ item.getDescription()|purify }}</small>
                                 </div>
                             {% endif %}
+                        </td>
+                        <td class="visible-md visible-lg">
+                            <a href="{{ path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}) }}" data-toggle="ajax" data-menu-link="mautic_project_index" size="sm" class="label label-gray" {% if 0 == item.entitiesCount|default(0) %}disabled="disabled"{% endif %}>
+                               {{- 'mautic.project.entity.count'|trans({'%count%': item.entitiesCount|default(0)}) -}}
+                            </a>
                         </td>
                         <td>
                             <abbr title="{{ dateToFull(item.getDateAdded) }}">

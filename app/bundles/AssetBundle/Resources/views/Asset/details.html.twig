@@ -216,18 +216,6 @@
         </div>
 
         {{ customContent('details.stats.graph.below', _context) }}
-
-        <!-- start: tab-content -->
-        <div class="tab-content pa-md preview-detail">
-            {{- include('@MauticAsset/Asset/preview.html.twig',
-                {
-                    'activeAsset' : activeAsset,
-                    'assetDownloadUrl' : url(
-                    'mautic_asset_action',
-                    {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
-                )}) -}}
-        </div>
-        <!--/ end: tab-content -->
     </div>
     <!--/ left section -->
 
@@ -239,12 +227,20 @@
                 {% include '@MauticCore/Components/card.html.twig' with {
                 type: 'link',
                 href: assetDownloadUrl,
-                ctaType: 'new tab',
+                ctaType: 'external',
                 heading: 'mautic.core.open_link',
                 attributes: {
                     'target': '_blank'
                 }
             } %}
+            {{- include('@MauticAsset/Modules/preview.html.twig',
+            {
+                'variant': 'dialog',
+                'activeAsset' : activeAsset,
+                'assetDownloadUrl' : url(
+                'mautic_asset_action',
+                {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
+            )}) -}}
             </div>
         </div>
         <!--/ preview URL -->

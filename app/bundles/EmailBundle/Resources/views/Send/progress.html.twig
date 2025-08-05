@@ -9,7 +9,7 @@
 
 {% block content %}
     <div class="row ma-lg email-send-progress" id="{{ id }}">
-        <div class="col-sm-offset-3 col-sm-6 text-center">
+        <div class="col-sm-offset-3 col-sm-6">
             <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
                 <div class="panel-heading">
                     <h4 class="panel-title">
@@ -46,7 +46,7 @@
                     </ul>
                 {% endif %}
 
-                <div class="panel-footer">
+                <div class="panel-footer text-center">
                     <span class="small">
                       <span class="imported-count">{{ progress[0] }}</span> / <span class="total-count">{{ progress[1] }}</span>
                     </span>
@@ -65,6 +65,25 @@
                     {% endif %}
                 </div>
             </div>
+
+        {% if 'inprogress' == status %}
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.email.send.exit_screen'|trans,
+                    variant: 'link',
+                    icon: 'ri-information-line',
+                    attributes: {
+                        'data-toggle': 'popover',
+                        'data-content': 'mautic.email.send.help_subheading_leaving'|trans,
+                        'data-placement': 'bottom',
+                        'data-container': 'body',
+                        'data-title': 'mautic.email.send.help_heading_leaving'|trans,
+                    }
+                }
+            ]
+        } %}
+        {% endif %}
         </div>
     </div>
 {% endblock %}

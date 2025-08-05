@@ -1,0 +1,93 @@
+{% set hasEntities = false %}
+{% for entityType, entityData in projectEntities %}
+	{% if entityData.count > 0 %}
+		{% set hasEntities = true %}
+	{% endif %}
+{% endfor %}
+
+{% if hasEntities %}
+	{% for entityType, entityData in projectEntities %}
+		{% if entityData.count > 0 %}
+			<div id="{{ entityType }}-list-wrapper" class="panel panel-default mt-md">
+				<div class="panel-heading pa-0 toolbar--table-toolbar">
+					<div class="d-flex ai-center jc-space-between list-toolbar toolbar--toolbar-content h-48">
+						<h4 class="panel-title fw-light mb-0 pl-md">{{ entityData.label }}</h4>
+						<a class="btn btn-ghost" data-toggle="ajaxmodal" data-target="#MauticSharedModal" href="{{ path('mautic_project_action', {'objectAction': 'addEntity', 'objectId': project.getId(), 'entityType': entityType}) }}" data-header="{{ 'mautic.project.add'|trans }} {{ entityData.label|trans }}" aria-label="{{ 'mautic.project.add'|trans }} {{ entityData.label|trans }}">
+							<i class="ri-add-line" aria-hidden="true" focusable="false"></i>
+							<span class="hidden-xs hidden-sm">{{ 'mautic.project.add'|trans }}</span>
+						</a>
+					</div>
+				</div>
+
+
+				<div class="page-list">
+					<div class="table-responsive">
+						<table class="table table-hover {{ entityType }}-list mb-0">
+							<thead>
+								<tr>
+									<th class="col-actions"></th>
+									<th class="col-name col-lg-5">{{ 'mautic.core.name'|trans }}</th>
+									<th class="visible-lg col-dateAdded">{{ 'mautic.lead.import.label.dateAdded'|trans }}</th>
+									<th class="visible-lg col-dateModified">{{ 'mautic.lead.import.label.dateModified'|trans }}</th>
+									<th class="visible-lg col-createdBy">{{ 'mautic.core.createdby'|trans }}</th>
+									<th class="visible-md visible-lg col-id">{{ 'mautic.core.id'|trans }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for entity in entityData.entities %}
+									<tr id="row_{{ entityType }}_{{ entity.getId() }}">
+										<td class="col-xs-1">
+											{{- include('@MauticCore/Helper/list_actions.html.twig', {
+                                        'item': entity,
+                                        'templateButtons': {
+                                            'edit': false,
+                                            'clone': false,
+                                            'delete': false
+                                        },
+                                        'customButtons': {
+                                            'remove': {
+                                                'confirm': {
+                                                    'btnClass': false,
+                                                    'btnText': 'mautic.project.remove_from_project'|trans,
+                                                    'message': 'mautic.project.form.confirm_remove'|trans({'%name%': entity.getName(), '%project%': project.getName()}),
+                                                    'confirmAction': path('mautic_project_action', {'objectAction': 'remove', 'objectId': project.getId(), 'entityType': entityType, 'entityId': entity.getId()}),
+                                                    'template': 'delete'
+                                                },
+                                                'iconClass': 'ri-subtract-line',
+                                                'priority': 100
+                                            }
+                                        },
+                                    }) -}}
+										</td>
+										<td>
+											<a href="{{ path('mautic_' ~ entityType ~ '_action', {'objectAction': 'view', 'objectId': entity.getId()}) }}" data-toggle="ajax">
+												{{ entity.getName()|purify }}
+											</a>
+										</td>
+										<td class="visible-lg" title="{{ entity.getDateAdded() ? dateToFullConcat(entity.getDateAdded()) : '' }}">
+											{{ entity.getDateAdded() ? dateToDate(entity.getDateAdded()) : '' }}
+										</td>
+										<td class="visible-lg" title="{{ entity.getDateModified() ? dateToFullConcat(entity.getDateModified()) : '' }}">
+											{{ entity.getDateModified() ? dateToDate(entity.getDateModified()) : '' }}
+										</td>
+										<td class="visible-lg">
+											{{ entity.getCreatedByUser() ? entity.getCreatedByUser()|escape : '' }}
+										</td>
+										<td class="visible-md visible-lg">
+											<span class="text-muted">{{ entity.getId() }}</span>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	{% endfor %}
+{% else %}
+	{{- include('@MauticCore/Helper/noresults.html.twig', {
+        'header': 'mautic.project.no_assigned_entities.header',
+        'message': 'mautic.project.no_assigned_entities.message'
+    }) -}}
+{% endif %}

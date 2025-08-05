@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends TestCase
@@ -63,6 +64,7 @@ class ExportHelperTest extends TestCase
             $this->coreParametersHelperMock,
             $this->filePathResolver,
             $this->processSignalService,
+            $this->createMock(EventDispatcherInterface::class),
         );
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
@@ -15,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -32,6 +34,7 @@ class ExportHelper
         private CoreParametersHelper $coreParametersHelper,
         private FilePathResolver $filePathResolver,
         private ProcessSignalService $processSignalService,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -185,6 +188,7 @@ class ExportHelper
                 $headerSet = true;
             }
 
+            $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
             CsvHelper::putCsv($handler, $row);
 
             // Check if signal caught here

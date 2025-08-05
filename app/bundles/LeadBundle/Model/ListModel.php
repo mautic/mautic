@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -66,6 +67,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         private SegmentChartQueryFactory $segmentChartQueryFactory,
         private RequestStack $requestStack,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private DoNotContactRepository $doNotContactRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -1341,6 +1343,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         return $leadCounts;
+    }
+
+    public function getActiveSegmentContactCount(int $segmentId): int
+    {
+        $total = $this->getRepository()->getLeadCount($segmentId);
+        $dnc   = $this->doNotContactRepository->getCount(null, null, null, $segmentId);
+
+        return max(0, $total - $dnc);
     }
 
     /**
