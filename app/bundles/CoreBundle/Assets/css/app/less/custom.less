@@ -481,7 +481,7 @@ code:hover > .copy-icon {
 .builder-content {
   position: fixed;
   left: 0;
-  top: 0;
+  top: 48px;
   width: 70%;
   height: 100%;
 }
@@ -562,9 +562,10 @@ code:hover > .copy-icon {
 
 .tooltip-inner { padding: 12px; }
 .popover {
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: clamp(4px, var(--border-radius-sm), 8px);
+  box-shadow: 0 0px 10px 0px rgb(0 0 0 / 7%);
 }
 .popover-title {
   padding: 16px 16px 12px;
@@ -578,7 +579,7 @@ code:hover > .copy-icon {
 
 .popover-content {
   padding: 12px 16px 16px;
-  border-radius: var(--border-radius-md);
+  border-radius: 0 0 clamp(4px, var(--border-radius-sm), 8px) clamp(4px, var(--border-radius-sm), 8px);
   background-color: var(--layer-02);
 }
 
@@ -650,4 +651,71 @@ code:hover > .copy-icon {
 
 .modal.fade .modal-dialog {
   animation: modal-fade var(--duration-productive) var(--easing-standard-productive);
+}
+
+.asset-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    .asset-preview__label {
+      opacity: 0.5;
+    }
+  }
+  
+  .asset-preview__label:has(a:focus) {
+    opacity: 0.5;
+  }
+}
+
+.asset-preview--image {
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-all-expressive); 
+  transform: scale(1);
+
+  .img-thumbnail {
+    background-color: var(--background);
+    border-color: transparent;
+    transition: var(--transition-all-expressive);
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    
+    .img-thumbnail {
+      border-radius: 12px;
+      box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+      border-color: var(--interactive);
+    }
+  }
+
+  &:active {
+    transform: scale(1.35);
+
+    .img-thumbnail {
+      border-radius: 24px;
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+      border-color: var(--interactive);
+    }
+
+    .asset-preview__label {
+      opacity: 0;
+    }
+  }
+}
+
+.asset-preview__label {
+  opacity: 0;
+  position: absolute;
+  top: 10px;
+  z-index: 1;
+  right: 10px;
+  transition: var(--transition-all-expressive);
+}
+
+.chart-no-data {
+  background-color: var(--layer);
+  width: 100%;
 }

@@ -6,33 +6,37 @@
     - eventSettings
     - canvasSettings
 #}
-<div id="campaign-builder" class="hide builder campaign-builder live">
-    <div class="btns-builder">
-        {% include '@MauticCore/Helper/button.html.twig' with {
-            buttons: [
-                {
-                    label: 'mautic.core.form.apply',
-                    variant: 'primary',
-                    onclick: 'Mautic.saveCampaignFromBuilder();',
-                    icon: 'ri-save-line',
-                    attributes: {
-                        class: 'btn-apply-builder',
-                        type: 'submit'
-                    }
-                },
-                {
-                    label: 'mautic.core.close.builder',
-                    variant: 'secondary',
-                    onclick: 'Mautic.closeCampaignBuilder();',
-                    icon: 'ri-close-line',
-                    attributes: {
-                        class: 'btn-close-campaign-builder'
-                    }
-                }
-            ]
-        } %}
-    </div>
+<div id="campaign-builder" class="hide builder campaign-builder live animation--slide-in-down">
     <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
+    {% include '@MauticCore/Components/uishell.html.twig' with {
+        Header: {
+            ariaLabel: 'mautic.campaign.builder',
+            children: {
+                HeaderName: {
+                    prefix: entity.name is empty ? '' : 'mautic.campaign.campaign',
+                    children: entity.name|default('mautic.campaign.unsaved'),
+                },
+                HeaderGlobal: {
+                    children: [
+                        {
+                            HeaderGlobalAction: {
+                                ariaLabel: 'mautic.core.form.apply',
+                                onClick: 'Mautic.saveCampaignFromBuilder();',
+                                renderActionIcon: 'ri-save-line',
+                            }
+                        },
+                        {
+                            HeaderGlobalAction: {
+                                ariaLabel: 'mautic.core.close.builder',
+                                onClick: 'Mautic.closeCampaignBuilder();',
+                                renderActionIcon: 'ri-close-line',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    } %}
     <div class="builder-content">
         <div id="CampaignCanvas">
             <div id="CampaignEvent_newsource{% if campaignSources is defined and campaignSources is not empty %}_hide{% endif %}" class="text-center list-campaign-source list-campaign-leadsource">

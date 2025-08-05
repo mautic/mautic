@@ -102,7 +102,7 @@
             />
             <span class="input-group-btn">
                 <button
-                    class="btn btn-ghost btn-icon btn-xs"
+                    class="btn btn-ghost btn--icon-only btn-xs"
                     onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
                     <i class="ri-fw ri-lg {{ value is defined and value is not empty ? 'ri-close-line' : 'ri-filter-2-fill' }}"></i>
                 </button>

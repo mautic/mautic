@@ -136,7 +136,7 @@ class FormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
-                'data'  => $options['data']->getNoIndex() ?: false,
+                'data'  => $options['data']->getNoIndex(),
             ]
         );
 

@@ -8,6 +8,7 @@
 ## Removed features
 - The ability to update Mautic in the browser (via user interface) has been removed. To update Mautic, use the **command line** instead.
 - The API Limiter was removed temporarily. Shoud be added back before the M7-stable is released. https://github.com/mautic/mautic/pull/14876
+- The `track_by_tracking_url` configuration setting has been removed. Identification of contacts via the `ct` parameter in tracking URLs was already the default behavior.
 
 ## Removed code
 
@@ -58,6 +59,7 @@
 ### PHP
 - Removed `Mautic\DashboardBundle\Dashboard\Widget::FORMAT_MYSQL` constant. Use `DateTimeHelper::FORMAT_DB_DATE_ONLY` instead.
 - Removed `Mautic\ApiBundle\Security\OAuth2\Firewall::OAuthListener` class as it was empty. Use `FOS\OAuthServerBundle\Security\Firewall\OAuthListener` instead.
+- Removed `Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder` as unused.
 
 ### Javascript
 - Removed `Mautic.insertTextInEditor` function. Use `Mautic.insertHtmlInEditor` instead.

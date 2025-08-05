@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Tests\Model;
 
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -114,10 +115,14 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->expects($this->exactly(3))
             ->method('getFilePath')
             ->willReturn('my-path');
-        $matcher = $this->exactly(3);
+        $matcher = $this->atLeast(3);
 
         $eventDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent $event, string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
+            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
+                if ($event instanceof JobExtendTimeEvent) {
+                    return $event;
+                }
+
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
                 Assert::assertSame($event->getFile(), 'my-path');
                 if (1 === $matcher->numberOfInvocations()) {

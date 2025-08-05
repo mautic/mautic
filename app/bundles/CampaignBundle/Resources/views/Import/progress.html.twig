@@ -1,0 +1,146 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}campaignImport{% endblock %}
+
+{% block headerTitle %}
+    {{ 'mautic.campaign.campaign.import.title'|trans }}
+{% endblock %}
+
+{% block content %}
+    {% set progress = importProgress ?? 0 %}
+    {% set isComplete = progress >= 100 %}
+    {% set hasErrors = (
+        (importSummary|default([]))|filter(s =>
+            s.update is defined and s.update.errors is defined and s.update.errors is not empty
+        ) is not empty
+        or
+        (analyzeSummary|default([]))|filter(group =>
+            group.errors is defined and group.errors.messages is defined and group.errors.messages is not empty
+        ) is not empty
+    ) %}
+    {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
+
+    <div class="row ma-lg" id="{{ id }}">
+        <div class="col-sm-offset-3 col-sm-6 text-center">
+            <div class="panel panel-{% if hasErrors %}danger{% elseif isComplete %}success{% else %}info{% endif %}">
+                <div class="panel-heading text-center">
+                    <h4 class="panel-title">
+                        {{ hasErrors
+                            ? 'mautic.campaign.campaign.import.error'|trans
+                            : (isComplete
+                                ? 'mautic.campaign.campaign.import.success'|trans
+                                : 'mautic.campaign.campaign.import.inprogress'|trans)
+                        }}
+                    </h4>
+                </div>
+                <div class="panel-body">
+
+                    {% if hasErrors %}
+                        {% include '@MauticCampaign/Import/_import_error_block.html.twig' %}
+
+                    {% elseif not isComplete %}
+                        <form method="post" action="{{ path('mautic_campaign_import_action', {'objectAction': 'progress'}) }}">
+                            {% set processedUuids = [] %}
+                            {% for group in analyzeSummary %}
+                                {% set merged = {} %}
+                                {% if group.update is defined %}
+                                    {% for entity, details in group.update %}
+                                        {% set skip = false %}
+                                        {% for uuid in details.uuids %}
+                                            {% if uuid in processedUuids %}
+                                                {% set skip = true %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if not skip %}
+                                            {% for uuid in details.uuids %}
+                                                {% set processedUuids = processedUuids|merge([uuid]) %}
+                                            {% endfor %}
+                                            {% set merged = merged|merge({ (entity ~ '_update'): details|merge({'status': 'Update'}) }) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% if group.new is defined %}
+                                    {% for entity, details in group.new %}
+                                        {% set skip = false %}
+                                        {% for uuid in details.uuids %}
+                                            {% if uuid in processedUuids %}
+                                                {% set skip = true %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if not skip %}
+                                            {% for uuid in details.uuids %}
+                                                {% set processedUuids = processedUuids|merge([uuid]) %}
+                                            {% endfor %}
+                                            {% set merged = merged|merge({ (entity ~ '_create'): details|merge({'status': 'Create'}) }) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% if merged is not empty %}
+                                    {% include '@MauticCampaign/Import/_summary_table.html.twig' with {
+                                        summary: merged,
+                                        tableId: 'importCombinedTable',
+                                        isAnalyzeStage: true
+                                    } %}
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="justify-content-center gap-3 mt-md">
+                                {{ include('@MauticCore/Helper/confirm.html.twig', {
+                                    'btnClass': 'btn btn-danger btn-nospin',
+                                    'message': 'mautic.campaign.campaign.import.cancelmessage'|trans,
+                                    'confirmText': 'mautic.campaign.campaign.import.cancelconfirm'|trans,
+                                    'confirmAction': path('mautic_campaign_import_action', {'objectAction' : 'cancel'}),
+                                    'iconClass': 'ri-delete-bin-line',
+                                    'btnText': 'mautic.campaign.campaign.import.cancel'|trans
+                                }) }}
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-play-line me-1"></i>
+                                    {{ 'mautic.campaign.campaign.import.proceed'|trans }}
+                                </button>
+                            </div>
+                        </form>
+
+                    {% else %}
+                        <h4 class="text-success">{{ 'mautic.campaign.campaign.import.finished'|trans }}</h4>
+
+                        {% for group in importSummary %}
+                            {% if group.update is defined and 'email' in group.update|keys %}
+                                {% set emailName = group.update['email'].names[0] %}
+                                <h4 class="text-info pa-sm">
+                                    {{ 'mautic.campaign.campaign.import.email_notice'|trans({'%emailName%': emailName}) }}
+                                </h4>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for group in importSummary %}
+                            {% set merged = {} %}
+                            {% if group.update is defined %}
+                                {% for entity, details in group.update %}
+                                    {% set merged = merged|merge({ (entity ~ '_update'): details|merge({'status': 'mautic.campaign.campaign.import.status.updated'|trans}) }) %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if group.new is defined %}
+                                {% for entity, details in group.new %}
+                                    {% set merged = merged|merge({ (entity ~ '_create'): details|merge({'status': 'mautic.campaign.campaign.import.status.created'|trans}) }) %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if merged is not empty %}
+                                {% include '@MauticCampaign/Import/_summary_table.html.twig' with {
+                                    summary: merged,
+                                    tableId: 'importCombinedTable',
+                                    showLinks: true
+                                } %}
+                            {% endif %}
+                        {% endfor %}
+
+
+                        {% include '@MauticCampaign/Import/_import_buttons.html.twig' %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
