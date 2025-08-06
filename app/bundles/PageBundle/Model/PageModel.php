@@ -414,7 +414,8 @@ class PageModel extends FormModel
         }
 
         $hit = new Hit();
-        $hit->setDateHit(new \DateTime());
+        // Ensure we use the actual request time
+        $hit->setDateHit(\DateTime::createFromFormat('U', $request->server->get('REQUEST_TIME', time())));
         $hit->setIpAddress($this->ipLookupHelper->getIpAddress());
 
         // Set info from request
