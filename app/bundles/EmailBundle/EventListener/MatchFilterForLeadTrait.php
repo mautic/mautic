@@ -190,7 +190,7 @@ trait MatchFilterForLeadTrait
     private function transformFilterDataForLead(array $data, array $lead): ?array
     {
         if ($this->isFilterCompany($data)) {
-            $primaryCompany = $lead['companies'][0] ?: null;
+            $primaryCompany = $lead['companies'][0] ?? null;
 
             return empty($primaryCompany) ? null : [$primaryCompany[$data['field']]];
         }
