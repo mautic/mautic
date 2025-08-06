@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait MatchFilterForLeadTrait
@@ -160,14 +160,14 @@ trait MatchFilterForLeadTrait
                             $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                             break;
                         case 'startsWith':
-                            $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                            $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
                             break;
                         case 'endsWith':
                             $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
                             $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
                             break;
                         case 'contains':
-                            $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
+                            $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                             break;
                         default:
                             throw new OperatorsNotFoundException('Operator is not defined or invalid operator found.');
@@ -226,13 +226,13 @@ trait MatchFilterForLeadTrait
      * @param string $operator   empty, !empty, in, !in
      * @param int[]  $segmentIds
      */
-    private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, ?array $segmentIds = null): bool
+    private function isContactSegmentRelationshipValid(int $contactId, string $operator, ?array $segmentIds = null): bool
     {
         return match ($operator) {
-            OperatorOptions::EMPTY     => $segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
-            OperatorOptions::NOT_EMPTY => $segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
-            OperatorOptions::IN        => $segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
-            OperatorOptions::NOT_IN    => $segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
             default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }

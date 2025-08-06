@@ -18,7 +18,7 @@ class TagRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->tagRepository = self::$container->get('mautic.lead.repository.tag');
+        $this->tagRepository = self::getContainer()->get('mautic.lead.repository.tag');
     }
 
     public function testGetTagIdsByLeadId(): void

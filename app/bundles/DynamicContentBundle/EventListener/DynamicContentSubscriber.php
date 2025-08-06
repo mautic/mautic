@@ -388,7 +388,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         if (empty($matches[1])) {
             return $tokens;
         }
-        
+
         foreach ($matches[1] as $match) {
             $tokens[] = trim($match);
         }

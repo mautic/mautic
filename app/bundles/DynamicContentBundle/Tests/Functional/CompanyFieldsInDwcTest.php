@@ -27,7 +27,7 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
     /**
      * @return iterable<string,array{bool,mixed[]}>
      */
-    public function dataCompanyFieldsAreFollowedWhenEmailIsSent(): iterable
+    public static function dataCompanyFieldsAreFollowedWhenEmailIsSent(): iterable
     {
         yield 'Equal ZIP code matches' => [true, [
             [
@@ -77,8 +77,8 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
 
     /**
      * @param mixed[] $filters
-     * @dataProvider dataCompanyFieldsAreFollowedWhenEmailIsSent
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataCompanyFieldsAreFollowedWhenEmailIsSent')]
     public function testCompanyFieldsAreFollowedWhenEmailIsSent(bool $shouldMatch, array $filters): void
     {
         $dynamicContent = $this->createDynamicContent($filters);
@@ -91,7 +91,7 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
 
         // Send email to contact
@@ -105,7 +105,7 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $email = $this->messageLogger->getMessages()[0]->toString();
+        $email = $this->getMailerMessages()[0]->toString();
 
         if ($shouldMatch) {
             Assert::assertStringContainsString($dynamicContent->getContent(), $email);

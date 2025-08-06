@@ -13,6 +13,7 @@ use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
@@ -40,20 +41,23 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
+    private MockObject $segmentRepository;
 
     private DynamicContentHelper $helper;
 
     protected function setUp(): void
     {
-        $this->mockModel           = $this->createMock(DynamicContentModel::class);
-        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
-        $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
-        $this->leadModel           = $this->createMock(LeadModel::class);
-        $this->helper              = new DynamicContentHelper(
+        $this->mockModel            = $this->createMock(DynamicContentModel::class);
+        $this->realTimeExecutioner  = $this->createMock(RealTimeExecutioner::class);
+        $this->mockDispatcher       = $this->createMock(EventDispatcher::class);
+        $this->leadModel            = $this->createMock(LeadModel::class);
+        $this->segmentRepository    = $this->createMock(LeadListRepository::class);
+        $this->helper               = new DynamicContentHelper(
             $this->mockModel,
             $this->realTimeExecutioner,
             $this->mockDispatcher,
             $this->leadModel,
+            $this->segmentRepository,
             $this->createMock(CompanyLeadRepository::class),
             $this->createMock(TagRepository::class),
         );

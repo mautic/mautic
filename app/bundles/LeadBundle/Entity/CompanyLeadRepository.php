@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
@@ -114,7 +113,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * @param int[] $ids
      *
-     * @return array<string,mixed>
+     * @return list<array<string,mixed>>
      */
     public function getPrimaryCompaniesByLeadIds(array $ids): array
     {

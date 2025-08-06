@@ -38,6 +38,7 @@ class DynamicContentHelper
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
         protected LeadModel $leadModel,
+        private LeadListRepository $segmentRepository,
         private CompanyLeadRepository $companyLeadRepository,
         private TagRepository $tagRepository,
     ) {
