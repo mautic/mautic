@@ -105,7 +105,7 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $email = $this->getMailerMessages()[0]->toString();
+        $email = $this->getMailerMessages()[0]->getHtmlBody();
 
         if ($shouldMatch) {
             Assert::assertStringContainsString($dynamicContent->getContent(), $email);
