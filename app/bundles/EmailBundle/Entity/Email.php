@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Validator\EntityEvent;
+use Mautic\DynamicContentBundle\Validator\Constraints\DwcToken;
 use Mautic\EmailBundle\Validator\EmailLists;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\EmailBundle\Validator\TextOnlyDynamicContent;
@@ -493,6 +494,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addPropertyConstraint('subject', new TextOnlyDynamicContent());
+        $metadata->addPropertyConstraint(
+            'subject',
+            new DwcToken()
+        );
 
         $metadata->addConstraint(new EmailLists());
         $metadata->addConstraint(new EntityEvent());

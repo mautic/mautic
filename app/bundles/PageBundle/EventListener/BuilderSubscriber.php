@@ -2,9 +2,9 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\DynamicContentBundle\EventListener\DwcTokensSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -20,20 +20,19 @@ use Twig\Environment;
 
 final class BuilderSubscriber implements EventSubscriberInterface
 {
-    private const pageTokenRegex         = '{pagelink=(.*?)}';
+    public const pageTokenRegex           = '{pagelink=(.*?)}';
 
-    private const dwcTokenRegex          = '{dwc=(.*?)}';
-
-    private const langBarRegex           = '{langbar}';
-
-    private const shareButtonsRegex      = '{sharebuttons}';
-
-    private const titleRegex             = '{pagetitle}';
-
-    private const descriptionRegex       = '{pagemetadescription}';
+    /**
+     * @deprecated use DwcTokensSubscriber::DWCTOKENREGEX instead
+     */
+    public const dwcTokenRegex            = DwcTokensSubscriber::DWCTOKENREGEX;
+    public const langBarRegex             = '{langbar}';
+    public const shareButtonsRegex        = '{sharebuttons}';
+    public const titleRegex               = '{pagetitle}';
 
     public const brandName                = '{brand=name}';
 
+    public const descriptionRegex         = '{pagemetadescription}';
     public const segmentListRegex         = '{segmentlist}';
 
     public const categoryListRegex        = '{categorylist}';
@@ -57,7 +56,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private array $renderedContentCache = [];
 
-    public function __construct(private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        private TokenHelper $tokenHelper,
+        private IntegrationHelper $integrationHelper,
+        private PageModel $pageModel,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private TranslatorInterface $translator,
+        private Environment $twig,
+        private CoreParametersHelper $coreParametersHelper)
     {
     }
 
@@ -114,26 +120,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
-        if ($event->tokensRequested([static::pageTokenRegex, static::dwcTokenRegex])) {
+        if ($event->tokensRequested([static::pageTokenRegex])) {
             $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
-
-            // add only filter based dwc tokens
-            $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->connection->createExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
-            $tokens         = $dwcTokenHelper->getTokens(
-                static::dwcTokenRegex,
-                '',
-                'slot_name',
-                'slot_name',
-                $expr
-            );
-            if (is_array($tokens)) {
-                array_walk($tokens, function (&$val) {
-                    $val = 'DWC:'.$val;
-                });
-            }
-
-            $event->addTokens(is_array($tokens) ? $tokens : []);
 
             $event->addTokens(
                 $event->filterTokens(

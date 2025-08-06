@@ -3,18 +3,13 @@
 namespace Mautic\DynamicContentBundle\Tests\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
-use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -24,7 +19,6 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,7 +72,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $contactTracker;
 
-    private MockObject $emailModel;
     private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
 
     private DynamicContentSubscriber $subscriber;
@@ -99,7 +92,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->security                   = $this->createMock(CorePermissions::class);
         $this->contactTracker             = $this->createMock(ContactTracker::class);
         $this->companyLeadRepositoryMock  = $this->createMock(CompanyLeadRepository::class);
-        $this->emailModel                 = $this->createMock(EmailModel::class);
         $this->subscriber                 = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -112,7 +104,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->security,
             $this->contactTracker,
             $this->companyLeadRepositoryMock,
-            $this->emailModel,
         );
     }
 
@@ -168,10 +159,19 @@ HTML;
             ->method('getDynamicContentForLead')
             ->willReturn($dwcContent);
 
-        $event->expects($this->once())
-            ->method('setContent')
-            ->with($expected);
-
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('replaceDWCTokenToHtmlTag')
+            ->willReturn($content);
+        $matcher = $this->exactly(2);
+        $event->expects($matcher)
+            ->method('setContent')->willReturnCallback(function (...$parameters) use ($matcher, $content, $expected) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($content, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($expected, $parameters[0]);
+                }
+            });
         $this->subscriber->decodeTokens($event);
     }
 
@@ -279,46 +279,5 @@ HTML;
             ->with($expected);
 
         $this->subscriber->onTokenReplacement($event);
-    }
-
-    public function testEmailValidationWithDWCContainingDisallowedTokens(): void
-    {
-        $dynamicContentRepository  = $this->createMock(DynamicContentRepository::class);
-        $this->emailModel->method('getBuilderComponents')->willReturn(['tokens' => ['{dwc=allowed}' => 'allowed', '{contactfield=firstname}' => 'John']]);
-        $this->dynamicContentModel->method('getRepository')->willReturn($dynamicContentRepository);
-
-        $email = new Email();
-        $email->setEmailType('list');
-        $email->setName('DWC token test email');
-        $email->setSubject('DWC token test email');
-        $email->setCustomHtml('{dwc=disallowed}');
-
-        $dynamicContentRepository->method('getDynamicContentBySlotName')
-            ->willReturn([[
-                'id'      => 1,
-                'content' => '{focus=1}',
-            ]]);
-
-        $this->dynamicContentHelper->method('findDwcTokens')->willReturn(['{dwc=disallowed}' => 'some value']);
-
-        $violationBuilder = $this->createMock(\Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface::class);
-        $violationBuilder->expects($this->once())
-            ->method('addViolation');
-
-        $executionContext = $this->createMock(ExecutionContextInterface::class);
-        $executionContext->expects($this->once())
-            ->method('buildViolation')
-            ->with(
-                'mautic.dynamicContent.error.token_disallowed',
-                [
-                    '%invalidTokens%' => 'focus',
-                    '%dwcId%'         => 1,
-                ]
-            )
-            ->willReturn($violationBuilder);
-
-        $event = new EntityValidateEvent($email, new EntityEvent(), $executionContext);
-
-        $this->subscriber->validateDWCTokens($event);
     }
 }

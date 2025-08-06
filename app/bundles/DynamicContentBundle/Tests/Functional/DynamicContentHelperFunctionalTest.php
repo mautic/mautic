@@ -34,12 +34,10 @@ class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
 
         /** @var DynamicContentHelper $dynamicContentHelper */
         $dynamicContentHelper = self::getContainer()->get('mautic.helper.dynamicContent');
+        $tokens               = $dynamicContentHelper->findDwcVariantsBySlotNames(['test_slot']);
 
-        $content = '<body><div>{dwc=test_slot}{/dwc}</div></body>';
-        $tokens  = $dynamicContentHelper->findDwcTokens($content);
-
-        foreach ($tokens as $tokens) {
-            foreach ($tokens as $varient) {
+        foreach ($tokens as $token) {
+            foreach ($token as $varient) {
                 Assert::assertTrue($varient->getIsPublished());
             }
         }

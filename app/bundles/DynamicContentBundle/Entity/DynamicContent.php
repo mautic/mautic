@@ -453,7 +453,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getContent()
     {

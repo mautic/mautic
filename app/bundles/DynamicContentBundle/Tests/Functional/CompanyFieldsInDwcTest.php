@@ -99,7 +99,7 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
             'lead_quickemail[fromname]' => 'Admin',
             'lead_quickemail[from]'     => 'admin@test.mail',
             'lead_quickemail[subject]'  => 'Some subject',
-            'lead_quickemail[body]'     => sprintf('<html><body><p>{dwc=%s}{/dwc}</p></body></html>', $dynamicContent->getSlotName()),
+            'lead_quickemail[body]'     => sprintf('<html><body><p>{dwc=%s}</p></body></html>', $dynamicContent->getSlotName()),
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);

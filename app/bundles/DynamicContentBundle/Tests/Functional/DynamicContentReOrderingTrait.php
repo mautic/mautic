@@ -24,8 +24,11 @@ trait DynamicContentReOrderingTrait
         yield ['3', ['DC-2' => 1, 'DC-3' => 2, 'DC-1' => 3, 'DC-4' => 4], true]; // Put from lower order to higher order
     }
 
-    private function createDynamicContent(string $name, string $slotName, int $order): DynamicContent
-    {
+    private function createDynamicContent(
+        string $name,
+        string $slotName,
+        int $order, string $content = '<p> some content </p>',
+    ): DynamicContent {
         $filters = [
             [
                 'glue'     => 'and',
@@ -41,7 +44,7 @@ trait DynamicContentReOrderingTrait
         $dwc = new DynamicContent();
         $dwc->setIsPublished(true)
             ->setName($name)
-            ->setContent('<p> some content </p>')
+            ->setContent($content)
             ->setIsCampaignBased(false)
             ->setFilters($filters)
             ->setSlotName($slotName)

@@ -479,6 +479,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         } else {
             $this->assertStringContainsString($errString, $this->client->getResponse()->getContent());
         }
+        $this->assertStringContainsString('Invalid Dynamic Web Content token or closing tag missing', $this->client->getResponse()->getContent());
     }
 
     /**

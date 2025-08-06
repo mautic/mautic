@@ -8,6 +8,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -23,15 +24,9 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @const DYNAMIC_CONTENT_REGEX
-     */
-    public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
-
-    /**
-     * @const DYNAMIC_WEB_CONTENT_REGEX
-     */
     public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
+
+    public const DWC_WITH_OPTIONAL_DEFAULT_CONTENT = '/\{dwc=([^\{\}=]+)\}(.*?)\{\/dwc\}/s';
 
     public function __construct(
         protected DynamicContentModel $dynamicContentModel,
@@ -102,34 +97,23 @@ class DynamicContentHelper
         return '';
     }
 
-    public function findDwcTokens(string $content): array
+    /**
+     * @param array<string> $slotNames
+     *
+     * @return array<string, DynamicContent[]>
+     */
+    public function findDwcVariantsBySlotNames(array $slotNames): array
     {
-        preg_match_all('/{dwc=(.*?)}/', $content, $matches);
-
-        $tokens = [];
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $slotName) {
-                $token = $matches[0][$key];
-                if (!empty($tokens[$token])) {
-                    continue;
-                }
-
-                $dwcs = $this->getDwcsBySlotName($slotName, true);
-
+        $dwcListBySlotName = [];
+        $dwcs              = $this->getDwcsBySlotName($slotNames, true);
+        if (!empty($dwcs)) {
+            foreach ($dwcs as $dwc) {
                 /** @var DynamicContent $dwc */
-                foreach ($dwcs as $dwc) {
-                    if ($dwc->getIsCampaignBased()) {
-                        continue;
-                    }
-
-                    $tokens[$token][] = $dwc;
-                }
+                $dwcListBySlotName[$dwc->getSlotName()][] = $dwc;
             }
-
-            unset($matches);
         }
 
-        return $tokens;
+        return $dwcListBySlotName;
     }
 
     /**
@@ -142,7 +126,7 @@ class DynamicContentHelper
         DynamicContent $dwc,
         PageDisplayEvent|EmailSendEvent|null $event = null,
     ) {
-        $content = $dwc->getContent();
+        $content = $dwc->getContent() ?? '';
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
         list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
@@ -163,19 +147,18 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string $slotName
-     * @param bool   $publishedOnly
+     * @param array<string>|string $slotNames
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false)
+    public function getDwcsBySlotName(array|string $slotNames, bool $publishedOnly = false)
     {
         $filter = [
             'where' => [
                 [
                     'col'  => 'e.slotName',
-                    'expr' => 'eq',
-                    'val'  => $slotName,
+                    'expr' => is_array($slotNames) ? 'in' : 'eq',
+                    'val'  => $slotNames,
                 ],
             ],
         ];
@@ -240,18 +223,19 @@ class DynamicContentHelper
 
     /**
      * @param Lead|array<mixed> $lead
+     * @param array<string>     $slotNames
      *
      * @return array<mixed>
      */
     public function getDwcTokensWithContent(
-        string $content,
+        array $slotNames,
         array|Lead $lead,
-        PageDisplayEvent|EmailSendEvent $event,
+        EmailSendEvent $event,
     ): array {
-        $result = [];
-        $tokens = $this->findDwcTokens($content);
+        $result            = [];
+        $dwcListBySlotName = $this->findDwcVariantsBySlotNames($slotNames);
 
-        if (!$tokens) {
+        if (empty($dwcListBySlotName)) {
             return $result;
         }
 
@@ -259,14 +243,14 @@ class DynamicContentHelper
             $lead = $lead->getProfileFields();
         }
 
-        $lead = $this->loadLeadPrimaryCompanyIfNeeded($lead, $tokens);
-        $lead = $this->loadLeadTagIdsIfNeeded($lead, $tokens);
+        $lead = $this->loadLeadPrimaryCompanyIfNeeded($lead, $dwcListBySlotName);
+        $lead = $this->loadLeadTagIdsIfNeeded($lead, $dwcListBySlotName);
 
-        foreach ($tokens as $token => $dwcs) {
-            $result[$token] = '';
-            foreach ($dwcs as $dwc) {
+        $result = [];
+        foreach ($dwcListBySlotName as $slotName => $tokenData) {
+            foreach ($tokenData as $dwc) {
                 if ($this->filtersMatchContact($dwc->getFilters(), $lead)) {
-                    $result[$token] = $lead ? $this->getRealDynamicContent($lead, $dwc, $event) : '';
+                    $result[$slotName] = $lead ? $this->getRealDynamicContent($lead, $dwc, $event) : '';
                     break;
                 }
             }
@@ -278,17 +262,25 @@ class DynamicContentHelper
     /**
      * @param array<mixed> $lead
      */
-    public function replaceTokensWithPlainText(string $getSubject, array|Lead $lead, EmailSendEvent $event): string
+    public function replaceTokensWithPlainText(string $subject, array|Lead $lead, EmailSendEvent $event): string
     {
         $event->setIsSubject(true);
-        $tokens = $this->getDwcTokensWithContent($getSubject, $lead, $event);
-        foreach ($tokens as $token => $content) {
-            $plainText  = strip_tags($content);
-            $getSubject = str_replace($token, $plainText, $getSubject);
+        preg_match_all(self::DWC_WITH_OPTIONAL_DEFAULT_CONTENT, $subject, $matches);
+        if (!empty($matches[1])) {
+            $tokens = $this->getDwcTokensWithContent($matches[1], $lead, $event);
+            foreach ($matches[1] as $key => $slotName) {
+                $content = isset($tokens[$slotName]) ? $tokens[$slotName] :
+                    $this->replaceTokenInsideDWCContent($matches[2][$key], $event, $lead);
+
+                $token          = '{dwc_subject_'.$slotName.'_'.$key.'}';
+                $plainText      = strip_tags($content);
+                $event->addToken($token, $plainText);
+                $subject = str_replace($matches[0][$key], $token, $subject);
+            }
         }
         $event->setIsSubject(false);
 
-        return $getSubject;
+        return $subject;
     }
 
     /**
@@ -340,5 +332,67 @@ class DynamicContentHelper
                 }
             }
         }
+    }
+
+    public function replaceDWCTokenToHtmlTag(string $content): string
+    {
+        return preg_replace_callback(
+            self::DYNAMIC_WEB_CONTENT_REGEX,
+            function ($matches) {
+                $slotName = htmlspecialchars($matches[1], ENT_QUOTES);
+
+                return '<div data-slot="dwc" data-param-slot-name="'.$slotName.'"></div>';
+            },
+            $content
+        );
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function findDwcSlotNameFromContent(string $content): array
+    {
+        $dwcSlotNames = [];
+        $dom          = new \DOMDocument('1.0', 'utf-8');
+        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $xpath        = new \DOMXPath($dom);
+        $contentSlots = $xpath->query('//*[@data-slot="dwc" and not(ancestor::title)]');
+        for ($i = 0; $i < $contentSlots->length; ++$i) {
+            /** @var \DOMElement $slot */
+            $slot = $contentSlots->item($i);
+            if ((!$slotName = $slot->getAttribute('data-param-slot-name'))
+                || in_array($slotName, $dwcSlotNames, true)
+            ) {
+                continue;
+            }
+            $dwcSlotNames[] = $slotName;
+        }
+
+        return $dwcSlotNames;
+    }
+
+    /**
+     * @param Lead|mixed[] $lead
+     */
+    public function replaceTokenInsideDWCContent(string $content, EmailSendEvent $event, Lead|array $lead): string
+    {
+        if (empty($content)) {
+            return '';
+        }
+        $emailSendEvent = new EmailSendEvent(
+            null,
+            [
+                'content' => $content,
+                'email'   => $event->getEmail(),
+                'idHash'  => $event->getIdHash(),
+                'tokens'  => $event->getTokens(),
+                'lead'    => $lead,
+            ],
+            true
+        );
+
+        $this->dispatcher->dispatch($emailSendEvent, EmailEvents::EMAIL_ON_DISPLAY);
+
+        return $emailSendEvent->getContent(true);
     }
 }
