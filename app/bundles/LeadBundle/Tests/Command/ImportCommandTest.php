@@ -87,9 +87,19 @@ class ImportCommandTest extends TestCase
 
         // InputInterface
         $inputInterfaceMock = $this->createMock(InputInterface::class);
-        $inputInterfaceMock->method('getOption')
-            ->withConsecutive(['id'], ['limit'])
-            ->willReturnOnConsecutiveCalls(42, 10);
+        $matcher            = $this->exactly(2);
+        $inputInterfaceMock->expects($matcher)->method('getOption')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->numberOfInvocations()) {
+                $this->assertSame('id', $parameters[0]);
+
+                return 42;
+            }
+            if (2 === $matcher->numberOfInvocations()) {
+                $this->assertSame('limit', $parameters[0]);
+
+                return 10;
+            }
+        });
 
         // OutputInterface
         $outputInterfaceMock = $this->createMock(OutputInterface::class);

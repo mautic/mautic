@@ -12,30 +12,12 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "field:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "field:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Field implements UuidInterface
 {
     use UuidTrait;
 
-    public const TABLE_NAME = 'form_fields';
+    public const TABLE_NAME  = 'form_fields';
+    public const ENTITY_NAME = 'form_field';
 
     /**
      * @var int
@@ -149,6 +131,8 @@ class Field implements UuidInterface
 
     private bool $isReadOnly = false;
 
+    private string $fieldWidth = '100%';
+
     /**
      * @var array
      */
@@ -185,6 +169,8 @@ class Field implements UuidInterface
      * @var string|null
      */
     private $mappedField;
+
+    public ?int $deletedId;
 
     /**
      * Reset properties on clone.
@@ -243,6 +229,11 @@ class Field implements UuidInterface
         $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
         $builder->addNullableField('mappedObject', Types::STRING, 'mapped_object');
         $builder->addNullableField('mappedField', Types::STRING, 'mapped_field');
+        $builder->createField('fieldWidth', Types::STRING)
+            ->columnName('field_width')
+            ->length(50)
+            ->option('default', '100%')
+            ->build();
         static::addUuidField($builder);
     }
 
@@ -277,6 +268,7 @@ class Field implements UuidInterface
                     'isReadOnly',
                     'mappedObject',
                     'mappedField',
+                    'fieldWidth',
                 ]
             )
             ->build();
@@ -841,7 +833,7 @@ class Field implements UuidInterface
      *
      * @param array|null $submissions
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
+    public function showForContact($submissions = null, ?Lead $lead = null, ?Form $form = null, ?DisplayManager $displayManager = null): bool
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {
@@ -1048,6 +1040,19 @@ class Field implements UuidInterface
     public function isAutoFillReadOnly(): bool
     {
         return $this->isAutoFill && $this->isReadOnly;
+    }
+
+    public function getFieldWidth(): string
+    {
+        return empty($this->fieldWidth) ? '100%' : $this->fieldWidth;
+    }
+
+    public function setFieldWidth(?string $fieldWidth): Field
+    {
+        $this->isChanged('fieldWidth', $fieldWidth);
+        $this->fieldWidth = $fieldWidth;
+
+        return $this;
     }
 
     public function setIsReadOnly(?bool $isReadOnly): void

@@ -87,9 +87,11 @@
         'class': containerAttributes.class|default([])|merge([
           'mauticform-row',
           'mauticform-' ~ containerClass,
-          'mauticform-field-' ~ order,
+          'mauticform-field-' ~ order
         ]),
+        'style': 'width: ' ~ field.fieldWidth
 }) %}
+
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
 

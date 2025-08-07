@@ -1,10 +1,10 @@
 type: php
 docroot: ""
-php_version: "8.3"
+php_version: "8.4"
 webserver_type: apache-fpm
 database:
     type: mariadb
-    version: "10.3"
+    version: "10.11"
 hooks:
     post-start:
         - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh

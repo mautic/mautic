@@ -18,10 +18,9 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     protected $useCleanupRollback = false;
 
     /**
-     * @dataProvider normalizeData
-     *
      * @param array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('normalizeData')]
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
@@ -80,7 +79,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     /**
      * @return array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
      */
-    public function normalizeData(): array
+    public static function normalizeData(): array
     {
         return [
             // Test for boolean custom field

@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -26,8 +27,8 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
-use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -483,6 +484,7 @@ class FieldModel extends FormModel
         private LeadFieldRepository $leadFieldRepository,
         private FieldList $fieldList,
         private LeadFieldSaver $leadFieldSaver,
+        private LeadFieldDeleter $leadFieldDeleter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -522,10 +524,7 @@ class FieldModel extends FormModel
      */
     public function getEntities(array $args = [])
     {
-        $repository = $this->em->getRepository(LeadField::class);
-        \assert($repository instanceof LeadFieldRepository);
-
-        return $repository->getEntities($args);
+        return $this->getRepository()->getEntities($args);
     }
 
     /**
@@ -615,7 +614,7 @@ class FieldModel extends FormModel
      * @throws AbortColumnUpdateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function saveEntity($entity, $unlock = true): void
@@ -631,16 +630,16 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
-        // Save the entity now if it's an existing entity
-        if (!$entity->isNew()) {
+        if ($entity->isNew()) {
+            try {
+                $this->customFieldColumn->createLeadColumn($entity);
+            } catch (CustomFieldLimitException $e) {
+                // Convert to original Exception not to cause BC
+                throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+            }
+        } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
-        }
-
-        try {
-            $this->customFieldColumn->createLeadColumn($entity);
-        } catch (CustomFieldLimitException $e) {
-            // Convert to original Exception not to cause BC
-            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+            $this->customFieldColumn->updateLeadColumn($entity);
         }
 
         // Update order of the other fields.
@@ -656,7 +655,7 @@ class FieldModel extends FormModel
      * @throws AbortColumnCreateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function saveEntities($entities, $unlock = true): void
@@ -667,22 +666,20 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param object $entity
+     * @param LeadField $entity
      *
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws AbortColumnUpdateException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws DriverException
+     * @throws SchemaException
      */
     public function deleteEntity($entity): void
     {
-        parent::deleteEntity($entity);
-
-        switch ($entity->getObject()) {
-            case 'lead':
-                $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
-                break;
-            case 'company':
-                $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
-                break;
+        if (!$entity instanceof LeadField) {
+            throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
+        $this->customFieldColumn->deleteLeadColumn($entity);
+        $this->leadFieldDeleter->deleteLeadFieldEntity($entity);
     }
 
     /**
@@ -1019,22 +1016,21 @@ class FieldModel extends FormModel
         return $leadFields;
     }
 
-    /**
-     * Get the MySQL database type based on the field type
-     * Use a static function so that it's accessible from DoctrineSubscriber
-     * without causing a circular service injection error.
-     *
-     * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
-     *
-     * @param bool $isUnique
-     */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false): array
-    {
-        return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
-    }
-
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    public function generateUniqueFieldAlias(string $alias): string
+    {
+        $originalAlias = $alias;
+        $i             = 1;
+
+        while ($this->getRepository()->findOneByAlias($alias)) {
+            $alias = $originalAlias.'_'.$i;
+            ++$i;
+        }
+
+        return $alias;
     }
 }

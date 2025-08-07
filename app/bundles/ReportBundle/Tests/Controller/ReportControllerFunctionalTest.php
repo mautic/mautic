@@ -397,11 +397,10 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider scheduleProvider
-     *
      * @throws NotSupported
      * @throws MappingException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('scheduleProvider')]
     public function testScheduleEdit(?string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
     {
         $report = new Report();
@@ -455,7 +454,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<mixed>[]
      */
-    public function scheduleProvider(): array
+    public static function scheduleProvider(): array
     {
         return [
             'null_to_now'      => [null, null, null, SchedulerEnum::UNIT_NOW, null, null],

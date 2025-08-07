@@ -49,12 +49,12 @@ class MessageApiController extends CommonApiController
         $this->entityClass      = Message::class;
         $this->entityNameOne    = 'message';
         $this->entityNameMulti  = 'messages';
-        $this->serializerGroups = ['messageDetails', 'messageChannelList', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['messageDetails', 'messageChannelList', 'categoryList', 'publishDetails', 'projectList'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 

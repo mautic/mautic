@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -32,8 +33,10 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $lead  = $this->createLead('John', 'Doe', 'test@domain.tld');
         $this->createPrimaryCompanyForLead($lead, $company);
+
         $email = $this->createEmail();
         $email->setCustomHtml('Contact emails is {contactfield=email}. Company details: {contactfield=companyname}, {contactfield=companycity}.');
+
         $this->em->flush();
         $this->em->clear();
 

@@ -21,7 +21,7 @@
 
 {% block mauticContent %}page{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': activePage,
     'customButtons': customButtons|default([]),
@@ -31,6 +31,8 @@
     'routeBase': 'page',
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activePage.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': activePage}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
@@ -54,28 +56,47 @@
         'entity': activePage,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
-    {% set tags = [] %}
+    {% set blueTags = [] %}
+    {% set grayTags = [] %}
 
-    {% set tags = tags
-        |merge(activePage.isPreferenceCenter
-            ? [{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.form.preference_center' }]
-            : [])
-        |merge(activePage.isVariant and not activePage.isVariant(true)
-            ? [{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]
-            : [])
-        |merge(activePage.isVariant(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]
-            : [])
-        |merge(activePage.isTranslation and not activePage.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
-            : [])
-        |merge(activePage.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
-            : [])
-    %}
+    {% if activePage.isPreferenceCenter %}
+        {% set blueTags = blueTags|merge([{ type: 'read-only', color: 'blue', icon_only: true, label: 'mautic.email.form.preference_center', icon: 'ri-equalizer-2-fill' }]) %}
+    {% endif %}
 
-    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+    {% if activePage.isTranslation and not activePage.isTranslation(true) %}
+        {% set blueTags = blueTags|merge([{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon: 'ri-translate', icon_only: true }]) %}
+    {% endif %}
+
+    {% if activePage.noIndex is defined and activePage.noIndex == 1 %}
+        {% set blueTags = blueTags|merge([{ label: 'mautic.core.tag.search_index.disabled'|trans, icon: 'ri-eye-off-fill', color: 'blue', icon_only: true }]) %}
+    {% endif %}
+
+    {% if activePage.isVariant and not activePage.isVariant(true) %}
+        {% set grayTags = grayTags|merge([{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]) %}
+    {% endif %}
+
+    {% if activePage.isVariant(true) %}
+        {% set grayTags = grayTags|merge([{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]) %}
+    {% endif %}
+
+    {% if activePage.isTranslation(true) %}
+        {% set grayTags = grayTags|merge([{ 
+            color: 'warm-gray', 
+            label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+            icon: 'ri-translate',
+            attributes: {
+                'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id})
+            }
+        }]) %}
+    {% endif %}
+
+    {% if activePage.language is defined and activePage.language is not empty %}
+        {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
+    {% endif %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
 
 {% endblock %}
 
@@ -105,31 +126,8 @@
       <div class="col-md-9 height-auto">
           <div>
               <!-- page detail header -->
-                {% set extra_content %}
-                    {% if activePage.isVariant(true) %}
-                        <div class="small">
-                            <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': variants.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.variant_of'|trans({'%parent%': variants.parent.getName()}) -}}
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% if activePage.isTranslation(true) %}
-                        <div class="small">
-                            <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.translation_of'|trans({'%parent%': translations.parent.getName()}) -}}
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% if activePage.isPreferenceCenter %}
-                        <div class="small">
-                            {{ 'mautic.core.icon_tooltip.preference_center'|trans }}
-                        </div>
-                    {% endif %}
-                {% endset %}
-
-                {% include '@MauticCore/Helper/description.html.twig' with {
-                    'description': activePage.metaDescription,
-                    'extra_content': extra_content
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with {
+                    'description': activePage.metaDescription
                 } %}
               <!--/ page detail header -->
 
@@ -175,7 +173,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats.pageviews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -225,26 +223,27 @@
               <!--/ #translation-container -->
           </div>
           <!--/ end: tab-content -->
-          {% elseif allowAbTest %}
-          <div class="pa-md">
-              <div class="text-center">
-                    {% include '@MauticCore/Helper/button.html.twig' with {
-                        buttons: [
-                            {
-                                label: 'mautic.core.ab_test.create',
-                                variant: 'tertiary',
-                                href: path('mautic_page_action', {'objectAction': 'abtest', 'objectId': activePage.id}),
-                                icon: 'ri-arrow-right-s-line',
-                                attributes: {
-                                    'class': 'create-abtest-link',
-                                    'data-toggle': 'ajax'
-                                }
-                            }
-                        ]
-                    } %}
-              </div>
-          </div>
           {% endif %}
+          
+          {% set additionalCards = [{
+              heading: 'mautic.page.results.view',
+              copy: (not showVariants and not showTranslations) ? 'mautic.page.results.view.description' : null,
+              pictogram: 'data--set',
+              href: path('mautic_page_results', {'objectId': activePage.id}),
+              attributes: {
+                  'data-toggle': 'ajax',
+                  'data-menu-link': 'mautic_form_index'
+              }
+          }] %}
+          
+          {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
+              'entity': activePage,
+              'routeBase': 'page',
+              'showVariants': showVariants,
+              'showTranslations': showTranslations,
+              'allowAbTest': allowAbTest,
+              'additionalCards': additionalCards
+          }) }}
       </div>
       <!--/ left section -->
 
@@ -253,31 +252,16 @@
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-              <div class="panel-heading">
-                  <div class="panel-title">{{ 'mautic.page.url'|trans }}</div>
-              </div>
               <div class="panel-body pt-xs">
-                  <div class="input-group">
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                             readonly
-                             value="{{ pageUrl|e }}"/>
-                      <span class="input-group-btn">
-                        {% include '@MauticCore/Helper/button.html.twig' with {
-                            buttons: [
-                                {
-                                    label: 'mautic.core.open_link',
-                                    variant: 'ghost',
-                                    icon_only: true,
-                                    icon: 'ri-external-link-line',
-                                    onclick: 'window.open("' ~ pageUrl ~ '", "_blank");',
-                                    attributes: {
-                                        'class': 'btn-nospin'
-                                    }
-                                }
-                            ]
-                        } %}
-                      </span>
-                  </div>
+                  {% include '@MauticCore/Components/card.html.twig' with {
+                      type: 'link',
+                      href: pageUrl,
+                      ctaType: 'new tab',
+                      heading: 'mautic.core.open_link',
+                      attributes: {
+                          'target': '_blank'
+                      }
+                  } %}
               </div>
           </div>
           {% endif %}
@@ -305,7 +289,7 @@
                   {% if previewSettingsForm.contact is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              <div class="control-label">{{ 'mautic.page.preview.show.contact'|trans }}</div>
                               {{ form_widget(previewSettingsForm.contact) }}
                           </div>
                       </div>
@@ -313,6 +297,13 @@
                   <div class="row">
                       <div class="form-group col-xs-12 ">
                           <div class="input-group">
+                              <div class="input-group-addon">
+                                  {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                      'item'  : activePage,
+                                      'model' : 'page',
+                                      'query' : 'customToggle=publicPreview'
+                                  }) -}}
+                              </div>
                               <input id="content_preview_url"
                                      data-route="page/preview"
                                      onclick="this.setSelectionRange(0, this.value.length);"
@@ -344,6 +335,26 @@
                   </div>
               </div>
           </div>
+          {% if draftPreviewUrl is not empty %}
+              <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+                  <div class="panel-heading">
+                      <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
+                  </div>
+                  <div class="panel-body pt-xs">
+                      <div class="input-group">
+                          <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                                 readonly
+                                 value="{{ draftPreviewUrl|e }}"/>
+                          <span class="input-group-btn">
+                    <button class="btn btn-default btn-nospin"
+                            onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                        <i class="fa fa-external-link"></i>
+                    </button>
+                </span>
+                      </div>
+                  </div>
+              </div>
+          {% endif %}
           <!--/ preview URL -->
           <hr class="hr-w-2" style="width:50%">
           <!-- recent activity -->

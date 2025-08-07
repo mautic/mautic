@@ -9,14 +9,14 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerFunctionalTest extends AbstractCampaignTest
+class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
@@ -43,8 +43,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
             'testCampaignCountsBeforeSummarizeCommandWithoutSummaryWithRange', 'testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange',
             'testCampaignCountsAfterSummarizeCommandWithoutSummaryWithRange', 'testCampaignCountsAfterSummarizeCommandWithSummaryAndRange',
             'testCampaignPendingCountsWithoutSummaryAndRange', 'testCampaignPendingCountsWithoutSummaryWithRange', 'testCampaignRemovedLeadCountsWithoutSummaryWithRange', 'testCampaignRemovedLeadCountsWithSummaryAndRange', 'testCampaignRemovedLeadAndPendingCountsWithSummaryAndRange', 'testCampaignRemovedLeadAndPendingCountsWithoutSummaryWithRange', ];
-        $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
-        $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
+        $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->name(), $functionForUseSummary);
+        $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->name(), $functionForUseRange);
         parent::setUp();
 
         $model = static::getContainer()->get(CampaignModel::class);
@@ -183,10 +183,16 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getCanvasTotalContacts(int $campaignId): int
     {
-        $crawler       = $this->getCrawlers($campaignId);
+        $from = date('Y-m-d', strtotime('-2 months'));
+        $to   = date('Y-m-d', strtotime('-1 month'));
+        $this->client->request('GET', sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
+        $response      = $this->client->getResponse();
+        $body          = json_decode($response->getContent(), true);
+        $crawler       = new Crawler($body['newContent']);
         $canvasJson    = trim($crawler->filter('canvas')->html());
         $canvasData    = json_decode($canvasJson, true);
         $datasets      = $canvasData['datasets'] ?? [];
+        $this->client->restart();
 
         return $this->processTotalContactStats($datasets);
     }
@@ -211,17 +217,15 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getCrawlers(int $campaignId): Crawler
     {
-        $from = date('F d, Y', strtotime('-2 months'));
-        $to   = date('F d, Y', strtotime('-1 month'));
+        $from = date('Y-m-d', strtotime('-2 months'));
+        $to   = date('Y-m-d', strtotime('-1 month'));
+        $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $body     = json_decode($response->getContent(), true);
+        $this->client->restart();
 
-        $parameters = [
-            'daterange' => [
-                'date_from' => $from,
-                'date_to'   => $to,
-            ],
-        ];
-
-        return $this->client->request(Request::METHOD_POST, '/s/campaigns/view/'.$campaignId, $parameters);
+        return new Crawler($body['actions']);
     }
 
     /**
@@ -231,18 +235,18 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     {
         $crawler        = $this->getCrawlers($campaignId);
         $successPercent = [
-            trim($crawler->filter('#actions-container .campaign-event-list li:nth-child(1) .label-success')->html()),
-            trim($crawler->filter('#actions-container .campaign-event-list li:nth-child(2) .label-success')->html()),
+            trim($crawler->filter('.campaign-event-list li:nth-child(1) .label-success')->text()),
+            trim($crawler->filter('.campaign-event-list li:nth-child(2) .label-success')->text()),
         ];
 
         $completed = [
-            trim($crawler->filter('#actions-container .campaign-event-list li:nth-child(1) .label-warning')->html()),
-            trim($crawler->filter('#actions-container .campaign-event-list li:nth-child(2) .label-warning')->html()),
+            trim($crawler->filter('.campaign-event-list li:nth-child(1) .label-warning')->text()),
+            trim($crawler->filter('.campaign-event-list li:nth-child(2) .label-warning')->text()),
         ];
 
         $pending = [
-            trim($crawler->filter('#actions-container .campaign-event-list li:nth-child(1) .label-gray')->html()),
-            trim($crawler->filter('#actions-container .campaign-event-list li:nth-child(2) .label-gray')->html()),
+            trim($crawler->filter('.campaign-event-list li:nth-child(1) .label-gray')->text()),
+            trim($crawler->filter('.campaign-event-list li:nth-child(2) .label-gray')->text()),
         ];
 
         return [
@@ -354,5 +358,31 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->em->flush();
 
         return $leadEventLog;
+    }
+
+    public function testCampaignView(): void
+    {
+        $campaign = $this->saveSomeCampaignLeadEventLogs();
+        $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+        self::assertStringContainsString('Campaign ABC', $response->getContent());
+        self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
+        self::assertSame('', trim($crawler->filter('#actions-container')->text()));
+        self::assertSame('', trim($crawler->filter('#conditions-container')->text()));
+        self::assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
+    }
+
+    public function testCampaignViewEvents(): void
+    {
+        $from     = date('Y-m-d', strtotime('-2 months'));
+        $to       = date('Y-m-d', strtotime('-1 month'));
+        $campaign = $this->saveSomeCampaignLeadEventLogs();
+        $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+        $body     = json_decode($response->getContent(), true);
+        self::assertCount(2, $body);
+        self::arrayHasKey('actions');
     }
 }

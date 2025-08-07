@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
@@ -69,10 +70,7 @@ class DateAnniversary implements FilterDecoratorInterface
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate): CompositeExpression|string|null
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }

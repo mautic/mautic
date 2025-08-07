@@ -158,7 +158,7 @@
         flex-direction: column;
         box-sizing: border-box;
         font-size: 12px;
-        border-radius: 16px;
+        border-radius: {{ getRoundedCorners('lg') }}px;
         box-shadow: rgb(0 0 0 / 30%) 0px 6px 24px 5px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
     }
 
@@ -168,7 +168,7 @@
         align-items: center;
         background: linear-gradient(160deg, rgba(0,0,0,1) 20%, rgba(0,0,0,0.3) 100%);
         backdrop-filter: blur(8px);
-        border-radius: 16px 16px 0 0;
+        border-radius: {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px 0 0;
         padding: 20px 20px 15px;
         font-weight: bold;
         font-size: 14px;
@@ -184,7 +184,7 @@
         flex-direction: column;
         background-color: #ffffff;
         padding: 25px 20px;
-        border-radius: 16px;
+        border-radius: {{ getRoundedCorners('lg') }}px;
     }
 
     .prefix {
@@ -194,15 +194,13 @@
     }
 
     .wrapper--content-header + .wrapper--content-body {
-            border-radius: 0 0 16px 16px;
+            border-radius: 0 0 {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px;
         }
 
     .button {
         display: inline-block;
         text-decoration: none;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 12px 12px 12px 12px;
+        border-radius: {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px;
         background-color: #000000;
         font-size: 16px;
         color: #ffffff;
@@ -271,7 +269,7 @@
     }
 
     .gmap {
-        border-radius: 12px;
+        border-radius: {{ getRoundedCorners('md') }}px;
         overflow: hidden;
     }
 

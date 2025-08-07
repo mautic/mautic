@@ -45,8 +45,9 @@ return [
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_preview' => [
-                'path'       => '/page/preview/{id}',
+                'path'       => '/page/preview/{id}/{objectType}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
+                'defaults'   => ['objectType' => null],
             ],
         ],
         'api' => [
@@ -127,7 +128,6 @@ return [
         'google_analytics'                      => null,
         'track_contact_by_ip'                   => false,
         'track_by_fingerprint'                  => false,
-        'track_by_tracking_url'                 => false,
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,

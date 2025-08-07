@@ -68,18 +68,14 @@
                             <a data-toggle="ajax" href="{{ path('mautic_focus_action', {'objectId': item.id, 'objectAction': 'view'}) }}">
                                 {{ item.name }}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
-                        {% if item.description %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ item.description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': item.description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName  = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color    = category ? '#' ~ category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ ('mautic.focus.type.' ~ item.type)|trans }}</td>
                     <td class="visible-md visible-lg">{{ ('mautic.focus.style.' ~ item.style)|trans }}</td>
@@ -99,5 +95,74 @@
         }) }}
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.focus.noresults.tip'}) }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.focus.noresults.tip'}) }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mb-md">
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
+                        'pictogram': 'spotlight',
+                        'size': '80'
+                    } %}
+                </div>
+
+                {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                    type: 'default',
+                    eyebrow: 'mautic.focus.onboarding.eyebrow',
+                    heading: 'mautic.focus.onboarding.purpose.heading',
+                    copy: 'mautic.focus.onboarding.purpose.copy',
+                }) }}
+                
+                {% set focusFeaturesContainer %}
+                <div class="row">
+                    <div class="col-sm-6 col-xs-12">
+                        {{ include('@MauticCore/Components/content-item.html.twig', {
+                            type: 'pictogram',
+                            pictogram: 'web--banners',
+                            heading: 'mautic.focus.onboarding.style.bar.heading',
+                            copy: 'mautic.focus.onboarding.style.bar.copy',
+                        }) }}
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        {{ include('@MauticCore/Components/content-item.html.twig', {
+                            type: 'pictogram',
+                            pictogram: 'design-and-development--01',
+                            heading: 'mautic.focus.onboarding.style.modal.heading',
+                            copy: 'mautic.focus.onboarding.style.modal.copy',
+                        }) }}
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        {{ include('@MauticCore/Components/content-item.html.twig', {
+                            type: 'pictogram',
+                            pictogram: 'notifications',
+                            heading: 'mautic.focus.onboarding.style.notification.heading',
+                            copy: 'mautic.focus.onboarding.style.notification.copy',
+                        }) }}
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        {{ include('@MauticCore/Components/content-item.html.twig', {
+                            type: 'pictogram',
+                            pictogram: 'maximize',
+                            heading: 'mautic.focus.onboarding.style.fullpage.heading',
+                            copy: 'mautic.focus.onboarding.style.fullpage.copy',
+                        }) }}
+                    </div>
+                </div>
+                {% endset %}
+
+                {{ include('@MauticCore/Components/content-group.html.twig', {
+                    heading: 'mautic.focus.onboarding.styles.heading',
+                    childContainer: focusFeaturesContainer,
+                }) }}
+                {% endset %}
+                
+                {{ include('@MauticCore/Components/content-block.html.twig', {
+                    heading: 'mautic.focus.onboarding.heading',
+                    subheading: 'mautic.focus.onboarding.subheading',
+                    copy: '',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

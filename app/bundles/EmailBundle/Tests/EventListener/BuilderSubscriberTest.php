@@ -46,13 +46,9 @@ class BuilderSubscriberTest extends TestCase
      */
     private $translator;
 
-    /**
-     * @param array<mixed> $data
-     * @param int|string   $dataName
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct(?string $name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
@@ -72,9 +68,7 @@ class BuilderSubscriberTest extends TestCase
         $this->translator->method('trans')->willReturn('some translation');
     }
 
-    /**
-     * @dataProvider fixEmailAccessibilityContent
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fixEmailAccessibilityContent')]
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
         $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
@@ -99,7 +93,7 @@ class BuilderSubscriberTest extends TestCase
     /**
      * @return iterable<array<int,string>>
      */
-    public function fixEmailAccessibilityContent(): iterable
+    public static function fixEmailAccessibilityContent(): iterable
     {
         yield [
             '<html><head></head></html>',
@@ -172,28 +166,39 @@ class BuilderSubscriberTest extends TestCase
         $event = new EmailSendEvent(null, $args);
 
         $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
+        $matcher                  = $this->exactly(5);
 
-        $this->coreParametersHelper->expects($this->exactly(5))
-            ->method('get')
-            ->withConsecutive(
-                ['unsubscribe_text'],
-                ['webview_text'],
-                ['default_signature_text'],
-                ['mailer_from_name'],
-                ['brand_name']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $unsubscribeTokenizedText,
-                'Just a text',
-                'Signature',
-                'jan.kozak@acquia.com',
-                'ACME'
-            );
+        $this->coreParametersHelper->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('unsubscribe_text', $parameters[0]);
+
+                    return $unsubscribeTokenizedText;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('webview_text', $parameters[0]);
+
+                    return 'Just a text';
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('default_signature_text', $parameters[0]);
+
+                    return 'Signature';
+                }
+                if (4 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_name', $parameters[0]);
+
+                    return 'jan.kozak@acquia.com';
+                }
+                if (5 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('brand_name', $parameters[0]);
+
+                    return 'ACME';
+                }
+            });
 
         $this->translator->expects($this->never())
-            ->method('trans')
-            ->withConsecutive([$unsubscribeTokenizedText], [])
-            ->willReturn($unsubscribeTokenizedText);
+            ->method('trans');
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(

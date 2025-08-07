@@ -16,12 +16,12 @@ use Symfony\Component\Form\FormInterface;
 final class ReportTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|ReportModel
+     * @var MockObject&ReportModel
      */
     private MockObject $reportModel;
 
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
@@ -78,19 +78,16 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
             ->willReturn($graphList);
 
         $this->formBuilder->method('addEventListener')
-            ->withConsecutive(
-                [
-                    FormEvents::PRE_SET_DATA,
-                    $this->callback(
-                        function (callable $listener) use ($report) {
-                            $form      = $this->createMock(FormInterface::class);
-                            $formEvent = new FormEvent($form, $report);
-                            $listener($formEvent);
+            ->willReturnCallback(
+                function (string $eventName, callable $listener) use ($report) {
+                    if (FormEvents::PRE_SET_DATA === $eventName) {
+                        $form      = $this->createMock(FormInterface::class);
+                        $formEvent = new FormEvent($form, $report);
+                        $listener($formEvent);
+                    }
 
-                            return true;
-                        }
-                    ),
-                ]
+                    return $this->formBuilder;
+                }
             );
 
         $this->reportType->buildForm($this->formBuilder, $data);

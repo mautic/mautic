@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,6 +45,7 @@ class InactiveExecutioner implements ExecutionerInterface
         private EventScheduler $scheduler,
         private InactiveHelper $helper,
         private EventExecutioner $executioner,
+        private ProcessSignalService $processSignalService,
     ) {
     }
 
@@ -55,7 +57,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -90,7 +92,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function validate($decisionId, ContactLimiter $limiter, OutputInterface $output = null)
+    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null)
     {
         $this->limiter = $limiter;
         $this->output  = $output ?: new NullOutput();
@@ -226,6 +228,8 @@ class InactiveExecutioner implements ExecutionerInterface
                         // No use making another call
                         break;
                     }
+
+                    $this->processSignalService->throwExceptionIfSignalIsCaught();
 
                     $this->logger->debug('CAMPAIGN: Fetching the next batch of inactive contacts starting with contact ID '.$batchMinContactId);
                     $this->limiter->setBatchMinContactId($batchMinContactId);

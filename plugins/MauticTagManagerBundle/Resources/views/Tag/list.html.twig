@@ -13,7 +13,7 @@
 {% set listCommand = 'mautic.tagmanager.tag.searchcommand.list'|trans %}
 
 {% block content %}
-    <div id="page-list-wrapper" class="panel panel-default">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
@@ -112,9 +112,9 @@
                                     </div>
                                     {% set description = item.getDescription() %}
                                     {% if description %}
-                                        <div class="text-secondary mt-4">
-                                            <small>{{ description|purify }}</small>
-                                        </div>
+                                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                            'description': description
+                                        }) }}
                                     {% endif %}
                                 </td>
                                 <td class="visible-md visible-lg">
@@ -140,11 +140,31 @@
                     </div>
                 </div>
             {% else %}
-                {{ include('@MauticCore/Helper/noresults.html.twig') }}
+                {% if searchValue is not empty %}
+                    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+                {% else %}
+                    <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+                        {% set childContainer %}
+                            <div class="mt-32 mb-md">
+                                {% include '@MauticCore/Components/pictogram.html.twig' with {
+                                    'pictogram': 'tags',
+                                    'size': '80'
+                                } %}
+                            </div>
+                        {% endset %}
+            
+                        {{ include('@MauticCore/Components/content-block.html.twig', {
+                            heading: 'mautic.tagmanager.contentblock.heading',
+                            subheading: 'mautic.tagmanager.contentblock.subheading',
+                            copy: 'mautic.tagmanager.contentblock.copy',
+                            childContainer: childContainer,
+                        }) }}
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.tags.segmentation', 'mautic.protip.tags.multivalue', 'mautic.protip.tags.creation'])
     }) }}
 {% endblock %}

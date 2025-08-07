@@ -86,9 +86,7 @@
                     </td>
                     <td class="visible-md visible-lg">{{ item.slotName }}</td>
                     <td class="visible-md visible-lg">
-                        {% set catName = item.category is not empty ? item.category.title : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = item.category is not empty ? '#' ~ item.category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.id }}</td>
                 </tr>

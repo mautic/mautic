@@ -73,7 +73,7 @@ class SummaryModel extends AbstractCommonModel
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function summarize(OutputInterface $output, int $hoursPerBatch = 1, int $maxHours = null, bool $rebuild = false): void
+    public function summarize(OutputInterface $output, int $hoursPerBatch = 1, ?int $maxHours = null, bool $rebuild = false): void
     {
         $start = null;
 

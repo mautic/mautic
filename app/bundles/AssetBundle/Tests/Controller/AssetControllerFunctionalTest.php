@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
+use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AssetControllerFunctionalTest extends AbstractAssetTest
+class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
 
@@ -116,9 +117,8 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 
     /**
      * @param array<string, string[]> $permission
-     *
-     * @dataProvider getValuesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getValuesProvider')]
     public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
     {
         $userCreator = $this->getUser($userCreatorUN);
@@ -149,7 +149,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
     /**
      * @return \Generator<string, mixed[]>
      */
-    public function getValuesProvider(): \Generator
+    public static function getValuesProvider(): \Generator
     {
         yield 'The sales user with edit own permission can edits its own asset' => [
             'route'              => 'edit',
@@ -358,5 +358,31 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->client->submit($form, $data);
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertStringNotContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+    }
+
+    public function testAssetWithProject(): void
+    {
+        $asset = new Asset();
+        $asset->setTitle('test');
+        $asset->setAlias('test');
+        $this->em->persist($asset);
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['asset[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedAsset = $this->em->find(Asset::class, $asset->getId());
+        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

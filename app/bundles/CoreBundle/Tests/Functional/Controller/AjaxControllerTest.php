@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\Psr7\Response;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -31,44 +29,18 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
-    /**
-     * @var MockHandler
-     */
-    private $clientMockHandler;
-
     protected function setUp(): void
     {
-        $this->configParams['composer_updates'] = 'testUpdateRunChecksAction' !== $this->getName();
-
         parent::setUp();
-
-        $this->clientMockHandler = static::getContainer()->get(MockHandler::class);
     }
 
-    public function testUpdateRunChecksAction(): void
-    {
-        $responseToPostUpdate  = new Response();
-        $responseToGetUpdate   = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/releases.json'));
-        $responseToGetMetadata = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/metadata.json'));
-
-        $this->clientMockHandler->append($responseToPostUpdate, $responseToGetUpdate, $responseToGetMetadata);
-
-        $this->client->request('GET', 's/ajax?action=core:updateRunChecks');
-        $response = $this->client->getResponse();
-        self::assertResponseIsSuccessful($response->getContent());
-        Assert::assertStringContainsString('Great! You are running the current version of Mautic.', $response->getContent());
-    }
-
-    /**
-     * @dataProvider dataForGlobalSearch
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearch')]
     public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
     {
         $this->em->persist($entity);
@@ -89,10 +61,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, mixed}>
      */
-    public function dataForGlobalSearch(): iterable
+    public static function dataForGlobalSearch(): iterable
     {
         // Api
-        $apiClient = $this->createApiClient('client');
+        $apiClient = self::createApiClient('client');
 
         yield 'Search API' => [
             'client',
@@ -101,7 +73,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Asset
-        $asset = $this->createAsset();
+        $asset = self::createAsset();
 
         yield 'Search Asset' => [
             'asset',
@@ -110,7 +82,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Campaign
-        $campaign = $this->createCampaign();
+        $campaign = self::createCampaign();
 
         yield 'Search Campaign' => [
             'campaign',
@@ -119,7 +91,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Channel: Marketing Messages
-        $message = $this->createMessage();
+        $message = self::createMessage();
 
         yield 'Search Marketing Messages' => [
             'marketing',
@@ -128,7 +100,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Dynamic Content
-        $dwc = $this->createDynamicContent();
+        $dwc = self::createDynamicContent();
 
         yield 'Search Dynamic Content' => [
             'dynamic',
@@ -137,7 +109,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Email
-        $email = $this->createEmail();
+        $email = self::createEmail();
 
         yield 'Search Email' => [
             'email',
@@ -146,7 +118,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Form
-        $form = $this->createForm();
+        $form = self::createForm();
 
         yield 'Search Forms' => [
             'form',
@@ -155,7 +127,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Lead
-        $lead = $this->createLead();
+        $lead = self::createLead();
 
         yield 'Search Contact' => [
             'john',
@@ -164,7 +136,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Companies
-        $company = $this->createCompany();
+        $company = self::createCompany();
 
         yield 'Search Companies' => [
             'maut',
@@ -173,7 +145,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Segment
-        $segment = $this->createSegment();
+        $segment = self::createSegment();
 
         yield 'Search Segment' => [
             'news',
@@ -182,7 +154,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Notification Mobile
-        $notification = $this->createNotification('Notification Mobile', true);
+        $notification = self::createNotification('Notification Mobile', true);
 
         yield 'Search Notification Mobile' => [
             'mobile',
@@ -191,7 +163,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Notification Web
-        $notification = $this->createNotification('Notification Web');
+        $notification = self::createNotification('Notification Web');
 
         yield 'Search Notification Web' => [
             'web',
@@ -200,7 +172,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Page
-        $page = $this->createPage();
+        $page = self::createPage();
 
         yield 'Search Page' => [
             'landing',
@@ -209,7 +181,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Point Action
-        $pointAction = $this->createPointAction();
+        $pointAction = self::createPointAction();
 
         yield 'Search Point Action' => [
             'action',
@@ -218,7 +190,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Point Group
-        $pointGroup = $this->createPointGroup();
+        $pointGroup = self::createPointGroup();
 
         yield 'Search Points Group' => [
             'group',
@@ -227,7 +199,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Point Trigger
-        $pointTrigger = $this->createPointTrigger();
+        $pointTrigger = self::createPointTrigger();
 
         yield 'Search Point Trigger' => [
             'trigger',
@@ -236,7 +208,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Report
-        $report = $this->createReport();
+        $report = self::createReport();
 
         yield 'Search Report' => [
             'lead',
@@ -256,7 +228,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Stage
-        $stage = $this->createStage();
+        $stage = self::createStage();
 
         yield 'Search Stage' => [
             'stage',
@@ -275,7 +247,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Focus
-        $focus = $this->createFocus('Focus');
+        $focus = self::createFocus('Focus');
 
         yield 'Search Focus' => [
             'focus',
@@ -319,10 +291,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider dataForGlobalSearchForNonAdminUser
-     *
      * @param array<string, string|int> $roleData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearchForNonAdminUser')]
     public function testGlobalSearchForNonAdminUser(
         string $searchString,
         mixed $entity,
@@ -359,9 +330,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, mixed}>
      */
-    public function dataForGlobalSearchForNonAdminUser(): iterable
+    public static function dataForGlobalSearchForNonAdminUser(): iterable
     {
-        $apiClient = $this->createApiClient('Client');
+        $apiClient = self::createApiClient('Client');
 
         yield 'Search API' => [
             // Search string
@@ -378,7 +349,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             's/credentials/edit/',
         ];
 
-        $asset = $this->createAsset();
+        $asset = self::createAsset();
         yield 'Search Asset' => [
             // Search string
             'asset',
@@ -394,7 +365,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             's/assets/view/',
         ];
 
-        $form = $this->createForm();
+        $form = self::createForm();
         yield 'Search Form' => [
             // Search string
             'form',
@@ -413,7 +384,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testGlobalSearchForRandomAndEmptyString(): void
     {
-        $apiClient = $this->createApiClient('client');
+        $apiClient = self::createApiClient('client');
         $this->em->persist($apiClient);
         $this->em->flush();
         $this->em->clear();
@@ -437,15 +408,15 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testGlobalSearchForMoreLink(): void
     {
-        $contactOne   = $this->createLead('contact-1@mautic-test.com');
-        $contactTwo   = $this->createLead('contact-2@mautic-test.com');
-        $contactThree = $this->createLead('contact-3@mautic-test.com');
-        $contactFour  = $this->createLead('contact-4@mautic-test.com');
+        $contactOne   = self::createLead('contact-1@mautic-test.com');
+        $contactTwo   = self::createLead('contact-2@mautic-test.com');
+        $contactThree = self::createLead('contact-3@mautic-test.com');
+        $contactFour  = self::createLead('contact-4@mautic-test.com');
 
-        $client1 = $this->createApiClient('Client1');
-        $client2 = $this->createApiClient('Client2');
-        $client3 = $this->createApiClient('Client3');
-        $client4 = $this->createApiClient('Client4');
+        $client1 = self::createApiClient('Client1');
+        $client2 = self::createApiClient('Client2');
+        $client3 = self::createApiClient('Client3');
+        $client4 = self::createApiClient('Client4');
 
         $this->em->persist($contactOne);
         $this->em->persist($contactTwo);
@@ -540,7 +511,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->em->persist($permission);
     }
 
-    private function createApiClient(string $name): Client
+    private static function createApiClient(string $name): Client
     {
         $apiClient = new Client();
         $apiClient->setName($name);
@@ -549,7 +520,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $apiClient;
     }
 
-    private function createAsset(): Asset
+    private static function createAsset(): Asset
     {
         $asset = new Asset();
         $asset->setTitle('Asset');
@@ -558,7 +529,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $asset;
     }
 
-    private function createCampaign(): Campaign
+    private static function createCampaign(): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName('Campaign');
@@ -566,7 +537,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $campaign;
     }
 
-    private function createMessage(): Message
+    private static function createMessage(): Message
     {
         $channel = new Channel();
         $channel->setChannel('email');
@@ -581,7 +552,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $message;
     }
 
-    private function createDynamicContent(): DynamicContent
+    private static function createDynamicContent(): DynamicContent
     {
         $dwc = new DynamicContent();
         $dwc->setName('Dynamic Content');
@@ -589,7 +560,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $dwc;
     }
 
-    private function createEmail(): Email
+    private static function createEmail(): Email
     {
         $email = new Email();
         $email->setName('Email');
@@ -599,7 +570,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $email;
     }
 
-    private function createForm(): Form
+    private static function createForm(): Form
     {
         $form = new Form();
         $form->setName('Forms');
@@ -608,7 +579,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $form;
     }
 
-    private function createLead(string $email = 'jon@example.com'): Lead
+    private static function createLead(string $email = 'jon@example.com'): Lead
     {
         $lead = new Lead();
         $lead->setFirstname('John');
@@ -617,7 +588,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createCompany(): Company
+    private static function createCompany(): Company
     {
         $company = new Company();
         $company->setName('Mautic');
@@ -625,7 +596,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $company;
     }
 
-    private function createSegment(): LeadList
+    private static function createSegment(): LeadList
     {
         $segment = new LeadList();
         $segment->setAlias('newsletter');
@@ -636,7 +607,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $segment;
     }
 
-    private function createNotification(string $name, bool $isMobile = false): Notification
+    private static function createNotification(string $name, bool $isMobile = false): Notification
     {
         $notification = new Notification();
         $notification->setName($name);
@@ -647,7 +618,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $notification;
     }
 
-    private function createPage(): Page
+    private static function createPage(): Page
     {
         $page = new Page();
         $page->setTitle('Landing Page');
@@ -656,7 +627,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $page;
     }
 
-    private function createPointAction(): Point
+    private static function createPointAction(): Point
     {
         $pointAction = new Point();
         $pointAction->setName('Read email action');
@@ -667,7 +638,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $pointAction;
     }
 
-    private function createPointGroup(): Group
+    private static function createPointGroup(): Group
     {
         $pointGroup = new Group();
         $pointGroup->setName('New Group');
@@ -675,7 +646,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $pointGroup;
     }
 
-    private function createPointTrigger(): Trigger
+    private static function createPointTrigger(): Trigger
     {
         $pointTrigger = new Trigger();
         $pointTrigger->setName('Trigger');
@@ -683,7 +654,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $pointTrigger;
     }
 
-    private function createReport(): Report
+    private static function createReport(): Report
     {
         $report = new Report();
         $report->setName('Lead and points');
@@ -692,7 +663,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $report;
     }
 
-    private function createStage(): Stage
+    private static function createStage(): Stage
     {
         $stage = new Stage();
         $stage->setName('Stage');
@@ -700,7 +671,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $stage;
     }
 
-    private function createFocus(string $name): Focus
+    private static function createFocus(string $name): Focus
     {
         $focus = new Focus();
         $focus->setName($name);
@@ -763,7 +734,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             '\s*<kbd>esc<\/kbd>\n'.
             '\s*<\/div>\n'.
             '\s*<\/div>\n\n'.
-            '<div class="pa-sm" id="globalSearchPanel">\n'. // Matches the search panel div
+            '<div id="globalSearchPanel">\n'. // Matches the search panel div
             '\s*<!-- No results message -->\n'. // Matches the "No results message" comment
             '\s*<div class="text-center text-secondary mt-sm">\n'. // Matches the no-results div
             '\s*.*?\n'. // Matches random text inside the no-results div

@@ -21,7 +21,7 @@ class Client
     /**
      * @throws \Http\Client\Exception
      */
-    public function post($url, array $payload, string $secret = null): ResponseInterface
+    public function post($url, array $payload, ?string $secret = null): ResponseInterface
     {
         $jsonPayload = json_encode($payload);
         $signature   = null === $secret ? null : base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));

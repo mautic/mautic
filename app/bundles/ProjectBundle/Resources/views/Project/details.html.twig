@@ -1,0 +1,101 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}project
+{% endblock %}
+
+{% block preHeader %}
+	{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': project,
+    'templateButtons': {
+        'close': true,
+    },
+    'routeBase': 'project',
+    'langVar': 'project',
+    'targetLabel': 'mautic.project.projects'|trans
+}) }}
+{% endblock %}
+
+{% block headerTitle %}
+	{{ project.getName() }}
+{% endblock %}
+
+{% block actions %}
+	{{ include('@MauticCore/Helper/page_actions.html.twig', {
+        'item': project,
+        'customButtons': [
+            {
+                'attr': {
+                    'data-toggle': 'ajaxmodal',
+                    'data-target': '#MauticSharedModal',
+                    'data-header': 'mautic.project.add_entity'|trans,
+                    'href': path('mautic_project_action', {'objectAction': 'selectEntityType', 'objectId': project.getId()})
+                },
+                'iconClass': 'ri-add-line',
+                'btnText': 'mautic.project.add_entity',
+                'primary': true
+            }
+        ],
+        'nameGetter': 'getName',
+        'templateButtons': {
+            'edit': securityIsGranted('project:project:edit'),
+            'delete': securityIsGranted('project:project:delete'),
+        },
+        'routeBase': 'project'
+    }) }}
+{% endblock %}
+
+{% block content %}
+	<div class="box-layout">
+		<div class="col-md-12 bg-white height-auto">
+			<div class="bg-auto">
+				<div class="pr-md pl-md pt-lg pb-lg">
+					<div class="box-layout">
+						<div class="col-xs-10">
+							<div class="text-white dark-sm mb-0">{{ project.getDescription()|purify }}</div>
+						</div>
+					</div>
+				</div>
+				<div class="collapse" id="sms-details">
+					<div class="pr-md pl-md pb-md">
+						<div class="panel shd-none mb-0">
+							<table class="table table-bordered table-striped mb-0">
+								<tbody>
+									<tr>
+										<td width="20%">
+											<span class="fw-b textTitle">{{ 'mautic.core.id'|trans }}</span>
+										</td>
+										<td>{{ project.getId() }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="bg-auto bg-dark-xs">
+				<div class="hr-expand nm">
+					<span data-toggle="tooltip" title="Detail">
+						<a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#sms-details">
+							<span class="caret"></span>
+							{{ 'mautic.core.details'|trans }}
+						</a>
+					</span>
+				</div>
+			</div>
+
+			<!-- Project Items Section -->
+			<div id="project-items-section" class="bg-auto mt-lg">
+				<div class="pr-md pl-md pb-lg">
+					<div class="row">
+						<div class="col-xs-12">
+							{{ include('@MauticProject/Project/_entity_list.html.twig') }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<input name="entityId" id="entityId" type="hidden" value="{{ project.getId()|e }}"/>
+	</div>
+
+
+{% endblock %}

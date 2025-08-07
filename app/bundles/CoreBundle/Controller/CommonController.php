@@ -116,7 +116,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array<string, string> $parameters
      */
-    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, Request $request = null): string
+    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
     {
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
             $event = $this->dispatcher->dispatch(
@@ -331,6 +331,7 @@ class CommonController extends AbstractController implements MauticController
 
         // Ajax call so respond with json
         $newContent = '';
+        $ignoreAjax = $request->get('ignoreAjax', false); // get the value here as the forward can overwrite it.
         if ($contentTemplate) {
             if ($forward) {
                 // the content is from another controller action so we must retrieve the response from it instead of
@@ -357,7 +358,7 @@ class CommonController extends AbstractController implements MauticController
 
         // there was a redirect within the controller leading to a double call of this function so just return the content
         // to prevent newContent from being json
-        if ($request->get('ignoreAjax', false)) {
+        if ($ignoreAjax) {
             return new Response($newContent, $code);
         }
 
@@ -592,7 +593,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Renders notification info for ajax.
      */
-    protected function getNotificationContent(Request $request = null): array
+    protected function getNotificationContent(?Request $request = null): array
     {
         if (null === $request) {
             $request = $this->getCurrentRequest();
@@ -616,18 +617,6 @@ class CommonController extends AbstractController implements MauticController
             'hasNewNotifications' => $showNewIndicator,
             'updateAvailable'     => (!empty($updateMessage)),
         ];
-    }
-
-    /**
-     * @param bool|true $isRead
-     *
-     * @deprecated Will be removed in Mautic 3.0 as unused.
-     */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null): void
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime);
     }
 
     /**
@@ -670,7 +659,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
     {
         $data = new DataExporterHelper();
 

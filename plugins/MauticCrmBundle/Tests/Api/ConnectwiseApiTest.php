@@ -6,17 +6,15 @@ use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseApi::class)]
 class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
 
     /**
-     * @testdox Tests that fetchAllRecords loops until all records are obtained
-     *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi::fetchAllRecords
-     *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
+    #[\PHPUnit\Framework\Attributes\TestDox('Tests that fetchAllRecords loops until all records are obtained')]
     public function testResultPagination(): void
     {
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)

@@ -204,7 +204,7 @@ class StatRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
     {
         return $this->getStatusCount('is_sent', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -216,7 +216,7 @@ class StatRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -228,7 +228,7 @@ class StatRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getFailedCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
     {
         return $this->getStatusCount('is_failed', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -241,7 +241,7 @@ class StatRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -323,7 +323,7 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int $emailIds
      */
-    public function getOpenedRates($emailIds, \DateTime $fromDate = null): array
+    public function getOpenedRates($emailIds, ?\DateTime $fromDate = null): array
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
@@ -544,7 +544,7 @@ class StatRepository extends CommonRepository
      *
      * @param array $emailIds
      */
-    public function getSentCounts($emailIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($emailIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
@@ -624,25 +624,6 @@ class StatRepository extends CommonRepository
             ->setParameter('emailId', (int) $emailId)
             ->getQuery()
             ->getResult();
-    }
-
-    /**
-     * @deprecated to be removed as it is not used anywhere
-     *
-     * @return mixed
-     */
-    public function checkContactsSentEmail($contacts, $emailId)
-    {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
-        $query->select('id, lead_id')
-            ->where('s.email_id = :email')
-            ->andWhere('s.lead_id in (:contacts)')
-            ->andWhere('is_failed = 0')
-            ->setParameter('email', $emailId)
-            ->setParameter('contacts', $contacts);
-
-        return $query->executeQuery()->fetchAssociative();
     }
 
     public function checkContactSentEmail(int $contactId, int $emailId): bool
@@ -765,8 +746,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array<int> $emailsIds
-     * @param array<int> $eventsIds
+     * @param array<int|string> $emailsIds
+     * @param array<int>        $eventsIds
      *
      * @return array<int, array<string, int|string>>
      *
@@ -834,7 +815,8 @@ class StatRepository extends CommonRepository
                     ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
         }
 
-        $queryBuilder->groupBy("{$leadAlias}.country");
+        $queryBuilder->groupBy("{$leadAlias}.country")
+                    ->orderBy("{$leadAlias}.country", 'ASC');
         $queryBuilder->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo");
         $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
         $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));

@@ -16,13 +16,9 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 {
     public function testWriteReportData(): void
     {
-        $csvExporter = $this->getMockBuilder(CsvExporter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $csvExporter = $this->createMock(CsvExporter::class);
 
-        $exportHandler = $this->getMockBuilder(ExportHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $exportHandler = $this->createMock(ExportHandler::class);
 
         $handler = 'Handler';
         $report  = new Report();
@@ -33,9 +29,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelper->expects($this->once())
             ->method('get')
@@ -62,13 +56,9 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testClear(): void
     {
-        $csvExporter = $this->getMockBuilder(CsvExporter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $csvExporter = $this->createMock(CsvExporter::class);
 
-        $exportHandler = $this->getMockBuilder(ExportHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $exportHandler = $this->createMock(ExportHandler::class);
 
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
@@ -85,13 +75,9 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilePath(): void
     {
-        $csvExporter = $this->getMockBuilder(CsvExporter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $csvExporter = $this->createMock(CsvExporter::class);
 
-        $exportHandler = $this->getMockBuilder(ExportHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $exportHandler = $this->createMock(ExportHandler::class);
 
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());

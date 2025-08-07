@@ -138,7 +138,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's upcoming events.
      */
-    public function getUpcomingEvents(array $options = null): array
+    public function getUpcomingEvents(?array $options = null): array
     {
         $leadIps = [];
 
@@ -157,7 +157,8 @@ class LeadEventLogRepository extends CommonRepository
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
-            ->where($query->expr()->eq('ll.is_scheduled', 1));
+            ->where($query->expr()->eq('ll.is_scheduled', 1))
+            ->andWhere('ll.trigger_date > NOW()');
 
         if (isset($options['lead'])) {
             /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
@@ -171,7 +172,7 @@ class LeadEventLogRepository extends CommonRepository
 
         if (isset($options['type'])) {
             $query->andwhere('e.type = :type')
-                  ->setParameter('type', $options['type']);
+            ->setParameter('type', $options['type']);
         }
 
         if (isset($options['eventType'])) {
@@ -214,9 +215,9 @@ class LeadEventLogRepository extends CommonRepository
         $excludeScheduled = false,
         $excludeNegative = true,
         $all = false,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
-        int $eventId = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
+        ?int $eventId = null,
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 
@@ -658,5 +659,22 @@ SQL;
         }
 
         return false;
+    }
+
+    public function deleteAnonymousContacts(): int
+    {
+        $conn           = $this->getEntityManager()->getConnection();
+        $tableName      = $this->getTableName();
+        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
+        $tempTableName  = 'to_delete';
+        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
+        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select id AS lead_id from %s where date_identified is null;', $tempTableName, $leadsTableName));
+        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::LOG_DELETE_BATCH_SIZE);
+        $deletedRecordCount= 0;
+        while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
+            $deletedRecordCount += $deletedRows;
+        }
+
+        return $deletedRecordCount;
     }
 }

@@ -31,9 +31,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->method('getSession')->willReturn($this->session);
     }
 
-    /**
-     * @dataProvider PageProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('PageProvider')]
     public function testCountPage(int $count, int $limit, int $page): void
     {
         $this->session->expects($this->once())
@@ -59,9 +57,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider startProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('startProvider')]
     public function testCountStart(int $page, int $limit, int $start): void
     {
         $this->session->expects($this->once())

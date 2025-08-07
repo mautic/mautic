@@ -38,14 +38,6 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
      */
     private const ONESIGNAL_API_BASE_URL = 'https://onesignal.com/api/v1/notifications';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->transportMock = $this->getMockHandler(static::getContainer());
-        $this->setupIntegration(static::getContainer(), $this->em, self::API_ID, self::REST_API_ID);
-    }
-
     public function testLeadNotContactable(): void
     {
         $notification = $this->createNotification($this->em);
@@ -519,7 +511,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         string $expectedMethod = 'GET',
         string $expectedUri = '',
         int $status = 200,
-        string $body = null,
+        ?string $body = null,
     ): callable {
         return static function (RequestInterface $request) use ($expectedData, $expectedMethod, $expectedUri, $status, $body) {
             Assert::assertSame($expectedMethod, $request->getMethod());

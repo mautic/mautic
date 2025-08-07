@@ -25,8 +25,8 @@ class SummaryRepository extends CommonRepository
      */
     public function getCampaignLogCounts(
         int $campaignId,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
@@ -88,8 +88,8 @@ class SummaryRepository extends CommonRepository
     public function summarize(
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo,
-        int $campaignId = null,
-        int $eventId = null,
+        ?int $campaignId = null,
+        ?int $eventId = null,
     ): void {
         $dateFromTsActual = $dateFrom->getTimestamp();
         $dateToTsActual   = $dateTo->getTimestamp();

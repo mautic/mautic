@@ -40,9 +40,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             'companyname'    => 'Mautic',
         ];
 
-        $model = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $model = $this->createMock(CompanyModel::class);
 
         $model->expects($this->once())
             ->method('checkForDuplicateCompanies')
@@ -73,9 +71,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             'companyemail'   => 'hello@mautic.org',
         ];
 
-        $model = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $model = $this->createMock(CompanyModel::class);
 
         $model->expects($this->once())
             ->method('checkForDuplicateCompanies')
@@ -108,9 +104,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             'companyemail'   => 'hello@mautic.org',
         ];
 
-        $model = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $model = $this->createMock(CompanyModel::class);
 
         $model->expects($this->once())
             ->method('checkForDuplicateCompanies')

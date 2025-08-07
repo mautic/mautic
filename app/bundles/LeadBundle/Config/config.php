@@ -362,11 +362,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.lead.doctrine.subscriber' => [
-                'class'     => Mautic\LeadBundle\EventListener\DoctrineSubscriber::class,
-                'tag'       => 'doctrine.event_subscriber',
-                'arguments' => ['monolog.logger.mautic'],
-            ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class,
                 'arguments' => ['mautic.lead.model.list'],
@@ -764,16 +759,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.lead.field.settings.background_service' => [
-                'class'     => Mautic\LeadBundle\Field\BackgroundService::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.field.custom_field_column',
-                    'mautic.lead.field.lead_field_saver',
-                    'mautic.lead.field.dispatcher.field_column_background_dispatcher',
-                    'mautic.lead.field.notification.custom_field',
-                ],
-            ],
             'mautic.lead.field.notification.custom_field' => [
                 'class'     => Mautic\LeadBundle\Field\Notification\CustomFieldNotification::class,
                 'arguments' => [
@@ -811,16 +796,6 @@ return [
             'mautic.lead.query.builder.complex_relation.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
-            ],
-            'mautic.lead.query.builder.special.leadlist' => [
-                'class'     => Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder::class,
-                'arguments' => [
-                    'mautic.lead.model.random_parameter_name',
-                    'mautic.lead.repository.lead_segment_query_builder',
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory',
-                    'event_dispatcher',
-                ],
             ],
             'mautic.lead.query.builder.channel_click.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
@@ -937,7 +912,9 @@ return [
         'contact_export_in_background'                                                          => true,
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
+        'contact_export_limit'                                                                  => 0,
         'contact_allow_multiple_companies'                                                      => true,
         'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
+        'update_segment_contact_count_in_background'                                            => false,
     ],
 ];

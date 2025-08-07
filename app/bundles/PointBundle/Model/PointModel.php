@@ -105,7 +105,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -171,7 +171,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false): void
+    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {

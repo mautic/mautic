@@ -90,7 +90,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $persistIntegrationEntities = [];
 
-    protected array $commandParameters         = [];
+    protected array $commandParameters = [];
+    private \Closure $clientFactory;
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
@@ -112,6 +113,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     ) {
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
+
+        $this->setClientFactory(fn (array $options): Client => new Client([
+            'handler' => HandlerStack::create(new CurlHandler([
+                'options' => $options,
+            ])),
+        ]));
     }
 
     public function setCommandParameters(array $params): void
@@ -788,12 +795,16 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     break;
             }
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
-            return [
-                'error' => [
-                    'message' => $exception->getResponse()->getBody()->getContents(),
-                    'code'    => $exception->getCode(),
-                ],
-            ];
+            if (!empty($settings['return_raw'])) {
+                return $exception->getResponse();
+            } else {
+                return [
+                    'error' => [
+                        'message' => $exception->getResponse()->getBody()->getContents(),
+                        'code'    => $exception->getCode(),
+                    ],
+                ];
+            }
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
@@ -817,7 +828,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $integrationEntityId,
         $internalEntity,
         $internalEntityId,
-        array $internal = null,
+        ?array $internal = null,
         $persist = true,
     ): ?IntegrationEntity {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
@@ -1913,7 +1924,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->notificationModel;
     }
 
-    public function logIntegrationError(\Exception $e, Lead $contact = null): void
+    public function logIntegrationError(\Exception $e, ?Lead $contact = null): void
     {
         $logger = $this->logger;
 
@@ -1973,7 +1984,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         $this->getName(),
                         false,
                         $errorHeader,
-                        'text-danger ri-error-warning-line-circle',
+                        'text-danger ri-error-warning-line',
                         null,
                         $user
                     );
@@ -2430,6 +2441,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
+     * @param callable(mixed[]): Client $clientFactory
+     */
+    public function setClientFactory(callable $clientFactory): void
+    {
+        $this->clientFactory = \Closure::fromCallable($clientFactory);
+    }
+
+    /**
      * Because so many integrations extend this class and mautic.http.client is not in the
      * constructor at the time of writing, let's just create a new client here. In addition,
      * we add some custom cURL options.
@@ -2438,8 +2457,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function makeHttpClient(array $options): Client
     {
-        return new Client(['handler' => HandlerStack::create(new CurlHandler([
-            'options' => $options,
-        ]))]);
+        return ($this->clientFactory)($options);
     }
 }

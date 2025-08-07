@@ -12,11 +12,10 @@ use PHPUnit\Framework\TestCase;
 final class BotRatioHelperTest extends TestCase
 {
     /**
-     * @dataProvider hitBotScenariosProvider
-     *
      * @param array<string> $ipDoNotTrackList
      * @param array<string> $blockedUserAgents
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBot(
         string $sentBefore,
         int $botHelperTimeEmailThreshold,
@@ -45,7 +44,7 @@ final class BotRatioHelperTest extends TestCase
     /**
      * @return iterable<string, array<mixed>>
      */
-    public function hitBotScenariosProvider(): iterable
+    public static function hitBotScenariosProvider(): iterable
     {
         // sentBefore, botHelperTimeEmailThreshold, ipAddress, ipDoNotTrackList, userAgent, blockedUserAgents, botHelperBotRatioThreshold, isBot
         yield 'Time and IP' => ['-1 second', 2, '217.30.65.82', ['217.30.65.*'], 'Mozilla/5.0', [], 0.6, true];

@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -66,6 +67,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         private SegmentChartQueryFactory $segmentChartQueryFactory,
         private RequestStack $requestStack,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private DoNotContactRepository $doNotContactRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -132,13 +134,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
         // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+        $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+            $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -191,7 +193,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -310,7 +312,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null): int
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, ?OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -510,8 +512,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
-        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+        } else {
+            $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        }
 
         return $leadsProcessed;
     }
@@ -631,7 +637,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            }
         }
 
         if (!empty($persistLists)) {
@@ -749,7 +759,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            }
 
             unset($listLead);
         }
@@ -1264,7 +1278,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of source choices.
      */
-    public function getSourceLists(string $sourceType = null): array
+    public function getSourceLists(?string $sourceType = null): array
     {
         $choices = [];
         switch ($sourceType) {
@@ -1329,6 +1343,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         return $leadCounts;
+    }
+
+    public function getActiveSegmentContactCount(int $segmentId): int
+    {
+        $total = $this->getRepository()->getLeadCount($segmentId);
+        $dnc   = $this->doNotContactRepository->getCount(null, null, null, $segmentId);
+
+        return max(0, $total - $dnc);
     }
 
     /**

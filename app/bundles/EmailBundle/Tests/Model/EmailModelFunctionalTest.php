@@ -127,7 +127,6 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
         [$sentCount, $failedCount, $failedRecipientsByList]     = $this->emailModel->sendEmailToLists($email, [$segment], 4, 2);
         $this->assertEquals($sentCount, 4);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 3, 2);
@@ -176,10 +175,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($parentEmail);
         $this->em->detach($childrenEmail);
 
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
-        \assert($emailModel instanceof EmailModel);
         $parentEmail->setName('Test change');
-        $emailModel->saveEntity($parentEmail);
+        $this->emailModel->saveEntity($parentEmail);
 
         self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
         self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
@@ -350,9 +347,6 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testGetContextEntity(): void
     {
-        /** @var EmailModel $emailModel */
-        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
-
         $email = new Email();
         $email->setName('Test email');
         $this->em->persist($email);

@@ -1,0 +1,26 @@
+<div class="contained-list contained-list--on-page">
+  {% if title is defined %}
+  <div class="contained-list__header">
+    <div id="contained-list-header" class="contained-list__label">{{ title|trans }}</div>
+    <div class="contained-list__action layout-constraint--size__min-sm layout-constraint--size__max-xl"></div>
+  </div>
+  {% endif %}
+  <ul role="list" aria-labelledby="contained-list-header">
+    {% for item in items %}
+    <li class="contained-list-item contained-list-item--clickable">
+      {% if item.link %}
+      <a class="contained-list-item__content" href="{{ item.link }}">
+        <div class="d-flex jc-space-between ai-center">
+            <div>{{ item.label|trans }}</div>
+            <i class="{{ item.icon }} ri-lg text-interactive ml-md" aria-hidden="true"></i>
+        </div>
+      </a>
+      {% else %}
+      <button class="contained-list-item__content" type="button" {% if item.disabled %}disabled{% endif %}>
+        <div>{{ item.label }}</div>
+      </button>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>

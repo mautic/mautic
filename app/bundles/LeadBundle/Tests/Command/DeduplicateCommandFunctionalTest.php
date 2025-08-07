@@ -17,7 +17,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testDeduplicateCommandWithAnotherUniqueFieldAndAnd' === $this->getName()) {
+        if ('testDeduplicateCommandWithAnotherUniqueFieldAndAnd' === $this->name()) {
             $this->configParams['contact_unique_identifiers_operator'] = CompositeExpression::TYPE_AND;
         }
 
@@ -119,7 +119,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(3, $contactRepository->count([]), $output->getDisplay());
     }
 
-    private function saveContact(string $email, string $phone = null): Lead
+    private function saveContact(string $email, ?string $phone = null): Lead
     {
         $contact = new Lead();
         $contact->setEmail($email);

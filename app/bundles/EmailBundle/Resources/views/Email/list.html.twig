@@ -8,7 +8,7 @@
 
 {% block content %}
     {% if isIndex %}
-        <div id="page-list-wrapper" class="panel panel-default">
+        <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'action': currentRoute,
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        {{ include('@MauticCore/Helper/protip.html.twig', {
+        {{ include('@MauticCore/Modules/protip.html.twig', {
             tip: random(['mautic.protip.emails.unsubscribe', 'mautic.protip.emails.test', 'mautic.protip.emails.personalize', 'mautic.protip.emails.spam', 'mautic.protip.emails.cta'])
         }) }}
     {% else %}

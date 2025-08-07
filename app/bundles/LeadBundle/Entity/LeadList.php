@@ -14,33 +14,18 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "segment:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "segment:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
 
-    public const TABLE_NAME = 'lead_lists';
+    use ProjectTrait;
+
+    public const TABLE_NAME  = 'lead_lists';
+    public const ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
@@ -105,6 +90,7 @@ class LeadList extends FormEntity implements UuidInterface
     public function __construct()
     {
         $this->leads = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -151,6 +137,7 @@ class LeadList extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
+        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
         static::addUuidField($builder);
     }
 
@@ -193,6 +180,8 @@ class LeadList extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'leadList');
     }
 
     /**
@@ -245,7 +234,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(Category $category = null): LeadList
+    public function setCategory(?Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -466,13 +455,6 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $now = (new DateTimeHelper())->getUtcDateTime();
         $this->setLastBuiltDate($now);
-    }
-
-    /**
-     * @deprecated Initialisation is no longer necessary and lastBuiltDate is allowed to be null
-     */
-    public function initializeLastBuiltDate(): void
-    {
     }
 
     public function getLastBuiltTime(): ?float

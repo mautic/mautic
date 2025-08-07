@@ -19,9 +19,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @dataProvider valueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('valueProvider')]
     public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result, string $operator = '='): void
     {
         $formPayload = [

@@ -12,32 +12,16 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "form:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "fields", "actions"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "form:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Form extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+
+    use ProjectTrait;
+    public const ENTITY_NAME = 'forms';
 
     /**
      * @var int
@@ -126,10 +110,7 @@ class Form extends FormEntity implements UuidInterface
      */
     private Collection $submissions;
 
-    /**
-     * @var int
-     */
-    public $submissionCount;
+    public int $submission_count = 0;
 
     /**
      * @var string|null
@@ -165,6 +146,8 @@ class Form extends FormEntity implements UuidInterface
         $this->fields      = new ArrayCollection();
         $this->actions     = new ArrayCollection();
         $this->submissions = new ArrayCollection();
+        $this->noIndex     = true;
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -249,6 +232,7 @@ class Form extends FormEntity implements UuidInterface
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'form_projects_xref', 'form_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -338,6 +322,8 @@ class Form extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
     protected function isChanged($prop, $val)

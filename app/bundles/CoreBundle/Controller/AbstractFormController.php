@@ -269,4 +269,23 @@ abstract class AbstractFormController extends CommonController
 
         return $form;
     }
+
+    protected function isButtonClicked(FormInterface $form, string $name): bool
+    {
+        return $form->get('buttons')->has($name) && $this->getFormButton($form, ['buttons', $name])->isClicked();
+    }
+
+    /**
+     * @param string[] $names
+     */
+    protected function isAnyOfButtonsClicked(FormInterface $form, array $names): bool
+    {
+        foreach ($names as $name) {
+            if ($this->isButtonClicked($form, $name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

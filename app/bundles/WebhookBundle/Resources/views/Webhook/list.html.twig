@@ -19,7 +19,7 @@
 
 {% block content %}
 {% if isIndex %}
-<div id="page-list-wrapper" class="panel panel-default">
+<div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
         'action': currentRoute,
@@ -81,6 +81,13 @@
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig', {
                         sessionVar: 'mautic_webhook',
+                        orderBy: 'c.title',
+                        text: 'mautic.core.category',
+                        class: 'visible-md visible-lg col-webhook-category',
+                }) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig', {
+                        sessionVar: 'mautic_webhook',
                         orderBy: 'e.webhookUrl',
                         text: 'mautic.webhook.webhook_url',
                         class: 'col-webhook-id visible-md visible-lg'
@@ -131,12 +138,13 @@
                             ) }}">
                                 {{ item.getName() }}
                             </a>
-                            {% if item.getDescription() is defined and item.getDescription() is not empty %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ item.getDescription()|purify }}</small>
-                            </div>
-                            {% endif %}
+                            {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                'description': item.getDescription()
+                            }) }}
                         </div>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getWebhookUrl() }}</td>
                     <td class="visible-md visible-lg">{{ item.getId() }} </td>
@@ -159,6 +167,26 @@
         ) }}
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
+                        'pictogram': 'event--streams',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.webhook.contentblock.heading',
+                subheading: 'mautic.webhook.contentblock.subheading',
+                copy: 'mautic.webhook.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}
 {% endblock %}

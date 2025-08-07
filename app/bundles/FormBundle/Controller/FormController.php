@@ -732,9 +732,10 @@ class FormController extends CommonFormController
             // load existing fields into session
             $modifiedFields   = [];
             $existingFields   = $entity->getFields()->toArray();
+            $fieldMap         = [];
             $submitButton     = false;
 
-            foreach ($existingFields as $formField) {
+            foreach ($existingFields as $fieldId => $formField) {
                 // Check to see if the field still exists
 
                 if ('button' == $formField->getType()) {
@@ -750,7 +751,10 @@ class FormController extends CommonFormController
 
                 if (!$id) {
                     // Cloned entity
-                    $id = $field['id'] = $field['sessionId'] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    $id = $field['id'] = $field['sessionId'] = $fieldMap[$fieldId] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    if (isset($field['parent'])) {
+                        $field['parent'] = $fieldMap[$field['parent']];
+                    }
                 }
 
                 unset($field['form']);

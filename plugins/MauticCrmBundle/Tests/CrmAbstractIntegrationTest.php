@@ -60,9 +60,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             'some_custom_field'   => 'some value',
         ];
 
-        $emailValidator = $this->getMockBuilder(EmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailValidator = $this->createMock(EmailValidator::class);
 
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
@@ -131,9 +129,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
     public function testLimitString(): void
     {
-        $integration = $this->getMockBuilder(StubIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(StubIntegration::class);
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
         $methodLimitString->setAccessible(true);

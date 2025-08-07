@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +18,11 @@ class DateRangeUnitTraitTest extends TestCase
     {
         parent::setUp();
 
-        $this->trait = $this->getMockForTrait(DateRangeUnitTrait::class);
+        // Can't test only trait. Need a concrete class.
+        $this->trait = $this->getMockBuilder(ChartQuery::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([])
+            ->getMock();
     }
 
     public function testGetTimeUnitFromDateRangeWithSameDay(): void

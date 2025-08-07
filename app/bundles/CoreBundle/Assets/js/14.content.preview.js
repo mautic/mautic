@@ -112,7 +112,7 @@ Mautic.updatePreviewContactLookupListFilter = function(field, item) {
 Mautic.activatePreviewContactLookupField = function(fieldOptions, filterId) {
 
     const lookupElementId = 'content_preview_settings_contact';
-    const action          = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');
+    const action          = mQuery('#' + lookupElementId).attr('data-chosen-lookup');
 
     const options = {
         limit: 20,
@@ -122,10 +122,11 @@ Mautic.activatePreviewContactLookupField = function(fieldOptions, filterId) {
     Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
     Mautic.contentPreviewUrlGenerator.init();
 
-    mQuery('#content_preview_settings_contact').on("change",function(event) {
+    mQuery('#content_preview_settings_contact').on('change',function(event) {
         if (event.target.value === '') {
             // Delete selected contact ID from URL and hidden input
             Mautic.contentPreviewUrlGenerator.regenerateUrl('', mQuery('#content_preview_settings_contact_id'));
+            mQuery('#content_preview_settings_contact_id').val('');
         }
     });
 

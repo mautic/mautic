@@ -113,6 +113,7 @@ class LeadEventLog implements ChannelInterface
             ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
             ->addIndex(['trigger_date'], 'campaign_trigger_date_order')
+            ->addIndex(['is_scheduled', 'event_id', 'trigger_date'], 'idx_scheduled_events')
             ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
 
         $builder->addBigIntIdField();
@@ -226,7 +227,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setDateTriggered(\DateTimeInterface $dateTriggered = null)
+    public function setDateTriggered(?\DateTimeInterface $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
@@ -341,7 +342,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setTriggerDate(\DateTimeInterface $triggerDate = null)
+    public function setTriggerDate(?\DateTimeInterface $triggerDate = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
@@ -508,7 +509,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setFailedLog(FailedLeadEventLog $log = null)
+    public function setFailedLog(?FailedLeadEventLog $log = null)
     {
         $this->failedLog = $log;
 

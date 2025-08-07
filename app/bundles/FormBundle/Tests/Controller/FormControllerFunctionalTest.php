@@ -12,6 +12,8 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +28,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        if ('testLabelsForFormAction' === $this->getName(false)) {
+        if ('testLabelsForFormAction' === $this->name()) {
             $this->truncateTables('assets', 'categories', 'emails', 'lead_lists');
         }
     }
@@ -362,9 +364,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      message: string,
      *      message_arg: array<string, mixed>
      *  }> $expectedMessages The expected messages with translation arguments
-     *
-     * @dataProvider dataTestLabelsForFormActions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestLabelsForFormActions')]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
@@ -409,7 +410,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      }>
      *  }>
      */
-    public function dataTestLabelsForFormActions(): iterable
+    public static function dataTestLabelsForFormActions(): iterable
     {
         $category = new Category();
         $category->setTitle('Category');
@@ -564,6 +565,120 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($action);
 
         return $action;
+    }
+
+    public function testCloneActionWithCondition(): void
+    {
+        $form = $this->createForm('Conditional Form', 'Conditional Form');
+        $this->em->flush();
+
+        $field1 = $this->createFormField([
+            'label'        => 'Country',
+            'type'         => 'country',
+            'mappedObject' => 'contact',
+            'mappedField'  => 'country',
+        ])->setForm($form);
+        $this->em->persist($field1);
+
+        $field2 = $this->createFormField([
+            'label'        => 'State',
+            'mappedObject' => 'contact',
+            'mappedField'  => 'state',
+            'conditions'   => [
+                'any'    => 0,
+                'expr'   => 'in',
+                'values' => ['United States'],
+            ],
+            'parent' => $field1->getId(),
+        ])->setForm($form);
+
+        $fieldSubmit = $this->createFormField([
+            'label'        => 'Submit',
+            'type'         => 'button',
+        ])->setForm($form);
+
+        $this->em->persist($field2);
+        $this->em->flush();
+
+        $form->addField($field1->getId(), $field1);
+        $form->addField($field2->getId(), $field2);
+        $form->addField($fieldSubmit->getId(), $fieldSubmit);
+
+        $field2->setParent((string) $field1->getId());
+
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // request for form clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/forms/clone/{$form->getId()}");
+        $mauticform     = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $mauticform['mauticform[name]']->setValue('Clone Conditional Form');
+        $mauticform['mauticform[isPublished]']->setValue('1');
+
+        $this->client->submit($mauticform);
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $forms);
+
+        $originalForm = $forms[0];
+        $clonedForm   = $forms[1];
+        Assert::assertSame($form->getId(), $originalForm->getId());
+        Assert::assertNotSame($form->getId(), $clonedForm->getId());
+
+        $fields = $clonedForm->getFields()->getValues();
+        Assert::assertCount(3, $fields);
+
+        list($clonedField1, $clonedField2, $clonedSubmit) = $fields;
+        Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
+    }
+
+    public function testFormWithProject(): void
+    {
+        $form = $this->createForm('Name', 'Alias');
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler     = $this->client->request('GET', '/s/forms/edit/'.$form->getId());
+        $formCrawler = $crawler->selectButton('Save')->form();
+        $formCrawler['mauticform[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($formCrawler);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedForm = $this->em->find(Form::class, $form->getId());
+        Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
+    }
+
+    public function testFormDetailsViewWithPreviewPanel(): void
+    {
+        // Create a form
+        $form = $this->createForm('Test Form Details', 'test_form_details');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // Request the form details view
+        $crawler = $this->client->request('GET', sprintf('/s/forms/view/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Check if preview panel exists
+        $previewPanel = $crawler->filter('div.panel.shd-none.bdr-rds-0.bdr-w-0.mt-sm.mb-0');
+
+        if ($previewPanel->count() > 0) {
+            // If preview panel exists, verify its structure
+            $panelHeading = $previewPanel->filter('.panel-heading .panel-title:contains("Preview")');
+            $this->assertCount(1, $panelHeading, 'Preview panel should have correct heading structure');
+
+            $panelBody = $previewPanel->filter('.panel-body.pt-xs');
+            $this->assertCount(1, $panelBody, 'Preview panel should have correct body structure');
+        }
     }
 
     private function createForm(string $name, string $alias): Form

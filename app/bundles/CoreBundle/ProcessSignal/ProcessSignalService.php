@@ -16,7 +16,7 @@ class ProcessSignalService
     /**
      * @param int[] $signals
      */
-    public function registerSignalHandler(callable $beforeCallback = null, array $signals = self::SIGNALS): void
+    public function registerSignalHandler(?callable $beforeCallback = null, array $signals = self::SIGNALS): void
     {
         if (!function_exists('pcntl_signal')) {
             return;
@@ -61,14 +61,18 @@ class ProcessSignalService
     }
 
     /**
+     * @param ?callable(): ?ProcessSignalState $stateCallable
+     *
      * @throws SignalCaughtException
      */
-    public function throwExceptionIfSignalIsCaught(): void
+    public function throwExceptionIfSignalIsCaught(?callable $stateCallable = null): void
     {
         if (!$this->isSignalCaught()) {
             return;
         }
 
-        throw new SignalCaughtException($this->signal);
+        $state = $stateCallable ? $stateCallable() : null;
+
+        throw new SignalCaughtException($this->signal, $state);
     }
 }

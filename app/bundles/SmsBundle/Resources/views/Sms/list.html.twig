@@ -5,7 +5,7 @@
 {% block headerTitle %}{{ 'mautic.sms.smses'|trans }}{% endblock %}
 {% block content %}
     {% if isIndex %}
-    <div id="page-list-wrapper" class="panel panel-default">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'searchId': 'sms-search',
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.sms.concise', 'mautic.protip.sms.timesensitive', 'mautic.protip.sms.compliance'])
     }) }}
     {% else %}
@@ -58,7 +58,7 @@
 {% endblock %}
 
 {% block listResults %}
-{% if items|length %}
+{% if items|length > 0 %}
     <div class="table-responsive">
         <table class="table table-hover sms-list">
             <thead>
@@ -158,7 +158,7 @@
                                     'model' : 'sms',
                                 }
                             ) -}}
-                            <a href="{{ path('mautic_sms_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}">
+                            <a href="{{ path('mautic_sms_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}" data-toggle="ajax">
                                 {{ item.getName() }}
                                 {% if 'list' == type %}
                                     <span data-toggle="tooltip" title="{{ 'mautic.sms.icon_tooltip.list_sms'|trans }}">
@@ -166,13 +166,11 @@
                                     </span>
                                 {% endif %}
                             </a>
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName  = category is not empty ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color    = category is not empty ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                         {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
@@ -193,6 +191,25 @@
 {% elseif not configured %}
     {{- include('@MauticCore/Helper/noresults.html.twig', { 'header' : 'mautic.sms.disabled', 'message' : 'mautic.sms.enable.in.configuration' }) -}}
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'mautic.sms.create.in.campaign.builder'}) -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.category.noresults.tip'}) -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
+                        'pictogram': 'mobile--chat',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+            {% include '@MauticCore/Components/content-block.html.twig' with {
+                heading: 'mautic.sms.contentblock.heading',
+                subheading: 'mautic.sms.contentblock.subheading',
+                copy: 'mautic.sms.contentblock.copy',
+                childContainer: childContainer
+            } %}
+        </div>
+    {% endif %}
 {% endif %}
 {% endblock %}

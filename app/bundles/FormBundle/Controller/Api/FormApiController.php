@@ -18,7 +18,6 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +55,7 @@ class FormApiController extends CommonApiController
         $this->entityClass      = Form::class;
         $this->entityNameOne    = 'form';
         $this->entityNameMulti  = 'forms';
-        $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails', 'projectList'];
 
         $this->dataInputMasks  = [
             'text'    => 'html',
@@ -145,9 +144,6 @@ class FormApiController extends CommonApiController
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
-        $connection = $this->doctrine->getConnection();
-        $connection->beginTransaction();
-
         if (!$entity->getId()) {
             $isNew = true;
 
@@ -163,126 +159,119 @@ class FormApiController extends CommonApiController
         $currentFields      = $entity->getFields();
         $currentActions     = $entity->getActions();
 
-        try {
-            // Add fields from the request
-            if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
-                $aliases = $entity->getFieldAliases();
+        // Add fields from the request
+        if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
+            $aliases = $entity->getFieldAliases();
 
-                foreach ($parameters['fields'] as &$fieldParams) {
-                    if (empty($fieldParams['id'])) {
-                        // Create an unique ID if not set - the following code requires one
-                        $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                        /** @var ?Field $fieldEntity */
-                        $fieldEntity       = $fieldModel->getEntity();
-                    } else {
-                        /** @var ?Field $fieldEntity */
-                        $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
-                        $requestFieldIds[] = $fieldParams['id'];
-                    }
+            foreach ($parameters['fields'] as &$fieldParams) {
+                if (empty($fieldParams['id'])) {
+                    // Create an unique ID if not set - the following code requires one
+                    $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    /** @var ?Field $fieldEntity */
+                    $fieldEntity       = $fieldModel->getEntity();
+                } else {
+                    /** @var ?Field $fieldEntity */
+                    $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
+                    $requestFieldIds[] = $fieldParams['id'];
+                }
 
-                    if (is_null($fieldEntity)) {
-                        $msg = $this->translator->trans(
-                            'mautic.core.error.entity.not.found',
-                            [
-                                '%entity%' => $this->translator->trans('mautic.form.field'),
-                                '%id%'     => $fieldParams['id'],
-                            ],
-                            'flashes'
-                        );
+                if (is_null($fieldEntity)) {
+                    $msg = $this->translator->trans(
+                        'mautic.core.error.entity.not.found',
+                        [
+                            '%entity%' => $this->translator->trans('mautic.form.field'),
+                            '%id%'     => $fieldParams['id'],
+                        ],
+                        'flashes'
+                    );
 
-                        throw new InvalidArgumentException($msg, Response::HTTP_NOT_FOUND);
-                    }
+                    return $this->returnError($msg, Response::HTTP_NOT_FOUND);
+                }
 
-                    $fieldEntityArray                 = $fieldEntity->convertToArray();
-                    $fieldEntityArray['formId']       = $formId;
-                    $fieldEntityArray['mappedObject'] = $fieldParams['mappedObject'] ?? null;
+                $fieldEntityArray                 = $fieldEntity->convertToArray();
+                $fieldEntityArray['formId']       = $formId;
+                $fieldEntityArray['mappedObject'] = $fieldParams['mappedObject'] ?? null;
 
-                    if (!empty($fieldParams['alias'])) {
-                        $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
+                if (!empty($fieldParams['alias'])) {
+                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
 
-                        if (!in_array($fieldParams['alias'], $aliases)) {
-                            $fieldEntityArray['alias'] = $fieldParams['alias'];
-                        }
-                    }
-
-                    if (empty($fieldEntityArray['alias'])) {
-                        $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'] ?? '', $aliases);
-                    }
-
-                    // Check that the alias is not already in use by another field
-                    if (in_array($fieldEntityArray['alias'], $requestUsedAliases)) {
-                        $msg = $this->translator->trans('mautic.form.field.alias.unique', ['%alias%' => $fieldEntityArray['alias']], 'validators');
-                        throw new InvalidArgumentException($msg, Response::HTTP_BAD_REQUEST);
-                    } else {
-                        $requestUsedAliases[] = $fieldEntityArray['alias'];
-                    }
-
-                    $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
-                    $fieldForm->submit($fieldParams, 'PATCH' !== $method);
-
-                    if (!$fieldForm->isValid()) {
-                        $formErrors = $this->getFormErrorMessages($fieldForm);
-                        $msg        = $this->getFormErrorMessage($formErrors);
-
-                        throw new InvalidArgumentException($msg, Response::HTTP_BAD_REQUEST);
+                    if (!in_array($fieldParams['alias'], $aliases)) {
+                        $fieldEntityArray['alias'] = $fieldParams['alias'];
                     }
                 }
 
-                $this->model->setFields($entity, $parameters['fields']);
-            }
-
-            // Remove fields which weren't in the PUT request
-            if (!$isNew && 'PUT' === $method) {
-                $fieldsToDelete = [];
-
-                foreach ($currentFields as $currentField) {
-                    if (!in_array($currentField->getId(), $requestFieldIds)) {
-                        $fieldsToDelete[] = $currentField->getId();
-                    }
+                if (empty($fieldEntityArray['alias'])) {
+                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'] ?? '', $aliases);
                 }
 
-                if ($fieldsToDelete) {
-                    $this->model->deleteFields($entity, $fieldsToDelete);
+                // Check that the alias is not already in use by another field
+                if (in_array($fieldEntityArray['alias'], $requestUsedAliases)) {
+                    $msg = $this->translator->trans('mautic.form.field.alias.unique', ['%alias%' => $fieldEntityArray['alias']], 'validators');
+
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
+                } else {
+                    $requestUsedAliases[] = $fieldEntityArray['alias'];
+                }
+
+                $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
+                $fieldForm->submit($fieldParams, 'PATCH' !== $method);
+
+                if (!$fieldForm->isValid()) {
+                    $formErrors = $this->getFormErrorMessages($fieldForm);
+                    $msg        = $this->getFormErrorMessage($formErrors);
+
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 
-            // Add actions from the request
-            if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
-                $actions = [];
-                foreach ($parameters['actions'] as &$actionParams) {
-                    if (empty($actionParams['id'])) {
-                        $actionParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                        $actionEntity       = $actionModel->getEntity();
-                    } else {
-                        $actionEntity       = $actionModel->getEntity($actionParams['id']);
-                        $requestActionIds[] = $actionParams['id'];
-                    }
+            $this->model->setFields($entity, $parameters['fields']);
+        }
 
-                    $actionEntity->setForm($entity);
+        // Remove fields which weren't in the PUT request
+        if (!$isNew && 'PUT' === $method) {
+            $fieldsToDelete = [];
 
-                    $actionForm = $this->createActionEntityForm($actionEntity, $actionParams);
-                    $actionForm->submit($actionParams, 'PATCH' !== $method);
-
-                    if (!$actionForm->isValid()) {
-                        $formErrors = $this->getFormErrorMessages($actionForm);
-                        $msg        = $this->getFormErrorMessage($formErrors);
-
-                        throw new InvalidArgumentException($msg, Response::HTTP_BAD_REQUEST);
-                    }
-                    $actions[] = $actionForm->getNormData();
+            foreach ($currentFields as $currentField) {
+                if (!in_array($currentField->getId(), $requestFieldIds)) {
+                    $fieldsToDelete[] = $currentField->getId();
                 }
-
-                // Save the form first and new actions so that new fields are available to actions.
-                // Using the repository function to not trigger the listeners twice.
-                $this->model->getRepository()->saveEntity($entity);
-                $this->model->setActions($entity, $actions);
             }
 
-            $connection->commit();
-        } catch (InvalidArgumentException $e) {
-            $connection->rollback();
+            if ($fieldsToDelete) {
+                $this->model->deleteFields($entity, $fieldsToDelete);
+            }
+        }
 
-            return $this->returnError($e->getMessage(), $e->getCode());
+        // Add actions from the request
+        if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
+            $actions = [];
+            foreach ($parameters['actions'] as &$actionParams) {
+                if (empty($actionParams['id'])) {
+                    $actionParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    $actionEntity       = $actionModel->getEntity();
+                } else {
+                    $actionEntity       = $actionModel->getEntity($actionParams['id']);
+                    $requestActionIds[] = $actionParams['id'];
+                }
+
+                $actionEntity->setForm($entity);
+
+                $actionForm = $this->createActionEntityForm($actionEntity, $actionParams);
+                $actionForm->submit($actionParams, 'PATCH' !== $method);
+
+                if (!$actionForm->isValid()) {
+                    $formErrors = $this->getFormErrorMessages($actionForm);
+                    $msg        = $this->getFormErrorMessage($formErrors);
+
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
+                }
+                $actions[] = $actionForm->getNormData();
+            }
+
+            // Save the form first and new actions so that new fields are available to actions.
+            // Using the repository function to not trigger the listeners twice.
+            $this->model->getRepository()->saveEntity($entity);
+            $this->model->setActions($entity, $actions);
         }
 
         // Remove actions which weren't in the PUT request

@@ -25,39 +25,31 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->campaignRepository = $this->getMockBuilder(CampaignRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->campaignRepository = $this->createMock(CampaignRepository::class);
     }
 
     public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs(): void
     {
-        $lead1 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead1 = $this->createMock(Lead::class);
         $lead1->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(2);
 
-        $log1 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log1 = $this->createMock(LeadEventLog::class);
         $log1->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead1);
         $log1->expects($this->once())
             ->method('setLead');
 
-        $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log2 = $this->createMock(LeadEventLog::class);
         $log2->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead2);
@@ -87,28 +79,24 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
 
     public function testHydratedLeadsFromRepositoryWithMissingLeadResultsLogBeingRemoved(): void
     {
-        $lead1 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead1 = $this->createMock(Lead::class);
         $lead1->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(2);
 
-        $log1 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log1 = $this->createMock(LeadEventLog::class);
         $log1->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead1);
         $log1->expects($this->once())
             ->method('setLead');
 
-        $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log2 = $this->createMock(LeadEventLog::class);
         $log2->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead2);

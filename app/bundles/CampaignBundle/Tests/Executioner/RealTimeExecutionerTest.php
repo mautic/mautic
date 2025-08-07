@@ -16,85 +16,70 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 
 class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
+     * @var MockObject|LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventRepository
+     * @var MockObject|EventRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
+    private MockObject $eventRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
+     * @var MockObject|EventExecutioner
      */
-    private \PHPUnit\Framework\MockObject\MockObject $executioner;
+    private MockObject $executioner;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DecisionExecutioner
+     * @var MockObject|DecisionExecutioner
      */
-    private \PHPUnit\Framework\MockObject\MockObject $decisionExecutioner;
+    private MockObject $decisionExecutioner;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
+     * @var MockObject|EventCollector
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
+    private MockObject $eventCollector;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
+     * @var MockObject|EventScheduler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
+    private MockObject $eventScheduler;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
+     * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
+     * @var MockObject|LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject $leadRepository;
 
     private DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {
-        $this->leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadModel = $this->createMock(LeadModel::class);
 
-        $this->eventRepository = $this->getMockBuilder(EventRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventRepository = $this->createMock(EventRepository::class);
 
-        $this->executioner = $this->getMockBuilder(EventExecutioner::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->executioner = $this->createMock(EventExecutioner::class);
 
-        $this->decisionExecutioner = $this->getMockBuilder(DecisionExecutioner::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->decisionExecutioner = $this->createMock(DecisionExecutioner::class);
 
-        $this->eventCollector = $this->getMockBuilder(EventCollector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventCollector = $this->createMock(EventCollector::class);
 
-        $this->eventScheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventScheduler = $this->createMock(EventScheduler::class);
 
-        $this->contactTracker = $this->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadRepository = $this->createMock(LeadRepository::class);
 
         $this->decisionHelper = new DecisionHelper($this->leadRepository);
     }
@@ -115,8 +100,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoRelatedEventsResultInEmptyResponses(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(10);
@@ -139,8 +123,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testChannelMisMatchResultsInEmptyResponses(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(5))
             ->method('getId')
             ->willReturn(10);
@@ -149,8 +132,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $event = $this->createMock(Event::class);
         $event->expects($this->exactly(3))
             ->method('getChannel')
             ->willReturn('email');
@@ -171,8 +153,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testChannelFuzzyMatchResultsInNonEmptyResponses(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(5))
             ->method('getId')
             ->willReturn(10);
@@ -181,18 +162,15 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $event = $this->createMock(Event::class);
         $event->expects($this->exactly(2))
             ->method('getChannel')
             ->willReturn('page');
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
-        $action1 = $this->getMockBuilder(Event::class)
-            ->getMock();
-        $action2 = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $action1 = $this->createMock(Event::class);
+        $action2 = $this->createMock(Event::class);
 
         $event->expects($this->once())
             ->method('getPositiveChildren')
@@ -226,8 +204,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testChannelIdMisMatchResultsInEmptyResponses(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(5))
             ->method('getId')
             ->willReturn(10);
@@ -236,14 +213,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly(4))
-            ->method('getChannelId')
-            ->willReturn(3);
+        $event = $this->getEventMock(2, 4);
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
@@ -261,8 +231,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyPositiveactionsResultsInEmptyResponses(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(5))
             ->method('getId')
             ->willReturn(10);
@@ -271,14 +240,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly(3))
-            ->method('getChannelId')
-            ->willReturn(3);
+        $event = $this->getEventMock(2, 3);
         $event->expects($this->once())
             ->method('getPositiveChildren')
             ->willReturn(new ArrayCollection());
@@ -303,8 +265,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testAssociatedEventsAreExecuted(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(5))
             ->method('getId')
             ->willReturn(10);
@@ -319,19 +280,10 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $action1 = $this->getMockBuilder(Event::class)
-            ->getMock();
-        $action2 = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $action1 = $this->createMock(Event::class);
+        $action2 = $this->createMock(Event::class);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly(3))
-            ->method('getChannelId')
-            ->willReturn(3);
+        $event = $this->getEventMock(2, 3);
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
         $event->expects($this->once())
@@ -370,8 +322,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNonDecisionEventsAreIgnored(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->exactly(5))
             ->method('getId')
             ->willReturn(10);
@@ -383,8 +334,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
+        $event = $this->createMock(Event::class);
         $event->method('getEventType')
             ->willReturn(Event::TYPE_CONDITION);
 
@@ -398,6 +348,19 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $responses = $this->getExecutioner()->execute('something');
 
         $this->assertEquals(0, $responses->containsResponses());
+    }
+
+    private function getEventMock(int $getChannelExpectsCount, int $getChannelIdExpectsCount): MockObject
+    {
+        $event = $this->createMock(Event::class);
+        $event->expects($this->exactly($getChannelExpectsCount))
+            ->method('getChannel')
+            ->willReturn('email');
+        $event->expects($this->exactly($getChannelIdExpectsCount))
+            ->method('getChannelId')
+            ->willReturn('3');
+
+        return $event;
     }
 
     /**

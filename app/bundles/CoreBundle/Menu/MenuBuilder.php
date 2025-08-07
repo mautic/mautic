@@ -87,6 +87,13 @@ class MenuBuilder
 
             $menuItems    = $event->getMenuItems();
 
+            //  Clean menu items: remove dropdown menu entry if empty (need to do it after all events are dispatched)
+            foreach ($menuItems['children'] as $key => $item) {
+                if (empty($item['route']) && empty($item['children'])) {
+                    unset($menuItems['children'][$key]);
+                }
+            }
+
             // KNP Menu explicitly requires a menu name since v3
             if (empty($menuItems['name'])) {
                 $menuItems['name'] = $name;

@@ -47,8 +47,6 @@ input[style] {
 
 .form-control, .chosen-container .chosen-single, .form-control.search.tt-input {
   background-color: var(--field);
-  border-width: var(--border-bottom);
-  border-color: var(--border-strong);
   transition: var(--transition-all-productive);
   border-radius: var(--border-radius-sm);
   .outline();
@@ -67,6 +65,11 @@ input[style] {
   }
 }
 
+.form-control, .chosen-container .chosen-single {
+  border-width: var(--border-bottom);
+  border-color: var(--border-strong);
+}
+
 .form-control {
   &:not(select) {
     padding: var(--spacing-04) var(--spacing-05);
@@ -83,13 +86,18 @@ input[style] {
   }
 }
 
-.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+.form-control[disabled], fieldset[disabled] .form-control {
   color: var(--text-disabled);
 }
 
 .form-control[disabled] {
   cursor: not-allowed;
   border-bottom-color: transparent;
+}
+
+.form-control[readonly] {
+  background-color: transparent;
+  color: var(--text-primary);
 }
 
 // stacked form
@@ -299,7 +307,7 @@ input[type=file] {.outline();}
           margin-right: 4px;
           margin-top: 1px;
           background-color: transparent;
-          border-radius: @border-radius-base;
+          border-radius: clamp(2px, var(--border-radius-sm), 4px);
           border: 1px solid var(--text-primary);
 
           &:after {
@@ -424,6 +432,38 @@ input[type=file] {.outline();}
   }
 }
 
+.radio-group--inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  input[type="radio"] {
+    &,
+    &:hover {
+      opacity: 0;
+      position: absolute;
+      z-index: 1;
+    }
+  }
+  label {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    display: block;
+    transition: var(--transition-all-productive);
+  }
+  input[type="radio"] {
+    &:checked,
+    &:focus {
+      + label {
+        outline: 2px solid var(--focus);
+      }
+    }
+  }
+}
+
 .radio-cards {
   svg,
   img {
@@ -470,7 +510,7 @@ input[type="checkbox"] {
   background-color: transparent;
   appearance: none;
   border: 1px solid var(--icon-primary);
-  border-radius: 4px;
+  border-radius: clamp(2px, var(--border-radius-sm), 4px);
   margin: 0;
   align-items: center;
   display: flex;

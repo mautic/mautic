@@ -19,7 +19,7 @@ use Mautic\UserBundle\Entity\User;
 
 trait CreateTestEntitiesTrait
 {
-    private function createLead(string $firstName, string $lastName = '', string $emailId = '', User $createdBy = null): Lead
+    private function createLead(string $firstName, string $lastName = '', string $emailId = '', ?User $createdBy = null): Lead
     {
         $lead = new Lead();
         $lead->setFirstname($firstName);
@@ -49,18 +49,6 @@ trait CreateTestEntitiesTrait
         $this->em->persist($campaign);
 
         return $campaign;
-    }
-
-    private function createPrimaryCompanyForLead(Lead $lead, Company $company, bool $isPrimary = true): CompanyLead
-    {
-        $companyLead = new CompanyLead();
-        $companyLead->setCompany($company);
-        $companyLead->setLead($lead);
-        $companyLead->setDateAdded(new \DateTime());
-        $companyLead->setPrimary($isPrimary);
-        $this->em->persist($companyLead);
-
-        return $companyLead;
     }
 
     /**
@@ -174,5 +162,17 @@ trait CreateTestEntitiesTrait
         $this->em->persist($listEventLog);
 
         return $listEventLog;
+    }
+
+    private function createPrimaryCompanyForLead(Lead $lead, Company $company, bool $isPrimary = true): CompanyLead
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary($isPrimary);
+        $this->em->persist($companyLead);
+
+        return $companyLead;
     }
 }

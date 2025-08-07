@@ -54,7 +54,15 @@ class EmailApiController extends CommonApiController
         $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
-        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
+        $this->serializerGroups = [
+            'emailDetails',
+            'categoryList',
+            'publishDetails',
+            'assetList',
+            'formList',
+            'leadListList',
+            'projectList',
+        ];
         $this->dataInputMasks   = [
             'customHtml'     => 'html',
             'dynamicContent' => [
@@ -215,7 +223,7 @@ class EmailApiController extends CommonApiController
         );
     }
 
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         if (isset($params['publicPreview']) && $entity instanceof Email) {
             $entity->setPublicPreview(InputHelper::boolean($params['publicPreview']) ?? false);

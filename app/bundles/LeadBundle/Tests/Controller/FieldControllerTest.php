@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\DBAL\Schema\Column;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpFoundation\Request;
@@ -71,5 +73,86 @@ class FieldControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/contacts/fields/clone/9999');
         $this->assertResponseStatusCodeSame(404);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]
+    public function testMaxCharLengthFieldValidationOnStringTypeWhenAddingCustomFieldFailure(string $label, string $type): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
+
+        $form  = $crawler->selectButton('Save & Close')->form();
+        $form['leadfield[label]']->setValue($label);
+        $form['leadfield[object]']->setValue('lead');
+        $form['leadfield[type]']->setValue($type);
+        $form['leadfield[charLengthLimit]']->setValue('260');
+        $crawler = $this->client->submit($form);
+
+        $errorMessage             = trim($crawler->filter('#leadfield_charLengthLimit')->nextAll()->text());
+        $maxCharLimitErrorMessage = 'This value should be between 1 and 191.';
+
+        $this->assertEquals($maxCharLimitErrorMessage, $errorMessage);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]
+    public function testMaxCharLengthFieldValidationOnStringTypeWhenAddingCustomFieldSuccess(string $label, string $type): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
+
+        $form  = $crawler->selectButton('Save & Close')->form();
+        $form['leadfield[label]']->setValue($label);
+        $form['leadfield[object]']->setValue('lead');
+        $form['leadfield[type]']->setValue($type);
+        $form['leadfield[charLengthLimit]']->setValue('191');
+        $this->client->submit($form);
+
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
+        $this->assertNotNull($field);
+    }
+
+    /**
+     * @return array<mixed, mixed>
+     */
+    public static function getStringTypeFieldsArray(): iterable
+    {
+        yield ['test_email', 'email'];
+        yield ['test_text', 'text'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCustomFields')]
+    public function testCustomFieldCharacterLengthLimit(string $label, string $type): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
+
+        $form  = $crawler->selectButton('Save & Close')->form();
+        $form['leadfield[label]']->setValue($label);
+        $form['leadfield[object]']->setValue('lead');
+        $form['leadfield[type]']->setValue($type);
+        $this->client->submit($form);
+
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
+        $this->assertNotNull($field);
+
+        /** @var ColumnSchemaHelper $helper */
+        $helper = $this->getContainer()->get('mautic.schema.helper.column');
+
+        // Table name to check the fields.
+        $name         = 'leads';
+        $schemaHelper = $helper->setName($name);
+
+        /** @var Column $fieldsDescription */
+        $fieldsDescription = $schemaHelper->getColumns()[$label];
+
+        $this->assertSame(191, $fieldsDescription->getLength());
+    }
+
+    /**
+     * @return array<mixed, mixed>
+     */
+    public static function getCustomFields(): iterable
+    {
+        yield ['test_timezone', 'timezone'];
+        yield ['test_locale', 'locale'];
+        yield ['test_country', 'country'];
+        yield ['test_phone', 'tel'];
     }
 }

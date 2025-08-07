@@ -1,0 +1,173 @@
+{% set isIndex = 'index' == tmpl %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'projects' %}
+
+{% block headerTitle 'project.menu.index'|trans %}
+
+{% block content %}
+{% if isIndex %}
+<div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %} panel-default">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'page_actions': {
+            'templateButtons': {
+                'new': permissions['project:project:create'],
+            },
+            'routeBase': 'project',
+            'langVar' : 'project.list',
+        },
+        'bulk_actions': {
+            'routeBase': 'project',
+            'templateButtons': {
+                'delete': permissions['project:project:delete'],
+            },
+        },
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            }
+        ]
+    }) }}
+    <div class="page-list">
+{% endif %}
+
+
+
+    {% if items|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped table-bordered" id="projectsTable">
+                <thead>
+                <tr>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': true,
+                        'target': '#projectsTable',
+                        'langVar': 'project.project',
+                        'routeBase': 'project',
+                        'templateButtons': {
+                            'delete': permissions['project:project:delete']
+                        }
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'projects',
+                        'orderBy': 'p.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-project-name'
+                    }) }}
+
+                    <th class="visible-md visible-lg col-project-entities-count">
+                        {{ 'mautic.project.list.thead.project.count'|trans }}
+                    </th>
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'projects',
+                        'orderBy': 'p.dateAdded',
+                        'text': 'mautic.core.date.added',
+                        'class': 'col-project-date-added'
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'projects',
+                        'orderBy': 'p.dateModified',
+                        'text': 'mautic.core.date.modified',
+                        'class': 'col-project-date-modified'
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'projects',
+                        'orderBy': 'p.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-project-id'
+                    }) }}
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': permissions['project:project:edit'],
+                                    'delete': permissions['project:project:delete']
+                                },
+                                'routeBase': 'project',
+                                'langVar': 'project',
+                                'nameGetter': 'getName'
+                            }) }}
+                        </td>
+                        <td>
+                            <div>
+                                {% if permissions['project:project:edit'] %}
+                                    <a href="{{ path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}) }}" data-toggle="ajax">
+                                        {{ item.getName()|e }}
+                                    </a>
+                                {% else %}
+                                    {{ item.getName() }}
+                                {% endif %}
+                            </div>
+                            {% if item.getDescription() %}
+                                <div class="text-muted mt-4">
+                                    <small>{{ item.getDescription()|purify }}</small>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="visible-md visible-lg">
+                            <a href="{{ path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}) }}" data-toggle="ajax" data-menu-link="mautic_project_index" size="sm" class="label label-gray" {% if 0 == item.entitiesCount|default(0) %}disabled="disabled"{% endif %}>
+                               {{- 'mautic.project.entity.count'|trans({'%count%': item.entitiesCount|default(0)}) -}}
+                            </a>
+                        </td>
+                        <td>
+                            <abbr title="{{ dateToFull(item.getDateAdded) }}">
+                                {{ dateToText(item.getDateAdded) }}
+                            </abbr>
+                        </td>
+                        <td>
+                            <abbr title="{{ dateToFull(item.getDateModified) }}">
+                                {{ dateToText(item.getDateModified) }}
+                            </abbr>
+                        </td>
+                        <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="panel-footer">
+                {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'baseUrl': path('mautic_project_index'),
+                    'sessionVar': 'project'
+                }) }}
+            </div>
+        </div>
+    {% else %}
+        {% if searchValue is not empty %}
+            {{ include('@MauticCore/Helper/noresults.html.twig') }}
+        {% else %}
+            <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+                {% set childContainer %}
+                    <div class="mt-32 mb-md">
+                        {% include '@MauticCore/Components/pictogram.html.twig' with {
+                            'pictogram': 'asset-management',
+                            'size': '80'
+                        } %}
+                    </div>
+                {% endset %}
+                {{ include('@MauticCore/Components/content-block.html.twig', {
+                    heading: 'mautic.project.contentblock.heading'|trans,
+                    subheading: 'mautic.project.contentblock.subheading'|trans,
+                    copy: 'mautic.project.contentblock.copy'|trans,
+                    childContainer: childContainer,
+                }) }}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}

@@ -119,13 +119,13 @@ class FromEmailHelperTest extends TestCase
     public function testDefaultIsReturnedWhenOwnerNotFound(): void
     {
         $this->coreParametersHelper->method('get')
-            ->willReturn($this->returnValueMap(
+            ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'someone@somewhere.com'],
                     ['mailer_from_name', null, 'Someone'],
                     ['mailer_is_owner', null, true],
                 ]
-            ));
+            );
 
         $defaultFrom = new AddressDTO('someone@somewhere.com', 'Someone');
         $contact     = ['owner_id' => 1];
@@ -173,18 +173,25 @@ class FromEmailHelperTest extends TestCase
 
     public function testTokenizedEmailIsReplacedWithSystemDefaultWhenFieldEmptyAndDefaultNotOverriddenAndMailAsOwnerDisabled(): void
     {
-        $this->coreParametersHelper->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['mailer_is_owner'],
-                ['mailer_from_email'],
-                ['mailer_from_name']
-            )
-            ->willReturnOnConsecutiveCalls(
-                false,
-                'default@somewhere.com',
-                'Default'
-            );
+        $matcher = $this->exactly(3);
+        $this->coreParametersHelper->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_is_owner', $parameters[0]);
+
+                    return false;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_email', $parameters[0]);
+
+                    return 'default@somewhere.com';
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_name', $parameters[0]);
+
+                    return 'Default';
+                }
+            });
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -253,11 +260,21 @@ class FromEmailHelperTest extends TestCase
                 'signature'  => 'hello there again',
             ],
         ];
+        $matcher = $this->exactly(2);
 
-        $this->leadRepository->expects($this->exactly(2))
-            ->method('getLeadOwner')
-            ->withConsecutive([1], [2])
-            ->willReturnOnConsecutiveCalls($users[0], $users[1]);
+        $this->leadRepository->expects($matcher)
+            ->method('getLeadOwner')->willReturnCallback(function (...$parameters) use ($matcher, $users) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(1, $parameters[0]);
+
+                    return $users[0];
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(2, $parameters[0]);
+
+                    return $users[1];
+                }
+            });
 
         $helper = $this->getHelper();
         foreach ($contacts as $key => $contact) {
@@ -321,16 +338,20 @@ class FromEmailHelperTest extends TestCase
 
     public function testTokenizedEmailIsReplacedWithSystemDefaultWhenFieldEmptyAndDefaultNotOverridden(): void
     {
-        $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['mailer_from_email'],
-                ['mailer_from_name']
-            )
-            ->willReturnOnConsecutiveCalls(
-                'default@somewhere.com',
-                'Default'
-            );
+        $matcher = $this->exactly(2);
+        $this->coreParametersHelper->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_email', $parameters[0]);
+
+                    return 'default@somewhere.com';
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_name', $parameters[0]);
+
+                    return 'Default';
+                }
+            });
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -348,16 +369,20 @@ class FromEmailHelperTest extends TestCase
 
     public function testTokenizedNameIsReplacedWithSystemDefaultWhenFieldEmptyAndDefaultNotOverridden(): void
     {
-        $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['mailer_from_email'],
-                ['mailer_from_name']
-            )
-            ->willReturnOnConsecutiveCalls(
-                'default@somewhere.com',
-                'Default'
-            );
+        $matcher = $this->exactly(2);
+        $this->coreParametersHelper->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_email', $parameters[0]);
+
+                    return 'default@somewhere.com';
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_name', $parameters[0]);
+
+                    return 'Default';
+                }
+            });
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -418,10 +443,20 @@ class FromEmailHelperTest extends TestCase
 
     public function testTokenizedNameIsReplacedWithSystemDefaultWhenFieldEmptyWithoutDefaultBeingOverriden(): void
     {
-        $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(['mailer_from_email'], ['mailer_from_name'])
-            ->willReturnOnConsecutiveCalls('default@somewhere.com', 'Default Name');
+        $matcher = $this->exactly(2);
+        $this->coreParametersHelper->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_email', $parameters[0]);
+
+                    return 'default@somewhere.com';
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mailer_from_name', $parameters[0]);
+
+                    return 'Default Name';
+                }
+            });
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -627,13 +662,13 @@ class FromEmailHelperTest extends TestCase
     public function testEmptySignatureIsReturnedWhenOwnerIsNotFound(): void
     {
         $this->coreParametersHelper->method('get')
-            ->willReturn($this->returnValueMap(
+            ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'someone@somewhere.com'],
                     ['mailer_from_name', null, 'Someone'],
                     ['mailer_is_owner', null, true],
                 ]
-            ));
+            );
 
         $this->leadRepository->expects($this->once())
             ->method('getLeadOwner')
@@ -671,11 +706,21 @@ class FromEmailHelperTest extends TestCase
             'email'      => 'user2@somewhere.com',
             'signature'  => 'user 2',
         ];
+        $matcher = $this->exactly(2);
 
-        $this->leadRepository->expects($this->exactly(2))
-            ->method('getLeadOwner')
-            ->withConsecutive([1], [2])
-            ->willReturnOnConsecutiveCalls($user, $user2);
+        $this->leadRepository->expects($matcher)
+            ->method('getLeadOwner')->willReturnCallback(function (...$parameters) use ($matcher, $user, $user2) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(1, $parameters[0]);
+
+                    return $user;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(2, $parameters[0]);
+
+                    return $user2;
+                }
+            });
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
@@ -696,7 +741,7 @@ class FromEmailHelperTest extends TestCase
         $params = [
             ['mailer_is_owner', null, true],
         ];
-        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+        $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $user = [
             'id'         => 1,

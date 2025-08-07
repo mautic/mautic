@@ -58,9 +58,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Some required fields are missing. You must map the field "Phone."', $crawler->html());
     }
 
-    /**
-     *  @dataProvider validateDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
     public function testImportMappingAndImport(string $skipIfExist, string $expectedName): void
     {
         $this->createLead('john@doe.email', 'Johny');
@@ -195,6 +193,48 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertArrayNotHasKey('error', $logs[2]->getProperties());
     }
 
+    public function testImportPublishAndUnpublish(): void
+    {
+        $permission = [
+            'lead:imports' => ['view', 'create', 'edit'],
+        ];
+        $role = $this->createRole(false, $permission);
+        $this->createPermission('lead:imports', $role, 36);
+        $user = $this->createUser($role);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Login newly created non-admin user
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
+
+        $uploadForm['lead_import[file]']->setValue((string) $file);
+
+        $crawler     = $this->client->submit($uploadForm);
+        $mappingForm = $crawler->selectButton('Import')->form();
+        $crawler     = $this->client->submit($mappingForm);
+
+        Assert::assertStringContainsString(
+            'Import process was successfully created. But it will not be processed as you do not have permission to publish.',
+            $crawler->html()
+        );
+
+        /** @var ImportRepository $importRepository */
+        $importRepository = $this->em->getRepository(Import::class);
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
+
+        Assert::assertNotNull($importEntity);
+        Assert::assertFalse($importEntity->getIsPublished());
+        Assert::assertSame(Import::STOPPED, $importEntity->getStatus());
+    }
+
     public function testImportFailedWithImportFailedException(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
@@ -247,7 +287,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $fieldRepository->saveEntity($phoneField);
     }
 
-    private function createLead(string $email = null, string $firstName = ''): Lead
+    private function createLead(?string $email = null, string $firstName = ''): Lead
     {
         $lead = new Lead();
         if (!empty($email)) {
@@ -322,7 +362,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     /**
      * @return mixed[]
      */
-    public function validateDataProvider(): iterable
+    public static function validateDataProvider(): iterable
     {
         yield ['0', 'John'];
         yield ['1', 'Johny'];

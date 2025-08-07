@@ -129,9 +129,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_UNAUTHORIZED, $clientResponse->getStatusCode());
     }
 
-    /**
-     * @dataProvider passwordProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('passwordProvider')]
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {
         $userPayload = [
@@ -151,7 +149,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<int, mixed>>
      */
-    public function passwordProvider(): iterable
+    public static function passwordProvider(): iterable
     {
         yield [Response::HTTP_BAD_REQUEST, 'aaa'];
         yield [Response::HTTP_BAD_REQUEST, 'qwerty'];

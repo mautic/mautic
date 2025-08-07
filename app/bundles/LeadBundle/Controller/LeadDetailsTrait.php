@@ -17,7 +17,7 @@ trait LeadDetailsTrait
     /**
      * @param int $page
      */
-    protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -158,7 +158,7 @@ trait LeadDetailsTrait
     /**
      * @return mixed[]
      */
-    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
+    protected function getEngagementData(Lead $lead, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
         $translator = $this->translator;
 
@@ -187,7 +187,7 @@ trait LeadDetailsTrait
     /**
      * @return mixed[]
      */
-    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, int $page = 1, int $limit = 25): array
+    protected function getAuditlogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -255,7 +255,7 @@ trait LeadDetailsTrait
      * @param int $page
      * @param int $limit
      */
-    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -290,7 +290,7 @@ trait LeadDetailsTrait
     /**
      * Get an array with engagements and points of a contact.
      */
-    protected function getStatsCount(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
+    protected function getStatsCount(Lead $lead, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');

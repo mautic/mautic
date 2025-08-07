@@ -26,7 +26,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         // Disable API just for specific test.
-        $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->getName();
+        $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->name();
 
         static::getContainer()->set(
             'session',

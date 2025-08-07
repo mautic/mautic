@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -103,13 +104,15 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add('buttons', FormButtonsType::class, [
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-ghost btn-dnd',
+                        'class'   => 'btn btn-tertiary btn-dnd',
                         'icon'    => 'ri-organization-chart',
                         'onclick' => 'Mautic.launchCampaignEditor();',
                     ],

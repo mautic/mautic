@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Field\Command;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,10 +15,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:fields:analyse',
+    description: 'Analyse actual usage of custom columns in leads table.'
+)]
 class AnalyseCustomFieldCommand extends Command
 {
-    protected static $defaultDescription = 'Analyse actual usage of custom columns in leads table.';
-
     public function __construct(private FieldModel $fieldModel, private LeadModel $leadModel, private TranslatorInterface $translator)
     {
         parent::__construct();
@@ -29,7 +32,6 @@ class AnalyseCustomFieldCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('mautic:fields:analyse')
             ->addOption(
                 'display-table',
                 't',

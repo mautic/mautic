@@ -9,11 +9,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::class)]
 class DateWeekNextTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
-     */
     public function testGetOperatorBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -30,9 +28,6 @@ class DateWeekNextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('between', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
-     */
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -52,9 +47,6 @@ class DateWeekNextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('=<', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
-     */
     public function testGetParameterValueBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -86,9 +78,6 @@ class DateWeekNextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
-     */
     public function testGetParameterValueSingle(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -113,9 +102,6 @@ class DateWeekNextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
-     */
     public function testGetParameterValueforGreaterOperatorIncludesSunday(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -139,9 +125,6 @@ class DateWeekNextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
-     */
     public function testGetParameterValueForLessThanOperatorIncludesSunday(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);

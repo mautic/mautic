@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Field\FieldList;
 class FakeContactHelper
 {
     public function __construct(
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
     ) {
     }
 

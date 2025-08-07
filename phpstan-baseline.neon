@@ -13,15 +13,6 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/ClientController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ApiBundle\\Controller\\ClientController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/ApiBundle/Controller/ClientController.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:createEntityForm\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -154,15 +145,6 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
-
-		-
 			message: '#^Property Mautic\\ApiBundle\\Controller\\CommonApiController\:\:\$dataInputMasks type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -183,15 +165,6 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$default of method Symfony\\Component\\HttpFoundation\\InputBag\<string\>\:\:get\(\) expects string\|null, int given\.$#'
 			identifier: argument.type
-			count: 1
-			path: app/bundles/ApiBundle/Controller/FetchCommonApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ApiBundle\\Controller\\FetchCommonApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/ApiBundle/Controller/FetchCommonApiController.php
 
@@ -550,15 +523,6 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Exclusion/FieldInclusionStrategy.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 2
-			path: app/bundles/ApiBundle/Tests/Controller/CommonApiControllerTest.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Tests\\Controller\\CommonApiControllerTest\:\:getResultFromProtectedMethod\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -575,21 +539,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/ApiBundle/Tests/Controller/CommonApiControllerTest.php
-
-		-
-			message: '#^Property Symfony\\Component\\HttpFoundation\\Request\:\:\$headers \(Symfony\\Component\\HttpFoundation\\HeaderBag\) does not accept Symfony\\Component\\HttpFoundation\\ParameterBag\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/ApiBundle/Tests/EventListener/ApiSubscriberTest.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\AssetBundle\\Controller\\Api\\AssetApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/AssetBundle/Controller/Api/AssetApiController.php
 
 		-
 			message: '''
@@ -708,12 +657,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\AssetBundle\\Entity\\Asset\:\:\$file \(Symfony\\Component\\HttpFoundation\\File\\File\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Property Mautic\\AssetBundle\\Entity\\Asset\:\:\$id \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: app/bundles/AssetBundle/Entity/Asset.php
 
@@ -1186,22 +1129,10 @@ parameters:
 			path: app/bundles/CacheBundle/Cache/Adapter/MemcachedTagAwareAdapter.php
 
 		-
-			message: '#^Method Mautic\\CacheBundle\\Cache\\Adapter\\RedisTagAwareAdapter\:\:__construct\(\) has parameter \$servers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CacheBundle/Cache/Adapter/RedisTagAwareAdapter.php
-
-		-
 			message: '#^Property Mautic\\CacheBundle\\EventListener\\CacheClearSubscriber\:\:\$cacheProvider \(Mautic\\CacheBundle\\Cache\\CacheProvider\) does not accept Symfony\\Component\\Cache\\Adapter\\AdapterInterface\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php
-
-		-
-			message: '#^Trying to mock an undefined method getCacheAdapter\(\) on class Mautic\\CacheBundle\\Cache\\Adapter\\FilesystemTagAwareAdapter\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/CacheBundle/Tests/EventListener/CacheClearSubscriberTest.php
 
 		-
 			message: '#^Variable \$campaign in PHPDoc tag @var does not exist\.$#'
@@ -1233,15 +1164,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\AjaxController\:\:getContactEventLog\(\) has parameter \$eventId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/AjaxController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CampaignBundle\\Controller\\AjaxController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/AjaxController.php
 
@@ -1342,15 +1264,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventApiController\:\:checkAllAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1389,15 +1302,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventApiController\:\:checkLeadAccess\(\) has parameter \$leadId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CampaignBundle\\Controller\\Api\\EventApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
 
@@ -1470,15 +1374,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController\:\:getContactEventsAction\(\) has parameter \$contactId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
 
@@ -1816,24 +1711,9 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
 
 		-
@@ -1938,15 +1818,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\EventController\:\:undeleteAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/EventController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CampaignBundle\\Controller\\EventController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/EventController.php
 
@@ -4019,38 +3890,11 @@ parameters:
 
 		-
 			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
-
-		-
-			message: '''
 				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:
 				2\.13\.0 to be removed in 3\.0; BC support for old listeners$#
 			'''
 			identifier: new.deprecated
 			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
-
-		-
-			message: '''
-				#^Parameter \$event of anonymous function has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 5
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
-
-		-
-			message: '''
-				#^Return type of anonymous function has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: return.deprecatedClass
-			count: 5
 			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
 
 		-
@@ -4103,24 +3947,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/CampaignBundle/Tests/Membership/MembershipManagerTest.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CategoryBundle/Controller/Api/CategoryApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CategoryBundle\\Controller\\BatchContactController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CategoryBundle/Controller/BatchContactController.php
 
 		-
 			message: '#^Method Mautic\\CategoryBundle\\Controller\\CategoryController\:\:deleteAction\(\) has parameter \$bundle with no type specified\.$#'
@@ -4177,15 +4003,6 @@ parameters:
 			path: app/bundles/CategoryBundle/Controller/CategoryController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CategoryBundle\\Controller\\CategoryController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CategoryBundle/Controller/CategoryController.php
-
-		-
 			message: '#^Property Mautic\\CategoryBundle\\Entity\\Category\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -4230,12 +4047,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CategoryBundle\\Model\\CategoryModel\:\:createForm\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CategoryBundle/Model/CategoryModel.php
-
-		-
-			message: '#^Method Mautic\\CategoryBundle\\Model\\CategoryModel\:\:getPermissionBase\(\) has parameter \$bundle with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CategoryBundle/Model/CategoryModel.php
 
@@ -4286,24 +4097,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CategoryBundle/Security/Permissions/CategoryPermissions.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/Api/MessageApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ChannelBundle\\Controller\\BatchContactController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/BatchContactController.php
 
 		-
 			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:cloneAction\(\) has invalid return type Mautic\\CoreBundle\\Controller\\Response\.$#'
@@ -4410,21 +4203,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:viewAction\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ChannelBundle\\Controller\\MessageController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/ChannelBundle/Controller/MessageController.php
 
@@ -4960,30 +4738,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:rescheduleMessage\(\) has parameter \$channel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:rescheduleMessage\(\) has parameter \$channelId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:rescheduleMessage\(\) has parameter \$leadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:rescheduleMessage\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:sendMessages\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5042,15 +4796,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/ChannelBundle/Security/Permissions/ChannelPermissions.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
 
 		-
 			message: '''
@@ -5148,15 +4893,6 @@ parameters:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
 			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: app/bundles/ConfigBundle/Controller/SysinfoController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ConfigBundle\\Controller\\SysinfoController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/ConfigBundle/Controller/SysinfoController.php
 
@@ -5581,15 +5317,6 @@ parameters:
 			path: app/bundles/CoreBundle/Config/config.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/CoreBundle/Config/services.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Configurator\\Step\\StepInterface\:\:checkOptionalSettings\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -5734,15 +5461,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/Api/FileApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CoreBundle\\Controller\\Api\\FileApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CoreBundle/Controller/Api/FileApiController.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Controller\\Api\\FileApiController\:\:\$allowedExtensions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -5771,15 +5489,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Controller/Api/StatsApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CoreBundle\\Controller\\Api\\ThemeApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CoreBundle/Controller/Api/ThemeApiController.php
 
 		-
 			message: '#^Variable \$themeZip in empty\(\) always exists and is not falsy\.$#'
@@ -5813,30 +5522,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Controller\\CommonController\:\:accessGranted\(\) has parameter \$level with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\CommonController\:\:addNotification\(\) has parameter \$header with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\CommonController\:\:addNotification\(\) has parameter \$iconClass with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\CommonController\:\:addNotification\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\CommonController\:\:addNotification\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Controller/CommonController.php
@@ -5938,15 +5623,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/CommonController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\CoreBundle\\Controller\\CommonController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Controller\\ExceptionController\:\:showAction\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5975,24 +5651,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Controller/FileController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\FormController\:\:customizeViewArguments\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FormController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\FormController\:\:customizeViewArguments\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FormController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\FormController\:\:customizeViewArguments\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FormController.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Controller\\FormController\:\:getSessionBase\(\) has parameter \$objectId with no type specified\.$#'
@@ -6056,18 +5714,6 @@ parameters:
 			identifier: empty.variable
 			count: 1
 			path: app/bundles/CoreBundle/Controller/ThemeController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\UpdateController\:\:schemaAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Controller/UpdateController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\UpdateController\:\:schemaAction\(\) should return array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CoreBundle/Controller/UpdateController.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\DependencyInjection\\Builder\\BundleMetadata\:\:setConfig\(\) has parameter \$config with no value type specified in iterable type array\.$#'
@@ -6298,18 +5944,6 @@ parameters:
 			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\CoreBundle\\Doctrine\\AbstractMauticMigration\:\:\$platform is not covariant with PHPDoc type Doctrine\\DBAL\\Platforms\\AbstractPlatform of overridden property Doctrine\\Migrations\\AbstractMigration\:\:\$platform\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Doctrine\\AbstractMauticMigration\:\:\$supported type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
-
-		-
 			message: '#^Access to deprecated property \$_eventManager of class Doctrine\\DBAL\\Connection\.$#'
 			identifier: property.deprecated
 			count: 1
@@ -6516,12 +6150,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addNamedField\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Mapping/ClassMetadataBuilder.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addPartialIndex\(\) has parameter \$columns with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Doctrine/Mapping/ClassMetadataBuilder.php
 
@@ -7426,78 +7054,6 @@ parameters:
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSection\(\) has parameter \$content with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSection\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSection\(\) has parameter \$header with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSection\(\) has parameter \$icon with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSection\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSection\(\) has parameter \$priority with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSlotType\(\) has parameter \$content with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSlotType\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSlotType\(\) has parameter \$header with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSlotType\(\) has parameter \$icon with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSlotType\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addSlotType\(\) has parameter \$params with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addToken\(\) has parameter \$key with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7542,18 +7098,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getRequested\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getSections\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getSlotTypes\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
 
@@ -7619,18 +7163,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\CoreBundle\\Event\\BuilderEvent\:\:\$abTestWinnerCriteria has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Event\\BuilderEvent\:\:\$sections has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Event\\BuilderEvent\:\:\$slotTypes has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
@@ -7844,63 +7376,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Event/CustomContentEvent.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Event\\CustomFormEvent\:
-				since M4, will be removed in M5 because it's not used$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\CustomFormEvent\:\:addListener\(\) has parameter \$eventName with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\CustomFormEvent\:\:addListener\(\) has parameter \$listener with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\CustomFormEvent\:\:getListeners\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\CustomFormEvent\:\:getSubscribers\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Event\\CustomFormEvent\:\:\$listeners type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Event\\CustomFormEvent\:\:\$subscribers type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomFormEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\CustomTemplateEvent\:\:__construct\(\) has parameter \$vars with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomTemplateEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\CustomTemplateEvent\:\:getVars\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Event/CustomTemplateEvent.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\DetermineWinnerEvent\:\:getAbTestResults\(\) return type has no value type specified in iterable type array\.$#'
@@ -8359,24 +7834,6 @@ parameters:
 			path: app/bundles/CoreBundle/Factory/IpLookupFactory.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Factory\\MauticFactory\:\:getModel\(\) has parameter \$modelNameKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Factory/MauticFactory.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Factory\\MauticFactory\:\:getParameter\(\) has parameter \$id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Factory/MauticFactory.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Factory\\MauticFactory\:\:serviceExists\(\) has parameter \$service with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Factory/MauticFactory.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Factory\\ModelFactory\:\:hasModel\(\) has parameter \$modelNameKey with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8441,42 +7898,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\DatetimeToStringTransformer\:\:reverseTransform\(\) should return string but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/DatetimeToStringTransformer.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\DatetimeToStringTransformer\:\:transform\(\) should return DateTime but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/DatetimeToStringTransformer.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\EmojiToHtmlTransformer\:\:reverseTransform\(\) has parameter \$content with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToHtmlTransformer.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\EmojiToHtmlTransformer\:\:reverseTransform\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToHtmlTransformer.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\EmojiToHtmlTransformer\:\:transform\(\) has parameter \$content with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToHtmlTransformer.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\EmojiToHtmlTransformer\:\:transform\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToHtmlTransformer.php
 
 		-
 			message: '#^Call to an undefined method Doctrine\\ORM\\EntityRepository\<object\>\:\:getEntities\(\)\.$#'
@@ -8631,12 +8052,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$encodingFormatMessage\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncodingValidator.php
-
-		-
-			message: '#^Call to method getClientOriginalName\(\) on an unknown class Mautic\\CoreBundle\\Form\\Validator\\Constraints\\LeadField\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncodingValidator.php
 
@@ -8799,24 +8214,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\BuilderTokenHelper\:\:getTokens\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\BuilderTokenHelper\:\:getVisualTokenHtml\(\) has parameter \$description with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\BuilderTokenHelper\:\:getVisualTokenHtml\(\) has parameter \$forPregReplace with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\BuilderTokenHelper\:\:getVisualTokenHtml\(\) has parameter \$token with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
 
@@ -9205,64 +8602,10 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/CoreParametersHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CoreParametersHelper\:\:getParameter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CoreParametersHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CoreParametersHelper\:\:getParameter\(\) has parameter \$default with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CoreParametersHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CoreParametersHelper\:\:getParameter\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CoreParametersHelper.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Helper\\CoreParametersHelper\:\:\$resolvedParameters type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Helper/CoreParametersHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CsvHelper\:\:convertHeadersIntoFields\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CsvHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CsvHelper\:\:convertHeadersIntoFields\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CsvHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CsvHelper\:\:csv_to_array\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CsvHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CsvHelper\:\:csv_to_array\(\) should return array but returns false\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CsvHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CsvHelper\:\:sanitizeHeaders\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CsvHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CsvHelper\:\:sanitizeHeaders\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CsvHelper.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\DataExporterHelper\:\:getDataForExport\(\) has parameter \$args with no value type specified in iterable type array\.$#'
@@ -9877,156 +9220,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/TrackingPixelHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:UTF8FixWin1252Chars\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:encode\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:encode\(\) has parameter \$encodingLabel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:encode\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:fixUTF8\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:fixUTF8\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:fixUTF8\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:normalizeEncoding\(\) has parameter \$encodingLabel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:removeBOM\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:removeBOM\(\) has parameter \$str with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:strlen\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toISO8859\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toISO8859\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toLatin1\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toLatin1\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toUTF8\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toUTF8\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toWin1252\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toWin1252\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:toWin1252\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:utf8_decode\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:utf8_decode\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:\$brokenUtf8ToUtf8 has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:\$utf8ToWin1252 has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\UTF8Helper\:\:\$win1252ToUtf8 has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/UTF8Helper.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Helper\\Update\\Exception\\CouldNotFetchLatestVersionException\:\:\$message has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -10349,12 +9542,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/IpLookup/TelizeLookup.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Loader\\RouteLoader\:\:load\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Loader/RouteLoader.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Loader\\RouteLoader\:\:supports\(\) has parameter \$type with no type specified\.$#'
@@ -11089,36 +10276,6 @@ parameters:
 			path: app/bundles/CoreBundle/Test/DoctrineExtensions/TablePrefix.php
 
 		-
-			message: '#^Class Mautic\\CoreBundle\\Test\\Listeners\\CleanupListener implements deprecated interface PHPUnit\\Framework\\TestListener\.$#'
-			identifier: class.implementsDeprecatedInterface
-			count: 1
-			path: app/bundles/CoreBundle/Test/Listeners/CleanupListener.php
-
-		-
-			message: '''
-				#^Usage of deprecated trait PHPUnit\\Framework\\TestListenerDefaultImplementation in class Mautic\\CoreBundle\\Test\\Listeners\\CleanupListener\:
-				The `TestListener` interface is deprecated$#
-			'''
-			identifier: traitUse.deprecated
-			count: 1
-			path: app/bundles/CoreBundle/Test/Listeners/CleanupListener.php
-
-		-
-			message: '#^Class Mautic\\CoreBundle\\Test\\Listeners\\SeparateProcessListener implements deprecated interface PHPUnit\\Framework\\TestListener\.$#'
-			identifier: class.implementsDeprecatedInterface
-			count: 1
-			path: app/bundles/CoreBundle/Test/Listeners/SeparateProcessListener.php
-
-		-
-			message: '''
-				#^Usage of deprecated trait PHPUnit\\Framework\\TestListenerDefaultImplementation in class Mautic\\CoreBundle\\Test\\Listeners\\SeparateProcessListener\:
-				The `TestListener` interface is deprecated$#
-			'''
-			identifier: traitUse.deprecated
-			count: 1
-			path: app/bundles/CoreBundle/Test/Listeners/SeparateProcessListener.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Test\\MauticMysqlTestCase\:\:applySqlFromFile\(\) has parameter \$file with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -11135,18 +10292,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Test/MauticMysqlTestCase.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\MauticSqliteTestCase\:\:getDatabasePath\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/MauticSqliteTestCase.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\MauticSqliteTestCase\:\:getOriginalDatabasePath\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/MauticSqliteTestCase.php
 
 		-
 			message: '#^Property Mautic\\CoreBundle\\Tests\\Functional\\Controller\\FileControllerTest\:\:\$uploadedFilePath has no type specified\.$#'
@@ -11170,15 +10315,6 @@ parameters:
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Controller\\AbstractFormController\:\:returnIsFormCancelled\(\)\.$#'
 			identifier: method.notFound
 			count: 3
-			path: app/bundles/CoreBundle/Tests/Unit/Controller/AbstractFormControllerTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/Controller/AbstractFormControllerTest.php
 
 		-
@@ -11237,12 +10373,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Type\\ConfigTypeTest\:\:getConfigFormType\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Type\\ConfigTypeTest\:\:getExtensions\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
@@ -11336,18 +10466,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/Helper/InputHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\IpLookupHelperTest\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/IpLookupHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\IpLookupHelperTest\:\:__construct\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/IpLookupHelperTest.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\IpLookupHelperTest\:\:getIpHelper\(\) has parameter \$mockCoreParametersHelper with no type specified\.$#'
@@ -11534,15 +10652,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: app/bundles/DashboardBundle/Controller/AjaxController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\DashboardBundle\\Controller\\Api\\WidgetApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/DashboardBundle/Controller/Api/WidgetApiController.php
 
 		-
 			message: '#^Method Mautic\\DashboardBundle\\Controller\\DashboardController\:\:editAction\(\) has parameter \$objectId with no type specified\.$#'
@@ -11842,15 +10951,6 @@ parameters:
 			path: app/bundles/DashboardBundle/Model/DashboardModel.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/DashboardBundle/Tests/Controller/DashboardControllerTest.php
-
-		-
 			message: '#^Parameter \#1 \$height of method Mautic\\DashboardBundle\\Entity\\Widget\:\:setHeight\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -11867,15 +10967,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/DashboardBundle/Tests/Entity/WidgetTest.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/Api/DynamicContentApiController.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentApiController\:\:getAction\(\) has parameter \$objectAlias with no type specified\.$#'
@@ -12688,24 +11779,6 @@ parameters:
 			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\EmailBundle\\Controller\\Api\\EmailApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
-
-		-
-			message: '''
-				#^Call to deprecated method getFieldList\(\) of class Mautic\\LeadBundle\\Model\\FieldModel\:
-				Use FieldList\:\:getFieldList method instead$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/EmailBundle/Controller/EmailController.php
-
-		-
 			message: '#^Cannot use array destructuring on array\|Doctrine\\Common\\Collections\\ArrayCollection\.$#'
 			identifier: offsetAccess.nonArray
 			count: 1
@@ -12728,18 +11801,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Controller\\EmailController\:\:abtestAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Controller/EmailController.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Controller\\EmailController\:\:buildSlotForms\(\) has parameter \$slotTypes with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Controller/EmailController.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Controller\\EmailController\:\:buildSlotForms\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/Controller/EmailController.php
@@ -12805,12 +11866,6 @@ parameters:
 			path: app/bundles/EmailBundle/Controller/EmailController.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Controller\\EmailController\:\:processSlots\(\) has parameter \$slots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Controller/EmailController.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Controller\\EmailController\:\:sendAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12841,25 +11896,10 @@ parameters:
 			path: app/bundles/EmailBundle/Controller/EmailController.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/EmailBundle/Controller/EmailController.php
-
-		-
 			message: '#^Cannot use array destructuring on array\|Doctrine\\Common\\Collections\\ArrayCollection\.$#'
 			identifier: offsetAccess.nonArray
 			count: 1
 			path: app/bundles/EmailBundle/Controller/EmailGraphStatsController.php
-
-		-
-			message: '''
-				#^Call to deprecated method getFieldList\(\) of class Mautic\\LeadBundle\\Model\\FieldModel\:
-				Use FieldList\:\:getFieldList method instead$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
 
 		-
 			message: '''
@@ -13022,12 +12062,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Controller\\PublicController\:\:pluginTrackingGifAction\(\) has parameter \$integration with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Controller\\PublicController\:\:processSlots\(\) has parameter \$slots with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Controller/PublicController.php
@@ -13480,12 +12514,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/EmailReplyRepositoryInterface.php
 
 		-
-			message: '#^Call to deprecated method iterate\(\) of class Doctrine\\ORM\\Query\.$#'
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/EmailBundle/Entity/EmailRepository.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\EmailRepository\:\:addCatchAllWhereClause\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -13540,21 +12568,9 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/EmailRepository.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\EmailRepository\:\:isOneUnpublished\(\) has parameter \$ids with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Entity/EmailRepository.php
-
-		-
 			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
 			identifier: argument.type
 			count: 2
-			path: app/bundles/EmailBundle/Entity/EmailRepository.php
-
-		-
-			message: '#^Return type of method Mautic\\EmailBundle\\Entity\\EmailRepository\:\:getPublishedBroadcasts\(\) has typehint with deprecated class Doctrine\\ORM\\Internal\\Hydration\\IterableResult\.$#'
-			identifier: return.deprecatedClass
-			count: 1
 			path: app/bundles/EmailBundle/Entity/EmailRepository.php
 
 		-
@@ -13631,18 +12647,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/Entity/StatDeviceRepository.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\StatRepository\:\:checkContactsSentEmail\(\) has parameter \$contacts with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/StatRepository.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\StatRepository\:\:checkContactsSentEmail\(\) has parameter \$emailId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/StatRepository.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\StatRepository\:\:deleteStat\(\) has parameter \$id with no type specified\.$#'
@@ -14221,18 +13225,6 @@ parameters:
 			path: app/bundles/EmailBundle/Exception/MailboxException.php
 
 		-
-			message: '#^Offset ''formType'' does not exist on array\{label\: false\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: app/bundles/EmailBundle/Form/Type/AbTestPropertiesType.php
-
-		-
-			message: '#^Offset ''formTypeOptions'' on array\{label\: false\} in isset\(\) does not exist\.$#'
-			identifier: isset.offset
-			count: 1
-			path: app/bundles/EmailBundle/Form/Type/AbTestPropertiesType.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\EmailValidator\:\:doPluginValidation\(\) has parameter \$address with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -14347,24 +13339,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:getContactOwner\(\) has parameter \$contact with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:getContactOwner\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:getContactOwnerSignature\(\) has parameter \$owner with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:getCustomHeaders\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -14437,12 +13411,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:processSlots\(\) has parameter \$slots with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:queue\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -14510,12 +13478,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setEmail\(\) has parameter \$assetAttachments with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setEmail\(\) has parameter \$slots with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
@@ -14595,15 +13557,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:validateEmail\(\) has parameter \$address with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\EmailBundle\\Helper\\MailHelper\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -14838,15 +13791,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\PointEventHelper\:\:validateEmail\(\) has parameter \$eventDetails with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PointEventHelper.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\EmailBundle\\Helper\\PointEventHelper\:\:sendEmail\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/EmailBundle/Helper/PointEventHelper.php
 
@@ -16456,28 +15400,10 @@ parameters:
 			path: app/bundles/EmailBundle/Stats/StatHelperContainer.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Controller/AjaxControllerTest.php
-
-		-
 			message: '#^You should use assertCount\(\$expectedCount, \$variable\) instead of assertSame\(\$expectedCount, count\(\$variable\)\)\.$#'
 			identifier: phpunit.assertCount
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Controller/Api/EmailApiControllerFunctionalTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Controller/EmailControllerTest.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Tests\\Entity\\StatTest\:\:addOpenDetailsTestProvider\(\) return type has no value type specified in iterable type array\.$#'
@@ -16540,15 +15466,6 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/EventListener/ReportSubscriberTest.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/TokenSubscriberTest.php
-
-		-
 			message: '#^Property Mautic\\EmailBundle\\Tests\\Form\\Type\\FormSubmitActionUserEmailTypeTest\:\:\$entityManager is unused\.$#'
 			identifier: property.unused
 			count: 1
@@ -16565,24 +15482,6 @@ parameters:
 			identifier: property.unused
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Form/Type/FormSubmitActionUserEmailTypeTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/PointEventHelperTest.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Tests\\Helper\\Transport\\BatchTransport\:\:getMetadatas\(\) return type has no value type specified in iterable type array\.$#'
@@ -16640,15 +15539,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 5
-			path: app/bundles/EmailBundle/Tests/Model/SendEmailToContactTest.php
 
 		-
 			message: '#^Property Mautic\\EmailBundle\\Tests\\MonitoredEmail\\Accessor\\ConfigAccessorTest\:\:\$config has no type specified\.$#'
@@ -16714,15 +15604,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/ActionController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\FormBundle\\Controller\\AjaxController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/FormBundle/Controller/AjaxController.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Controller\\Api\\FormApiController\:\:createActionEntityForm\(\) has parameter \$action with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -16777,26 +15658,8 @@ parameters:
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\FormBundle\\Controller\\Api\\FormApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController\:\:getEntityAction\(\) has parameter \$submissionId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
 
@@ -16821,15 +15684,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/Controller/FieldController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\FormBundle\\Controller\\FieldController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/FormBundle/Controller/FieldController.php
 
@@ -16879,15 +15733,6 @@ parameters:
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 6
-			path: app/bundles/FormBundle/Controller/FormController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\FormBundle\\Controller\\FormController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
 			path: app/bundles/FormBundle/Controller/FormController.php
 
 		-
@@ -16998,15 +15843,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\FormBundle\\Controller\\ResultController\:\:getPostActionRedirectArguments\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Controller/ResultController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\FormBundle\\Controller\\ResultController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/FormBundle/Controller/ResultController.php
 
@@ -17857,24 +16693,6 @@ parameters:
 			path: app/bundles/FormBundle/Form/Type/SubmitActionRepostType.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Helper\\FormFieldHelper\:\:getFieldFilter\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Helper/FormFieldHelper.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Helper\\FormFieldHelper\:\:getList\(\) has parameter \$customFields with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Helper/FormFieldHelper.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Helper\\FormFieldHelper\:\:getList\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Helper/FormFieldHelper.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Helper\\FormFieldHelper\:\:getTypes\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -17985,12 +16803,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\FormBundle\\Model\\FieldModel\:\:createForm\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Model/FieldModel.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Model\\FieldModel\:\:getObjectFields\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Model/FieldModel.php
 
@@ -18358,36 +17170,6 @@ parameters:
 			path: app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
 
 		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\FormTestAbstract\:\:\$formRepository has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/FormTestAbstract.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\FormTestAbstract\:\:\$leadFieldModel has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/FormTestAbstract.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\FormTestAbstract\:\:\$mockId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/FormTestAbstract.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\FormTestAbstract\:\:\$mockName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/FormTestAbstract.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\FormTestAbstract\:\:\$mockTrackingId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/FormTestAbstract.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:fieldProvider\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18424,15 +17206,6 @@ parameters:
 			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
 
 		-
-			message: '''
-				#^Call to deprecated method getObjectFields\(\) of class Mautic\\FormBundle\\Model\\FieldModel\:
-				to be removed in Mautic 4\. This method is not used anymore\.$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/bundles/FormBundle/Tests/Model/FieldModelFunctionalTest.php
-
-		-
 			message: '#^Property Mautic\\FormBundle\\Tests\\Model\\FormUploaderTest\:\:\$formId1 has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -18467,12 +17240,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/FormBundle/Tests/ProgressiveProfiling/DisplayManagerTest.php
-
-		-
-			message: '#^Property Symfony\\Component\\HttpFoundation\\Request\:\:\$files \(Symfony\\Component\\HttpFoundation\\FileBag\) does not accept PHPUnit\\Framework\\MockObject\\MockObject&Symfony\\Component\\HttpFoundation\\ParameterBag\.$#'
-			identifier: assign.propertyType
-			count: 3
-			path: app/bundles/FormBundle/Tests/Validator/UploadFieldValidatorTest.php
 
 		-
 			message: '#^Property Mautic\\FormBundle\\Validator\\Constraint\\FileExtensionConstraint\:\:\$message has no type specified\.$#'
@@ -18663,15 +17430,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param for parameter \$index with type int is incompatible with native type float\.$#'
 			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/InstallBundle/Controller/InstallController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\InstallBundle\\Controller\\InstallController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/InstallBundle/Controller/InstallController.php
 
@@ -18874,15 +17632,6 @@ parameters:
 			path: app/bundles/InstallBundle/InstallFixtures/ORM/RoleData.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/InstallBundle/Tests/Controller/InstallControllerTest.php
-
-		-
 			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface\:\:getApiKey\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -18929,18 +17678,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth1aTwoLegged/HttpFactory.php
-
-		-
-			message: '#^Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\AbstractClientFactory\:\:buildClient\(\) expects Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\CredentialsInterface, Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/AbstractClientFactory.php
-
-		-
-			message: '#^Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\AbstractClientFactory\:\:credentialsAreConfigured\(\) expects Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\CredentialsInterface, Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/AbstractClientFactory.php
 
 		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\HttpFactory\:\:getReAuthConfig\(\) return type has no value type specified in iterable type array\.$#'
@@ -19019,12 +17756,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/IntegrationsBundle/Auth/Support/Oauth2/Token/TokenFactoryInterface.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\:\:onPluginUpdate\(\) has parameter \$metadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Bundle/AbstractPluginBundle.php
 
 		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Controller\\AuthController\:\:callbackAction\(\) has no return type specified\.$#'
@@ -19523,12 +18254,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/IntegrationsBundle/Helper/TokenParser.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Integration\\BasicIntegration\:\:getSupportedFeatures\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Integration/BasicIntegration.php
 
 		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormFeaturesInterface\:\:getSupportedFeatures\(\) return type has no value type specified in iterable type array\.$#'
@@ -20407,18 +19132,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Tests/Unit/Entity/ObjectMappingRepositoryTest.php
 
 		-
-			message: '#^Trying to mock an undefined method setFirstResult\(\) on class Doctrine\\ORM\\AbstractQuery\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Entity/ObjectMappingRepositoryTest.php
-
-		-
-			message: '#^Trying to mock an undefined method setMaxResults\(\) on class Doctrine\\ORM\\AbstractQuery\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Entity/ObjectMappingRepositoryTest.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\EventListener\\LeadSubscriberTest\:\:handleRecordFieldChanges\(\) has parameter \$fieldChanges with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -20533,15 +19246,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:checkAllAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -20596,15 +19300,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\FieldApiController\:\:getWhereFromRequest\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -20625,15 +19320,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\FieldApiController\:\:saveEntity\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\FieldApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
 
@@ -20920,15 +19606,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:\$dncChannels has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -20979,15 +19656,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\ListApiController\:\:checkLeadAccess\(\) has parameter \$leadId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\ListApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
 
@@ -21050,24 +19718,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\NoteApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\Api\\TagApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/TagApiController.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\AuditlogController\:\:batchExportAction\(\) has parameter \$leadId with no type specified\.$#'
@@ -21254,15 +19904,6 @@ parameters:
 			identifier: throws.notThrowable
 			count: 1
 			path: app/bundles/LeadBundle/Controller/AuditlogController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\BatchSegmentController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/BatchSegmentController.php
 
 		-
 			message: '#^Cannot call method getId\(\) on null\.$#'
@@ -21463,12 +20104,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/FieldController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\FieldController\:\:cloneAction\(\) should return Symfony\\Component\\HttpFoundation\\RedirectResponse but returns array\|Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Controller/FieldController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\FieldController\:\:deleteAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -21570,15 +20205,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:viewAction\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ImportController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\LeadBundle\\Controller\\ImportController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/LeadBundle/Controller/ImportController.php
 
@@ -22044,18 +20670,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ListController\:\:viewAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ListController.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ListController.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: app/bundles/LeadBundle/Controller/ListController.php
 
@@ -23941,15 +22555,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
 
 		-
-			message: '''
-				#^Call to deprecated method normalizeType\(\) of class Mautic\\LeadBundle\\Entity\\LeadListRepository\:
-				These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary\. To be removed in next Mautic version\.$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadListRepository\:\:addCatchAllWhereClause\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -24094,12 +22699,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$user with type bool is incompatible with native type Mautic\\UserBundle\\Entity\\User\|null\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
-
-		-
 			message: '#^Parameter \#2 \$y of method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:in\(\) expects array\<string\>\|string, array\<int\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -24172,15 +22771,6 @@ parameters:
 			message: '''
 				#^Call to deprecated method getFilterExpressionFunctions\(\) of class Mautic\\LeadBundle\\Entity\\LeadRepository\:
 				to be removed in Mautic 3\. Use FilterOperatorProvider\:\:getAllOperators\(\) instead\.$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: '''
-				#^Call to deprecated method normalizeType\(\) of class Mautic\\LeadBundle\\Entity\\LeadRepository\:
-				These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary\. To be removed in next Mautic version\.$#
 			'''
 			identifier: method.deprecated
 			count: 1
@@ -25904,15 +24494,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/TypeOperatorSubscriber.php
 
 		-
-			message: '''
-				#^Call to deprecated method normalizeType\(\) of class Mautic\\LeadBundle\\EventListener\\TypeOperatorSubscriber\:
-				These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary\. To be removed in next Mautic version\.$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/TypeOperatorSubscriber.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Field\\DTO\\CustomFieldObject\:\:\$objects type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -26268,24 +24849,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Helper/LeadChangeEventDispatcher.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Helper\\PointEventHelper\:\:changeLists\(\) has parameter \$event with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Helper/PointEventHelper.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Helper\\PointEventHelper\:\:changeLists\(\) has parameter \$factory with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Helper/PointEventHelper.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Helper\\PointEventHelper\:\:changeLists\(\) has parameter \$lead with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Helper/PointEventHelper.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Helper\\PrimaryCompanyHelper\:\:getProfileFieldsWithPrimaryCompany\(\) return type has no value type specified in iterable type array\.$#'
@@ -26741,24 +25304,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/FieldModel.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\FieldModel\:\:getSchemaDefinition\(\) has parameter \$alias with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Model/FieldModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\FieldModel\:\:getSchemaDefinition\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Model/FieldModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\FieldModel\:\:getSchemaDefinition\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Model/FieldModel.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\FieldModel\:\:reorderFieldsByEntity\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -26897,15 +25442,6 @@ parameters:
 			'''
 			identifier: method.deprecated
 			count: 2
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
-			message: '''
-				#^Call to deprecated method normalizeType\(\) of class Mautic\\LeadBundle\\Model\\LeadModel\:
-				These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary\. To be removed in next Mautic version\.$#
-			'''
-			identifier: method.deprecated
-			count: 1
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
@@ -27338,15 +25874,6 @@ parameters:
 			message: '''
 				#^Call to deprecated method getFilterExpressionFunctions\(\) of class Mautic\\LeadBundle\\Model\\ListModel\:
 				to be removed in Mautic 3\. Use FilterOperatorProvider\:\:getAllOperators\(\) instead\.$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: '''
-				#^Call to deprecated method normalizeType\(\) of class Mautic\\LeadBundle\\Model\\ListModel\:
-				These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary\. To be removed in next Mautic version\.$#
 			'''
 			identifier: method.deprecated
 			count: 1
@@ -28481,15 +27008,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerTest.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerTest\:\:getResultFromProtectedMethod\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -28628,18 +27146,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Entity/LeadFieldRepositoryTest.php
 
 		-
-			message: '#^Trying to mock an undefined method setFirstResult\(\) on class Doctrine\\ORM\\AbstractQuery\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadFieldRepositoryTest.php
-
-		-
-			message: '#^Trying to mock an undefined method setMaxResults\(\) on class Doctrine\\ORM\\AbstractQuery\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadFieldRepositoryTest.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:setIsGlobalDataProvider\(\) return type has no value type specified in iterable type iterable\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -28766,15 +27272,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberTest.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/OwnerSubscriberTest.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Tests\\EventListener\\OwnerSubscriberTest\:\:getMockMailer\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -28783,15 +27280,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\OwnerSubscriberTest\:\:\$contacts has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/OwnerSubscriberTest.php
-
-		-
-			message: '''
-				#^Return type of method Mautic\\LeadBundle\\Tests\\EventListener\\OwnerSubscriberTest\:\:getMockFactory\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: return.deprecatedClass
 			count: 1
 			path: app/bundles/LeadBundle/Tests/EventListener/OwnerSubscriberTest.php
 
@@ -28959,18 +27447,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Tests/Segment/ContactSegmentFilterCrateTest.php
-
-		-
-			message: '#^Trying to mock an undefined method getRelationJoinTable\(\) on class Mautic\\LeadBundle\\Segment\\Decorator\\FilterDecoratorInterface\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/ContactSegmentFilterTest.php
-
-		-
-			message: '#^Trying to mock an undefined method getRelationJoinTableField\(\) on class Mautic\\LeadBundle\\Segment\\Decorator\\FilterDecoratorInterface\.$#'
-			identifier: phpunit.mockMethod
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/ContactSegmentFilterTest.php
 
 		-
 			message: '#^Parameter \#1 \$filterName of method Mautic\\LeadBundle\\Tests\\Segment\\Decorator\\Date\\DateOptionFactoryTest\:\:getFilterDecorator\(\) expects string, null given\.$#'
@@ -29171,60 +27647,6 @@ parameters:
 			path: app/bundles/MarketplaceBundle/Collection/VersionCollection.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\MarketplaceBundle\\Controller\\AjaxController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Controller/AjaxController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\MarketplaceBundle\\Controller\\CacheController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Controller/CacheController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\MarketplaceBundle\\Controller\\Package\\DetailController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Controller/Package/DetailController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\MarketplaceBundle\\Controller\\Package\\InstallController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Controller/Package/InstallController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\MarketplaceBundle\\Controller\\Package\\ListController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Controller/Package/ListController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\MarketplaceBundle\\Controller\\Package\\RemoveController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Controller/Package/RemoveController.php
-
-		-
 			message: '#^Method Mautic\\MarketplaceBundle\\DTO\\Maintainer\:\:fromArray\(\) has parameter \$array with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -29285,15 +27707,6 @@ parameters:
 			path: app/bundles/MarketplaceBundle/Security/Permissions/MarketplacePermissions.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/MarketplaceBundle/Tests/Functional/Controller/AjaxControllerTest.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Api\\AbstractNotificationApi\:\:convertToTrackedUrl\(\) has parameter \$clickthrough with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -29346,15 +27759,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/NotificationBundle/Api/OneSignalApi.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/Api/NotificationApiController.php
 
 		-
 			message: '''
@@ -29426,12 +27830,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
-
-		-
 			message: '#^Parameter \#1 \$unit of method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getHitsLineChartData\(\) expects Mautic\\NotificationBundle\\Model\\char, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -29498,22 +27896,10 @@ parameters:
 			path: app/bundles/NotificationBundle/Controller/NotificationController.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/NotificationController.php
-
-		-
 			message: '#^Parameter \#1 \$unit of method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getHitsLineChartData\(\) expects Mautic\\NotificationBundle\\Model\\char, null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/NotificationBundle/Controller/NotificationController.php
-
-		-
-			message: '#^Cannot cast Symfony\\Component\\Validator\\ConstraintViolationListInterface to string\.$#'
-			identifier: cast.string
-			count: 1
-			path: app/bundles/NotificationBundle/Entity/Notification.php
 
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:getMobileSettings\(\) return type has no value type specified in iterable type array\.$#'
@@ -29771,12 +28157,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Method Mautic\\NotificationBundle\\Event\\NotificationClickEvent\:\:__construct\(\) has parameter \$request with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Event/NotificationClickEvent.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Event\\NotificationSendEvent\:\:__construct\(\) has parameter \$heading with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -29981,15 +28361,6 @@ parameters:
 			path: app/bundles/PageBundle/Controller/AjaxController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PageBundle\\Controller\\Api\\PageApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PageBundle/Controller/Api/PageApiController.php
-
-		-
 			message: '#^Cannot use array destructuring on array\|Doctrine\\Common\\Collections\\ArrayCollection\.$#'
 			identifier: offsetAccess.nonArray
 			count: 1
@@ -30005,26 +28376,8 @@ parameters:
 			path: app/bundles/PageBundle/Controller/PageController.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Controller\\PageController\:\:buildSlotForms\(\) has parameter \$slotTypes with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Controller\\PageController\:\:buildSlotForms\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Controller\\PageController\:\:deleteAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Controller\\PageController\:\:processSlots\(\) has parameter \$slots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PageBundle/Controller/PageController.php
 
@@ -30045,27 +28398,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
-			message: '''
-				#^Call to deprecated method processSlots\(\) of class Mautic\\PageBundle\\Controller\\PublicController\:
-				\- to be removed in 3\.0$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/bundles/PageBundle/Controller/PublicController.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Controller\\PublicController\:\:indexAction\(\) has parameter \$slug with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Controller/PublicController.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Controller\\PublicController\:\:processSlots\(\) has parameter \$slots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Controller/PublicController.php
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Controller\\PublicController\:\:redirectAction\(\) has parameter \$redirectId with no type specified\.$#'
@@ -30305,12 +28637,6 @@ parameters:
 			path: app/bundles/PageBundle/Entity/Page.php
 
 		-
-			message: '#^Cannot cast Symfony\\Component\\Validator\\ConstraintViolationListInterface to string\.$#'
-			identifier: cast.string
-			count: 1
-			path: app/bundles/PageBundle/Entity/Page.php
-
-		-
 			message: '#^Cannot use array destructuring on array\|Doctrine\\Common\\Collections\\ArrayCollection\.$#'
 			identifier: offsetAccess.nonArray
 			count: 1
@@ -30525,18 +28851,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/PageBundle/Entity/PageRepository.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Entity\\Redirect\:\:setHits\(\) should return Mautic\\PageBundle\\Entity\\Page but returns \$this\(Mautic\\PageBundle\\Entity\\Redirect\)\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/PageBundle/Entity/Redirect.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Entity\\Redirect\:\:setUniqueHits\(\) should return Mautic\\PageBundle\\Entity\\Page but returns \$this\(Mautic\\PageBundle\\Entity\\Redirect\)\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/PageBundle/Entity/Redirect.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
@@ -30854,12 +29168,6 @@ parameters:
 			path: app/bundles/PageBundle/Event/VideoHitEvent.php
 
 		-
-			message: '#^Call to an undefined method DOMNode\:\:getAttribute\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\EventListener\\BuilderSubscriber\:\:renderCategoryList\(\) has parameter \$params with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -31051,24 +29359,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PageBundle\\Helper\\PointActionHelper\:\:validateUrlHit\(\) has parameter \$eventDetails with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Helper/PointActionHelper.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PageBundle\\Helper\\PointActionHelper\:\:validatePageHit\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PageBundle/Helper/PointActionHelper.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PageBundle\\Helper\\PointActionHelper\:\:validateUrlHit\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/PageBundle/Helper/PointActionHelper.php
 
@@ -31727,15 +30017,6 @@ parameters:
 			path: app/bundles/PageBundle/Tests/Controller/PageControllerTest.php
 
 		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 5
-			path: app/bundles/PageBundle/Tests/Controller/PublicControllerTest.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Tests\\Controller\\PublicControllerTest\:\:getVariantContent\(\) has parameter \$aCount with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -31854,90 +30135,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/PageBundle/Tests/PageTestAbstract.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:dropPluginSchema\(\) has parameter \$metadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:installPluginSchema\(\) has parameter \$installedSchema with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:installPluginSchema\(\) has parameter \$metadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:onPluginInstall\(\) has parameter \$installedSchema with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:onPluginInstall\(\) has parameter \$metadata with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:onPluginUninstall\(\) has parameter \$metadata with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:onPluginUpdate\(\) has parameter \$metadata with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:updatePluginSchema\(\) has parameter \$metadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:dropPluginSchema\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:installPluginSchema\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:onPluginUninstall\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Bundle\\PluginBundleBase\:\:updatePluginSchema\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PluginBundle/Bundle/PluginBundleBase.php
 
 		-
 			message: '''
@@ -32879,12 +31076,6 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:installPlugins\(\) has parameter \$pluginMetadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:installPlugins\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -32903,35 +31094,8 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:updatePlugins\(\) has parameter \$installedPlugins with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:updatePlugins\(\) has parameter \$installedPluginsSchemas with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:updatePlugins\(\) has parameter \$pluginMetadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:updatePlugins\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Helper\\ReloadHelper\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/PluginBundle/Helper/ReloadHelper.php
 
@@ -33827,26 +31991,8 @@ parameters:
 			path: app/bundles/PluginBundle/Model/PluginModel.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\PluginModel\:\:getInstalledPluginTables\(\) has parameter \$pluginsMetadata with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Model/PluginModel.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\PluginModel\:\:getInstalledPluginTables\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Model/PluginModel.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\PluginModel\:\:getIntegrationEntityRepository\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/PluginModel.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\PluginModel\:\:getPluginsMetadata\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PluginBundle/Model/PluginModel.php
 
@@ -33929,36 +32075,9 @@ parameters:
 			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Tests\\Helper\\PluginBundleBaseStub\:\:onPluginInstall\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Tests\\Helper\\PluginBundleBaseStub\:\:onPluginUpdate\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
-
-		-
 			message: '#^Call to an undefined method Mautic\\PluginBundle\\Entity\\Plugin\:\:isMissing\(\)\.$#'
 			identifier: method.notFound
 			count: 2
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
 			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
 
 		-
@@ -34082,15 +32201,6 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PointBundle\\Controller\\Api\\PointApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:createTriggerEventEntityForm\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -34133,15 +32243,6 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Controller\\PointController\:\:cloneAction\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -34159,12 +32260,6 @@ parameters:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
 			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: app/bundles/PointBundle/Controller/TriggerController.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
 			count: 1
 			path: app/bundles/PointBundle/Controller/TriggerController.php
 
@@ -34544,15 +32639,6 @@ parameters:
 			path: app/bundles/PointBundle/Helper/EventHelper.php
 
 		-
-			message: '''
-				#^Access to deprecated property \$mauticFactory of class Mautic\\PointBundle\\Model\\PointModel\:
-				https\://github\.com/mautic/mautic/issues/8229$#
-			'''
-			identifier: property.deprecated
-			count: 1
-			path: app/bundles/PointBundle/Model/PointModel.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Model\\PointModel\:\:createForm\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -34583,15 +32669,6 @@ parameters:
 			path: app/bundles/PointBundle/Model/PointModel.php
 
 		-
-			message: '''
-				#^Parameter \$mauticFactory of method Mautic\\PointBundle\\Model\\PointModel\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PointBundle/Model/PointModel.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Model\\TriggerEventModel\:\:createForm\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -34602,15 +32679,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PointBundle/Model/TriggerEventModel.php
-
-		-
-			message: '''
-				#^Access to deprecated property \$mauticFactory of class Mautic\\PointBundle\\Model\\TriggerModel\:
-				https\://github\.com/mautic/mautic/issues/8229$#
-			'''
-			identifier: property.deprecated
-			count: 1
-			path: app/bundles/PointBundle/Model/TriggerModel.php
 
 		-
 			message: '#^Method Mautic\\PointBundle\\Model\\TriggerModel\:\:createForm\(\) has parameter \$options with no value type specified in iterable type array\.$#'
@@ -34655,15 +32723,6 @@ parameters:
 			path: app/bundles/PointBundle/Model/TriggerModel.php
 
 		-
-			message: '''
-				#^Parameter \$mauticFactory of method Mautic\\PointBundle\\Model\\TriggerModel\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/PointBundle/Model/TriggerModel.php
-
-		-
 			message: '#^Property Mautic\\PointBundle\\Model\\TriggerModel\:\:\$triggers has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -34686,15 +32745,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PointBundle/Security/Permissions/PointPermissions.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/PointBundle/Tests/Unit/Model/TriggerModelTest.php
 
 		-
 			message: '#^Constant Mautic\\ReportBundle\\Builder\\MauticReportBuilder\:\:OPERATORS type has no value type specified in iterable type array\.$#'
@@ -34741,15 +32791,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\ReportBundle\\Controller\\Api\\ReportApiController\:\:getOptionsFromRequest\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ReportBundle/Controller/Api/ReportApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\ReportBundle\\Controller\\Api\\ReportApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/ReportBundle/Controller/Api/ReportApiController.php
 
@@ -35570,46 +33611,10 @@ parameters:
 			path: app/bundles/ReportBundle/Security/Permissions/ReportPermissions.php
 
 		-
-			message: '''
-				#^Call to deprecated method fileCouldBeSend\(\) of class Mautic\\ReportBundle\\Scheduler\\Model\\MessageSchedule\:
-				2\.16\.0 use \\Mautic\\ReportBundle\\Scheduler\\Model\\FileHandler\:\:fileCanBeAttached instead\. To be removed in 3\.0\.0\.$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/bundles/ReportBundle/Tests/Scheduler/Model/MessageScheduleTest.php
-
-		-
-			message: '''
-				#^Call to deprecated method getMessage\(\) of class Mautic\\ReportBundle\\Scheduler\\Model\\MessageSchedule\:
-				2\.15\.2 to be removed in 3\.0\. Use getMessageForAttachedFile or getMessageForLinkedFile$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/bundles/ReportBundle/Tests/Scheduler/Model/MessageScheduleTest.php
-
-		-
-			message: '#^Method Mautic\\ReportBundle\\Tests\\Scheduler\\Model\\MessageScheduleTest\:\:doSendFileProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/ReportBundle/Tests/Scheduler/Model/MessageScheduleTest.php
-
-		-
-			message: '#^Method Mautic\\ReportBundle\\Tests\\Scheduler\\Model\\MessageScheduleTest\:\:sendFileProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/ReportBundle/Tests/Scheduler/Model/MessageScheduleTest.php
-
-		-
 			message: '#^Parameter \#1 \$reportId of class Mautic\\ReportBundle\\Scheduler\\Option\\ExportOption constructor expects int\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/ReportBundle/Tests/Scheduler/Option/ExportOptionTest.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Api\\AbstractSmsApi\:\:convertToTrackedUrl\(\) has parameter \$clickthrough with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/SmsBundle/Api/AbstractSmsApi.php
 
 		-
 			message: '#^PHPDoc tag @throws with type Mautic\\CampaignBundle\\Executioner\\Exception\\NoContactsFoundException\|Mautic\\SmsBundle\\Broadcast\\LimitQuotaException is not subtype of Throwable$#'
@@ -35634,15 +33639,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/Callback/HandlerContainer.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\SmsBundle\\Api\\TwilioApi\:
-				Use \\Mautic\\SmsBundle\\Integration\\Twilio\\TwilioTransport instead$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/SmsBundle/Config/config.php
 
 		-
 			message: '''
@@ -35704,15 +33700,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\SmsBundle\\Controller\\Api\\SmsApiController\:\:sendAction\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\SmsBundle\\Controller\\Api\\SmsApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
 
@@ -35792,12 +33779,6 @@ parameters:
 			path: app/bundles/SmsBundle/Controller/SmsController.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/SmsBundle/Controller/SmsController.php
-
-		-
 			message: '#^Parameter \#1 \$unit of method Mautic\\SmsBundle\\Model\\SmsModel\:\:getHitsLineChartData\(\) expects Mautic\\SmsBundle\\Model\\char, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -35840,12 +33821,6 @@ parameters:
 			path: app/bundles/SmsBundle/Entity/Sms.php
 
 		-
-			message: '#^Call to deprecated method iterate\(\) of class Doctrine\\ORM\\Query\.$#'
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/SmsBundle/Entity/SmsRepository.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\SmsRepository\:\:addSearchCommandWhereClause\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -35866,12 +33841,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\SmsRepository\:\:upCount\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Entity/SmsRepository.php
-
-		-
-			message: '#^Return type of method Mautic\\SmsBundle\\Entity\\SmsRepository\:\:getPublishedBroadcasts\(\) has typehint with deprecated class Doctrine\\ORM\\Internal\\Hydration\\IterableResult\.$#'
-			identifier: return.deprecatedClass
 			count: 1
 			path: app/bundles/SmsBundle/Entity/SmsRepository.php
 
@@ -36419,15 +34388,6 @@ parameters:
 			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\StageBundle\\Controller\\Api\\StageApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
-
-		-
 			message: '#^Method Mautic\\StageBundle\\Controller\\StageController\:\:cloneAction\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -36911,15 +34871,6 @@ parameters:
 			path: app/bundles/UserBundle/Controller/Api/RoleApiController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\UserBundle\\Controller\\Api\\RoleApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/RoleApiController.php
-
-		-
 			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:preSaveEntity\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -36940,15 +34891,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
 
@@ -36994,15 +34936,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\UserBundle\\Controller\\SecurityController\:\:ssoLoginCheckAction\(\) has parameter \$integration with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/SecurityController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\UserBundle\\Controller\\SecurityController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/UserBundle/Controller/SecurityController.php
 
@@ -37479,15 +35412,6 @@ parameters:
 
 		-
 			message: '''
-				#^Parameter \$factory of method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
-
-		-
-			message: '''
 				#^Call to deprecated method setStandardParameters\(\) of class Mautic\\CoreBundle\\Controller\\FormController\:
 				2\.3 \- to be removed in 3\.0; extend AbstractStandardFormController instead$#
 			'''
@@ -37598,15 +35522,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Controller/WebhookController.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\WebhookBundle\\Controller\\WebhookController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/WebhookController.php
-
-		-
 			message: '#^Method Mautic\\WebhookBundle\\Entity\\Event\:\:setEventType\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -37681,12 +35596,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\WebhookBundle\\Entity\\WebhookQueueRepository\:\:deleteQueuesById\(\) has parameter \$idList with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/WebhookBundle/Entity/WebhookQueueRepository.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Entity\\WebhookQueueRepository\:\:getQueueCountByWebhookId\(\) has parameter \$id with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/WebhookBundle/Entity/WebhookQueueRepository.php
 
@@ -38005,18 +35914,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Controller\\GrapesJsController\:\:checkForMjmlTemplate\(\) has parameter \$template with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
-
-		-
-			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Controller\\GrapesJsController\:\:processEmailSlots\(\) has parameter \$slots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
-
-		-
-			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Controller\\GrapesJsController\:\:processPageSlots\(\) has parameter \$slots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
 
@@ -39700,18 +37597,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getFormFieldsByObject\(\) has parameter \$settings with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getLeadData\(\) has parameter \$leadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getLeadData\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
@@ -42413,24 +40298,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\MauticCrmBundle\:\:getMetadata\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/MauticCrmBundle.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\MauticCrmBundle\:\:onPluginInstall\(\) has parameter \$installedSchema with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/MauticCrmBundle.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\MauticCrmBundle\:\:onPluginInstall\(\) has parameter \$metadata with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/MauticCrmBundle.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Services\\Transport\:\:delete\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -43186,15 +41053,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFocusBundle\\Controller\\Api\\FocusApiController\:\:generateJsAction\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFocusBundle/Controller/Api/FocusApiController.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method MauticPlugin\\MauticFocusBundle\\Controller\\Api\\FocusApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: plugins/MauticFocusBundle/Controller/Api/FocusApiController.php
 
@@ -44210,15 +42068,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Command/MonitorTwitterMentionsCommand.php
 
 		-
-			message: '''
-				#^Parameter \$factory of method MauticPlugin\\MauticSocialBundle\\Controller\\Api\\TweetApiController\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/Api/TweetApiController.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\JsController\:\:generateAction\(\) has parameter \$formName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -44290,12 +42139,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:viewAction\(\) has invalid return type MauticPlugin\\MauticSocialBundle\\Controller\\JsonResponse\.$#'
 			identifier: class.notFound
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$routeParameters with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 

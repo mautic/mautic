@@ -81,7 +81,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $lead->getPoints());
     }
 
-    private function createReadEmailAction(int $delta, Group $group = null): Point
+    private function createReadEmailAction(int $delta, ?Group $group = null): Point
     {
         $pointAction = new Point();
         $pointAction->setName('Read email action');

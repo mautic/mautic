@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
@@ -47,7 +48,10 @@ class CustomFieldColumn
             $columnExists = $leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew());
 
             if ($columnExists && $this->customFieldIndex->isUpdatePending($leadField)) {
-                $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                try {
+                    $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                } catch (NoListenerException) {
+                }
                 $this->processUpdateLeadColumn($leadField);
             }
 
@@ -138,5 +142,77 @@ class CustomFieldColumn
         }
 
         $this->customFieldIndex->updateUniqueIdentifierIndex($leadField);
+    }
+
+    /**
+     * @throws SchemaException
+     * @throws \OutOfRangeException
+     */
+    public function updateLeadColumn(LeadField $leadField): void
+    {
+        try {
+            $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+        } catch (NoListenerException) {
+        } catch (AbortColumnUpdateException) { // if processing in background
+            return;
+        }
+
+        $this->processUpdateLeadColumn($leadField);
+
+        $this->processUpdateLeadColumnLength($leadField);
+    }
+
+    /**
+     * @throws SchemaException
+     * @throws \OutOfRangeException
+     */
+    public function processUpdateLeadColumnLength(LeadField $leadField): void
+    {
+        $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
+
+        $leadsSchema->updateColumnLength($leadField->getAlias(), $leadField->getCharLengthLimit());
+
+        $leadsSchema->executeChanges();
+    }
+
+    /**
+     * Register a lead field to be deleted.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function deleteLeadColumn(LeadField $leadField): void
+    {
+        try {
+            $this->fieldColumnDispatcher->dispatchPreDeleteColumnEvent($leadField);
+        } catch (NoListenerException) {
+        } catch (AbortColumnUpdateException) { // if processing in background
+            return;
+        }
+
+        $this->processDeleteLeadColumn($leadField);
+    }
+
+    /**
+     * Deletes the field column in the leads table.
+     *
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
+     */
+    public function processDeleteLeadColumn(LeadField $leadField): void
+    {
+        $leadField->deletedId = $leadField->getId();
+        switch ($leadField->getObject()) {
+            case 'lead':
+                $this->columnSchemaHelper->setName('leads')->dropColumn($leadField->getAlias())->executeChanges();
+                break;
+            case 'company':
+                $this->columnSchemaHelper->setName('companies')->dropColumn($leadField->getAlias())->executeChanges();
+                break;
+        }
+
+        $this->columnSchemaHelper->dropColumn($leadField->getCustomFieldObject());
     }
 }

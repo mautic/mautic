@@ -67,6 +67,7 @@ class ListModelTest extends TestCase
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
         $requestStackMock                      = $this->createMock(RequestStack::class);
         $categoryModelMock                     = $this->createMock(CategoryModel::class);
+        $doNotContactRepositoryMock            = $this->createMock(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
 
         $this->model = new ListModel(
             $categoryModelMock,
@@ -75,6 +76,7 @@ class ListModelTest extends TestCase
             $segmentChartQueryFactoryMock,
             $requestStackMock,
             $this->segmentCountCacheHelper,
+            $doNotContactRepositoryMock,
             $entityManagerMock,
             $this->createMock(CorePermissions::class),
             $eventDispatcherInterfaceMock,
@@ -86,10 +88,9 @@ class ListModelTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceTypeTestDataProvider
-     *
      * @param string|null $sourceType
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('sourceTypeTestDataProvider')]
     public function testGetSourceLists(array $getLookupResultsReturn, $sourceType, array $expected): void
     {
         $this->prepareMockForTestGetSourcesLists($getLookupResultsReturn);
@@ -106,6 +107,7 @@ class ListModelTest extends TestCase
         $categoryModel            = $this->createMock(CategoryModel::class);
         $categoryModel->expects($this->once())->method('getLookupResults')->willReturn($getLookupResultsReturn);
         $segmentCountCacheHelperMock = $this->createMock(SegmentCountCacheHelper::class);
+        $doNotContactRepositoryMock  = $this->createMock(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
 
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->setConstructorArgs([
@@ -115,6 +117,7 @@ class ListModelTest extends TestCase
                 $segmentChartQueryFactory,
                 $requestStack,
                 $segmentCountCacheHelperMock,
+                $doNotContactRepositoryMock,
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),
                 $this->createMock(EventDispatcherInterface::class),
@@ -122,7 +125,7 @@ class ListModelTest extends TestCase
                 $this->createMock(Translator::class),
                 $this->createMock(UserHelper::class),
                 $this->createMock(LoggerInterface::class)])
-            ->addMethods([])
+            ->onlyMethods([])
             ->getMock();
 
         $this->fixture = $mockListModel;
@@ -323,6 +326,34 @@ class ListModelTest extends TestCase
         $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
         self::assertSame([$segmentId => $leadCount], $leadCounts);
+    }
+
+    public function testGetActiveSegmentContactCount(): void
+    {
+        $segmentId = 123;
+        $total     = 10;
+        $dnc       = 3;
+
+        $this->leadListRepositoryMock
+            ->expects(self::once())
+            ->method('getLeadCount')
+            ->with($segmentId)
+            ->willReturn($total);
+
+        $doNotContactRepository = $this->createMock(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
+        $doNotContactRepository
+            ->expects(self::once())
+            ->method('getCount')
+            ->with(null, null, null, $segmentId)
+            ->willReturn($dnc);
+
+        $reflection = new \ReflectionClass($this->model);
+        $property   = $reflection->getProperty('doNotContactRepository');
+        $property->setAccessible(true);
+        $property->setValue($this->model, $doNotContactRepository);
+
+        $active = $this->model->getActiveSegmentContactCount($segmentId);
+        self::assertSame($total - $dnc, $active);
     }
 
     public function testLeadListExists(): void

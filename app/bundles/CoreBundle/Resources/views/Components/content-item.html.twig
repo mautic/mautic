@@ -1,0 +1,41 @@
+{% set common_header_content %}
+    <div class="content-item__header fw-b type-heading-02 mb-xs">{{ heading|trans }}</div>
+    <div class="content-item__copy type-body-compact-02 {% if cta is defined and cta %} mb-md{% endif %}">{{ copy|trans }}</div>
+    {% if cta is defined and cta %}
+        {% set cta = cta|merge({'variant': 'link', 'icon': 'ri-arrow-right-line', 'href': cta.link}) %}
+        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
+    {% endif %}
+{% endset %}
+
+{# === IMAGE TYPE === #}
+{% if type == 'image' %}
+    <div class="d-flex fd-column row-gap-xs mb-32">
+        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-xs fs-0">
+        <div>{{ common_header_content }}</div>
+    </div>
+
+{# === LOGO TYPE === #}
+{% elseif type == 'logo' %}
+    <div class="mb-32">
+        <img src="{{ asset(logo.src) }}" alt="{{ logo.alt|trans }}" title="{{ logo.alt|trans }}" class="mb-32" style="height: 30px; width: fit-content;">
+        {{ common_header_content }}
+    </div>
+
+{# === PICTOGRAM TYPE === #}
+{% elseif type == 'pictogram' %}
+    <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}fd-row-sm column-gap-lg {% endif %}fd-column row-gap-xs mb-32">
+        {% include '@MauticCore/Components/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
+        <div>{{ common_header_content }}</div>
+    </div>
+
+{# === STATISTIC TYPE === #}
+{% elseif type == 'statistic' %}
+    <div class="mb-32">
+        <div class="content-item__statistic type-fluid-display-03 mb-xs">{{ statistic }}</div>
+        {{ common_header_content }}
+    </div>
+
+{# === TEXT TYPE === #}
+{% elseif type == 'text' %}
+    <div class="mb-32">{{ common_header_content }}</div>
+{% endif %}

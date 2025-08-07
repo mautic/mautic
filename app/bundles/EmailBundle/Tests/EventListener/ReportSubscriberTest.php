@@ -238,13 +238,18 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
             ->willReturn(['mautic.email.graph.pie.read.ingored.unsubscribed.bounced']);
+        $matcher = $this->any();
 
-        $eventMock->method('checkContext')
-            ->withConsecutive(
-                [['email.stats', 'emails']],
-                ['emails']
-            )
-            ->willReturn(true);
+        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->numberOfInvocations()) {
+                $this->assertSame(['email.stats', 'emails'], $parameters[0]);
+            }
+            if (2 === $matcher->numberOfInvocations()) {
+                $this->assertSame('emails', $parameters[0]);
+            }
+
+            return true;
+        });
 
         $eventMock->expects($this->once())
             ->method('getQueryBuilder')
@@ -285,14 +290,19 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventMock         = $this->createMock(ReportGraphEvent::class);
         $chartQueryMock    = $this->createMock(ChartQuery::class);
         $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $matcher           = $this->any();
 
-        $eventMock
-            ->method('checkContext')
-            ->withConsecutive(
-                [['email.stats', 'emails']],
-                ['emails']
-            )
-            ->willReturn(true);
+        $eventMock->expects($matcher)
+            ->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(['email.stats', 'emails'], $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('emails', $parameters[0]);
+                }
+
+                return true;
+            });
 
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
@@ -339,13 +349,20 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
             ->willReturn(['mautic.email.table.most.emails.failed']);
+        $matcher = $this->any();
 
-        $eventMock->method('checkContext')
-            ->withConsecutive(
-                [['email.stats', 'emails']],
-                ['emails']
-            )
-            ->willReturnOnConsecutiveCalls(true, false);
+        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->numberOfInvocations()) {
+                $this->assertSame(['email.stats', 'emails'], $parameters[0]);
+
+                return true;
+            }
+            if (2 === $matcher->numberOfInvocations()) {
+                $this->assertSame('emails', $parameters[0]);
+
+                return false;
+            }
+        });
 
         $eventMock->expects($this->once())
             ->method('getQueryBuilder')

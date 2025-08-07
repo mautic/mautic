@@ -553,10 +553,9 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider leadFieldOrderChoiceListProvider
-     *
      * @param string[] $expectedOptions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('leadFieldOrderChoiceListProvider')]
     public function testUpdateLeadFieldOrderChoiceListAction(string $object, string $group, array $expectedOptions): void
     {
         $payload = [
@@ -599,7 +598,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function leadFieldOrderChoiceListProvider(): \Generator
+    public static function leadFieldOrderChoiceListProvider(): \Generator
     {
         yield ['lead', 'core', ['Fax', 'Website']];
         yield ['lead', 'social', ['Facebook', 'Foursquare', 'Instagram']];

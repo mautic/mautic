@@ -31,10 +31,6 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         '*/Test/*',
         '*/Tests/*',
-        '*.html.php',
-
-        // Remove in M6 once the class is removed.
-        __DIR__.'/app/bundles/CoreBundle/Helper/UTF8Helper.php',
 
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update

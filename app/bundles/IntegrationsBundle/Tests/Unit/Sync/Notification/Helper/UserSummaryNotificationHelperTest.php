@@ -63,30 +63,45 @@ class UserSummaryNotificationHelperTest extends TestCase
     {
         $this->helper->storeSummaryNotification('Foo', 'Bar', 1);
         $this->helper->storeSummaryNotification('Bar', 'Foo', 2);
+        $matcher = $this->exactly(2);
 
-        $this->ownerProvider->expects($this->exactly(2))
-            ->method('getOwnersForObjectIds')
-            ->withConsecutive(
-                [Contact::NAME, [1 => 1]],
-                [Contact::NAME, [2 => 2]]
-            )
-            ->willReturnOnConsecutiveCalls(
-                [['owner_id' => 1, 'id' => 1]],
-                [['owner_id' => 2, 'id' => 2]]
-            );
+        $this->ownerProvider->expects($matcher)
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(Contact::NAME, $parameters[0]);
+                    $this->assertSame([1 => 1], $parameters[1]);
+
+                    return [['owner_id' => 1, 'id' => 1]];
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(Contact::NAME, $parameters[0]);
+                    $this->assertSame([2 => 2], $parameters[1]);
+
+                    return [['owner_id' => 2, 'id' => 2]];
+                }
+            });
 
         $this->userHelper->expects($this->never())
             ->method('getAdminUsers');
+        $matcher = $this->exactly(4);
 
-        $this->translator->expects($this->exactly(4))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.integration.sync.user_notification.header', $this->anything()],
-                ['test', $this->anything()],
-                ['mautic.integration.sync.user_notification.header', $this->anything()],
-                ['test', $this->anything()]
-            )
-            ->willReturn('test');
+        $this->translator->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('test', $parameters[0]);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
+                }
+                if (4 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('test', $parameters[0]);
+                }
+
+                return 'test';
+            });
 
         $this->writer->expects($this->exactly(2))
             ->method('writeUserNotification');
@@ -101,31 +116,46 @@ class UserSummaryNotificationHelperTest extends TestCase
     {
         $this->helper->storeSummaryNotification('Foo', 'Bar', 1);
         $this->helper->storeSummaryNotification('Bar', 'Foo', 2);
+        $matcher = $this->exactly(2);
 
-        $this->ownerProvider->expects($this->exactly(2))
-            ->method('getOwnersForObjectIds')
-            ->withConsecutive(
-                [Contact::NAME, [1 => 1]],
-                [Contact::NAME, [2 => 2]]
-            )
-            ->willReturnOnConsecutiveCalls(
-                [],
-                []
-            );
+        $this->ownerProvider->expects($matcher)
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(Contact::NAME, $parameters[0]);
+                    $this->assertSame([1 => 1], $parameters[1]);
+
+                    return [];
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(Contact::NAME, $parameters[0]);
+                    $this->assertSame([2 => 2], $parameters[1]);
+
+                    return [];
+                }
+            });
 
         $this->userHelper->expects($this->exactly(2))
             ->method('getAdminUsers')
             ->willReturn([1]);
+        $matcher = $this->exactly(4);
 
-        $this->translator->expects($this->exactly(4))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.integration.sync.user_notification.header', $this->anything()],
-                ['test', $this->anything()],
-                ['mautic.integration.sync.user_notification.header', $this->anything()],
-                ['test', $this->anything()]
-            )
-            ->willReturn('test');
+        $this->translator->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('test', $parameters[0]);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
+                }
+                if (4 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('test', $parameters[0]);
+                }
+
+                return 'test';
+            });
 
         $this->writer->expects($this->exactly(2))
             ->method('writeUserNotification');

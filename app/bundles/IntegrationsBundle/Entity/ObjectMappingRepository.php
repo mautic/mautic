@@ -100,7 +100,7 @@ class ObjectMappingRepository extends CommonRepository
      * This method allows inserting a new record when an ORM way is not possible.
      * For example, when coping with \Doctrine\DBAL\Exception\RetryableException.
      */
-    public function insert(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, int $internalObjectId, \DateTimeInterface $createdAt = null): int
+    public function insert(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, int $internalObjectId, ?\DateTimeInterface $createdAt = null): int
     {
         $createdAt = $createdAt ?: new \DateTimeImmutable();
         $qb        = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -123,7 +123,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectName', $internalObjectName)
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('date', $createdAt->format(DateTimeHelper::FORMAT_DB))
-            ->setParameter('isDeleted', [], Types::BOOLEAN)
+            ->setParameter('isDeleted', false, Types::BOOLEAN)
             ->setParameter('internalStorage', [], Types::JSON);
 
         return $qb->executeStatement();
@@ -198,7 +198,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return mixed[]|null
      */
-    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, string $lock = null): ?array
+    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, ?string $lock = null): ?array
     {
         $connection = $this->getEntityManager()->getConnection();
         $qb         = $connection->createQueryBuilder();

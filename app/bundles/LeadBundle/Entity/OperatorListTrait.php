@@ -198,7 +198,7 @@ trait OperatorListTrait
             $choices = array_diff_key($choices, array_flip($definition['exclude']));
         }
 
-        if (property_exists($this, 'translator')) {
+        if (property_exists($this, 'translator')) { // @phpstan-ignore-line based on https://github.com/phpstan/phpstan/issues/9095 (Call to function property_exists() with ...  'translator' will always evaluate to false.)
             foreach ($choices as $value => $label) {
                 $choices[$value] = $this->translator->trans($label);
             }
@@ -207,9 +207,6 @@ trait OperatorListTrait
         return array_flip($choices);
     }
 
-    /**
-     * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
-     */
     protected function normalizeType(mixed $type): mixed
     {
         if (null === $type) {

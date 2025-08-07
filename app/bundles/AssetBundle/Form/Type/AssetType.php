@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -150,6 +151,8 @@ class AssetType extends AbstractType
                 'bundle' => 'asset',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         $builder->add('language', LocaleType::class, [
             'label'      => 'mautic.core.language',
