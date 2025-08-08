@@ -11,9 +11,7 @@ class PublicControllerAnalyticsTest extends TestCase
         $content         = '<html><head></head><body>test</body></html>';
         $footerAnalytics = '<script>footer</script>';
 
-        if (!empty($footerAnalytics)) {
-            $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
-        }
+        $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
 
         $this->assertStringContainsString('<script>footer</script>', $content);
     }
