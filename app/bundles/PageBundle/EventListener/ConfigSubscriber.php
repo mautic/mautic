@@ -33,8 +33,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
             // and trackingconfig form would overwrote values in the pageconfig form. See #5559.
             'parameters' => [
-                'cat_in_page_url'      => false,
-                'google_analytics'     => false,
+                'cat_in_page_url'       => false,
+                'google_analytics'      => false,
                 'google_analytics_body' => false,
             ],
         ]);
