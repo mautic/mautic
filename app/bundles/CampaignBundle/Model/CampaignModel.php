@@ -557,9 +557,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Gets a list of published campaigns.
      *
-     * @return array
+     * @return array<int|string, int|string|object|array<int|string, mixed[]>|null>
      */
-    public function getPublishedCampaigns(bool $forList = false)
+    public function getPublishedCampaigns(bool $forList = false, string $permissionSuffix = 'viewother'): array
     {
         static $campaigns = [];
 
@@ -568,7 +568,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 null,
                 null,
                 $forList,
-                $this->security->isGranted($this->getPermissionBase().':viewother')
+                $this->security->isGranted($this->getPermissionBase().':'.$permissionSuffix)
             );
         }
 

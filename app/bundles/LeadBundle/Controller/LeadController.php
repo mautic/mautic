@@ -1356,7 +1356,7 @@ class LeadController extends FormController
         ) {
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
             $campaignModel  = $this->getModel('campaign');
-            $campaigns      = $campaignModel->getPublishedCampaigns(true);
+            $campaigns      = $campaignModel->getPublishedCampaigns(true, 'editother');
             $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
