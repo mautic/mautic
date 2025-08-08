@@ -126,6 +126,7 @@ return [
     'parameters' => [
         'cat_in_page_url'                       => false,
         'google_analytics'                      => null,
+        'google_analytics_body'                 => null,
         'track_contact_by_ip'                   => false,
         'track_by_fingerprint'                  => false,
         'google_analytics_id'                   => null,

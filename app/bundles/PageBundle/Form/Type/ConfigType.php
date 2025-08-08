@@ -41,6 +41,22 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+            'google_analytics_body',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.page.config.form.google.analytics.body',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => htmlspecialchars_decode((string) ($options['data']['google_analytics_body'] ?? '')),
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.page.config.form.google.analytics.body.tooltip',
+                    'rows'    => 10,
+                ],
+                'required' => false,
+            ]
+        );
     }
 
     public function getBlockPrefix(): string
