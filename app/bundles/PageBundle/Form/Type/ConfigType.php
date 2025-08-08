@@ -43,15 +43,15 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'google_analytics_body',
+            'footer_script',
             TextareaType::class,
             [
-                'label'      => 'mautic.page.config.form.google.analytics.body',
+                'label'      => 'mautic.page.form.footerscript',
                 'label_attr' => ['class' => 'control-label'],
-                'data'       => htmlspecialchars_decode((string) ($options['data']['google_analytics_body'] ?? '')),
+                'data'       => htmlspecialchars_decode((string) ($options['data']['footer_script'] ?? '')),
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.config.form.google.analytics.body.tooltip',
+                    'tooltip' => 'mautic.page.form.footerscript.tooltip',
                     'rows'    => 10,
                 ],
                 'required' => false,

@@ -33,9 +33,9 @@ class ConfigSubscriber implements EventSubscriberInterface
             // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
             // and trackingconfig form would overwrote values in the pageconfig form. See #5559.
             'parameters' => [
-                'cat_in_page_url'       => false,
-                'google_analytics'      => false,
-                'google_analytics_body' => false,
+                'cat_in_page_url'  => false,
+                'google_analytics' => false,
+                'footer_script'    => false,
             ],
         ]);
     }
@@ -72,8 +72,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             $event->setConfig($values);
         }
 
-        if (!empty($values['pageconfig']['google_analytics_body'])) {
-            $values['pageconfig']['google_analytics_body'] = htmlspecialchars($values['pageconfig']['google_analytics_body']);
+        if (!empty($values['pageconfig']['footer_script'])) {
+            $values['pageconfig']['footer_script'] = htmlspecialchars($values['pageconfig']['footer_script']);
             $event->setConfig($values);
         }
     }

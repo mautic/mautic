@@ -283,9 +283,9 @@ class PublicController extends AbstractFormController
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
                 }
 
-                $bodyAnalytics = $analyticsHelper->getBodyCode();
-                if (!empty($bodyAnalytics)) {
-                    $content = str_replace('</body>', $bodyAnalytics."\n</body>", $content);
+                $footerAnalytics = $analyticsHelper->getFooterCode();
+                if (!empty($footerAnalytics)) {
+                    $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
                 }
                 if ($entity->getNoIndex()) {
                     $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
@@ -397,9 +397,9 @@ class PublicController extends AbstractFormController
         } else {
             $content = str_replace('</head>', $analytics."\n</head>", $content);
 
-            $bodyAnalytics = $analyticsHelper->getBodyCode();
-            if (!empty($bodyAnalytics)) {
-                $content = str_replace('</body>', $bodyAnalytics."\n</body>", $content);
+            $footerAnalytics = $analyticsHelper->getFooterCode();
+            if (!empty($footerAnalytics)) {
+                $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
             }
         }
 
