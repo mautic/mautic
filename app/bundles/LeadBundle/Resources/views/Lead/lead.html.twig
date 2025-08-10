@@ -280,122 +280,91 @@
         </div>
 
         <div class="pa-md">
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained mt-10">
-                <li class="active">
-                    <a href="#timeline-container" role="tab" data-toggle="tab">
-                        <span size="sm" class="label label-primary mr-sm" id="TimelineCount">
-                            {{ events.total }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.history'|trans }}
-                    </a>
-                </li>
-                <li class="">
-                    <a href="#notes-container" role="tab" data-toggle="tab">
-                        <span size="sm" class="label label-primary mr-sm" id="NoteCount">
-                            {{ noteCount }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.notes'|trans }}
-                    </a>
-                </li>
-                {% if not isAnonymous %}
-                    <li class="">
-                        <a href="#social-container" role="tab" data-toggle="tab">
-                        <span size="sm" class="label label-primary mr-sm" id="SocialCount">
-                            {{ socialProfiles|length }}
-                        </span>
-                            {{ 'mautic.lead.lead.tab.social'|trans }}
-                        </a>
-                    </li>
-                {% endif %}
-                <li class="">
-                    <a href="#integration-container" role="tab" data-toggle="tab">
-                    <span size="sm" class="label label-primary mr-sm" id="IntegrationCount">
-                        {{ integrations|length }}
-                    </span>
-                        {{ 'mautic.lead.lead.tab.integration'|trans }}
-                    </a>
-                </li>
-                <li class="">
-                    <a href="#auditlog-container" role="tab" data-toggle="tab">
-                    <span size="sm" class="label label-primary mr-sm" id="AuditLogCount">
-                        {{ auditlog.total }}
-                    </span>
-                        {{ 'mautic.lead.lead.tab.auditlog'|trans }}
-                    </a>
-                </li>
-                    <li class="">
-                        <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
-                        <span size="sm" class="label label-primary mr-sm" id="PlaceCount">
-                            {{ places|length }}
-                        </span>
-                            {{ 'mautic.lead.lead.tab.places'|trans }}
-                        </a>
-                    </li>
-                {{ customContent('tabs', _context) }}
-            </ul>
-            <!--/ tabs controls -->
+            {% set leadTabs = [
+                {
+                    'id': 'timeline-container',
+                    'label': 'mautic.lead.lead.tab.history',
+                    'renderTag': {
+                        'label': (events.total|default(0))
+                    },
+                    'content': include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}),
+                    'className': 'bdr-w-0 pa-md'
+                },
+                {
+                    'id': 'notes-container',
+                    'label': 'mautic.lead.lead.tab.notes',
+                    'renderTag': {
+                        'label': (noteCount|default(0))
+                    },
+                    'content': render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1})),
+                    'className': 'bdr-w-0 pa-md'
+                }
+            ] %}
 
-            <!-- start: tab-content -->
-            <div class="tab-content pa-md">
-                <!-- #history-container -->
-                <div class="tab-pane fade in active bdr-w-0" id="timeline-container">
-                    {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
-                </div>
-                <!--/ #history-container -->
+            {% if not isAnonymous %}
+                {% set leadTabs = leadTabs|merge([{
+                    'id': 'social-container',
+                    'label': 'mautic.lead.lead.tab.social',
+                    'renderTag': {
+                        'label': (socialProfiles|length|default(0))
+                    },
+                    'content': include('@MauticLead/Social/index.html.twig', {
+                        'lead': lead,
+                        'socialProfiles': socialProfiles,
+                        'socialProfileUrls': socialProfileUrls,
+                    }),
+                    'className': 'bdr-w-0 pa-md'
+                }]) %}
+            {% endif %}
 
-                <!-- #notes-container -->
-                <div class="tab-pane fade bdr-w-0" id="notes-container">
-                    {{ render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1})) }}
-                </div>
-                <!--/ #notes-container -->
-
-                <!-- #social-container -->
-                {% if not isAnonymous %}
-                    <div class="tab-pane fade bdr-w-0" id="social-container">
-                        {{ include('@MauticLead/Social/index.html.twig', {
-                            'lead': lead,
-                            'socialProfiles': socialProfiles,
-                            'socialProfileUrls': socialProfileUrls,
-                        }) }}
-                    </div>
-                {% endif %}
-                <!--/ #social-container -->
-
-                <!-- #integration-container -->
-                <div class="tab-pane fade bdr-w-0" id="integration-container">
-                    {{ include('@MauticLead/Integration/index.html.twig', {
+            {% set leadTabs = leadTabs|merge([
+                {
+                    'id': 'integration-container',
+                    'label': 'mautic.lead.lead.tab.integration',
+                    'renderTag': {
+                        'label': (integrations|length|default(0))
+                    },
+                    'content': include('@MauticLead/Integration/index.html.twig', {
                         'lead': lead,
                         'integrations': integrations,
-                    }) }}
-                </div>
-                <!--/ #integration-container -->
-
-                <!-- #auditlog-container -->
-                <div class="tab-pane fade bdr-w-0" id="auditlog-container">
-                    {{ include('@MauticLead/Auditlog/_list.html.twig', {
+                    }),
+                    'className': 'bdr-w-0 pa-md',
+                },
+                {
+                    'id': 'auditlog-container',
+                    'label': 'mautic.lead.lead.tab.auditlog',
+                    'renderTag': {
+                        'label': (auditlog.total|default(0))
+                    },
+                    'content': include('@MauticLead/Auditlog/_list.html.twig', {
                         'lead': lead,
                         'events': auditlog,
-                    }) }}
-                </div>
-                <!--/ #auditlog-container -->
+                    }),
+                    'className': 'bdr-w-0 pa-md'
+                },
+                {
+                    'id': 'place-container',
+                    'label': 'mautic.lead.lead.tab.places',
+                    'renderTag': {
+                        'label': (places|length|default(0))
+                    },
+                    'content': (not places and not configGetParameter('ip_lookup_auth') ? 
+                        include('@MauticCore/Helper/no_information.html.twig', {
+                            'tip': 'mautic.contact.noinformation.places'
+                        }) : '') ~ include('@MauticLead/Lead/_map.html.twig', {'places': places}),
+                    'className': 'bdr-w-0 pa-md'
+                }
+            ]) %}
 
-                <!-- custom content -->
-                {{ customContent('tabs.content', _context) }}
-                <!-- end: custom content -->
-
-                <!-- #place-container -->
-                    <div class="tab-pane fade bdr-w-0" id="place-container">
-                        {% if not places and not configGetParameter('ip_lookup_auth') %}
-                            {{ include('@MauticCore/Helper/no_information.html.twig', {
-                                'tip': 'mautic.contact.noinformation.places'
-                            }) }}
-                        {% endif %}
-                        {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
-                    </div>
-                <!--/ #place-container -->
+            <div class="mt-10">
+                {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
+                    'tabs': leadTabs,
+                    'variant': 'contained',
+                }) }}
             </div>
-            <!--/ end: tab-content -->
+
+            {{ customContent('tabs', _context) }}
+            {{ customContent('tabs.content', _context) }}
         </div>
 
     </div>

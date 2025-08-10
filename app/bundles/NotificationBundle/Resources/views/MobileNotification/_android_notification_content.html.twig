@@ -1,0 +1,25 @@
+{#
+  Variables
+    - form
+    - integrationSettings
+#}
+<div class="row">
+    <div class="col-md-6">
+        {{ form_row(form.mobileSettings.android_small_icon) }}
+        {{ form_row(form.mobileSettings.android_large_icon) }}
+        {{ form_row(form.mobileSettings.android_big_picture) }}
+    </div>
+    <div class="col-md-6">
+        <div class="well">
+            <div class="layer-one">
+                <h4>{{ 'Advanced Settings'|trans }}</h4>
+                <hr />
+                {{ form_row(form.mobileSettings.android_sound) }}
+                {{ form_row(form.mobileSettings.android_group_key) }}
+                {{ form_row(form.mobileSettings.android_led_color) }}
+                {{ form_row(form.mobileSettings.android_accent_color) }}
+                {{ form_row(form.mobileSettings.android_lockscreen_visibility) }}
+            </div>
+        </div>
+    </div>
+</div> 

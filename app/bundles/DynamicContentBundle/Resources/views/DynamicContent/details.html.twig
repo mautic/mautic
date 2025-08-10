@@ -166,38 +166,31 @@
 
               {{ customContent('details.stats.graph.below', _context) }}
 
-              <!-- tabs controls -->
-              <ul class="nav nav-tabs nav-tabs-contained">
-                  <li class="active">
-                      <a href="#clicks-container" role="tab" data-toggle="tab">
-                          {{ 'mautic.trackable.click_counts'|trans }}
-                      </a>
-                  </li>
-                  {% if showTranslations %}
-                  <li class>
-                      <a href="#translation-container" role="tab" data-toggle="tab">
-                          {{ 'mautic.core.translations'|trans }}
-                      </a>
-                  </li>
-                  {% endif %}
-              </ul>
-              <!--/ tabs controls -->
-          </div>
-          <!-- start: tab-content -->
-          <div class="tab-content pa-md">
-              <div class="tab-pane active active bdr-w-0" id="clicks-container">
+              {% set tabs = [] %}
+              
+              {% set clicksContent %}
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
+              {% endset %}
+              {% set tabs = tabs|merge([{
+                  'label': 'mautic.trackable.click_counts',
+                  'content': clicksContent,
+                  'className': 'pa-md'
+              }]) %}
 
-              </div>
-              <!-- #translation-container -->
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
-                      {{ translationContent|raw }}
-                  </div>
+                  {% set tabs = tabs|merge([{
+                      'label': 'mautic.core.translations',
+                      'content': translationContent|raw,
+                      'className': 'pa-md'
+                  }]) %}
               {% endif %}
-              <!--/ #translation-container -->
+
+              {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
+                  'tabs': tabs,
+                  'variant': 'contained',
+                  'selectedIndex': 0
+              }) }}
           </div>
-          <!-- end: tab-content -->
       </div>
       <!--/ left section -->
 

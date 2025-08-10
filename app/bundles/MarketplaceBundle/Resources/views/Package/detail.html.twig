@@ -166,15 +166,20 @@
     {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
         'tabs': [
             {
-                'title': 'mautic.core.overview',
-                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_overview.html.twig')
+                'label': 'mautic.core.overview',
+                'id': 'overview-tab',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_overview.html.twig'),
+                'className': 'bdr-w-0'
             },
             {
-                'title': 'mautic.core.details',
-                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_details.html.twig')
+                'label': 'mautic.core.details',
+                'id': 'details-tab',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_details.html.twig'),
+                'className': 'bdr-w-0'
             }
         ],
-        'style': 'line'
+        'variant': 'line',
+        'selectedIndex': 0
     } %}
 
 </div>
@@ -214,15 +219,20 @@
     {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
         'tabs': [
             {
-                'title': 'marketplace.package.github.info',
-                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_github.html.twig')
+                'label': 'marketplace.package.github.info',
+                'id': 'github-tab',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_github.html.twig'),
+                'className': 'bdr-w-0'
             },
             {
-                'title': 'marketplace.package.packagist.info',
-                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_packagist.html.twig')
+                'label': 'marketplace.package.packagist.info',
+                'id': 'packagist-tab',
+                'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_packagist.html.twig'),
+                'className': 'bdr-w-0'
             }
         ],
-        'style': 'contained'
+        'variant': 'contained',
+        'selectedIndex': 0
     } %}
 
 </div>

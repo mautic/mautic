@@ -184,66 +184,66 @@
 
               {{ customContent('details.stats.graph.below', _context) }}
 
-              <!-- tabs controls -->
-              <ul class="nav nav-tabs nav-tabs-contained">
-                  {% if showVariants %}
-                      <li class="active">
-                          <a href="#variants-container" role="tab" data-toggle="tab">
-                              {{- 'mautic.core.variants'|trans -}}
-                          </a>
-                      </li>
-                  {% endif %}
-                  {% if showTranslations %}
-                      <li class="{% if not showVariants %}active{% endif %}">
-                          <a href="#translation-container" role="tab" data-toggle="tab">
-                              {{- 'mautic.core.translations'|trans -}}
-                          </a>
-                      </li>
-                  {% endif %}
-              </ul>
-              <!--/ tabs controls -->
-          </div>
+              {% if showVariants or showTranslations %}
+                  {% set variantsContent %}
+                      {{ variantContent|raw }}
+                  {% endset %}
 
-          {% if showVariants or showTranslations %}
-          <!-- start: tab-content -->
-          <div class="tab-content pa-md">
-              {% if showVariants %}
-              <!-- #variants-container -->
-              <div class="tab-pane active bdr-w-0" id="variants-container">
-                  {{ variantContent|raw }}
-              </div>
-              <!--/ #variants-container -->
+                  {% set translationContent %}
+                      {{ translationContent|raw }}
+                  {% endset %}
+
+                  {% set tabs = [] %}
+
+                  {% if showVariants %}
+                      {% set tabs = tabs|merge([
+                          {
+                              'label': 'mautic.core.variants',
+                              'id': 'variants-container',
+                              'content': variantsContent,
+                              'className': 'bdr-w-0 pa-md'
+                          }
+                      ]) %}
+                  {% endif %}
+
+                  {% if showTranslations %}
+                      {% set tabs = tabs|merge([
+                          {
+                              'label': 'mautic.core.translations',
+                              'id': 'translation-container',
+                              'content': translationContent,
+                              'className': 'bdr-w-0 pa-md'
+                          }
+                      ]) %}
+                  {% endif %}
+
+                  {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
+                      'tabs': tabs,
+                      'variant': 'contained',
+                      'selectedIndex': showVariants ? 0 : 0
+                  }) }}
               {% endif %}
-              <!-- #translation-container -->
-              {% if showTranslations %}
-              <div class="tab-pane {% if not showVariants %}active{% endif %} bdr-w-0" id="translation-container">
-                  {{ translationContent|raw }}
-              </div>
-              {% endif %}
-              <!--/ #translation-container -->
+
+              {% set additionalCards = [{
+                heading: 'mautic.page.results.view',
+                copy: (not showVariants and not showTranslations) ? 'mautic.page.results.view.description' : null,
+                pictogram: 'data--set',
+                href: path('mautic_page_results', {'objectId': activePage.id}),
+                attributes: {
+                    'data-toggle': 'ajax',
+                    'data-menu-link': 'mautic_form_index'
+                }
+            }] %}
+            
+            {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
+                'entity': activePage,
+                'routeBase': 'page',
+                'showVariants': showVariants,
+                'showTranslations': showTranslations,
+                'allowAbTest': allowAbTest,
+                'additionalCards': additionalCards
+            }) }}
           </div>
-          <!--/ end: tab-content -->
-          {% endif %}
-          
-          {% set additionalCards = [{
-              heading: 'mautic.page.results.view',
-              copy: (not showVariants and not showTranslations) ? 'mautic.page.results.view.description' : null,
-              pictogram: 'data--set',
-              href: path('mautic_page_results', {'objectId': activePage.id}),
-              attributes: {
-                  'data-toggle': 'ajax',
-                  'data-menu-link': 'mautic_form_index'
-              }
-          }] %}
-          
-          {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
-              'entity': activePage,
-              'routeBase': 'page',
-              'showVariants': showVariants,
-              'showTranslations': showTranslations,
-              'allowAbTest': allowAbTest,
-              'additionalCards': additionalCards
-          }) }}
       </div>
       <!--/ left section -->
 
