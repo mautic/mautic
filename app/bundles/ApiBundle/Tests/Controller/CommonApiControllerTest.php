@@ -170,6 +170,9 @@ class CommonApiControllerTest extends CampaignTestAbstract
                 return true;
             }
 
+            /**
+             * @param object $entity
+             */
             public function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
             {
                 $this->processFormMethod = $method;
