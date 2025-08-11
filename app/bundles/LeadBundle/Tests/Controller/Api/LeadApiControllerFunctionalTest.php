@@ -1092,6 +1092,46 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedDatesOrder, $resultOrder);
     }
 
+    public function testNewEntityActionUsesPostForNewContactAndPatchForExisting(): void
+    {
+        // Test 1: Create a new contact - should use POST method internally
+        $newContactPayload = [
+            'email'     => 'new-contact@test.com',
+            'firstname' => 'New',
+            'lastname'  => 'Contact',
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $newContactPayload);
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode());
+
+        $responseData = json_decode($response->getContent(), true);
+        $contactId    = $responseData['contact']['id'];
+
+        // Verify contact was created
+        $this->assertNotNull($contactId);
+        $this->assertSame($newContactPayload['email'], $responseData['contact']['fields']['all']['email']);
+
+        // Test 2: Send same request again with ID - should use PATCH method internally and update existing
+        $existingContactPayload = [
+            'id'        => $contactId,
+            'email'     => 'new-contact@test.com', // Same email
+            'firstname' => 'Updated',               // Different name
+            'lastname'  => 'Contact',
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $existingContactPayload);
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode()); // Should be 200 (updated) not 201 (created)
+
+        $responseData = json_decode($response->getContent(), true);
+
+        // Verify it's the same contact (same ID) but updated
+        $this->assertSame($contactId, $responseData['contact']['id']);
+        $this->assertSame('Updated', $responseData['contact']['fields']['all']['firstname']);
+        $this->assertSame($existingContactPayload['email'], $responseData['contact']['fields']['all']['email']);
+    }
+
     private function createCompany(string $name): Company
     {
         $company = new Company();
