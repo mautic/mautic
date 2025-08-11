@@ -20,8 +20,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\RouterInterface;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
@@ -83,9 +81,9 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
-    private function createBasicController(): CommonApiController
+    protected function getResultFromProtectedMethod($method, array $args)
     {
-        return new CommonApiController(
+        $controller = new CommonApiController(
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
             $this->createMock(EntityResultHelper::class),
@@ -98,88 +96,12 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
-    }
-
-    protected function getResultFromProtectedMethod($method, array $args)
-    {
-        $controller = $this->createBasicController();
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
         $method               = $controllerReflection->getMethod($method);
         $method->setAccessible(true);
 
         return $method->invokeArgs($controller, $args);
-    }
-
-    /**
-     * @dataProvider newEntityActionMethodProvider
-     */
-    public function testNewEntityActionSelectsCorrectMethod(?int $entityId, string $expectedMethod): void
-    {
-        $controller = $this->createTestController($entityId);
-        $request    = new Request();
-        $controller->newEntityAction($request);
-
-        $this->assertEquals($expectedMethod, $controller->processFormMethod);
-    }
-
-    /**
-     * @return array<string, array<int, int|string|null>>
-     */
-    public function newEntityActionMethodProvider(): array
-    {
-        return [
-            'entity without ID uses POST' => [null, 'POST'],
-            'entity with ID uses PATCH'   => [123, 'PATCH'],
-        ];
-    }
-
-    private function createTestController(?int $entityId): object
-    {
-        $entityMock = new class($entityId) {
-            private ?int $id;
-
-            public function __construct(?int $id)
-            {
-                $this->id = $id;
-            }
-
-            public function getId(): ?int
-            {
-                return $this->id;
-            }
-        };
-
-        return new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), $this->createMock(EntityResultHelper::class), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $entityMock) extends CommonApiController {
-            public ?string $processFormMethod = null;
-            private object $entityMock;
-
-            public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $managerRegistry, ModelFactory $modelFactory, EventDispatcherInterface $eventDispatcher, CoreParametersHelper $coreParametersHelper, object $entityMock)
-            {
-                parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $managerRegistry, $modelFactory, $eventDispatcher, $coreParametersHelper);
-                $this->entityMock = $entityMock;
-            }
-
-            public function getNewEntity($parameters = [])
-            {
-                return $this->entityMock;
-            }
-
-            public function checkEntityAccess($entity, $action = 'view')
-            {
-                return true;
-            }
-
-            /**
-             * @param object $entity
-             */
-            public function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
-            {
-                $this->processFormMethod = $method;
-
-                return new Response();
-            }
-        };
     }
 
     public function testGetBatchEntities(): void
