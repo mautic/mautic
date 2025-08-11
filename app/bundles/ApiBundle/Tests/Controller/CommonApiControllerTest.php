@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
@@ -81,9 +82,9 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
-    protected function getResultFromProtectedMethod($method, array $args)
+    private function createBasicController()
     {
-        $controller = new CommonApiController(
+        return new CommonApiController(
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
             $this->createMock(EntityResultHelper::class),
@@ -96,12 +97,82 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
+    }
+
+    protected function getResultFromProtectedMethod($method, array $args)
+    {
+        $controller = $this->createBasicController();
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
         $method               = $controllerReflection->getMethod($method);
         $method->setAccessible(true);
 
         return $method->invokeArgs($controller, $args);
+    }
+
+    /**
+     * @dataProvider newEntityActionMethodProvider
+     */
+    public function testNewEntityActionSelectsCorrectMethod($entityId, $expectedMethod): void
+    {
+        $controller = $this->createTestController($entityId);
+        $request    = new Request();
+        $controller->newEntityAction($request);
+
+        $this->assertEquals($expectedMethod, $controller->processFormMethod);
+    }
+
+    public function newEntityActionMethodProvider(): array
+    {
+        return [
+            'entity without ID uses POST' => [null, 'POST'],
+            'entity with ID uses PATCH'   => [123, 'PATCH'],
+        ];
+    }
+
+    private function createTestController($entityId)
+    {
+        $entityMock = new class($entityId) {
+            private $id;
+
+            public function __construct($id)
+            {
+                $this->id = $id;
+            }
+
+            public function getId()
+            {
+                return $this->id;
+            }
+        };
+
+        return new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), $this->createMock(EntityResultHelper::class), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $entityMock) extends CommonApiController {
+            public $processFormMethod;
+            private $entityMock;
+
+            public function __construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $managerRegistry, $modelFactory, $eventDispatcher, $coreParametersHelper, $entityMock)
+            {
+                parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $managerRegistry, $modelFactory, $eventDispatcher, $coreParametersHelper);
+                $this->entityMock = $entityMock;
+            }
+
+            public function getNewEntity($parameters = [])
+            {
+                return $this->entityMock;
+            }
+
+            public function checkEntityAccess($entity, $action = 'view')
+            {
+                return true;
+            }
+
+            public function processForm(Request $request, $entity, $parameters = null, $method = 'PATCH')
+            {
+                $this->processFormMethod = $method;
+
+                return new Response();
+            }
+        };
     }
 
     public function testGetBatchEntities(): void
