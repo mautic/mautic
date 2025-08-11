@@ -12,18 +12,15 @@ class AnonymizeHelper
     /**
      * @param string|bool|null $email
      */
-    public static function email($email, bool $pseudonymized = false, string $newDomain = self::PRE_DEFINED_DOMAIN): string|false
+    public static function anonymizeEmail($email, bool $pseudonymized = false, string $newDomain = self::PRE_DEFINED_DOMAIN): ?string
     {
-        if (empty($email)) {
-            return '';
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return null;
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return false;
-        }
         $emailParts = explode('@', $email);
 
-        $toEncrypt= $emailParts[0].time().random_int(0, 999999);
+        $toEncrypt = $emailParts[0].time().random_int(0, 999999);
 
         if ($pseudonymized) {
             $toEncrypt = $emailParts[0];
@@ -37,7 +34,7 @@ class AnonymizeHelper
     /**
      * @param string|bool|null $text
      */
-    public static function text($text, bool $pseudonymize = false): string
+    public static function anonymizeText($text, bool $pseudonymize = false): string
     {
         if (empty($text)) {
             $text = '';

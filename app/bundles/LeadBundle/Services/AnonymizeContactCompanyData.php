@@ -123,13 +123,13 @@ class AnonymizeContactCompanyData
 
         try {
             if ('email' === $field['type']) {
-                $valueAnonymized = AnonymizeHelper::email($field['value'], $pseudonymize);
+                $valueAnonymized = AnonymizeHelper::anonymizeEmail($field['value'], $pseudonymize);
                 if ($leadField->getCharLengthLimit() < strlen($valueAnonymized)) {
                     $valueAnonymized = $this->formatHashEmail($valueAnonymized, $leadField->getCharLengthLimit());
                 }
                 $this->updateEmailStatusValues($field['value'], $valueAnonymized, $pseudonymize);
             } else {
-                $valueAnonymized = AnonymizeHelper::text($field['value'], $pseudonymize);
+                $valueAnonymized = AnonymizeHelper::anonymizeText($field['value'], $pseudonymize);
             }
 
             if ($leadField->getCharLengthLimit() < strlen($valueAnonymized) && 'email' === $field['type']) {
@@ -190,7 +190,7 @@ class AnonymizeContactCompanyData
         $emailStats = $this->emailModel->getStatRepository()->findBy(['emailAddress' => $email]);
         foreach ($emailStats as $emailStat) {
             if (!$pseudonymize) {
-                $hash = AnonymizeHelper::email($email, $pseudonymize);
+                $hash = AnonymizeHelper::anonymizeEmail($email, $pseudonymize);
             }
 
             $emailStat->setEmailAddress($hash);
@@ -281,7 +281,7 @@ class AnonymizeContactCompanyData
         foreach ($results as $resultForm) {
             foreach ($resultForm as $key => $value) {
                 if (!in_array($key, self::COLUMNS_NOT_ACCEPTED)) {
-                    $finalResult[$value] = AnonymizeHelper::text($value, true);
+                    $finalResult[$value] = AnonymizeHelper::anonymizeText($value, true);
                 }
             }
         }
@@ -358,7 +358,7 @@ class AnonymizeContactCompanyData
                 if (array_key_exists($value, $valuesAnonymize)) {
                     $keyValueToChange[$key] = $valuesAnonymize[$value];
                 } else {
-                    $keyValueToChange[$key] = AnonymizeHelper::text($value);
+                    $keyValueToChange[$key] = AnonymizeHelper::anonymizeText($value);
                 }
             }
         }
