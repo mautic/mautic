@@ -193,6 +193,9 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
+        if (empty($availablePoints)) {
+            return;
+        }
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         $hasLeadPointChanges = false;

@@ -84,7 +84,7 @@ class StatRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->addSelect('e.name AS email_name')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = "email" and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = \'email\' and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
             ->addSelect('COUNT(ph.id) AS link_hits');
 
         if (null !== $createdByUserId) {
@@ -427,9 +427,8 @@ class StatRepository extends CommonRepository
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id');
 
         if ($leadId) {
-            $query->andWhere(
-                $query->expr()->eq('s.lead_id', (int) $leadId)
-            );
+            $query->andWhere('s.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (!empty($options['basic_select'])) {
@@ -462,18 +461,18 @@ class StatRepository extends CommonRepository
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
                 $query->expr()->or(
-                    $query->expr()->like('ec.subject', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('e.subject', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%'))
+                    $query->expr()->like('ec.subject', ':search'),
+                    $query->expr()->like('e.subject', ':search'),
+                    $query->expr()->like('e.name', ':search')
                 )
-            );
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         if (isset($options['fromDate']) && $options['fromDate']) {
             $dt = new DateTimeHelper($options['fromDate']);
             $query->andWhere(
-                $query->expr()->gte($timestampColumn, $query->expr()->literal($dt->toUtcString()))
-            );
+                $query->expr()->gte($timestampColumn, ':fromDate')
+            )->setParameter('fromDate', $dt->toUtcString());
         }
 
         $timeToReadParser = function (&$stat): void {

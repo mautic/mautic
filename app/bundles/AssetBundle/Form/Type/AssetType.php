@@ -197,15 +197,14 @@ class AssetType extends AbstractType
         if (empty($object)) {
             return;
         }
-        $parameters       = (new ParameterLoader())->getParameterBag();
-        $mimeTypesAllowed = $parameters->get('allowed_mimetypes');
-        $extensions       = array_keys($mimeTypesAllowed);
-        $fileName         = $object;
+        $parameters = (new ParameterLoader())->getParameterBag();
+        $extensions = $parameters->get('allowed_extensions');
+        $fileName   = $object;
         if (!is_string($object) && $object instanceof Asset) {
             $fileName = $object->getOriginalFileName();
         }
         $fileExtension    = pathinfo($fileName, PATHINFO_EXTENSION);
-        if (!in_array($fileExtension, $extensions, true)) {
+        if (!in_array(strtolower($fileExtension), array_map('strtolower', $extensions), true)) {
             $context->buildViolation('mautic.asset.asset.error.file.extension', [
                 '%fileExtension%'=> $fileExtension,
                 '%extensions%'   => implode(', ', $extensions),

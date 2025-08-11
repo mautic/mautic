@@ -114,6 +114,6 @@ SQL;
         $sql               = "UPDATE {$table_name} SET ip_address = '*.*.*.*', ip_details = 'N;' WHERE ip_address != '*.*.*.*'";
         $conn              = $this->getEntityManager()->getConnection();
 
-        return $conn->executeQuery($sql)->rowCount();
+        return $conn->executeStatement($sql);
     }
 }
