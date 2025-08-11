@@ -120,7 +120,6 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
     {
         return new Callback(
             function ($validateMe, ExecutionContextInterface $context): void {
-                /** @var Integration $data */
                 $data = $context->getRoot()->getData();
 
                 if (
@@ -129,8 +128,6 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
                 ) {
                     $context->buildViolation('mautic.lead.lead.events.error.empty_fields')
                         ->addViolation();
-                    $data['properties']['fieldsToDelete']    = [];
-                    $data['properties']['fieldsToAnonymize'] = [];
                 }
 
                 $fieldMatch = array_intersect($data['properties']['fieldsToDelete'], $data['properties']['fieldsToAnonymize']);
