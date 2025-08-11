@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
@@ -82,7 +83,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
-    private function createBasicController()
+    private function createBasicController(): CommonApiController
     {
         return new CommonApiController(
             $this->createMock(CorePermissions::class),
@@ -113,7 +114,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
     /**
      * @dataProvider newEntityActionMethodProvider
      */
-    public function testNewEntityActionSelectsCorrectMethod($entityId, $expectedMethod): void
+    public function testNewEntityActionSelectsCorrectMethod(?int $entityId, string $expectedMethod): void
     {
         $controller = $this->createTestController($entityId);
         $request    = new Request();
@@ -122,6 +123,9 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($expectedMethod, $controller->processFormMethod);
     }
 
+    /**
+     * @return array<string, array<int, int|string|null>>
+     */
     public function newEntityActionMethodProvider(): array
     {
         return [
@@ -130,27 +134,27 @@ class CommonApiControllerTest extends CampaignTestAbstract
         ];
     }
 
-    private function createTestController($entityId)
+    private function createTestController(?int $entityId): object
     {
         $entityMock = new class($entityId) {
-            private $id;
+            private ?int $id;
 
-            public function __construct($id)
+            public function __construct(?int $id)
             {
                 $this->id = $id;
             }
 
-            public function getId()
+            public function getId(): ?int
             {
                 return $this->id;
             }
         };
 
         return new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), $this->createMock(EntityResultHelper::class), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $entityMock) extends CommonApiController {
-            public $processFormMethod;
-            private $entityMock;
+            public ?string $processFormMethod = null;
+            private object $entityMock;
 
-            public function __construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $managerRegistry, $modelFactory, $eventDispatcher, $coreParametersHelper, $entityMock)
+            public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $managerRegistry, ModelFactory $modelFactory, EventDispatcherInterface $eventDispatcher, CoreParametersHelper $coreParametersHelper, object $entityMock)
             {
                 parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $managerRegistry, $modelFactory, $eventDispatcher, $coreParametersHelper);
                 $this->entityMock = $entityMock;
@@ -166,7 +170,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
                 return true;
             }
 
-            public function processForm(Request $request, $entity, $parameters = null, $method = 'PATCH')
+            public function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
             {
                 $this->processFormMethod = $method;
 
