@@ -29,7 +29,6 @@ class AnonymizeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $pureEmail = 'teste';
         $newEmail  = AnonymizeHelper::anonymizeEmail($pureEmail);
-        $this->assertNotFalse($newEmail);
         $this->assertNull($newEmail);
     }
 
