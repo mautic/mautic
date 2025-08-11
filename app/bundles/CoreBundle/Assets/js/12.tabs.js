@@ -184,6 +184,28 @@ Mautic.deleteTab = function(deleteBtn) {
     return false;
 };
 
+/**
+ * Remember the last active tab for each tab list on the page.
+ */
+Mautic.rememberActiveTabs = function() {
+    mQuery('.nav-tabs').each(function(index) {
+        const $navTabs = mQuery(this);
+        const storageKey = 'mautic-active-tab-' + window.location.pathname + '-' + index;
+
+        const activeTab = localStorage.getItem(storageKey);
+        if (activeTab) {
+            const $tab = $navTabs.find('a[href="' + activeTab + '"]');
+            if ($tab.length) {
+                $tab.tab('show');
+            }
+        }
+
+        $navTabs.find('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+            localStorage.setItem(storageKey, mQuery(e.target).attr('href'));
+        });
+    });
+};
+
 // Initialize the Tabs Scroll functionality
 Mautic.initTabsScroll = function() {
     mQuery('.nav-tabs').each(function() {
@@ -264,10 +286,12 @@ function debounce(func, wait) {
 
 // Initialize on document ready
 mQuery(document).ready(function() {
+    Mautic.rememberActiveTabs();
     Mautic.initTabsScroll();
 });
 
 // Re-initialize on every AJAX complete
 mQuery(document).ajaxComplete(function(event, xhr, settings) {
+    Mautic.rememberActiveTabs();
     Mautic.initTabsScroll();
 });
