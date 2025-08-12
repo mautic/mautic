@@ -55,18 +55,61 @@ class FocusRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return match ($filter->command) {
-            $this->translator->trans('mautic.project.searchcommand.name'),
-            $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
-                'focus_id',
-                'focus_projects_xref',
-                $this->getTableAlias(),
-                $filter->string,
-                $filter->not
-            ),
-            default => $this->addStandardSearchCommandWhereClause($q, $filter),
-        };
+        [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $standardSearchParameters];
+        }
+
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $parameters      = [];
+        $forceParameters = [];
+
+        switch ($command) {
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylebar'):
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylebar', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('f.style', ":$unique");
+                $forceParameters = [$unique => 'bar'];
+                break;
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylemodal'):
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylemodal', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('f.style', ":$unique");
+                $forceParameters = [$unique => 'modal'];
+                break;
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylenotification'):
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylenotification', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('f.style', ":$unique");
+                $forceParameters = [$unique => 'notification'];
+                break;
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylefullpage'):
+            case $this->translator->trans('mautic.focus.focus.searchcommand.stylefullpage', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('f.style', ":$unique");
+                $forceParameters = [$unique => 'page'];
+                break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'focus_id',
+                    'focus_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
+        }
+
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        }
+
+        return [
+            $expr,
+            $parameters,
+        ];
     }
 
     /**
@@ -76,6 +119,10 @@ class FocusRepository extends CommonRepository
     {
         return array_merge([
             'mautic.project.searchcommand.name',
+            'mautic.focus.focus.searchcommand.stylebar',
+            'mautic.focus.focus.searchcommand.stylemodal',
+            'mautic.focus.focus.searchcommand.stylenotification',
+            'mautic.focus.focus.searchcommand.stylefullpage',
         ], $this->getStandardSearchCommands());
     }
 
