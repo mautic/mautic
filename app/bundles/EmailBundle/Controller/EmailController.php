@@ -120,82 +120,14 @@ class EmailController extends FormController
         ];
 
         // retrieve a list of categories
-        $categories = $this->getModel('category')->getLookupResults('email', '', 0);
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories = $categoryModel->getLookupResults('email', '', 0);
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
             'options' => $categories,
             'prefix'  => 'category',
         ];
-
-        $currentFilters = $session->get('mautic.email.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
         $ignoreListJoin = true;
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filter] = explode(':', $updatedFilter);
-
-                    $newFilters[$column][] = $filter;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.email.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $listIds = $catIds = $templates = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                    case 'theme':
-                        $key = 'themes';
-                        break;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $listIds[] = (int) $fltr;
-                            break;
-                        case 'category':
-                            $catIds[] = (int) $fltr;
-                            break;
-                        case 'theme':
-                            $templates[] = $fltr;
-                            break;
-                    }
-                }
-            }
-
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
-                $ignoreListJoin    = false;
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-
-            if (!empty($templates)) {
-                $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
-            }
-        }
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());

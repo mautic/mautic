@@ -56,10 +56,14 @@ class AssetController extends FormController
                 ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $session        = $request->getSession();
-        $currentFilters = $session->get('mautic.asset.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-        $categories     = $this->getModel('category')->getLookupResults('asset', '', 0);
+        if ($this->security->isGranted('asset:assets:full')) {
+            $filter['force'][] =
+                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+        }
+
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories     = $categoryModel->getLookupResults('asset', '', 0);
 
         $listFilters = [
             'filters' => [
@@ -73,40 +77,6 @@ class AssetController extends FormController
                 ],
             ],
         ];
-
-        if ($updatedFilters) {
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $flt] = explode(':', $updatedFilter);
-                    $newFilters[$column][] = $flt;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.asset.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.core.filter.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('category' === $type) {
-                        $catIds[] = (int) $fltr;
-                    }
-                }
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-        }
 
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());

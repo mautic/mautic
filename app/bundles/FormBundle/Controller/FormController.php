@@ -92,10 +92,9 @@ class FormController extends CommonFormController
         if (!$permissions['form:forms:viewother']) {
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
-
-        $currentFilters = $session->get('mautic.form.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-        $categories     = $this->getModel('category')->getLookupResults('form', '', 0);
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories     = $categoryModel->getLookupResults('form', '', 0);
 
         $listFilters = [
             'filters' => [
@@ -109,40 +108,6 @@ class FormController extends CommonFormController
                 ],
             ],
         ];
-
-        if ($updatedFilters) {
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $flt] = explode(':', $updatedFilter);
-                    $newFilters[$column][] = $flt;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.form.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.core.filter.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('category' === $type) {
-                        $catIds[] = (int) $fltr;
-                    }
-                }
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-        }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());

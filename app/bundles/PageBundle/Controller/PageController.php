@@ -110,10 +110,9 @@ class PageController extends FormController
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
-
-        $currentFilters = $request->getSession()->get('mautic.page.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-        $categories     = $this->getModel('category')->getLookupResults('page', '', 0);
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories     = $categoryModel->getLookupResults('page', '', 0);
 
         $listFilters = [
             'filters' => [
@@ -127,40 +126,6 @@ class PageController extends FormController
                 ],
             ],
         ];
-
-        if ($updatedFilters) {
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $flt] = explode(':', $updatedFilter);
-                    $newFilters[$column][] = $flt;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $request->getSession()->set('mautic.page.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.core.filter.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('category' === $type) {
-                        $catIds[] = (int) $fltr;
-                    }
-                }
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-        }
 
         $orderBy    = $request->getSession()->get('mautic.page.orderby', 'p.dateModified');
         $orderByDir = $request->getSession()->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
