@@ -974,6 +974,77 @@ class CampaignController extends AbstractStandardFormController
             ],
         ];
 
+        $session        = $this->getCurrentRequest()->getSession();
+        $currentFilters = $session->get('mautic.campaign.list_filters', []);
+        $updatedFilters = $this->requestStack->getCurrentRequest()->get('filters', false);
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    $newFilters[$clmn][] = $fltr;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $session->set('mautic.campaign.list_filters', $currentFilters);
+
+        $joinLists = $joinForms = false;
+        if (!empty($currentFilters)) {
+            $listIds = $catIds = $formIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                switch ($type) {
+                    case 'list':
+                        $key = 'mautic.campaign.leadsource.list';
+                        break;
+                    case 'form':
+                        $key = 'mautic.campaign.leadsource.form';
+                        break;
+                    case 'category':
+                        $key = 'mautic.core.filter.categories';
+                        break;
+                    default:
+                        $key = $type;
+                }
+                $listFilters['filters']['groups'][$key]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ('list' === $type) {
+                        $listIds[] = (int) $fltr;
+                    } elseif ('form' === $type) {
+                        $formIds[] = (int) $fltr;
+                    } elseif ('category' === $type) {
+                        foreach ($categories as $category) {
+                            if (($category['alias'] ?? null) === $fltr) {
+                                $catIds[] = (int) $category['id'];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!empty($listIds)) {
+                $joinLists         = true;
+                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+            }
+
+            if (!empty($formIds)) {
+                $joinForms         = true;
+                $filter['force'][] = ['column' => 'f.id', 'expr' => 'in', 'value' => $formIds];
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+            }
+        }
+
         // Store for customizeViewArguments
         $this->listFilters = $listFilters;
 
@@ -983,7 +1054,10 @@ class CampaignController extends AbstractStandardFormController
             $filter,
             $orderBy,
             $orderByDir,
-            []
+            [
+                'joinLists' => $joinLists,
+                'joinForms' => $joinForms,
+            ]
         );
     }
 

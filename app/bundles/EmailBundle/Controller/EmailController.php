@@ -127,7 +127,76 @@ class EmailController extends FormController
             'options' => $categories,
             'prefix'  => 'category',
         ];
+
+        $currentFilters = $session->get('mautic.email.list_filters', []);
+        $updatedFilters = $request->get('filters', false);
         $ignoreListJoin = true;
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$column, $flt] = explode(':', $updatedFilter);
+                    $newFilters[$column][] = $flt;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $session->set('mautic.email.list_filters', $currentFilters);
+
+        if (!empty($currentFilters)) {
+            $listIds = $catIds = $templates = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                switch ($type) {
+                    case 'list':
+                        $key = 'lists';
+                        break;
+                    case 'category':
+                        $key = 'categories';
+                        break;
+                    case 'theme':
+                        $key = 'themes';
+                        break;
+                    default:
+                        $key = $type;
+                }
+
+                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ('list' === $type) {
+                        $listIds[] = (int) $fltr;
+                    } elseif ('category' === $type) {
+                        foreach ($categories as $category) {
+                            if (($category['alias'] ?? null) === $fltr) {
+                                $catIds[] = (int) $category['id'];
+                                break;
+                            }
+                        }
+                    } elseif ('theme' === $type) {
+                        $templates[] = $fltr;
+                    }
+                }
+            }
+
+            if (!empty($listIds)) {
+                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $ignoreListJoin    = false;
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
+            }
+
+            if (!empty($templates)) {
+                $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
+            }
+        }
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
