@@ -98,11 +98,33 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('a.language', ":$unique"),
-                    $q->expr()->like('a.language', ":$langUnique")
-                );
+                $expr            = '('.$q->expr()->eq('a.language', ":$unique").' OR '.$q->expr()->like('a.language', ":$langUnique").')';
                 $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isimage'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isimage', [], null, 'en_US'):
+                $expr            = $q->expr()->like('a.mime', ":$unique");
+                $forceParameters = [$unique => 'image/%'];
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo', [], null, 'en_US'):
+                $expr            = $q->expr()->like('a.mime', ":$unique");
+                $forceParameters = [$unique => 'video/%'];
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio', [], null, 'en_US'):
+                $expr            = $q->expr()->like('a.mime', ":$unique");
+                $forceParameters = [$unique => 'audio/%'];
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument', [], null, 'en_US'):
+                $docUnique1      = $this->generateRandomParameterName();
+                $docUnique2      = $this->generateRandomParameterName();
+                $expr            = '('.$q->expr()->like('a.mime', ":$docUnique1").' OR '.$q->expr()->like('a.mime', ":$docUnique2").')';
+                $forceParameters = [
+                    $docUnique1 => 'application/%',
+                    $docUnique2 => 'text/%',
+                ];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
@@ -144,6 +166,10 @@ class AssetRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
+            'mautic.asset.asset.searchcommand.isimage',
+            'mautic.asset.asset.searchcommand.isvideo',
+            'mautic.asset.asset.searchcommand.isdocument',
+            'mautic.asset.asset.searchcommand.isaudio',
             'mautic.project.searchcommand.name',
         ];
 
