@@ -15,7 +15,7 @@
                     {% for value, label in groupFilter.options %}
                         {% if label is iterable %}
                             {% set value = label.value|default(label.id) %}
-                            {% set label = label.label|default(label.title|default(label.name)) %}
+                            {% set label = label.label|default(label.title|default(label.alias|default(''))) %}
                         {% endif %}
 
                         {% set selected = (groupFilter.values is defined and value in groupFilter.values) ? ' selected' : '' %}
@@ -32,7 +32,7 @@
             {% for value, label in filter.options %}
                 {% if label is iterable %}
                     {% set value = label.value|default(label.id) %}
-                    {% set label = label.label|default(label.title|default(label.name)) %}
+                    {% set label = label.label|default(label.title|default(label.alias|default(''))) %}
                 {% endif %}
 
                 {% set selected = (filter.values is defined and value in filter.values) ? ' selected' : '' %}

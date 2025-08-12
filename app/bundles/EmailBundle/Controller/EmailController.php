@@ -119,6 +119,13 @@ class EmailController extends FormController
             'prefix'  => 'theme',
         ];
 
+        // retrieve a list of categories
+        $categories = $this->getModel('category')->getLookupResults('email', '', 0);
+        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
+            'options' => $categories,
+            'prefix'  => 'category',
+        ];
+
         $currentFilters = $session->get('mautic.email.list_filters', []);
         $updatedFilters = $request->get('filters', false);
         $ignoreListJoin = true;

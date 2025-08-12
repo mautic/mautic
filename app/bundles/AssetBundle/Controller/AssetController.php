@@ -56,6 +56,58 @@ class AssetController extends FormController
                 ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
+        $session        = $request->getSession();
+        $currentFilters = $session->get('mautic.asset.list_filters', []);
+        $updatedFilters = $request->get('filters', false);
+        $categories     = $this->getModel('category')->getLookupResults('asset', '', 0);
+
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [
+                    'mautic.core.filter.categories' => [
+                        'options' => $categories,
+                        'prefix'  => 'category',
+                    ],
+                ],
+            ],
+        ];
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$column, $flt] = explode(':', $updatedFilter);
+                    $newFilters[$column][] = $flt;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $session->set('mautic.asset.list_filters', $currentFilters);
+
+        if (!empty($currentFilters)) {
+            $catIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                $listFilters['filters']['groups']['mautic.core.filter.'.$type]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ('category' === $type) {
+                        $catIds[] = (int) $fltr;
+                    }
+                }
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
+            }
+        }
+
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
 
@@ -96,12 +148,10 @@ class AssetController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        // retrieve a list of categories
-        $categories = $assetModel->getLookupResults('category', '', 0);
-
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
+                'filters'     => $listFilters,
                 'items'       => $assets,
                 'categories'  => $categories,
                 'limit'       => $limit,

@@ -98,6 +98,7 @@ class FieldController extends FormController
             'viewParameters' => [
                 'items'       => $fields,
                 'searchValue' => $search,
+                'filters'     => [],
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl,
                 'totalItems'  => $count,

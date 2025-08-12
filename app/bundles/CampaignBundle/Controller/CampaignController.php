@@ -954,6 +954,7 @@ class CampaignController extends AbstractStandardFormController
         $updatedFilters = $this->requestStack->getCurrentRequest()->get('filters', false);
 
         $sourceLists = $this->getCampaignModel()->getSourceLists();
+        $categories  = $this->getModel('category')->getLookupResults('campaign', '', 0);
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.campaign.filter.placeholder'),
@@ -966,6 +967,10 @@ class CampaignController extends AbstractStandardFormController
                     'mautic.campaign.leadsource.list' => [
                         'options' => $sourceLists['lists'],
                         'prefix'  => 'list',
+                    ],
+                    'mautic.core.filter.categories'     => [
+                        'options' => $categories,
+                        'prefix'  => 'category',
                     ],
                 ],
             ],
@@ -994,15 +999,28 @@ class CampaignController extends AbstractStandardFormController
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
-            $listIds = [];
+            $listIds = $catIds = $formIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
+                switch ($type) {
+                    case 'list':
+                        $key = 'mautic.campaign.leadsource.list';
+                        break;
+                    case 'form':
+                        $key = 'mautic.campaign.leadsource.form';
+                        break;
+                    case 'category':
+                        $key = 'mautic.core.filter.categories';
+                        break;
+                }
+                $listFilters['filters']['groups'][$key]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
-                    if ('list' == $type) {
+                    if ('list' === $type) {
                         $listIds[] = (int) $fltr;
-                    } else {
+                    } elseif ('form' === $type) {
                         $formIds[] = (int) $fltr;
+                    } elseif ('category' === $type) {
+                        $catIds[] = (int) $fltr;
                     }
                 }
             }
@@ -1015,6 +1033,10 @@ class CampaignController extends AbstractStandardFormController
             if (!empty($formIds)) {
                 $joinForms         = true;
                 $filter['force'][] = ['column' => 'f.id', 'expr' => 'in', 'value' => $formIds];
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
             }
         }
 

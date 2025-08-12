@@ -44,6 +44,58 @@ class StageController extends AbstractFormController
         $start      = $pageHelper->getStart();
         $search     = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
+
+        $currentFilters = $request->getSession()->get('mautic.stage.list_filters', []);
+        $updatedFilters = $request->get('filters', false);
+        $categories     = $this->getModel('category')->getLookupResults('stage', '', 0);
+
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [
+                    'mautic.core.filter.categories' => [
+                        'options' => $categories,
+                        'prefix'  => 'category',
+                    ],
+                ],
+            ],
+        ];
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$column, $flt] = explode(':', $updatedFilter);
+                    $newFilters[$column][] = $flt;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $request->getSession()->set('mautic.stage.list_filters', $currentFilters);
+
+        if (!empty($currentFilters)) {
+            $catIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                $listFilters['filters']['groups']['mautic.core.filter.'.$type]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ('category' === $type) {
+                        $catIds[] = (int) $fltr;
+                    }
+                }
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
+            }
+        }
+
         $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
         $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
         $stageModel = $this->getModel('stage');
@@ -88,6 +140,7 @@ class StageController extends AbstractFormController
             [
                 'viewParameters' => [
                     'searchValue' => $search,
+                    'filters'     => $listFilters,
                     'items'       => $stages,
                     'actions'     => $actions['actions'],
                     'page'        => $page,

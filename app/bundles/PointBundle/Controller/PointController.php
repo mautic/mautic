@@ -41,6 +41,58 @@ class PointController extends AbstractFormController
         $start      = $pageHelper->getStart();
         $search     = $request->get('search', $request->getSession()->get('mautic.point.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
+
+        $currentFilters = $request->getSession()->get('mautic.point.list_filters', []);
+        $updatedFilters = $request->get('filters', false);
+        $categories     = $this->getModel('category')->getLookupResults('point', '', 0);
+
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [
+                    'mautic.core.filter.categories' => [
+                        'options' => $categories,
+                        'prefix'  => 'category',
+                    ],
+                ],
+            ],
+        ];
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$column, $flt] = explode(':', $updatedFilter);
+                    $newFilters[$column][] = $flt;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $request->getSession()->set('mautic.point.list_filters', $currentFilters);
+
+        if (!empty($currentFilters)) {
+            $catIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                $listFilters['filters']['groups']['mautic.core.filter.'.$type]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ('category' === $type) {
+                        $catIds[] = (int) $fltr;
+                    }
+                }
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+            }
+        }
+
         $orderBy    = $request->getSession()->get('mautic.point.orderby', 'p.name');
         $orderByDir = $request->getSession()->get('mautic.point.orderbydir', 'ASC');
         $pointModel = $this->getModel('point');
@@ -80,6 +132,7 @@ class PointController extends AbstractFormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
+                'filters'     => $listFilters,
                 'items'       => $points,
                 'actions'     => $actions['actions'],
                 'page'        => $page,
