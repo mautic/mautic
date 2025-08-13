@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\PhpVersionHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\DashboardBundle\Dashboard\Widget as WidgetService;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\UploadType;
@@ -373,8 +374,20 @@ class DashboardController extends AbstractFormController
         $dir  = $pathsHelper->getSystemPath("dashboard.$type");
         $path = $dir.'/'.$name.'.json';
 
+        $deleted = false;
         if (file_exists($path) && is_writable($path)) {
-            unlink($path);
+            $deleted = @unlink($path);
+        }
+
+        if ($deleted) {
+            $this->addFlashMessage('mautic.core.notice.deleted', ['%name%' => $name]);
+        } else {
+            $errorKey = file_exists($path) ? 'mautic.core.permission.issue' : 'mautic.core.error.notfound';
+            $this->addFlashMessage(
+                'mautic.core.error.delete.error',
+                ['%error%' => $this->translator->trans($errorKey, [], 'flashes')],
+                FlashBag::LEVEL_ERROR
+            );
         }
 
         return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
