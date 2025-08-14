@@ -6,76 +6,69 @@ use PHPUnit\Framework\TestCase;
 
 class PublicControllerAnalyticsTest extends TestCase
 {
-    public function testFooterAnalyticsInjection(): void
+    /**
+     * @dataProvider analyticsScenarioProvider
+     */
+    public function testAnalyticsInjection(string $analytics, string $footerAnalytics, bool $noIndex, array $expectedStrings): void
     {
-        $content         = '<html><head></head><body>test</body></html>';
-        $footerAnalytics = '<script>footer</script>';
-
-        $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
-
-        $this->assertStringContainsString('<script>footer</script>', $content);
-    }
-
-    public function testEmptyFooterAnalyticsCondition(): void
-    {
-        $content         = '<html><head></head><body>test</body></html>';
-        $originalContent = $content;
-
-        $footerAnalytics = $this->getFooterValue(false);
-
-        if (!empty($footerAnalytics)) {
-            $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
-        }
-
-        $this->assertEquals($originalContent, $content);
-    }
-
-    public function testAnalyticsHeadInjection(): void
-    {
-        $content = '<html><head></head><body>test</body></html>';
-
-        $analytics = $this->getAnalyticsValue(true);
+        $content = '<html><head></head><body>test content</body></html>';
 
         if (!empty($analytics)) {
             $content = str_replace('</head>', $analytics."\n</head>", $content);
         }
 
-        $this->assertStringContainsString('<script>analytics</script>', $content);
-    }
-
-    public function testFooterCodeInitialization(): void
-    {
-        $footerScript    = '<script>footer</script>';
-        $footerAnalytics = $footerScript;
-
-        $this->assertEquals($footerScript, $footerAnalytics);
-    }
-
-    public function testDispatcherHasListenersCondition(): void
-    {
-        $hasListeners = $this->getHasListenersValue();
-
-        if ($hasListeners) {
-            $result = 'event dispatched';
-        } else {
-            $result = 'no listeners';
+        if (!empty($footerAnalytics)) {
+            $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
         }
 
-        $this->assertEquals('event dispatched', $result);
+        if ($noIndex) {
+            $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
+        }
+
+        foreach ($expectedStrings as $expected) {
+            $this->assertStringContainsString($expected, $content);
+        }
     }
 
-    private function getFooterValue(bool $hasFooter): string
+    public static function analyticsScenarioProvider(): array
     {
-        return $hasFooter ? '<script>footer</script>' : '';
-    }
-
-    private function getAnalyticsValue(bool $hasAnalytics): string
-    {
-        return $hasAnalytics ? '<script>analytics</script>' : '';
-    }
-
-    private function getHasListenersValue(): bool
-    {
-        return true;
+        return [
+            'head only' => [
+                '<script>head</script>',
+                '',
+                false,
+                ['<script>head</script>', 'test content'],
+            ],
+            'footer only' => [
+                '',
+                '<script>footer</script>',
+                false,
+                ['<script>footer</script>', 'test content'],
+            ],
+            'both scripts' => [
+                '<script>head</script>',
+                '<script>footer</script>',
+                false,
+                ['<script>head</script>', '<script>footer</script>', 'test content'],
+            ],
+            'noindex only' => [
+                '',
+                '',
+                true,
+                ['<meta name="robots" content="noindex">', 'test content'],
+            ],
+            'all features' => [
+                '<script>head</script>',
+                '<script>footer</script>',
+                true,
+                ['<script>head</script>', '<script>footer</script>', '<meta name="robots" content="noindex">', 'test content'],
+            ],
+            'no analytics' => [
+                '',
+                '',
+                false,
+                ['test content'],
+            ],
+        ];
     }
 }
