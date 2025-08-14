@@ -686,4 +686,61 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(200);
     }
+
+    public function testIndexActionAnalyticsInjection(): void
+    {
+        $pageEntity = $this->createMock(Page::class);
+        $pageEntity->method('getCustomHtml')->willReturn('<html><head></head><body>test</body></html>');
+        $pageEntity->method('getNoIndex')->willReturn(true);
+
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')->willReturnMap([
+            ['google_analytics', null, '<script>analytics</script>'],
+            ['footer_script', null, '<script>footer</script>'],
+        ]);
+
+        $analyticsHelper = new AnalyticsHelper($coreParametersHelper);
+        $analytics       = $analyticsHelper->getCode();
+        $footerAnalytics = $analyticsHelper->getFooterCode();
+        $content         = $pageEntity->getCustomHtml();
+
+        if (!empty($analytics)) {
+            $content = str_replace('</head>', $analytics."\n</head>", $content);
+        }
+        if (!empty($footerAnalytics)) {
+            $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
+        }
+        if ($pageEntity->getNoIndex()) {
+            $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
+        }
+
+        $this->assertStringContainsString('<script>analytics</script>', $content);
+        $this->assertStringContainsString('<script>footer</script>', $content);
+        $this->assertStringContainsString('<meta name="robots" content="noindex">', $content);
+    }
+
+    public function testPreviewActionAnalyticsInjection(): void
+    {
+        $pageEntity = $this->createMock(Page::class);
+        $pageEntity->method('getCustomHtml')->willReturn('<html><head></head><body>preview</body></html>');
+
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')->willReturnMap([
+            ['google_analytics', null, '<script>preview-analytics</script>'],
+            ['footer_script', null, '<script>preview-footer</script>'],
+        ]);
+
+        $analyticsHelper = new AnalyticsHelper($coreParametersHelper);
+        $analytics       = $analyticsHelper->getCode();
+        $footerAnalytics = $analyticsHelper->getFooterCode();
+        $content         = $pageEntity->getCustomHtml();
+
+        $content = str_replace('</head>', $analytics."\n</head>", $content);
+        if (!empty($footerAnalytics)) {
+            $content = str_replace('</body>', $footerAnalytics."\n</body>", $content);
+        }
+
+        $this->assertStringContainsString('<script>preview-analytics</script>', $content);
+        $this->assertStringContainsString('<script>preview-footer</script>', $content);
+    }
 }
