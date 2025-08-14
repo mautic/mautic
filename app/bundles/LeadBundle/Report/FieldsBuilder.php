@@ -15,6 +15,7 @@ class FieldsBuilder
         private ListModel $listModel,
         private UserModel $userModel,
         private LeadModel $leadModel,
+        private DncReportService $dncReportService,
     ) {
     }
 
@@ -77,6 +78,9 @@ class FieldsBuilder
                 'notEmpty' => 'mautic.core.operator.isnotempty',
             ],
         ];
+
+        // Add DNC Status filter
+        $filters = array_merge($filters, $this->dncReportService->getDncFilters());
 
         $ownerPrefix           = $prefix.'owner_id';
         $ownersList            = [];

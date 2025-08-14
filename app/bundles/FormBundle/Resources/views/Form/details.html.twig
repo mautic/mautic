@@ -386,54 +386,68 @@
     </div>
     <!--/ right section -->
 
-    <!-- #modal-automatic-copy -->
-    <div class="modal fade" id="modal-automatic-copy">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.embedded'|trans }}</h5>
-                </div>
-                <div class="modal-body">
-                    <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
-                    <h3>{{ 'mautic.form.form.help.automaticcopy.js'|trans }}</h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="{{ url('mautic_form_generateform', {'id': activeForm.id}, true) }}"&gt;&lt;/script&gt;</textarea>
-                    <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="{{ url('mautic_form_preview', {'id': activeForm.id}, true) }}" width="300" height="300"&gt;&lt;p&gt;Your browser does not support iframes.&lt;/p&gt;&lt;/iframe&gt;</textarea>
-                    <i>{{ 'mautic.form.form.help.automaticcopy.iframe.note'|trans }}</i>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-ghost" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--/ #modal-automatic-copy -->
+    {% set automaticCopyModalContent %}
+        <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
+        <h3>{{ 'mautic.form.form.help.automaticcopy.js'|trans }}</h3>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'single',
+            'innerText': ('<script type="text/javascript" src="' ~ absolute_url(path('mautic_form_generateform', {'id': activeForm.id})) ~ '"></script>')
+        }) }}
+        <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'single',
+            'innerText': ('<iframe src="' ~ absolute_url(path('mautic_form_preview', {'id': activeForm.id})) ~ '" width="300" height="300" title="' ~ ('mautic.form.form.iframe.title'|trans) ~ '"><p>Your browser does not support iframes.</p></iframe>')
+        }) }}
+        <i>{{ 'mautic.form.form.help.automaticcopy.iframe.note'|trans }}</i>
+    {% endset %}
 
-    <!-- #modal-manual-copy -->
-    <div class="modal fade" id="modal-manual-copy">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.selfhosted'|trans }}</h5>
-                </div>
-                <div class="panel-body">
-                    <p>{{ 'mautic.form.form.help.selfhosted'|trans }}</p>
+    {{ include('@MauticCore/Components/modal.html.twig', {
+        id: 'modal-automatic-copy',
+        modalLabel: 'mautic.form.form.header.copy',
+        modalHeading: 'mautic.form.form.header.embedded',
+        modalContent: automaticCopyModalContent,
+        buttons: [
+            {
+                label: 'mautic.core.close'|trans,
+                variant: 'primary',
+                attributes: {
+                    'data-dismiss': 'modal'
+                }
+            }
+        ]
+    }) }}
 
-                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
-                    <textarea class="form-html form-control" readonly
-                              onclick="this.setSelectionRange(0, this.value.length);">{{ formScript|purify }}</textarea>
+    {% set manualCopyModalContent %}
+        <p>{{ 'mautic.form.form.help.selfhosted'|trans }}</p>
 
-                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
-                    <textarea class="form-html form-control" readonly
-                              onclick="this.setSelectionRange(0, this.value.length);">{{ formContent|raw }}</textarea>
-                </div>
-                <div class="panel-footer text-right">
-                    <button type="button" class="btn btn-ghost" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--/ #modal-manual-copy -->
+        <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'multi',
+            'innerText': formScript
+        }) }}
+
+        <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'multi',
+            'innerText': formContent
+        }) }}
+    {% endset %}
+
+    {{ include('@MauticCore/Components/modal.html.twig', {
+        id: 'modal-manual-copy',
+        modalLabel: 'mautic.form.form.header.copy',
+        modalHeading: 'mautic.form.form.header.selfhosted',
+        modalContent: manualCopyModalContent,
+        buttons: [
+            {
+                label: 'mautic.core.close'|trans,
+                variant: 'primary',
+                attributes: {
+                    'data-dismiss': 'modal'
+                }
+            }
+        ]
+    }) }}
 </div>
 <!--/ end: box layout -->
 
