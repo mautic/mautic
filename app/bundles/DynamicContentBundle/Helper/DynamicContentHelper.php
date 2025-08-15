@@ -136,17 +136,7 @@ class DynamicContentHelper
                     continue;
                 }
 
-                $dwcs = $this->getDwcsBySlotName($slotName);
-
-                /** @var DynamicContent $dwc */
-                foreach ($dwcs as $dwc) {
-                    if ($dwc->getIsCampaignBased()) {
-                        continue;
-                    }
-                    $content                   = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
-                    $tokens[$token]['content'] = $content;
-                    $tokens[$token]['filters'] = $dwc->getFilters();
-                }
+                $tokens[$token] = $lead ? $this->getDynamicContentSlotForLead($slotName, $lead) : '';
             }
 
             unset($matches);
