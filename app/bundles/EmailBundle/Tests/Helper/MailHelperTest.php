@@ -100,6 +100,8 @@ class MailHelperTest extends TestCase
 
     private EntityManagerInterface&MockObject $entityManager;
 
+    private ModelFactory&MockObject $mockFactory;
+
     /**
      * @var array<array<string,string|int>>
      */
@@ -149,6 +151,7 @@ class MailHelperTest extends TestCase
         $this->entityManager        = $this->createMock(EntityManagerInterface::class);
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->requestStack         = new RequestStack();
+        $this->mockFactory          = $this->createMock(ModelFactory::class);
 
         $this->entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
@@ -1624,6 +1627,58 @@ class MailHelperTest extends TestCase
         $this->assertCount(1, $to);
         $this->assertEquals($email, $to[0]->getAddress());
         $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
+    }
+
+    public function testClearMetadataAfterSend(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->mockFactory,
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class)
+        );
+
+        $email = new Email();
+        $email->setSubject('Test Subject');
+        $email->setCustomHtml('Test content');
+        $mailer->setEmail($email);
+
+        // Add metadata to the message by setting lead and body
+        $contact = $this->contacts[0];
+        $mailer->addTo($contact['email']);
+        $mailer->setLead($contact);
+        $mailer->setBody('Test email body with {firstname} token');
+
+        // Manually add metadata to verify clearing functionality
+        $mailer->message->addMetadata($contact['email'], ['test' => 'metadata']);
+
+        // Verify metadata exists before sending
+        $metadataBeforeSend = $mailer->message->getMetadata();
+        $this->assertCount(1, $metadataBeforeSend, 'Metadata should exist before sending');
+
+        // Send the email
+        $mailer->send();
+
+        // Verify metadata is cleared after sending
+        $metadataAfterSend = $mailer->message->getMetadata();
+        $this->assertCount(0, $metadataAfterSend, 'Metadata should be cleared after sending to prevent memory leaks');
     }
 
     public function testSetCcWithIndexedArray(): void

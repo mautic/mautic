@@ -625,7 +625,7 @@ SQL;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
-            $deleteEntries = $conn->executeQuery($sql, [$campaignId], [Types::INTEGER])->rowCount();
+            $deleteEntries = $conn->executeStatement($sql, [$campaignId], [Types::INTEGER]);
         }
     }
 
@@ -639,7 +639,7 @@ SQL;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
-            $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
+            $deleteEntries = $conn->executeStatement($sql, [$eventIds], [ArrayParameterType::INTEGER]);
         }
     }
 

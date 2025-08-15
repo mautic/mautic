@@ -261,6 +261,6 @@ class AuditLogRepository extends CommonRepository
         $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
         $conn       = $this->getEntityManager()->getConnection();
 
-        return $conn->executeQuery($sql)->rowCount();
+        return $conn->executeStatement($sql);
     }
 }

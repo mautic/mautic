@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -15,13 +16,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreviewFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
     private const PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
 
     public function testPreviewPage(): void
     {
-        $lead  = $this->createLead();
+        $lead  = $this->createLead('John', 'Doe', 'test@domain.tld');
         $email = $this->createEmail();
         $this->em->flush();
 
@@ -65,20 +67,11 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    private function createLead(): Lead
-    {
-        $lead = new Lead();
-        $lead->setEmail('test@domain.tld');
-        $this->em->persist($lead);
-
-        return $lead;
-    }
-
     public function testPreviewEmailWithCorrectDCVariationFilterSegmentMembership(): void
     {
         $segment1 = $this->createSegment('Segment 1');
         $segment2 = $this->createSegment('Segment 2');
-        $lead     = $this->createLead();
+        $lead     = $this->createLead('John', 'Doe', 'test@domain.tld');
         $this->addLeadToSegment($lead, $segment1);
         $email = $this->createEmail();
 
@@ -242,6 +235,37 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/email/preview/5009');
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
+    }
+
+    public function testPreviewEmailForContactWithPrimaryCompany(): void
+    {
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+
+        $this->em->persist($company);
+
+        $lead    = $this->createLead('John', 'Doe', 'test@domain.tld');
+        $lead->setCompany($company->getName());
+        $this->em->persist($lead);
+
+        $this->createPrimaryCompanyForLead($lead, $company);
+
+        $email = $this->createEmail();
+        $email->setCustomHtml('<html><body>Contact emails is {contactfield=email}. Company Name: {contactfield=companyname} and Company City: {contactfield=companycity}</body></html>');
+
+        $this->em->flush();
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        $url                    = "/email/preview/{$email->getId()}";
+        $urlWithContact         = "{$url}?contactId={$lead->getId()}";
+        $contentNoContactInfo   = 'Contact emails is [Email]. Company Name: [Company Name] and Company City: [City]';
+        $contentWithContactInfo = sprintf('Contact emails is %s. Company Name: %s and Company City: %s', $lead->getEmail(), $company->getName(), $company->getCity());
+
+        // Admin user
+        $this->assertPageContent($url, $contentNoContactInfo);
+        $this->assertPageContent($urlWithContact, $contentWithContactInfo);
     }
 
     private function createSegment(string $name = 'Segment 1'): LeadList
