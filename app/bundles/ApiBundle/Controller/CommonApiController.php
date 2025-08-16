@@ -505,15 +505,13 @@ class CommonApiController extends FetchCommonApiController
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
-        // continuing only in edit action
-        if ('edit' === $action) {
+        // continuing only in edit action and if the entity has isPublished property
+        if ('edit' === $action && null !== $publishedStatus) {
             // if the entity has isPublished property in parameters then using that else using original
-            if (null !== $publishedStatus) {
-                if (isset($parameters['isPublished'])) {
-                    $publishedStatus = $parameters['isPublished'];
-                } else {
-                    $entity->setIsPublished($publishedStatus);
-                }
+            if (isset($parameters['isPublished'])) {
+                $publishedStatus = $parameters['isPublished'];
+            } else {
+                $entity->setIsPublished($publishedStatus);
             }
         }
 
