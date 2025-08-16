@@ -495,20 +495,25 @@ class CommonApiController extends FetchCommonApiController
             unset($submitParams['category']);
         }
 
-        // saving the previous published status
-        $publishedStatus = $entity->getIsPublished();
+        // if the entity has isPublished property then saving the previous published status
+        $publishedStatus = null;
+        if (property_exists($entity, 'isPublished')) {
+            $publishedStatus = $entity->getIsPublished();
+        }
 
         $this->prepareParametersFromRequest($form, $submitParams, $entity, $this->dataInputMasks);
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
-        // if it is an edit action, we need to restore the original published status
+        // continuing only in edit action
         if ('edit' === $action) {
-            // if isPublished is set in request then we will use that, else we will use saved one
-            if (isset($parameters['isPublished'])) {
-                $publishedStatus = $parameters['isPublished'];
-            } else {
-                $entity->setIsPublished($publishedStatus);
+            // if the entity has isPublished property in parameters then using that else using original
+            if (null !== $publishedStatus) {
+                if (isset($parameters['isPublished'])) {
+                    $publishedStatus = $parameters['isPublished'];
+                } else {
+                    $entity->setIsPublished($publishedStatus);
+                }
             }
         }
 
