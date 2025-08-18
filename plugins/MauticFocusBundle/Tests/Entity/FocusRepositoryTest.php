@@ -54,7 +54,7 @@ class FocusRepositoryTest extends TestCase
     public function testAddSearchCommandWhereClauseWithStyleBar(): void
     {
         $filter = $this->createFilter('style:bar');
-        
+
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
             ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
@@ -84,7 +84,7 @@ class FocusRepositoryTest extends TestCase
     public function testAddSearchCommandWhereClauseWithStyleModal(): void
     {
         $filter = $this->createFilter('style:modal');
-        
+
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
             ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
@@ -114,7 +114,7 @@ class FocusRepositoryTest extends TestCase
     public function testAddSearchCommandWhereClauseWithStyleNotification(): void
     {
         $filter = $this->createFilter('style:notification');
-        
+
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
             ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
@@ -144,7 +144,7 @@ class FocusRepositoryTest extends TestCase
     public function testAddSearchCommandWhereClauseWithStyleFullpage(): void
     {
         $filter = $this->createFilter('style:fullpage');
-        
+
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
             ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
@@ -174,7 +174,7 @@ class FocusRepositoryTest extends TestCase
     public function testAddSearchCommandWhereClauseWithNotFilter(): void
     {
         $filter = $this->createFilter('style:bar', true);
-        
+
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
             ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {

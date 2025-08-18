@@ -177,7 +177,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandIntegration(): void
     {
         $q = $this->focusRepository->createQueryBuilder('f');
-        
+
         $filter = $this->createFilter('style:bar');
         [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
 
