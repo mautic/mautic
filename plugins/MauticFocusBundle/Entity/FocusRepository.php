@@ -65,37 +65,25 @@ class FocusRepository extends CommonRepository
         $parameters      = [];
         $forceParameters = [];
 
-        switch ($command) {
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylebar'):
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylebar', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('f.style', ":$unique");
-                $forceParameters = [$unique => 'bar'];
-                break;
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylemodal'):
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylemodal', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('f.style', ":$unique");
-                $forceParameters = [$unique => 'modal'];
-                break;
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylenotification'):
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylenotification', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('f.style', ":$unique");
-                $forceParameters = [$unique => 'notification'];
-                break;
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylefullpage'):
-            case $this->translator->trans('mautic.focus.focus.searchcommand.stylefullpage', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('f.style', ":$unique");
-                $forceParameters = [$unique => 'page'];
-                break;
-            case $this->translator->trans('mautic.project.searchcommand.name'):
-            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
-                return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
-                    'focus_id',
-                    'focus_projects_xref',
-                    $this->getTableAlias(),
-                    $filter->string,
-                    $filter->not
-                );
+        $styleMapping = [
+            'mautic.focus.focus.searchcommand.stylebar'          => 'bar',
+            'mautic.focus.focus.searchcommand.stylemodal'        => 'modal',
+            'mautic.focus.focus.searchcommand.stylenotification' => 'notification',
+            'mautic.focus.focus.searchcommand.stylefullpage'     => 'page',
+        ];
+
+        if (isset($styleMapping[$command]) || $this->isTranslatedCommand($command, array_keys($styleMapping))) {
+            $expr            = $q->expr()->eq('f.style', ":$unique");
+            $forceParameters = [$unique => $styleMapping[$command] ?? $this->getStyleValueFromCommand($command, $styleMapping)];
+        } elseif ($this->isTranslatedCommand($command, ['mautic.project.searchcommand.name'])) {
+            return $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'focus_id',
+                'focus_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            );
         }
 
         if ($expr && $filter->not) {
@@ -110,6 +98,38 @@ class FocusRepository extends CommonRepository
             $expr,
             $parameters,
         ];
+    }
+
+    /**
+     * Check if a command matches any of the given translation keys (including fallback to en_US)
+     *
+     * @param array<string> $translationKeys
+     */
+    private function isTranslatedCommand(string $command, array $translationKeys): bool
+    {
+        foreach ($translationKeys as $key) {
+            if ($command === $this->translator->trans($key) ||
+                $command === $this->translator->trans($key, [], null, 'en_US')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the style value from a translated command
+     *
+     * @param array<string, string> $styleMapping
+     */
+    private function getStyleValueFromCommand(string $command, array $styleMapping): ?string
+    {
+        foreach ($styleMapping as $key => $value) {
+            if ($command === $this->translator->trans($key) ||
+                $command === $this->translator->trans($key, [], null, 'en_US')) {
+                return $value;
+            }
+        }
+        return null;
     }
 
     /**
