@@ -118,11 +118,18 @@
                                     {% endif %}
                                 </td>
                                 <td class="visible-md visible-lg">
-                                    <a size="sm" class="label label-gray" href="{{-  path('mautic_contact_index', {
-                                        'search' : "#{'mautic.tagmanager.lead.searchcommand.list'|trans}:\"#{item.getTag()}\"",
-                                    }) -}}" data-toggle="ajax" {{- 0 == tagsCount[item.getId()] ? 'disabled=disabled' : '' -}}>
-                                    {{- 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}) -}}
-                                    </a>
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                        tags: [{
+                                            label: 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}),
+                                            color: 'gray',
+                                            size: 'sm',
+                                            attributes: {
+                                                href: path('mautic_contact_index', {'search': 'mautic.tagmanager.lead.searchcommand.list'|trans ~ ':"' ~ item.getTag() ~ '"'}),
+                                                'data-toggle': 'ajax',
+                                                disabled: 0 == tagsCount[item.getId()] ? 'disabled' : null
+                                            }
+                                        }]
+                                    } %}
                                 </td>
                                 <td class="visible-md visible-lg">{{ item.getId() }}</td>
                             </tr>
@@ -152,7 +159,7 @@
                                 } %}
                             </div>
                         {% endset %}
-            
+
                         {{ include('@MauticCore/Components/content-block.html.twig', {
                             heading: 'mautic.tagmanager.contentblock.heading',
                             subheading: 'mautic.tagmanager.contentblock.subheading',
