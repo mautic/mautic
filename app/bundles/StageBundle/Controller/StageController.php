@@ -495,26 +495,36 @@ class StageController extends AbstractFormController
                 }
 
                 if ($valid) {
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.stage.notice.merged',
+                        'msgVars' => [
+                            '%name%' => $secondaryStage->getName(),
+                            '%into%' => $primaryStage->getName(),
+                        ],
+                    ];
+                    
                     $viewParameters = [
-                        'objectId'     => $primaryStage->getId(),
-                        'objectAction' => 'edit',
+                        'page' => $page,
                     ];
                 }
             } else {
                 $viewParameters = [
-                    'objectId'     => $secondaryStage->getId(),
-                    'objectAction' => 'edit',
+                    'page' => $page,
                 ];
             }
 
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $this->generateUrl('mautic_stage_action', $viewParameters),
+                    'returnUrl'       => $this->generateUrl('mautic_stage_index', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::editAction',
+                    'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
+                        'activeLink' => '#mautic_stage_index',
+                        'mauticContent' => 'stage',
                     ],
+                    'flashes' => $flashes ?? [],
                 ]
             );
         }
