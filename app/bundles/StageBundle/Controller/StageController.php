@@ -627,6 +627,8 @@ final class StageController extends AbstractFormController
 
     /**
      * Handle merge form submission to reduce cognitive complexity.
+     *
+     * @param array<string, mixed> $postActionVars
      */
     private function handleMergeFormSubmission(Request $request, \Symfony\Component\Form\FormInterface $form, StageModel $model, Stage $secondaryStage, array $postActionVars, int $page): Response
     {

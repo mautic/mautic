@@ -110,8 +110,6 @@ final class StageRepository extends CommonRepository
             $user = $user->getId();
         }
 
-        $key = (int) $user.$id;
-
         $q = $this->_em->createQueryBuilder()
             ->from(Stage::class, 's', 's.id');
 
@@ -132,9 +130,7 @@ final class StageRepository extends CommonRepository
 
         $q->orderBy('s.name');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
