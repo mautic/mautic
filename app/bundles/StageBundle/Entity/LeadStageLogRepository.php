@@ -49,10 +49,38 @@ class LeadStageLogRepository extends CommonRepository
 
     public function updateStage($fromStageId, $toStageId): void
     {
-        $this->_em->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-            ->set('stage_id', (int) $toStageId)
-            ->where('stage_id = '.(int) $fromStageId)
-            ->executeStatement();
+        $records = $this->_em->getConnection()->createQueryBuilder()
+            ->select('pl.lead_id, pl.ip_id, pl.date_fired')
+            ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
+            ->where('pl.stage_id = '.(int) $fromStageId)
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        if (!empty($records)) {
+            foreach ($records as $record) {
+                $existingRecord = $this->_em->getConnection()->createQueryBuilder()
+                    ->select('pl.stage_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
+                    ->where('pl.stage_id = '.(int) $toStageId)
+                    ->andWhere('pl.lead_id = '.(int) $record['lead_id'])
+                    ->executeQuery()
+                    ->fetchOne();
+
+                if ($existingRecord) {
+                    $this->_em->getConnection()->createQueryBuilder()
+                        ->delete(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
+                        ->where('stage_id = '.(int) $fromStageId)
+                        ->andWhere('lead_id = '.(int) $record['lead_id'])
+                        ->executeStatement();
+                } else {
+                    $this->_em->getConnection()->createQueryBuilder()
+                        ->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
+                        ->set('stage_id', (int) $toStageId)
+                        ->where('stage_id = '.(int) $fromStageId)
+                        ->andWhere('lead_id = '.(int) $record['lead_id'])
+                        ->executeStatement();
+                }
+            }
+        }
     }
 }

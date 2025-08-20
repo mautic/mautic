@@ -104,9 +104,10 @@ class StageRepository extends CommonRepository
      *
      * @return array
      */
+    private static $stages = [];
+
     public function getStages($user = false, $id = '')
     {
-        static $stages = [];
 
         if (is_object($user)) {
             $user = $user->getId();
@@ -143,6 +144,8 @@ class StageRepository extends CommonRepository
 
         return $results;
     }
+
+
 
     /**
      * Get a list of stages.

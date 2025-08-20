@@ -183,21 +183,31 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             return $mainStage;
         }
 
-        $this->em->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX.'leads')
-            ->set('stage_id', (int) $mainStageId)
-            ->where('stage_id = '.(int) $secStageId)
-            ->executeStatement();
+        $this->em->beginTransaction();
 
-        /** @var StagesChangeLogRepository $changeLogRepo */
-        $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
-        $changeLogRepo->updateStage($secStageId, $mainStageId);
+        try {
+            $this->em->getConnection()->createQueryBuilder()
+                ->update(MAUTIC_TABLE_PREFIX.'leads')
+                ->set('stage_id', (int) $mainStageId)
+                ->where('stage_id = '.(int) $secStageId)
+                ->executeStatement();
 
-        /** @var LeadStageLogRepository $leadStageLogRepo */
-        $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
-        $leadStageLogRepo->updateStage($secStageId, $mainStageId);
+            /** @var StagesChangeLogRepository $changeLogRepo */
+            $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
+            $changeLogRepo->updateStage($secStageId, $mainStageId);
 
-        $this->deleteEntity($secStage);
+            /** @var LeadStageLogRepository $leadStageLogRepo */
+            $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
+            $leadStageLogRepo->updateStage($secStageId, $mainStageId);
+
+            $this->deleteEntity($secStage);
+
+            $this->em->commit();
+        } catch (\Exception $e) {
+            $this->em->rollback();
+            $this->logger->error('STAGE: Error during merge: ' . $e->getMessage());
+            throw $e;
+        }
 
         return $mainStage;
     }

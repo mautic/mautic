@@ -446,6 +446,7 @@ class StageController extends AbstractFormController
         }
 
         $stages       = $model->getRepository()->getStages(false, $secondaryStage->getId());
+
         $stageChoices = [];
         foreach ($stages as $stage) {
             $stageChoices[$stage['name']] = $stage['id'];
@@ -457,14 +458,16 @@ class StageController extends AbstractFormController
             StageMergeType::class,
             [],
             [
-                'action' => $action,
                 'stages' => $stageChoices,
+                'action' => $action,
             ]
         );
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $valid = true;
-            if (!$this->isFormCancelled($form)) {
+            $valid = false;
+            $flashes = [];
+
+            if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $data         = $form->getData();
                     $primaryId    = $data['stage_to_merge'];
@@ -492,9 +495,7 @@ class StageController extends AbstractFormController
                     }
 
                     $model->stageMerge($primaryStage, $secondaryStage);
-                }
 
-                if ($valid) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.stage.notice.merged',
@@ -503,30 +504,36 @@ class StageController extends AbstractFormController
                             '%into%' => $primaryStage->getName(),
                         ],
                     ];
-                    
-                    $viewParameters = [
-                        'page' => $page,
-                    ];
+
+                    $viewParameters = ['page' => $page];
+                    return $this->postActionRedirect(
+                        [
+                            'returnUrl'       => $this->generateUrl('mautic_stage_index', $viewParameters),
+                            'viewParameters'  => $viewParameters,
+                            'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
+                            'passthroughVars' => [
+                                'closeModal' => 1,
+                                'activeLink' => '#mautic_stage_index',
+                                'mauticContent' => 'stage',
+                            ],
+                            'flashes' => $flashes,
+                        ]
+                    );
                 }
             } else {
-                $viewParameters = [
-                    'page' => $page,
-                ];
+                return $this->postActionRedirect(
+                    array_merge(
+                        $postActionVars,
+                        [
+                            'passthroughVars' => [
+                                'closeModal' => 1,
+                                'activeLink' => '#mautic_stage_index',
+                                'mauticContent' => 'stage',
+                            ],
+                        ]
+                    )
+                );
             }
-
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $this->generateUrl('mautic_stage_index', $viewParameters),
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
-                    'passthroughVars' => [
-                        'closeModal' => 1,
-                        'activeLink' => '#mautic_stage_index',
-                        'mauticContent' => 'stage',
-                    ],
-                    'flashes' => $flashes ?? [],
-                ]
-            );
         }
 
         $tmpl = $request->get('tmpl', 'index');
