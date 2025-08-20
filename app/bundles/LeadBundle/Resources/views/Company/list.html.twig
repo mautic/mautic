@@ -163,12 +163,18 @@
                           <span size="sm" class="label label-gray">{{ item.score }}</span>
                       </td>
                       <td class="visible-md visible-lg">
-                          <a size="sm" class="label label-gray"
-                             href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
-                             data-toggle="ajax"
-                             {% if 0 == leadCounts[item.id] %}disabled="disabled"{% endif %}>
-                                  {{ 'mautic.lead.company.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}
-                          </a>
+                          {% include '@MauticCore/Helper/_tag.html.twig' with {
+                              tags: [{
+                                  label: 'mautic.lead.company.viewleads_count'|trans({'%count%': leadCounts[item.id]}),
+                                  color: 'gray',
+                                  size: 'sm',
+                                  attributes: {
+                                      href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans ~ ':' ~ item.id}),
+                                      'data-toggle': 'ajax',
+                                      disabled: 0 == leadCounts[item.id] ? 'disabled' : null
+                                  }
+                              }]
+                          } %}
                       </td>
                       <td class="visible-md visible-lg">{{ item.id }}</td>
                   </tr>
