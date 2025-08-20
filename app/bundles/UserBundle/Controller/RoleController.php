@@ -183,6 +183,100 @@ class RoleController extends FormController
     }
 
     /**
+     * Clone an existing role and present it as a new form.
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction(Request $request, $objectId)
+    {
+        if (!$this->security->isGranted('user:roles:create')) {
+            return $this->accessDenied();
+        }
+
+        /** @var RoleModel $model */
+        $model  = $this->getModel('user.role');
+        $source = $model->getEntity($objectId);
+
+        // set the page we came from
+        $page      = $request->getSession()->get('mautic.role.page', 1);
+        $returnUrl = $this->generateUrl('mautic_role_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'Mautic\\UserBundle\\Controller\\RoleController::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_role_index',
+                'mauticContent' => 'role',
+            ],
+        ];
+
+        if (null === $source) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, [
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.user.role.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ])
+            );
+        }
+
+        $entity            = $model->cloneEntity($source);
+        $permissionsConfig = $this->getPermissionsConfig($source);
+        $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
+        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+
+        if ('POST' === $request->getMethod()) {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $role        = $request->request->all()['role'] ?? [];
+                    $permissions = $role['permissions'] ?? null;
+
+                    if ($permissions !== null) {
+                        $model->setRolePermissions($entity, $permissions);
+                    }
+
+                    $model->saveEntity($entity);
+
+                    $this->addFlashMessage('mautic.core.notice.created', [
+                        '%name%'      => $entity->getName(),
+                        '%menu_link%' => 'mautic_role_index',
+                        '%url%'       => $this->generateUrl('mautic_role_action', [
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                        ]),
+                    ]);
+                }
+            }
+
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
+                return $this->postActionRedirect($postActionVars);
+            } elseif ($valid) {
+                return $this->editAction($request, $entity->getId(), true);
+            }
+        }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form'              => $form->createView(),
+                'permissionsConfig' => $permissionsConfig,
+            ],
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
+            'passthroughVars' => [
+                'activeLink'     => '#mautic_role_new',
+                'route'          => $action,
+                'mauticContent'  => 'role',
+                'permissionList' => $permissionsConfig['list'],
+            ],
+        ]);
+    }
+
+    /**
      * Generate's role edit form and processes post data.
      *
      * @param int  $objectId

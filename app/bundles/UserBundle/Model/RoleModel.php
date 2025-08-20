@@ -110,6 +110,19 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         return parent::getEntity($id);
     }
 
+    public function cloneEntity(Role $source): Role
+    {
+        $clone = new Role();
+        $clone->setName($this->translator->trans('mautic.user.role.clone.prefix', ['%name%' => $source->getName()], 'messages'));
+        $clone->setDescription($source->getDescription());
+        $clone->setIsAdmin($source->isAdmin());
+
+        $rawPermissions = $source->getRawPermissions();
+        $clone->setRawPermissions($rawPermissions);
+
+        return $clone;
+    }
+
     /**
      * @throws MethodNotAllowedHttpException
      */
