@@ -7,8 +7,10 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadStageLog>
  */
-class LeadStageLogRepository extends CommonRepository
+final class LeadStageLogRepository extends CommonRepository
 {
+    private const LEAD_ID_FIELD = 'lead_id = ';
+
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
@@ -18,7 +20,7 @@ class LeadStageLogRepository extends CommonRepository
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('pl.stage_id')
             ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
-            ->where('pl.lead_id = '.$toLeadId)
+            ->where('pl.'.self::LEAD_ID_FIELD.$toLeadId)
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -29,8 +31,8 @@ class LeadStageLogRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId);
+            ->set('lead_id', (string) $toLeadId)
+            ->where(self::LEAD_ID_FIELD.(int) $fromLeadId);
 
         if (!empty($actions)) {
             $q->andWhere(
@@ -40,7 +42,7 @@ class LeadStageLogRepository extends CommonRepository
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-                ->where('lead_id = '.(int) $fromLeadId)
+                ->where(self::LEAD_ID_FIELD.(int) $fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();
@@ -62,7 +64,7 @@ class LeadStageLogRepository extends CommonRepository
                     ->select('pl.stage_id')
                     ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
                     ->where('pl.stage_id = '.(int) $toStageId)
-                    ->andWhere('pl.lead_id = '.(int) $record['lead_id'])
+                    ->andWhere('pl.'.self::LEAD_ID_FIELD.(int) $record['lead_id'])
                     ->executeQuery()
                     ->fetchOne();
 
@@ -70,14 +72,14 @@ class LeadStageLogRepository extends CommonRepository
                     $this->_em->getConnection()->createQueryBuilder()
                         ->delete(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
                         ->where('stage_id = '.(int) $fromStageId)
-                        ->andWhere('lead_id = '.(int) $record['lead_id'])
+                        ->andWhere(self::LEAD_ID_FIELD.(int) $record['lead_id'])
                         ->executeStatement();
                 } else {
                     $this->_em->getConnection()->createQueryBuilder()
                         ->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
                         ->set('stage_id', (int) $toStageId)
                         ->where('stage_id = '.(int) $fromStageId)
-                        ->andWhere('lead_id = '.(int) $record['lead_id'])
+                        ->andWhere(self::LEAD_ID_FIELD.(int) $record['lead_id'])
                         ->executeStatement();
                 }
             }

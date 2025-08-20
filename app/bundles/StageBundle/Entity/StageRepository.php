@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Stage>
  */
-class StageRepository extends CommonRepository
+final class StageRepository extends CommonRepository
 {
     public function getEntities(array $args = [])
     {
@@ -104,8 +104,6 @@ class StageRepository extends CommonRepository
      *
      * @return array<int, array<string, mixed>>
      */
-    private static array $stages = [];
-
     public function getStages($user = false, $id = ''): array
     {
         if (is_object($user)) {
@@ -113,9 +111,6 @@ class StageRepository extends CommonRepository
         }
 
         $key = (int) $user.$id;
-        if (isset(self::$stages[$key])) {
-            return self::$stages[$key];
-        }
 
         $q = $this->_em->createQueryBuilder()
             ->from(Stage::class, 's', 's.id');
@@ -138,8 +133,6 @@ class StageRepository extends CommonRepository
         $q->orderBy('s.name');
 
         $results = $q->getQuery()->getArrayResult();
-
-        self::$stages[$key] = $results;
 
         return $results;
     }
