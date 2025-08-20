@@ -3,6 +3,7 @@
 namespace Mautic\StageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * @extends CommonRepository<Stage>
@@ -14,6 +15,13 @@ class StageRepository extends CommonRepository
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'c');
+
+        if (!empty($args['withContactCount'])) {
+            $q->leftJoin(Lead::class, 'l', 'WITH', 'l.stage = s')
+                ->addSelect('COUNT(l.id) AS contactCount')
+                ->groupBy('s.id');
+            unset($args['withContactCount']);
+        }
 
         $args['qb'] = $q;
 
