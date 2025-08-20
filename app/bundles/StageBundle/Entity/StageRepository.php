@@ -99,23 +99,22 @@ class StageRepository extends CommonRepository
     /**
      * Get a list of lists.
      *
-     * @param bool   $user
-     * @param string $id
+     * @param bool|object $user
+     * @param string      $id
      *
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    private static $stages = [];
+    private static array $stages = [];
 
-    public function getStages($user = false, $id = '')
+    public function getStages($user = false, $id = ''): array
     {
-
         if (is_object($user)) {
             $user = $user->getId();
         }
 
         $key = (int) $user.$id;
-        if (isset($stages[$key])) {
-            return $stages[$key];
+        if (isset(self::$stages[$key])) {
+            return self::$stages[$key];
         }
 
         $q = $this->_em->createQueryBuilder()
@@ -140,12 +139,10 @@ class StageRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
-        $stages[$key] = $results;
+        self::$stages[$key] = $results;
 
         return $results;
     }
-
-
 
     /**
      * Get a list of stages.

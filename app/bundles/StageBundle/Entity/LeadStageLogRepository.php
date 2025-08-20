@@ -47,7 +47,7 @@ class LeadStageLogRepository extends CommonRepository
         }
     }
 
-    public function updateStage($fromStageId, $toStageId): void
+    public function updateStage(int $fromStageId, int $toStageId): void
     {
         $records = $this->_em->getConnection()->createQueryBuilder()
             ->select('pl.lead_id, pl.ip_id, pl.date_fired')

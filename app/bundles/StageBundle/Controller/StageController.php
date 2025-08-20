@@ -406,7 +406,7 @@ class StageController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array<string, mixed>|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function mergeAction(Request $request, FormFactoryInterface $formFactory, $objectId)
     {
@@ -464,7 +464,7 @@ class StageController extends AbstractFormController
         );
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $valid = false;
+            $valid   = false;
             $flashes = [];
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -506,14 +506,15 @@ class StageController extends AbstractFormController
                     ];
 
                     $viewParameters = ['page' => $page];
+
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $this->generateUrl('mautic_stage_index', $viewParameters),
                             'viewParameters'  => $viewParameters,
                             'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
                             'passthroughVars' => [
-                                'closeModal' => 1,
-                                'activeLink' => '#mautic_stage_index',
+                                'closeModal'    => 1,
+                                'activeLink'    => '#mautic_stage_index',
                                 'mauticContent' => 'stage',
                             ],
                             'flashes' => $flashes,
@@ -526,8 +527,8 @@ class StageController extends AbstractFormController
                         $postActionVars,
                         [
                             'passthroughVars' => [
-                                'closeModal' => 1,
-                                'activeLink' => '#mautic_stage_index',
+                                'closeModal'    => 1,
+                                'activeLink'    => '#mautic_stage_index',
                                 'mauticContent' => 'stage',
                             ],
                         ]

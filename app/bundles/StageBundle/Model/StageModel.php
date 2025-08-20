@@ -188,7 +188,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         try {
             $this->em->getConnection()->createQueryBuilder()
                 ->update(MAUTIC_TABLE_PREFIX.'leads')
-                ->set('stage_id', (int) $mainStageId)
+                ->set('stage_id', (string) $mainStageId)
                 ->where('stage_id = '.(int) $secStageId)
                 ->executeStatement();
 
@@ -205,7 +205,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             $this->em->commit();
         } catch (\Exception $e) {
             $this->em->rollback();
-            $this->logger->error('STAGE: Error during merge: ' . $e->getMessage());
+            $this->logger->error('STAGE: Error during merge: '.$e->getMessage());
             throw $e;
         }
 
