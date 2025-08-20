@@ -46,4 +46,13 @@ class LeadStageLogRepository extends CommonRepository
             $q->executeStatement();
         }
     }
+
+    public function updateStage($fromStageId, $toStageId): void
+    {
+        $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
+            ->set('stage_id', (int) $toStageId)
+            ->where('stage_id = '.(int) $fromStageId)
+            ->executeStatement();
+    }
 }

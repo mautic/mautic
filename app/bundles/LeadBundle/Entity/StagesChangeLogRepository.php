@@ -55,6 +55,15 @@ class StagesChangeLogRepository extends CommonRepository
             ->executeStatement();
     }
 
+    public function updateStage($fromStageId, $toStageId): void
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
+            ->set('stage_id', (int) $toStageId)
+            ->where('stage_id = '.(int) $fromStageId)
+            ->executeStatement();
+    }
+
     /**
      * Get the current stage assigned to a lead.
      *

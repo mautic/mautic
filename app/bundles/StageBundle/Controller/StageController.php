@@ -5,6 +5,7 @@ namespace Mautic\StageBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Form\Type\StageMergeType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -398,6 +399,149 @@ class StageController extends AbstractFormController
         }
 
         return $this->newAction($request, $formFactory, $entity);
+    }
+
+    /**
+     * Stage merge function.
+     *
+     * @param int $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function mergeAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    {
+        $model = $this->getModel('stage');
+        \assert($model instanceof StageModel);
+        $secondaryStage = $model->getEntity($objectId);
+        $page           = $request->getSession()->get('mautic.stage.page', 1);
+
+        $returnUrl      = $this->generateUrl('mautic_stage_index', ['page' => $page]);
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_stage_index',
+                'mauticContent' => 'stage',
+            ],
+        ];
+
+        if (null === $secondaryStage) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.stage.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        } elseif (!$this->security->isGranted('stage:stages:edit')) {
+            return $this->accessDenied();
+        }
+
+        $stages       = $model->getRepository()->getStages(false, $secondaryStage->getId());
+        $stageChoices = [];
+        foreach ($stages as $stage) {
+            $stageChoices[$stage['name']] = $stage['id'];
+        }
+
+        $action = $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]);
+
+        $form = $formFactory->create(
+            StageMergeType::class,
+            [],
+            [
+                'action' => $action,
+                'stages' => $stageChoices,
+            ]
+        );
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $valid = true;
+            if (!$this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $data         = $form->getData();
+                    $primaryId    = $data['stage_to_merge'];
+                    $primaryStage = $model->getEntity($primaryId);
+
+                    if (null === $primaryStage) {
+                        return $this->postActionRedirect(
+                            array_merge(
+                                $postActionVars,
+                                [
+                                    'flashes' => [
+                                        [
+                                            'type'    => 'error',
+                                            'msg'     => 'mautic.stage.error.notfound',
+                                            'msgVars' => ['%id%' => $primaryId],
+                                        ],
+                                    ],
+                                ]
+                            )
+                        );
+                    } elseif ($model->isLocked($secondaryStage)) {
+                        return $this->isLocked($postActionVars, $secondaryStage, 'stage');
+                    } elseif ($model->isLocked($primaryStage)) {
+                        return $this->isLocked($postActionVars, $primaryStage, 'stage');
+                    }
+
+                    $model->stageMerge($primaryStage, $secondaryStage);
+                }
+
+                if ($valid) {
+                    $viewParameters = [
+                        'objectId'     => $primaryStage->getId(),
+                        'objectAction' => 'edit',
+                    ];
+                }
+            } else {
+                $viewParameters = [
+                    'objectId'     => $secondaryStage->getId(),
+                    'objectAction' => 'edit',
+                ];
+            }
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $this->generateUrl('mautic_stage_action', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::editAction',
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                    ],
+                ]
+            );
+        }
+
+        $tmpl = $request->get('tmpl', 'index');
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'tmpl'         => $tmpl,
+                    'action'       => $action,
+                    'form'         => $form->createView(),
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_stage_action',
+                        [
+                            'objectAction' => 'merge',
+                            'objectId'     => $secondaryStage->getId(),
+                        ]
+                    ),
+                ],
+                'contentTemplate' => '@MauticStage/Stage/merge.html.twig',
+                'passthroughVars' => [
+                    'route'  => false,
+                    'target' => ('update' == $tmpl) ? '.stage-merge-options' : null,
+                ],
+            ]
+        );
     }
 
     /**

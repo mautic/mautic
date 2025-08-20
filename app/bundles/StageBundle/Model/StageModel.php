@@ -11,7 +11,11 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\LeadStageLog;
+use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
@@ -166,6 +170,36 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $chart->setDataset($this->translator->trans('mautic.stage.changes'), $data);
 
         return $chart->render();
+    }
+
+    public function stageMerge(Stage $mainStage, Stage $secStage): Stage
+    {
+        $this->logger->debug('STAGE: Merging stages');
+
+        $mainStageId = $mainStage->getId();
+        $secStageId  = $secStage->getId();
+
+        if ($mainStageId === $secStageId) {
+            return $mainStage;
+        }
+
+        $this->em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->set('stage_id', (int) $mainStageId)
+            ->where('stage_id = '.(int) $secStageId)
+            ->executeStatement();
+
+        /** @var StagesChangeLogRepository $changeLogRepo */
+        $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
+        $changeLogRepo->updateStage($secStageId, $mainStageId);
+
+        /** @var LeadStageLogRepository $leadStageLogRepo */
+        $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
+        $leadStageLogRepo->updateStage($secStageId, $mainStageId);
+
+        $this->deleteEntity($secStage);
+
+        return $mainStage;
     }
 
     /**
