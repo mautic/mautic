@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
+// Define base paths with defaults
 $paths = [
-    // customizable
+    // customizable paths
     'themes'       => 'themes',
     'assets'       => 'app/assets',
     'media'        => 'media',
@@ -11,21 +13,23 @@ $paths = [
     'local_config' => '%kernel.project_dir%/config/local.php',
 ];
 
-$root        = $root ?? realpath(__DIR__.'/..');
+// Set root paths
+$root = $root ?? realpath(__DIR__.'/..');
 $projectRoot = $projectRoot ?? Mautic\CoreBundle\Loader\ParameterLoader::getProjectDirByRoot($root);
 
-// allow easy overrides of the above
-if (file_exists($projectRoot.'/config/paths_local.php')) {
-    include $projectRoot.'/config/paths_local.php';
-} elseif (file_exists($root.'/config/paths_local.php')) {
-    include $root.'/config/paths_local.php';
+// Check for local path overrides (only check one location, prioritizing project root)
+$localPathsFile = file_exists($projectRoot.'/config/paths_local.php') 
+    ? $projectRoot.'/config/paths_local.php'
+    : ($root.'/config/paths_local.php');
+
+if (file_exists($localPathsFile)) {
+    include $localPathsFile;
 }
 
-// fixed
-$paths = array_merge($paths, [
-    // remove /app from the root
-    'root'    => substr($root, 0, -4),
+// Add fixed paths - these cannot be overridden
+$paths += [
+    'root'    => substr($root, 0, -4), // remove /app from the root
     'app'     => 'app',
     'bundles' => 'app/bundles',
     'vendor'  => 'vendor',
-]);
+];
