@@ -131,7 +131,7 @@ class CustomFieldColumn
     {
         $hasIndex = $this->customFieldIndex->hasIndex($leadField);
 
-        if (!$hasIndex && $leadField->isIsIndex() && $leadField->isPublished()) {
+        if ($leadField->isIsIndex() && $leadField->isPublished() && !$hasIndex) {
             $this->customFieldIndex->addIndexOnColumn($leadField);
         } elseif ($hasIndex && (!$leadField->isIsIndex() || !$leadField->isPublished())) {
             $this->customFieldIndex->dropIndexOnColumn($leadField);
