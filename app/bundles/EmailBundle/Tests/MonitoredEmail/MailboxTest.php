@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,7 +27,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $this->assertEquals($expected, $mailbox->getMailboxSettings());
     }
@@ -69,7 +70,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->will($this->returnValue(__DIR__.'/../../../../cache/'));
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $settings = $mailbox->getMailboxSettings('EmailBundle', 'bounces');
 
@@ -116,7 +117,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->will($this->returnValue(__DIR__.'/../../../../cache/'));
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $settings = $mailbox->getMailboxSettings('EmailBundle', 'bounces');
 
@@ -151,7 +152,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        new Mailbox($parametersHelper, $pathsHelper);
 
         // Test $this->settings['use_attachments'] == true
         // dir creation is not failing
@@ -182,7 +183,118 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->with('tmp', true)
             ->will($this->returnValue(__DIR__.'/../../../../cache/tmp'));
 
-        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        new Mailbox($parametersHelper, $pathsHelper);
+    }
+
+    public function testEncodingConversionWithValidEncoding(): void
+    {
+        $string       = 'some UTF8 text with öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'UTF-8';
+        $toEncoding   = 'ISO-8859-1';
+
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+
+        $this->assertNotSame($string, $result, 'Converted string should differ from the original string.');
+    }
+
+    public function testEncodingConversionWithInvalidEncoding(): void
+    {
+        $string       = 'some text with non-ascii chars öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'INVALID-ENC';
+        $toEncoding   = 'ISO-8859-1';
+
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+
+        $this->assertSame($string, $result, 'Conversion with invalid encodings should return the original string.');
+    }
+
+    public function testEncodingConversionFallback(): void
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('Test skipped as the mbstring extension is not installed.');
+        }
+
+        $string       = 'some UTF-8 text with non-ascii chars öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'UTF-8';
+        $toEncoding   = 'ISO-8859-1';
+
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $listEncodings = mb_list_encodings();
+        if (in_array($fromEncoding, $listEncodings)) {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertNotSame($string, $result, 'Converted string should differ from the original string if conversion succeeds.');
+        } else {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertSame($string, $result, 'Conversion with invalid encodings should return the original string.');
+        }
+    }
+
+    public function testEncodingConversionFallbackWithInvalidEncoding(): void
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('Test skipped as the mbstring extension is not installed.');
+        }
+
+        $string       = 'some text with non-ascii chars öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'INVALID-ENC';
+        $toEncoding   = 'ISO-8859-1';
+
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $listEncodings = mb_list_encodings();
+        if (in_array($fromEncoding, $listEncodings)) {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertNotSame($string, $result, 'Converted string should differ from the original string if conversion succeeds.');
+        } else {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertSame($string, $result, 'Conversion with invalid encodings should return the original string.');
+        }
+    }
+
+    private function invokeConvertStringEncoding(Mailbox $mailbox, string $string, string $fromEncoding, string $toEncoding): string
+    {
+        $reflection = new \ReflectionClass($mailbox);
+        $method     = $reflection->getMethod('convertStringEncoding');
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($mailbox, [$string, $fromEncoding, $toEncoding]);
     }
 
     public function testIsConnectedReturnsFalseOnValueError(): void
