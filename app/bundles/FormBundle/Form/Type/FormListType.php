@@ -34,21 +34,18 @@ class FormListType extends AbstractType
 
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($repo, $viewOther): array {
-                static $choices;
-
-                if (is_array($choices)) {
-                    return $choices;
-                }
-
                 $choices = [];
 
-                $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type']);
+                $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type'], $options['top_level'], $options['ignore_ids']);
                 foreach ($forms as $form) {
-                    $choices[$form['name'].' ('.$form['id'].')'] = $form['id'];
+                    $choices[$form['language']]["{$form['name']} ({$form['id']})"] = $form['id'];
                 }
 
-                // sort by language
+                // sort by language then by name
                 ksort($choices);
+                foreach ($choices as &$group) {
+                    ksort($group);
+                }
 
                 return $choices;
             },
@@ -56,9 +53,11 @@ class FormListType extends AbstractType
             'multiple'          => true,
             'placeholder'       => false,
             'form_type'         => null,
+            'top_level'         => null,
+            'ignore_ids'        => [],
         ]);
 
-        $resolver->setDefined(['form_type']);
+        $resolver->setDefined(['form_type', 'top_level', 'ignore_ids']);
     }
 
     public function getParent(): ?string

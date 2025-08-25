@@ -54,15 +54,18 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
+     * @param string       $search
+     * @param int          $limit
+     * @param int          $start
+     * @param bool         $viewOther
+     * @param string|null  $formType
+     * @param bool|string  $topLevel
+     * @param array<int>   $ignoreIds
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
+    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null, $topLevel = false, array $ignoreIds = []): array
     {
         $q = $this->createQueryBuilder('f');
-        $q->select('partial f.{id, name, alias}');
+        $q->select('partial f.{id, name, alias, language}');
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('f.name', ':search'))
@@ -78,6 +81,17 @@ class FormRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('f.formType', ':type')
             )->setParameter('type', $formType);
+        }
+
+        if ($topLevel) {
+            if (true === $topLevel || 'translation' === $topLevel) {
+                $q->andWhere($q->expr()->isNull('f.translationParent'));
+            }
+        }
+
+        if (!empty($ignoreIds)) {
+            $q->andWhere($q->expr()->notIn('f.id', ':formIds'))
+                ->setParameter('formIds', $ignoreIds);
         }
 
         $q->orderBy('f.name');

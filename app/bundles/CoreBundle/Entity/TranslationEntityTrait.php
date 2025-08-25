@@ -14,14 +14,14 @@ trait TranslationEntityTrait
      *
      * @var string
      *
-     * @Groups({"page:read", "download:read", "email:read"})
+     * @Groups({"page:read", "download:read", "email:read", "form:read"})
      */
     public $languageSlug;
 
     /**
      * @var mixed
      *
-     * @Groups({"page:read", "download:read", "email:read"})
+     * @Groups({"page:read", "download:read", "email:read", "form:read"})
      **/
     private $translationChildren;
 
@@ -33,7 +33,7 @@ trait TranslationEntityTrait
     /**
      * @var string
      *
-     * @Groups({"page:read", "download:read", "email:read"})
+     * @Groups({"page:read", "download:read", "email:read", "form:read"})
      */
     private $language = 'en';
 

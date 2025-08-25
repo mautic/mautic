@@ -2,7 +2,9 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -30,6 +32,7 @@ class FormType extends AbstractType
     public function __construct(
         private CorePermissions $security,
         private LanguageHelper $langHelper,
+        private EntityManagerInterface $em,
     ) {
     }
 
@@ -58,6 +61,27 @@ class FormType extends AbstractType
                 ],
                 'placeholder'       => '',
             ]
+        );
+
+        $transformer = new IdToEntityModelTransformer($this->em, Form::class);
+        $builder->add(
+            $builder->create(
+                'translationParent',
+                FormListType::class,
+                [
+                    'label'      => 'mautic.core.form.translation_parent',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.core.form.translation_parent.help',
+                    ],
+                    'required'    => false,
+                    'multiple'    => false,
+                    'placeholder' => 'mautic.core.form.translation_parent.empty',
+                    'top_level'   => 'translation',
+                    'ignore_ids'  => [(int) $options['data']->getId()],
+                ]
+            )->addModelTransformer($transformer)
         );
 
         $builder->add('formAttributes', TextType::class, [
