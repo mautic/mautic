@@ -22,8 +22,8 @@ class FormFieldEmailType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $doNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
-        $hasDenyList       = !empty($doNotSubmitEmails) && is_array($doNotSubmitEmails);
+        $doNotSubmitEmails  = $this->coreParametersHelper->get('do_not_submit_emails');
+        $hasDenyList        = !empty($doNotSubmitEmails) && is_array($doNotSubmitEmails);
         $defaultDonotSubmit = $hasDenyList ? true : ($options['data']['donotsubmit'] ?? false);
 
         $builder->add(
