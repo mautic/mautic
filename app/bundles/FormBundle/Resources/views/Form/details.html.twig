@@ -109,20 +109,29 @@
     } %}
 {% endif %}
 
+{% if activeForm.isTranslation and not activeForm.isTranslation(true) %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with { 
+        tags: [{ 
+            color: 'blue', 
+            label: 'mautic.core.icon_tooltip.translation', 
+            icon: 'ri-translate', 
+            icon_only: true,
+            }] } %}
+{% endif %}
+
 {% if activeForm.isTranslation(true) %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
-        tags: [{
-            label: 'mautic.core.translation_of'|trans({'%parent%': translations.parent.getName()}),
-            icon: 'ri-translate',
-            color: 'warm-gray',
-            attributes: {
-                'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': translations.parent.id})
-            }
-        }]
+    {% include '@MauticCore/Helper/_tag.html.twig' with { 
+        tags: [{ 
+            color: 'warm-gray', 
+            label: 'mautic.core.translation_of'|trans({'%parent%': translations.parent.name}),
+            icon: 'ri-translate', 
+            attributes: { 
+                href: path('mautic_form_action', {'objectAction': 'view', 'objectId': translations.parent.id}) 
+            } 
+        }] 
     } %}
 {% endif %}
 
-{# Language #}
 {% if activeForm.language is defined and activeForm.language is not empty %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [{
