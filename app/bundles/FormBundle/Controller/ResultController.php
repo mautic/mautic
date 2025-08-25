@@ -392,7 +392,7 @@ class ResultController extends CommonFormController
         );
     }
 
-    public function markSpamAction(Request $request, Configurator $configurator)
+    public function markSpamAction(Request $request, Configurator $configurator): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
@@ -459,7 +459,7 @@ class ResultController extends CommonFormController
         );
     }
 
-    public function batchMarkSpamAction(Request $request, Configurator $configurator)
+    public function batchMarkSpamAction(Request $request, Configurator $configurator): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $formId  = $this->getFormIdFromRequest();
         $session = $request->getSession();
@@ -535,7 +535,7 @@ class ResultController extends CommonFormController
         foreach ($form->getFields() as $field) {
             if ('email' === $field->getType()) {
                 $alias = $field->getAlias();
-                if (!empty($results[$alias]) && false !== strpos($results[$alias], '@')) {
+                if (!empty($results[$alias]) && str_contains($results[$alias], '@')) {
                     return strtolower(substr(strrchr($results[$alias], '@'), 1));
                 }
             }
@@ -589,9 +589,6 @@ class ResultController extends CommonFormController
     {
         switch ($action) {
             case 'batchDelete':
-                $formId                             = $this->getFormIdFromRequest();
-                $args['viewParameters']['objectId'] = $formId;
-                break;
             case 'batchMarkSpam':
                 $formId                             = $this->getFormIdFromRequest();
                 $args['viewParameters']['objectId'] = $formId;
