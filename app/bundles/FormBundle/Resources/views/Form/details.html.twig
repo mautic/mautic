@@ -87,17 +87,6 @@
     ]
 } %}
 
-{% if activeForm.noIndex is defined and activeForm.noIndex == 1 %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
-        tags: [{
-            label: 'mautic.core.tag.search_index.disabled'|trans,
-            icon: 'ri-eye-off-fill',
-            color: 'blue',
-            icon_only: true
-        }]
-    } %}
-{% endif %}
-
 {% if activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [{
