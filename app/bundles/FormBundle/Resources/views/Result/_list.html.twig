@@ -22,6 +22,18 @@
                       'routeBase': 'form_results',
                       'query': {'formId': formId},
                       'templateButtons': {'delete': canDelete},
+                      'customButtons': [{
+                          'confirm': {
+                              'message': 'mautic.form.result.markspam.confirm_batch'|trans,
+                              'confirmText': 'mautic.form.result.markspam.batch'|trans,
+                              'confirmAction': path('mautic_form_results_action', {'objectAction': 'batchMarkSpam', 'formId': formId}),
+                              'iconClass': 'ri-spam-2-line',
+                              'btnText': 'mautic.form.result.markspam.batch'|trans,
+                              'precheck': 'batchActionPrecheck',
+                              'confirmCallback': 'executeBatchAction',
+                              'id': 'batchMarkSpam',
+                          }
+                      }],
                   }) }}
                 {% endif %}
 
@@ -84,12 +96,31 @@
               <tr>
                   {% if canDelete %}
                   <td>
+                      {% set custom = [] %}
+                      {% set hasEmail = false %}
+                      {% for key, r in item.results %}
+                          {% if 'email' == r.type and r.value is not empty %}
+                              {% set hasEmail = true %}
+                          {% endif %}
+                      {% endfor %}
+                      {% if hasEmail %}
+                          {% set custom = custom|merge([{
+                              'attr': {
+                                  'href': path('mautic_form_results_action', {'objectAction': 'markSpam', 'objectId': item.id, 'formId': formId}),
+                                  'data-toggle': 'ajax',
+                                  'data-method': 'POST',
+                              },
+                              'btnText': 'mautic.form.result.markspam'|trans,
+                              'iconClass': 'ri-spam-2-line',
+                          }]) %}
+                      {% endif %}
                       {{ include('@MauticCore/Helper/list_actions.html.twig', {
                           'item': item,
                           'templateButtons': {'delete': canDelete},
                           'route': 'mautic_form_results_action',
                           'langVar': 'form.results',
                           'query': {'formId': formId, 'objectAction': 'delete'},
+                          'customButtons': custom,
                       }) }}
                   </td>
                   {% endif %}

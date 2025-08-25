@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -11,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
@@ -390,6 +392,158 @@ class ResultController extends CommonFormController
         );
     }
 
+    public function markSpamAction(Request $request, Configurator $configurator)
+    {
+        $formId   = $request->get('formId', 0);
+        $objectId = $request->get('objectId', 0);
+        $session  = $request->getSession();
+        $page     = $session->get('mautic.formresult.'.$formId.'.page', 1);
+        $flashes  = [];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $model = $this->getModel('form.submission');
+            \assert($model instanceof SubmissionModel);
+
+            /** @var Submission|null $submission */
+            $submission = $model->getEntity($objectId);
+
+            if (null === $submission) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.form.error.notfound',
+                    'msgVars' => ['%id%' => $objectId],
+                ];
+            } elseif (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
+                return $this->accessDenied();
+            } else {
+                $domain = $this->getDomainFromSubmission($submission);
+
+                if ($domain) {
+                    $formatted = '*@'.$domain;
+                    $domains   = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                    if (!in_array($formatted, $domains, true)) {
+                        $domains[] = $formatted;
+                        $configurator->mergeParameters(['do_not_submit_emails' => $domains]);
+                        $configurator->write();
+                    }
+
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.form.result.markspam.success',
+                        'msgVars' => ['%domain%' => $domain],
+                    ];
+                } else {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => 'mautic.form.result.markspam.error',
+                    ];
+                }
+            }
+        }
+
+        $viewParameters = [
+            'objectId' => $formId,
+            'page'     => $page,
+        ];
+
+        return $this->postActionRedirect(
+            [
+                'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => 'Mautic\\FormBundle\\Controller\\ResultController::indexAction',
+                'passthroughVars' => [
+                    'mauticContent' => 'formresult',
+                ],
+                'flashes' => $flashes,
+            ]
+        );
+    }
+
+    public function batchMarkSpamAction(Request $request, Configurator $configurator)
+    {
+        $formId  = $this->getFormIdFromRequest();
+        $session = $request->getSession();
+        $page    = $session->get('mautic.formresult.'.$formId.'.page', 1);
+        $flashes = [];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $model = $this->getModel('form.submission');
+            \assert($model instanceof SubmissionModel);
+
+            $ids           = json_decode($request->query->get('ids', '[]'), true);
+            $domainsToSave = [];
+
+            foreach ($ids as $id) {
+                /** @var Submission|null $submission */
+                $submission = $model->getEntity($id);
+                if (null === $submission) {
+                    continue;
+                }
+                if (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
+                    $flashes[] = $this->accessDenied(true);
+                    continue;
+                }
+                $domain = $this->getDomainFromSubmission($submission);
+                if ($domain) {
+                    $domainsToSave['*@'.$domain] = true;
+                }
+            }
+
+            if ($domainsToSave) {
+                $existing = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                foreach (array_keys($domainsToSave) as $d) {
+                    if (!in_array($d, $existing, true)) {
+                        $existing[] = $d;
+                    }
+                }
+                $configurator->mergeParameters(['do_not_submit_emails' => $existing]);
+                $configurator->write();
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.result.markspam.batch.success',
+                ];
+            } else {
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.result.markspam.batch.none',
+                ];
+            }
+        }
+
+        $viewParameters = [
+            'objectId' => $formId,
+            'page'     => $page,
+        ];
+
+        return $this->postActionRedirect(
+            [
+                'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => 'Mautic\\FormBundle\\Controller\\ResultController::indexAction',
+                'passthroughVars' => [
+                    'mauticContent' => 'formresult',
+                ],
+                'flashes' => $flashes,
+            ]
+        );
+    }
+
+    private function getDomainFromSubmission(Submission $submission): ?string
+    {
+        $results = $submission->getResults();
+        $form    = $submission->getForm();
+        foreach ($form->getFields() as $field) {
+            if ('email' === $field->getType()) {
+                $alias = $field->getAlias();
+                if (!empty($results[$alias]) && false !== strpos($results[$alias], '@')) {
+                    return strtolower(substr(strrchr($results[$alias], '@'), 1));
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -435,6 +589,10 @@ class ResultController extends CommonFormController
     {
         switch ($action) {
             case 'batchDelete':
+                $formId                             = $this->getFormIdFromRequest();
+                $args['viewParameters']['objectId'] = $formId;
+                break;
+            case 'batchMarkSpam':
                 $formId                             = $this->getFormIdFromRequest();
                 $args['viewParameters']['objectId'] = $formId;
                 break;
