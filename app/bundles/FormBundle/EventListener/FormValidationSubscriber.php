@@ -10,6 +10,7 @@ use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\PhoneCountryValidationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -87,15 +88,32 @@ class FormValidationSubscriber implements EventSubscriberInterface
         $field = $event->getField();
         $value = $event->getValue();
 
-        if ('tel' === $field->getType() && !empty($field->getValidation()['international'])) {
-            $phoneUtil = PhoneNumberUtil::getInstance();
-            try {
-                $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException) {
-                if (!empty($field->getValidation()['international_validationmsg'])) {
-                    $event->failedValidation($field->getValidation()['international_validationmsg']);
-                } else {
-                    $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
+        if ('tel' === $field->getType()) {
+            $validation = $field->getValidation();
+
+            if (!empty($validation['country'])) {
+                $patterns = PhoneCountryValidationHelper::getCountryPatterns();
+                $country  = $validation['country'];
+                $regex    = $patterns[$country] ?? null;
+
+                if (empty($regex) || 0 === preg_match('~'.$regex.'~', $value)) {
+                    $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => $country], 'validators');
+                    $event->failedValidation($message);
+
+                    return;
+                }
+            }
+
+            if (!empty($validation['international'])) {
+                $phoneUtil = PhoneNumberUtil::getInstance();
+                try {
+                    $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
+                } catch (NumberParseException) {
+                    if (!empty($validation['international_validationmsg'])) {
+                        $event->failedValidation($validation['international_validationmsg']);
+                    } else {
+                        $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
+                    }
                 }
             }
         }
