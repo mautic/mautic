@@ -33,12 +33,8 @@
     {% endif %}
 
     {% set other_attributes = attributes|filter((v, k) => k != 'class' and k != 'id') %}
-    {% set truncated_label = translated_label %}
-    {% set label_tooltip = '' %}
-    {% if translated_label|length > 27 %}
-        {% set truncated_label = translated_label|slice(0,24) ~ '...' %}
-        {% set label_tooltip = translated_label %}
-    {% endif %}
+    {% set truncated_label = translated_label|u.truncate(27, '...') %}
+    {% set label_tooltip = translated_label|length > 27 ? translated_label : '' %}
 
     {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}

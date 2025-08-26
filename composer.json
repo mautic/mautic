@@ -22,7 +22,8 @@
     },
   "require": {
     "composer/installers": "^2.3",
-    "mautic/core-lib": "^7.0"
+    "mautic/core-lib": "^7.0",
+    "twig/string-extra": "^3.21"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",
