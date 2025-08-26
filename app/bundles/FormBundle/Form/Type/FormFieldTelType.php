@@ -27,7 +27,7 @@ class FormFieldTelType extends AbstractType
             ChoiceType::class,
             [
                 'label'       => 'mautic.form.field.type.tel.country_validation',
-                'choices'     => array_combine(PhoneCountryValidationHelper::getCountries(), PhoneCountryValidationHelper::getCountries()),
+                'choices'     => PhoneCountryValidationHelper::getCountries(),
                 'placeholder' => 'mautic.core.none',
                 'required'    => false,
                 'data'        => $options['data']['country'] ?? null,
@@ -51,7 +51,7 @@ class FormFieldTelType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'),
+                    'tooltip'      => $this->translator->trans('mautic.form.field.type.tel.international_validationmsg.tooltip'),
                     'data-show-on' => '{"formfield_validation_international_1": "checked"}',
                 ],
                 'required' => false,
