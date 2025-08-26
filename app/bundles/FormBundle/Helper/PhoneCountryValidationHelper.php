@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Helper;
 
 use Symfony\Component\Intl\Countries;
@@ -7,7 +9,7 @@ use Symfony\Component\Intl\Countries;
 /**
  * Provides regex patterns for validating phone numbers by country.
  */
-class PhoneCountryValidationHelper
+final class PhoneCountryValidationHelper
 {
     /**
      * Returns a mapping of country codes to validation regex patterns.
