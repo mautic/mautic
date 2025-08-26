@@ -66,7 +66,7 @@ class FormFieldTelType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => '[Country]'], 'validators'),
+                    'tooltip' => $this->translator->trans('mautic.form.field.type.tel.country_validationmsg.tooltip'),
                 ],
                 'required'   => false,
             ]
