@@ -2,6 +2,13 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
@@ -27,6 +34,25 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
+        new Post(security: "is_granted('dynamiccontent:dynamiccontents:create')"),
+        new Get(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
+        new Put(security: "is_granted('dynamiccontent:dynamiccontents:editown')"),
+        new Patch(security: "is_granted('dynamiccontent:dynamiccontents:editother')"),
+        new Delete(security: "is_granted('dynamiccontent:dynamiccontents:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['dynamicContent:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'translationChildren'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['dynamicContent:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
@@ -39,66 +65,79 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @var int
      */
+    #[Groups(['dynamicContent:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $name;
 
     /**
      * @Groups({"dynamicContent:read", "dynamicContent:write"})
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private string $type = TypeList::HTML;
 
     /**
      * @var string|null
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $description;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $category;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $publishDown;
 
     /**
      * @var string|null
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $content;
 
     /**
      * @var array|null
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $utmTags = [];
 
     /**
      * @var int
      */
+    #[Groups(['dynamicContent:read'])]
     private $sentCount = 0;
 
     /**
      * @var ArrayCollection<Stat>
      */
+    #[Groups(['dynamicContent:read'])]
     private $stats;
 
     /**
      * @var bool
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $isCampaignBased = true;
 
     /**
      * @var string|null
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $slotName;
 
     public function __construct()

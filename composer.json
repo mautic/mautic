@@ -162,7 +162,7 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate"
+    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
   },
   "config": {
     "platform": {
