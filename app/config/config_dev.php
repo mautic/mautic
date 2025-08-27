@@ -88,6 +88,11 @@ $container->loadFromExtension('maker', [
     'root_namespace' => 'Mautic',
 ]);
 
+// API Platform Configuration
+$container->loadFromExtension('api_platform', [
+    'enable_profiler'   => true,
+]);
+
 // Allow overriding config without a requiring a full bundle or hacks
 if (file_exists($configBaseDir.'/config/config_override.php')) {
     $loader->import($configBaseDir.'/config/config_override.php');

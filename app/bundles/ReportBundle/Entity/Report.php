@@ -2,8 +2,13 @@
 
 namespace Mautic\ReportBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -20,25 +25,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "report:read"
- *        },
- *       "swagger_definition_name"="Read",
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "report:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('report:reports:viewown')"),
+        new Post(security: "is_granted('report:reports:create')"),
+        new Get(security: "is_granted('report:reports:viewown')"),
+        new Put(security: "is_granted('report:reports:editown')"),
+        new Patch(security: "is_granted('report:reports:editother')"),
+        new Delete(security: "is_granted('report:reports:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['report:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['report:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Report extends FormEntity implements SchedulerInterface, UuidInterface
 {
     use UuidTrait;

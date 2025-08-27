@@ -6,6 +6,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\UserBundle\Model\UserModel;
 
@@ -26,7 +27,9 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($this->getFields());
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
+        $dncReportService = $this->createMock(DncReportService::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
         $expected = [
             'l.id' => [
@@ -162,7 +165,9 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($tagList);
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
+        $dncReportService = $this->createMock(DncReportService::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
         $expected = [
             'l.id' => [
@@ -281,7 +286,9 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 
         $leadModel = $this->createMock(LeadModel::class);
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
+        $dncReportService = $this->createMock(DncReportService::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
         $expected = [
             'comp.id' => [

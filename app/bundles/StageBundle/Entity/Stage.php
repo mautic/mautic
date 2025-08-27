@@ -2,6 +2,13 @@
 
 namespace Mautic\StageBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -13,26 +20,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "stage:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "stage:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('stage:stages:viewown')"),
+        new Post(security: "is_granted('stage:stages:create')"),
+        new Get(security: "is_granted('stage:stages:viewown')"),
+        new Put(security: "is_granted('stage:stages:editown')"),
+        new Patch(security: "is_granted('stage:stages:editother')"),
+        new Delete(security: "is_granted('stage:stages:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['stage:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['stage:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -40,31 +46,37 @@ class Stage extends FormEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['stage:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $description;
 
     /**
      * @var int
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $weight = 0;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $publishDown;
 
     /**
@@ -75,6 +87,7 @@ class Stage extends FormEntity implements UuidInterface
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
+    #[Groups(['stage:read', 'stage:write'])]
     private $category;
 
     public function __clone()

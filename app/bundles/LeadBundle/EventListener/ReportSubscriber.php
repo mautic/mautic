@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -73,6 +74,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private CompanyReportData $companyReportData,
         private FieldsBuilder $fieldsBuilder,
         private Translator $translator,
+        private DncReportService $dncReportService,
     ) {
     }
 
@@ -157,7 +159,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
                     ],
                 ];
-                $columns      = array_merge($columns, $stageColumns);
+                $columns      = array_merge($columns, $stageColumns, $this->dncReportService->getDncColumns());
             }
 
             $data = [
@@ -936,6 +938,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     unset($row);
                 }
             }
+        } elseif ($event->checkContext([self::CONTEXT_LEADS])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
         }
 
         $event->setData($data);

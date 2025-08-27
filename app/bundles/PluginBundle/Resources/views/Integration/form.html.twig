@@ -98,12 +98,18 @@
                 </div>
             {%- endif -%}
 
-            {%- if form.apiKeys|length > 0 and callbackUrl is not empty -%}
-                <div class="well well-sm">
-                    {{- 'mautic.integration.callbackuri'|trans }}<br/>
-                    <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="{{ callbackUrl|e }}" class="form-control"/>
-                </div>
-            {%- endif -%}
+            <div class="row">
+                {%- if form.apiKeys|length > 0 and callbackUrl is not empty -%}
+                    <div class="well well-sm">
+                        {{- 'mautic.integration.callbackuri'|trans }}<br/>
+                        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                            variant: 'single',
+                            innerText: callbackUrl,
+                            className: 'layer-two mt-sm'
+                        }) }}
+                    </div>
+                {%- endif -%}
+            </div>
 
             {%- if form.authButton is defined -%}
                 <div class="row">
