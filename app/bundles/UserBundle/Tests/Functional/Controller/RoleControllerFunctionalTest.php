@@ -51,4 +51,36 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString($updatedName, $this->client->getResponse()->getContent());
     }
+
+    public function testCloneRoleAction(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/roles/new');
+        $this->assertTrue($this->client->getResponse()->isOk(), 'Precondition: user can access role creation');
+
+        $role = new Role();
+        $role->setName('Original Role');
+        $role->setDescription('Original Description');
+
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $rolesBefore = $this->em->getRepository(Role::class)->count([]);
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/roles/clone/'.$role->getId());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $newName      = 'Cloned Role';
+        $saveButton   = $crawler->selectButton('role[buttons][apply]');
+        $this->assertGreaterThan(0, $saveButton->count(), 'Expected Apply button on clone form');
+        $form         = $saveButton->form();
+        $form['role[name]']->setValue($newName);
+        $crawler      = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $this->assertStringContainsString($newName, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Original Description', $this->client->getResponse()->getContent());
+
+        $rolesAfterCount = $this->em->getRepository(Role::class)->count([]);
+        $this->assertSame($rolesBefore + 1, $rolesAfterCount);
+    }
 }

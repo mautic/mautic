@@ -117,7 +117,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         $clone->setDescription($source->getDescription());
         $clone->setIsAdmin($source->isAdmin());
 
-        $rawPermissions = $source->getRawPermissions();
+        $rawPermissions = $source->getRawPermissions() ?? [];
         $clone->setRawPermissions($rawPermissions);
 
         return $clone;
