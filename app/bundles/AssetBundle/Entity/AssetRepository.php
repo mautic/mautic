@@ -90,6 +90,11 @@ class AssetRepository extends CommonRepository
         $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $mimeCommandMap  = [
+            'mautic.asset.asset.searchcommand.isimage' => 'image/%',
+            'mautic.asset.asset.searchcommand.isvideo' => 'video/%',
+            'mautic.asset.asset.searchcommand.isaudio' => 'audio/%',
+        ];
         switch ($command) {
             case $this->translator->trans('mautic.asset.asset.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
@@ -103,18 +108,20 @@ class AssetRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.isimage'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isimage', [], null, 'en_US'):
-                $expr            = $q->expr()->like('a.mime', ":$unique");
-                $forceParameters = [$unique => 'image/%'];
-                break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo', [], null, 'en_US'):
-                $expr            = $q->expr()->like('a.mime', ":$unique");
-                $forceParameters = [$unique => 'video/%'];
-                break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio', [], null, 'en_US'):
-                $expr            = $q->expr()->like('a.mime', ":$unique");
-                $forceParameters = [$unique => 'audio/%'];
+                foreach ($mimeCommandMap as $key => $pattern) {
+                    if (in_array($command, [
+                        $this->translator->trans($key),
+                        $this->translator->trans($key, [], null, 'en_US'),
+                    ], true)) {
+                        $expr            = $q->expr()->like('a.mime', ":$unique");
+                        $forceParameters = [$unique => $pattern];
+                        break;
+                    }
+                }
                 break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument', [], null, 'en_US'):
