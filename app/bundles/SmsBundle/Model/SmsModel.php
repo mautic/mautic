@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -43,6 +44,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
+    use TranslationModelTrait;
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
@@ -81,6 +84,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     {
         return 'sms:smses';
     }
+
+    public function saveEntity($entity, $unlock = true): void
+    {
+        parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
+    }
+
 
     /**
      * Save an array of entities.
@@ -521,7 +532,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['sms_type'] ?? null
+                    $options['sms_type'] ?? null,
+                    $options['top_level'] ?? '',
+                    $options['ignore_ids'] ?? [],
                 );
 
                 foreach ($entities as $entity) {

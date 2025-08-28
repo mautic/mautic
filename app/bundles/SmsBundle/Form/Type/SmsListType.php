@@ -33,7 +33,9 @@ class SmsListType extends AbstractType
                 ],
                 'ajax_lookup_action' => function (Options $options): string {
                     $query = [
-                        'sms_type' => $options['sms_type'],
+                        'sms_type'   => $options['sms_type'],
+                        'top_level'  => $options['top_level'],
+                        'ignore_ids' => $options['ignore_ids'],
                     ];
 
                     return 'sms:getLookupChoiceList&'.http_build_query($query);
@@ -41,7 +43,7 @@ class SmsListType extends AbstractType
                 'multiple'   => true,
                 'required'   => false,
                 'sms_type'   => 'template',
-                'top_level'  => 'variant',
+                'top_level'  => 'translation',
                 'ignore_ids' => [],
             ]
         );
