@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -52,10 +53,8 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $stageModel;
 
-    /**
-     * @var MockObject&StageRepository
-     */
-    private MockObject $stageRepository;
+    /** @var StageRepository|object */
+    private $stageRepository;
 
     /**
      * @var MockObject&CategoryModel
@@ -88,7 +87,19 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $this->stageModel      = $this->createMock(StageModel::class);
-        $this->stageRepository = $this->createMock(StageRepository::class);
+        $repo = new class {
+            /** @var array<int, array{label:string, value:int}> */
+            public array $simpleList = [];
+
+            /**
+             * @return array<int, array{label:string, value:int}>
+             */
+            public function getSimpleList(): array
+            {
+                return $this->simpleList;
+            }
+        };
+        $this->stageRepository = $repo;
         $this->categoryModel   = $this->createMock(CategoryModel::class);
         $this->assetModel      = $this->createMock(AssetModel::class);
         $this->translator      = $this->createMock(TranslatorInterface::class);
@@ -148,9 +159,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getTagList')
             ->willReturn([['label' => 'Tag C', 'value' => 44]]);
 
-        $this->stageRepository->expects($this->once())
-            ->method('getSimpleList')
-            ->willReturn([['label' => 'Stage D', 'value' => 55]]);
+        $this->stageRepository->simpleList = [['label' => 'Stage D', 'value' => 55]];
 
         $this->categoryModel->expects($this->once())
             ->method('getLookupResults')

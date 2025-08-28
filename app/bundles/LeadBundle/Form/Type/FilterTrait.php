@@ -16,6 +16,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * This trait is consumed dynamically by multiple form types at runtime.
+ *
+ * @phpstan-ignore-next-line trait.unused
+ */
 trait FilterTrait
 {
     use RegexTrait;

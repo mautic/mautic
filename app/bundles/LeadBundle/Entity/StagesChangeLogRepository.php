@@ -42,25 +42,26 @@ class StagesChangeLogRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param int $fromLeadId
-     * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', ':to')
+            ->where('lead_id = :from')
+            ->setParameter('to', (string) $toLeadId)
+            ->setParameter('from', (string) $fromLeadId)
             ->executeStatement();
     }
 
-    public function updateStage($fromStageId, $toStageId): void
+    public function updateStage(int $fromStageId, int $toStageId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
-            ->set('stage_id', (int) $toStageId)
-            ->where('stage_id = '.(int) $fromStageId)
+            ->set('stage_id', ':to')
+            ->where('stage_id = :from')
+            ->setParameter('to', (string) $toStageId)
+            ->setParameter('from', (string) $fromStageId)
             ->executeStatement();
     }
 
