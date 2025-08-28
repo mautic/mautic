@@ -4,7 +4,9 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -16,6 +18,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private CompanyReportData $companyReportData,
+        private DncReportService $dncReportService,
     ) {
     }
 
@@ -25,6 +28,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
+            ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
         ];
     }
 
@@ -136,7 +140,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $companyColumns = $this->companyReportData->getCompanyData();
 
-        $columns = array_merge(
+        $commonColumnsAndFilters = array_merge(
             $columns,
             $event->getStandardColumns($campaignPrefix, [], 'mautic_campaign_action'),
             $event->getCategoryColumns($catPrefix),
@@ -145,10 +149,13 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->getChannelColumns(),
             $companyColumns
         );
+        $reportColumns = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncColumns());
+        $reportFilters = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncFilters());
 
         $data = [
             'display_name' => 'mautic.campaign.events',
-            'columns'      => $columns,
+            'columns'      => $reportColumns,
+            'filters'      => $reportFilters,
         ];
         $event->addTable(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG, $data);
 
@@ -223,5 +230,17 @@ class ReportSubscriber implements EventSubscriberInterface
 
             unset($queryBuilder);
         }
+    }
+
+    public function onReportDisplay(ReportDataEvent $event): void
+    {
+        $data = $event->getData();
+
+        if ($event->checkContext([self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
+        }
+
+        $event->setData($data);
+        unset($data);
     }
 }

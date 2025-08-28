@@ -23,6 +23,7 @@
     "ext-pdo": "*",
     "ext-zip": "*",
     "ext-zlib": "*",
+    "api-platform/core": "^4.1.0",
     "aws/aws-sdk-php": "~3.0",
     "barryvdh/elfinder-flysystem-driver": "^0.4.3",
     "beberlei/doctrineextensions": "^1.3",

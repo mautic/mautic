@@ -186,7 +186,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $this->logger->info(sprintf('Authentication request failed: %s', $exception->getMessage()));
 
         // Gets app/bundles/UserBundle/Security/Firewall/AuthenticationListener.php:74 and till the end of the method referenced.
-        if ('api' === $this->firewallName) {
+        if (in_array($this->firewallName, ['api', 'v2api'])) {
             // Continue with another authentication.
             return null;
         }
