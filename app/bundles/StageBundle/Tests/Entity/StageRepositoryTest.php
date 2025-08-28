@@ -8,10 +8,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
+use Mautic\StageBundle\Tests\_helpers\StageTestSeederTrait;
 
 final class StageRepositoryTest extends MauticMysqlTestCase
 {
-    public function testGetEntitiesReturnsContactCount(): void
+    use StageTestSeederTrait;
+
+    private function seedStagesWithLeads(): void
     {
         $stageA = (new Stage())
             ->setName('Stage A')
@@ -38,6 +41,11 @@ final class StageRepositoryTest extends MauticMysqlTestCase
         $this->em->persist($lead1);
         $this->em->persist($lead2);
         $this->em->flush();
+    }
+
+    public function testGetEntitiesReturnsContactCount(): void
+    {
+        $this->seedStagesWithLeads();
 
         $repository = $this->em->getRepository(Stage::class);
         \assert($repository instanceof StageRepository);
