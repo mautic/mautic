@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
@@ -37,9 +39,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *   }
  * )
  */
-class Sms extends FormEntity implements UuidInterface
+class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
+    use TranslationEntityTrait;
 
     /**
      * @var int
@@ -55,11 +58,6 @@ class Sms extends FormEntity implements UuidInterface
      * @var string|null
      */
     private $description;
-
-    /**
-     * @var string
-     */
-    private $language = 'en';
 
     /**
      * @var string
@@ -112,13 +110,16 @@ class Sms extends FormEntity implements UuidInterface
         $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
 
+        $this->clearTranslations();
+
         parent::__clone();
     }
 
     public function __construct()
     {
-        $this->lists = new ArrayCollection();
-        $this->stats = new ArrayCollection();
+        $this->lists               = new ArrayCollection();
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
     }
 
     /**
@@ -138,9 +139,9 @@ class Sms extends FormEntity implements UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->build();
+//        $builder->createField('language', 'string')
+//            ->columnName('lang')
+//            ->build();
 
         $builder->createField('message', 'text')
             ->build();
@@ -172,6 +173,8 @@ class Sms extends FormEntity implements UuidInterface
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        self::addTranslationMetadata($builder, self::class);
 
         static::addUuidField($builder);
     }
@@ -339,25 +342,6 @@ class Sms extends FormEntity implements UuidInterface
     {
         $this->isChanged('message', $message);
         $this->message = $message;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setLanguage($language)
-    {
-        $this->isChanged('language', $language);
-        $this->language = $language;
-
-        return $this;
     }
 
     /**
