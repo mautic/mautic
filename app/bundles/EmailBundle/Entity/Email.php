@@ -2,6 +2,13 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -35,6 +42,25 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('email:emails:viewown')"),
+        new Post(security: "is_granted('email:emails:create')"),
+        new Get(security: "is_granted('email:emails:viewown')"),
+        new Put(security: "is_granted('email:emails:editown')"),
+        new Patch(security: "is_granted('email:emails:editother')"),
+        new Delete(security: "is_granted('email:emails:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['email:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'asset', 'page', 'translationChildren', 'unsubscribeForm', 'fields', 'actions', 'lists', 'excludedLists', 'preferenceCenter', 'assetAttachments', 'variantChildren'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['email:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use VariantEntityTrait;
@@ -289,6 +315,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var int
      */
     private $clonedId;
+
+    /**
+     * @Groups({"email:read", "email:write", "download:read"})
+     */
+    private bool $isDuplicate = false;
 
     public function __clone()
     {
@@ -1404,5 +1435,15 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         }
 
         return $keys;
+    }
+
+    public function isDuplicate(): bool
+    {
+        return $this->isDuplicate;
+    }
+
+    public function setIsDuplicate(bool $isDuplicate): void
+    {
+        $this->isDuplicate = $isDuplicate;
     }
 }

@@ -2,14 +2,40 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown')"),
+        new Put(security: "is_granted('form:forms:editown')"),
+        new Patch(security: "is_granted('form:forms:editother')"),
+        new Delete(security: "is_granted('form:forms:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['action:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['action:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Action implements UuidInterface
 {
     use UuidTrait;
@@ -18,36 +44,43 @@ class Action implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['action:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['action:read', 'action:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['action:read', 'action:write'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['action:read', 'action:write'])]
     private $type;
 
     /**
      * @var int
      */
+    #[Groups(['action:read', 'action:write'])]
     private $order = 0;
 
     /**
      * @var array
      */
+    #[Groups(['action:read', 'action:write'])]
     private $properties = [];
 
     /**
      * @var Form|null
      */
+    #[Groups(['action:read', 'action:write'])]
     private $form;
 
     /**
