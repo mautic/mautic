@@ -28,6 +28,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function setUp(): void
     {
+        $this->configParams['legacy_builder_enabled'] = true;
         $this->configParams['disable_trackable_urls'] = false;
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['mailer_from_email']      = 'admin@email.com';

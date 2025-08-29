@@ -2,6 +2,13 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -15,26 +22,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "point:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "point:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('point:triggers:viewown')"),
+        new Post(security: "is_granted('point:triggers:create')"),
+        new Get(security: "is_granted('point:triggers:viewown')"),
+        new Put(security: "is_granted('point:triggers:editown')"),
+        new Patch(security: "is_granted('point:triggers:editother')"),
+        new Delete(security: "is_granted('point:triggers:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['point:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['point:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -43,46 +49,55 @@ class Point extends FormEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['point:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['point:read', 'point:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['point:read', 'point:write'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['point:read', 'point:write'])]
     private $type;
 
     /**
      * @var bool
      */
+    #[Groups(['point:read', 'point:write'])]
     private $repeatable = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['point:read', 'point:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['point:read', 'point:write'])]
     private $publishDown;
 
     /**
      * @var int
      */
+    #[Groups(['point:read', 'point:write'])]
     private $delta = 0;
 
     /**
      * @var array
      */
+    #[Groups(['point:read', 'point:write'])]
     private $properties = [];
 
     /**
@@ -93,8 +108,10 @@ class Point extends FormEntity implements UuidInterface
     /**
      * @var Category|null
      **/
+    #[Groups(['point:read', 'point:write'])]
     private $category;
 
+    #[Groups(['point:read', 'point:write'])]
     private ?Group $group = null;
 
     public function __clone()

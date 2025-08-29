@@ -2,6 +2,13 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -15,9 +22,30 @@ use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'Segments',
+    operations: [
+        new GetCollection(uriTemplate: '/segments', security: "is_granted('lead:lists:viewown')"),
+        new Post(uriTemplate: '/segments', security: "is_granted('lead:lists:create')"),
+        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown')"),
+        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown')"),
+        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother')"),
+        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['segment:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['segment:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -30,46 +58,55 @@ class LeadList extends FormEntity implements UuidInterface
     /**
      * @var int|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $name;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $publicName;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 
     /**
      * @var string|null
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $alias;
 
     /**
      * @var array
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $filters = [];
 
     /**
      * @var bool
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $isGlobal = true;
 
     /**
      * @var bool
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $isPreferenceCenter = false;
 
     /**
@@ -80,11 +117,13 @@ class LeadList extends FormEntity implements UuidInterface
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltDate;
 
     /**
      * @var float|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltTime;
 
     public function __construct()
@@ -122,7 +161,6 @@ class LeadList extends FormEntity implements UuidInterface
             ->build();
 
         $builder->createOneToMany('leads', 'ListLead')
-            ->setIndexBy('id')
             ->mappedBy('list')
             ->fetchExtraLazy()
             ->build();

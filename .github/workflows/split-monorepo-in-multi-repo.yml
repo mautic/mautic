@@ -91,6 +91,7 @@ jobs:
                     - theme-blend
                     - theme-mono
                     - theme-capture
+                    - theme-multi-step
 
         name: Sync commits into mautic/${{ matrix.config }}
         steps:

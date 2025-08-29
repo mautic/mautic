@@ -57,7 +57,7 @@
                     'target': '#leadFieldTable',
                 }) }}
                   <th class="col-leadfield-label">{{ 'mautic.lead.field.label'|trans }}</th>
-                  <th class="visible-md visible-lg col-leadfield-alias">{{ 'mautic.core.alias'|trans }}</th>
+                  <th class="visible-md visible-lg col-leadfield-token">{{ 'mautic.lead.field.token'|trans }}</th>
                   <th class="visible-md visible-lg col-leadfield-group">{{ 'mautic.lead.field.object'|trans }}</th>
                   <th class="visible-md visible-lg col-leadfield-group">{{ 'mautic.lead.field.group'|trans }}</th>
                   <th class="col-leadfield-type">{{ 'mautic.lead.field.type'|trans }}</th>
@@ -94,7 +94,15 @@
                           {{ customContent('lead.field.name', _context) }}
                       </span>
                       </td>
-                      <td class="visible-md visible-lg">{{ item.alias }}</td>
+                      <td class="visible-md visible-lg">
+                          {% set tokenText = item.object == 'user' ? '{ownerfield=' ~ item.alias ~ '}' : '{contactfield=' ~ item.alias ~ '}' %}
+                          {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                              variant: 'inline',
+                              innerText: tokenText,
+                              copyText: tokenText,
+                              copyButtonDescription: 'mautic.lead.field.copy_token'
+                          } %}
+                      </td>
                       <td class="visible-md visible-lg">{{ ('mautic.'~item.object~'.'~item.object)|trans }}</td>
                       <td class="visible-md visible-lg">{{ ('mautic.lead.field.group.'~item.group)|trans }}</td>
                       <td>{{ translatorConditional('mautic.core.type.'~item.type, 'mautic.lead.field.type.'~item.type) }}</td>
