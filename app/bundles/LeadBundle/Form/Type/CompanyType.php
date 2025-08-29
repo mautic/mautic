@@ -7,6 +7,8 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Form\DataTransformer\FieldLogoUrlTransformer;
+use Mautic\LeadBundle\Form\Validator\Constraints\UrlImage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
@@ -33,6 +35,8 @@ class CompanyType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $options                       = $this->addConstraints($options);
+        $options                       = $this->addTransformers($options);
         $cleaningRules                 = $this->getFormFields($builder, $options, 'company');
         $cleaningRules['companyemail'] = 'email';
 
@@ -139,5 +143,35 @@ class CompanyType extends AbstractType
         );
 
         $resolver->setRequired(['fields']);
+    }
+
+    /**
+     * @param array<mixed> $fieldDetails
+     *
+     * @return array<mixed>
+     */
+    private function addTransformers(array $fieldDetails): array
+    {
+        $transformers = [
+            'companylogourl' => [new FieldLogoUrlTransformer()],
+        ];
+        $fieldDetails['transformers'] = $transformers;
+
+        return $fieldDetails;
+    }
+
+    /**
+     * @param array<mixed> $fieldDetails
+     *
+     * @return array<mixed>
+     */
+    private function addConstraints(array $fieldDetails): array
+    {
+        $constraints = [
+            'companylogourl' => [new UrlImage()],
+        ];
+        $fieldDetails['constraints'] = $constraints;
+
+        return $fieldDetails;
     }
 }

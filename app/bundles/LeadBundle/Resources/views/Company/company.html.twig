@@ -196,6 +196,19 @@
 
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
+        {% if company.logourl is not empty %}
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <div class="col-md-12">
+                <div class="col-md-6 col-md-offset-3 pt-md pb-md">
+                    <div class="panel panel-default text-center">
+                        <div class="panel-body text-center panel-logourl">
+                            <img src="{{ company.getLogoUrl() }}" alt="{{ company.name }}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <!-- form HTML -->
         <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="mt-sm points-panel text-center">

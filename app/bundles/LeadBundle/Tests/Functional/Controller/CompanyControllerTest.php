@@ -42,6 +42,46 @@ class CompanyControllerTest extends MauticMysqlTestCase
         return $user;
     }
 
+    public function testFormLogoUrlValidateFailByNoExist(): void
+    {
+        $content = $this->requestFormToValidate('http://nonexistent-domain.invalid/logo.JPEG');
+        self::assertStringContainsString('The logo URL is not valid. Please enter a valid URL', $content);
+    }
+
+    public function testFormLogoUrlWrongExtension(): void
+    {
+        $content = $this->requestFormToValidate('http://www.example.com/logo.gif');
+        self::assertStringContainsString('The logo URL is not valid. Please enter a valid URL', $content);
+    }
+
+    public function testFormLogoUrlValidateSuccess(): void
+    {
+        $content = $this->requestFormToValidate('http://localhost/media/images/tmp-png-test.png');
+        self::assertStringNotContainsString('The logo URL is not valid. Please enter a valid URL', $content);
+    }
+
+    private function requestFormToValidate(string $url): string
+    {
+        $crawler = $this->client->request(
+            'GET',
+            '/s/companies/new'
+        );
+        $form                                    = $crawler->filter('form[name=company]')->form();
+        $dataValues                              = $form->getPhpValues();
+        $dataValues['company']['companyname']    = 'Company mautic';
+        $dataValues['company']['companylogourl'] = $url;
+        $form->setValues($dataValues);
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(200, $clientResponse->getStatusCode());
+
+        if (false === $clientResponse->getContent()) {
+            return '';
+        }
+
+        return $clientResponse->getContent();
+    }
+
     private function createRole(bool $isAdmin = false): Role
     {
         $role = new Role();

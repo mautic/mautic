@@ -59,6 +59,13 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     private $description;
 
+    /**
+     * URL of the company's logo.
+     *
+     * @var string|null
+     */
+    private $logourl;
+
     public function __clone()
     {
         $this->id = null;
@@ -122,6 +129,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                 'website',
                 'industry',
                 'description',
+                'logourl',
             ],
             FieldModel::$coreCompanyFields
         );
@@ -148,6 +156,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                     'website',
                     'industry',
                     'description',
+                    'logourl',
                     'score',
                 ]
             )
@@ -527,5 +536,47 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $this->description = $description;
 
         return $this;
+    }
+
+    /**
+     * Get the URL of the company's logo.
+     *
+     * @return string|null
+     */
+    public function getLogourl()
+    {
+        return $this->logourl;
+    }
+
+    /**
+     * Set the URL of the company's logo.
+     *
+     * @param string|null $logourl
+     */
+    public function setLogourl($logourl): static
+    {
+        $this->isChanged('companylogourl', $logourl);
+        $this->logourl = $logourl;
+
+        return $this;
+    }
+
+    /**
+     * Get Company Logo image as base64.
+     */
+    public function getLogoBase64(): ?string
+    {
+        if ($this->logourl) {
+            $imageData = @file_get_contents($this->logourl);
+            if (false !== $imageData) {
+                $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imageData);
+                $base64   = base64_encode($imageData);
+
+                return 'data:'.$mimeType.';base64,'.$base64;
+            }
+        }
+
+        return null;
     }
 }

@@ -84,6 +84,21 @@
     width: 75px;
 }
 
+.panel-logourl {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+.panel-logourl img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;  /* fit inside without cropping */
+    display: block;
+}
+
 .panel-foursquare .panel-heading {
     background: #0072b1;
     color: #FFFFFF;

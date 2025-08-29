@@ -83,6 +83,16 @@ trait EntityFieldsBuildFormTrait
                 $constraints[] = new Length(['max' => $field['charLengthLimit']]);
             }
 
+            if (
+                array_key_exists('constraints', $options)
+                && array_key_exists($alias, $options['constraints'])
+                && !empty($options['constraints'][$alias])
+            ) {
+                foreach ($options['constraints'][$alias] as $constraint) {
+                    $constraints[] = $constraint;
+                }
+            }
+
             switch ($type) {
                 case NumberType::class:
                     if (empty($properties['scale'])) {
@@ -290,6 +300,16 @@ trait EntityFieldsBuildFormTrait
                         ]
                     );
                     break;
+            }
+
+            if (
+                array_key_exists('transformers', $options)
+                && array_key_exists($alias, $options['transformers'])
+                && !empty($options['transformers'][$alias])
+            ) {
+                foreach ($options['transformers'][$alias] as $transformer) {
+                    $builder->get($alias)->addModelTransformer($transformer);
+                }
             }
         }
 
