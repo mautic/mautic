@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -87,7 +86,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $this->stageModel      = $this->createMock(StageModel::class);
-        $repo = new class {
+        $repo                  = new class {
             /** @var array<int, array{label:string, value:int}> */
             public array $simpleList = [];
 
