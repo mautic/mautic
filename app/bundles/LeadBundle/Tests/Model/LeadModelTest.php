@@ -579,10 +579,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             /** @var Stage|mixed|null */
             public $returnValue;
 
-            /**
-             * @param mixed $value
-             */
-            public function findByIdOrName($value): ?Stage
+            public function findByIdOrName(int|string $value): ?Stage
             {
                 return $this->returnValue;
             }
@@ -627,10 +624,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             /** @var Stage|mixed|null */
             public $returnValue;
 
-            /**
-             * @param mixed $value
-             */
-            public function findByIdOrName($value): ?Stage
+            public function findByIdOrName(int|string $value): ?Stage
             {
                 return $this->returnValue;
             }
