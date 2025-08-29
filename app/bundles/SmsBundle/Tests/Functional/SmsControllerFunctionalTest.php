@@ -109,6 +109,51 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($updatedChildSms->getTranslationParent());
     }
 
+    public function testTranslationsAreDisplayedOnViewPage(): void
+    {
+        // Create a parent SMS.
+        $parentSms = $this->createAnSms('Parent SMS', 'Parent SMS message');
+        $parentSms->setLanguage('en');
+
+        // Create a child SMS and set the parent.
+        $childSms = $this->createAnSms('Child SMS', 'Child SMS message');
+        $childSms->setLanguage('fr');
+
+        $childSms->setTranslationParent($parentSms);
+        $parentSms->addTranslationChild($childSms);
+
+        $this->em->persist($parentSms);
+        $this->em->persist($childSms);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Go to the view page of the parent SMS.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/view/'.$parentSms->getId());
+        $this->assertResponseIsSuccessful();
+
+        // Assert that the translations tab is visible.
+        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'), 'Translations tab should be visible on parent SMS view');
+
+        // Click on the translations tab.
+        $this->client->click($crawler->selectLink('Translations')->link());
+
+        // Assert that the child SMS is displayed.
+        $this->assertStringContainsString('Child SMS', $this->client->getCrawler()->filter('#translation-container')->text());
+
+        // Go to the view page of the child SMS.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/view/'.$childSms->getId());
+        $this->assertResponseIsSuccessful();
+
+        // Assert that the translations tab is visible.
+        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'), 'Translations tab should be visible on child SMS view');
+
+        // Click on the translations tab.
+        $this->client->click($crawler->selectLink('Translations')->link());
+
+        // Assert that the parent SMS is displayed.
+        $this->assertStringContainsString('Parent SMS', $this->client->getCrawler()->filter('#translation-container')->text());
+    }
+
     private function createAnSms(string $name, string $message): Sms
     {
         $sms = new Sms();

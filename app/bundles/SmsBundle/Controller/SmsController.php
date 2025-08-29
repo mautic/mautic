@@ -74,6 +74,9 @@ class SmsController extends FormController
                 ];
         }
 
+        // Not to include translations
+        $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
+
         $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
         $orderByDir = $session->get('mautic.sms.orderbydir', $this->getDefaultOrderDirection());
 
@@ -196,6 +199,8 @@ class SmsController extends FormController
         // Get click through stats
         $trackableLinks = $model->getSmsClickStats($sms->getId());
 
+        [$translationParent, $translationChildren] = $sms->getTranslations();
+
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
             'viewParameters' => [
@@ -225,6 +230,10 @@ class SmsController extends FormController
                     ]
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'translations'  => [
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren,
+                ],
             ],
             'contentTemplate' => '@MauticSms/Sms/details.html.twig',
             'passthroughVars' => [
