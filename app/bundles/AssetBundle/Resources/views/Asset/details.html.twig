@@ -224,6 +224,18 @@
         <!-- preview URL -->
         <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-body pt-xs">
+                <div class="tile tile--clickable">
+                    {{ 'mautic.asset.asset.copy_url'|trans }}
+                {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                    variant: 'single',
+                    innerText: assetDownloadUrl,
+                    label: 'mautic.asset.asset.copy_url',
+                    copyButtonDescription: 'mautic.asset.asset.copy_url',
+                    attributes: {
+                        'style': 'text-overflow: clip;'
+                    }
+                } %}
+                </div>
                 {% include '@MauticCore/Components/card.html.twig' with {
                 type: 'link',
                 href: assetDownloadUrl,
