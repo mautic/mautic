@@ -92,7 +92,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $this->postTranslationEntitySave($entity);
     }
 
-
     /**
      * Save an array of entities.
      *
@@ -291,6 +290,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
                         continue;
                     }
+
+                    list($ignore, $sms) = $this->getTranslatedEntity($sms, $lead);
+                    \assert($sms instanceof Sms);
 
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
                     $smsEvent->setSmsId($sms->getId());

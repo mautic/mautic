@@ -10,155 +10,134 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateEntitiesTrait;
+
     public function testSmsCanBeCreatedWithTranslationParent(): void
     {
-        // Create a parent SMS.
-        $parentSms = $this->createAnSms('Parent SMS', 'Parent SMS message');
+        // Arrange
+        $parentSms = $this->createAndPersistSms('Parent SMS', 'Parent SMS message');
 
-        // Create a child SMS and set the parent.
-        $this->client->request(Request::METHOD_GET, '/s/sms/new');
+        // Act
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/new');
         $this->assertResponseIsSuccessful();
 
-        $form = $this->client->getCrawler()->selectButton('Save')->form();
-
+        $form                                   = $crawler->selectButton('Save')->form();
         $form['sms[name]']                      = 'Child SMS';
         $form['sms[message]']                   = 'Child SMS message';
-        $form['sms[translationParentSelector]'] = $parentSms->getId();
+        $form['sms[translationParentSelector]'] = (string) $parentSms->getId();
+
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        // Assert the relationship.
+        // Assert
         $childSms = $this->em->getRepository(Sms::class)->findOneBy(['name' => 'Child SMS']);
         $this->assertInstanceOf(Sms::class, $childSms);
+        $this->assertInstanceOf(Sms::class, $childSms->getTranslationParent());
         $this->assertSame($parentSms->getId(), $childSms->getTranslationParent()->getId());
     }
 
     public function testSmsCannotBeItsOwnTranslationParent(): void
     {
-        // Create an SMS.
-        $sms = $this->createAnSms('Test SMS', 'Test SMS message');
+        // Arrange
+        $sms = $this->createAndPersistSms('Test SMS', 'Test SMS message');
 
-        // Go to the edit page of the SMS.
+        // Act
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/edit/'.$sms->getId());
         $this->assertResponseIsSuccessful();
 
-        // Assert that the dropdown does not contain the SMS itself.
+        // Assert
         $options = $crawler->filter('#sms_translationParentSelector option');
         $this->assertCount(2, $options);
         $this->assertSame('Choose a translated item...', $options->eq(0)->text());
         $this->assertSame('Create new...', $options->eq(1)->text());
+
+        // Ensure the SMS itself is not in the dropdown
+        $optionValues = $options->each(fn ($node) => $node->attr('value'));
+        $this->assertNotContains((string) $sms->getId(), $optionValues);
     }
 
     public function testSmsWithTranslationParentCanBeEdited(): void
     {
-        // Create a parent SMS.
-        $parentSms = $this->createAnSms('Parent SMS', 'Parent SMS message');
-
-        // Create a child SMS and set the parent.
-        $childSms = $this->createAnSms('Child SMS', 'Child SMS message');
+        // Arrange
+        $parentSms    = $this->createAndPersistSms('Parent SMS', 'Parent SMS message');
+        $childSms     = $this->createAndPersistSms('Child SMS', 'Child SMS message');
         $childSms->setTranslationParent($parentSms);
+
+        $newParentSms = $this->createAndPersistSms('New Parent SMS', 'New Parent SMS message');
         $this->em->flush();
 
-        // Create a new potential parent SMS.
-        $newParentSms = $this->createAnSms('New Parent SMS', 'New Parent SMS message');
-
-        // Go to the edit page of the child SMS.
+        // Act
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/edit/'.$childSms->getId());
         $this->assertResponseIsSuccessful();
 
-        // Assert that the dropdown has the original parent selected.
-        $this->assertSame((string) $parentSms->getId(), $crawler->filter('#sms_translationParentSelector')->filter('option[selected]')->attr('value'));
+        // Assert original parent is selected
+        $this->assertSame(
+            (string) $parentSms->getId(),
+            $crawler->filter('#sms_translationParentSelector option[selected]')->attr('value')
+        );
 
-        // Change the translation parent to the new parent.
-        $form = $this->client->getCrawler()->selectButton('Save')->form();
-
-        $form['sms[translationParentSelector]'] = $newParentSms->getId();
+        // Change parent
+        $form                                   = $crawler->selectButton('Save')->form();
+        $form['sms[translationParentSelector]'] = (string) $newParentSms->getId();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        // Assert that the translation parent has been updated.
-        $this->em->clear();
-        $updatedChildSms = $this->em->getRepository(Sms::class)->find($childSms->getId());
-        $this->assertSame($newParentSms->getId(), $updatedChildSms->getTranslationParent()->getId());
+        // Assert parent updated
+        $this->em->refresh($childSms);
+        $this->assertInstanceOf(Sms::class, $childSms->getTranslationParent());
+        $this->assertSame($newParentSms->getId(), $childSms->getTranslationParent()->getId());
     }
 
     public function testTranslationParentCanBeRemovedFromSms(): void
     {
-        // Create a parent SMS.
-        $parentSms = $this->createAnSms('Parent SMS', 'Parent SMS message');
-
-        // Create a child SMS and set the parent.
-        $childSms = $this->createAnSms('Child SMS', 'Child SMS message');
+        // Arrange
+        $parentSms = $this->createAndPersistSms('Parent SMS', 'Parent SMS message');
+        $childSms  = $this->createAndPersistSms('Child SMS', 'Child SMS message');
         $childSms->setTranslationParent($parentSms);
         $this->em->flush();
 
-        // Go to the edit page of the child SMS.
-        $this->client->request(Request::METHOD_GET, '/s/sms/edit/'.$childSms->getId());
+        // Act
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/edit/'.$childSms->getId());
         $this->assertResponseIsSuccessful();
 
-        // Remove the translation parent.
-        $form = $this->client->getCrawler()->selectButton('Save')->form();
-
+        $form                                   = $crawler->selectButton('Save')->form();
         $form['sms[translationParentSelector]'] = '';
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        // Assert that the translation parent has been removed.
-        $this->em->clear();
-        $updatedChildSms = $this->em->getRepository(Sms::class)->find($childSms->getId());
-        $this->assertNull($updatedChildSms->getTranslationParent());
+        // Assert
+        $this->em->refresh($childSms);
+        $this->assertNull($childSms->getTranslationParent());
     }
 
     public function testTranslationsAreDisplayedOnViewPage(): void
     {
-        // Create a parent SMS.
-        $parentSms = $this->createAnSms('Parent SMS', 'Parent SMS message');
-        $parentSms->setLanguage('en');
-
-        // Create a child SMS and set the parent.
-        $childSms = $this->createAnSms('Child SMS', 'Child SMS message');
-        $childSms->setLanguage('fr');
-
+        // Arrange
+        $parentSms = $this->createAndPersistSms('Parent SMS', 'Parent SMS message', 'en');
+        $childSms  = $this->createAndPersistSms('Child SMS', 'Child SMS message', 'fr');
         $childSms->setTranslationParent($parentSms);
         $parentSms->addTranslationChild($childSms);
 
-        $this->em->persist($parentSms);
-        $this->em->persist($childSms);
         $this->em->flush();
-        $this->em->clear();
 
-        // Go to the view page of the parent SMS.
+        // Act & Assert - Parent view
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/view/'.$parentSms->getId());
         $this->assertResponseIsSuccessful();
-
-        // Assert that the translations tab is visible.
-        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'), 'Translations tab should be visible on parent SMS view');
-
-        // Click on the translations tab.
+        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'));
         $this->client->click($crawler->selectLink('Translations')->link());
+        $this->assertSelectorTextContains('#translation-container', 'Child SMS');
 
-        // Assert that the child SMS is displayed.
-        $this->assertStringContainsString('Child SMS', $this->client->getCrawler()->filter('#translation-container')->text());
-
-        // Go to the view page of the child SMS.
+        // Act & Assert - Child view
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/view/'.$childSms->getId());
         $this->assertResponseIsSuccessful();
-
-        // Assert that the translations tab is visible.
-        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'), 'Translations tab should be visible on child SMS view');
-
-        // Click on the translations tab.
+        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'));
         $this->client->click($crawler->selectLink('Translations')->link());
-
-        // Assert that the parent SMS is displayed.
-        $this->assertStringContainsString('Parent SMS', $this->client->getCrawler()->filter('#translation-container')->text());
+        $this->assertSelectorTextContains('#translation-container', 'Parent SMS');
     }
 
-    private function createAnSms(string $name, string $message): Sms
+    private function createAndPersistSms(string $name, string $message, string $locale = 'en'): Sms
     {
-        $sms = new Sms();
-        $sms->setName($name);
-        $sms->setMessage($message);
+        $sms = $this->createAnSms($name, $message, true, $locale);
         $this->em->persist($sms);
         $this->em->flush();
 
