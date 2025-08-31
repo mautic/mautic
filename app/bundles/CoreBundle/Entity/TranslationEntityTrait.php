@@ -12,11 +12,9 @@ trait TranslationEntityTrait
     /**
      * Set by AbstractCommonModel::getEntityBySlugs() if a language slug was used to fetch the entity.
      *
-     * @var string
-     *
      * @Groups({"page:read", "download:read", "email:read"})
      */
-    public $languageSlug;
+    public string $languageSlug;
 
     /**
      * @var mixed
@@ -31,17 +29,11 @@ trait TranslationEntityTrait
     private $translationParent;
 
     /**
-     * @var string
-     *
      * @Groups({"page:read", "download:read", "email:read"})
      */
-    private $language = 'en';
+    private string $language = 'en';
 
-    /**
-     * @param ClassMetadata $builder
-     * @param string        $languageColumnName
-     */
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
+    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
     {
         $builder->createOneToMany('translationChildren', $entityClass)
             ->setIndexBy('id')
@@ -179,7 +171,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array|ArrayCollection
+     * @return array<int, TranslationEntityInterface[]|TranslationEntityInterface>|ArrayCollection
      */
     public function getTranslations($onlyChildren = false)
     {
@@ -216,7 +208,13 @@ trait TranslationEntityTrait
     {
         $count = 0;
 
-        [$parent, $children] = $this->getTranslations();
+        $translations = $this->getTranslations();
+        if ($translations instanceof Collection) {
+            $translations = $translations->toArray();
+        }
+
+        [$parent, $children] = $translations;
+
         if ($variantParent != $parent) {
             $count = $parent->$getter();
         }

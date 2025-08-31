@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -199,7 +200,12 @@ class SmsController extends FormController
         // Get click through stats
         $trackableLinks = $model->getSmsClickStats($sms->getId());
 
-        [$translationParent, $translationChildren] = $sms->getTranslations();
+        $translations = $sms->getTranslations();
+        if ($translations instanceof Collection) {
+            $translations = $translations->toArray();
+        }
+
+        [$translationParent, $translationChildren] = $translations;
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
