@@ -171,7 +171,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array<int, TranslationEntityInterface[]|TranslationEntityInterface>|ArrayCollection
+     * @return array|ArrayCollection
      */
     public function getTranslations($onlyChildren = false)
     {
@@ -208,13 +208,7 @@ trait TranslationEntityTrait
     {
         $count = 0;
 
-        $translations = $this->getTranslations();
-        if ($translations instanceof Collection) {
-            $translations = $translations->toArray();
-        }
-
-        [$parent, $children] = $translations;
-
+        [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
             $count = $parent->$getter();
         }
