@@ -26,26 +26,25 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "form:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "fields", "actions", "translationChildren"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "form:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown')"),
+        new Put(security: "is_granted('form:forms:editown')"),
+        new Patch(security: "is_granted('form:forms:editother')"),
+        new Delete(security: "is_granted('form:forms:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['form:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'fields', 'actions', 'translationChildren'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['form:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Form extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
