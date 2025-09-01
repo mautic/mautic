@@ -78,7 +78,7 @@ class ReportGeneratorEventTest extends TestCase
 
     public function testAddLeadLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->exactly(5))
+        $this->report->expects($this->exactly(6))
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'h.name']);
 

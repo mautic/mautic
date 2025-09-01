@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
@@ -136,6 +137,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private ReportSubscriber $reportSubscriber;
 
+    private MockObject&DncReportService $dncReportService;
+
     /**
      * @var array
      */
@@ -190,6 +193,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->companyRepositoryMock            = $this->createMock(CompanyRepository::class);
         $this->pointsChangeLogRepositoryMock    = $this->createMock(PointsChangeLogRepository::class);
         $this->reportMock                       = $this->createMock(Report::class);
+        $this->dncReportService                 = $this->createMock(DncReportService::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
             $this->leadFieldModelMock,
@@ -199,7 +203,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->companyModelMock,
             $this->companyReportDataMock,
             $this->fieldsBuilderMock,
-            $this->translatorMock
+            $this->translatorMock,
+            $this->dncReportService
         );
 
         $this->queryBuilderMock->expects($this->any())

@@ -93,6 +93,13 @@
   &.btn-block, &.btn-wide {width: 100%;}
 }
 
+.btn ~ .btn,
+.btn ~ .btn-group,
+.btn-group ~ .btn,
+.btn-group ~ .btn-group {
+  margin-left: 5px;
+}
+
 // Hierarchycal buttons
 // ---------------------------------
 
@@ -173,7 +180,7 @@
   padding-right: var(--spacing-10);
   gap: var(--spacing-07);
   &:has(i) {padding-right: var(--spacing-05);}
-  &.btn-icon {
+  &.btn--icon-only {
     padding-right: 0;
     span { width: initial;}
   }
@@ -203,7 +210,7 @@
 
   //// Ghost Danger
   &.btn-danger,
-  &.btn-danger.btn-icon {
+  &.btn-danger.btn--icon-only {
     .button-variant(
       @background: transparent,
       @text-color: var(--button-danger-secondary),
@@ -217,7 +224,7 @@
   }
 
   //// Ghost icon only
-  &.btn-icon {
+  &.btn--icon-only {
     .button-variant(
       @background: transparent,
       @text-color: var(--icon-primary),
@@ -234,7 +241,7 @@
 }
 
 // Ghost icon only
-.btn-icon {
+.btn--icon-only {
   justify-content: center;
   padding: 0;
   align-items: center;
@@ -279,7 +286,33 @@
   &:hover,
   &:focus { text-decoration: none; }
 
-  i { font-size: 18px; }
+  span {
+    position: relative;
+  }
+
+  span:before {
+    content: '';
+    position: absolute;
+    background-color: transparent;
+    pointer-events: none;
+    width: 100%;
+    height: 1px;
+    bottom: -1px;
+    transition: var(--transition-all-productive);
+  }
+
+  i { font-size: calc(1em + 2px); }
+
+  &:hover {
+    span:before {
+      background-color: var(--link-primary-hover);
+    }
+  }
+
+  &:hover,
+  &:focus { 
+    text-decoration: none;
+  }
 }
 
 .btn-info {

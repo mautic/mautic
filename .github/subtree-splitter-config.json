@@ -264,6 +264,11 @@
             "name": "theme-capture",
             "directory": "themes/capture",
             "target": "git@github.com:mautic/theme-capture.git"
+        },
+        {
+            "name": "theme-multi-step",
+            "directory": "themes/multi-step",
+            "target": "git@github.com:mautic/theme-multi-step.git"
         }
     ]
 }

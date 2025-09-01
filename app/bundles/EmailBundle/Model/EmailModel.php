@@ -2129,6 +2129,35 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param string|array<string> $filter
+     * @param array<string,mixed>  $options
+     *
+     * @return array<string,array<string,string>>
+     */
+    public function getLookupResultsWithIdName(
+        string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = [],
+    ): array {
+        $results    = $this->getLookupResults($type, $filter, $limit, $start, $options);
+        $newResults = [];
+
+        foreach ($results as $language => $emails) {
+            if (!isset($options['name_is_key']) || empty($options['name_is_key'])) {
+                foreach ($emails as $name => $id) {
+                    $newResults[$language][$name] = sprintf('%s (%s)', $id, $name);
+                }
+            } else {
+                foreach ($emails as $id => $name) {
+                    $newResults[$language][$id] = sprintf('%s (%s)', $name, $id);
+                }
+            }
+        }
+        // sort by language
+        ksort($newResults);
+
+        return $newResults;
+    }
+
+    /**
      * @param array<int|string, int|string|array<int|string, mixed>|null> $contact
      *
      * @return array<int|string, int|string|array<int|string, mixed>|null>

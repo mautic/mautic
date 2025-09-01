@@ -348,7 +348,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {% else %}
     {% if id is defined and 'publish' in id %}
     <div class="d-flex gap-3">
-        <label class="btn btn-tertiary btn-icon btn-nospin btn-datepicker" size="sm" for="{{ id|escape }}">
+        <label class="btn btn-tertiary btn--icon-only btn-nospin btn-datepicker" size="sm" for="{{ id|escape }}">
             {% if 'publishUp' in id %}
                 <i class="ri-calendar-check-line ri-1x"></i>
             {% elseif 'publishDown' in id %}
