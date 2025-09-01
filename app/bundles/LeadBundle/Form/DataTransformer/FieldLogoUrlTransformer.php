@@ -30,7 +30,7 @@ class FieldLogoUrlTransformer implements DataTransformerInterface
 
         // Check if the URL starts with http:// or https://, if not, prepend http://
         if (!str_starts_with($value, 'https://') && !str_starts_with($value, 'http://')) {
-            $value = 'http://'.$value;
+            $value = 'https://'.$value;
         }
 
         return $value;
