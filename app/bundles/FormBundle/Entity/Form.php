@@ -634,6 +634,22 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
         );
     }
 
+    public function setLanguage(?string $language): self
+    {
+        if ($language === null || $language === '') {
+            $language = (function_exists('locale_get_default') ? \locale_get_default() : 'en') ?: 'en';
+        }
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language ?: ((function_exists('locale_get_default') ? \locale_get_default() : 'en') ?: 'en');
+    }
+
     /**
      * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
