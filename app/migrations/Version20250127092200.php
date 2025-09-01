@@ -23,13 +23,11 @@ final class Version20250127092200 extends PreUpAssertionMigration
     {
         $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
         
-        // Add translation_parent_id column
         $table->addColumn('translation_parent_id', 'integer', [
             'unsigned' => true,
             'notnull' => false,
         ]);
 
-        // Add foreign key constraint
         $table->addForeignKeyConstraint(
             $this->getPrefixedTableName(self::TABLE_NAME),
             ['translation_parent_id'],
@@ -37,7 +35,6 @@ final class Version20250127092200 extends PreUpAssertionMigration
             ['onDelete' => 'CASCADE']
         );
 
-        // Add index on translation_parent_id for performance
         $table->addIndex(['translation_parent_id'], 'idx_forms_translation_parent_id');
     }
 
@@ -45,7 +42,6 @@ final class Version20250127092200 extends PreUpAssertionMigration
     {
         $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
         
-        // Drop foreign key constraint
         $foreignKeys = $table->getForeignKeys();
         foreach ($foreignKeys as $foreignKey) {
             if (in_array('translation_parent_id', $foreignKey->getLocalColumns())) {
@@ -54,12 +50,10 @@ final class Version20250127092200 extends PreUpAssertionMigration
             }
         }
         
-        // Drop index
         if ($table->hasIndex('idx_forms_translation_parent_id')) {
             $table->dropIndex('idx_forms_translation_parent_id');
         }
         
-        // Drop column
         $table->dropColumn('translation_parent_id');
     }
 }
