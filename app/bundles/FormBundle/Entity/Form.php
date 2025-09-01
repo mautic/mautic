@@ -167,7 +167,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private $noIndex;
+    private $noIndex = true;
 
     /**
      * @var int|null
