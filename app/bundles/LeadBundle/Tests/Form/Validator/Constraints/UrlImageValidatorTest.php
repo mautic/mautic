@@ -42,7 +42,7 @@ class UrlImageValidatorTest extends TestCase
         $constraint = new UrlImage();
 
         // Use .invalid TLD so get_headers() won’t return Content-Type -> prevents extra violations
-        $validator->validate('http://nonexistent-domain.invalid/logo.gif', $constraint);
+        $validator->validate('https://nonexistent-domain.invalid/logo.gif', $constraint);
     }
 
     public function testAllowedExtensionWithoutHeadersDoesNotAddViolation(): void
@@ -62,7 +62,7 @@ class UrlImageValidatorTest extends TestCase
         $constraint = new UrlImage();
 
         // .invalid TLD ensures get_headers() fails; allowed extension passes without header-based check
-        $validator->validate('http://nonexistent-domain.invalid/image.png', $constraint);
+        $validator->validate('https://nonexistent-domain.invalid/image.png', $constraint);
     }
 
     public function testCaseInsensitiveExtensionAllowed(): void
@@ -81,6 +81,6 @@ class UrlImageValidatorTest extends TestCase
 
         $constraint = new UrlImage();
 
-        $validator->validate('http://nonexistent-domain.invalid/logo.JPEG', $constraint);
+        $validator->validate('https://nonexistent-domain.invalid/logo.JPEG', $constraint);
     }
 }

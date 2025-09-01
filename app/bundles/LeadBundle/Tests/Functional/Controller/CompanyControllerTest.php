@@ -44,7 +44,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testFormLogoUrlValidateFailByNoExist(): void
     {
-        $content = $this->requestFormToValidate('http://nonexistent-domain.invalid/logo.JPEG');
+        $content = $this->requestFormToValidate('https://nonexistent-domain.invalid/logo.JPEG');
         self::assertStringContainsString('The logo URL is not valid. Please enter a valid URL', $content);
     }
 
