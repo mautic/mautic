@@ -75,7 +75,7 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 height-auto">
+    <div class="col-md-7 col-lg-9 height-auto">
         <div>
             <!-- page detail header -->
             <!-- sms detail collapseable toggler -->
@@ -184,8 +184,9 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-5 col-lg-3 height-auto">
         <!-- activity feed -->
+        <div class="mb-48" style="zoom: 0.8;">{{ include('@MauticSms/Sms/preview.html.twig') }}</div>
         {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
     </div>
     <!--/ right section -->

@@ -101,7 +101,8 @@
     "mautic/theme-capture": "self.version",
     "mautic/theme-chord": "self.version",
     "mautic/theme-formscape": "self.version",
-    "mautic/theme-reachout": "self.version"
+    "mautic/theme-reachout": "self.version",
+    "mautic/theme-multi-step": "self.version"
   },
   "autoload": {
     "psr-4": {
