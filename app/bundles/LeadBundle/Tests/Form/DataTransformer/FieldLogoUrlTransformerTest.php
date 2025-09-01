@@ -21,12 +21,12 @@ class FieldLogoUrlTransformerTest extends \PHPUnit\Framework\TestCase
     public function provideTransformCases(): array
     {
         return [
-            'adds http when missing'              => ['example.com', 'http://example.com'],
-            'trims whitespace and adds http'      => ['  example.com  ', 'http://example.com'],
+            'adds http when missing'              => ['example.com', 'https://example.com'],
+            'trims whitespace and adds http'      => ['  example.com  ', 'https://example.com'],
             'keeps http'                          => ['http://example.com', 'http://example.com'],
             'keeps https'                         => ['https://example.com', 'https://example.com'],
             'removes query (path present)'        => ['https://example.com/path?utm=1&id=2', 'https://example.com/path?utm=1&id=2'],
-            'removes query (no path)'             => ['example.com?x=1', 'http://example.com?x=1'],
+            'removes query (no path)'             => ['example.com?x=1', 'https://example.com?x=1'],
         ];
     }
 
