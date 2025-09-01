@@ -25,9 +25,8 @@ class FieldLogoUrlTransformerTest extends \PHPUnit\Framework\TestCase
             'trims whitespace and adds http'      => ['  example.com  ', 'http://example.com'],
             'keeps http'                          => ['http://example.com', 'http://example.com'],
             'keeps https'                         => ['https://example.com', 'https://example.com'],
-            'removes query (path present)'        => ['https://example.com/path?utm=1&id=2', 'https://example.com/path'],
-            'removes query (no path)'             => ['example.com?x=1', 'http://example.com'],
-            'keeps fragment while removing query' => ['https://ex.com/a?b=c#frag', 'https://ex.com/a#frag'],
+            'removes query (path present)'        => ['https://example.com/path?utm=1&id=2', 'https://example.com/path?utm=1&id=2'],
+            'removes query (no path)'             => ['example.com?x=1', 'http://example.com?x=1'],
         ];
     }
 

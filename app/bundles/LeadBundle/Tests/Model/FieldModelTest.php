@@ -63,7 +63,7 @@ class FieldModelTest extends MauticMysqlTestCase
             // Filters
             [],
             // Expected count
-            44,
+            45,
         ];
 
         yield 'Contact fields' => [
@@ -77,7 +77,7 @@ class FieldModelTest extends MauticMysqlTestCase
             // Filters
             ['object' => 'company'],
             // Expected count
-            15,
+            16,
         ];
 
         yield 'Text fields' => [
