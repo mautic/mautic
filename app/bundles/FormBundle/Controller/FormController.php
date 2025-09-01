@@ -256,7 +256,13 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        [$translationParent, $translationChildren] = $activeForm->getTranslations();
+        $translations = $activeForm->getTranslations();
+        if (is_array($translations)) {
+            [$translationParent, $translationChildren] = $translations;
+        } else {
+            $translationParent   = $activeForm;
+            $translationChildren = [];
+        }
 
         $submissionCounts = $formSubmissionModel->getRepository()->getSubmissionCounts($activeForm);
 
@@ -277,7 +283,7 @@ class FormController extends CommonFormController
                     'formScript'        => htmlspecialchars($model->getFormScript($activeForm), ENT_QUOTES, 'UTF-8'),
                     'formContent'       => htmlspecialchars($model->getContent($activeForm, false), ENT_QUOTES, 'UTF-8'),
                     'availableActions'  => $customComponents['actions'],
-                    'translations'     => [
+                    'translations'      => [
                         'parent'   => $translationParent,
                         'children' => $translationChildren,
                     ],

@@ -48,6 +48,7 @@ use Twig\Environment;
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,

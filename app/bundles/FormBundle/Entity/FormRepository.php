@@ -54,13 +54,13 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @param string       $search
-     * @param int          $limit
-     * @param int          $start
-     * @param bool         $viewOther
-     * @param string|null  $formType
-     * @param bool|string  $topLevel
-     * @param array<int>   $ignoreIds
+     * @param string      $search
+     * @param int         $limit
+     * @param int         $start
+     * @param bool        $viewOther
+     * @param string|null $formType
+     * @param bool|string $topLevel
+     * @param array<int>  $ignoreIds
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null, $topLevel = false, array $ignoreIds = []): array
     {

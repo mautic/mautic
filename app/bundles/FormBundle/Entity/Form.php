@@ -381,7 +381,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
             // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } elseif ('translationParent' == $prop || 'category' == $prop) {
-            $current = $this->{'get'.ucfirst($prop)}();
+            $current   = $this->{'get'.ucfirst($prop)}();
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -636,7 +636,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     public function setLanguage(?string $language): self
     {
-        if ($language === null || $language === '') {
+        if (null === $language || '' === $language) {
             $language = (function_exists('locale_get_default') ? \locale_get_default() : 'en') ?: 'en';
         }
         $this->isChanged('language', $language);
