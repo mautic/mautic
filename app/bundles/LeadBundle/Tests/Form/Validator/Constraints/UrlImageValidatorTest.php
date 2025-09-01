@@ -33,7 +33,7 @@ class UrlImageValidatorTest extends TestCase
         $context = $this->createMock(ExecutionContextInterface::class);
         $context->expects($this->once())
             ->method('buildViolation')
-            ->with('URL must end with .jpg, .jpeg, .png, or .svg')
+            ->with('mautic.lead.field.companylogourl.invalid')
             ->willReturn($builder);
 
         $validator = new UrlImageValidator();
@@ -47,8 +47,14 @@ class UrlImageValidatorTest extends TestCase
 
     public function testAllowedExtensionWithoutHeadersDoesNotAddViolation(): void
     {
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $builder->expects($this->once())->method('addViolation');
+
         $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->never())->method('buildViolation');
+        $context->expects($this->once())
+            ->method('buildViolation')
+            ->with('mautic.lead.field.companylogourl.invalid')
+            ->willReturn($builder);
 
         $validator = new UrlImageValidator();
         $validator->initialize($context);
@@ -61,8 +67,14 @@ class UrlImageValidatorTest extends TestCase
 
     public function testCaseInsensitiveExtensionAllowed(): void
     {
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $builder->expects($this->once())->method('addViolation');
+
         $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->never())->method('buildViolation');
+        $context->expects($this->once())
+            ->method('buildViolation')
+            ->with('mautic.lead.field.companylogourl.invalid')
+            ->willReturn($builder);
 
         $validator = new UrlImageValidator();
         $validator->initialize($context);

@@ -18,7 +18,7 @@ class FieldLogoUrlTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string, array{0: string, 1: string}>
      */
-    private function provideTransformCases(): array
+    public function provideTransformCases(): array
     {
         return [
             'adds http when missing'              => ['example.com', 'http://example.com'],
