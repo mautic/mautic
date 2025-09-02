@@ -306,6 +306,11 @@ class Form extends FormEntity implements UuidInterface
             'groups'  => ['urlRequiredPassTwo'],
         ]));
 
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
+            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
+            'groups'  => ['hideformRequired'],
+        ]));
+
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
@@ -328,6 +333,8 @@ class Form extends FormEntity implements UuidInterface
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        } elseif ('hideform' == $postAction) {
+            $groups[] = 'hideformRequired';
         }
 
         if ('' != $data->getProgressiveProfilingLimit()) {

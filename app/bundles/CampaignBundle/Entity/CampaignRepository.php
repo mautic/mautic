@@ -339,6 +339,7 @@ class CampaignRepository extends CommonRepository
                         $sq->expr()->in('e.event_id', $pendingEvents)
                     )
                 );
+            $this->updateQueryFromContactLimiter('e', $sq, $limiter, true);
 
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
