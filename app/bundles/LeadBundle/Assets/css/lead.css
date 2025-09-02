@@ -91,7 +91,7 @@
     margin: 0 auto;
 }
 
-.panel-logourl img
+.panel-logourl > img
 {
     width: 100%;
     height: 100%;

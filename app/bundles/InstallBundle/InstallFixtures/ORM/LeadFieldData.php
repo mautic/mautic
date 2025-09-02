@@ -48,9 +48,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $entity->setIsFixed(!empty($field['fixed']));
                 $entity->setIsListable(!empty($field['listable']));
                 $entity->setIsShortVisible(!empty($field['short']));
-                if ('textarea' === $type) {
-                    $entity->setCharLengthLimit(null);
-                }
+
                 if (isset($field['default'])) {
                     $entity->setDefaultValue($field['default']);
                 }

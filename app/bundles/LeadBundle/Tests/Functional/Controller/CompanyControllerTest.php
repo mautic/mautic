@@ -8,6 +8,8 @@ use Mautic\UserBundle\Entity\User;
 
 class CompanyControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public const USERNAME = 'jhony';
 
     public function testMergeAction(): void

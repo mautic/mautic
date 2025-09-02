@@ -273,12 +273,6 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'company',
         ],
-        'companylogourl' => [
-            'fixed'    => true,
-            'type'     => 'textarea',
-            'listable' => true,
-            'object'   => 'company',
-        ],
         'companynumber_of_employees' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'scale' => 0],
