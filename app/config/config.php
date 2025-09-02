@@ -44,6 +44,9 @@ if (defined('MAUTIC_INSTALLER')) {
 }
 
 $container->loadFromExtension('framework', [
+    'assets' => [
+        'base_path' => './',
+    ],
     'secret' => '%mautic.secret_key%',
     'router' => [
         'resource'            => '%mautic.application_dir%/app/config/routing.php',
@@ -363,6 +366,62 @@ $container->loadFromExtension('fm_elfinder', [
                     ],
                 ],
             ],
+        ],
+    ],
+]);
+
+// API Platform Configuration
+$container->loadFromExtension('api_platform', [
+    'title'             => 'Mautic API',
+    'description'       => 'API endpoints for Mautic',
+    'version'           => '1.0.0',
+    'show_webby'        => false,
+    'enable_swagger'    => true,
+    'enable_swagger_ui' => true,
+    'swagger'           => [
+        'versions' => [3],
+    ],
+    'enable_re_doc'     => true,
+    'enable_entrypoint' => true,
+    'enable_docs'       => true,
+    'enable_profiler'   => false,
+    'collection'        => [
+        'pagination'    => [
+            'enabled'        => true,
+        ],
+    ],
+    'patch_formats'     => [
+        'json'    => ['application/merge-patch+json'],
+        'jsonapi' => ['application/vnd.api+json'],
+    ],
+    'error_formats' => [
+        'jsonproblem' => [
+            'mime_types' => [
+                'application/problem+json',
+            ],
+        ],
+        'jsonld' => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+    ],
+    'exception_to_status' => [
+        'Symfony\Component\Serializer\Exception\ExceptionInterface'       => 400,
+        'ApiPlatform\Exception\InvalidArgumentException'                  => Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST,
+        'ApiPlatform\Validator\Exception\ValidationException'             => 400,
+        'Doctrine\ORM\OptimisticLockException'                            => 409,
+        'Symfony\Component\Security\Core\Exception\AccessDeniedException' => 403,
+    ],
+    'formats' => [
+        'jsonld' => [
+            'mime_types' => ['application/ld+json'],
+        ],
+        'json' => [
+            'mime_types' => ['application/json'],
+        ],
+        'html' => [
+            'mime_types' => ['text/html'],
         ],
     ],
 ]);

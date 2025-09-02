@@ -888,7 +888,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
 
             if (isset($fieldData[$entityField['alias']])) {
-                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
+                $fieldData = $this->getCleanedFieldData($entityField, $fieldData);
 
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;
@@ -1003,5 +1003,20 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $uniqueData = $this->companyDeduper->getUniqueData($updateData);
 
         return (bool) array_diff_assoc($updateData, $uniqueData);
+    }
+
+    /**
+     * @param array<mixed> $fieldData
+     *
+     * @return array<mixed>
+     */
+    private function getCleanedFieldData(mixed $entityField, array $fieldData): array
+    {
+        $fieldData[$entityField['alias']] = InputHelper::_(
+            $fieldData[$entityField['alias']],
+            'html' === $entityField['type'] ? 'html' : 'string'
+        );
+
+        return $fieldData;
     }
 }

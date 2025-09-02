@@ -97,7 +97,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     public function testWhileLoopBreaksWithNoMoreContacts(): void
     {
         $campaign = new class extends Campaign {
-            public function getId()
+            public function getId(): int
             {
                 return 111;
             }
@@ -158,7 +158,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     public function testWhileLoopBreaksWithNoMoreContactsForRepeatableCampaign(): void
     {
         $campaign = new class extends Campaign {
-            public function getId()
+            public function getId(): int
             {
                 return 111;
             }
