@@ -39,7 +39,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 'value'      => 'companyindustry',
                 'isListType' => true,
             ],
-            $payload['fields'][10]
+            $payload['fields'][9]
         );
     }
 }
