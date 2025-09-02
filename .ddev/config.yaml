@@ -14,7 +14,7 @@ hooks:
 upload_dirs:
     - media/files
     - media/images
-webimage_extra_packages: ["php${DDEV_PHP_VERSION}-imap"]
+#webimage_extra_packages: ["php${DDEV_PHP_VERSION}-imap"]
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
