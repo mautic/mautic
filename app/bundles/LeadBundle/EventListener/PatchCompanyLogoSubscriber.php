@@ -13,14 +13,14 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
         'object'                  => 'company',
         'group'                   => 'core',
         'alias'                   => 'companylogourl',
-        'is_required'             => 0,
-        'is_fixed'                => 1,
-        'is_visible'              => 1,
-        'is_short_visible'        => 0,
-        'is_listable'             => 1,
-        'is_publicity_updatable'  => 0,
-        'is_unique_identifier'    => 0,
-        'is_index'                => 0,
+        'is_required'             => false,
+        'is_fixed'                => true,
+        'is_visible'              => true,
+        'is_short_visible'        => false,
+        'is_listable'             => true,
+        'is_publicity_updatable'  => false,
+        'is_unique_identifier'    => false,
+        'is_index'                => false,
     ];
 
     public function __construct(
