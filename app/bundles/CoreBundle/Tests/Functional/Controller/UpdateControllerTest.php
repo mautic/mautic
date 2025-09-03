@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class UpdateControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testIndexActionRendersSuccessfully(): void
     {
         $this->client->request('GET', 's/update');
