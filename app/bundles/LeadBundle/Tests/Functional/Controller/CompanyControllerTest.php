@@ -3,14 +3,26 @@
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\EventListener\PatchCompanyLogoSubscriber;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class CompanyControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     public const USERNAME = 'jhony';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->installCustomFieldWithEvent();
+    }
 
     public function testMergeAction(): void
     {
@@ -109,5 +121,25 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->persist($user);
 
         return $user;
+    }
+
+    private function installCustomFieldWithEvent(): void
+    {
+        /** @var PatchCompanyLogoSubscriber $subscriber */
+        $subscriber = self::getContainer()->get(PatchCompanyLogoSubscriber::class);
+
+        // Real command with the right name so the subscriber executes
+        $command = new class('doctrine:migrations:migrate') extends Command {
+            public function __construct(string $name)
+            {
+                parent::__construct($name);
+            }
+        };
+
+        $input  = new ArrayInput([]);
+        $output = new BufferedOutput();
+        $event  = new ConsoleTerminateEvent($command, $input, $output, 0);
+
+        $subscriber->installCompanyLogoCustomField($event);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\LeadBundle\Controller\CompanyController;
 use Mautic\LeadBundle\Entity\LeadField;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 class PatchCompanyLogoSubscriber implements EventSubscriberInterface
 {
@@ -33,24 +33,32 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::CONTROLLER => [
+            ConsoleEvents::TERMINATE => [
                 ['installCompanyLogoCustomField', 0],
             ],
         ];
     }
 
-    public function installCompanyLogoCustomField(\Symfony\Component\HttpKernel\Event\ControllerEvent $event): void
+    public function installCompanyLogoCustomField(ConsoleTerminateEvent $event): void
     {
-        if (!array_key_exists(0, (array) $event->getController()) || !$event->getController()[0] instanceof CompanyController) {
+        $command = $event->getCommand();
+        $output  = $event->getOutput();
+
+        if ('doctrine:migrations:migrate' !== $command->getName()) {
             return;
         }
+
         $existingField = $this->fieldModel->getRepository()->findOneBy([
             'alias'  => self::DEFAULT_VALUES['alias'],
             'object' => self::DEFAULT_VALUES['object'],
         ]);
         if ($existingField) {
+            $this->logger->info('lead_fields entry for companylogourl already exists; nothing to do.');
+            $output->writeln('<info>[notice] Migration </info><info>Migration skipped: </info><comment>lead_fields</comment><info> entry for </info><comment>companylogourl</comment><info> already exists; <comment>nothing to do.</comment></info>');
+
             return;
         }
+
         $this->createField(
             'mautic.lead.field.companylogourl',
             'url',
@@ -58,6 +66,8 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
                 'limit' => 255,
             ]
         );
+        $this->logger->info('Inserted lead_fields entry for companylogourl (url, company).');
+        $output->writeln('<info>[notice] Migration Inserted</info> <comment>lead_fields</comment><info> entry for </info><comment>companylogourl</comment><info> (url, company).</info>');
     }
 
     /**
