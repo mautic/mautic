@@ -83,7 +83,9 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $form                                    = $crawler->filter('form[name=company]')->form();
         $dataValues                              = $form->getPhpValues();
         $dataValues['company']['companyname']    = 'Company mautic';
-        $dataValues['company']['companylogourl'] = $url;
+        if (array_key_exists('companylogourl', $dataValues['company'])) {
+            $dataValues['company']['companylogourl'] = $url;
+        }
         $form->setValues($dataValues);
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();

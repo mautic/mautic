@@ -152,9 +152,15 @@ class CompanyType extends AbstractType
      */
     private function addTransformers(array $fieldDetails): array
     {
+        $company      = $fieldDetails['data'] ?? null;
+        if (!($company instanceof Company)) {
+            return $fieldDetails;
+        }
+
         $transformers = [
             'companylogourl' => [new FieldLogoUrlTransformer()],
         ];
+
         $fieldDetails['transformers'] = $transformers;
 
         return $fieldDetails;
@@ -167,9 +173,15 @@ class CompanyType extends AbstractType
      */
     private function addConstraints(array $fieldDetails): array
     {
+        $company      = $fieldDetails['data'] ?? null;
+        if (!($company instanceof Company)) {
+            return $fieldDetails;
+        }
+
         $constraints = [
             'companylogourl' => [new UrlImage()],
         ];
+
         $fieldDetails['constraints'] = $constraints;
 
         return $fieldDetails;

@@ -196,8 +196,13 @@
 
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
-        {% if fields['core']['companylogourl']['value'] is not empty %}
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+        {% if fields['core'] is defined
+            and fields['core']['companylogourl'] is defined
+            and fields['core']['companylogourl']['value'] is defined
+            and fields['core']['companylogourl']['value'] is not empty
+        %}
+
+            <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="col-md-12">
                 <div class="col-md-6 col-md-offset-3 pt-md pb-md">
                     <div class="panel panel-default text-center">
