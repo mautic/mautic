@@ -33,6 +33,12 @@ class DynamicFiltersType extends AbstractType
                     'required' => false,
                 ];
 
+                if (!empty($filter['value'])) {
+                    $args['attr']['placeholder'] = $filter['value'];
+                } elseif (!empty($definition['defaultValue'])) {
+                    $args['attr']['placeholder'] = $definition['defaultValue'];
+                }
+
                 switch ($definition['type']) {
                     case 'bool':
                     case 'boolean':
@@ -47,7 +53,7 @@ class DynamicFiltersType extends AbstractType
 
                         if (isset($options['data'][$definition['alias']])) {
                             $args['data'] = (1 == (int) $options['data'][$definition['alias']]);
-                        } else {
+                        } elseif (isset($filter['value']) && '' !== $filter['value']) {
                             $args['data'] = (int) $filter['value'];
                         }
                         break;

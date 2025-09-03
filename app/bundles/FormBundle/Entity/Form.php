@@ -2,6 +2,13 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,9 +20,29 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown')"),
+        new Put(security: "is_granted('form:forms:editown')"),
+        new Patch(security: "is_granted('form:forms:editother')"),
+        new Delete(security: "is_granted('form:forms:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['form:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'fields', 'actions'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['form:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Form extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -26,105 +53,127 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $id;
 
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private ?string $language = null;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $formAttributes;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $alias;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
+    #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $cachedHtml;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $postAction = 'message';
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $postActionProperty;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $publishDown;
 
     /**
      * @var ArrayCollection<int, Field>
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $fields;
 
     /**
      * @var ArrayCollection<string, Action>
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $actions;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $template;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $inKioskMode = false;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $renderStyle = false;
 
     /**
      * @var Collection<int, Submission>
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private Collection $submissions;
 
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     public int $submission_count = 0;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $formType;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $noIndex;
 
     /**
      * @var int|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $progressiveProfilingLimit;
 
     /**
@@ -257,6 +306,11 @@ class Form extends FormEntity implements UuidInterface
             'groups'  => ['urlRequiredPassTwo'],
         ]));
 
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
+            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
+            'groups'  => ['hideformRequired'],
+        ]));
+
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
@@ -279,6 +333,8 @@ class Form extends FormEntity implements UuidInterface
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        } elseif ('hideform' == $postAction) {
+            $groups[] = 'hideformRequired';
         }
 
         if ('' != $data->getProgressiveProfilingLimit()) {

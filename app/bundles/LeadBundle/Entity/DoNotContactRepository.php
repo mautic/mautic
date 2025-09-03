@@ -186,4 +186,19 @@ class DoNotContactRepository extends CommonRepository
 
         return $dnc;
     }
+
+    /**
+     * Get all unique combinations of reason and channel.
+     *
+     * @return array<int, array{reason: mixed, channel: mixed}> Array of arrays containing 'reason' and 'channel'
+     */
+    public function getReasonChannelCombinations(): array
+    {
+        $qb = $this->createQueryBuilder('dnc')
+            ->select('DISTINCT dnc.reason, dnc.channel')
+            ->orderBy('dnc.reason', 'ASC')
+            ->addOrderBy('dnc.channel', 'ASC');
+
+        return $qb->getQuery()->getResult();
+    }
 }

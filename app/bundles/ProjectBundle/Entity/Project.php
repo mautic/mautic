@@ -63,6 +63,12 @@ class Project extends FormEntity implements UuidInterface
      */
     private array $properties = [];
 
+    /**
+     * Transient property to store the count of entities associated with this project.
+     * This is not persisted to the database.
+     */
+    public int $entitiesCount = 0;
+
     public function __clone()
     {
         $this->id = null;

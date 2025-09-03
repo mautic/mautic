@@ -39,20 +39,16 @@ class FieldController extends FormController
 
         $limit  = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $search = $request->get('search', $session->get('mautic.leadfield.filter', ''));
-        $session->set('mautic.leadfilter.filter', $search);
+        $session->set('mautic.leadfield.filter', $search);
 
         // do some default filtering
-        $orderBy    = $request->getSession()->get('mautic.leadfilter.orderby', 'f.order');
-        $orderByDir = $request->getSession()->get('mautic.leadfilter.orderbydir', 'ASC');
+        $orderBy    = $request->getSession()->get('mautic.leadfield.orderby', 'f.order');
+        $orderByDir = $request->getSession()->get('mautic.leadfield.orderbydir', 'ASC');
 
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
-
-        $search  = $request->get('search', $session->get('mautic.lead.emailtoken.filter', ''));
-
-        $session->set('mautic.lead.emailtoken.filter', $search);
 
         $fields = $fieldModel->getEntities([
             'start'      => $start,

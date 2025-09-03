@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
-use Mautic\ProjectBundle\Tests\Functional\AbstratctProjectSearchTestCase;
+use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
-final class FocusProjectSearchFunctionalTest extends AbstratctProjectSearchTestCase
+final class FocusProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void

@@ -72,4 +72,21 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($script, $page->getFooterScript());
     }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('setIsDuplicateDataProvider')]
+    public function testIsDuplicate(bool $isDuplicate): void
+    {
+        $page = new Page();
+        $page->setIsDuplicate($isDuplicate);
+        Assert::assertIsBool($page->isDuplicate());
+    }
+
+    /**
+     * @return iterable<array{bool}>
+     */
+    public static function setIsDuplicateDataProvider(): iterable
+    {
+        yield [true];
+        yield [false];
+    }
 }

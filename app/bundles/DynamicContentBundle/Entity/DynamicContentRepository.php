@@ -6,12 +6,15 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<DynamicContent>
  */
 class DynamicContentRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     public const SEARCH = ':search';
 
     /**
@@ -67,6 +70,16 @@ class DynamicContentRepository extends CommonRepository
                     $q->expr()->like('e.language', ":$langUnique")
                 );
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'dynamic_content_id',
+                    'dynamic_content_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -95,6 +108,7 @@ class DynamicContentRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

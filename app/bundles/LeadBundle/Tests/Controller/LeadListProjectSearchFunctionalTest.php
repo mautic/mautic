@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\ProjectBundle\Tests\Functional\AbstratctProjectSearchTestCase;
+use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 
-final class LeadListProjectSearchFunctionalTest extends AbstratctProjectSearchTestCase
+final class LeadListProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void

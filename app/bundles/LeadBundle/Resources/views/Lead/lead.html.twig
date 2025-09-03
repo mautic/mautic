@@ -19,8 +19,9 @@
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
-  {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ leadName|purify }}</span><span class="span-block small ml-sm">
+    {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ leadName|purify }}</span><span class="span-block small ml-sm">
     {{ lead.secondaryIdentifier|purify }}</span></div>
+    {{ customContent('lead.name.after', _context) }}
 {% endblock %}
 
 {% block preHeader %}
@@ -206,7 +207,7 @@
                                                             {% elseif 'url' == field.type %}
                                                                 <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
                                                             {% elseif 'html' == field.type %}
-                                                                <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
+                                                                <div style="resize: vertical; overflow: auto">{{ field.value|raw }}</div>
                                                             {% elseif 'datetime' == field.type %}
                                                                 {{ dateToFullConcat(field.value, 'UTC') }}
                                                             {% else %}
@@ -622,34 +623,48 @@
             {% endif %}
         </div>
         <div class="pa-sm panel-companies layout--size-0">
-            {% set companiesList = [] %}
-            {% for key, company in companies %}
-                {% set companiesList = companiesList|merge([{
-                    'label': company.companyname|purify,
-                    'link': path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}),
-                    'icon': (company.is_primary == 1 ? 'ri-user-star-fill' : ''),
-                    'button': {
-                        'onclick': 'Mautic.setAsPrimaryCompany(' ~ company.id ~ ', ' ~ lead.id ~ ');',
-                        'icon': 'ri-check-line',
-                        'size': 'lg',
-                        'label': 'mautic.lead.company.set.primary'|trans
-                    }
-                }]) %}
-            {% endfor %}
+            {% if companies is defined and companies|length > 0 %}
+                {% set companiesList = [] %}
+                {% for key, company in companies %}
+                    {% set companiesList = companiesList|merge([{
+                        'label': company.companyname|purify,
+                        'link': path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}),
+                        'icon': (company.is_primary == 1 ? 'ri-user-star-fill' : ''),
+                        'button': {
+                            'onclick': 'Mautic.setAsPrimaryCompany(' ~ company.id ~ ', ' ~ lead.id ~ ');',
+                            'icon': 'ri-check-line',
+                            'size': 'lg',
+                            'label': 'mautic.lead.company.set.primary'|trans
+                        }
+                    }]) %}
+                {% endfor %}
 
-            {% set tileContent %}
-            <div class="ma-neg-local">
-                {{ include('@MauticCore/Components/contained-list--interactive-actions.html.twig', {
-                    'title': 'mautic.lead.lead.companies'|trans,
-                    'items': companiesList
+                {% set tileContent %}
+                <div class="ma-neg-local">
+                    {{ include('@MauticCore/Components/contained-list.html.twig', {
+                        'title': 'mautic.lead.lead.companies'|trans,
+                        'items': companiesList,
+                        'variant': 'interactive-actions'
+                    }) }}
+                </div>
+                {% endset %}
+
+                {{ include('@MauticCore/Components/tile.html.twig', {
+                    'type': 'base',
+                    'content': tileContent
                 }) }}
-            </div>
-            {% endset %}
-
-            {{ include('@MauticCore/Components/tile.html.twig', {
-                'type': 'base',
-                'content': tileContent
-            }) }}
+            {% else %}
+                {% set content %}
+                <div class="d-flex jc-space-between">
+                    <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.companies'|trans }}</span>
+                    <i class="ri-building-line" aria-hidden="true"></i>
+                </div>
+                <p class="text-helper">{{ 'mautic.lead.lead.companies.no_results'|trans }}</p>
+                <div class="clearfix"></div>
+                {% endset %}
+                
+                {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
+            {% endif %}
         </div>
         <div class="pa-sm">
             {% if lists[lead.id] is defined and lists[lead.id]|length > 0 %}

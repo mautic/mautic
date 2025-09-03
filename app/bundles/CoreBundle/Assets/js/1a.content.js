@@ -1750,14 +1750,18 @@ Mautic.processCsvContactExport = function (route) {
  * @param {string} text
  */
 Mautic.copyToClipboard = function (text) {
-    navigator.clipboard.writeText(text).then(function () {
-        var message = Mautic.translate('mautic.core.notice.copiedtoclipboard');
-        var flashMessage = Mautic.addInfoFlashMessage(message);
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    const decodedText = textArea.value || textArea.innerText;
+
+    navigator.clipboard.writeText(decodedText).then(function () {
+        const message = Mautic.translate('mautic.core.notice.copiedtoclipboard');
+        const flashMessage = Mautic.addInfoFlashMessage(message);
         Mautic.setFlashes(flashMessage);
     }).catch(function (err) {
         console.error('Clipboard write error:', err);
-        var message = Mautic.translate('mautic.core.error.copyfailed');
-        var flashMessage = Mautic.addErrorFlashMessage(message);
+        const message = Mautic.translate('mautic.core.error.copyfailed');
+        const flashMessage = Mautic.addErrorFlashMessage(message);
         Mautic.setFlashes(flashMessage);
     });
 };

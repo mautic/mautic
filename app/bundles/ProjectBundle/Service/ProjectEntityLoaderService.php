@@ -241,9 +241,11 @@ final class ProjectEntityLoaderService
     private function normalizeEntityType(string $entityType): string
     {
         return match ($entityType) {
-            'leadlist' => 'segment',
-            'lead'     => 'contact',
-            default    => $entityType,
+            'leadlist'       => 'segment',
+            'lead'           => 'contact',
+            'dynamiccontent' => 'dynamicContent',
+            'trigger'        => 'pointtrigger',
+            default          => $entityType,
         };
     }
 
@@ -268,10 +270,12 @@ final class ProjectEntityLoaderService
     {
         // Map entity types to their model keys
         $modelKey = match ($entityType) {
-            'segment' => 'lead.list',
-            'message' => 'channel.message',
-            'company' => 'lead.company',
-            default   => $entityType,
+            'segment'        => 'lead.list',
+            'message'        => 'channel.message',
+            'company'        => 'lead.company',
+            'dynamicContent' => 'dynamicContent.dynamicContent',
+            'pointtrigger'   => 'point.trigger',
+            default          => $entityType,
         };
 
         $model = $this->modelFactory->getModel($modelKey);
