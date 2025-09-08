@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\TestCase;
@@ -85,15 +84,5 @@ class RoleModelTest extends TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
-    }
-
-    private function createPermission(string $bundle, string $name, int $bitwise): Permission
-    {
-        $permission = new Permission();
-        $permission->setBundle($bundle);
-        $permission->setName($name);
-        $permission->setBitwise($bitwise);
-
-        return $permission;
     }
 }

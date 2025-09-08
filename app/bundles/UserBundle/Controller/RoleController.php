@@ -187,7 +187,7 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, int $objectId)
     {
         if (!$this->security->isGranted('user:roles:create')) {
             return $this->accessDenied();
@@ -237,7 +237,7 @@ class RoleController extends FormController
                     $role        = $request->request->all()['role'] ?? [];
                     $permissions = $role['permissions'] ?? null;
 
-                    if ($permissions !== null) {
+                    if (null !== $permissions) {
                         $model->setRolePermissions($entity, $permissions);
                     }
 

@@ -58,7 +58,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    protected function renderAuthorize(array $data): Response
+    protected function renderAuthorize(array $data, Environment $twig): Response
     {
         $response = $this->twig->render(
             '@MauticApi/Authorize/oAuth2/authorize.html.twig',
@@ -68,13 +68,13 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         return new Response($response);
     }
 
-    public function authorizeAction(Request $request): Response
+    public function authorizeAction(Request $request, AuthorizeFormHandler $formHandler, Environment $twig): Response
     {
         // The parent bundle does not care about token being empty.
         if (null === $this->tokenStorage->getToken()) {
             throw new AccessDeniedException('This user does not have access to this section. No token.');
         }
 
-        return parent::authorizeAction($request);
+        return parent::authorizeAction($request, $formHandler, $twig);
     }
 }
