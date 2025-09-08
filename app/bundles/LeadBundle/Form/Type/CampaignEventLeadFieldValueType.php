@@ -7,7 +7,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -136,33 +138,40 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && $supportsChoices) {
-                $multiple = in_array($operator, ['in', '!in']);
-                $value    = $multiple && !is_array($data['value']) ? [$data['value']] : $data['value'];
+                $isMultiple   = in_array($operator, [OperatorOptions::IN, OperatorOptions::NOT_IN]);
+                $value        = $isMultiple && !is_array($data['value']) ? [$data['value']] : $data['value'];
+                $innerBuilder = $form->getConfig()->getFormFactory()->createNamedBuilder('value', ChoiceType::class, null, [
+                    'choices'    => array_flip($fieldValues),
+                    'label'      => 'mautic.form.field.form.value',
+                    'multiple'   => $isMultiple,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'                => 'form-control',
+                        'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
+                        'data-toggle'          => $fieldType,
+                        'data-onload-callback' => 'updateLeadFieldValueOptions',
+                    ],
+                    'choice_attr' => $choiceAttr,
+                    'required'    => true,
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.value.required']
+                        ),
+                    ],
+                    'auto_initialize' => false,
+                    'data'            => $value,
+                ]);
 
-                $form->add(
-                    'value',
-                    ChoiceType::class,
-                    [
-                        'choices'           => array_flip($fieldValues),
-                        'label'             => 'mautic.form.field.form.value',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => [
-                            'class'                => 'form-control',
-                            'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
-                            'data-toggle'          => $fieldType,
-                            'data-onload-callback' => 'updateLeadFieldValueOptions',
-                        ],
-                        'choice_attr' => $choiceAttr,
-                        'required'    => true,
-                        'constraints' => [
-                            new NotBlank(
-                                ['message' => 'mautic.core.value.required']
-                            ),
-                        ],
-                        'multiple' => $multiple,
-                        'data'     => $value,
-                    ]
-                );
+                $transform = function ($value) use ($isMultiple) {
+                    if ($isMultiple) {
+                        return !is_array($value) ? (array) $value : $value;
+                    }
+
+                    return is_array($value) ? reset($value) : $value;
+                };
+                $innerBuilder->addModelTransformer(new CallbackTransformer($transform, $transform));
+
+                $form->add($innerBuilder->getForm());
             } else {
                 $attr = [
                     'class'                => 'form-control',

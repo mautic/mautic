@@ -37,7 +37,7 @@ class ConfigTypeTest extends TypeTestCase
             'site_url'             => 'http://example.com',
             'cache_path'           => 'tmp',
             'log_path'             => '/var/log',
-            'image_path'           => '/tmp/sample-image.png',
+            'image_path'           => 'media/',
             'cached_data_timeout'  => 30000,
             'date_format_full'     => 'F j, Y g:i:s a T',
             'date_format_short'    => 'D, M d - g:i:s a',

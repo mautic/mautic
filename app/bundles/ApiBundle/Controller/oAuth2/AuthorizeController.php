@@ -28,20 +28,16 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     public function __construct(
         RequestStack $requestStack,
         Form $authorizeForm,
-        AuthorizeFormHandler $authorizeFormHandler,
         OAuth2 $oAuth2Server,
         TokenStorageInterface $tokenStorage,
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
-        private Environment $twig,
     ) {
         parent::__construct(
             $requestStack,
             $authorizeForm,
-            $authorizeFormHandler,
             $oAuth2Server,
-            $twig,
             $tokenStorage,
             $router,
             $clientManager,
@@ -60,7 +56,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
      */
     protected function renderAuthorize(array $data, Environment $twig): Response
     {
-        $response = $this->twig->render(
+        $response = $twig->render(
             '@MauticApi/Authorize/oAuth2/authorize.html.twig',
             $data
         );

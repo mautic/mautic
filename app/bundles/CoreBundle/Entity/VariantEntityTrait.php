@@ -6,27 +6,32 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 trait VariantEntityTrait
 {
     /**
      * @var mixed
      **/
+    #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantChildren;
 
     /**
      * @var mixed
      **/
+    #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
 
     /**
      * @var array
      */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = [];
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantStartDate;
 
     /**

@@ -21,6 +21,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const TEST_EMAIL         = 'test@email.com';
+    private const DEFAULT_TEST_EMAIL = 'default@email.com';
+
     public function testHitRepositoryMostVisited(): void
     {
         $page = $this->createPage('test page 1');
@@ -139,32 +142,16 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Check sql injection in parameter orderby
-        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
-        $this->assertStringNotContainsString(
-            'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
-        );
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
 
         // Check sql injection in parameter name
-        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'\'&orderby=a_id');
-        $this->assertStringNotContainsString(
-            'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
-        );
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'\'&orderby=a_id');
 
         // Check sql injection in parameter tmpl
-        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list\'&name=report.'.$report->getId().'&orderby=a_id');
-        $this->assertStringNotContainsString(
-            'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
-        );
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list\'&name=report.'.$report->getId().'&orderby=a_id');
 
         // Check sql injection in parameter id
-        $this->client->request('GET', '/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
-        $this->assertStringNotContainsString(
-            'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
-        );
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
         Assert::assertTrue($this->client->getResponse()->isOk());
@@ -289,22 +276,9 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($response->isOk());
 
         // Load view content as HTML and convert the report table to result array
-        $result  = [];
-        $content = $response->getContent();
-        $dom     = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
-        $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
-        $rows  = $tbody->getElementsByTagName('tr');
-
-        for ($i = 0; $i < count($rows); ++$i) {
-            $cells = $rows[$i]->getElementsByTagName('td');
-            foreach ($cells as $c) {
-                $result[$i][] = htmlentities(trim($c->nodeValue));
-            }
-        }
+        $result  = $this->parseReportTable($response->getContent());
 
         Assert::assertSame($expected, $result);
-        Assert::assertCount($tbody->childElementCount, $expected);
     }
 
     public function testContactReportNotLikeExpression(): void
@@ -354,20 +328,8 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         Assert::assertTrue($this->client->getResponse()->isOk());
         $response = $this->client->getResponse();
-        $content  = $response->getContent();
 
-        $dom     = new \DOMDocument('1.0', 'utf-8');
-
-        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
-        $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
-        $rows  = $tbody->getElementsByTagName('tr');
-
-        for ($i = 0; $i < count($rows); ++$i) {
-            $cells = $rows[$i]->getElementsByTagName('td');
-            foreach ($cells as $c) {
-                $result[$i][] = htmlentities(trim($c->nodeValue));
-            }
-        }
+        $result = $this->parseReportTable($response->getContent());
         $this->assertEquals(2, count($result));
     }
 
@@ -597,6 +559,27 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<int,array<int,mixed>>
      */
+    private function parseReportTable(string $content): array
+    {
+        $result = [];
+        $dom    = new \DOMDocument('1.0', 'utf-8');
+        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
+        $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
+        $rows  = $tbody->getElementsByTagName('tr');
+
+        for ($i = 0; $i < $rows->length; ++$i) {
+            $cells = $rows->item($i)->getElementsByTagName('td');
+            foreach ($cells as $c) {
+                $result[$i][] = htmlentities(trim($c->nodeValue));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<int,array<int,mixed>>
+     */
     private function domTableToArray(Crawler $crawler): array
     {
         return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
@@ -645,5 +628,88 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $hit;
+    }
+
+    private function assertSqlInjectionNotWork(string $url): void
+    {
+        $this->client->request('GET', $url);
+        $this->assertStringNotContainsString(
+            'You have an error in your SQL syntax',
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testDynamicFiltersAreApplied(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail(self::TEST_EMAIL);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Report with dynamic filters');
+        $report->setSource('leads');
+        $report->setColumns(['l.email']);
+        $report->setFilters([
+            [
+                'column'    => 'l.email',
+                'condition' => 'eq',
+                'dynamic'   => 1,
+                'value'     => self::TEST_EMAIL,
+            ],
+        ]);
+
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $content  = $this->client->getResponse()->getcontent();
+        Assert::assertStringContainsString(self::TEST_EMAIL, $content);
+    }
+
+    public function testDynamicFiltersWithDefaultValueAreApplied(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail(self::DEFAULT_TEST_EMAIL);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Report with dynamic filters');
+        $report->setSource('leads');
+        $report->setColumns(['l.email']);
+        $report->setFilters([
+            [
+                'column'    => 'l.email',
+                'condition' => 'eq',
+                'dynamic'   => 1,
+                'value'     => '',
+            ],
+        ]);
+
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        // Mock the ReportModel to add a defaultValue to the filter definition
+        $reportModel = $this->createMock(ReportModel::class);
+
+        $filterDefinitions              = new \stdClass();
+        $filterDefinitions->definitions = [
+            'l.email' => [
+                'alias'        => 'email',
+                'defaultValue' => self::DEFAULT_TEST_EMAIL,
+                'label'        => 'Email',
+                'type'         => 'text',
+            ],
+        ];
+
+        $reportModel->method('getFilterList')->willReturn($filterDefinitions);
+        static::getContainer()->set('mautic.report.model.report', $reportModel);
+
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $content = $this->client->getResponse()->getContent();
+        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, $content);
     }
 }

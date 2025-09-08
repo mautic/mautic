@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\Trigger;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -62,6 +63,8 @@ class TriggerType extends AbstractType
                 'bundle' => 'point',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         $builder->add(
             'points',

@@ -2,6 +2,13 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -11,26 +18,25 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "channel:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"message"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "channel:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('channel:messages:viewown')"),
+        new Post(security: "is_granted('channel:messages:create')"),
+        new Get(security: "is_granted('channel:messages:viewown')"),
+        new Put(security: "is_granted('channel:messages:editown')"),
+        new Patch(security: "is_granted('channel:messages:editother')"),
+        new Delete(security: "is_granted('channel:messages:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['channel:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['message'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['channel:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Channel extends CommonEntity implements UuidInterface
 {
     use UuidTrait;
@@ -38,36 +44,43 @@ class Channel extends CommonEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['channel:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['channel:read', 'channel:write', 'message:read'])]
     private $channel;
 
     /**
      * @var int|null
      */
+    #[Groups(['channel:read', 'channel:write'])]
     private $channelId;
 
     /**
      * @var string
      */
+    #[Groups(['channel:read', 'message:read'])]
     private $channelName;
 
     /**
      * @var Message
      */
+    #[Groups(['channel:read', 'channel:write'])]
     private $message;
 
     /**
      * @var array
      */
+    #[Groups(['channel:read', 'channel:write'])]
     private $properties = [];
 
     /**
      * @var bool
      */
+    #[Groups(['channel:read', 'channel:write', 'message:read'])]
     private $isEnabled = false;
 
     public static function loadMetadata(ClassMetadata $metadata): void

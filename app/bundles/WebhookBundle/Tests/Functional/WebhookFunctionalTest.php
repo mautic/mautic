@@ -2,8 +2,8 @@
 
 namespace Mautic\WebhookBundle\Tests\Functional;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebhookFunctionalTest extends MauticMysqlTestCase
 {
+    use ClientMockTrait;
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -47,12 +49,12 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     {
         $sendRequestCounter = 0;
 
-        $handlerStack = static::getContainer()->get(MockHandler::class);
+        $handlerStack = $this->getClientMockHandler();
 
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(
             function (RequestInterface $request) use (&$sendRequestCounter) {
-                Assert::assertSame('://whatever.url', $request->getUri()->getPath());
+                Assert::assertSame('/post', $request->getUri()->getPath());
                 $jsonPayload = json_decode($request->getBody()->getContents(), true);
                 Assert::assertCount(3, $jsonPayload['mautic.lead_post_save_new']);
                 Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
@@ -93,7 +95,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $webhook->addEvent($event);
         $webhook->setName('Webhook from a functional test');
-        $webhook->setWebhookUrl('https:://whatever.url');
+        $webhook->setWebhookUrl('https://httpbin.org/post');
         $webhook->setSecret('any_secret_will_do');
         $webhook->isPublished(true);
         $webhook->setCreatedBy(1);
