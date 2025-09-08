@@ -212,7 +212,7 @@ export default class BuilderService {
 
   static getCkeConf(tokenCallback) {
     const ckEditorToolbarOptions = ['undo', 'redo', '|', 'bold','italic', 'underline','strikethrough', '|', 'fontSize','fontFamily','fontColor','fontBackgroundColor', '|' ,'alignment','outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'bulletedList','numberedList', '|', 'link', '|', 'TokenPlugin'];
-    return Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback);
+    return Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback, true);
   }
 
   /**

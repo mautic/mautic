@@ -211,8 +211,9 @@ Mautic.getFeedItems = function (queryText) {
     }
 }
 
-Mautic.getTokensForPlugIn = function(method) {
+Mautic.getTokensForPlugIn = function(method, removeDWCToken) {
     method = typeof method != 'undefined' ? method : 'page:getBuilderTokens';
+    removeDWCToken = typeof removeDWCToken != 'undefined' ? removeDWCToken : false;
     // OK, let's fetch the tokens.
     mQuery.ajax({
         url: mauticAjaxUrl,
@@ -224,6 +225,12 @@ Mautic.getTokensForPlugIn = function(method) {
                 Mautic.configureDynamicContentAtWhoTokens();
                 mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
+                    if (removeDWCToken
+                        && i.startsWith('{dwc') && value.startsWith('DWC:'))
+                    {
+                        return;
+                    }
+
                     return {'id':i, 'name':value};
                 });
             }
@@ -261,7 +268,8 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
     Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback));
 }
 
-Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback) {
+Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback, removeDWCToken) {
+    removeDWCToken = typeof removeDWCToken != "undefined" ? removeDWCToken : false;
     const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
     const ckEditorColors = [
@@ -385,7 +393,7 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
 
     if (ckEditorToolbar.indexOf('TokenPlugin') > -1)
     {
-        const tokens = Mautic.getTokensForPlugIn(tokenCallback);
+        const tokens = Mautic.getTokensForPlugIn(tokenCallback, removeDWCToken);
         mQuery.extend(ckEditorOption, {
             extraPlugins: [Mautic.MentionLinks],
             dynamicTokenLabel: 'Insert token',
