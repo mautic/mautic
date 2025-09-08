@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
+use Mautic\EmailBundle\Event\ManualWinnerEvent;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
@@ -1228,7 +1229,12 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
+            // setting parent here, as the parent will be removed by the code below.
+            $parent = $entity->getVariantParent() ?? $entity;
+
             $model->convertVariant($entity);
+
+            $this->dispatcher->dispatch(new ManualWinnerEvent($parent));
 
             $flashes[] = [
                 'type'    => 'notice',

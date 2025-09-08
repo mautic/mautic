@@ -45,6 +45,13 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
                 'limit' => 255,
                 'value' => '',
             ],
+            'range' => [
+                'label' => 'Range',
+                'alias' => 'range',
+                'type'  => 'text',
+                'limit' => 64,
+                'value' => '',
+            ],
         ];
 
         foreach ($fields as $field) {

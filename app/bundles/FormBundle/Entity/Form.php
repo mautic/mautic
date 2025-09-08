@@ -237,7 +237,7 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->createOneToMany('fields', 'Field')
             ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
+            ->setOrderBy(['order' => 'ASC', 'id' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()

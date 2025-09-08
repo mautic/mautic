@@ -2,8 +2,8 @@
 
 namespace Mautic\WebhookBundle\Tests\Functional;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebhookFunctionalTest extends MauticMysqlTestCase
 {
+    use ClientMockTrait;
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -47,7 +49,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     {
         $sendRequestCounter = 0;
 
-        $handlerStack = static::getContainer()->get(MockHandler::class);
+        $handlerStack = $this->getClientMockHandler();
 
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(

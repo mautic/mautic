@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Functional\Command;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
 {
+    use ClientMockTrait;
+
     protected function setUp(): void
     {
         $this->configParams['queue_mode']    = WebhookModel::COMMAND_PROCESS;
@@ -31,7 +33,7 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
     {
         $webhook      = $this->createWebhook('test', 'https://httpbin.org/post', 'secret');
         $event        = $this->createWebhookEvent($webhook, 'Type');
-        $handlerStack = static::getContainer()->get(MockHandler::class);
+        $handlerStack = $this->getClientMockHandler();
         $queueIds     = [];
 
         // Generate 10 queue records.

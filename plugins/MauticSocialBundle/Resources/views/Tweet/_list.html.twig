@@ -31,8 +31,8 @@
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
-                                    'edit': securityIsGranted('mauticSocial:tweet:edit'),
-                                    'delete': securityIsGranted('mauticSocial:tweet:delete'),
+                                    'edit': securityIsGranted('mauticSocial:tweets:edit'),
+                                    'delete': securityIsGranted('mauticSocial:tweets:delete'),
                                 },
                                 'routeBase': 'mautic_tweet',
                                 'langVar': 'mautic.integration.Twitter',
