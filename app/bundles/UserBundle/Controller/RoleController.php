@@ -14,6 +14,15 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 class RoleController extends FormController
 {
+    private const PERMISSION_CREATE = 'user:roles:create';
+    private const PERMISSION_EDIT   = 'user:roles:edit';
+    private const PERMISSION_DELETE = 'user:roles:delete';
+
+    private const FLASH_MENU_LINK = '%menu_link%';
+    private const FLASH_URL       = '%url%';
+
+    private const TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
+
     /**
      * Generate's default role list view.
      *
@@ -88,9 +97,9 @@ class RoleController extends FormController
                 'limit'       => $limit,
                 'tmpl'        => $tmpl,
                 'permissions' => [
-                    'create' => $this->security->isGranted('user:roles:create'),
-                    'edit'   => $this->security->isGranted('user:roles:edit'),
-                    'delete' => $this->security->isGranted('user:roles:delete'),
+                    'create' => $this->security->isGranted(self::PERMISSION_CREATE),
+                    'edit'   => $this->security->isGranted(self::PERMISSION_EDIT),
+                    'delete' => $this->security->isGranted(self::PERMISSION_DELETE),
                 ],
             ],
             'contentTemplate' => '@MauticUser/Role/list.html.twig',
@@ -108,7 +117,7 @@ class RoleController extends FormController
      */
     public function newAction(Request $request)
     {
-        if (!$this->security->isGranted('user:roles:create')) {
+        if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             return $this->accessDenied();
         }
 
@@ -142,9 +151,9 @@ class RoleController extends FormController
                     $model->saveEntity($entity);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $entity->getName(),
-                        '%menu_link%' => 'mautic_role_index',
-                        '%url%'       => $this->generateUrl('mautic_role_action', [
+                        '%name%'              => $entity->getName(),
+                        self::FLASH_MENU_LINK => 'mautic_role_index',
+                        self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
                             'objectAction' => 'edit',
                             'objectId'     => $entity->getId(),
                         ]),
@@ -172,7 +181,7 @@ class RoleController extends FormController
                 'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => '@MauticUser/Role/form.html.twig',
+            'contentTemplate' => self::TEMPLATE_FORM,
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_new',
                 'route'          => $this->generateUrl('mautic_role_action', ['objectAction' => 'new']),
@@ -189,7 +198,7 @@ class RoleController extends FormController
      */
     public function cloneAction(Request $request, int $objectId)
     {
-        if (!$this->security->isGranted('user:roles:create')) {
+        if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             return $this->accessDenied();
         }
 
@@ -211,8 +220,10 @@ class RoleController extends FormController
             ],
         ];
 
+        $response = null;
+
         if (null === $source) {
-            return $this->postActionRedirect(
+            $response = $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
                         [
@@ -223,17 +234,17 @@ class RoleController extends FormController
                     ],
                 ])
             );
-        }
+        } else {
+            $entity            = $model->cloneEntity($source);
+            $permissionsConfig = $this->getPermissionsConfig($source);
+            $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
+            $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
-        $entity            = $model->cloneEntity($source);
-        $permissionsConfig = $this->getPermissionsConfig($source);
-        $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
-        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+            if ($request->isMethod('POST')) {
+                $cancelled = $this->isFormCancelled($form);
+                $valid     = !$cancelled && $this->isFormValid($form);
 
-        if ('POST' === $request->getMethod()) {
-            $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($valid) {
                     $role        = $request->request->all()['role'] ?? [];
                     $permissions = $role['permissions'] ?? null;
 
@@ -244,36 +255,40 @@ class RoleController extends FormController
                     $model->saveEntity($entity);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $entity->getName(),
-                        '%menu_link%' => 'mautic_role_index',
-                        '%url%'       => $this->generateUrl('mautic_role_action', [
+                        '%name%'              => $entity->getName(),
+                        self::FLASH_MENU_LINK => 'mautic_role_index',
+                        self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
                             'objectAction' => 'edit',
                             'objectId'     => $entity->getId(),
                         ]),
                     ]);
                 }
+
+                if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
+                    $response = $this->postActionRedirect($postActionVars);
+                } elseif ($valid) {
+                    $response = $this->editAction($request, $entity->getId(), true);
+                }
             }
 
-            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                return $this->postActionRedirect($postActionVars);
-            } elseif ($valid) {
-                return $this->editAction($request, $entity->getId(), true);
+            if (!$response instanceof Response) {
+                $response = $this->delegateView([
+                    'viewParameters' => [
+                        'form'              => $form->createView(),
+                        'permissionsConfig' => $permissionsConfig,
+                    ],
+                    'contentTemplate' => self::TEMPLATE_FORM,
+                    'passthroughVars' => [
+                        'activeLink'     => '#mautic_role_new',
+                        'route'          => $action,
+                        'mauticContent'  => 'role',
+                        'permissionList' => $permissionsConfig['list'],
+                    ],
+                ]);
             }
         }
 
-        return $this->delegateView([
-            'viewParameters' => [
-                'form'              => $form->createView(),
-                'permissionsConfig' => $permissionsConfig,
-            ],
-            'contentTemplate' => '@MauticUser/Role/form.html.twig',
-            'passthroughVars' => [
-                'activeLink'     => '#mautic_role_new',
-                'route'          => $action,
-                'mauticContent'  => 'role',
-                'permissionList' => $permissionsConfig['list'],
-            ],
-        ]);
+        return $response;
     }
 
     /**
@@ -286,7 +301,7 @@ class RoleController extends FormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        if (!$this->security->isGranted('user:roles:edit')) {
+        if (!$this->security->isGranted(self::PERMISSION_EDIT)) {
             return $this->accessDenied();
         }
 
@@ -347,9 +362,9 @@ class RoleController extends FormController
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $entity->getName(),
-                        '%menu_link%' => 'mautic_role_index',
-                        '%url%'       => $this->generateUrl('mautic_role_action', [
+                        '%name%'              => $entity->getName(),
+                        self::FLASH_MENU_LINK => 'mautic_role_index',
+                        self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
                             'objectAction' => 'edit',
                             'objectId'     => $entity->getId(),
                         ]),
@@ -377,7 +392,7 @@ class RoleController extends FormController
                 'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => '@MauticUser/Role/form.html.twig',
+            'contentTemplate' => self::TEMPLATE_FORM,
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_index',
                 'route'          => $action,
@@ -445,7 +460,7 @@ class RoleController extends FormController
      */
     public function deleteAction(Request $request, $objectId)
     {
-        if (!$this->security->isGranted('user:roles:delete')) {
+        if (!$this->security->isGranted(self::PERMISSION_DELETE)) {
             return $this->accessDenied();
         }
 
@@ -547,7 +562,7 @@ class RoleController extends FormController
                         'msg'     => 'mautic.user.role.error.deletenotallowed',
                         'msgVars' => ['%name%' => $entity->getName()],
                     ];
-                } elseif (!$this->security->isGranted('user:roles:delete')) {
+                } elseif (!$this->security->isGranted(self::PERMISSION_DELETE)) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'user.role', true);

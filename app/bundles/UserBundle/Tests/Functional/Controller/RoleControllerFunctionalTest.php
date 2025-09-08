@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const ROLE_NAME_FIELD = 'role[name]';
+
     public function testNewRoleAction(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/roles/new');
@@ -19,7 +21,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $desc = 'Role Description';
 
         $form = $saveButton->form();
-        $form['role[name]']->setValue($name);
+        $form[self::ROLE_NAME_FIELD]->setValue($name);
         $form['role[description]']->setValue($desc);
 
         $this->client->submit($form);
@@ -44,7 +46,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $updatedName = 'Test Role Updated';
 
         $form = $saveButton->form();
-        $form['role[name]']->setValue($updatedName);
+        $form[self::ROLE_NAME_FIELD]->setValue($updatedName);
 
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -73,8 +75,8 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $saveButton   = $crawler->selectButton('role[buttons][apply]');
         $this->assertGreaterThan(0, $saveButton->count(), 'Expected Apply button on clone form');
         $form         = $saveButton->form();
-        $form['role[name]']->setValue($newName);
-        $crawler      = $this->client->submit($form);
+        $form[self::ROLE_NAME_FIELD]->setValue($newName);
+        $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $this->assertStringContainsString($newName, $this->client->getResponse()->getContent());
