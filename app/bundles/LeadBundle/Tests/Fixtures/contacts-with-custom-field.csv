@@ -1,0 +1,3 @@
+email,firstname,lastname,company,custom_boolean_field
+john@doe.email,John,doe,Company B,No
+ferda@mravenec.email,Ferda,Mravenec,Company B,Yes

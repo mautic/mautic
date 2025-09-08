@@ -36,7 +36,7 @@ class StageApiController extends CommonApiController
         $this->entityClass      = Stage::class;
         $this->entityNameOne    = 'stage';
         $this->entityNameMulti  = 'stages';
-        $this->serializerGroups = ['stageDetails', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['stageDetails', 'categoryList', 'publishDetails', 'projectList'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

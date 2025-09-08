@@ -176,6 +176,7 @@ class FormType extends AbstractType
                 'mautic.form.form.postaction.message'  => 'message',
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.return'   => 'return',
+                'mautic.form.form.postaction.hideform' => 'hideform',
             ],
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],
@@ -188,7 +189,7 @@ class FormType extends AbstractType
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
-        $required   = (in_array($postAction, ['redirect', 'message'])) ? true : false;
+        $required   = (in_array($postAction, ['redirect', 'message', 'hideform'])) ? true : false;
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],

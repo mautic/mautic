@@ -97,24 +97,25 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
+        $operator        = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
+        $queryBuilder    = $event->getQueryBuilder();
+        $field           = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
-        $operator    = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
         $expressions = [];
-
-        $queryBuilder = $event->getQueryBuilder();
-
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $queryBuilder->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
+            $expressions[] = $queryBuilder->expr()->$operator($field, $parameter);
         }
 
         if ('notRegexp' === $operator) {
-            $expressions = [$queryBuilder->expr()->or(
-                $queryBuilder->expr()->and(...$expressions),
-                $queryBuilder->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-            )];
+            // Build and() from all expressions, then or() with isNull
+            $andExpr    = $queryBuilder->expr()->and(...$expressions);
+            $isNullExpr = $queryBuilder->expr()->isNull($field);
+            $finalExpr  = $queryBuilder->expr()->or($andExpr, $isNullExpr);
+        } else {
+            // For 'multiselect', or() with all expressions
+            $finalExpr = $queryBuilder->expr()->or(...$expressions);
         }
-
-        $event->addExpression($event->getQueryBuilder()->expr()->and(...$expressions));
+        $event->addExpression($finalExpr);
         $event->stopPropagation();
     }
 

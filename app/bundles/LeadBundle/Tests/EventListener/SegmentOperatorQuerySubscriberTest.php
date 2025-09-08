@@ -305,10 +305,46 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
             );
 
         $this->expressionBuilder->expects($this->once())
-            ->method('and');
+            ->method('or');
 
         $this->expressionBuilder->expects($this->once())
             ->method('regexp')
+            ->with('l.email', 'paramenter_holder_1');
+
+        $this->subscriber->onMultiselectOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnMultiselectOperatorsIfExcludeOperator(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['paramenter_holder_1']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('email');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('!multiselect');
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with(
+                $this->anything(),
+                CompositeExpression::TYPE_AND
+            );
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('and');
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('notRegexp')
             ->with('l.email', 'paramenter_holder_1');
 
         $this->subscriber->onMultiselectOperators($event);

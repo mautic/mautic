@@ -374,6 +374,30 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * Compare a form result value with empty value for defined lead.
+     */
+    public function compareEmptyDateValue(int $lead, string $field, string $operatorExpr): bool
+    {
+        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $property = $this->getPropertyByField($field, $q);
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    ('empty' === $operatorExpr) ?
+                        $q->expr()->isNull($property)
+                        :
+                        $q->expr()->isNotNull($property)
+                )
+            )
+            ->setParameter('lead', $lead, \PDO::PARAM_INT);
+        $result = $q->executeQuery()->fetchAssociative();
+
+        return !empty($result['id']);
+    }
+
+    /**
      * Compare a form result value with defined date value for defined lead.
      *
      * @param int    $lead  ID
