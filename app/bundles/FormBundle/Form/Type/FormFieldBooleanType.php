@@ -31,9 +31,4 @@ final class FormFieldBooleanType extends AbstractType
             'required'   => false,
         ]);
     }
-
-    public function getBlockPrefix(): string
-    {
-        return 'formfield_boolean';
-    }
 }
