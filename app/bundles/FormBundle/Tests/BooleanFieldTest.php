@@ -5,312 +5,195 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Model\SubmissionModel;
-use Twig\Environment;
+use Mautic\FormBundle\Entity\Submission;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class BooleanFieldTest extends MauticMysqlTestCase
+final class BooleanFieldTest extends MauticMysqlTestCase
 {
-    protected SubmissionModel $submissionModel;
-    protected \ReflectionMethod $normalizeValueMethod;
-    protected Environment $twig;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->submissionModel      = static::getContainer()->get('mautic.form.model.submission');
-        $reflection                 = new \ReflectionClass($this->submissionModel);
-        $this->normalizeValueMethod = $reflection->getMethod('normalizeValue');
-        $this->normalizeValueMethod->setAccessible(true);
-        $this->twig = static::getContainer()->get('twig');
-    }
+    protected $useCleanupRollback   = false;
+    protected bool $authenticateApi = true;
 
     /**
-     * @param array<string, string> $properties
+     * Create a standalone form via API with a single boolean field and a submit button.
+     *
+     * @param array<string,string> $booleanProperties
+     *
+     * @return array{formId:int,formAlias:string}
      */
-    protected function createBooleanField(array $properties = []): Field
+    private function createFormWithBooleanField(array $booleanProperties): array
     {
-        $field = new Field();
-        $field->setType('boolean');
-        $field->setLabel('Test Boolean Field');
-        $field->setAlias('test_boolean');
-        $field->setProperties($properties);
+        $payload = [
+            'name'        => 'Boolean Test Form',
+            'description' => 'Form created via boolean field test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'postAction'  => 'return',
+            'fields'      => [
+                [
+                    'label'      => 'Consent',
+                    'type'       => 'boolean',
+                    'alias'      => 'test_boolean',
+                    'isRequired' => false,
+                    'properties' => $booleanProperties,
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
 
-        return $field;
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response  = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId    = $response['form']['id'];
+        $formAlias = $response['form']['alias'];
+
+        return ['formId' => (int) $formId, 'formAlias' => (string) $formAlias];
     }
 
-    protected function assertNormalizedValue(mixed $input, Field $field, bool $expected): void
+    private function cleanupForm(int $formId): void
     {
-        $result = $this->normalizeValueMethod->invoke($this->submissionModel, $input, $field);
-        $this->assertEquals($expected, $result);
+        $this->setUpSymfony($this->configParams);
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    protected function renderBooleanField(Field $field): string
+    public function testBooleanFieldRendersAsRadioWithBothLabelsAndSubmits(): void
     {
-        return $this->twig->render('@MauticForm/Field/boolean.html.twig', [
-            'field'    => $field,
-            'id'       => 'test',
-            'formId'   => 1,
-            'formName' => 'test_form',
-        ]);
-    }
-
-    /**
-     * @param array<string> $expectedContent
-     * @param array<string> $unexpectedContent
-     */
-    protected function assertBooleanFieldRendersCorrectly(Field $field, array $expectedContent, array $unexpectedContent = []): void
-    {
-        $html = $this->renderBooleanField($field);
-
-        foreach ($expectedContent as $content) {
-            $this->assertStringContainsString($content, $html);
-        }
-
-        foreach ($unexpectedContent as $content) {
-            $this->assertStringNotContainsString($content, $html);
-        }
-    }
-
-    public function testBooleanFieldFormSubmission(): void
-    {
-        $field = $this->createBooleanField([
+        $created = $this->createFormWithBooleanField([
             'yes' => 'Custom Yes',
             'no'  => 'Custom No',
         ]);
+        $formId    = $created['formId'];
+        $formAlias = $created['formAlias'];
 
-        $this->assertNormalizedValue('1', $field, true);
-        $this->assertNormalizedValue('0', $field, true);
-        $this->assertNormalizedValue('Custom Yes', $field, true);
-        $this->assertNormalizedValue('Custom No', $field, true);
-        $this->assertNormalizedValue('', $field, false);
-        $this->assertNormalizedValue(null, $field, false);
-    }
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $html      = $crawler->html();
+        $pageAlias = (string) $crawler->filter('form[data-mautic-form]')->attr('data-mautic-form');
 
-    public function testBooleanFieldWithBlankLabels(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => '',
-        ]);
-
-        $this->assertNormalizedValue(['1'], $field, true);
-        $this->assertNormalizedValue('1', $field, true);
-        $this->assertNormalizedValue('Custom Yes', $field, true);
-        $this->assertNormalizedValue([''], $field, false);
-        $this->assertNormalizedValue([], $field, false);
-        $this->assertNormalizedValue('', $field, false);
-        $this->assertNormalizedValue(null, $field, false);
-    }
-
-    public function testBooleanFieldValueNormalization(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => 'Custom No',
-        ]);
-
-        $this->assertNormalizedValue('1', $field, true);
-        $this->assertNormalizedValue('0', $field, true);
-        $this->assertNormalizedValue('Custom Yes', $field, true);
-        $this->assertNormalizedValue('Custom No', $field, true);
-        $this->assertNormalizedValue('true', $field, true);
-        $this->assertNormalizedValue('false', $field, true);
-        $this->assertNormalizedValue('', $field, false);
-        $this->assertNormalizedValue(null, $field, false);
-    }
-
-    public function testBooleanFieldWithDefaultLabels(): void
-    {
-        $field = $this->createBooleanField();
-
-        $this->assertNormalizedValue('1', $field, true);
-        $this->assertNormalizedValue('0', $field, true);
-        $this->assertNormalizedValue('true', $field, true);
-        $this->assertNormalizedValue('false', $field, true);
-        $this->assertNormalizedValue('', $field, false);
-        $this->assertNormalizedValue(null, $field, false);
-    }
-
-    public function testNormalizeValueWithEmptySubmission(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => 'Custom No',
-        ]);
-
-        $this->assertNormalizedValue('', $field, false);
-        $this->assertNormalizedValue(null, $field, false);
-    }
-
-    public function testNormalizeValueCheckboxModeOnlyYesLabel(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'I wanna receive comm',
-            'no'  => '',
-        ]);
-
-        $this->assertNormalizedValue(['1'], $field, true);
-        $this->assertNormalizedValue([''], $field, false);
-        $this->assertNormalizedValue([], $field, false);
-    }
-
-    public function testNormalizeValueCheckboxModeOnlyNoLabel(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => '',
-            'no'  => 'I do not want to receive comm',
-        ]);
-
-        $this->assertNormalizedValue(['0'], $field, true);
-        $this->assertNormalizedValue([''], $field, false);
-        $this->assertNormalizedValue([], $field, false);
-    }
-
-    public function testBooleanFieldTemplateWithCustomLabels(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => 'Custom No',
-        ]);
-
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'Custom Yes',
-            'Custom No',
-            'value="0"',
-            'value="1"',
-        ]);
-    }
-
-    public function testBooleanFieldTemplateWithBlankLabels(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => '',
-        ]);
-
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'Custom Yes',
-            'value="1"',
-        ], [
-            'No',
-            'value="0"',
-        ]);
-    }
-
-    public function testBooleanFieldTemplateWithBlankYesLabel(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => '',
-            'no'  => 'Custom No',
-        ]);
-
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'Custom No',
-            'value="0"',
-        ], [
-            'Yes',
-            'value="1"',
-        ]);
-    }
-
-    public function testBooleanFieldTemplateWithDefaultLabels(): void
-    {
-        $field = $this->createBooleanField();
-
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'Yes',
-            'No',
-            'value="0"',
-            'value="1"',
-        ]);
-    }
-
-    public function testBooleanFieldTemplateNoDefaultSelection(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => 'Custom No',
-        ]);
-
-        $html = $this->renderBooleanField($field);
-
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'Custom Yes',
-            'Custom No',
-            'value="0"',
-            'value="1"',
-        ]);
-
+        $this->assertStringContainsString('Custom Yes', $html);
+        $this->assertStringContainsString('Custom No', $html);
+        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringContainsString('value="1"', $html);
+        $this->assertStringContainsString('mauticform-boolean', $html);
+        $this->assertStringContainsString('mauticform-boolean-positive', $html);
+        $this->assertStringContainsString('mauticform-boolean-negative', $html);
+        $this->assertStringContainsString('mauticform-radiogrp-radio', $html);
         $this->assertStringNotContainsString('checked="checked"', $html);
-        $this->assertStringNotContainsString('checked', $html);
+
+        $formCrawler = $crawler->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $this->assertCount(1, $formCrawler, $html);
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[test_boolean]' => '0',
+        ]);
+        $this->client->submit($form);
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $this->assertCount(1, $submissions);
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+        $this->assertSame(['test_boolean' => '0'], $submission->getResults());
+
+        $this->cleanupForm($formId);
     }
 
-    public function testBooleanFieldTemplateCssClasses(): void
+    public function testBooleanFieldRendersCheckboxModeWithOnlyYesLabelAndSubmits(): void
     {
-        $field = $this->createBooleanField([
-            'yes' => 'Custom Yes',
-            'no'  => 'Custom No',
-        ]);
-
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'mauticform-boolean',
-            'mauticform-boolean-positive',
-            'mauticform-boolean-negative',
-            'mauticform-radiogrp-radio',
-        ]);
-    }
-
-    public function testBooleanFieldTemplateCheckboxMode(): void
-    {
-        $field = $this->createBooleanField([
+        $created = $this->createFormWithBooleanField([
             'yes' => 'I wanna receive comm',
             'no'  => '',
         ]);
+        $formId    = $created['formId'];
+        $formAlias = $created['formAlias'];
 
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'type="checkbox"',
-            'I wanna receive comm',
-            'value="1"',
-            'mauticform-checkboxgrp-checkbox',
-        ], [
-            'type="radio"',
-            'value="0"',
+        // Load public form page
+        $crawler   = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $html      = $crawler->html();
+        $pageAlias = (string) $crawler->filter('form[data-mautic-form]')->attr('data-mautic-form');
+
+        // Assert checkbox rendering with positive option only
+        $this->assertStringContainsString('type="checkbox"', $html);
+        $this->assertStringContainsString('I wanna receive comm', $html);
+        $this->assertStringContainsString('value="1"', $html);
+        $this->assertStringContainsString('name="mauticform[test_boolean][]"', $html);
+        $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
+        $this->assertStringContainsString('mauticform-boolean-positive', $html);
+        $this->assertStringNotContainsString('value="0"', $html);
+
+        // Submit unchecked (no value sent)
+        $formCrawler = $crawler->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $form        = $formCrawler->form();
+        $this->client->submit($form);
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $this->assertCount(1, $submissions);
+        /** @var Submission $submission1 */
+        $submission1 = $submissions[0];
+        $this->assertSame(['test_boolean' => ''], $submission1->getResults());
+
+        // Submit checked (send value "1")
+        $crawler2     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler2 = $crawler2->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $form2        = $formCrawler2->form();
+        $form2->setValues([
+            'mauticform[test_boolean]' => ['1'],
         ]);
+        $this->client->submit($form2);
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $this->assertCount(2, $submissions);
+        /** @var Submission $submission2 */
+        $submission2 = $submissions[1];
+        $this->assertSame(['test_boolean' => '1'], $submission2->getResults());
+
+        $this->cleanupForm($formId);
     }
 
-    public function testBooleanFieldTemplateCheckboxModeOnlyNoLabel(): void
+    public function testBooleanFieldRendersCheckboxModeWithOnlyNoLabelAndSubmits(): void
     {
-        $field = $this->createBooleanField([
+        $created = $this->createFormWithBooleanField([
             'yes' => '',
             'no'  => 'I do not want to receive comm',
         ]);
+        $formId    = $created['formId'];
+        $formAlias = $created['formAlias'];
 
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'type="checkbox"',
-            'I do not want to receive comm',
-            'value="0"',
-            'mauticform-checkboxgrp-checkbox',
-        ], [
-            'type="radio"',
-            'value="1"',
-        ]);
-    }
+        $crawler   = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $html      = $crawler->html();
+        $pageAlias = (string) $crawler->filter('form[data-mautic-form]')->attr('data-mautic-form');
 
-    public function testBooleanFieldTemplateCheckboxModeSubmissionSimulation(): void
-    {
-        $field = $this->createBooleanField([
-            'yes' => 'I wanna receive comm',
-            'no'  => '',
-        ]);
+        $this->assertStringContainsString('type="checkbox"', $html);
+        $this->assertStringContainsString('I do not want to receive comm', $html);
+        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringContainsString('name="mauticform[test_boolean][]"', $html);
+        $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
+        $this->assertStringContainsString('mauticform-boolean-negative', $html);
 
-        $this->assertBooleanFieldRendersCorrectly($field, [
-            'type="checkbox"',
-            'value="1"',
-            'I wanna receive comm',
-            'name="mauticform[test_boolean][]"',
-            'mauticform-checkboxgrp-checkbox',
-            'mauticform-boolean-positive',
+        // Submit with the checkbox checked (send value "0")
+        $formCrawler = $crawler->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $form        = $formCrawler->form();
+        $form->setValues([
+            'mauticform[test_boolean]' => ['0'],
         ]);
+        $this->client->submit($form);
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $this->assertCount(1, $submissions);
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+        $this->assertSame(['test_boolean' => '0'], $submission->getResults());
+
+        $this->cleanupForm($formId);
     }
 }
