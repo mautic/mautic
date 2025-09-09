@@ -1156,7 +1156,7 @@ class SubmissionModel extends CommonFormModel
 
         // boolean field normalization
         if ('boolean' === $f->getType()) {
-            return !(empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]));
+            return !(empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0])));
         }
 
         // select and multiselect normalization
