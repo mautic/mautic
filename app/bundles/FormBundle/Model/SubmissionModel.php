@@ -268,11 +268,7 @@ class SubmissionModel extends CommonFormModel
                     $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
 
                     if (($onlyYesLabel || $onlyNoLabel) && empty($value)) {
-                        if ($onlyNoLabel) {
-                            $leadValue = true;
-                        } else {
-                            $leadValue = false;
-                        }
+                        $leadValue = $onlyNoLabel;
                     }
                 }
 
@@ -1160,11 +1156,7 @@ class SubmissionModel extends CommonFormModel
 
         // boolean field normalization
         if ('boolean' === $f->getType()) {
-            if (empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]))) {
-                return false;
-            } else {
-                return true;
-            }
+            return !(empty($value) || (1 === count($value) && (null === $value[0] || '' === $value[0]));
         }
 
         // select and multiselect normalization

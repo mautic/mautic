@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\View;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-class FormResultsDisplayTest extends MauticMysqlTestCase
+final class FormResultsDisplayTest extends MauticMysqlTestCase
 {
     public function testBooleanFieldResultsDisplay(): void
     {
