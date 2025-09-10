@@ -73,4 +73,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
     $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
         ->tag('controller.service_arguments');
+    // Decorate the form_login class to ensure no user enumeration can
+    // happen via timing attacks.
+    $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)
+        ->decorate('security.authenticator.form_login.main')
+        ->args([
+            service('.inner'),
+            service('mautic.user.provider'),
+            service('security.password_hasher_factory'),
+            [], // This will be replaced by the compiler pass
+        ]);
 };

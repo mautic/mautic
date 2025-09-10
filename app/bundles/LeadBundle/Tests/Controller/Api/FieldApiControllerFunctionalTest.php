@@ -6,6 +6,10 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -168,6 +172,232 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'A \'positive\' label is required.',
         ];
+    }
+
+    /**
+     * @dataProvider provideEmptyMultiSelectValue
+     */
+    public function testMultiselectSetDefaultValue(mixed $defaultFieldValue): void
+    {
+        $fieldAlias = 'test_multi';
+
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        \assert($fieldModel instanceof FieldModel);
+
+        $fields = $fieldModel->getLeadFieldCustomFields();
+        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+
+        // Add field.
+        $leadField = new LeadField();
+        $leadField->setName('Test Field')
+            ->setAlias($fieldAlias)
+            ->setType('multiselect')
+            ->setObject('lead')
+            ->setProperties([
+                'list' => [
+                    [
+                        'label' => 'Halusky',
+                        'value' => 'halusky',
+                    ],
+                    [
+                        'label' => 'Bramborak',
+                        'value' => 'bramborak',
+                    ],
+                    [
+                        'label' => 'Makovec',
+                        'value' => 'makovec',
+                    ],
+                ],
+            ]);
+        $fieldModel->saveEntity($leadField);
+
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setEmail('email@acquia.cz');
+
+        $contact->addUpdatedField($fieldAlias, ['bramborak', 'makovec']);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Call endpoint
+        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('bramborak|makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test patch and values should be updated
+        $updatedValues = [
+            $fieldAlias  => ['halusky'],
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test empty patch and values should be updated
+        $updatedValues = [
+            $fieldAlias          => $defaultFieldValue,
+            'overwriteWithBlank' => true,
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+    }
+
+    /**
+     * @return \Iterator<string, array<string|array<string|null>|null>>
+     */
+    public static function provideEmptyMultiSelectValue(): \Iterator
+    {
+        yield 'null' => [null];
+        yield 'empty string value' => [''];
+        yield 'empty array with empty string value' => [['']];
+        yield 'empty array with null value' => [[null]];
+    }
+
+    /**
+     * @dataProvider provideEmptySelectValue
+     */
+    public function testSelectSetDefaultValue(mixed $defaultFieldValue): void
+    {
+        $fieldAlias = 'test_single';
+
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        \assert($fieldModel instanceof FieldModel);
+
+        $fields = $fieldModel->getLeadFieldCustomFields();
+        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+
+        // Add field.
+        $leadField = new LeadField();
+        $leadField->setName('Test Field')
+            ->setAlias($fieldAlias)
+            ->setType('select')
+            ->setObject('lead')
+            ->setProperties([
+                'list' => [
+                    [
+                        'label' => 'Halusky',
+                        'value' => 'halusky',
+                    ],
+                    [
+                        'label' => 'Bramborak',
+                        'value' => 'bramborak',
+                    ],
+                    [
+                        'label' => 'Makovec',
+                        'value' => 'makovec',
+                    ],
+                ],
+            ]);
+        $fieldModel->saveEntity($leadField);
+
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setEmail('email@acquia.cz');
+
+        $contact->addUpdatedField($fieldAlias, ['makovec']);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Call endpoint
+        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test patch and values should be updated
+        $updatedValues = [
+            $fieldAlias  => 'halusky',
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test empty patch and values should be updated
+        $updatedValues = [
+            $fieldAlias          => $defaultFieldValue,
+            'overwriteWithBlank' => true,
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+    }
+
+    /**
+     * @return \Iterator<string, array<string|null>>
+     */
+    public static function provideEmptySelectValue(): \Iterator
+    {
+        yield 'null' => [null];
+        yield 'empty string value' => [''];
     }
 
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int

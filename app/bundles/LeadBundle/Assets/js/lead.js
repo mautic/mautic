@@ -850,6 +850,8 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
         selectedVal = 'select';
     }
 
+    mQuery('#leadfield_properties [data-toggle="tooltip"]').tooltip('destroy');
+
     if (mQuery('#field-templates .' + selectedVal).length) {
         mQuery('#leadfield_properties').html(
             mQuery('#field-templates .' + selectedVal).html()
@@ -895,6 +897,8 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
                 }
             }, 500);
         });
+
+        mQuery('#leadfield_properties [data-toggle="tooltip"]').tooltip();
     } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }

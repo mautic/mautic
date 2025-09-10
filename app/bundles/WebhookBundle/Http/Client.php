@@ -2,19 +2,19 @@
 
 namespace Mautic\WebhookBundle\Http;
 
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle7\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PrivateAddressChecker;
+use Mautic\WebhookBundle\Exception\PrivateAddressException;
 use Psr\Http\Message\ResponseInterface;
 
 class Client
 {
-    /**
-     * @param GuzzleClient $httpClient
-     */
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private $httpClient,
+        private GuzzleClient $httpClient,
+        private PrivateAddressChecker $privateAddressChecker,
     ) {
     }
 
@@ -30,6 +30,13 @@ class Client
             'X-Origin-Base-URL' => $this->coreParametersHelper->get('site_url'),
             'Webhook-Signature' => $signature,
         ];
+
+        $allowedPrivateAddresses = $this->coreParametersHelper->get('webhook_allowed_private_addresses');
+        $this->privateAddressChecker->setAllowedPrivateAddresses($allowedPrivateAddresses);
+
+        if (!$this->privateAddressChecker->isAllowedUrl($url)) {
+            throw new PrivateAddressException();
+        }
 
         return $this->httpClient->sendRequest(new Request('POST', $url, $headers, $jsonPayload));
     }
