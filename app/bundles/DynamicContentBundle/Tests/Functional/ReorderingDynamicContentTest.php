@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
