@@ -38,11 +38,11 @@ final class AjaxController extends CommonAjaxController
         $includeDefaultOption = InputHelper::clean($request->query->get('includeDefaultOption'));
 
         if ($includeDefaultOption) {
-            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.placeholder')] = [
+            $displayOrderArray[$this->translator->trans('mautic.dynamicContent.choose.placeholder')] = [
                 'value'    => '',
                 'selected' => true,
             ];
-            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.default.order')] = [
+            $displayOrderArray[$this->translator->trans('mautic.dynamicContent.choose.default.order')] = [
                 'value'    => 0,
                 'selected' => false,
             ];
@@ -68,7 +68,7 @@ final class AjaxController extends CommonAjaxController
             $dwcDisplayOrder = $dynamicContent->getDisplayOrder();
             $dwcSlotName     = $dynamicContent->getSlotName();
 
-            $displayOrderArray[$translator->trans('mautic.dynamicContent.choose.default.order')] = [
+            $displayOrderArray[$this->translator->trans('mautic.dynamicContent.choose.default.order')] = [
                 'value'    => 0,
                 'selected' => 0 == $dwcDisplayOrder - 1,
             ];
