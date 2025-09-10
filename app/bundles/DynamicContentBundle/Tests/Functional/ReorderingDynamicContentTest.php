@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\DynamicContent\TypeList;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -99,6 +101,11 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         $dwcForm['dwc[isCampaignBased]']->setValue('1');
         $this->client->submit($dwcForm);
         $this->assertResponseIsSuccessful();
+
+        /** @var DynamicContentRepository $dwcRepo */
+        $dwcRepo = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
+        $dwc     = $dwcRepo->getEntity($dwc1->getId());
+        Assert::assertNull($dwc->getDisplayOrder(), 'Display Order should be null when isCampaignBased is set to true');
 
         $this->assertDynamicContentOrder('slot-1', [
             'DC-2' => 1,

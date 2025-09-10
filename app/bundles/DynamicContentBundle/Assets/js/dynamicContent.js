@@ -174,46 +174,31 @@ Mautic.activateSlotNameLookupField = function (fieldOptions, filterId) {
 
 mQuery( document ).ajaxComplete(function(event, xhr, settings) {
     if (settings.type === 'POST' && (settings.url.indexOf('dwc/edit') > -1 || settings.url.indexOf('dwc/new') > -1)) {
-        Mautic.refreshDisplayOrder();
+        if (!xhr.responseJSON.newContent.includes('help-block')) {
+            Mautic.refreshDisplayOrder();
+        }
     }
 });
 
 Mautic.refreshDisplayOrder = function () {
-    if (mQuery('form[name="dwc"]').length === 0) {
-        Mautic.refreshDisplayOrderFlag = null;
-        return;
-    }
     const slotName = mQuery('#dwc_slotName').val();
-    const orderField = mQuery('select#dwc_displayOrder');
-    const orderFieldValue = parseInt(orderField.val());
-    const currentOrder = Mautic.refreshDisplayOrderFlag === null
-        ? orderFieldValue + 1
-        : orderFieldValue < Mautic.dwcLastOrder ? orderFieldValue + 1 : orderFieldValue
-    orderField.attr('data-current-order', currentOrder);
-    orderField.attr('data-current-slot', slotName);
-    Mautic.refreshDisplayOrderFlag = 1;
-    Mautic.dwcLastOrder = currentOrder;
     Mautic.fetchDwcDisplayOrder(slotName);
 }
 
 Mautic.fetchDwcDisplayOrder = function(slotName) {
     mQuery.ajax({
         url: `${mauticAjaxUrl}?action=dynamicContent:getDwcTokensBySlotName&includeDefaultOption=true`,
-        data: { slotName: slotName },
+        data: { slotName: slotName, id: mQuery('#dwc_unlockId').val() },
         success: function(response) {
             const displayOrders = response.display_orders;
             const orderField = mQuery('select#dwc_displayOrder').empty();
-            const currentOrder = parseInt(orderField.data('current-order'));
-            const currentSlot  = orderField.data('current-slot');
 
-            mQuery.each(displayOrders, function (label, value) {
-                if (value !== currentOrder || currentSlot !== slotName) {
-                    mQuery('<option/>', {
-                        value: value,
-                        text: label,
-                        selected: (value === currentOrder - 1)
-                    }).appendTo(orderField);
-                }
+            mQuery.each(displayOrders, function (label, dwc) {
+                mQuery('<option/>', {
+                    value: dwc.value,
+                    text: label,
+                    selected: dwc.selected
+                }).appendTo(orderField);
             })
             orderField.trigger('chosen:updated');
         },

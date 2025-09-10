@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Tests\Functional\DynamicContentReOrderingTrait;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Assert;
@@ -13,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerTest extends MauticMysqlTestCase
 {
+    use DynamicContentReOrderingTrait;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -53,10 +56,38 @@ class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testGetDwcTokensBySlotNameAction(): void
     {
-        $this->client->request('GET', 's/ajax?action=dynamicContent:getDwcTokensBySlotName&slotName=test-dwc-1');
-        $clientResponse = $this->client->getResponse();
-        Assert::assertEquals(200, $clientResponse->getStatusCode());
-        Assert::assertJson($clientResponse->getContent());
+        $this->createDynamicContent('DC-1', 'slot-1', 0);
+        $dwc = $this->createDynamicContent('DC-2', 'slot-1', 1);
+        $this->createDynamicContent('DC-3', 'slot-1', 2);
+
+        $parameters = http_build_query([
+            'slotName'             => 'slot-1',
+            'includeDefaultOption' => true,
+        ]);
+
+        $this->client->request('GET', 's/ajax?action=dynamicContent:getDwcTokensBySlotName&'.$parameters);
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        $result  = json_decode($content, true);
+        Assert::assertJson($content);
+        Assert::assertCount(5, $result['display_orders']);
+
+        $this->client->restart();
+
+        // Verify when dwc id is passed it should not return current DWC displayOrder in response.
+        $parameters = http_build_query([
+            'id'                   => $dwc->getId(),
+            'slotName'             => 'slot-1',
+            'includeDefaultOption' => true,
+        ]);
+
+        $this->client->request('GET', 's/ajax?action=dynamicContent:getDwcTokensBySlotName&'.$parameters);
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        $result  = json_decode($content, true);
+        Assert::assertJson($content);
+        Assert::assertCount(4, $result['display_orders']);
+        Assert::assertTrue($result['display_orders']['(1) DC-1']['selected']);
     }
 
     public function testGetBuilderTokensAction(): void
