@@ -569,7 +569,7 @@ class ResultController extends CommonFormController
         )->fetchAllAssociative();
 
         if (empty($fieldsToUpdate)) {
-            return; // No fields need updating
+            return;
         }
 
         $fieldIds = [];
@@ -581,7 +581,7 @@ class ResultController extends CommonFormController
         }
 
         if (empty($fieldIds)) {
-            return; // No fields actually need updating
+            return;
         }
 
         $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
