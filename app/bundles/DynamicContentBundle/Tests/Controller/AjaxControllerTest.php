@@ -71,8 +71,13 @@ class AjaxControllerTest extends MauticMysqlTestCase
         $result  = json_decode($content, true);
         Assert::assertJson($content);
         Assert::assertCount(5, $result['display_orders']);
+    }
 
-        $this->client->restart();
+    public function testGetDwcTokensBySlotNameActionWithIdParam(): void
+    {
+        $this->createDynamicContent('DC-1', 'slot-1', 0);
+        $dwc = $this->createDynamicContent('DC-2', 'slot-1', 1);
+        $this->createDynamicContent('DC-3', 'slot-1', 2);
 
         // Verify when dwc id is passed it should not return current DWC displayOrder in response.
         $parameters = http_build_query([
