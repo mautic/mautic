@@ -119,6 +119,31 @@ class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testGetCampaignPublishAndVersionData(): void
+    {
+        $campaign = $this->createCampaign();
+        $this->em->flush();
+
+        $result = $this->repository->getCampaignPublishAndVersionData($campaign->getId());
+
+        Assert::assertIsArray($result);
+        Assert::assertArrayHasKey('is_published', $result);
+        Assert::assertArrayHasKey('version', $result);
+        Assert::assertEquals('1', $result['is_published']);
+        // Version should be a string representation of an integer
+        Assert::assertIsString($result['version']);
+        Assert::assertGreaterThanOrEqual('1', $result['version']);
+    }
+
+    public function testGetCampaignPublishAndVersionDataWithNonExistentCampaign(): void
+    {
+        $nonExistentId = 99999;
+
+        $result = $this->repository->getCampaignPublishAndVersionData($nonExistentId);
+
+        Assert::assertEquals([], $result);
+    }
+
     private function createLead(Campaign $campaign, ?CampaignLead &$campaignLead = null): Lead // @phpstan-ignore parameterByRef.unusedType
     {
         $lead = new Lead();
