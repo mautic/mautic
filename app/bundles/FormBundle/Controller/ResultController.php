@@ -419,13 +419,17 @@ class ResultController extends CommonFormController
                 $domain = $this->getDomainFromSubmission($submission);
 
                 if ($domain) {
-                    $formatted = '*@'.$domain;
-                    $domains   = $this->coreParametersHelper->get('do_not_submit_emails', []);
-                    if (!in_array($formatted, $domains, true)) {
+                    $formatted     = '*@'.$domain;
+                    $domains       = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                    $isNewDomain   = !in_array($formatted, $domains, true);
+
+                    if ($isNewDomain) {
                         $domains[] = $formatted;
                         $configurator->mergeParameters(['do_not_submit_emails' => $domains]);
                         $configurator->write();
                     }
+
+                    $this->enableDonotSubmitValidationOnUnconfiguredForms();
 
                     $flashes[] = [
                         'type'    => 'notice',
@@ -490,14 +494,20 @@ class ResultController extends CommonFormController
             }
 
             if ($domainsToSave) {
-                $existing = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                $existing      = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                $hasNewDomains = false;
+
                 foreach (array_keys($domainsToSave) as $d) {
                     if (!in_array($d, $existing, true)) {
-                        $existing[] = $d;
+                        $existing[]    = $d;
+                        $hasNewDomains = true;
                     }
                 }
                 $configurator->mergeParameters(['do_not_submit_emails' => $existing]);
                 $configurator->write();
+
+                $this->enableDonotSubmitValidationOnUnconfiguredForms();
+
                 $flashes[] = [
                     'type' => 'notice',
                     'msg'  => 'mautic.form.result.markspam.batch.success',
@@ -542,6 +552,56 @@ class ResultController extends CommonFormController
         }
 
         return null;
+    }
+
+    private function enableDonotSubmitValidationOnUnconfiguredForms(): void
+    {
+        /** @var FormModel $formModel */
+        $formModel  = $this->getModel('form.form');
+        $connection = $this->doctrine->getConnection();
+
+        $fieldsToUpdate = $connection->executeQuery(
+            'SELECT ff.id, ff.form_id, ff.validation 
+             FROM form_fields ff 
+             WHERE ff.type = ? 
+             AND (ff.validation IS NULL OR ff.validation = ? OR ff.validation = ?)',
+            ['email', '[]', '{}']
+        )->fetchAllAssociative();
+
+        if (empty($fieldsToUpdate)) {
+            return; // No fields need updating
+        }
+
+        $fieldIds = [];
+        foreach ($fieldsToUpdate as $fieldData) {
+            $validation = json_decode($fieldData['validation'] ?? '[]', true) ?: [];
+            if (!array_key_exists('donotsubmit', $validation)) {
+                $fieldIds[] = $fieldData['id'];
+            }
+        }
+
+        if (empty($fieldIds)) {
+            return; // No fields actually need updating
+        }
+
+        $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
+        $connection->executeStatement(
+            "UPDATE form_fields 
+             SET validation = JSON_SET(COALESCE(validation, '{}'), '$.donotsubmit', true) 
+             WHERE id IN ($placeholders)",
+            $fieldIds
+        );
+
+        $updatedFormIds = array_unique(array_column($fieldsToUpdate, 'form_id'));
+
+        foreach ($updatedFormIds as $formId) {
+            $form = $formModel->getEntity($formId);
+            if ($form) {
+                $form->setCachedHtml('');
+                $formModel->saveEntity($form);
+                $formModel->generateHtml($form);
+            }
+        }
     }
 
     /**
