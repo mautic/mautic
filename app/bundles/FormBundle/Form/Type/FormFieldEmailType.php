@@ -32,6 +32,9 @@ class FormFieldEmailType extends AbstractType
             [
                 'label' => 'mautic.form.field.type.donotsubmit',
                 'data'  => $defaultDonotSubmit,
+                'attr'  => [
+                    'tooltip' => 'mautic.form.field.help.donotsubmit',
+                ],
             ]
         );
 
