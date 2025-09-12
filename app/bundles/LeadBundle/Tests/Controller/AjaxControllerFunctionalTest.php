@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -345,6 +346,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertTrue($response->isOk(), $response->getContent());
 
+        $responseData = json_decode($response->getContent(), true);
+
         Assert::assertSame(
             [
                 'levels' => [
@@ -376,16 +379,33 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                         ],
                     ],
                 ],
-                'edges' => [
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
-                    ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
-                    ['source' => "{$segmentC->getId()}-{$segmentE->getId()}", 'target' => "{$segmentE->getId()}-{$segmentA->getId()}"],
-                ],
             ],
-            json_decode($response->getContent(), true)
+            [
+                'levels' => $responseData['levels'],
+            ]
         );
+
+        $expectedEdges = [
+            ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
+            ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
+            ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
+            ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+            ['source' => "{$segmentC->getId()}-{$segmentE->getId()}", 'target' => "{$segmentE->getId()}-{$segmentA->getId()}"],
+        ];
+
+        $actualEdges = $responseData['edges'];
+        Assert::assertCount(count($expectedEdges), $actualEdges, 'Should have the correct number of edges');
+
+        foreach ($expectedEdges as $expectedEdge) {
+            $edgeFound = false;
+            foreach ($actualEdges as $actualEdge) {
+                if ($actualEdge['source'] === $expectedEdge['source'] && $actualEdge['target'] === $expectedEdge['target']) {
+                    $edgeFound = true;
+                    break;
+                }
+            }
+            Assert::assertTrue($edgeFound, "Expected edge {$expectedEdge['source']} -> {$expectedEdge['target']} not found");
+        }
     }
 
     public function testRemoveTagFromLeadAction(): void
@@ -603,6 +623,71 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         yield ['lead', 'core', ['Fax', 'Website']];
         yield ['lead', 'social', ['Facebook', 'Foursquare', 'Instagram']];
         yield ['company', 'core', []];
+    }
+
+    public function testTogglePreferredLeadChannelActionWithFlashMessage(): void
+    {
+        $contact = $this->createContact('test@example.com');
+
+        $payload = [
+            'action'         => 'lead:togglePreferredLeadChannel',
+            'leadId'         => $contact->getId(),
+            'channel'        => 'email',
+            'channelAction'  => 'remove',
+        ];
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $payload = [
+            'action'         => 'lead:togglePreferredLeadChannel',
+            'leadId'         => $contact->getId(),
+            'channel'        => 'email',
+            'channelAction'  => 'add',
+        ];
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertSame(1, $response['success']);
+        $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
+        $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
+
+        $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
+    }
+
+    public function testRemoveBounceStatusActionWithFlashMessage(): void
+    {
+        $contact = $this->createContact('bounce@example.com');
+
+        $dnc = new DoNotContact();
+        $dnc->setLead($contact);
+        $dnc->setChannel('email');
+        $dnc->setReason(DoNotContact::BOUNCED);
+        $dnc->setDateAdded(new \DateTime());
+
+        $this->em->persist($dnc);
+        $this->em->flush();
+
+        $payload = [
+            'action'  => 'lead:removeBounceStatus',
+            'id'      => $dnc->getId(),
+            'channel' => 'email',
+        ];
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertSame(1, $response['success']);
+        $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
+        $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
+
+        $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
     }
 
     private function getMembersForCampaign(int $campaignId): array

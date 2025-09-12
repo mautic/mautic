@@ -303,8 +303,9 @@ class InputHelper
                 }
             }
 
-            // http_build_query urlencodes by default
-            $parts['query'] = http_build_query($query);
+            // http_build_query urlencodes to RFC 1738 by default
+            // We change the encoding_type to RFC 3986 so that spaces are encoded as %20 instead of +
+            $parts['query'] = http_build_query($query, '', null, PHP_QUERY_RFC3986);
         }
 
         return

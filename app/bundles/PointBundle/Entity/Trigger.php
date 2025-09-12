@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -42,6 +43,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Trigger extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    use ProjectTrait;
     public const ENTITY_NAME = 'point_trigger';
 
     /**
@@ -117,6 +119,7 @@ class Trigger extends FormEntity implements UuidInterface
     public function __construct()
     {
         $this->events = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -155,6 +158,7 @@ class Trigger extends FormEntity implements UuidInterface
             ->build();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -189,6 +193,8 @@ class Trigger extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'trigger');
     }
 
     /**

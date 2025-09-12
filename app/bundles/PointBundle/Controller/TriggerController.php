@@ -413,12 +413,13 @@ class TriggerController extends FormController
             $model->lockEntity($entity);
         }
 
+        $triggerEvents   = [];
+
         if ($cleanSlate) {
             // clean slate
             $this->clearSessionComponents($request, $objectId);
 
             // load existing events into session
-            $triggerEvents   = [];
             $existingActions = $entity->getEvents()->toArray();
             foreach ($existingActions as $a) {
                 $id     = $a->getId();
