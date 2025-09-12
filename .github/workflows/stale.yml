@@ -1,0 +1,54 @@
+name: Close stale issues and PRs
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          ascending: true
+          operations-per-run: 500
+          remove-stale-when-updated: true
+
+          # Issues
+          exempt-all-issue-milestones: true
+          days-before-issue-stale: 90
+          days-before-issue-close: 14
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'security,legacy,bounty'
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had recent activity.
+            It will be closed if no further activity occurs. If you would like to keep it open please
+            let us know by replying and confirming that this is still relevant to the latest version of
+            Mautic and we will try to get to it as soon as we can. Thank you for your contributions.
+          close-issue-message: >
+            This issue has been automatically closed because it has not had recent activity.
+            If it persists in the latest version of Mautic, please create a new issue and link back to this
+            one for reference. Thank you for your contributions.
+
+          # Pull Requests
+          exempt-all-pr-milestones: true
+          days-before-pr-stale: 365
+          days-before-pr-close: 30
+          stale-pr-label: 'stale'
+          exempt-pr-labels: 'security,legacy,bounty'
+          stale-pr-message: >
+            This pull request has been automatically marked as stale because it has not had recent activity.
+            It will be closed if no further activity occurs. If you would like to keep it open,
+            please update or comment so we know it is still relevant. Thank you for your contributions.
+          close-pr-message: >
+            This pull request has been automatically closed because it has not had recent activity.
+            If you would like it to be considered for a future release, please reopen and update the PR.
+            Thank you for your contributions.

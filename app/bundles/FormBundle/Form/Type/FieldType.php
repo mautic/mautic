@@ -141,6 +141,9 @@ class FieldType extends AbstractType
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
+                case 'slider':
+                    $addIsRequired = false;
+                    break;
             }
         }
 
@@ -166,6 +169,27 @@ class FieldType extends AbstractType
                 'label'=> false,
             ]
         );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            $data = $event->getData();
+
+            if (!is_array($data)) {
+                return;
+            }
+
+            $isNew      = empty($data['id']) || (is_string($data['id']) && str_contains($data['id'], 'new'));
+            $hasNoLabel = empty($data['label']);
+            $type       = $data['type'] ?? null;
+
+            if ($isNew && $hasNoLabel && is_string($type) && '' !== $type) {
+                $translated = $this->translator->trans('mautic.form.field.type.'.$type);
+                if ($translated === 'mautic.form.field.type.'.$type) {
+                    $translated = ucfirst($type);
+                }
+                $data['label'] = $translated;
+                $event->setData($data);
+            }
+        });
 
         // Build form fields
         $builder->add(
@@ -597,6 +621,16 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldNumberType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'slider':
+                    $builder->add(
+                        'properties',
+                        FormFieldSliderType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,

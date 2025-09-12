@@ -350,6 +350,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/stone-creator"><img src="https://avatars.githubusercontent.com/u/1327019?v=4?s=100" width="100px;" alt="Stone-creator"/><br /><sub><b>Stone-creator</b></sub></a><br /><a href="#userTesting-stone-creator" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lolaslade"><img src="https://avatars.githubusercontent.com/u/2320484?v=4?s=100" width="100px;" alt="lolcode"/><br /><sub><b>lolcode</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=lolaslade" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

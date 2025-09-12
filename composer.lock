@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "baebcd4a10f9da07ef496a15614c5607",
+    "content-hash": "46b54265380e77f94cf03bd8a47fe4ce",
     "packages": [
         {
             "name": "api-platform/core",
@@ -5168,16 +5168,16 @@
         },
         {
             "name": "klapaudius/oauth-server-bundle",
-            "version": "5.1.2",
+            "version": "5.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/klapaudius/FOSOAuthServerBundle.git",
-                "reference": "0b112e6c28b4c2824124568db6a198e6f07af04a"
+                "reference": "c67a39afd881b4a36adf6df74c2873b9a3ceb0b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/klapaudius/FOSOAuthServerBundle/zipball/0b112e6c28b4c2824124568db6a198e6f07af04a",
-                "reference": "0b112e6c28b4c2824124568db6a198e6f07af04a",
+                "url": "https://api.github.com/repos/klapaudius/FOSOAuthServerBundle/zipball/c67a39afd881b4a36adf6df74c2873b9a3ceb0b7",
+                "reference": "c67a39afd881b4a36adf6df74c2873b9a3ceb0b7",
                 "shasum": ""
             },
             "require": {
@@ -5251,9 +5251,15 @@
             ],
             "support": {
                 "issues": "https://github.com/klapaudius/FOSOAuthServerBundle/issues",
-                "source": "https://github.com/klapaudius/FOSOAuthServerBundle/tree/5.1.2"
+                "source": "https://github.com/klapaudius/FOSOAuthServerBundle/tree/5.1.3"
             },
-            "time": "2025-04-26T21:23:17+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/klapaudius",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-28T11:39:01+00:00"
         },
         {
             "name": "klapaudius/oauth2-php",
@@ -6123,7 +6129,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "abdfd426667df2bfcd0af523f7d370ae72b7d494"
+                "reference": "0d3182dcdfd44755e8775aa3950b72ac31cc5279"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6162,7 +6168,7 @@
                 "jms/serializer-bundle": "^5.4",
                 "joomla/filter": "~1.4.4",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0",
-                "klapaudius/oauth-server-bundle": "^5.0.0",
+                "klapaudius/oauth-server-bundle": "5.1.3",
                 "knplabs/gaufrette": "~0.9.0",
                 "knplabs/knp-menu-bundle": "^3.0",
                 "matomo/device-detector": "^4.0",
