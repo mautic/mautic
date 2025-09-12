@@ -47,6 +47,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'number'        => [
             'filter' => 'float',
         ],
+        'slider'        => [
+            'filter' => 'float',
+        ],
         'pagebreak' => [],
         'password'  => [],
         'radiogrp'  => [],
