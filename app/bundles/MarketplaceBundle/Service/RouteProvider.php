@@ -20,7 +20,6 @@ class RouteProvider
 
     public const ROUTE_RATE_PACKAGE = 'mautic_marketplace_rate_package';
 
-
     public function __construct(
         private RouterInterface $router,
     ) {

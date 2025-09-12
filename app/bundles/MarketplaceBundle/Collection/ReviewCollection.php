@@ -40,13 +40,13 @@ class ReviewCollection implements \Iterator, \Countable, \ArrayAccess
     public function getAverageRating(): float
     {
         $count = $this->count();
-    
-        if ($count === 0) {
+
+        if (0 === $count) {
             return 0;
         }
-    
-        $total = array_reduce($this->records, fn($carry, $review) => $carry + $review->rating, 0);
-    
+
+        $total = array_reduce($this->records, fn ($carry, $review) => $carry + $review->rating, 0);
+
         return $total / $count;
     }
 

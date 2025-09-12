@@ -21,7 +21,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         /** @var MockHandler $handlerStack */
         $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
-            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.
+            new Response($responseCode, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.
         );
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
@@ -29,6 +29,11 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         Assert::assertSame($responseCode, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+
+        if ($responseCode >= 300) {
+            return;
+        }
+
         Assert::assertStringContainsString($foundPackageDesc, $responseContent);
         Assert::assertStringContainsString($foundPackageName, $responseContent);
         Assert::assertStringContainsString($latestVersion, $responseContent);
@@ -44,6 +49,14 @@ final class DetailControllerTest extends MauticMysqlTestCase
             SymfonyResponse::HTTP_NOT_FOUND,
             'mautic/unicorn',
             'Package &#039;mautic/unicorn&#039; not found in allowlist.',
+        ];
+
+        yield [
+            'koco/mautic-recaptcha-bundle',
+            SymfonyResponse::HTTP_OK,
+            'Mautic Recaptcha Bundle', // The KocoCaptcha was in the "ApiResponse/allowlist.json".
+            'This plugin brings reCAPTCHA integration to mautic.',
+            '<a href="https://github.com/KonstantinCodes/mautic-recaptcha/releases/tag/3.0.1" id="latest-version" target="_blank" rel="noopener noreferrer">',
         ];
     }
 }

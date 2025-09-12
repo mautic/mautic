@@ -14,7 +14,7 @@ class Connection
 {
     public function __construct(
         private ClientInterface $httpClient,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -25,7 +25,7 @@ class Connection
     {
         $offset = ($page - 1) * $limit + 1;
 
-        return $this->makeRequest("https://mau.tc/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}");
+        return $this->makeRequest("https://mau.tc/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}&_order=");
     }
 
     /**

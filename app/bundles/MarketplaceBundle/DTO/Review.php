@@ -9,7 +9,7 @@ final class Review
     public function __construct(
         public string $username,
         public int $rating,
-        public string $review
+        public string $review,
     ) {
     }
 
