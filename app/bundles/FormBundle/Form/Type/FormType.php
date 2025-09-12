@@ -76,8 +76,8 @@ class FormType extends AbstractType
                 return;
             }
             if (!in_array($value, $languageChoices, true)) {
-                $form      = $event->getForm();
-                $augmented = $languageChoices;
+                $form              = $event->getForm();
+                $augmented         = $languageChoices;
                 $augmented[$value] = $value;
                 $form->add('language', ChoiceType::class, [
                     'choices'     => $augmented,

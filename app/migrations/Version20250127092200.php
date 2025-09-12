@@ -22,10 +22,10 @@ final class Version20250127092200 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
-        
+
         $table->addColumn('translation_parent_id', 'integer', [
             'unsigned' => true,
-            'notnull' => false,
+            'notnull'  => false,
         ]);
 
         $table->addForeignKeyConstraint(
@@ -41,7 +41,7 @@ final class Version20250127092200 extends PreUpAssertionMigration
     public function down(Schema $schema): void
     {
         $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
-        
+
         $foreignKeys = $table->getForeignKeys();
         foreach ($foreignKeys as $foreignKey) {
             if (in_array('translation_parent_id', $foreignKey->getLocalColumns())) {
@@ -49,11 +49,11 @@ final class Version20250127092200 extends PreUpAssertionMigration
                 break;
             }
         }
-        
+
         if ($table->hasIndex('idx_forms_translation_parent_id')) {
             $table->dropIndex('idx_forms_translation_parent_id');
         }
-        
+
         $table->dropColumn('translation_parent_id');
     }
 }

@@ -37,11 +37,7 @@ trait TranslationEntityTrait
      */
     private $language = 'en';
 
-    /**
-     * @param ClassMetadata $builder
-     * @param string        $languageColumnName
-     */
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
+    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
     {
         $builder->createOneToMany('translationChildren', $entityClass)
             ->setIndexBy('id')
@@ -79,9 +75,9 @@ trait TranslationEntityTrait
     /**
      * Get translated items.
      *
-     * @return ?Collection
+     * @return Collection<int, TranslationEntityInterface>
      */
-    public function getTranslationChildren()
+    public function getTranslationChildren(): Collection
     {
         return $this->translationChildren;
     }
@@ -100,10 +96,7 @@ trait TranslationEntityTrait
         return $this;
     }
 
-    /**
-     * @return ?TranslationEntityInterface
-     */
-    public function getTranslationParent()
+    public function getTranslationParent(): ?TranslationEntityInterface
     {
         return $this->translationParent;
     }
@@ -118,11 +111,9 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param string $language
-     *
      * @return $this
      */
-    public function setLanguage($language)
+    public function setLanguage(string $language)
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('language', $language);
@@ -133,20 +124,15 @@ trait TranslationEntityTrait
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
 
     /**
      * @param bool $isChild True to return if the item is a translation of a parent
-     *
-     * @return bool
      */
-    public function isTranslation($isChild = false)
+    public function isTranslation($isChild = false): bool
     {
         $parent   = $this->getTranslationParent();
         $children = $this->getTranslationChildren();
@@ -179,7 +165,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array|ArrayCollection
+     * @return array{0: TranslationEntityInterface, 1: array<TranslationEntityInterface>}|array<TranslationEntityInterface>
      */
     public function getTranslations($onlyChildren = false)
     {
@@ -206,13 +192,7 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @param string                      $getter
-     * @param ?TranslationEntityInterface $variantParent
-     *
-     * @return int
-     */
-    protected function getAccumulativeTranslationCount($getter, $variantParent = null)
+    protected function getAccumulativeTranslationCount(string $getter, ?TranslationEntityInterface $variantParent = null): int
     {
         $count = 0;
 
