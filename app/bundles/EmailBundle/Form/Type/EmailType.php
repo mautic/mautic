@@ -83,6 +83,8 @@ class EmailType extends AbstractType
                     'class'   => 'form-control',
                     'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
                 ],
+                'required' => true,
+                'data'     => 'Default Subject',
             ]
         );
 
