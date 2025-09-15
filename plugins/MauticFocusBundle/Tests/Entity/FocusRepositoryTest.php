@@ -4,20 +4,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Entity;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FocusRepository::class)]
 class FocusRepositoryTest extends TestCase
@@ -34,8 +29,8 @@ class FocusRepositoryTest extends TestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
-        $this->translator = $this->createMock(Translator::class);
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->translator    = $this->createMock(Translator::class);
+        $this->queryBuilder  = $this->createMock(QueryBuilder::class);
 
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->method('getManagerForClass')->willReturn($this->entityManager);
@@ -49,7 +44,7 @@ class FocusRepositoryTest extends TestCase
             ->getMock();
 
         // Use reflection to set the translator property
-        $reflection = new \ReflectionClass($this->repository);
+        $reflection         = new \ReflectionClass($this->repository);
         $translatorProperty = $reflection->getProperty('translator');
         $translatorProperty->setAccessible(true);
         $translatorProperty->setValue($this->repository, $this->translator);
@@ -61,10 +56,11 @@ class FocusRepositoryTest extends TestCase
 
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
-            ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
-                if ($key === 'mautic.focus.focus.searchcommand.stylebar') {
+            ->willReturnCallback(function ($key, $params = [], $domain = null, $locale = null) {
+                if ('mautic.focus.focus.searchcommand.stylebar' === $key) {
                     return 'style:bar';
                 }
+
                 return 'unknown';
             });
 
@@ -91,10 +87,11 @@ class FocusRepositoryTest extends TestCase
 
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
-            ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
-                if ($key === 'mautic.focus.focus.searchcommand.stylemodal') {
+            ->willReturnCallback(function ($key, $params = [], $domain = null, $locale = null) {
+                if ('mautic.focus.focus.searchcommand.stylemodal' === $key) {
                     return 'style:modal';
                 }
+
                 return 'unknown';
             });
 
@@ -121,10 +118,11 @@ class FocusRepositoryTest extends TestCase
 
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
-            ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
-                if ($key === 'mautic.focus.focus.searchcommand.stylenotification') {
+            ->willReturnCallback(function ($key, $params = [], $domain = null, $locale = null) {
+                if ('mautic.focus.focus.searchcommand.stylenotification' === $key) {
                     return 'style:notification';
                 }
+
                 return 'unknown';
             });
 
@@ -151,10 +149,11 @@ class FocusRepositoryTest extends TestCase
 
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
-            ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
-                if ($key === 'mautic.focus.focus.searchcommand.stylefullpage') {
+            ->willReturnCallback(function ($key, $params = [], $domain = null, $locale = null) {
+                if ('mautic.focus.focus.searchcommand.stylefullpage' === $key) {
                     return 'style:fullpage';
                 }
+
                 return 'unknown';
             });
 
@@ -181,10 +180,11 @@ class FocusRepositoryTest extends TestCase
 
         // Set up translator to return the expected command for both default and en_US locale
         $this->translator->method('trans')
-            ->willReturnCallback(function($key, $params = [], $domain = null, $locale = null) {
-                if ($key === 'mautic.focus.focus.searchcommand.stylebar') {
+            ->willReturnCallback(function ($key, $params = [], $domain = null, $locale = null) {
+                if ('mautic.focus.focus.searchcommand.stylebar' === $key) {
                     return 'style:bar';
                 }
+
                 return 'unknown';
             });
 
@@ -293,13 +293,14 @@ class FocusRepositoryTest extends TestCase
         $this->assertNull($result);
     }
 
-    private function createFilter(string $command, bool $not = false): stdClass
+    private function createFilter(string $command, bool $not = false): \stdClass
     {
-        $filter = new stdClass();
+        $filter          = new \stdClass();
         $filter->command = $command;
-        $filter->string = 'test';
-        $filter->not = $not;
-        $filter->strict = false;
+        $filter->string  = 'test';
+        $filter->not     = $not;
+        $filter->strict  = false;
+
         return $filter;
     }
 
@@ -309,8 +310,9 @@ class FocusRepositoryTest extends TestCase
     private function callProtectedMethod(string $methodName, array $args): mixed
     {
         $reflection = new \ReflectionClass($this->repository);
-        $method = $reflection->getMethod($methodName);
+        $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
+
         return $method->invokeArgs($this->repository, $args);
     }
 }

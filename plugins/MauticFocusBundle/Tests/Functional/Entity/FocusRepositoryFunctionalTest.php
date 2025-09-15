@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use stdClass;
 
 class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -19,10 +18,10 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = static::$kernel->getContainer()->get('mautic.focus.model.focus');
+        $this->focusModel      = static::$kernel->getContainer()->get('mautic.focus.model.focus');
         $this->focusRepository = $this->focusModel->getRepository();
-        $translator = static::$kernel->getContainer()->get('translator');
-        $reflection = new \ReflectionClass($this->focusRepository);
+        $translator            = static::$kernel->getContainer()->get('translator');
+        $reflection            = new \ReflectionClass($this->focusRepository);
         if ($reflection->hasProperty('translator')) {
             $prop = $reflection->getProperty('translator');
             $prop->setAccessible(true);
@@ -34,7 +33,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandWhereClauseWithStyleBar(): void
     {
         $filter = $this->createFilter('style:bar');
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
@@ -47,7 +46,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandWhereClauseWithStyleModal(): void
     {
         $filter = $this->createFilter('style:modal');
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
@@ -60,7 +59,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandWhereClauseWithStyleNotification(): void
     {
         $filter = $this->createFilter('style:notification');
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
@@ -73,7 +72,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandWhereClauseWithStyleFullpage(): void
     {
         $filter = $this->createFilter('style:fullpage');
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
@@ -86,7 +85,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandWhereClauseWithNotFilter(): void
     {
         $filter = $this->createFilter('style:bar', true);
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
@@ -99,7 +98,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSearchCommandWhereClauseWithStandardCommand(): void
     {
         $filter = $this->createFilter('ispublished:1');
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
@@ -138,7 +137,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testAddCatchAllWhereClause(): void
     {
         $filter = $this->createFilter('test');
-        $q = $this->focusRepository->createQueryBuilder('f');
+        $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addCatchAllWhereClause', [$q, $filter]);
 
@@ -150,7 +149,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetEntities(): void
     {
-        $args = ['iterable_mode' => false];
+        $args     = ['iterable_mode' => false];
         $entities = $this->focusRepository->getEntities($args);
 
         if ($entities instanceof \Traversable) {
@@ -162,7 +161,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetEntitiesWithIterableMode(): void
     {
-        $args = ['iterable_mode' => true];
+        $args     = ['iterable_mode' => true];
         $entities = $this->focusRepository->getEntities($args);
 
         if ($entities instanceof \Traversable) {
@@ -191,7 +190,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        $filter = $this->createFilter('style:bar');
+        $filter              = $this->createFilter('style:bar');
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $q->where($expr);
@@ -210,10 +209,10 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
     private function setUpTestData(): void
     {
-        $focusBar = $this->createFocus('Bar Focus', 'bar');
-        $focusModal = $this->createFocus('Modal Focus', 'modal');
+        $focusBar          = $this->createFocus('Bar Focus', 'bar');
+        $focusModal        = $this->createFocus('Modal Focus', 'modal');
         $focusNotification = $this->createFocus('Notification Focus', 'notification');
-        $focusFullpage = $this->createFocus('Fullpage Focus', 'page');
+        $focusFullpage     = $this->createFocus('Fullpage Focus', 'page');
 
         $this->focusModel->saveEntity($focusBar);
         $this->focusModel->saveEntity($focusModal);
@@ -268,13 +267,14 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         return $focus;
     }
 
-    private function createFilter(string $command, bool $not = false): stdClass
+    private function createFilter(string $command, bool $not = false): \stdClass
     {
-        $filter = new stdClass();
+        $filter          = new \stdClass();
         $filter->command = $command;
-        $filter->string = 'test';
-        $filter->not = $not;
-        $filter->strict = false;
+        $filter->string  = 'test';
+        $filter->not     = $not;
+        $filter->strict  = false;
+
         return $filter;
     }
 
@@ -284,8 +284,9 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     private function callProtectedMethod(string $methodName, array $args): mixed
     {
         $reflection = new \ReflectionClass($this->focusRepository);
-        $method = $reflection->getMethod($methodName);
+        $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
+
         return $method->invokeArgs($this->focusRepository, $args);
     }
 }
