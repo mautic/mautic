@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 interface VariantEntityInterface
 {
@@ -20,7 +21,7 @@ interface VariantEntityInterface
 
     public function removeVariantParent(): void;
 
-    public function getVariantChildren(): ArrayCollection;
+    public function getVariantChildren(): ArrayCollection|Collection;
 
     /**
      * @return $this
