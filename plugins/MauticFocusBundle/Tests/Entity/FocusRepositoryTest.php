@@ -22,9 +22,13 @@ use stdClass;
 #[\PHPUnit\Framework\Attributes\CoversClass(FocusRepository::class)]
 class FocusRepositoryTest extends TestCase
 {
+    /** @var FocusRepository&MockObject */
     private FocusRepository $repository;
+    /** @var EntityManager&MockObject */
     private MockObject $entityManager;
+    /** @var Translator&MockObject */
     private MockObject $translator;
+    /** @var QueryBuilder&MockObject */
     private QueryBuilder $queryBuilder;
 
     protected function setUp(): void
@@ -299,7 +303,10 @@ class FocusRepositoryTest extends TestCase
         return $filter;
     }
 
-    private function callProtectedMethod(string $methodName, array $args)
+    /**
+     * @param array<int, mixed> $args
+     */
+    private function callProtectedMethod(string $methodName, array $args): mixed
     {
         $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod($methodName);
