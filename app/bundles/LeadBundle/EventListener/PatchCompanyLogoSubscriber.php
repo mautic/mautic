@@ -6,6 +6,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PatchCompanyLogoSubscriber implements EventSubscriberInterface
 {
@@ -23,10 +24,15 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
         'is_index'                => false,
     ];
 
+    public const LEGACY_FIELD_NAME_ALIAS = 'companylogourl';
+
+    public const NEW_FIELD_NAME_ALIAS = 'companylogo_filename';
+
     public function __construct(
         private \Mautic\LeadBundle\Model\FieldModel $fieldModel,
         protected \Psr\Log\LoggerInterface $logger,
         protected \Symfony\Contracts\Translation\TranslatorInterface $translator,
+        private Filesystem $filesystem,
     ) {
     }
 
@@ -49,42 +55,59 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
         }
 
         $existingField = $this->fieldModel->getRepository()->findOneBy([
-            'alias'  => self::DEFAULT_VALUES['alias'],
+            'alias'  => self::LEGACY_FIELD_NAME_ALIAS,
             'object' => self::DEFAULT_VALUES['object'],
         ]);
-        if ($existingField) {
-            $this->logger->info('lead_fields entry for companylogourl already exists; nothing to do.');
-            $output->writeln('<info>[notice] Migration </info><info>Migration skipped: </info><comment>lead_fields</comment><info> entry for </info><comment>companylogourl</comment><info> already exists; <comment>nothing to do.</comment></info>');
 
-            return;
+        if ($existingField) {
+            $this->fieldModel->deleteEntity($existingField);
+            $this->logger->info('lead_fields entry for companylogourl deleted (url, company).');
+            $output->writeln('<info>[notice] Migration </info><info>Migration skipped: </info><comment>lead_fields</comment><info> entry for </info><comment>companylogourl</comment><info> already exists; <comment>nothing to do.</comment></info>');
         }
 
-        $this->createField(
-            'mautic.lead.field.companylogourl',
-            'url',
-            [
-                'limit' => 255,
-            ]
-        );
-        $this->logger->info('Inserted lead_fields entry for companylogourl (url, company).');
-        $output->writeln('<info>[notice] Migration Inserted</info> <comment>lead_fields</comment><info> entry for </info><comment>companylogourl</comment><info> (url, company).</info>');
+        // Create new field
+        $existingField = $this->fieldModel->getRepository()->findOneBy([
+            'alias'  => self::NEW_FIELD_NAME_ALIAS,
+            'object' => self::DEFAULT_VALUES['object'],
+        ]);
+
+        if (null === $existingField) {
+            $this->createField(
+                'mautic.lead.field.'.self::NEW_FIELD_NAME_ALIAS,
+                'text',
+                [
+                    'limit' => 255,
+                ],
+                self::NEW_FIELD_NAME_ALIAS
+            );
+        }
+
+        if (!$this->filesystem->exists($concurrentDirectory = __DIR__.'/../../../../media/logos')) {
+            $this->filesystem->mkdir($concurrentDirectory, 0755);
+        }
+
+        $this->logger->info('Inserted lead_fields entry for '.self::NEW_FIELD_NAME_ALIAS.' (url, company).');
+        $output->writeln('<info>[notice] Migration Inserted</info> <comment>lead_fields</comment><info> entry for </info><comment>'.self::NEW_FIELD_NAME_ALIAS.'</comment><info> (url, company).</info>');
     }
 
     /**
      * @param array<string, mixed> $options
      */
-    private function createField(string $label, string $type, array $options = []): void
+    private function createField(string $label, string $type, array $options = [], string $alias = ''): void
     {
         // Create new field
         $properties = [];
         if (!empty($options['properties'])) {
             $properties = $options['properties'];
         }
+        if ('' === $alias) {
+            $alias = self::DEFAULT_VALUES['alias'];
+        }
 
         $label = $this->translator->trans($label);
 
         $field = new LeadField();
-        $field->setAlias(self::DEFAULT_VALUES['alias']);
+        $field->setAlias($alias);
         $field->setLabel($label);
         $field->setType($type);
         $field->setObject(self::DEFAULT_VALUES['object']);
@@ -97,6 +120,7 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
         $field->setIsPubliclyUpdatable(self::DEFAULT_VALUES['is_publicity_updatable']);
         $field->setIsUniqueIdentifier(self::DEFAULT_VALUES['is_unique_identifier']);
         $field->setIsIndex(self::DEFAULT_VALUES['is_index']);
+        $field->setNew();
 
         if (!empty($options['limit']) && is_int($options['limit'])) {
             $field->setCharLengthLimit($options['limit']);

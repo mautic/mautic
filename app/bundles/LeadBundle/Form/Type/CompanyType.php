@@ -7,8 +7,8 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Form\DataTransformer\FieldLogoUrlTransformer;
-use Mautic\LeadBundle\Form\Validator\Constraints\UrlImage;
+use Mautic\LeadBundle\EventListener\PatchCompanyLogoSubscriber;
+use Mautic\LeadBundle\Form\Validator\Constraints\ImagePath;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
@@ -157,9 +157,8 @@ class CompanyType extends AbstractType
             return $fieldDetails;
         }
 
-        $transformers = [
-            'companylogourl' => [new FieldLogoUrlTransformer()],
-        ];
+        // Add transformers
+        $transformers = [];
 
         $fieldDetails['transformers'] = $transformers;
 
@@ -179,7 +178,7 @@ class CompanyType extends AbstractType
         }
 
         $constraints = [
-            'companylogourl' => [new UrlImage()],
+            PatchCompanyLogoSubscriber::NEW_FIELD_NAME_ALIAS => [new ImagePath()],
         ];
 
         $fieldDetails['constraints'] = $constraints;

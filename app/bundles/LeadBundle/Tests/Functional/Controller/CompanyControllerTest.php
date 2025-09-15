@@ -17,6 +17,12 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
     public const USERNAME = 'jhony';
 
+    private string $txtFilePath;
+
+    private string $imageFilePath;
+
+    private string $imageNoContentTypeFilePath;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -56,35 +62,47 @@ class CompanyControllerTest extends MauticMysqlTestCase
         return $user;
     }
 
-    public function testFormLogoUrlValidateFailByNoExist(): void
+    public function testFormLogoNameValidateFailByNoExist(): void
     {
-        $content = $this->requestFormToValidate('https://nonexistent-domain.invalid/logo.JPEG');
-        self::assertStringContainsString('The logo URL is not valid. Please enter a valid URL', $content);
+        if (file_exists($this->txtFilePath)) {
+            unlink($this->imageFilePath);
+        }
+        $content = $this->requestFormToValidate('test.jpg');
+        self::assertStringContainsString('The logo filename is not valid. Please enter a valid filename', $content);
     }
 
-    public function testFormLogoUrlWrongExtension(): void
+    public function testFormLogoNameWrongExtension(): void
     {
-        $content = $this->requestFormToValidate('http://www.example.com/logo.gif');
-        self::assertStringContainsString('The logo URL is not valid. Please enter a valid URL', $content);
+        $name    = pathinfo($this->txtFilePath, PATHINFO_BASENAME);
+        $content = $this->requestFormToValidate($name);
+        self::assertStringContainsString('The logo filename is not valid. Please enter a valid filename', $content);
     }
 
-    public function testFormLogoUrlValidateSuccess(): void
+    public function testFormLogoNameNoContentType(): void
     {
-        $content = $this->requestFormToValidate('https://mautic.org/wp-content/uploads/2024/10/mautic-logo.svg');
-        self::assertStringNotContainsString('The logo URL is not valid. Please enter a valid URL', $content);
+        $name    = pathinfo($this->imageNoContentTypeFilePath, PATHINFO_BASENAME);
+        $content = $this->requestFormToValidate($name);
+        self::assertStringContainsString('The logo filename is not valid. Please enter a valid filename', $content);
     }
 
-    private function requestFormToValidate(string $url): string
+    public function testFormLogoNameValidateSuccess(): void
+    {
+        $name    = pathinfo($this->imageFilePath, PATHINFO_BASENAME);
+        $content = $this->requestFormToValidate($name);
+        self::assertStringNotContainsString('The logo filename is not valid. Please enter a valid filename', $content);
+    }
+
+    private function requestFormToValidate(string $fileName): string
     {
         $crawler = $this->client->request(
             'GET',
             '/s/companies/new'
         );
-        $form                                    = $crawler->filter('form[name=company]')->form();
-        $dataValues                              = $form->getPhpValues();
-        $dataValues['company']['companyname']    = 'Company mautic';
-        if (array_key_exists('companylogourl', $dataValues['company'])) {
-            $dataValues['company']['companylogourl'] = $url;
+        $form                                                                       = $crawler->filter('form[name=company]')->form();
+        $dataValues                                                                 = $form->getPhpValues();
+        $dataValues['company'][PatchCompanyLogoSubscriber::NEW_FIELD_NAME_ALIAS]    = 'Company mautic';
+        if (array_key_exists(PatchCompanyLogoSubscriber::NEW_FIELD_NAME_ALIAS, $dataValues['company'])) {
+            $dataValues['company'][PatchCompanyLogoSubscriber::NEW_FIELD_NAME_ALIAS] = $fileName;
         }
         $form->setValues($dataValues);
         $this->client->submit($form);
@@ -143,5 +161,71 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $event  = new ConsoleTerminateEvent($command, $input, $output, 0);
 
         $subscriber->installCompanyLogoCustomField($event);
+        $this->createFiles();
+    }
+
+    private function createFiles(): void
+    {
+        $this->createTxtFile();
+        $this->createImageFile();
+        $this->createImageWithNoContentType();
+    }
+
+    private function createTxtFile(): string
+    {
+        $basePath = self::getContainer()->getParameter('mautic.application_dir').'/media/logos/';
+        $fileName = 'test.txt';
+        $path     = $basePath.$fileName;
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        $this->createFile($path, 'This is a test txt file.');
+
+        return $this->txtFilePath = $path;
+    }
+
+    private function createFile(string $path, string $content): void
+    {
+        $file = fopen($path, 'w');
+        fwrite($file, $content);
+        fclose($file);
+    }
+
+    private function createImageFile(): string
+    {
+        $basePath = self::getContainer()->getParameter('mautic.application_dir').'/media/logos/';
+        $fileName = 'test.jpg';
+        $path     = $basePath.$fileName;
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        $image   = imagecreatetruecolor(100, 100);
+        $bgColor = imagecolorallocate($image, 255, 0, 0);
+        imagefill($image, 0, 0, $bgColor);
+        imagejpeg($image, $path);
+        imagedestroy($image);
+
+        return $this->imageFilePath = $path;
+    }
+
+    private function createImageWithNoContentType(): string
+    {
+        $basePath = self::getContainer()->getParameter('mautic.application_dir').'/media/logos/';
+        $fileName = 'testNoContent.jpg';
+        $path     = $basePath.$fileName;
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        $svgContent = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+          "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+        <svg width="100" height="100" version="1.1"
+             xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="40" stroke="green"
+                  stroke-width="4" fill="yellow" />
+        </svg>';
+        $this->createFile($path, $svgContent);
+
+        return $this->imageNoContentTypeFilePath = $path;
     }
 }
