@@ -2,6 +2,13 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -9,85 +16,97 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "trigger:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "events"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "trigger:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('point:triggers:viewown')"),
+        new Post(security: "is_granted('point:triggers:create')"),
+        new Get(security: "is_granted('point:triggers:viewown')"),
+        new Put(security: "is_granted('point:triggers:editown')"),
+        new Patch(security: "is_granted('point:triggers:editother')"),
+        new Delete(security: "is_granted('point:triggers:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['trigger:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'events'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['trigger:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Trigger extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    use ProjectTrait;
     public const ENTITY_NAME = 'point_trigger';
 
     /**
      * @var int
      */
+    #[Groups(['trigger:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $description;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $publishDown;
 
     /**
      * @var int
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $points = 0;
 
     /**
      * @var string
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $color = 'a0acb8';
 
     /**
      * @var bool
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $triggerExistingLeads = false;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $category;
 
     /**
      * @var ArrayCollection<int, TriggerEvent>
      */
+    #[Groups(['trigger:read', 'trigger:write'])]
     private $events;
 
+    #[Groups(['trigger:read', 'trigger:write'])]
     private ?Group $group = null;
 
     public function __clone()
@@ -100,6 +119,7 @@ class Trigger extends FormEntity implements UuidInterface
     public function __construct()
     {
         $this->events = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -138,6 +158,7 @@ class Trigger extends FormEntity implements UuidInterface
             ->build();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -172,6 +193,8 @@ class Trigger extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'trigger');
     }
 
     /**

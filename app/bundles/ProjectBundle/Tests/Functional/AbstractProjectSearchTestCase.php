@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * This class should simplify writing functional tests for project search functionality on various entities.
  */
-abstract class AbstratctProjectSearchTestCase extends MauticMysqlTestCase
+abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
 {
     /**
      * @param string[] $expectedEntities

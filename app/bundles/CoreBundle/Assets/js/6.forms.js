@@ -675,7 +675,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
             var valueFieldAttrs = {
                 'class': valueField.attr('class'),
                 'id': valueField.attr('id'),
-                'name': valueField.attr('name'),
+                'name': valueField.attr('name').replace(/\[\]$/, ''),
                 'autocomplete': valueField.attr('autocomplete'),
                 'value': valueField.val()
             };
@@ -691,7 +691,8 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                     .attr('id', valueFieldAttrs['id'])
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
+                    .attr('value', valueFieldAttrs['value'])
+                    .removeAttr('multiple');
 
                 var multiple = (fieldOperator === 'in' || fieldOperator === '!in');
                 if (multiple) {

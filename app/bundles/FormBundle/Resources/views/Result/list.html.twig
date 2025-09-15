@@ -16,6 +16,17 @@
 
 {% block mauticContent %}formresult{% endblock %}
 
+{% block preHeader %}
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'templateButtons': {
+        'close': true,
+    },
+    'routeBase': 'form',
+    'langVar': 'form',
+    'targetLabel': 'mautic.form.forms'|trans
+}) }}
+{% endblock %}
+
 {% block headerTitle %}
   {{ 'mautic.form.result.header.index'|trans({'%name%': form.name}) }}
 {% endblock %}
@@ -61,15 +72,17 @@
         {% endif %}
     {% endif %}
 
-  {% set buttons = buttons|merge([{
-      'attr': {
-          'class': 'btn btn-ghost',
-          'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}),
-          'data-toggle': 'ajax',
-      },
-      'iconClass': 'ri-close-line',
-      'btnText': 'mautic.core.form.close'|trans,
-  }]) %}
+  {% if securityHasEntityAccess('form:forms:editown', 'form:forms:editother', form.createdBy) %}
+      {% set buttons = buttons|merge([{
+          'attr': {
+              'class': 'btn btn-ghost',
+              'href': path('mautic_form_action', {'objectAction': 'edit', 'objectId': form.id}),
+              'data-toggle': 'ajax',
+          },
+          'iconClass': 'ri-edit-line',
+          'btnText': 'mautic.core.form.edit'|trans,
+      }]) %}
+  {% endif %}
 
   {{ include('@MauticCore/Helper/page_actions.html.twig', {'customButtons': buttons}) }}
 {% endblock %}

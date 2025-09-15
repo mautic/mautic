@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -357,6 +358,8 @@ class AjaxController extends CommonAjaxController
                     $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
                 } elseif ('add' === $action) {
                     $doNotContact->removeDncForContact($leadId, $channel);
+                    $this->addFlashMessage('mautic.lead.event.donotcontact_channel_contactable', ['%channel%' => $channel], FlashBag::LEVEL_SUCCESS);
+                    $dataArray['flashes'] = $this->getFlashContent();
                 }
                 $dataArray['success'] = 1;
             }
@@ -447,6 +450,8 @@ class AjaxController extends CommonAjaxController
             if ($lead) {
                 // Use lead model to trigger listeners
                 $doNotContact->removeDncForContact($lead->getId(), $channel);
+                $this->addFlashMessage('mautic.lead.event.donotcontact_channel_contactable', ['%channel%' => $channel], FlashBag::LEVEL_SUCCESS);
+                $dataArray['flashes'] = $this->getFlashContent();
             } else {
                 $emailModel->getRepository()->deleteDoNotEmailEntry($dncId);
             }
