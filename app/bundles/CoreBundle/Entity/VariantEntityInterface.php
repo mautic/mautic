@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @method int|null getId()
- */
 interface VariantEntityInterface
 {
     public function getVariantParent(): ?VariantEntityInterface;
