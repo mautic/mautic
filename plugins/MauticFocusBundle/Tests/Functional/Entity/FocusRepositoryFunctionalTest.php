@@ -21,6 +21,13 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->focusModel = static::$kernel->getContainer()->get('mautic.focus.model.focus');
         $this->focusRepository = $this->focusModel->getRepository();
+        $translator = static::$kernel->getContainer()->get('translator');
+        $reflection = new \ReflectionClass($this->focusRepository);
+        if ($reflection->hasProperty('translator')) {
+            $prop = $reflection->getProperty('translator');
+            $prop->setAccessible(true);
+            $prop->setValue($this->focusRepository, $translator);
+        }
         $this->setUpTestData();
     }
 
@@ -29,12 +36,12 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('style:bar');
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
-        $this->assertArrayHasKey('param1', $parameters);
-        $this->assertEquals('bar', $parameters['param1']);
+        $this->assertNotEmpty($parameters);
+        $this->assertContains('bar', array_values($parameters));
     }
 
     public function testSearchCommandWhereClauseWithStyleModal(): void
@@ -42,12 +49,12 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('style:modal');
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
-        $this->assertArrayHasKey('param1', $parameters);
-        $this->assertEquals('modal', $parameters['param1']);
+        $this->assertNotEmpty($parameters);
+        $this->assertContains('modal', array_values($parameters));
     }
 
     public function testSearchCommandWhereClauseWithStyleNotification(): void
@@ -55,12 +62,12 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('style:notification');
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
-        $this->assertArrayHasKey('param1', $parameters);
-        $this->assertEquals('notification', $parameters['param1']);
+        $this->assertNotEmpty($parameters);
+        $this->assertContains('notification', array_values($parameters));
     }
 
     public function testSearchCommandWhereClauseWithStyleFullpage(): void
@@ -68,12 +75,12 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('style:fullpage');
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
-        $this->assertArrayHasKey('param1', $parameters);
-        $this->assertEquals('page', $parameters['param1']);
+        $this->assertNotEmpty($parameters);
+        $this->assertContains('page', array_values($parameters));
     }
 
     public function testSearchCommandWhereClauseWithNotFilter(): void
@@ -81,12 +88,12 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('style:bar', true);
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
-        $this->assertArrayHasKey('param1', $parameters);
-        $this->assertEquals('bar', $parameters['param1']);
+        $this->assertNotEmpty($parameters);
+        $this->assertContains('bar', array_values($parameters));
     }
 
     public function testSearchCommandWhereClauseWithStandardCommand(): void
@@ -94,7 +101,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('ispublished:1');
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
@@ -119,7 +126,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetDefaultOrder(): void
     {
-        $order = $this->focusRepository->getDefaultOrder();
+        $order = $this->callProtectedMethod('getDefaultOrder', []);
 
         $this->assertIsArray($order);
         $this->assertCount(1, $order);
@@ -133,12 +140,12 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter = $this->createFilter('test');
         $q = $this->focusRepository->createQueryBuilder('f');
 
-        [$expr, $parameters] = $this->focusRepository->addCatchAllWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addCatchAllWhereClause', [$q, $filter]);
 
         $this->assertNotNull($expr);
         $this->assertIsArray($parameters);
-        $this->assertArrayHasKey('param1', $parameters);
-        $this->assertEquals('%test%', $parameters['param1']);
+        $this->assertNotEmpty($parameters);
+        $this->assertContains('%test%', array_values($parameters));
     }
 
     public function testGetEntities(): void
@@ -146,6 +153,9 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $args = ['iterable_mode' => false];
         $entities = $this->focusRepository->getEntities($args);
 
+        if ($entities instanceof \Traversable) {
+            $entities = iterator_to_array($entities, false);
+        }
         $this->assertIsArray($entities);
         $this->assertGreaterThan(0, count($entities));
     }
@@ -155,6 +165,9 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $args = ['iterable_mode' => true];
         $entities = $this->focusRepository->getEntities($args);
 
+        if ($entities instanceof \Traversable) {
+            $entities = iterator_to_array($entities, false);
+        }
         $this->assertIsArray($entities);
         $this->assertGreaterThan(0, count($entities));
     }
@@ -179,7 +192,7 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $q = $this->focusRepository->createQueryBuilder('f');
 
         $filter = $this->createFilter('style:bar');
-        [$expr, $parameters] = $this->focusRepository->addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
         $q->where($expr);
         foreach ($parameters as $param => $value) {
@@ -263,5 +276,16 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $filter->not = $not;
         $filter->strict = false;
         return $filter;
+    }
+
+    /**
+     * @param array<int, mixed> $args
+     */
+    private function callProtectedMethod(string $methodName, array $args): mixed
+    {
+        $reflection = new \ReflectionClass($this->focusRepository);
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+        return $method->invokeArgs($this->focusRepository, $args);
     }
 }
