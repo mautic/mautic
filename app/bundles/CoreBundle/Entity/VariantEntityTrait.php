@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -14,7 +13,7 @@ trait VariantEntityTrait
      * @var mixed
      **/
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantChildren;
+    private ArrayCollection $variantChildren;
 
     /**
      * @var mixed
@@ -66,7 +65,7 @@ trait VariantEntityTrait
     public function addVariantChild(VariantEntityInterface $child): static
     {
         if (!$this->getVariantChildren()->contains($child)) {
-            $this->variantChildren[] = $child;
+            $this->variantChildren->add($child);
         }
 
         return $this;
@@ -82,15 +81,9 @@ trait VariantEntityTrait
 
     /**
      * Get variantChildren.
-     *
-     * @return Collection|array<VariantEntityInterface|object>
      */
-    public function getVariantChildren(): Collection|array
+    public function getVariantChildren(): ArrayCollection
     {
-        if (null === $this->variantChildren) {
-            $this->variantChildren = new ArrayCollection();
-        }
-
         return $this->variantChildren;
     }
 
