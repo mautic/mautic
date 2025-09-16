@@ -141,6 +141,9 @@ class FieldType extends AbstractType
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
+                case 'slider':
+                    $addIsRequired = false;
+                    break;
             }
         }
 
@@ -618,6 +621,16 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldNumberType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'slider':
+                    $builder->add(
+                        'properties',
+                        FormFieldSliderType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,

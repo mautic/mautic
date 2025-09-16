@@ -717,6 +717,44 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    public function testSliderFieldRendersWithInputAttributes(): void
+    {
+        // Create a form with a slider field
+        $form = $this->createForm('Test Slider Form', 'test_slider_form');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // Create a slider field
+        $sliderField = $this->createFormField([
+            'label' => 'Test Slider',
+            'type'  => 'slider',
+        ]);
+        $sliderField->setProperties([
+            'min'  => 0,
+            'max'  => 100,
+            'step' => 5,
+        ]);
+        $sliderField->setForm($form);
+        $sliderField->setOrder(1);
+        $this->em->persist($sliderField);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Request the form preview instead of view
+        $crawler = $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Check that the slider input has the oninput attribute
+        $sliderInput = $crawler->filter('input[type="range"]');
+        $this->assertCount(1, $sliderInput, 'Slider input should be present');
+
+        $oninputAttr = $sliderInput->attr('oninput');
+        $this->assertNotNull($oninputAttr, 'Slider input should have oninput attribute');
+        $this->assertStringContainsString('document.getElementById', $oninputAttr, 'Slider input should use getElementById to target output element');
+        $this->assertStringContainsString('.textContent = this.value', $oninputAttr, 'Slider input should set output value to input value');
+    }
+
     private function createForm(string $name, string $alias): Form
     {
         $form = new Form();
