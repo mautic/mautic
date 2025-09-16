@@ -13,6 +13,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class CompanyControllerTest extends MauticMysqlTestCase
 {
+    protected const ERROR_MESSAGE = 'The logo filename is not valid. Please enter a valid filename';
+
     protected $useCleanupRollback = false;
 
     public const USERNAME = 'jhony';
@@ -67,32 +69,28 @@ class CompanyControllerTest extends MauticMysqlTestCase
         if (file_exists($this->txtFilePath)) {
             unlink($this->imageFilePath);
         }
-        $content = $this->requestFormToValidate('test.jpg');
-        self::assertStringContainsString('The logo filename is not valid. Please enter a valid filename', $content);
+        $this->requestFormToValidate('test.jpg');
     }
 
     public function testFormLogoNameWrongExtension(): void
     {
         $name    = pathinfo($this->txtFilePath, PATHINFO_BASENAME);
-        $content = $this->requestFormToValidate($name);
-        self::assertStringContainsString('The logo filename is not valid. Please enter a valid filename', $content);
+        $this->requestFormToValidate($name);
     }
 
     public function testFormLogoNameNoContentType(): void
     {
         $name    = pathinfo($this->imageNoContentTypeFilePath, PATHINFO_BASENAME);
-        $content = $this->requestFormToValidate($name);
-        self::assertStringContainsString('The logo filename is not valid. Please enter a valid filename', $content);
+        $this->requestFormToValidate($name);
     }
 
     public function testFormLogoNameValidateSuccess(): void
     {
         $name    = pathinfo($this->imageFilePath, PATHINFO_BASENAME);
-        $content = $this->requestFormToValidate($name);
-        self::assertStringNotContainsString('The logo filename is not valid. Please enter a valid filename', $content);
+        $this->requestFormToValidate($name, false);
     }
 
-    private function requestFormToValidate(string $fileName): string
+    private function requestFormToValidate(string $fileName, bool $contain = true): void
     {
         $crawler = $this->client->request(
             'GET',
@@ -110,10 +108,15 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertEquals(200, $clientResponse->getStatusCode());
 
         if (false === $clientResponse->getContent()) {
-            return '';
+            return;
         }
 
-        return $clientResponse->getContent();
+        $content = $clientResponse->getContent();
+        if ($contain) {
+            self::assertStringContainsString(self::ERROR_MESSAGE, $content);
+        } else {
+            self::assertStringNotContainsString(self::ERROR_MESSAGE, $content);
+        }
     }
 
     private function createRole(bool $isAdmin = false): Role
