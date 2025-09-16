@@ -130,6 +130,18 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         $this->authEventResponse = $authEvent->getResponse();
 
         if (!$user instanceof User) {
+            // Still 'check' the credentials to prevent user enumeration via response timing comparison.
+            // We check it against a pre-calculated hash so the verify functions take roughly
+            // the same amount of time, and we pass the actual entered password so the response
+            // timing varies with the given password the same way it does for existing users.
+            try {
+                $fakeUser = new User();
+                $fakeUser->setUsername($credentials['username']);
+                $fakeUser->setPassword('$2y$13$aAwXNyqA87lcXQQuk8Cp6eo2amRywLct29oG2uWZ8lYBeamFZ8UhK');
+                $this->checkCredentials($credentials, $fakeUser);
+            } catch (WeakPasswordException) {
+                // Ignore.
+            }
             throw new BadCredentialsException();
         }
 
