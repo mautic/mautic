@@ -407,7 +407,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public function getSentCount(bool $includeVariants = false): mixed
     {
-        return ($includeVariants) ? $this->getAccumulativeVariantCount('getSentCount') : $this->sentCount;
+        return ($includeVariants) ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
     /**
