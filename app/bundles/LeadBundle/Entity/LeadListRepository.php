@@ -436,12 +436,24 @@ class LeadListRepository extends CommonRepository
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $forceParameters = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.dynamic'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.dynamic', [], null, 'en_US'):
+                [$staticExpr, $forceParameters] = $this->getStaticSegmentExpression($q);
+                $expr                           = $q->expr()->not($staticExpr);
+                $returnParameter                = false;
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.static'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.static', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getStaticSegmentExpression($q);
+                $returnParameter          = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
@@ -480,12 +492,40 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     *
+     * @return array{mixed, array<string, string>}
+     */
+    private function getStaticSegmentExpression($q): array
+    {
+        $column         = sprintf('%s.filters', $this->getTableAlias());
+        $emptyParameter = $this->generateRandomParameterName();
+        $nullParameter  = $this->generateRandomParameterName();
+
+        $expr = $q->expr()->orX(
+            $q->expr()->isNull($column),
+            $q->expr()->eq($column, ":$emptyParameter"),
+            $q->expr()->eq($column, ":$nullParameter")
+        );
+
+        return [
+            $expr,
+            [
+                $emptyParameter => serialize([]),
+                $nullParameter  => 'N;',
+            ],
+        ];
+    }
+
+    /**
      * @return string[]
      */
     public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
+            'mautic.lead.list.searchcommand.dynamic',
+            'mautic.lead.list.searchcommand.static',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',

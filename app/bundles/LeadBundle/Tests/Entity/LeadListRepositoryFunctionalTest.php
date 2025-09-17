@@ -36,6 +36,44 @@ final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
         $this->assertTrue($result);
     }
 
+    public function testSegmentTypeSearchCommands(): void
+    {
+        $dynamicFilters = [
+            [
+                'object'   => 'lead',
+                'glue'     => 'and',
+                'field'    => 'email',
+                'type'     => 'email',
+                'operator' => '=',
+                'filter'   => 'dynamic@example.com',
+            ],
+        ];
+
+        $dynamicSegment = $this->createSegment('DynamicSearch', $dynamicFilters);
+        $staticSegment  = $this->createSegment('StaticSearch');
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        $commands = $leadListRepository->getSearchCommands();
+        $this->assertContains('mautic.lead.list.searchcommand.dynamic', $commands);
+        $this->assertContains('mautic.lead.list.searchcommand.static', $commands);
+
+        $dynamicResults = $leadListRepository->getEntities([
+            'filter'           => ['string' => sprintf('ids:%d is:dynamic', $dynamicSegment->getId())],
+            'ignore_paginator' => true,
+        ]);
+        $dynamicIds = array_map('intval', array_keys($dynamicResults));
+        $this->assertSame([$dynamicSegment->getId()], $dynamicIds);
+
+        $staticResults = $leadListRepository->getEntities([
+            'filter'           => ['string' => sprintf('ids:%d is:static', $staticSegment->getId())],
+            'ignore_paginator' => true,
+        ]);
+        $staticIds = array_map('intval', array_keys($staticResults));
+        $this->assertSame([$staticSegment->getId()], $staticIds);
+    }
+
     private function createLead(): Lead
     {
         $lead = new Lead();
@@ -47,12 +85,16 @@ final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
         return $lead;
     }
 
-    private function createSegment(string $suffix = 'A'): LeadList
+    private function createSegment(string $suffix = 'A', ?array $filters = null): LeadList
     {
         $segment = new LeadList();
         $segment->setName("Segment {$suffix}");
         $segment->setPublicName("Segment {$suffix}");
         $segment->setAlias("segment-{$suffix}");
+
+        if (null !== $filters) {
+            $segment->setFilters($filters);
+        }
 
         $this->em->persist($segment);
         $this->em->flush();
