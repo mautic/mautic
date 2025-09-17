@@ -32,6 +32,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $leadFour  = $this->createLead('four');
         $leadFive  = $this->createLead('five');
         $leadSix   = $this->createLead('six');
+        $leadSeven = $this->createLead('seven');
 
         // add some leads in lists
         $listOne  = $this->createLeadList('first-list', $leadOne, $leadTwo, $leadThree);
@@ -45,20 +46,20 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $previousQueries = [];
 
         // non-existent segment search
-        $this->assertSearchResult('segment%3AnonExistent', [], [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix]);
+        $this->assertSearchResult('segment%3AnonExistent', [], [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix, $leadSeven]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = 'nonexistent'",
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN (0)))) AND (l.date_identified IS NOT NULL)",
         ], $previousQueries);
 
         // first-list segment search
-        $this->assertSearchResult('segment%3A'.$listOne->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix]);
+        $this->assertSearchResult('segment%3A'.$listOne->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix, $leadSeven]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
             "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
-        $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix, $leadSeven], [$leadOne, $leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
@@ -66,17 +67,29 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         ], $previousQueries);
 
         // second-list segment search
-        $this->assertSearchResult('segment%3A'.$listTwo->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree]);
+        $this->assertSearchResult('segment%3A'.$listTwo->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree, $leadSeven]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
             "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
-        $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree], [$leadOne, $leadFour, $leadFive, $leadSix]);
+        $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree, $leadSeven], [$leadOne, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
             "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+        ], $previousQueries);
+
+        $this->assertSearchResult('is%3Aunsegmented', [$leadSeven], [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix]);
+        $this->assertQueries([
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+        ], $previousQueries);
+
+        $this->assertSearchResult('!is%3Aunsegmented', [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix], [$leadSeven]);
+        $this->assertQueries([
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
     }
 

@@ -770,6 +770,21 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $q->expr()->{$nullExpr}('l.owner_id')
                 );
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isunsegmented'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isunsegmented', [], null, 'en_US'):
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'llu')
+                    ->where(
+                        $q->expr()->and(
+                            $q->expr()->eq('l.id', 'llu.lead_id'),
+                            $q->expr()->eq('llu.manually_removed', 0)
+                        )
+                    );
+
+                $expr           = $q->expr()->{$filter->not ? 'exists' : 'notExists'}($sq->getSQL());
+                $filter->strict = true;
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
                 $q->leftJoin($this->getTableAlias(), MAUTIC_TABLE_PREFIX.'users', 'u', "u.id = {$this->getTableAlias()}.owner_id");
@@ -1030,6 +1045,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.isanonymous',
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
+            'mautic.lead.lead.searchcommand.isunsegmented',
             'mautic.lead.lead.searchcommand.list',
             'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
