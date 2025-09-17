@@ -281,7 +281,7 @@ class CampaignRepository extends CommonRepository
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $q->expr()->and(
+                $expr = $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishDown'),
                     $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
@@ -291,7 +291,7 @@ class CampaignRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $q->expr()->and(
+                $expr = $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishUp'),
                     $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
