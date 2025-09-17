@@ -65,6 +65,11 @@ class ReportRepository extends CommonRepository
                 $expr            = $q->expr()->eq('r.isScheduled', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
+            case $this->translator->trans('mautic.report.report.searchcommand.source'):
+            case $this->translator->trans('mautic.report.report.searchcommand.source', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.source', ":$unique");
+                $forceParameters = [$unique => $filter->string];
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -88,6 +93,7 @@ class ReportRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
             'mautic.report.report.searchcommand.isscheduled',
+            'mautic.report.report.searchcommand.source',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
