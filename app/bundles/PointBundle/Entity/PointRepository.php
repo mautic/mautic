@@ -2,6 +2,8 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -123,19 +125,59 @@ class PointRepository extends CommonRepository
 
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return match ($filter->command) {
-            $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
+        $command             = $filter->command;
+        $projectCommand      = $this->translator->trans('mautic.project.searchcommand.name');
+        $projectCommandEn    = $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US');
+        $typeCommand         = $this->translator->trans('mautic.point.searchcommand.type');
+        $typeCommandEn       = $this->translator->trans('mautic.point.searchcommand.type', [], null, 'en_US');
+        $gainValues          = [
+            $this->translator->trans('mautic.point.searchcommand.type_gain'),
+            $this->translator->trans('mautic.point.searchcommand.type_gain', [], null, 'en_US'),
+        ];
+        $lossValues          = [
+            $this->translator->trans('mautic.point.searchcommand.type_loss'),
+            $this->translator->trans('mautic.point.searchcommand.type_loss', [], null, 'en_US'),
+        ];
+
+        if ($command === $projectCommand || $command === $projectCommandEn) {
+            return $this->handleProjectFilter(
                 $this->_em->getConnection()->createQueryBuilder(),
                 'point_id',
                 'point_projects_xref',
                 $this->getTableAlias(),
                 $filter->string,
                 $filter->not
-            ),
-            $this->translator->trans('mautic.point.searchcommand.isrepeatable'),
-            $this->translator->trans('mautic.point.searchcommand.isrepeatable', [], null, 'en_US')       => $this->addRepeatableWhereClause($q, $filter),
-            default                                                                                      => $this->addStandardSearchCommandWhereClause($q, $filter),
-        };
+            );
+        }
+
+        $repeatableCommand   = $this->translator->trans('mautic.point.searchcommand.isrepeatable');
+        $repeatableCommandEn = $this->translator->trans('mautic.point.searchcommand.isrepeatable', [], null, 'en_US');
+
+        if ($command === $repeatableCommand || $command === $repeatableCommandEn) {
+            return $this->addRepeatableWhereClause($q, $filter);
+        }
+
+        $expr  = null;
+        $value = $filter->string;
+
+        if ($command === $typeCommand || $command === $typeCommandEn) {
+            $expr = $this->buildDeltaTypeExpression($q, $value, $gainValues, $lossValues);
+        } elseif (str_contains($command, ':')) {
+            [$baseCommand, $subCommand] = explode(':', $command, 2);
+            if ($baseCommand === $typeCommand || $baseCommand === $typeCommandEn) {
+                $expr = $this->buildDeltaTypeExpression($q, $subCommand, $gainValues, $lossValues);
+            }
+        }
+
+        if (null !== $expr) {
+            if ($filter->not) {
+                $expr = $q->expr()->not($expr);
+            }
+
+            return [$expr, []];
+        }
+
+        return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
     /**
@@ -143,15 +185,19 @@ class PointRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return array_merge([
-            'mautic.project.searchcommand.name',
-            'mautic.point.searchcommand.isrepeatable',
-        ], $this->getStandardSearchCommands());
+        return array_merge(
+            [
+                'mautic.point.searchcommand.type',
+                'mautic.project.searchcommand.name',
+                'mautic.point.searchcommand.isrepeatable',
+            ],
+            $this->getStandardSearchCommands()
+        );
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
-     * @param object                                                       $filter
+     * @param DbalQueryBuilder|QueryBuilder $q
+     * @param object                        $filter
      *
      * @return array{0:mixed,1:array<string,bool>}
      */
@@ -171,5 +217,25 @@ class PointRepository extends CommonRepository
             $expr,
             [$parameter => $value],
         ];
+    }
+
+    /**
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param string[]                      $gainValues
+     * @param string[]                      $lossValues
+     */
+    private function buildDeltaTypeExpression($q, string $value, array $gainValues, array $lossValues): mixed
+    {
+        $field = $this->getTableAlias().'.delta';
+
+        if (in_array($value, $gainValues, true)) {
+            return $q->expr()->gt($field, '0');
+        }
+
+        if (in_array($value, $lossValues, true)) {
+            return $q->expr()->lt($field, '0');
+        }
+
+        return null;
     }
 }
