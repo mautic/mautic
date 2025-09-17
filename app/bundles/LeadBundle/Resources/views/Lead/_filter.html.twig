@@ -164,26 +164,35 @@
         'routeBase': 'contact',
         'langVar': 'lead.lead',
     },
-    'quickFilters': [
-        {
-            'search': 'mautic.core.searchcommand.ismine',
-            'label': 'mautic.core.searchcommand.ismine.label',
-            'tooltip': 'mautic.core.searchcommand.ismine.description',
-            'icon': 'ri-user-line'
+    'quickFilters': {
+        'mautic.core.quick_filters.ownership': {
+            'conflictGroup': true,
+            'filters': [
+                {
+                    'search': 'mautic.core.searchcommand.ismine',
+                    'label': 'mautic.core.searchcommand.ismine.label',
+                    'tooltip': 'mautic.core.searchcommand.ismine.description',
+                    'icon': 'ri-user-line'
+                },
+                {
+                    'search': 'mautic.lead.lead.searchcommand.isunowned',
+                    'label': 'mautic.lead.lead.searchcommand.isunowned.label',
+                    'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
+                    'icon': 'ri-user-unfollow-line'
+                }
+            ]
         },
-        {
-            'search': 'mautic.lead.lead.searchcommand.isunowned',
-            'label': 'mautic.lead.lead.searchcommand.isunowned.label',
-            'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
-            'icon': 'ri-user-unfollow-line'
-        },
-        {
-            'search': (('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)),
-            'label': 'mautic.lead.lead.searchcommand.dnc.label',
-            'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
-            'icon': 'ri-prohibited-line'
+        'mautic.core.quick_filters.others': {
+            'filters': [
+                {
+                    'search': (('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)),
+                    'label': 'mautic.lead.lead.searchcommand.dnc.label',
+                    'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
+                    'icon': 'ri-prohibited-line'
+                }
+            ]
         }
-    ],
+    },
     'searchScopeHint': searchScopeHint|default(''),
     'searchScopes': searchScopes|default([]),
 }) -}}
