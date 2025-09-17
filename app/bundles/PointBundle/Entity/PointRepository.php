@@ -3,6 +3,7 @@
 namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
@@ -131,7 +132,9 @@ class PointRepository extends CommonRepository
                 $filter->string,
                 $filter->not
             ),
-            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+            $this->translator->trans('mautic.point.searchcommand.isrepeatable'),
+            $this->translator->trans('mautic.point.searchcommand.isrepeatable', [], null, 'en_US')       => $this->addRepeatableWhereClause($q, $filter),
+            default                                                                                      => $this->addStandardSearchCommandWhereClause($q, $filter),
         };
     }
 
@@ -140,6 +143,33 @@ class PointRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
+        return array_merge([
+            'mautic.project.searchcommand.name',
+            'mautic.point.searchcommand.isrepeatable',
+        ], $this->getStandardSearchCommands());
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param object                                                       $filter
+     *
+     * @return array{0:mixed,1:array<string,bool>}
+     */
+    private function addRepeatableWhereClause($q, $filter): array
+    {
+        $column    = $this->getTableAlias().'.repeatable';
+        $parameter = $this->generateRandomParameterName();
+        $rawString = trim((string) $filter->string);
+        $value     = '' === $rawString ? null : InputHelper::boolean($rawString);
+        $value     = null === $value ? true : $value;
+
+        $expr = $filter->not
+            ? $q->expr()->neq($column, ":$parameter")
+            : $q->expr()->eq($column, ":$parameter");
+
+        return [
+            $expr,
+            [$parameter => $value],
+        ];
     }
 }
