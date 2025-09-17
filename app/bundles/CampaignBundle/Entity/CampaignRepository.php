@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -276,7 +277,10 @@ class CampaignRepository extends CommonRepository
             return [$expr, $parameters];
         }
 
-        $unique  = $this->generateRandomParameterName();
+        $unique          = $this->generateRandomParameterName();
+        $forceParameters = [];
+        $applyNot        = true;
+        $alias           = $this->getTableAlias();
 
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
@@ -299,6 +303,22 @@ class CampaignRepository extends CommonRepository
                 );
                 $forceParameters = [$unique => true];
                 break;
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.source.segment'):
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.source.segment', [], null, 'en_US'):
+                $expr = $q instanceof QueryBuilder
+                    ? sprintf('%s.lists %s', $alias, $filter->not ? 'IS EMPTY' : 'IS NOT EMPTY')
+                    : sprintf('%1$sEXISTS(SELECT 1 FROM %2$scampaign_leadlist_xref cl WHERE cl.campaign_id = %3$s.id)', $filter->not ? 'NOT ' : '', MAUTIC_TABLE_PREFIX, $alias);
+                $applyNot   = false;
+                $parameters = [];
+                break;
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.source.form'):
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.source.form', [], null, 'en_US'):
+                $expr = $q instanceof QueryBuilder
+                    ? sprintf('%s.forms %s', $alias, $filter->not ? 'IS EMPTY' : 'IS NOT EMPTY')
+                    : sprintf('%1$sEXISTS(SELECT 1 FROM %2$scampaign_form_xref cf WHERE cf.campaign_id = %3$s.id)', $filter->not ? 'NOT ' : '', MAUTIC_TABLE_PREFIX, $alias);
+                $applyNot   = false;
+                $parameters = [];
+                break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
@@ -311,7 +331,7 @@ class CampaignRepository extends CommonRepository
                 );
         }
 
-        if ($expr && $filter->not) {
+        if ($expr && $applyNot && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
@@ -330,6 +350,8 @@ class CampaignRepository extends CommonRepository
         return array_merge([
             'mautic.campaign.campaign.searchcommand.isexpired',
             'mautic.campaign.campaign.searchcommand.ispending',
+            'mautic.campaign.campaign.searchcommand.source.segment',
+            'mautic.campaign.campaign.searchcommand.source.form',
             'mautic.project.searchcommand.name',
         ], $this->getStandardSearchCommands());
     }
