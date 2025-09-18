@@ -13,9 +13,11 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
+use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ProjectModel extends FormModel implements AjaxLookupModelInterface
@@ -65,5 +67,38 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
 
         // Results are already in the correct format (id => name)
         return $this->entityLoaderService->getLookupResults($type, (string) $filter, (int) $limit, (int) $start, $projectId);
+    }
+
+    /**
+     * @param mixed $id
+     *
+     * @return Project|object|null
+     */
+    public function getEntity($id = null)
+    {
+        if (null === $id) {
+            return new Project();
+        }
+
+        return parent::getEntity($id);
+    }
+
+    /**
+     * @param array<mixed> $options
+     *
+     * @return mixed
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = [])
+    {
+        if (!$entity instanceof Project) {
+            throw new MethodNotAllowedHttpException(['Project'], 'Entity must be of class Project()');
+        }
+
+        return $formFactory->create(ProjectEntityType::class, $entity, $options);
+    }
+
+    public function getPermissionBase(): string
+    {
+        return 'project:project';
     }
 }

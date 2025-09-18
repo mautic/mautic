@@ -18,6 +18,16 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ApiResource(
+ *     collectionOperations={
+ *       "get"={"security"="'project:project:viewother'"},
+ *       "post"={"security"="'project:project:create'"}
+ *    },
+ *    itemOperations={
+ *       "get"={"security"="'project:project:view'"},
+ *       "put"={"security"="'project:project:edit'"},
+ *       "patch"={"security"="'project:project:edit'"},
+ *       "delete"={"security"="'project:project:delete'"}
+ *    },
  *   attributes={
  *     "security"="false",
  *     "normalization_context"={

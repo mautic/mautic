@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\ProjectBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ProjectEntityType extends AbstractType
 {
@@ -40,5 +42,20 @@ final class ProjectEntityType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults(
+            [
+                'data_class'      => Project::class,
+                'csrf_protection' => false,
+            ]
+        );
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'project_entity';
     }
 }

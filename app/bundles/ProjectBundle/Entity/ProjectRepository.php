@@ -14,12 +14,25 @@ class ProjectRepository extends CommonRepository
     protected function getDefaultOrder(): array
     {
         return [
-            ['p.date_modified', 'ASC'],
+            ['p.dateModified', 'ASC'],
         ];
     }
 
     public function getTableAlias(): string
     {
         return 'p';
+    }
+
+    public function getEntities(array $args = [])
+    {
+        $q = $this->_em
+            ->createQueryBuilder()
+            ->select($this->getTableAlias())
+            ->from('MauticProjectBundle:Project'/** @var MODEL */, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->orderBy($this->getTableAlias().'.id');
+
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
     }
 }
