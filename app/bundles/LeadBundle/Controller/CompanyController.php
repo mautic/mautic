@@ -50,7 +50,16 @@ class CompanyController extends FormController
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
         $search     = $request->get('search', $request->getSession()->get('mautic.company.filter', ''));
-        $filter     = ['string' => $search, 'force' => []];
+        $filter     = [
+            'string' => $search,
+            'force'  => [
+                [
+                    'column' => 'comp.is_published',
+                    'expr'   => 'eq',
+                    'value'  => true,
+                ],
+            ],
+        ];
         $orderBy    = $request->getSession()->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $request->getSession()->get('mautic.company.orderbydir', 'ASC');
 
