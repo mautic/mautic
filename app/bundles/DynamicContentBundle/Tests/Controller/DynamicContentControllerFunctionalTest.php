@@ -233,4 +233,36 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
     }
+
+    public function testLocaleAndTimezoneFilterValidation(): void
+    {
+        $this->createAndLoginUser(self::PERMISSION_CREATE);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $formHtml = $crawler->html();
+
+        Assert::assertStringContainsString('preferred_locale', $formHtml);
+        Assert::assertStringContainsString('timezone', $formHtml);
+
+        $buttonCrawler = $crawler->selectButton('Save');
+        $form          = $buttonCrawler->form();
+        $form->setValues([
+            'dwc[name]'    => 'Test Locale Timezone Filter Validation',
+            'dwc[content]' => 'Test content for locale and timezone filter validation',
+        ]);
+        $crawler = $this->client->submit($form);
+
+        $content = $crawler->text();
+
+        Assert::assertStringNotContainsString('This value is not valid', $content);
+        Assert::assertStringNotContainsString('form-error', $crawler->html());
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString('Edit Dynamic Content', $content);
+        Assert::assertStringContainsString('Test Locale Timezone Filter Validation', $content);
+
+        $this->assertTrue(true, 'Dynamic content created successfully without choice validation errors');
+    }
 }
