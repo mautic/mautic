@@ -28,23 +28,23 @@ final class Version20250923135527 extends PreUpAssertionMigration
                 'notnull'  => false,
             ]);
 
-            $table->addIndex(['translation_parent_id'], 'IDX_SMS_TRANSLATION_PARENT');
+            $table->addIndex(['translation_parent_id'], 'IDX_MOBILE_PUSH_TRANSLATION_PARENT');
 
             $table->addForeignKeyConstraint(
                 $table,
                 ['translation_parent_id'],
                 ['id'],
                 ['onDelete' => 'CASCADE'],
-                'FK_SMS_TRANSLATION_PARENT'
+                'FK_MOBILE_PUSH_TRANSLATION_PARENT'
             );
         }
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_SMS_TRANSLATION_PARENT');
+        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_MOBILE_PUSH_TRANSLATION_PARENT');
 
-        $this->addSql('DROP INDEX IDX_SMS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
+        $this->addSql('DROP INDEX IDX_MOBILE_PUSH_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
 
         $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
     }
