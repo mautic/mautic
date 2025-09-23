@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -36,9 +38,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *   }
  * )
  */
-class Notification extends FormEntity implements UuidInterface
+class Notification extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
+    use TranslationEntityTrait;
 
     /**
      * @var int
@@ -54,11 +57,6 @@ class Notification extends FormEntity implements UuidInterface
      * @var string|null
      */
     private $description;
-
-    /**
-     * @var string
-     */
-    private $language = 'en';
 
     /**
      * @var string|null
@@ -147,8 +145,9 @@ class Notification extends FormEntity implements UuidInterface
 
     public function __construct()
     {
-        $this->lists = new ArrayCollection();
-        $this->stats = new ArrayCollection();
+        $this->lists               = new ArrayCollection();
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
     }
 
     /**
@@ -167,10 +166,6 @@ class Notification extends FormEntity implements UuidInterface
             ->setCustomRepositoryClass(NotificationRepository::class);
 
         $builder->addIdColumns();
-
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->build();
 
         $builder->createField('url', 'text')
             ->nullable()
@@ -509,25 +504,6 @@ class Notification extends FormEntity implements UuidInterface
     /**
      * @return mixed
      */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setLanguage($language)
-    {
-        $this->isChanged('language', $language);
-        $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getPublishDown()
     {
         return $this->publishDown;
@@ -563,12 +539,9 @@ class Notification extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSentCount()
+    public function getSentCount(bool $includeVariants = false): mixed
     {
-        return $this->sentCount;
+        return ($includeVariants) ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
     /**
