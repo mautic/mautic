@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\ContentEvent;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -32,6 +33,7 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
         private DynamicContentHelper $dynamicContentHelper,
         private EmailModel $emailModel,
         private PageModel $pageModel,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -73,6 +75,10 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
 
     public function validateDWCTokensEligibility(EntityValidateEvent $event): void
     {
+        if (!$this->coreParametersHelper->get('dynamic_content_use_token_eligibility_validation')) {
+            return;
+        }
+
         $entity = $event->getEntity();
         if ((!$entity instanceof Email && !$entity instanceof Page)
         || !$entity->getCustomHtml()) {

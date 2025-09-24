@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form as TemplateForm;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,7 +17,14 @@ final class DynamicContentTokenValidationTest extends MauticMysqlTestCase
     use DynamicContentReOrderingTrait;
     public const INVALID_TOKEN_WITH_MISSING_CONTENT = 'Invalid Dynamic Web Content token or closing tag missing or default content missing between opening and closing tags.';
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dwcTokenDataProvider')]
+    protected function setUp(): void
+    {
+        $this->configParams['dynamic_content_use_token_eligibility_validation'] = ' with data set "Token eligibility validation disabled"' !== $this->dataSetAsString();
+
+        parent::setUp();
+    }
+
+    #[DataProvider('dwcTokenDataProvider')]
     public function testDwcTokenValidation(bool $success, string $token): void
     {
         $subject = 'subject'.$token;
@@ -71,7 +79,17 @@ final class DynamicContentTokenValidationTest extends MauticMysqlTestCase
         Assert::assertStringContainsString($errorMsg, $this->client->getResponse()->getContent());
     }
 
-    public function testPageWithEmailRelatedToken(): void
+    /**
+     * @return iterable<string, bool[]>
+     */
+    public static function dataUseTokenEligibilityValidation(): iterable
+    {
+        yield 'Token eligibility validation enabled' => [true];
+        yield 'Token eligibility validation disabled' => [false];
+    }
+
+    #[DataProvider('dataUseTokenEligibilityValidation')]
+    public function testPageWithEmailRelatedToken(bool $useTokenEligibilityValidation): void
     {
         $contactToken = '{contactfield=city}';
         $dwc          = $this->createDynamicContent(
@@ -83,7 +101,13 @@ final class DynamicContentTokenValidationTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         $errorMsg = 'The page contains disallowed token(s) &quot;'.$contactToken.'&quot; in DWC ID '.$dwc->getId().'. Please remove or correct them before saving.';
-        Assert::assertStringContainsString($errorMsg, $this->client->getResponse()->getContent());
+        $content  = $this->client->getResponse()->getContent();
+
+        if ($useTokenEligibilityValidation) {
+            Assert::assertStringContainsString($errorMsg, $content);
+        } else {
+            Assert::assertStringNotContainsString($errorMsg, $content);
+        }
     }
 
     private function createForm(): TemplateForm
