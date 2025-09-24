@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
@@ -12,9 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventSubscriber implements EventSubscriberInterface
 {
-    private float $disableCampaignThreshold = 0.1;
-
-    public function __construct(private EventRepository $eventRepository, private NotificationHelper $notificationHelper, private CampaignRepository $campaignRepository)
+    public function __construct(private EventRepository $eventRepository, private NotificationHelper $notificationHelper)
     {
     }
 
