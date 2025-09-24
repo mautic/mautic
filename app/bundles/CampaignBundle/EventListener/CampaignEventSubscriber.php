@@ -58,17 +58,6 @@ class CampaignEventSubscriber implements EventSubscriberInterface
     {
         $log           = $event->getLog();
         $failedEvent   = $log->getEvent();
-        $campaign      = $failedEvent->getCampaign();
-        $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent);
-        $contactCount  = $campaign->getLeads()->count();
-        $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
-
         $this->notificationHelper->notifyOfFailure($log->getLead(), $failedEvent);
-
-        if ($failedPercent >= $this->disableCampaignThreshold && $campaign->isPublished()) {
-            $this->notificationHelper->notifyOfUnpublish($failedEvent);
-            $campaign->setIsPublished(false);
-            $this->campaignRepository->saveEntity($campaign);
-        }
     }
 }
