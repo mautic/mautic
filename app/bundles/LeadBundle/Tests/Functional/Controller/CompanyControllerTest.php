@@ -69,13 +69,13 @@ class CompanyControllerTest extends MauticMysqlTestCase
         if (file_exists($this->txtFilePath)) {
             unlink($this->imageFilePath);
         }
-        $this->requestFormToValidate('test.jpg');
+        $this->requestFormToValidate('test.jpg', true, 'The logo file was not found. Please upload the file first.');
     }
 
     public function testFormLogoNameWrongExtension(): void
     {
         $name    = pathinfo($this->txtFilePath, PATHINFO_BASENAME);
-        $this->requestFormToValidate($name);
+        $this->requestFormToValidate($name, true, 'The logo filename has an invalid extension.');
     }
 
     public function testFormLogoNameNoContentType(): void
@@ -90,7 +90,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->requestFormToValidate($name, false);
     }
 
-    private function requestFormToValidate(string $fileName, bool $contain = true): void
+    private function requestFormToValidate(string $fileName, bool $contain = true, string $message = ''): void
     {
         $crawler = $this->client->request(
             'GET',
@@ -112,10 +112,11 @@ class CompanyControllerTest extends MauticMysqlTestCase
         }
 
         $content = $clientResponse->getContent();
+        $message = $message ?: self::ERROR_MESSAGE;
         if ($contain) {
-            self::assertStringContainsString(self::ERROR_MESSAGE, $content);
+            self::assertStringContainsString($message, $content);
         } else {
-            self::assertStringNotContainsString(self::ERROR_MESSAGE, $content);
+            self::assertStringNotContainsString($message, $content);
         }
     }
 

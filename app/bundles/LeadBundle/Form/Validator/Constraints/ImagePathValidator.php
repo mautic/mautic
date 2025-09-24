@@ -30,21 +30,21 @@ class ImagePathValidator extends ConstraintValidator
 
         // Basic sanity: no control chars or null bytes
         if (preg_match('/[\x00-\x1F\x7F]/', $fileName)) {
-            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid')->addViolation();
+            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid_characters')->addViolation();
 
             return;
         }
 
         // Forbid any path separators or drive letters
         if (preg_match('#[\\\\/]#', $fileName) || preg_match('/^[A-Za-z]:/', $fileName)) {
-            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid')->addViolation();
+            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid_characters')->addViolation();
 
             return;
         }
 
         // Forbid traversal or hidden filenames
         if (str_contains($fileName, '..') || str_starts_with($fileName, '.')) {
-            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid')->addViolation();
+            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid_characters')->addViolation();
 
             return;
         }
@@ -60,7 +60,7 @@ class ImagePathValidator extends ConstraintValidator
 
         // Ensure the resolved path is within the logos directory
         if (!file_exists($rootFilePath)) {
-            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid')
+            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid_file_not_found')
                 ->addViolation();
 
             return;
@@ -72,17 +72,16 @@ class ImagePathValidator extends ConstraintValidator
 
         // Remove any query parameters from the URL
         $parts = parse_url($rootFilePath);
-        //        dd($parts);
 
         if (array_key_exists('query', $parts) && is_string($parts['query']) && '' !== $parts['query']) {
-            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid')
+            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid_name_file')
                 ->addViolation();
 
             return;
         }
 
         if (!in_array($extension, $allowedExtensions, true)) {
-            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid')
+            $this->context->buildViolation('mautic.lead.field.companylogo_filename.invalid_extension')
                 ->addViolation();
 
             return;
