@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -68,6 +69,10 @@ class MobileNotificationController extends FormController
                     'expr' => 'eq',
                     'col'  => 'mobile',
                     'val'  => 1,
+                ],
+                [
+                    'expr' => 'isNull',
+                    'col'  => 'translationParent',
                 ],
             ],
         ];
@@ -206,6 +211,13 @@ class MobileNotificationController extends FormController
         // Get click through stats
         $trackableLinks = $model->getNotificationClickStats($notification->getId());
 
+        $translations = $notification->getTranslations();
+        if ($translations instanceof Collection) {
+            $translations = $translations->toArray();
+        }
+
+        [$translationParent, $translationChildren] = $translations;
+
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $notification->getId()]),
             'viewParameters' => [
@@ -234,6 +246,10 @@ class MobileNotificationController extends FormController
                     ]
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'translations'  => [
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren,
+                ],
             ],
             'contentTemplate' => '@MauticNotification/MobileNotification/details.html.twig',
             'passthroughVars' => [
