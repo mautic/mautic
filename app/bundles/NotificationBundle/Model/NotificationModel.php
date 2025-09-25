@@ -310,7 +310,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['notification_type'] ?? null
+                    $options
                 );
 
                 foreach ($entities as $entity) {
