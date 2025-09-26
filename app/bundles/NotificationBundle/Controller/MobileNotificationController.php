@@ -2,7 +2,6 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
