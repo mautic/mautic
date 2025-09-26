@@ -47,7 +47,7 @@ class NotificationTypeTest extends TypeTestCase
         $form = $this->factory->create(NotificationType::class);
 
         $expected = new Notification();
-        $expected->setLanguage(null);
+        $expected->setLanguage('');
         $expected->setUtmTags([
             'utmSource'   => null,
             'utmMedium'   => null,
@@ -93,7 +93,7 @@ class NotificationTypeTest extends TypeTestCase
         $form = $this->factory->create(NotificationType::class);
 
         $expected = new Notification();
-        $expected->setLanguage(null);
+        $expected->setLanguage('');
         $expected->setName('The name');
         $expected->setHeading('The heading');
         $expected->setMessage('The message');
