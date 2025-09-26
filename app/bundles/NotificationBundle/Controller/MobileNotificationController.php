@@ -211,12 +211,7 @@ class MobileNotificationController extends FormController
         // Get click through stats
         $trackableLinks = $model->getNotificationClickStats($notification->getId());
 
-        $translations = $notification->getTranslations();
-        if ($translations instanceof Collection) {
-            $translations = $translations->toArray();
-        }
-
-        [$translationParent, $translationChildren] = $translations;
+        [$translationParent, $translationChildren] = $notification->getTranslations();
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $notification->getId()]),

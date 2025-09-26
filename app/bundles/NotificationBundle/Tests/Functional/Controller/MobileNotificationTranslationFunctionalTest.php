@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\Stat;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestCase
@@ -134,6 +136,26 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
         $this->assertSelectorTextContains('#translation-container', 'Parent Notification');
     }
 
+    public function testListPageWithSentStats(): void
+    {
+        // Arrange
+        $parentNotification = $this->createAndPersistNotification('Parent Notification', 'Parent Notification message', 'en');
+        $childNotification  = $this->createAndPersistNotification('Child Notification', 'Child Notification message', 'fr');
+        $childNotification->setTranslationParent($parentNotification);
+        $parentNotification->addTranslationChild($childNotification);
+
+        $this->em->flush();
+
+        // Create a stat
+        $this->createStatEntry($parentNotification, $this->createContact('user', 'one'));
+        $this->createStatEntry($childNotification, $this->createContact('user', 'two'));
+
+        // Act & Assert - list view
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/mobile_notifications');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(2, $crawler->filterXPath("//td[contains(@class, 'col-stats')]"));
+    }
+
     private function createANotification(string $name, string $message, bool $isPublished = true, string $locale = 'en'): Notification
     {
         $notification = new Notification();
@@ -154,5 +176,29 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
         $this->em->flush();
 
         return $notification;
+    }
+
+    public function createStatEntry(Notification $notification, Lead $lead): void
+    {
+        $stat = new Stat();
+        $stat->setDateSent(new \DateTime());
+        $stat->setLead($lead);
+        $stat->setNotification($notification);
+        $stat->setSource(null);
+        $stat->setSourceId(null);
+
+        $this->em->persist($stat);
+        $this->em->flush();
+    }
+
+    private function createContact(string $firstname, string $lastname): Lead
+    {
+        $contact = new Lead();
+        $contact->setFirstname($firstname);
+        $contact->setLastname($lastname);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        return $contact;
     }
 }
