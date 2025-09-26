@@ -231,6 +231,10 @@ class NotificationRepository extends CommonRepository
             );
         }
 
+        if (!empty($options['top_level']) && 'translation' === $options['top_level']) {
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        }
+
         if (!empty($options['ignore_ids'])) {
             $q->andWhere($q->expr()->notIn('e.id', $options['ignore_ids']));
         }
