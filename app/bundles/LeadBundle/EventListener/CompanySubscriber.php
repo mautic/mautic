@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event as Events;
@@ -13,6 +14,7 @@ class CompanySubscriber implements EventSubscriberInterface
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
+        private EntityManager $entityManager,
     ) {
     }
 
@@ -58,5 +60,18 @@ class CompanySubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+        $this->clearCompanyInLeadsCompanyFields($company->getName());
+    }
+
+    private function clearCompanyInLeadsCompanyFields(?string $companyName): void
+    {
+        if (null === $companyName) {
+            return;
+        }
+        $connection = $this->entityManager->getConnection();
+        $connection->executeStatement(
+            'UPDATE '.MAUTIC_TABLE_PREFIX.'leads SET company = NULL WHERE company = :companyName',
+            ['companyName' => $companyName]
+        );
     }
 }

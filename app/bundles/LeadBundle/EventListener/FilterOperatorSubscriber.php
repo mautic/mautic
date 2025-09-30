@@ -113,13 +113,13 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
@@ -346,8 +346,10 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::IN,
-                    OperatorOptions::NOT_IN,
+                    OperatorOptions::INCLUDING_ANY,
+                    OperatorOptions::EXCLUDING_ANY,
+                    OperatorOptions::INCLUDING_ALL,
+                    OperatorOptions::EXCLUDING_ALL,
                 ]),
             ],
             'lead_email_sent' => [
@@ -358,8 +360,10 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_sent'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::IN,
-                    OperatorOptions::NOT_IN,
+                    OperatorOptions::INCLUDING_ANY,
+                    OperatorOptions::EXCLUDING_ANY,
+                    OperatorOptions::INCLUDING_ALL,
+                    OperatorOptions::EXCLUDING_ALL,
                 ]),
             ],
             'lead_email_sent_date' => [
@@ -607,8 +611,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                         OperatorOptions::NOT_LIKE,
                         OperatorOptions::REGEXP,
                         OperatorOptions::NOT_REGEXP,
-                        OperatorOptions::IN,
-                        OperatorOptions::NOT_IN,
+                        OperatorOptions::INCLUDING_ANY,
+                        OperatorOptions::EXCLUDING_ANY,
                         OperatorOptions::STARTS_WITH,
                         OperatorOptions::ENDS_WITH,
                         OperatorOptions::CONTAINS,

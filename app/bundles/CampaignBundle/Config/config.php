@@ -209,26 +209,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.campaign.scheduler'               => [
-                'class'     => Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'mautic.campaign.event_logger',
-                    'mautic.campaign.scheduler.interval',
-                    'mautic.campaign.scheduler.datetime',
-                    'mautic.campaign.scheduler.optimized',
-                    'mautic.campaign.event_collector',
-                    'event_dispatcher',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.campaign.executioner.action' => [
-                'class'     => Mautic\CampaignBundle\Executioner\Event\ActionExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.dispatcher.action',
-                    'mautic.campaign.event_logger',
-                ],
-            ],
             'mautic.campaign.executioner.condition' => [
                 'class'     => Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class,
                 'arguments' => [

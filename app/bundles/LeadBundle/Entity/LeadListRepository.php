@@ -614,6 +614,26 @@ SQL;
 
     /**
      * @param int[] $expectedSegmentIds
+     */
+    public function isContactInAllSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        return count($segmentIds) === count($expectedSegmentIds);
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isNotContactInAllSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        return [] === $segmentIds;
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
      *
      * @return int[]
      */

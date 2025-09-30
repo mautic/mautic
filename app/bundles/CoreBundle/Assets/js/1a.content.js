@@ -879,7 +879,7 @@ Mautic.onPageUnload = function (container, response) {
  * @param event
  * @returns {boolean}
  */
-Mautic.ajaxifyLink = function (el, event) {
+Mautic.ajaxifyLink = function (el, event, extraData = {}) {
     if (mQuery(el).hasClass('disabled')) {
         return false;
     }
@@ -929,7 +929,7 @@ Mautic.ajaxifyLink = function (el, event) {
     //give an ajaxified link the option of not displaying the global loading bar
     var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
 
-    Mautic.loadContent(route, link, method, target, showLoadingBar);
+    Mautic.loadContent(route, link, method, target, showLoadingBar, undefined, extraData);
 };
 
 /**

@@ -14,8 +14,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -45,10 +49,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Sms extends FormEntity implements UuidInterface
+class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
 {
     use UuidTrait;
     use ProjectTrait;
+    use TranslationEntityTrait;
+    use VariantEntityTrait;
 
     /**
      * @var int
@@ -67,12 +73,6 @@ class Sms extends FormEntity implements UuidInterface
      */
     #[Groups(['sms:read', 'sms:write'])]
     private $description;
-
-    /**
-     * @var string
-     */
-    #[Groups(['sms:read', 'sms:write'])]
-    private $language = 'en';
 
     /**
      * @var string
@@ -133,6 +133,8 @@ class Sms extends FormEntity implements UuidInterface
         $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
 
+        $this->clearTranslations();
+
         parent::__clone();
     }
 
@@ -141,6 +143,7 @@ class Sms extends FormEntity implements UuidInterface
         $this->lists = new ArrayCollection();
         $this->stats = new ArrayCollection();
         $this->initializeProjects();
+        $this->translationChildren = new ArrayCollection();
     }
 
     /**
@@ -159,10 +162,6 @@ class Sms extends FormEntity implements UuidInterface
             ->setCustomRepositoryClass(SmsRepository::class);
 
         $builder->addIdColumns();
-
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->build();
 
         $builder->createField('message', 'text')
             ->build();
@@ -194,6 +193,8 @@ class Sms extends FormEntity implements UuidInterface
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        self::addTranslationMetadata($builder, self::class);
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'sms_projects_xref', 'sms_id');
@@ -369,25 +370,6 @@ class Sms extends FormEntity implements UuidInterface
     /**
      * @return mixed
      */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setLanguage($language)
-    {
-        $this->isChanged('language', $language);
-        $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getPublishDown()
     {
         return $this->publishDown;
@@ -423,12 +405,9 @@ class Sms extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSentCount()
+    public function getSentCount(bool $includeVariants = false): mixed
     {
-        return $this->sentCount;
+        return ($includeVariants) ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
     /**

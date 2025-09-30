@@ -350,6 +350,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/stone-creator"><img src="https://avatars.githubusercontent.com/u/1327019?v=4?s=100" width="100px;" alt="Stone-creator"/><br /><sub><b>Stone-creator</b></sub></a><br /><a href="#userTesting-stone-creator" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lolaslade"><img src="https://avatars.githubusercontent.com/u/2320484?v=4?s=100" width="100px;" alt="lolcode"/><br /><sub><b>lolcode</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=lolaslade" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.rodrigoaguilera.net"><img src="https://avatars.githubusercontent.com/u/655187?v=4?s=100" width="100px;" alt="Rodrigo"/><br /><sub><b>Rodrigo</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rodrigoaguilera" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DarshBhavnani"><img src="https://avatars.githubusercontent.com/u/131427031?v=4?s=100" width="100px;" alt="Darsh Bhavnani"/><br /><sub><b>Darsh Bhavnani</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=DarshBhavnani" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.clear-code.com/"><img src="https://avatars.githubusercontent.com/u/27350?v=4?s=100" width="100px;" alt="Sutou Kouhei"/><br /><sub><b>Sutou Kouhei</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=kou" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/naoya-kawakatsu"><img src="https://avatars.githubusercontent.com/u/49386563?v=4?s=100" width="100px;" alt="naoya-kawakatsu"/><br /><sub><b>naoya-kawakatsu</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=naoya-kawakatsu" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
+use Mautic\EmailBundle\Event\ManualWinnerEvent;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
@@ -28,6 +29,7 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,6 +42,8 @@ class EmailController extends FormController
     use EntityContactsTrait;
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+
+    private bool $invalidHtmlError = false;
 
     /**
      * @param int $page
@@ -513,34 +517,40 @@ class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
-                    // form is valid so process the data
-                    $model->saveEntity($entity);
+                    try {
+                        // form is valid so process the data
+                        $model->saveEntity($entity);
 
-                    $this->addFlashMessage(
-                        'mautic.core.notice.created',
-                        [
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_email_index',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_email_action',
-                                [
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId(),
-                                ]
-                            ),
-                        ]
-                    );
+                        $this->addFlashMessage(
+                            'mautic.core.notice.created',
+                            [
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_email_index',
+                                '%url%'       => $this->generateUrl(
+                                    'mautic_email_action',
+                                    [
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $entity->getId(),
+                                    ]
+                                ),
+                            ]
+                        );
 
-                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        $viewParameters = [
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId(),
-                        ];
-                        $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
-                        $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
-                    } else {
-                        // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $model, $themeHelper, $entity->getId(), true);
+                        if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
+                            $viewParameters = [
+                                'objectAction' => 'view',
+                                'objectId'     => $entity->getId(),
+                            ];
+                            $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
+                            $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
+                        } else {
+                            // return edit view so that all the session stuff is loaded
+                            return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $model, $themeHelper, $entity->getId(), true);
+                        }
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid                  = false;
+                        $this->invalidHtmlError = true;
+                        $this->addFlashMessage($e->getMessage(), [], 'error');
                     }
                 }
             } else {
@@ -602,12 +612,13 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $form->createView(),
-                    'isVariant'     => $entity->isVariant(true),
-                    'email'         => $entity,
-                    'themes'        => $themeHelper->getInstalledThemes('email', true),
-                    'updateSelect'  => $updateSelect,
-                    'permissions'   => $permissions,
+                    'form'              => $form->createView(),
+                    'isVariant'         => $entity->isVariant(true),
+                    'email'             => $entity,
+                    'themes'            => $themeHelper->getInstalledThemes('email', true),
+                    'updateSelect'      => $updateSelect,
+                    'permissions'       => $permissions,
+                    'invalidHtmlError'  => $this->invalidHtmlError,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/form.html.twig',
                 'passthroughVars' => [
@@ -710,34 +721,40 @@ class EmailController extends FormController
                     $entity->setCustomHtml($content);
 
                     // form is valid so process the data
-                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    try {
+                        $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
-                        $this->dispatcher->dispatch(new EmailEditSubmitEvent(
-                            $existingEmail,
-                            $entity,
-                            $this->getFormButton($form, ['buttons', 'save'])->isClicked(),
-                            $this->getFormButton($form, ['buttons', 'apply'])->isClicked(),
-                            $form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked(),
-                            $form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked(),
-                            $form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked()
-                        ), EmailEvents::ON_EMAIL_EDIT_SUBMIT);
+                        if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+                            $this->dispatcher->dispatch(new EmailEditSubmitEvent(
+                                $existingEmail,
+                                $entity,
+                                $this->getFormButton($form, ['buttons', 'save'])->isClicked(),
+                                $this->getFormButton($form, ['buttons', 'apply'])->isClicked(),
+                                $form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked(),
+                                $form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked(),
+                                $form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked()
+                            ), EmailEvents::ON_EMAIL_EDIT_SUBMIT);
+                        }
+
+                        $this->addFlashMessage(
+                            'mautic.core.notice.updated',
+                            [
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_email_index',
+                                '%url%'       => $this->generateUrl(
+                                    'mautic_email_action',
+                                    [
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $entity->getId(),
+                                    ]
+                                ),
+                            ]
+                        );
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid                  = false;
+                        $this->invalidHtmlError = true;
+                        $this->addFlashMessage($e->getMessage(), [], 'error');
                     }
-
-                    $this->addFlashMessage(
-                        'mautic.core.notice.updated',
-                        [
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_email_index',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_email_action',
-                                [
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId(),
-                                ]
-                            ),
-                        ]
-                    );
                 }
             } else {
                 // clear any modified content
@@ -850,6 +867,7 @@ class EmailController extends FormController
                     'attachmentSize'     => $attachmentSize,
                     'permissions'        => $permissions,
                     'draftPreviewUrl'    => $draftPreviewUrl,
+                    'invalidHtmlError'   => $this->invalidHtmlError,
                     'previewUrl'         => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $entity->getId()],
@@ -937,36 +955,42 @@ class EmailController extends FormController
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    // form is valid so process the data
-                    $model->saveEntity($entity);
+                    try {
+                        // form is valid so process the data
+                        $model->saveEntity($entity);
 
-                    $this->addFlashMessage(
-                        'mautic.core.notice.created',
-                        [
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_email_index',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_email_action',
-                                [
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId(),
-                                ]
-                            ),
-                        ],
-                        'warning'
-                    );
-                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        $viewParameters = [
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId(),
-                        ];
-                        $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
-                        $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
-                    } else {
-                        return $this->redirectToRoute('mautic_email_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]);
+                        $this->addFlashMessage(
+                            'mautic.core.notice.created',
+                            [
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_email_index',
+                                '%url%'       => $this->generateUrl(
+                                    'mautic_email_action',
+                                    [
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $entity->getId(),
+                                    ]
+                                ),
+                            ],
+                            'warning'
+                        );
+                        if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
+                            $viewParameters = [
+                                'objectAction' => 'view',
+                                'objectId'     => $entity->getId(),
+                            ];
+                            $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
+                            $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
+                        } else {
+                            return $this->redirectToRoute('mautic_email_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]);
+                        }
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid                  = false;
+                        $this->invalidHtmlError = true;
+                        $this->addFlashMessage($e->getMessage(), [], 'error');
                     }
                 }
             } else {
@@ -1006,11 +1030,12 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $form->createView(),
-                    'isVariant'     => $entity->isVariant(true),
-                    'email'         => $entity,
-                    'themes'        => $themeHelper->getInstalledThemes('email', true),
-                    'permissions'   => $permissions,
+                    'form'              => $form->createView(),
+                    'isVariant'         => $entity->isVariant(true),
+                    'email'             => $entity,
+                    'themes'            => $themeHelper->getInstalledThemes('email', true),
+                    'permissions'       => $permissions,
+                    'invalidHtmlError'  => $this->invalidHtmlError,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/form.html.twig',
                 'passthroughVars' => [
@@ -1228,7 +1253,13 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
+            // setting parent here, as the parent will be removed by the code below.
+            $parent = $entity->getVariantParent() ?? $entity;
+            \assert($parent instanceof Email);
+
             $model->convertVariant($entity);
+
+            $this->dispatcher->dispatch(new ManualWinnerEvent($parent));
 
             $flashes[] = [
                 'type'    => 'notice',

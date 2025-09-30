@@ -48,42 +48,47 @@ class CampaignController extends AbstractStandardFormController
     use EntityContactsTrait;
 
     /**
-     * @var array
+     * @var array<string, mixed>
+     */
+    protected array $campaignElements = [];
+
+    /**
+     * @var array<string, mixed>
      */
     protected $addedSources = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $campaignEvents = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $campaignSources = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $connections = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $deletedEvents = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $deletedSources = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $listFilters = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $modifiedEvents = [];
 
@@ -721,7 +726,6 @@ class CampaignController extends AbstractStandardFormController
 
         // Simulate edit
         $campaign->setCanvasSettings($canvasSettings);
-        $this->setSessionCanvasSettings($tempId, $canvasSettings);
         $tempId = $this->getCampaignSessionId($campaign, 'clone', $tempId);
 
         $campaignSources = $this->getCampaignModel()->getLeadSources($objectId);
@@ -753,47 +757,79 @@ class CampaignController extends AbstractStandardFormController
             // Add the canvas settings to the entity to be able to rebuild it
             $this->afterEntitySave($entity, $form, $action, false);
         } else {
-            $this->clearSessionComponents($this->sessionId);
             $this->sessionId = $entity->getId();
         }
     }
 
     /**
+     * This method is called before and after form is submitted.
+     *
      * @param bool $isClone
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
-        // set added/updated events
-        [$this->modifiedEvents, $this->deletedEvents, $this->campaignEvents] = $this->getSessionEvents($sessionId);
-
-        // set added/updated sources
-        [$this->addedSources, $this->deletedSources, $campaignSources]     = $this->getSessionSources($sessionId, $isClone);
-        $this->connections                                                 = $this->getSessionCanvasSettings($sessionId);
 
         if ($isPost) {
+            // fetch data from form - use all() to get array data
+            $requestData = $this->requestStack->getCurrentRequest()->request->all();
+            $campaign    = $requestData['campaign'] ?? [];
+
+            $campaignElements = $campaign['campaignElements'] ?? [];
+
+            // First load existing events to ensure we have complete data
+            if (!$isClone && $entity->getId()) {
+                $this->prepareCampaignEventsForEdit($entity, $sessionId, $isClone);
+            }
+
+            // set global elements (this may override some events with form data)
+            $this->setCampaignElements($campaignElements, $isClone);
+
             $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
-            $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources, true);
+            $this->prepareCampaignSourcesForEdit($sessionId, $this->campaignSources, true);
         } else {
             if (!$isClone) {
                 // clear out existing fields in case the form was refreshed, browser closed, etc
-                $this->clearSessionComponents($sessionId);
                 $this->modifiedEvents = $this->campaignSources = [];
 
                 if ($entity->getId()) {
                     $campaignSources = $this->getCampaignModel()->getLeadSources($entity->getId());
                     $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources);
-
-                    $this->setSessionCanvasSettings($sessionId, $entity->getCanvasSettings());
+                } else {
+                    $this->campaignElements['modifiedSources']  = [];
+                    $this->campaignElements['campaignSources']  = [];
                 }
             }
 
             $this->deletedEvents = [];
+            $this->prepareCampaignEventsForEdit($entity, $sessionId, $isClone);
 
             $form->get('sessionId')->setData($sessionId);
-
-            $this->prepareCampaignEventsForEdit($entity, $sessionId, $isClone);
+            $this->campaignElements['canvasSettings'] = $entity->getCanvasSettings();
+            $form->get('campaignElements')->setData(json_encode($this->campaignElements));
         }
+    }
+
+    /**
+     * Method to take JSON string or array of campaignElements and set all global variables.
+     *
+     * @param string|array<string, mixed> $campaignElements
+     */
+    private function setCampaignElements(string|array $campaignElements, bool $isClone = false): void
+    {
+        // sets the global campaignElements
+        if (is_string($campaignElements)) {
+            $this->campaignElements = json_decode($campaignElements, true);
+        } else {
+            $this->campaignElements = $campaignElements;
+        }
+
+        // set added/updated events - comes from global campaignElements which was set above
+        $this->setCampaignEvents();
+        // set added/updated sources - comes from global campaignElements which was set above
+        $this->setCampaignSources($isClone);
+
+        $this->connections = $this->campaignElements['canvasSettings'] ?? [];
     }
 
     /**
@@ -825,8 +861,8 @@ class CampaignController extends AbstractStandardFormController
         }
 
         if ($isClone) {
-            [$this->addedSources, $this->deletedSources, $campaignSources] = $this->getSessionSources($objectId, $isClone);
-            $this->getCampaignModel()->setLeadSources($entity, $campaignSources, []);
+            $this->setCampaignSources($isClone);
+            $this->getCampaignModel()->setLeadSources($entity, $this->campaignElements['campaignSources'], []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
             $this->getCampaignModel()->getRepository()->saveEntity($entity);
             // Set as new so that timestamps are still hydrated
@@ -849,20 +885,6 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return true;
-    }
-
-    /**
-     * Clear field and events from the session.
-     */
-    protected function clearSessionComponents($id)
-    {
-        $session = $this->getCurrentRequest()->getSession();
-        $session->remove('mautic.campaign.'.$id.'.events.modified');
-        $session->remove('mautic.campaign.'.$id.'.events.deleted');
-        $session->remove('mautic.campaign.'.$id.'.events.canvassettings');
-        $session->remove('mautic.campaign.'.$id.'.leadsources.current');
-        $session->remove('mautic.campaign.'.$id.'.leadsources.modified');
-        $session->remove('mautic.campaign.'.$id.'.leadsources.deleted');
     }
 
     /**
@@ -1000,78 +1022,50 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @return mixed[]
+     * Set events from form data.
      */
-    protected function getPostActionRedirectArguments(array $args, $action): array
+    private function setCampaignEvents(): void
     {
-        switch ($action) {
-            case 'new':
-            case 'edit':
-                if (!empty($args['entity'])) {
-                    $sessionId = $this->getCampaignSessionId($args['entity'], $action);
-                    $this->clearSessionComponents($sessionId);
-                }
-                break;
-        }
-
-        return $args;
+        $this->modifiedEvents = (array) ($this->campaignElements['modifiedEvents'] ?? []);
+        $this->deletedEvents  = (array) ($this->campaignElements['deletedEvents'] ?? []);
+        $this->campaignEvents = array_diff_key($this->modifiedEvents, array_flip($this->deletedEvents));
     }
 
     /**
-     * Get events from session.
+     * Set sources from form data.
      */
-    protected function getSessionEvents($id): array
+    private function setCampaignSources(bool $isClone = false): void
     {
-        $session = $this->getCurrentRequest()->getSession();
-
-        $modifiedEvents = $session->get('mautic.campaign.'.$id.'.events.modified', []);
-        $deletedEvents  = $session->get('mautic.campaign.'.$id.'.events.deleted', []);
-
-        $events = array_diff_key($modifiedEvents, array_flip($deletedEvents));
-
-        return [$modifiedEvents, $deletedEvents, $events];
-    }
-
-    /**
-     * Get events from session.
-     */
-    protected function getSessionSources($id, $isClone = false): array
-    {
-        $session = $this->getCurrentRequest()->getSession();
-
-        $campaignSources = $session->get('mautic.campaign.'.$id.'.leadsources.current', []);
-        $modifiedSources = $session->get('mautic.campaign.'.$id.'.leadsources.modified', []);
+        $campaignSources = (array) ($this->campaignElements['campaignSources'] ?? []);
+        $modifiedSources = (array) ($this->campaignElements['modifiedSources'] ?? []);
 
         if ($campaignSources === $modifiedSources) {
             if ($isClone) {
                 // Clone hasn't saved the sources yet so return the current list as added
-                return [$campaignSources, [], $campaignSources];
+                $this->addedSources = $this->campaignSources = $campaignSources;
             } else {
-                return [[], [], $campaignSources];
+                $this->campaignSources = $campaignSources;
             }
-        }
-
-        // Deleted sources
-        $deletedSources = [];
-        foreach ($campaignSources as $type => $sources) {
-            if (isset($modifiedSources[$type])) {
-                $deletedSources[$type] = array_diff_key($sources, $modifiedSources[$type]);
-            } else {
-                $deletedSources[$type] = $sources;
+        } else {
+            // Deleted sources
+            foreach ($campaignSources as $type => $sources) {
+                if (isset($modifiedSources[$type])) {
+                    $this->deletedSources[$type] = array_diff_key($sources, $modifiedSources[$type]);
+                } else {
+                    $this->deletedSources[$type] = $sources;
+                }
             }
-        }
 
-        // Added sources
-        $addedSources = [];
-        foreach ($modifiedSources as $type => $sources) {
-            if (isset($campaignSources[$type])) {
-                $addedSources[$type] = array_diff_key($sources, $campaignSources[$type]);
-            } else {
-                $addedSources[$type] = $sources;
+            // Added sources
+            foreach ($modifiedSources as $type => $sources) {
+                if (isset($campaignSources[$type])) {
+                    $this->addedSources[$type] = array_diff_key($sources, $campaignSources[$type]);
+                } else {
+                    $this->addedSources[$type] = $sources;
+                }
             }
+            $this->campaignSources = $modifiedSources;
         }
-
-        return [$addedSources, $deletedSources, $modifiedSources];
     }
 
     /**
@@ -1099,10 +1093,11 @@ class CampaignController extends AbstractStandardFormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'campaign'        => $entity,
-                        'sources'         => $this->getCampaignModel()->getLeadSources($entity),
-                        'showEmailStats'  => $showEmailStats,
-                        'dateRangeForm'   => $dateRangeForm->createView(),
+                        'campaign'         => $entity,
+                        'sources'          => $this->getCampaignModel()->getLeadSources($entity),
+                        'showEmailStats'   => $showEmailStats,
+                        'dateRangeForm'    => $dateRangeForm->createView(),
+                        'campaignElements' => $this->campaignElements,
                     ]
                 );
                 break;
@@ -1112,11 +1107,12 @@ class CampaignController extends AbstractStandardFormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'eventSettings'   => $this->eventCollector->getEventsArray(),
-                        'campaignEvents'  => $this->campaignEvents,
-                        'campaignSources' => $this->campaignSources,
-                        'deletedEvents'   => $this->deletedEvents,
-                        'hasEventClone'   => $session->has('mautic.campaign.events.clone.storage'),
+                        'eventSettings'    => $this->eventCollector->getEventsArray(),
+                        'campaignEvents'   => $this->campaignEvents,
+                        'campaignSources'  => $this->campaignSources,
+                        'deletedEvents'    => $this->deletedEvents,
+                        'hasEventClone'    => $session->has('mautic.campaign.events.clone.storage'),
+                        'campaignElements' => $this->campaignElements,
                     ]
                 );
                 break;
@@ -1138,8 +1134,11 @@ class CampaignController extends AbstractStandardFormController
         $existingEvents = $entity->getEvents()->toArray();
         $translator     = $this->translator;
         foreach ($existingEvents as $e) {
+            // remove deleted events from existing events
+            if (!empty($e->getDeleted())) {
+                continue;
+            }
             $event = $e->convertToArray();
-
             if ($isClone) {
                 $id          = $e->getTempId();
                 $event['id'] = $id;
@@ -1184,8 +1183,9 @@ class CampaignController extends AbstractStandardFormController
             $campaignEvents[$id] = $event;
         }
 
-        $this->modifiedEvents = $this->campaignEvents = $campaignEvents;
-        $this->getCurrentRequest()->getSession()->set('mautic.campaign.'.$objectId.'.events.modified', $campaignEvents);
+        $this->modifiedEvents                     = $this->campaignEvents                     = $campaignEvents;
+        $this->campaignElements['modifiedEvents'] = $campaignEvents;
+        $this->campaignElements['campaignEvents'] = $campaignEvents;
     }
 
     protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
@@ -1208,20 +1208,9 @@ class CampaignController extends AbstractStandardFormController
         }
 
         if (!$isPost) {
-            $session = $this->getCurrentRequest()->getSession();
-            $session->set('mautic.campaign.'.$objectId.'.leadsources.current', $campaignSources);
-            $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $campaignSources);
+            $this->campaignElements['campaignSources']  = $campaignSources;
+            $this->campaignElements['modifiedSources']  = $campaignSources;
         }
-    }
-
-    protected function setSessionCanvasSettings($sessionId, $canvasSettings)
-    {
-        $this->getCurrentRequest()->getSession()->set('mautic.campaign.'.$sessionId.'.events.canvassettings', $canvasSettings);
-    }
-
-    protected function getSessionCanvasSettings($sessionId): mixed
-    {
-        return $this->getCurrentRequest()->getSession()->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
     }
 
     /**

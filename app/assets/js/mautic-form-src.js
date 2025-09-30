@@ -1,6 +1,6 @@
 /**
  * Autocomplete library.
- * 
+ *
  * @see https://github.com/TarekRaafat/autoComplete.js/blob/master/dist/autoComplete.min.js
  * @version 10.2.8
  */
@@ -225,6 +225,13 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
             }
         };
 
+        Form.syncSliderOutputs = function(formId) {
+            const theForm = document.getElementById('mauticform_' + formId);
+            if (!theForm) return;
+            const outputs = theForm.querySelectorAll('output.mauticform-slider-value');
+            [].forEach.call(outputs, function(out) { out.textContent = ''; });
+        };
+
         Form.prepareMessengerForm = function(formId) {
             var theForm = document.getElementById('mauticform_' + formId);
 
@@ -326,7 +333,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
             Object.keys((parents[key])).forEach(function(key2) {
                 [].forEach.call(selectedValues, function (selectedValue) {
-                    
+
                     var el = document.getElementById(key2);
                     if (selectedValue) {
                         if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
@@ -770,6 +777,10 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                         }
 
                         if (response.success) {
+                            if (response.hideform) {
+                                this.fadeOut(document.getElementsByClassName('mauticform-innerform')[0]);
+                            }
+
                             if (response.successMessage) {
                                 this.setMessage(response.successMessage, 'message');
                             }
@@ -788,6 +799,17 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                         Form.customCallbackHandler(formId, 'onResponseEnd', response);
                     }
+                },
+
+                fadeOut: function(el) {
+                    el.style.opacity = 1;
+                    (function fade() {
+                        if ((el.style.opacity -= .1) < 0) {
+                            el.style.display = 'none';
+                        } else {
+                            requestAnimationFrame(fade);
+                        }
+                    })();
                 },
 
                 setMessage: function (message, type) {
@@ -811,6 +833,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     document.getElementById('mauticform_' + formId).reset();
 
                     Form.prepareShowOn(formId); // Hides conditional fields again.
+                    Form.syncSliderOutputs(formId);
                 },
 
                 disableSubmitButton: function() {

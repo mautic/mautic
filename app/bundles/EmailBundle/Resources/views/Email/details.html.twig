@@ -275,7 +275,7 @@
                               {% endif %}
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.email.stat.sent'|trans }}</span>
+                                      <span class="fw-b" data-toggle="tooltip" data-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
                                   </td>
                                   <td>{{ email.sentCount }}</td>
                               </tr>
@@ -323,7 +323,7 @@
                                 {
                                     'title': 'mautic.email.stat.sent',
                                     'value': email.getSentCount(true),
-                                    'tooltip': 'mautic.email.stat.sent.tooltip',
+                                    'tooltip': 'mautic.email.stat.sent.details',
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.getId()}),
                                     'icon': 'ri-mail-unread-line'
                                 },
