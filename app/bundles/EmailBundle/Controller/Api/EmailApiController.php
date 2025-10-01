@@ -161,7 +161,7 @@ class EmailApiController extends CommonApiController
         $post       = $request->request->all();
         $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
         $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-        $ignoreDnc  = isset($post['ignoreDnc']) ? (bool) $post['ignoreDnc'] : false;
+        $ignoreDnc  = isset($post['ignoreDnc']) ? (bool) $post['ignoreDnc'] : true;
         $response   = ['success' => false];
 
         $cleanTokens = [];
