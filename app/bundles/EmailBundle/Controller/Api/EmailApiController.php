@@ -161,7 +161,7 @@ class EmailApiController extends CommonApiController
         $post       = $request->request->all();
         $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
         $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-        $defaultIgnoreDnc = !$entity->isSegment();
+        $defaultIgnoreDnc = !$entity->isSegmentEmail();
         $ignoreDnc  = isset($post['ignoreDnc']) ? (bool) $post['ignoreDnc'] : $defaultIgnoreDnc;
         $response   = ['success' => false];
 
