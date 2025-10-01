@@ -56,6 +56,59 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         Assert::assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
     }
 
+    public function testBatchDownloadWithoutIdsReturnsError(): void
+    {
+        $this->client->request('GET', '/s/assets/batchDownload');
+
+        $response  = $this->client->getResponse();
+        $translator = static::getContainer()->get('translator');
+
+        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+
+        $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        Assert::assertArrayHasKey('message', $content);
+        Assert::assertSame(
+            $translator->trans('mautic.asset.asset.batch_download.error.no_selection', [], 'flashes'),
+            $content['message']
+        );
+        Assert::assertArrayHasKey('flashes', $content);
+    }
+
+    public function testBatchDownloadReturnsZipWithSanitizedTitles(): void
+    {
+        $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
+
+        $this->client->request('GET', '/s/assets/batchDownload', ['ids' => $ids]);
+
+        $response = $this->client->getResponse();
+
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        Assert::assertSame('application/zip', $response->headers->get('Content-Type'));
+
+        ob_start();
+        $response->sendContent();
+        $zipContent = ob_get_clean();
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_asset_batch_test_');
+        \assert(false !== $zipPath);
+        file_put_contents($zipPath, $zipContent);
+
+        $zipArchive = new \ZipArchive();
+        Assert::assertTrue(true === $zipArchive->open($zipPath));
+        Assert::assertSame(1, $zipArchive->numFiles);
+
+        $entryName     = $zipArchive->getNameIndex(0);
+        $expectedName  = 'Asset controller test. Preview action.png';
+        $entryContents = $zipArchive->getFromName($entryName);
+
+        Assert::assertSame($expectedName, $entryName);
+        Assert::assertSame($this->expectedPngContent, $entryContents);
+
+        $zipArchive->close();
+        unlink($zipPath);
+    }
+
     /**
      * Preview action should return the file content.
      */

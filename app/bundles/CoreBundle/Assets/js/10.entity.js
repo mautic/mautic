@@ -360,6 +360,20 @@ Mautic.executeBatchAction = function (action, el) {
 };
 
 /**
+ * Downloads selected entities as a single archive.
+ *
+ * @param action
+ */
+Mautic.batchAssetDownload = function (action, el) {
+    var items = Mautic.getCheckedListIds(el, true);
+
+    var queryGlue   = action.indexOf('?') >= 0 ? '&' : '?';
+    var downloadUrl = action + queryGlue + 'ids=' + encodeURIComponent(items);
+
+    Mautic.initiateFileDownload(downloadUrl);
+};
+
+/**
  * Checks that items are checked before showing confirmation
  *
  * @param container
@@ -402,3 +416,33 @@ Mautic.getCheckedListIds = function(el, stringify) {
 
     return items;
 };
+
+mQuery(document).on('click', '[data-mautic-batch-download]', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    var trigger = mQuery(this);
+    var action  = trigger.data('mautic-batch-download');
+
+    if (!action) {
+        return;
+    }
+
+    var targetSelector = trigger.data('target') || '';
+    var selectedCount  = Mautic.batchActionPrecheck(targetSelector);
+
+    if (!selectedCount) {
+        var messageKey = 'mautic.asset.asset.batch_download.error.no_selection';
+        var message    = Mautic.translate(messageKey);
+        var flash      = Mautic.addErrorFlashMessage(message);
+        Mautic.setFlashes(flash);
+
+        return;
+    }
+
+    Mautic.batchAssetDownload(action, this);
+
+    mQuery('[data-toggle="cancel-checkall"]').trigger('click');
+    trigger.blur();
+});

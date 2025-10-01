@@ -2,17 +2,21 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class AssetController extends FormController
 {
@@ -648,6 +652,224 @@ class AssetController extends FormController
                 'flashes' => $flashes,
             ])
         );
+    }
+
+    public function batchDownloadAction(Request $request, AssetModel $assetModel, CoreParametersHelper $parametersHelper): Response
+    {
+        $permissions = $this->security->isGranted([
+            'asset:assets:viewown',
+            'asset:assets:viewother',
+        ], 'RETURN_ARRAY');
+
+        if (!$permissions['asset:assets:viewown'] && !$permissions['asset:assets:viewother']) {
+            return $this->accessDenied();
+        }
+
+        $idsPayload = $request->get('ids', '');
+        if ('' === $idsPayload) {
+            return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.no_selection');
+        }
+
+        $ids = json_decode((string) $idsPayload, true);
+        if (!is_array($ids) || empty($ids)) {
+            return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.no_selection');
+        }
+
+        $downloadableAssets = [];
+
+        foreach ($ids as $id) {
+            if (!is_scalar($id)) {
+                return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.no_selection');
+            }
+
+            $asset = $assetModel->getEntity((int) $id);
+
+            if (null === $asset) {
+                return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.not_found');
+            }
+
+            if (!$this->security->hasEntityAccess(
+                'asset:assets:viewown',
+                'asset:assets:viewother',
+                $asset->getCreatedBy()
+            )) {
+                return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.permission');
+            }
+
+            if ($asset->isLocal()) {
+                $asset->setUploadDir($parametersHelper->get('upload_dir'));
+                $absolutePath = $asset->getAbsolutePath();
+
+                if (empty($absolutePath) || !is_file($absolutePath) || !is_readable($absolutePath)) {
+                    return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.unavailable');
+                }
+            }
+
+            $downloadableAssets[] = $asset;
+        }
+
+        if (0 === count($downloadableAssets)) {
+            return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.none_available');
+        }
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_asset_batch_');
+        if (false === $zipPath) {
+            return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.zip_creation');
+        }
+
+        $zipArchive = new \ZipArchive();
+        if (true !== $zipArchive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
+            @unlink($zipPath);
+
+            return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.zip_creation');
+        }
+
+        $usedNames = [];
+
+        foreach ($downloadableAssets as $asset) {
+            $filename = $this->generateBatchDownloadFilename($asset, $usedNames);
+
+            if ($asset->isRemote()) {
+                $content = @file_get_contents($asset->getFilePath());
+
+                if (false === $content || false === $zipArchive->addFromString($filename, $content)) {
+                    $zipArchive->close();
+                    @unlink($zipPath);
+
+                    return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.unavailable');
+                }
+
+                continue;
+            }
+
+            $absolutePath = $asset->getAbsolutePath();
+
+            if (empty($absolutePath) || false === $zipArchive->addFile($absolutePath, $filename)) {
+                $zipArchive->close();
+                @unlink($zipPath);
+
+                return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.unavailable');
+            }
+        }
+
+        if (true !== $zipArchive->close()) {
+            @unlink($zipPath);
+
+            return $this->createBatchDownloadErrorResponse('mautic.asset.asset.batch_download.error.zip_creation');
+        }
+
+        $downloadName = sprintf('assets-batch-%s.zip', (new \DateTimeImmutable())->format('Ymd-His'));
+
+        $response = new BinaryFileResponse($zipPath);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $downloadName);
+        $response->headers->set('Content-Type', 'application/zip');
+
+        register_shutdown_function(static function () use ($zipPath): void {
+            if (is_file($zipPath)) {
+                @unlink($zipPath);
+            }
+        });
+
+        return $response;
+    }
+
+    /**
+     * @param array<string, string|int> $messageVars
+     */
+    private function createBatchDownloadErrorResponse(string $messageKey, array $messageVars = []): JsonResponse
+    {
+        $this->addFlashMessage($messageKey, $messageVars, FlashBag::LEVEL_ERROR);
+
+        return new JsonResponse(
+            [
+                'message' => $this->translator->trans($messageKey, $messageVars, 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
+
+    /**
+     * @param array<string> $usedNames
+     */
+    private function generateBatchDownloadFilename(Asset $asset, array &$usedNames): string
+    {
+        $title = trim((string) $asset->getTitle());
+
+        if ('' === $title) {
+            $title = $asset->getAlias() ?: (string) $asset->getId();
+        }
+
+        $title = $this->normaliseFilename($title);
+
+        if ('' === $title) {
+            $title = (string) $asset->getId();
+        }
+
+        $extension = $this->resolveExtension($asset);
+        $baseName  = $title;
+
+        $index     = 1;
+        $finalName = $this->buildFilename($baseName, $extension);
+
+        while (in_array(mb_strtolower($finalName), $usedNames, true)) {
+            $candidate = sprintf('%s (%d)', $baseName, $index);
+            $finalName = $this->buildFilename($candidate, $extension);
+            ++$index;
+        }
+
+        $usedNames[] = mb_strtolower($finalName);
+
+        return $finalName;
+    }
+
+    private function normaliseFilename(string $value): string
+    {
+        $disallowedCharacters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
+        $sanitized            = str_replace($disallowedCharacters, ' ', $value);
+
+        $sanitized = preg_replace('/[[:cntrl:]]+/u', ' ', $sanitized);
+        if (null === $sanitized) {
+            $sanitized = $value;
+        }
+
+        $sanitized = preg_replace('/\s+/u', ' ', $sanitized);
+        if (null === $sanitized) {
+            $sanitized = $value;
+        }
+
+        return trim($sanitized);
+    }
+
+    private function resolveExtension(Asset $asset): string
+    {
+        $extension = (string) $asset->getExtension();
+
+        if ('' !== $extension) {
+            return $extension;
+        }
+
+        $originalName = (string) $asset->getOriginalFileName();
+
+        return $originalName ? (string) pathinfo($originalName, PATHINFO_EXTENSION) : '';
+    }
+
+    private function buildFilename(string $baseName, string $extension): string
+    {
+        $trimmedBase = rtrim($baseName, '. ');
+
+        if ('' === $extension) {
+            return $trimmedBase;
+        }
+
+        $lowerBase = mb_strtolower($trimmedBase);
+        $lowerExt  = '.'.mb_strtolower($extension);
+
+        if (str_ends_with($lowerBase, $lowerExt)) {
+            return $trimmedBase;
+        }
+
+        return sprintf('%s.%s', $trimmedBase, $extension);
     }
 
     /**
