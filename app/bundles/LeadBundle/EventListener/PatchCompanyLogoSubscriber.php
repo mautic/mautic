@@ -13,7 +13,7 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
     public const DEFAULT_VALUES = [
         'object'                  => 'company',
         'group'                   => 'core',
-        'alias'                   => 'companylogourl',
+        'alias'                   => 'companylogofilename',
         'is_required'             => false,
         'is_fixed'                => true,
         'is_visible'              => true,
@@ -24,7 +24,7 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
         'is_index'                => false,
     ];
 
-    public const LEGACY_FIELD_NAME_ALIAS = 'companylogourl';
+    public const LEGACY_FIELD_NAME_ALIAS = 'companylogofilename';
 
     public const NEW_FIELD_NAME_ALIAS = 'companylogo_filename';
 
@@ -61,8 +61,8 @@ class PatchCompanyLogoSubscriber implements EventSubscriberInterface
 
         if ($existingField) {
             $this->fieldModel->deleteEntity($existingField);
-            $this->logger->info('lead_fields entry for companylogourl deleted (url, company).');
-            $output->writeln('<info>[notice] Migration </info><info>Migration skipped: </info><comment>lead_fields</comment><info> entry for </info><comment>companylogourl</comment><info> already exists; <comment>nothing to do.</comment></info>');
+            $this->logger->info('lead_fields entry for companylogofilename deleted (url, company).');
+            $output->writeln('<info>[notice] Migration </info><info>Migration skipped: </info><comment>lead_fields</comment><info> entry for </info><comment>companylogofilename</comment><info> already exists; <comment>nothing to do.</comment></info>');
         }
 
         // Create new field
