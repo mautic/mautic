@@ -9,42 +9,41 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250923135527 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'push_notifications';
+    protected const TABLE_NAME  = 'push_notifications';
+    private const COLUMN_NAME   = 'translation_parent_id';
 
     protected function preUpAssertions(): void
     {
-        $column = 'translation_parent_id';
-        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName())->hasColumn($column), "Column {$this->prefix}push_notifications.{$column} already exists");
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName())->hasColumn(self::COLUMN_NAME), "Column {$this->prefix}push_notifications.{$column} already exists");
     }
 
     public function up(Schema $schema): void
     {
         $table = $schema->getTable($this->getPrefixedTableName());
 
-        // translation_parent_id
-        if (!$table->hasColumn('translation_parent_id')) {
-            $table->addColumn('translation_parent_id', 'integer', [
+        if (!$table->hasColumn(self::COLUMN_NAME)) {
+            $table->addColumn(self::COLUMN_NAME, 'integer', [
                 'unsigned' => true,
                 'notnull'  => false,
             ]);
 
-            $table->addIndex(['translation_parent_id'], 'IDX_MOBILE_PUSH_TRANSLATION_PARENT');
+            $table->addIndex([self::COLUMN_NAME], 'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
 
             $table->addForeignKeyConstraint(
                 $table,
-                ['translation_parent_id'],
+                [self::COLUMN_NAME],
                 ['id'],
                 ['onDelete' => 'CASCADE'],
-                'FK_MOBILE_PUSH_TRANSLATION_PARENT'
+                'FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT'
             );
         }
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_MOBILE_PUSH_TRANSLATION_PARENT');
+        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
 
-        $this->addSql('DROP INDEX IDX_MOBILE_PUSH_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
+        $this->addSql('DROP INDEX IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
 
         $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
     }
