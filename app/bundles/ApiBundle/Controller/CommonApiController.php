@@ -418,7 +418,7 @@ class CommonApiController extends FetchCommonApiController
         }
 
         if (-1 === $lastEntityIndex || $lastEntityIndex === $key) {
-            $this->doctrine->getManager()->detach($entity);
+            $this->detachEntity($entity);
         }
 
         $this->inBatchMode = false;
@@ -587,5 +587,13 @@ class CommonApiController extends FetchCommonApiController
 
             $entity->setCategory($category);
         }
+    }
+
+    /**
+     * Entity not to be detached in case of Lead Batch API.
+     */
+    protected function detachEntity(object $entity): void
+    {
+        $this->doctrine->getManager()->detach($entity);
     }
 }

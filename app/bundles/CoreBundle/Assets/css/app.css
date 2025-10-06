@@ -9992,6 +9992,32 @@ lesshat-selector { -lh-property: 0 ;
 .animation--slide-scale-in-right {
   animation: animationSlideScaleInRight var(--duration-expressive) forwards;
 }
+.animation--grow {
+  transition: transform var(--duration-expressive);
+}
+.animation--grow:hover {
+  transform: scale(1.02);
+}
+.animation--shrink {
+  transition: transform var(--duration-expressive);
+}
+.animation--shrink:hover {
+  transform: scale(0.9);
+}
+.animation--grow-in {
+  transform: scale(0);
+  transition: transform var(--duration-expressive);
+}
+.animation--grow-in.active {
+  transform: scale(1);
+}
+.animation--shrink-out {
+  transform: scale(1);
+  transition: transform var(--duration-expressive);
+}
+.animation--shrink-out.active {
+  transform: scale(0);
+}
 @keyframes animationSlideInUp {
   from {
     transform: translateY(20px);

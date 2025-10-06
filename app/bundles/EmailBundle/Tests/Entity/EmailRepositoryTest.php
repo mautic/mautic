@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailRepositoryTest extends TestCase
 {
@@ -24,6 +25,14 @@ class EmailRepositoryTest extends TestCase
 
         $this->repo = $this->configureRepository(Email::class);
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+            'mautic.email.email.searchcommand.isexpired' => 'is:expired',
+            'mautic.email.email.searchcommand.ispending' => 'is:pending',
+            default                                      => $id,
+        });
+        $this->repo->setTranslator($translator);
     }
 
     /**
@@ -272,5 +281,46 @@ class EmailRepositoryTest extends TestCase
     private function replaceQueryPrefix(string $query): string
     {
         return str_replace('{prefix}', MAUTIC_TABLE_PREFIX, $query);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesExpirationFilters(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'is:expired', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+        $method->setAccessible(true);
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        self::assertSame(
+            '(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())',
+            (string) $expr
+        );
+        self::assertSame(['par1' => true], $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'is:pending', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+        $method->setAccessible(true);
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        self::assertSame(
+            '(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())',
+            (string) $expr
+        );
+        self::assertSame(['par1' => true], $params);
+    }
+
+    public function testGetSearchCommandsContainsExpirationFilters(): void
+    {
+        $commands = $this->repo->getSearchCommands();
+        self::assertContains('mautic.email.email.searchcommand.isexpired', $commands);
+        self::assertContains('mautic.email.email.searchcommand.ispending', $commands);
     }
 }

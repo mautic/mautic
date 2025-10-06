@@ -74,7 +74,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $page->setIsPublished(true);
         $page->setTitle('Page Title');
         $page->setAlias('page-alias');
-        $page->setTemplate('Blank');
+        $page->setTemplate('blank');
         $page->setCustomHtml('Test Html'.$token);
         $this->em->persist($page);
         $this->em->flush();

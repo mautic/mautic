@@ -207,35 +207,16 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegment('Segment A', 'segment-a');
         $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
 
-        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
-            $contact = new Lead();
-            $contact->setEmail($emailAddress);
-
-            $member = new ListLead();
-            $member->setLead($contact);
-            $member->setList($segment);
-            $member->setDateAdded(new \DateTime());
-
-            $this->em->persist($member);
-            $this->em->persist($contact);
-        }
+        $this->addContactsToSegment($segment, ['contact@one.email', 'contact@two.email']);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
-            'id'         => $email->getId(),
-            'pending'    => 2,
-            'batchLimit' => 10,
-        ]);
-
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
-        $this->assertQueuedEmailCount(2);
+        $this->sendBatchEmail($email);
 
         $email = $this->getMailerMessage();
 
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
         Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
@@ -268,38 +249,18 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
-            $contact = new Lead();
-            $contact->setEmail($emailAddress);
-
-            $member = new ListLead();
-            $member->setLead($contact);
-            $member->setList($segment);
-            $member->setDateAdded(new \DateTime());
-
-            $this->em->persist($member);
-            $this->em->persist($contact);
-        }
-
+        $this->addContactsToSegment($segment, ['contact@one.email', 'contact@two.email']);
         $this->em->persist($segment);
         $this->em->persist($email);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
-            'id'         => $email->getId(),
-            'pending'    => 2,
-            'batchLimit' => 10,
-        ]);
-
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
-        $this->assertQueuedEmailCount(2);
+        $this->sendBatchEmail($email);
 
         $email = $this->getMailerMessage();
 
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
         Assert::assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame('Custom From Name', $email->getFrom()[0]->getName());
@@ -322,42 +283,27 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setFromName('{contactfield=address1}');
         $email->setReplyToAddress('custom@replyto.address');
 
-        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
-            $contact = new Lead();
-            $contact->setEmail($emailAddress);
-            $contact->setAddress1('address1 name for '.$emailAddress);
-            $contact->setAddress2('address2+'.$emailAddress);
-
-            $member = new ListLead();
-            $member->setLead($contact);
-            $member->setList($segment);
-            $member->setDateAdded(new \DateTime());
-
-            $this->em->persist($member);
-            $this->em->persist($contact);
-        }
+        $this->addContactsToSegment(
+            $segment,
+            ['contact@one.email', 'contact@two.email'],
+            function (Lead $contact, string $emailAddress) {
+                $contact->setAddress1('address1 name for '.$emailAddress);
+                $contact->setAddress2('address2+'.$emailAddress);
+            }
+        );
 
         $this->em->persist($segment);
         $this->em->persist($email);
         $this->em->flush();
 
-        $this->setCsrfHeader();
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
-            'id'         => $email->getId(),
-            'pending'    => 2,
-            'batchLimit' => 10,
-        ]);
-
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
-        $this->assertQueuedEmailCount(2);
+        $this->sendBatchEmail($email, 2, 10, true);
 
         $messages   = self::getMailerMessages();
         $messageOne = array_values(array_filter($messages, fn ($message) => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
         $messageTwo = array_values(array_filter($messages, fn ($message) => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
 
         Assert::assertSame('Subject A', $messageOne->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageOne->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageOne->getHtmlBody());
         Assert::assertSame('Dear contact@one.email', $messageOne->getTextBody());
         Assert::assertCount(1, $messageOne->getFrom());
         Assert::assertSame('address1 name for contact@one.email', $messageOne->getFrom()[0]->getName());
@@ -371,7 +317,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
 
         Assert::assertSame('Subject A', $messageTwo->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageTwo->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageTwo->getHtmlBody());
         Assert::assertSame('Dear contact@two.email', $messageTwo->getTextBody());
         Assert::assertCount(1, $messageTwo->getFrom());
         Assert::assertSame('address1 name for contact@two.email', $messageTwo->getFrom()[0]->getName());
@@ -417,6 +363,36 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
         Assert::assertEquals('Email B clone', $secondEmail->getName());
         Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+    }
+
+    public function testEmailDetailsPageShouldNotHavePendingCount(): void
+    {
+        $segment = $this->createSegment('Test Segment A', 'test-segment-a');
+        $email   = $this->createEmail('Test Email C', 'Test Email C Subject', 'list', 'blank', 'Test html', $segment);
+        $this->em->flush();
+
+        $this->client->enableProfiler();
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+
+        // checking if pending count is removed from details page ui
+        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text());
+        $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
+
+        $profile = $this->client->getProfile();
+
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $profile->getCollector('db');
+        $queries     = $dbCollector->getQueries();
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
+
+        $pendingCountQuery = array_filter(
+            $queries['default'],
+            function (array $query) use ($prefix, $segment, $email) {
+                return $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+            }
+        );
+
+        $this->assertCount(0, $pendingCountQuery);
     }
 
     public function testAbTestAction(): void
@@ -514,6 +490,51 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
     }
 
+    /**
+     * @param array<mixed> $emails
+     *
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    private function addContactsToSegment(LeadList $segment, array $emails, ?callable $contactCallback = null): void
+    {
+        foreach ($emails as $emailAddress) {
+            $contact = new Lead();
+            $contact->setEmail($emailAddress);
+
+            if ($contactCallback) {
+                $contactCallback($contact, $emailAddress);
+            }
+
+            $member = new ListLead();
+            $member->setLead($contact);
+            $member->setList($segment);
+            $member->setDateAdded(new \DateTime());
+
+            $this->em->persist($member);
+            $this->em->persist($contact);
+        }
+    }
+
+    /**
+     * Helper method to send batch email and assert common response expectations.
+     */
+    private function sendBatchEmail(Email $email, int $pending = 2, int $batchLimit = 10, bool $setCsrf = false): void
+    {
+        if ($setCsrf) {
+            $this->setCsrfHeader();
+        }
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
+            'id'         => $email->getId(),
+            'pending'    => $pending,
+            'batchLimit' => $batchLimit,
+        ]);
+
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(2);
+    }
+
     private function createSegment(string $name, string $alias): LeadList
     {
         $segment = new LeadList();
@@ -543,48 +564,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
-    }
-
-    public function testEmailDetailsPageShouldNotHavePendingCount(): void
-    {
-        // Create a segment
-        $segment = new LeadList();
-        $segment->setName('Test Segment A');
-        $segment->setPublicName('Test Segment A');
-        $segment->setAlias('test-segment-a');
-
-        // Create email template of type "list" and attach the segment to it
-        $email = new Email();
-        $email->setName('Test Email C');
-        $email->setSubject('Test Email C Subject');
-        $email->setEmailType('list');
-        $email->setCustomHtml('This is Email C custom HTML.');
-        $email->addList($segment);
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $this->client->enableProfiler();
-        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
-
-        // checking if pending count is removed from details page ui
-        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text(null, false));
-        $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
-
-        $profile = $this->client->getProfile();
-
-        /** @var DoctrineDataCollector $dbCollector */
-        $dbCollector = $profile->getCollector('db');
-        $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
-
-        $pendingCountQuery = array_filter(
-            $queries['default'],
-            fn (array $query) => $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"
-        );
-
-        $this->assertCount(0, $pendingCountQuery);
     }
 
     public function testSendEmailForImportCustomEmailTemplate(): void
@@ -751,5 +730,34 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertStringContainsString('Email subject maximum length is 190 characters', $response->getContent());
+    }
+
+    /**
+     * Test that long email name with empty subject doesn't cause server error.
+     * This addresses issue #15394 where TextOnlyDynamicContentValidator
+     * threw UnexpectedTypeException for null subject values.
+     */
+    public function testLongNameWithEmptySubjectValidation(): void
+    {
+        $longName = str_repeat('a', Email::MAX_NAME_SUBJECT_LENGTH + 1); // 191 characters
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue($longName);
+        $form['emailform[emailType]']->setValue('template');
+
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+
+        // Should return validation errors, NOT a 500 server error
+        $this->assertTrue($response->isOk() || $response->isClientError());
+        $this->assertFalse($response->isServerError(), 'Should not return 500 server error for empty subject with long name');
+
+        // Should contain validation messages for both name length and subject being required
+        $content = $response->getContent();
+        $this->assertStringContainsString('Email name maximum length is 190 characters', $content);
     }
 }

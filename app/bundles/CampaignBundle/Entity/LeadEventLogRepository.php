@@ -677,4 +677,23 @@ SQL;
 
         return $deletedRecordCount;
     }
+
+    /**
+     * @param string[] $ids
+     */
+    public function markEventLogsQueued(array $ids): void
+    {
+        if (!$ids) {
+            return;
+        }
+
+        $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder()
+            ->update($this->getTableName())
+            ->set('date_queued', 'NOW()')
+            ->where('id IN (:ids)')
+            ->setParameter('ids', $ids, ArrayParameterType::STRING)
+            ->executeStatement();
+    }
 }

@@ -1598,6 +1598,51 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "lolaslade",
+      "name": "lolcode",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2320484?v=4",
+      "profile": "https://github.com/lolaslade",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rodrigoaguilera",
+      "name": "Rodrigo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/655187?v=4",
+      "profile": "https://www.rodrigoaguilera.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "DarshBhavnani",
+      "name": "Darsh Bhavnani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/131427031?v=4",
+      "profile": "https://github.com/DarshBhavnani",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "kou",
+      "name": "Sutou Kouhei",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27350?v=4",
+      "profile": "https://www.clear-code.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "naoya-kawakatsu",
+      "name": "naoya-kawakatsu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49386563?v=4",
+      "profile": "https://github.com/naoya-kawakatsu",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

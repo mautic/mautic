@@ -1493,7 +1493,7 @@ class MailHelperTest extends TestCase
 
         $metadata = $transport->getMessage()->getMetadata();
         foreach ($this->contacts as $contact) {
-            Assert::assertSame($metadata[$contact['email']]['tokens']['{tracking_pixel}'], 'http://tracking.url');
+            Assert::assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
         }
     }
 

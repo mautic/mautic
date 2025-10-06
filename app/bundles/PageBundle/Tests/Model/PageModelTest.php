@@ -104,13 +104,13 @@ class PageModelTest extends PageTestAbstract
         $res = $cleanQueryMethod->invokeArgs($pageModel, [
             [
                 'page_title'    => 'Mautic & PHP',
-                'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum',
+                'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
                 'page_language' => 'en',
             ],
         ]);
         $this->assertEquals($res, [
             'page_title'    => 'Mautic &#38; PHP',
-            'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum',
+            'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
             'page_language' => 'en',
         ]);
     }

@@ -785,11 +785,14 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerDate;
     }
 
-    /**
-     * @param \DateTime|null $triggerDate
-     */
-    public function setTriggerDate($triggerDate): void
+    public function setTriggerDate(mixed $triggerDate = 'now'): void
     {
+        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
+            $triggerDate = new \DateTime($triggerDate['date']);
+        } elseif (is_string($triggerDate)) {
+            $triggerDate = new \DateTime($triggerDate);
+        }
+
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
     }
@@ -1090,8 +1093,14 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function setDeleted(?\DateTimeInterface $deleted): Event
+    public function setDeleted(mixed $deleted = 'now'): Event
     {
+        if (is_array($deleted) && array_key_exists('date', $deleted)) {
+            $deleted = new \DateTime($deleted['date']);
+        } elseif (is_string($deleted)) {
+            $deleted = new \DateTime($deleted);
+        }
+
         $this->isChanged('deleted', $deleted);
         $this->deleted = $deleted;
 
@@ -1119,7 +1128,7 @@ class Event implements ChannelInterface, UuidInterface
             $triggerDate = null;
         } elseif (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
             $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (!$triggerDate instanceof \DateTime) {
+        } elseif (is_string($triggerDate)) {
             $triggerDate = new \DateTime($triggerDate);
         }
 

@@ -117,6 +117,10 @@ return [
                 'path'       => '/saml/discovery',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::discoveryAction',
             ],
+            'mautic_saml_login_retry' => [
+                'path'       => '/saml/login_retry',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::samlLoginRetryAction',
+            ],
         ],
     ],
 
@@ -178,6 +182,17 @@ return [
                     '%mautic.saml_idp_entity_id%',
                 ],
                 'tag'       => 'lightsaml.trust_options_store',
+            ],
+
+            'mautic.security.saml.entity_descriptor_provider' => [
+                'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
+                'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
+                'arguments' => [
+                    '%lightsaml.own.entity_id%',
+                    'router',
+                    '%lightsaml.route.login_check%',
+                    'lightsaml.own.credential_store',
+                ],
             ],
 
             'mautic.security.saml.entity_descriptor_store' => [

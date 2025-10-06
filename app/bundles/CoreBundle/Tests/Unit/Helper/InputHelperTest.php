@@ -131,7 +131,7 @@ class InputHelperTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('urlProvider')]
-    public function testUrlSanitization(string $inputUrl, string $outputUrl, bool $ignoreFragment = false): void
+    public function testUrlSanitization(string $inputUrl, string $outputUrl, string $message, bool $ignoreFragment = false): void
     {
         $cleanedUrl = InputHelper::url($inputUrl, false, null, null, [], $ignoreFragment);
 
@@ -140,47 +140,113 @@ class InputHelperTest extends TestCase
 
     public static function urlProvider(): iterable
     {
-        // valid URL is reconstructed as expected
-        yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
+        yield [
+            'https://www.mautic.org/somewhere/something?foo=bar#abc123',
+            'https://www.mautic.org/somewhere/something?foo=bar#abc123',
+            'A valid URL is reconstructed as expected.',
+        ];
 
-        // non URL is simply cleaned
-        yield ['<img src="hello.png" />', '&#60;imgsrc=&#34;hello.png&#34;/&#62;'];
+        yield [
+            '<img src="hello.png" />',
+            '&#60;imgsrc=&#34;hello.png&#34;/&#62;',
+            'A non-URL is simply cleaned.',
+        ];
 
-        // disallowed protocol changed to default
-        yield ['foo://www.mautic.org', 'http://www.mautic.org'];
+        yield [
+            'foo://www.mautic.org',
+            'http://www.mautic.org',
+            'A disallowed protocol is changed to the default (http).',
+        ];
 
         // user and password are included
-        yield ['http://user:password@www.mautic.org', 'http://user:password@www.mautic.org'];
+        yield [
+            'http://user:password@www.mautic.org',
+            'http://user:password@www.mautic.org',
+            'User and password are included in the URL.',
+        ];
 
-        // user and password have tags stripped
         // PHP 7.3.26 changed behavior for this type of URL but in either case, the <img> tag is sanitized
         $sanitizedUrl = (\version_compare(PHP_VERSION, '7.3.26', '>=')) ?
             'http://&#60;img&#62;:&#60;img&#62;@www.mautic.org' :
             'http://:@www.mautic.org';
-        yield ['http://<img>:<img>@www.mautic.org', $sanitizedUrl];
+        yield [
+            'http://<img>:<img>@www.mautic.org',
+            $sanitizedUrl,
+            'User and password have tags stripped.',
+        ];
 
-        // host is cleaned (should have the whole url go through ::clean() because it's not recognized as a valid host
-        yield ['http://<img/src="doesnotexist.jpg">', 'http://&#60;img/src=&#34;doesnotexist.jpg&#34;&#62;'];
+        yield [
+            'http://<img/src="doesnotexist.jpg">',
+            'http://&#60;img/src=&#34;doesnotexist.jpg&#34;&#62;',
+            'Host is cleaned and tags are stripped.',
+        ];
 
-        // port is included
-        yield ['http://www.mautic.org:8080/path', 'http://www.mautic.org:8080/path'];
+        yield [
+            'http://www.mautic.org:8080/path',
+            'http://www.mautic.org:8080/path',
+            'Port is included in the URL.',
+        ];
 
-        // path has tags stripped
-        yield ['http://www.mautic.org/abc<img/src="doesnotexist.jpg">123', 'http://www.mautic.org/abc123'];
+        yield [
+            'http://www.mautic.org/abc<img/src="doesnotexist.jpg">123',
+            'http://www.mautic.org/abc123',
+            'Path has tags stripped.',
+        ];
 
-        // query keys are urlencoded
-        yield ['http://www.mautic.org?<foo>=bar', 'http://www.mautic.org?%3Cfoo%3E=bar'];
+        yield [
+            'http://www.mautic.org?<foo>=bar',
+            'http://www.mautic.org?%3Cfoo%3E=bar',
+            'Query keys are urlencoded.',
+        ];
 
-        // query is urlencoded appropriately
-        yield ['http://www.mautic.org?%3Cfoo%3E=<bar>', 'http://www.mautic.org?%3Cfoo%3E=%3Cbar%3E'];
+        yield [
+            'http://www.mautic.org?%3Cfoo%3E=<bar>',
+            'http://www.mautic.org?%3Cfoo%3E=%3Cbar%3E',
+            'Query values are urlencoded.',
+        ];
 
-        // fragment is included and cleaned
-        yield ['http://www.mautic.org#<img/src="doesnotexist.jpg">', 'http://www.mautic.org#'];
-        yield ['http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E', 'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E'];
-        yield ['http://www.mautic.org#abc<img/src="doesnotexist.jpg">123', 'http://www.mautic.org#abc123'];
+        yield [
+            'http://www.mautic.org#<img/src="doesnotexist.jpg">',
+            'http://www.mautic.org#',
+            'Fragment is cleaned and tags are stripped.',
+        ];
 
-        // fragment is not included
-        yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
+        yield [
+            'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E',
+            'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E',
+            'Fragment is cleaned and tags are stripped.',
+        ];
+
+        yield [
+            'http://www.mautic.org#abc<img/src="doesnotexist.jpg">123',
+            'http://www.mautic.org#abc123',
+            'Fragment is cleaned and tags are stripped.',
+        ];
+
+        yield [
+            'http://www.mautic.org#abc123',
+            'http://www.mautic.org',
+            'Fragment is removed when ignoreFragment is true.',
+            true,
+        ];
+
+        yield [
+            'http://example.com/?q=this%20has%20spaces',
+            'http://example.com/?q=this%20has%20spaces',
+            '%20 Spaces are not encoded to +.',
+        ];
+
+        yield [
+            'http://example.com/?q=this+has+spaces',
+            'http://example.com/?q=this%20has%20spaces',
+            '+ spaces are encoded to %20',
+        ];
+
+        yield [
+            'http://example.com/?q=this+has+spaces&foo=~bar',
+            'http://example.com/?q=this%20has%20spaces&foo=~bar',
+            'The tilde character should not be encoded',
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('filenameProvider')]

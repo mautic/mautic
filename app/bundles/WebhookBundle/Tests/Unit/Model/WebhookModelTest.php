@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Psr7\Response;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -18,12 +19,13 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Mautic\WebhookBundle\Service\WebhookService;
+use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class WebhookModelTest extends TestCase
 {
@@ -79,6 +81,7 @@ class WebhookModelTest extends TestCase
         $this->webhookQueueRepository = $this->createMock(WebhookQueueRepository::class);
         $this->httpClientMock         = $this->createMock(Client::class);
         $this->eventDispatcherMock    = $this->createMock(EventDispatcher::class);
+
         $this->model                  = $this->initModel();
     }
 
@@ -150,6 +153,9 @@ class WebhookModelTest extends TestCase
             ->willReturnCallback(function ($param) {
                 if ('queue_mode' === $param) {
                     return WebhookModel::COMMAND_PROCESS;
+                }
+                if ('webhook_retry_delay' === $param) {
+                    return 3600;
                 }
 
                 return null;
@@ -225,9 +231,9 @@ class WebhookModelTest extends TestCase
         $event->setEventType('mautic.email_on_send');
 
         $queue = new class extends WebhookQueue {
-            public function getId(): int
+            public function getId(): string
             {
-                return 1;
+                return '1';
             }
         };
         $queue->setPayload('{"payload": "some data"}');
@@ -283,6 +289,8 @@ class WebhookModelTest extends TestCase
 
         $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
 
+        $webhookRetryTime = (new \DateTimeImmutable())
+            ->format(DateTimeHelper::FORMAT_DB);
         $this->webhookQueueRepository->expects($this->once())
             ->method('getEntities')
             ->with(
@@ -295,11 +303,43 @@ class WebhookModelTest extends TestCase
                                 'value'  => 1,
                             ],
                         ],
+                        'where' => [
+                            [
+                                'expr' => 'andX',
+                                'val'  => [
+                                    [
+                                        'expr' => 'orX',
+                                        'val'  => [
+                                            [
+                                                'column' => 'w.retries',
+                                                'expr'   => 'eq',
+                                                'value'  => 0,
+                                            ],
+                                            [
+                                                'expr' => 'andX',
+                                                'val'  => [
+                                                    [
+                                                        'column' => 'w.retries',
+                                                        'expr'   => 'gt',
+                                                        'value'  => 0,
+                                                    ],
+                                                    [
+                                                        'column' => 'w.dateModified',
+                                                        'expr'   => 'lt',
+                                                        'value'  => $webhookRetryTime,
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                     'limit'         => 0,
                     'iterable_mode' => true,
                     'start'         => 0,
-                    'orderBy'       => 'w.id',
+                    'orderBy'       => 'w.retries,w.id',
                     'orderByDir'    => 'ASC',
                 ]
             );
@@ -323,17 +363,48 @@ class WebhookModelTest extends TestCase
             ->willReturn($this->webhookQueueRepository);
 
         $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
-
-        $this->webhookQueueRepository->expects($this->once())
-            ->method('getEntities')
-            ->with(
-                [
-                    'filter' => [
-                        'force' => [
+        $webhookRetryTime = (new \DateTimeImmutable())
+            ->format(DateTimeHelper::FORMAT_DB);
+        $expected = [
+            'iterable_mode' => true,
+            'orderBy'       => 'w.retries,w.id',
+            'orderByDir'    => 'ASC',
+            'filter'        => [
+                'force' => [
+                    [
+                        'column' => 'IDENTITY(w.webhook)',
+                        'expr'   => 'eq',
+                        'value'  => 1,
+                    ],
+                ],
+                'where' => [
+                    [
+                        'expr' => 'andX',
+                        'val'  => [
                             [
-                                'column' => 'IDENTITY(w.webhook)',
-                                'expr'   => 'eq',
-                                'value'  => 1,
+                                'expr' => 'orX',
+                                'val'  => [
+                                    [
+                                        'column' => 'w.retries',
+                                        'expr'   => 'eq',
+                                        'value'  => 0,
+                                    ],
+                                    [
+                                        'expr' => 'andX',
+                                        'val'  => [
+                                            [
+                                                'column' => 'w.retries',
+                                                'expr'   => 'gt',
+                                                'value'  => 0,
+                                            ],
+                                            [
+                                                'column' => 'w.dateModified',
+                                                'expr'   => 'lt',
+                                                'value'  => $webhookRetryTime,
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                             [
                                 'column' => 'w.id',
@@ -347,11 +418,12 @@ class WebhookModelTest extends TestCase
                             ],
                         ],
                     ],
-                    'iterable_mode' => true,
-                    'orderBy'       => 'w.id',
-                    'orderByDir'    => 'ASC',
-                ]
-            );
+                ],
+            ],
+        ];
+        $this->webhookQueueRepository->expects($this->once())
+            ->method('getEntities')
+            ->with($expected);
 
         $model = $this->initModel();
         $model->setMinQueueId(20);
@@ -361,17 +433,21 @@ class WebhookModelTest extends TestCase
 
     private function initModel(): WebhookModel
     {
-        $model = new WebhookModel(
+        $webhookServiceMock = $this->createMock(WebhookService::class);
+
+        // create anew webhook model instance using mocks
+        $model              = new WebhookModel(
             $this->parametersHelperMock,
             $this->serializerMock,
             $this->httpClientMock,
             $this->entityManagerMock,
             $this->createMock(CorePermissions::class),
             $this->eventDispatcherMock,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(UrlGenerator::class),
             $this->createMock(Translator::class),
             $this->userHelper,
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(Logger::class),
+            $webhookServiceMock
         );
 
         return $model;

@@ -71,7 +71,9 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        'transports' => [
+            'main' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        ],
     ],
     'messenger'            => [
         'failure_transport'  => 'failed',

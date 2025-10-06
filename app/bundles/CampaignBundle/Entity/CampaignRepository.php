@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
@@ -266,18 +267,55 @@ class CampaignRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return match ($filter->command) {
-            $this->translator->trans('mautic.project.searchcommand.name'),
-            $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
-                'campaign_id',
-                'campaign_projects_xref',
-                $this->getTableAlias(),
-                $filter->string,
-                $filter->not
-            ),
-            default => $this->addStandardSearchCommandWhereClause($q, $filter),
-        };
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
+        $unique  = $this->generateRandomParameterName();
+
+        switch ($filter->command) {
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
+                $expr = $q->expr()->and(
+                    $q->expr()->eq('c.isPublished', ":$unique"),
+                    $q->expr()->isNotNull('c.publishDown'),
+                    $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
+                    $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
+                );
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
+            case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
+                $expr = $q->expr()->and(
+                    $q->expr()->eq('c.isPublished', ":$unique"),
+                    $q->expr()->isNotNull('c.publishUp'),
+                    $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
+                    $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
+                );
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'campaign_id',
+                    'campaign_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
+        }
+
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        }
+
+        return [$expr, $parameters];
     }
 
     /**
@@ -286,6 +324,8 @@ class CampaignRepository extends CommonRepository
     public function getSearchCommands(): array
     {
         return array_merge([
+            'mautic.campaign.campaign.searchcommand.isexpired',
+            'mautic.campaign.campaign.searchcommand.ispending',
             'mautic.project.searchcommand.name',
         ], $this->getStandardSearchCommands());
     }
@@ -339,6 +379,7 @@ class CampaignRepository extends CommonRepository
                         $sq->expr()->in('e.event_id', $pendingEvents)
                     )
                 );
+            $this->updateQueryFromContactLimiter('e', $sq, $limiter, true);
 
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
@@ -616,5 +657,22 @@ class CampaignRepository extends CommonRepository
             ->getQuery();
 
         return array_unique(array_map(fn ($val): int => (int) $val, $query->getSingleColumnResult()));
+    }
+
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws Exception
+     */
+    public function getCampaignPublishAndVersionData(int $campaignId): array
+    {
+        $result = $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                'SELECT is_published, version FROM '.MAUTIC_TABLE_PREFIX.'campaigns WHERE id = ? FOR UPDATE',
+                [$campaignId],
+                [\PDO::PARAM_INT]
+            )->fetchAssociative();
+
+        return $result ?: [];
     }
 }

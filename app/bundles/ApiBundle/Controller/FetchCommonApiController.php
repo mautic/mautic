@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiInitializeEvent;
 use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -149,6 +150,16 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
         }
+
+        $event = new ApiInitializeEvent(
+            (string) $this->entityClass,
+            $this->serializerGroups,
+            $this->exclusionStrategies,
+        );
+        $this->dispatcher->dispatch($event);
+
+        $this->serializerGroups    = $event->getSerializerGroups();
+        $this->exclusionStrategies = $event->getExclusionStrategies();
     }
 
     /**
