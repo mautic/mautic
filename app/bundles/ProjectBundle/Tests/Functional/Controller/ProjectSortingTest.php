@@ -33,12 +33,18 @@ final class ProjectSortingTest extends MauticMysqlTestCase
         // When a user clicks the table header for the first time they get a DESC sort
         $this->client->request('GET', '/s/projects', ['tmpl' => 'list', 'name' => 'projects', 'orderby' => $orderBy]);
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $this->assertSame($expectedOrder, $this->getOrderedProjectsFromResponse($this->client->getResponse()->getContent()));
+        self::assertSame(
+            $expectedOrder,
+            $this->getOrderedProjectsFromResponse($this->client->getResponse()->getContent())
+        );
 
         // When they click again they get an ASC sort
         $this->client->request('GET', '/s/projects', ['tmpl' => 'list', 'name' => 'projects', 'orderby' => $orderBy]);
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $this->assertSame(array_reverse($expectedOrder), $this->getOrderedProjectsFromResponse($this->client->getResponse()->getContent()));
+        self::assertSame(
+            array_reverse($expectedOrder),
+            $this->getOrderedProjectsFromResponse($this->client->getResponse()->getContent())
+        );
     }
 
     /**
