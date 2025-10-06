@@ -20,19 +20,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class EmailOrEmailTokenListValidator extends ConstraintValidator
 {
-    private ArrayStringTransformer $transformer;
-
-    private EventDispatcherInterface $dispatcher;
-
     public function __construct(
-        EmailValidator $emailValidator,
-        CustomFieldValidator $customFieldValidator,
-        EventDispatcherInterface $dispatcher
+        private EmailValidator $emailValidator,
+        private CustomFieldValidator $customFieldValidator,
+        private EventDispatcherInterface $dispatcher,
+        private ArrayStringTransformer $transformer,
     ) {
-        $this->transformer          = new ArrayStringTransformer();
-        $this->emailValidator       = $emailValidator;
-        $this->customFieldValidator = $customFieldValidator;
-        $this->dispatcher           = $dispatcher;
     }
 
     public function validate(mixed $csv, Constraint $constraint): void

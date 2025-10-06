@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Validator;
 
+use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailOrEmailTokenValidationEvent;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -20,11 +21,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
-    /**
-     * @param mixed $value
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
-    public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult, bool $eventShouldValidate = false): void
+    public function testNoEmailsProvided(mixed $value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult, bool $eventShouldValidate = false): void
     {
         $context = new class extends ExecutionContext {
             /**
@@ -97,7 +95,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $emaiOrEmailTokenListValidator = new EmailOrEmailTokenListValidator(
             new EmailValidator($translator, $dispatcher),
             new CustomFieldValidator($fieldModel, $translator),
-            $dispatcher = $this->createMock(EventDispatcherInterface::class)
+            $dispatcher = $this->createMock(EventDispatcherInterface::class),
+            new ArrayStringTransformer()
         );
 
         if ($eventShouldValidate) {
@@ -303,13 +302,20 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         // Test that plugins can successfully validate
         yield [
             '{plugin-token=something}',
-            function () {
-                $this->fail('Field should not be fetched');
+            1,
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function () {
-                $this->fail('Plugins are allowed to validate first.');
+            function ($message, array $parameters = []): void {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => '{plugin-token=something}',
+                        '%details%' => '\'{plugin-token=something}\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                    ],
+                    $parameters
+                );
             },
-            true,
         ];
     }
 }
