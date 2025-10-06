@@ -158,12 +158,12 @@ class EmailApiController extends CommonApiController
             return $lead;
         }
 
-        $post       = $request->request->all();
-        $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-        $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+        $post             = $request->request->all();
+        $tokens           = (!empty($post['tokens'])) ? $post['tokens'] : [];
+        $assetsIds        = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
         $defaultIgnoreDnc = !$entity->isSegmentEmail();
-        $ignoreDnc  = isset($post['ignoreDnc']) ? (bool) $post['ignoreDnc'] : $defaultIgnoreDnc;
-        $response   = ['success' => false];
+        $ignoreDnc        = isset($post['ignoreDnc']) ? (bool) $post['ignoreDnc'] : $defaultIgnoreDnc;
+        $response         = ['success' => false];
 
         $cleanTokens = [];
 
