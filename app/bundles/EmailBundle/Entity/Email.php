@@ -1205,6 +1205,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
+     * Check if this is a segment email (list email type).
+     */
+    public function isSegmentEmail(): bool
+    {
+        return 'list' === $this->emailType;
+    }
+
+    /**
      * Add asset.
      *
      * @return Email

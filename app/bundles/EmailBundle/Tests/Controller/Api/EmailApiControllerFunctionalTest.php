@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -647,6 +648,128 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             [
                 'name' => 'Updated Child Email',
             ],
+        ];
+    }
+
+    /**
+     * Test sending email to DNC contact with ignoreDnc parameter.
+     */
+    #[DataProvider('ignoreDncDataProvider')]
+    public function testSendEmailToDNCLeadWithIgnoreDnc(bool $isSegmentEmail, ?bool $ignoreDncParam, bool $expectedSuccess, string $testDescription): void
+    {
+        // Create a segment if needed
+        $segment = null;
+        if ($isSegmentEmail) {
+            $segment = new LeadList();
+            $segment->setName('Test Segment');
+            $segment->setPublicName('Test Segment');
+            $segment->setAlias('test-segment');
+            $this->em->persist($segment);
+        }
+
+        // Create email
+        $email = new Email();
+        $email->setName('Test Email');
+        $email->setSubject('Test Subject');
+        $email->setCustomHtml('<h1>Test</h1>');
+        $email->setFromAddress('from@test.com');
+        $email->setFromName('Test');
+        $email->setIsPublished(true);
+        if ($segment) {
+            $email->addList($segment);
+            $email->setEmailType('list');
+        } else {
+            $email->setEmailType('template');
+        }
+        $this->em->persist($email);
+
+        // Create contact
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $this->em->persist($contact);
+
+        // Create DNC entry
+        $contactDNC = new DoNotContact();
+        $contactDNC->setLead($contact);
+        $contactDNC->setReason(DoNotContact::UNSUBSCRIBED);
+        $contactDNC->setChannel('email');
+        $contactDNC->setDateAdded(new \DateTime());
+        $this->em->persist($contactDNC);
+
+        $this->em->flush();
+
+        // Prepare request payload
+        $payload = [];
+        if (null !== $ignoreDncParam) {
+            $payload['ignoreDnc'] = $ignoreDncParam;
+        }
+
+        // Send email via API
+        $this->client->request('POST', "/api/emails/{$email->getId()}/contact/{$contact->getId()}/send", $payload);
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $testDescription.': '.$response->getContent());
+        $this->assertSame($expectedSuccess, $responseData['success'], $testDescription);
+
+        // Verify stat was created only if email was sent successfully
+        $stat = $this->em->getRepository(Stat::class)->findOneBy([
+            'email' => $email->getId(),
+            'lead'  => $contact->getId(),
+        ]);
+
+        if ($expectedSuccess) {
+            $this->assertNotNull($stat, $testDescription.': Stat should be created when email is sent');
+        } else {
+            $this->assertNull($stat, $testDescription.': Stat should NOT be created when email is not sent');
+        }
+    }
+
+    /**
+     * @return iterable<string, array{isSegmentEmail: bool, ignoreDncParam: bool|null, expectedSuccess: bool, testDescription: string}>
+     */
+    public static function ignoreDncDataProvider(): iterable
+    {
+        yield 'Segment email without ignoreDnc parameter - should NOT send (default false)' => [
+            'isSegmentEmail'   => true,
+            'ignoreDncParam'   => null,
+            'expectedSuccess'  => false,
+            'testDescription'  => 'Segment email defaults to ignoreDnc=false',
+        ];
+
+        yield 'Segment email with ignoreDnc=true - should send' => [
+            'isSegmentEmail'   => true,
+            'ignoreDncParam'   => true,
+            'expectedSuccess'  => true,
+            'testDescription'  => 'Segment email with ignoreDnc=true overrides DNC',
+        ];
+
+        yield 'Segment email with ignoreDnc=false - should NOT send' => [
+            'isSegmentEmail'   => true,
+            'ignoreDncParam'   => false,
+            'expectedSuccess'  => false,
+            'testDescription'  => 'Segment email with ignoreDnc=false respects DNC',
+        ];
+
+        yield 'Non-segment email without ignoreDnc parameter - should send (default true for backward compatibility)' => [
+            'isSegmentEmail'   => false,
+            'ignoreDncParam'   => null,
+            'expectedSuccess'  => true,
+            'testDescription'  => 'Non-segment email defaults to ignoreDnc=true',
+        ];
+
+        yield 'Non-segment email with ignoreDnc=true - should send' => [
+            'isSegmentEmail'   => false,
+            'ignoreDncParam'   => true,
+            'expectedSuccess'  => true,
+            'testDescription'  => 'Non-segment email with ignoreDnc=true overrides DNC',
+        ];
+
+        yield 'Non-segment email with ignoreDnc=false - should NOT send' => [
+            'isSegmentEmail'   => false,
+            'ignoreDncParam'   => false,
+            'expectedSuccess'  => false,
+            'testDescription'  => 'Non-segment email with ignoreDnc=false respects DNC',
         ];
     }
 }
