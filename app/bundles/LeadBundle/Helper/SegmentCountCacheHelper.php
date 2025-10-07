@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Psr\Cache\InvalidArgumentException;
 

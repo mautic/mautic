@@ -835,7 +835,7 @@ return [
             ],
             'mautic.helper.segment.count.cache' => [
                 'class'     => Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
-                'arguments' => ['mautic.helper.cache_storage'],
+                'arguments' => ['mautic.cache.provider'],
             ],
         ],
         'fixtures' => [

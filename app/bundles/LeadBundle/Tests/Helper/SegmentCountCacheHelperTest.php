@@ -11,7 +11,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\Cache\CacheItem;
 
 class SegmentCountCacheHelperTest extends TestCase
 {
