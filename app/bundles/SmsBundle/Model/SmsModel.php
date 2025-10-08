@@ -247,6 +247,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             unset($contacts[$removeMeId], $contactIds[$removeMeId]);
         }
 
+        $translatedSms = null;
         if (!empty($contacts)) {
             $messageQueue    = $options['resend_message_queue'] ?? null;
             $campaignEventId = (is_array($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1] : null;
@@ -277,9 +278,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
-                    $leadId          = $lead->getId();
-                    $stat            = $this->createStatEntry($sms, $lead, $channel, false, $listId);
+                    $leadId            = $lead->getId();
+                    [, $translatedSms] = $this->getTranslatedEntity($sms, $lead);
+                    \assert($translatedSms instanceof Sms);
 
+                    $stat            = $this->createStatEntry($translatedSms, $lead, $channel, false, $listId);
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
@@ -291,11 +294,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         continue;
                     }
 
-                    list($ignore, $sms) = $this->getTranslatedEntity($sms, $lead);
-                    \assert($sms instanceof Sms);
-
-                    $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
-                    $smsEvent->setSmsId($sms->getId());
+                    $smsEvent = new SmsSendEvent($translatedSms->getMessage(), $lead);
+                    $smsEvent->setSmsId($translatedSms->getId());
                     $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
 
                     $tokenEvent = $this->dispatcher->dispatch(
@@ -305,8 +305,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                             [
                                 'channel' => [
                                     'sms',          // Keep BC pre 2.14.1
-                                    $sms->getId(),  // Keep BC pre 2.14.1
-                                    'sms' => $sms->getId(),
+                                    $translatedSms->getId(),  // Keep BC pre 2.14.1
+                                    'sms' => $translatedSms->getId(),
                                 ],
                                 'stat'    => $stat->getTrackingHash(),
                             ]
@@ -318,8 +318,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         'sent'    => false,
                         'type'    => 'mautic.sms.sms',
                         'status'  => 'mautic.sms.timeline.status.delivered',
-                        'id'      => $sms->getId(),
-                        'name'    => $sms->getName(),
+                        'id'      => $translatedSms->getId(),
+                        'name'    => $translatedSms->getName(),
                         'content' => $tokenEvent->getContent(),
                     ];
 
@@ -345,8 +345,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($sentCount || $failedCount) {
-            $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
+        if ($translatedSms instanceof Sms || $sentCount || $failedCount) {
+            $this->getRepository()->upCount($translatedSms->getId(), 'sent', $sentCount);
             $this->getStatRepository()->saveEntities($stats);
 
             foreach ($stats as $stat) {
