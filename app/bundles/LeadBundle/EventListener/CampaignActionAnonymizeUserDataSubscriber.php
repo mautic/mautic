@@ -115,7 +115,17 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
             }
         }
 
-        return $this->companyModel->getRepository()->findBy(['id' => $companiesId]);
+        return $this->companyModel->getRepository()->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'comp.id',
+                        'expr'   => 'in',
+                        'value'  => $companiesId,
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**

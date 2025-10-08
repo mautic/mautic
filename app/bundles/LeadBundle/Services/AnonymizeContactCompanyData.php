@@ -64,44 +64,14 @@ class AnonymizeContactCompanyData
     public function setHashes(array $leadsCompanies, LeadField $field, bool $pseudonymize): array
     {
         foreach ($leadsCompanies as $key => $leadCompany) {
-            if (!method_exists($leadCompany, 'getField')) {
-                continue;
-            }
-            $leadField = false;
-            if ($leadCompany instanceof Company && 'company' === $field->getObject()) {
-                $leadField = $leadCompany->getField($field->getAlias());
-                if (false === $leadField) {
-                    $alias          = self::COMPANY_FIELDS_TO_COLUMNS[$field->getAlias()] ?? $field->getAlias();
-                    $leadFieldValue = $leadCompany->getFieldValue($alias);
-                    if (property_exists($leadCompany, $alias) && null !== $leadFieldValue) {
-                        $tempLeadField = $leadCompany->{'get'.ucfirst($alias)}();
-                        if (empty($tempLeadField)) {
-                            continue;
-                        }
-                        unset($leadField);
-                        $leadField['value'] = $tempLeadField;
-                        $leadField['type']  = $field->getType();
-                    } else {
-                        continue;
-                    }
-                }
-            }
-            if ($leadCompany instanceof Lead && 'lead' === $field->getObject()) {
-                $leadField = $leadCompany->getField($field->getAlias());
-                if (false === $leadField) {
-                    continue;
-                }
-
-                $field     = $this->fieldModel->getRepository()->find($leadField['id']);
-
-                if (null === $field) {
-                    continue;
-                }
-            }
+            $leadField = $leadCompany->getField($field->getAlias());
             if (false === $leadField) {
                 continue;
             }
-
+            $field     = $this->fieldModel->getRepository()->getEntity($leadField['id']);
+            if (null === $field) {
+                continue;
+            }
             $leadsCompanies[$key] = $this->setHash($leadCompany, $leadField, $field, $pseudonymize);
         }
 
