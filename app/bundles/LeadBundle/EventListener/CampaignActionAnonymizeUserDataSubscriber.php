@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -27,6 +28,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         private FieldModel $fieldModel,
         private CompanyModel $companyModel,
         private AnonymizeContactCompanyData $anonymizeContactCompanyData,
+        private AuditLogModel $auditLogModel,
     ) {
     }
 
@@ -59,13 +61,22 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
             return;
         }
 
-        $properties       = $event->getEvent()->getProperties();
-        $pseudonymize     = isset($properties['pseudonymize']) && (bool) $properties['pseudonymize'];
-        $leads            = $this->leadModel->getRepository()->findBy(['id' => $event->getContactIds()]);
-        $companies        = $this->getCompaniesByLeads($event->getContactIds());
-
-        $idFields                     = array_merge($properties['fieldsToAnonymize'], $properties['fieldsToDelete']);
-        $fields                       = $this->fieldModel->getRepository()->findBy(['id' => $idFields]);
+        $properties           = $event->getEvent()->getProperties();
+        $isToPseudonymize     = array_key_exists('pseudonymize', $properties) && (bool) $properties['pseudonymize'] ?? false;
+        $leadFilter           = [
+            'force' => [
+                ['column' => 'l.id', 'expr' => 'in', 'value' => $event->getContactIds()],
+            ],
+        ];
+        $leads            = $this->leadModel->getEntities($leadFilter);
+        $companies        = $this->companyModel->getCompaniesByLeads($event->getContactIds());
+        $idFields         = array_merge($properties['fieldsToAnonymize'], $properties['fieldsToDelete']);
+        $fieldFilter      = [
+            'force' => [
+                ['column' => 'f.id', 'expr' => 'in', 'value'  => $idFields],
+            ],
+        ];
+        $fields                       = $this->fieldModel->getRepository()->getEntities($fieldFilter);
         $deleteFormResultsAndAuditLog = false;
 
         foreach ($fields as $field) {
@@ -76,13 +87,13 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
             }
 
             if (in_array($field->getId(), $properties['fieldsToAnonymize'])) {
-                [$leads,$companies]           = $this->setHashFields($leads, $companies, $field, $pseudonymize);
+                [$leads,$companies]           = $this->setHashFields($leads, $companies, $field, $isToPseudonymize);
                 $deleteFormResultsAndAuditLog = true;
             }
         }
 
         if ($deleteFormResultsAndAuditLog) {
-            $this->anonymizeContactCompanyData->updateFormResults($event->getContacts(), $pseudonymize);
+            $this->anonymizeContactCompanyData->updateFormResults($event->getContacts(), $isToPseudonymize);
         }
 
         if (!empty($leads)) {
@@ -96,36 +107,8 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         $event->passAll();
 
         if ($deleteFormResultsAndAuditLog) {
-            $this->anonymizeContactCompanyData->deleteAuditLog($event->getContacts());
+            $this->auditLogModel->deleteAuditLogByLeads($event->getContactIds(), true);
         }
-    }
-
-    /**
-     * @param array<int> $leadIds
-     *
-     * @return array<Company>
-     */
-    private function getCompaniesByLeads(array $leadIds): array
-    {
-        $companiesByLead  = $this->companyModel->getRepository()->getCompaniesForContacts($leadIds);
-        $companiesId      = [];
-        foreach ($companiesByLead as $companies) {
-            foreach ($companies as $company) {
-                $companiesId[] = $company['id'];
-            }
-        }
-
-        return $this->companyModel->getRepository()->getEntities([
-            'filter' => [
-                'force' => [
-                    [
-                        'column' => 'comp.id',
-                        'expr'   => 'in',
-                        'value'  => $companiesId,
-                    ],
-                ],
-            ],
-        ]);
     }
 
     /**

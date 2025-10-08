@@ -12,9 +12,27 @@ class AnonymizeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $pureEmail = 'teste@gmail.com';
         $newDomain = 'ano.nym';
-        $newEmail  = AnonymizeHelper::anonymizeEmail($pureEmail, false, $newDomain);
+        $newEmail  = AnonymizeHelper::anonymizeEmail($pureEmail, false, 0, $newDomain);
         $this->assertNotSame($pureEmail, $newEmail);
         $this->assertStringContainsString($newDomain, $newEmail);
+    }
+
+    public function testEmailWithDomainWithLimit(): void
+    {
+        $pureEmail = 'teste@gmail.com';
+        $newDomain = 'ano.nym';
+        $newEmail  = AnonymizeHelper::anonymizeEmail($pureEmail, false, 64, $newDomain);
+        $this->assertNotSame($pureEmail, $newEmail);
+        $this->assertStringContainsString($newDomain, $newEmail);
+        $this->assertCount(64, str_split($newEmail));
+    }
+
+    public function testEmailWithNoDomainWithLimit(): void
+    {
+        $pureEmail = 'teste@gmail.com';
+        $newEmail  = AnonymizeHelper::anonymizeEmail($pureEmail, false, 64);
+        $this->assertNotSame($pureEmail, $newEmail);
+        $this->assertCount(64, str_split($newEmail));
     }
 
     public function testEmailWithoutDomain(): void
@@ -29,7 +47,7 @@ class AnonymizeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $pureEmail = 'teste';
         $newEmail  = AnonymizeHelper::anonymizeEmail($pureEmail);
-        $this->assertNull($newEmail);
+        $this->assertEmpty($newEmail);
     }
 
     public function testText(): void

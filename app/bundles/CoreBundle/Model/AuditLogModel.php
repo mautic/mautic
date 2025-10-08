@@ -2,14 +2,41 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends AbstractCommonModel<AuditLog>
  */
 class AuditLogModel extends AbstractCommonModel
 {
+    public function __construct(
+        protected EntityManagerInterface $em,
+        protected CorePermissions $security,
+        protected EventDispatcherInterface $dispatcher,
+        protected UrlGeneratorInterface $router,
+        protected Translator $translator,
+        protected UserHelper $userHelper,
+        protected LoggerInterface $logger,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected CompanyModel $companyModel,
+        protected LeadModel $leadModel,
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
+    }
+
     /**
      * @return \Mautic\CoreBundle\Entity\AuditLogRepository
      */
@@ -29,7 +56,7 @@ class AuditLogModel extends AbstractCommonModel
         $object    = $args['object'] ?? '';
         $objectId  = $args['objectId'] ?? '';
         $action    = $args['action'] ?? '';
-        $details   = $args['details'] ?? '';
+        $details   = $args['details'] ?? [];
         $ipAddress = isset($args['ipAddress']) ? ($this->coreParametersHelper->get('anonymize_ip') ? '*.*.*.*' : $args['ipAddress']) : '';
         $log       = new AuditLog();
         $log->setBundle($bundle);
@@ -69,5 +96,37 @@ class AuditLogModel extends AbstractCommonModel
     public function getLogForObject($object, $id, $afterDate = null, $limit = 10, $bundle = null)
     {
         return $this->getRepository()->getLogForObject($object, $id, $limit, $afterDate, $bundle);
+    }
+
+    public function deleteAuditLogByLeads(array $leadsId, bool $deleteCompaniesByLeads = false): void
+    {
+        $leads = $this->leadModel->getLeadsByIds($leadsId);
+        foreach ($leads as $lead) {
+            assert($lead instanceof Lead);
+            $auditLogs = $this->getRepository()->findBy(
+                [
+                    'objectId' => $lead,
+                    'bundle'   => 'lead',
+                    'object'   => 'lead',
+                ]
+            );
+            $this->getRepository()->deleteEntities($auditLogs);
+            if (!$deleteCompaniesByLeads) {
+                continue;
+            }
+            $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
+            foreach ($companyLeads as $companyLead) {
+                assert($companyLead instanceof CompanyLead);
+                $company          = $companyLead->getCompany();
+                $auditLogsCompany = $this->getRepository()->findBy(
+                    [
+                        'objectId' => $company,
+                        'bundle'   => 'lead',
+                        'object'   => 'company',
+                    ]
+                );
+                $this->getRepository()->deleteEntities($auditLogsCompany);
+            }
+        }
     }
 }

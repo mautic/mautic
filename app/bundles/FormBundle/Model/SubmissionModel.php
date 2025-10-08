@@ -45,6 +45,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Helper\AnonymizeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -1152,5 +1153,72 @@ class SubmissionModel extends CommonFormModel
         }
 
         return implode(', ', $value);
+    }
+
+    /**
+     * @param array <string,string> $dataForm
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function updateSubmissionAnonymizeByLead(int $formId, string $formAlias, Submission $submissionForm, array $dataForm): void
+    {
+        $connection = $this->em->getConnection();
+        $nameTable  = $this->getRepository()->getResultsTableName($formId, $formAlias);
+        $columns    = $connection->createSchemaManager()->listTableColumns($nameTable);
+
+        foreach ($columns as $column) {
+            // 1 = IntegerType
+            if (1 === $column->getType()->getBindingType()) {
+                continue;
+            }
+            $columnsToUpdate[] = $column->getName();
+        }
+
+        $results  = $this->getSubmissionsByForm($formId, $formAlias, $submissionForm);
+
+        $keyValueToChange = [];
+
+        foreach ($results as $resultForm) {
+            foreach ($resultForm as $key => $value) {
+                if (!in_array($key, $columnsToUpdate)) {
+                    continue;
+                }
+
+                if (array_key_exists($value, $dataForm)) {
+                    $keyValueToChange[$key] = $dataForm[$value];
+                } else {
+                    $keyValueToChange[$key] = AnonymizeHelper::anonymizeText($value);
+                }
+            }
+        }
+
+        if (empty($keyValueToChange)) {
+            return;
+        }
+
+        $connection->update(
+            $nameTable,
+            $keyValueToChange,
+            [
+                'submission_id' => $submissionForm->getId(),
+            ]
+        );
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getSubmissionsByForm(int $formId, string $formAlias, Submission $submission): array
+    {
+        $connection = $this->em->getConnection();
+        $nameTable  = $this->getRepository()->getResultsTableName($formId, $formAlias);
+
+        return $connection->createQueryBuilder()
+            ->select('*')
+            ->from($nameTable)
+            ->where('submission_id = :submissionId')
+            ->setParameter('submissionId', $submission->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
     }
 }

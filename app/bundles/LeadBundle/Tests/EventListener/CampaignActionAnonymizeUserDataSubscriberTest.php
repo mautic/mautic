@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\EventListener\CampaignActionAnonymizeUserDataSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -24,12 +25,14 @@ class CampaignActionAnonymizeUserDataSubscriberTest extends TestCase
         $fieldModelMock                                  = $this->createMock(FieldModel::class);
         $companyModelMock                                = $this->createMock(CompanyModel::class);
         $anonymizeContactCompanyDataMock                 = $this->createMock(\Mautic\LeadBundle\Services\AnonymizeContactCompanyData::class);
+        $auditLogModelMock                               = $this->createMock(AuditLogModel::class);
 
         $this->campaignActionAnonymizeUserDataSubscriber = new CampaignActionAnonymizeUserDataSubscriber(
             $leadModelMock,
             $fieldModelMock,
             $companyModelMock,
-            $anonymizeContactCompanyDataMock
+            $anonymizeContactCompanyDataMock,
+            $auditLogModelMock
         );
     }
 

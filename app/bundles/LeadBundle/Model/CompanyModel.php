@@ -937,6 +937,34 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param array<int> $leadIds
+     *
+     * @return array<Company>
+     */
+    public function getCompaniesByLeads(array $leadIds): array
+    {
+        $companiesByLead  = $this->getRepository()->getCompaniesForContacts($leadIds);
+        $companiesId      = [];
+        foreach ($companiesByLead as $companies) {
+            foreach ($companies as $company) {
+                $companiesId[] = $company['id'];
+            }
+        }
+
+        return $this->getRepository()->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'comp.id',
+                        'expr'   => 'in',
+                        'value'  => $companiesId,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * @param array $fields
      * @param array $data
      */

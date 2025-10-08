@@ -12,10 +12,14 @@ class AnonymizeHelper
     /**
      * @param string|bool|null $email
      */
-    public static function anonymizeEmail($email, bool $pseudonymized = false, string $newDomain = self::PRE_DEFINED_DOMAIN): ?string
-    {
+    public static function anonymizeEmail(
+        $email,
+        bool $pseudonymized = false,
+        int $limit = 0,
+        string $newDomain = self::PRE_DEFINED_DOMAIN,
+    ): string {
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return null;
+            return '';
         }
 
         $emailParts = explode('@', $email);
@@ -26,15 +30,45 @@ class AnonymizeHelper
             $toEncrypt = $emailParts[0];
             $newDomain = self::PRE_PSEUDONYMIZED_DOMAIN;
         }
-        $name       = hash('sha256', $toEncrypt);
 
-        return $name.'@'.$newDomain;
+        $name       = hash('sha256', $toEncrypt);
+        $email      = $name.'@'.$newDomain;
+
+        if (0 === $limit || $limit >= strlen($email)) {
+            return $email;
+        }
+
+        // if the limit is less than total characters keep going
+        // Extract the domain from the email
+        $atPosition = strrpos($email, '@'); // Find the position of '@'
+
+        if (false === $atPosition) {
+            // If the email does not have a domain, return the email as-is
+            return $email;
+        }
+
+        $domain       = substr($email, $atPosition); // Extract the domain (e.g., @gmail.com or @uol.com)
+        $domainLength = strlen($domain);
+
+        // Calculate the allowed length for the local part
+        $localPartLength = $limit - $domainLength;
+
+        // If the local part length is less than 1, it's not possible to truncate
+        if ($localPartLength < 1) {
+            return $email;
+        }
+
+        // Extract and truncate the local part
+        $localPart = substr($email, 0, $localPartLength);
+
+        // Combine the truncated local part with the domain
+        return $localPart.$domain;
     }
 
     /**
      * @param string|bool|null $text
      */
-    public static function anonymizeText($text, bool $pseudonymize = false): string
+    public static function anonymizeText($text, bool $pseudonymize = false, int $limit = 0): string
     {
         if (empty($text)) {
             $text = '';
@@ -44,6 +78,11 @@ class AnonymizeHelper
             $text = $text.time().random_int(0, 999999);
         }
 
-        return hash('sha256', $text);
+        $hash = hash('sha256', $text);
+        if (0 === $limit || $limit >= strlen($hash)) {
+            return $hash;
+        }
+
+        return substr($hash, 0, $limit);
     }
 }
