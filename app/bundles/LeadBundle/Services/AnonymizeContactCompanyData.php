@@ -105,6 +105,7 @@ class AnonymizeContactCompanyData
             if (false === $leadField) {
                 continue;
             }
+
             $leadCompany->addUpdatedField($field->getAlias(), null);
             $leadsCompanies[$key] = $leadCompany;
         }
