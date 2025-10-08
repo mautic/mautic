@@ -20,30 +20,7 @@ use Psr\Log\LoggerInterface;
 class AnonymizeContactCompanyData
 {
     public const COLUMNS_NOT_ACCEPTED = ['submission_id', 'form_id'];
-    /**
-     * @var array<string, string>
-     */
-    public const COMPANY_FIELDS_TO_COLUMNS =
-        [
-            'companyaddress1'    => 'address1',
-            'companyaddress2'    => 'address2',
-            'companycity'        => 'city',
-            'companystate'       => 'state',
-            'companyzip'         => 'zip',
-            'companycountry'     => 'country',
-            'companyphone'       => 'phone',
-            'companyfax'         => 'fax',
-            'companywebsite'     => 'website',
-            'companyemail'       => 'email',
-            'companyname'        => 'name',
-            'companydescription' => 'description',
-            'companyindustry'    => 'industry',
-            'companyemployees'   => 'employees',
-            'companyrevenue'     => 'revenue',
-            'companystatus'      => 'status',
-            'companytype'        => 'type',
-            'companyalias'       => 'alias',
-        ];
+
 
     public function __construct(
         private readonly FieldModel $fieldModel,
