@@ -17,6 +17,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         self::bootKernel();
         $this->container = static::getContainer();
         // Service id used in project convention
