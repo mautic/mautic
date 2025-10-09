@@ -62,7 +62,10 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         }
 
         $properties           = $event->getEvent()->getProperties();
-        $isToPseudonymize     = array_key_exists('pseudonymize', $properties) && (bool) $properties['pseudonymize'] ?? false;
+        $isToPseudonymize = false;
+        if(array_key_exists('pseudonymize', $properties)) {
+            $isToPseudonymize = (bool)$properties['pseudonymize'];
+        }
         $leadFilter           = [
             'force' => [
                 ['column' => 'l.id', 'expr' => 'in', 'value' => $event->getContactIds()],

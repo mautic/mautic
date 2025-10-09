@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Model;
 
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\DependencyInjection\Container;
 
 class AuditLogModelTest extends MauticMysqlTestCase
 {
-    private $container;
+    private Container $container;
     private AuditLogModel $model;
-    private $repo;
+    private AuditLogRepository $repo;
 
     protected function setUp(): void
     {

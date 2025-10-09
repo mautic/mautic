@@ -1206,7 +1206,7 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @return array<string,string>
+     * @return array<array<string,string>>
      */
     public function getSubmissionsByForm(int $formId, string $formAlias, Submission $submission): array
     {

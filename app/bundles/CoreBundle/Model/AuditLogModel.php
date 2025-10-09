@@ -98,6 +98,11 @@ class AuditLogModel extends AbstractCommonModel
         return $this->getRepository()->getLogForObject($object, $id, $limit, $afterDate, $bundle);
     }
 
+    /**
+     * @param array<int> $leadsId
+     * @param bool $deleteCompaniesByLeads
+     * @return void
+     */
     public function deleteAuditLogByLeads(array $leadsId, bool $deleteCompaniesByLeads = false): void
     {
         $leads = $this->leadModel->getLeadsByIds($leadsId);

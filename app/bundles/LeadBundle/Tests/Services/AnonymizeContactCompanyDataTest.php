@@ -2,19 +2,21 @@
 
 namespace Mautic\LeadBundle\Tests\Services;
 
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Services\AnonymizeContactCompanyData;
 use Mautic\LeadBundle\Model\FieldModel;
-use Psr\Log\LoggerInterface;
+use Mautic\LeadBundle\Services\AnonymizeContactCompanyData;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class AnonymizeContactCompanyDataTest extends TestCase
 {
+    /** @var FieldModel&MockObject */
     private FieldModel $fieldModel;
     private LoggerInterface $logger;
     private EmailModel $emailModel;
@@ -22,9 +24,9 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fieldModel     = $this->createMock(FieldModel::class);
-        $this->logger         = $this->createMock(LoggerInterface::class);
-        $this->emailModel     = $this->createMock(EmailModel::class);
+        $this->fieldModel      = $this->createMock(FieldModel::class);
+        $this->logger          = $this->createMock(LoggerInterface::class);
+        $this->emailModel      = $this->createMock(EmailModel::class);
         $this->submissionModel = $this->createMock(SubmissionModel::class);
 
         // Use the actual StatRepository class so the mocked return type matches the declared return type
@@ -39,7 +41,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testSetHashesAnonymizesEmailAndCallsAddUpdatedField(): void
     {
-        $alias = 'email';
+        $alias          = 'email';
         $leadFieldArray = [
             'id'    => 123,
             'type'  => 'email',
