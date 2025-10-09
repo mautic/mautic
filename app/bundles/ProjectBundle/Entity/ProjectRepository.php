@@ -23,16 +23,19 @@ class ProjectRepository extends CommonRepository
         return 'p';
     }
 
-    public function getEntities(array $args = [])
+    public function checkProjectNameExists(string $name, ?int $ignoredId = null): bool
     {
-        $q = $this->_em
-            ->createQueryBuilder()
-            ->select($this->getTableAlias())
-            ->from('MauticProjectBundle:Project'/** @var MODEL */, $this->getTableAlias(), $this->getTableAlias().'.id')
-            ->orderBy($this->getTableAlias().'.id');
+        $q = $this->createQueryBuilder($this->getTableAlias());
+        $q->select('1');
+        $q->where($this->getTableAlias().'.name = :name');
+        $q->setParameter('name', $name);
+        $q->setMaxResults(1);
 
-        $args['qb'] = $q;
+        if (null !== $ignoredId) {
+            $q->andWhere($q->expr()->neq($this->getTableAlias().'.id', ':ignoredId'));
+            $q->setParameter('ignoredId', $ignoredId);
+        }
 
-        return parent::getEntities($args);
+        return !empty($q->getQuery()->getResult());
     }
 }
