@@ -100,8 +100,6 @@ class AuditLogModel extends AbstractCommonModel
 
     /**
      * @param array<int> $leadsId
-     * @param bool $deleteCompaniesByLeads
-     * @return void
      */
     public function deleteAuditLogByLeads(array $leadsId, bool $deleteCompaniesByLeads = false): void
     {
