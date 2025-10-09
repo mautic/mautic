@@ -17,6 +17,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
@@ -535,35 +537,216 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(2);
     }
 
-    private function createSegment(string $name, string $alias): LeadList
+    public function testPublishPermissionOnNewEmailForAdminUser(): void
     {
-        $segment = new LeadList();
-        $segment->setName($name);
-        $segment->setAlias($alias);
-        $segment->setPublicName($name);
-        $this->em->persist($segment);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]:not([disabled="disabled"][checked])');
+        $isPublishedInput   = $crawler->filter('input[name="emailform[isPublished]"][value="1"][checked]:not([disabled="disabled"])');
+        $publishUpInput     = $crawler->filter('input[name="emailform[publishUp]"]:not([disabled="disabled"])');
+        $publishDownInput   = $crawler->filter('input[name="emailform[publishDown]"]:not([disabled="disabled"])');
+        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found, unchecked and enabled.');
+        Assert::assertCount(1, $isPublishedInput, 'The published field should be found, checked and enabled.');
+        Assert::assertCount(1, $publishUpInput, 'The publish up field should be found and enabled.');
+        Assert::assertCount(1, $publishDownInput, 'The publish down field should be found and enabled.');
 
-        return $segment;
+        $form = $crawler->selectButton('Save & Close')->form();
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[subject]']->setValue('Email publish test');
+        $form['emailform[name]']->setValue('Email publish test');
+        $form['emailform[template]']->setValue('blank');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        Assert::assertTrue($email->getIsPublished());
     }
 
     /**
-     * @param mixed[]|null $varientSetting
+     * @dataProvider createPermissionDataProvider
+     *
+     * @param string[] $permissions
      */
-    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, ?LeadList $segment = null, ?array $varientSetting = []): Email
+    public function testPublishPermissionOnCreate(array $permissions, bool $expectDisabled, bool $publishedByDefault, bool $publishAfterSave): void
     {
-        $email = new Email();
-        $email->setName($name);
-        $email->setSubject($subject);
-        $email->setEmailType($emailType);
-        $email->setTemplate($template);
-        $email->setCustomHtml($customHtml);
-        $email->setVariantSettings($varientSetting);
-        if (!empty($segment)) {
-            $email->addList($segment);
-        }
-        $this->em->persist($email);
+        // Set user to be able to create emails, but not publish them.
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', 'sales');
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        return $email;
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertResponseIsSuccessful();
+        $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
+        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
+        Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
+        Assert::assertSame($publishedByDefault, is_null($isUnpublishedInput->attr('checked')));
+
+        $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
+        Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
+        Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
+        Assert::assertSame($publishedByDefault, !is_null($isPublishedInput->attr('checked')));
+
+        $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
+        $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
+        Assert::assertSame($expectDisabled, !is_null($publishUpInput->attr('disabled')));
+        Assert::assertSame($expectDisabled, !is_null($publishDownInput->attr('disabled')));
+
+        $form = $crawler->selectButton('Save & Close')->form();
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[subject]']->setValue('Email publish test');
+        $form['emailform[name]']->setValue('Email publish test');
+        $form['emailform[template]']->setValue('blank');
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        Assert::assertSame($publishAfterSave, $email->getIsPublished());
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public static function createPermissionDataProvider(): iterable
+    {
+        yield 'user cannot publish without publish permission' => [
+            'permissions'        => ['create'],
+            'expectDisabled'     => true,
+            'publishedByDefault' => false,
+            'publishAfterSave'   => false,
+        ];
+
+        yield 'user can publish other with just publish own permission' => [
+            'permissions'        => ['create', 'publishown'],
+            'expectDisabled'     => false,
+            'publishedByDefault' => true,
+            'publishAfterSave'   => true,
+        ];
+
+        yield 'user cannot publish own with just publish other permission' => [
+            'permissions'        => ['create', 'publishother'],
+            'expectDisabled'     => true,
+            'publishedByDefault' => false,
+            'publishAfterSave'   => false,
+        ];
+    }
+
+    public function testPublishPermissionOnEditEmailForAdminUser(): void
+    {
+        $email = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
+        $this->em->flush();
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]:not([disabled="disabled"][checked])');
+        $isPublishedInput   = $crawler->filter('input[name="emailform[isPublished]"][value="1"][checked]:not([disabled="disabled"])');
+        $publishUpInput     = $crawler->filter('input[name="emailform[publishUp]"]:not([disabled="disabled"])');
+        $publishDownInput   = $crawler->filter('input[name="emailform[publishDown]"]:not([disabled="disabled"])');
+        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found, unchecked and enabled.');
+        Assert::assertCount(1, $isPublishedInput, 'The published field should be found, checked and enabled.');
+        Assert::assertCount(1, $publishUpInput, 'The publish up field should be found and enabled.');
+        Assert::assertCount(1, $publishDownInput, 'The publish down field should be found and enabled.');
+    }
+
+    /**
+     * @dataProvider editPermissionDataProvider
+     *
+     * @param string[] $permissions
+     */
+    public function testPublishPermissionOnEdit(string $owner, string $user, array $permissions, bool $expectDisabled, bool $publishAfterSave): void
+    {
+        $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
+        $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
+        $email->setCreatedBy($ownerUser);
+        $this->em->flush();
+
+        // Set user to be able to create emails, but not publish them.
+        $loggedInUser = $this->em->getRepository(User::class)->findOneBy(['username' => $user]);
+        $this->setPermission($loggedInUser->getRole(), ['email:emails' => $permissions]);
+
+        $this->loginUser($loggedInUser);
+        $this->client->setServerParameter('PHP_AUTH_USER', $loggedInUser->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        // Check that the publish button is disabled and set to unpublish for the sales user.
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
+        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
+        Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
+        Assert::assertTrue(is_null($isUnpublishedInput->attr('checked')));
+
+        $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
+        Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
+        Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
+        Assert::assertTrue(!is_null($isPublishedInput->attr('checked')));
+
+        $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
+        $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
+        Assert::assertSame($expectDisabled, !is_null($publishUpInput->attr('disabled')));
+        Assert::assertSame($expectDisabled, !is_null($publishDownInput->attr('disabled')));
+
+        $form = $crawler->selectButton('Save & Close')->form();
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[subject]']->setValue('Email publish test');
+        $form['emailform[name]']->setValue('Email publish test');
+        $form['emailform[template]']->setValue('blank');
+        $form['emailform[isPublished]']->setValue('0'); // Tries to change the email to unpublished.
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        Assert::assertSame($publishAfterSave, $email->getIsPublished());
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public static function editPermissionDataProvider(): iterable
+    {
+        yield 'user cannot publish without publish permission' => [
+            'owner'            => 'sales',
+            'user'             => 'sales',
+            'permissions'      => ['editown', 'editother'],
+            'expectDisabled'   => true,
+            'publishAfterSave' => true,
+        ];
+
+        yield 'user cannot publish other with just publish own permission' => [
+            'owner'            => 'admin',
+            'user'             => 'sales',
+            'permissions'      => ['editown', 'editother', 'publishown'],
+            'expectDisabled'   => true,
+            'publishAfterSave' => true,
+        ];
+
+        yield 'user cannot publish own with just publish other permission' => [
+            'owner'            => 'sales',
+            'user'             => 'sales',
+            'permissions'      => ['editown', 'editother', 'publishother'],
+            'expectDisabled'   => true,
+            'publishAfterSave' => true,
+        ];
+
+        yield 'user can publish own with just publish own permission' => [
+            'owner'            => 'sales',
+            'user'             => 'sales',
+            'permissions'      => ['editown', 'editother', 'publishown'],
+            'expectDisabled'   => false,
+            'publishAfterSave' => false,
+        ];
+
+        yield 'user can publish other with just publish other permission' => [
+            'owner'            => 'admin',
+            'user'             => 'sales',
+            'permissions'      => ['editown', 'editother', 'publishother'],
+            'expectDisabled'   => false,
+            'publishAfterSave' => false,
+        ];
     }
 
     public function testSendEmailForImportCustomEmailTemplate(): void
@@ -598,30 +781,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
         $this->assertNotEmpty($response['body']);
-    }
-
-    private function createDynamicContent(string $type): DynamicContent
-    {
-        $dynamicContent = new DynamicContent();
-        $dynamicContent->setName('Dynamic content');
-        $dynamicContent->setType($type);
-        $dynamicContent->setIsCampaignBased(false);
-        $dynamicContent->setSlotName('slot-name');
-        $dynamicContent->setContent('text content');
-        $dynamicContent->setFilters([
-            [
-                'glue'     => 'and',
-                'field'    => 'email',
-                'object'   => 'lead',
-                'type'     => 'email',
-                'filter'   => null,
-                'display'  => null,
-                'operator' => '!empty',
-            ],
-        ]);
-        $this->em->persist($dynamicContent);
-
-        return $dynamicContent;
     }
 
     /**
@@ -759,5 +918,71 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         // Should contain validation messages for both name length and subject being required
         $content = $response->getContent();
         $this->assertStringContainsString('Email name maximum length is 190 characters', $content);
+    }
+
+    private function createSegment(string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setAlias($alias);
+        $segment->setPublicName($name);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    /**
+     * @param mixed[]|null $varientSetting
+     */
+    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, ?LeadList $segment = null, ?array $varientSetting = []): Email
+    {
+        $email = new Email();
+        $email->setName($name);
+        $email->setSubject($subject);
+        $email->setEmailType($emailType);
+        $email->setTemplate($template);
+        $email->setCustomHtml($customHtml);
+        $email->setVariantSettings($varientSetting);
+        if (!empty($segment)) {
+            $email->addList($segment);
+        }
+        $this->em->persist($email);
+
+        return $email;
+    }
+
+    private function createDynamicContent(string $type): DynamicContent
+    {
+        $dynamicContent = new DynamicContent();
+        $dynamicContent->setName('Dynamic content');
+        $dynamicContent->setType($type);
+        $dynamicContent->setIsCampaignBased(false);
+        $dynamicContent->setSlotName('slot-name');
+        $dynamicContent->setContent('text content');
+        $dynamicContent->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ]);
+        $this->em->persist($dynamicContent);
+
+        return $dynamicContent;
+    }
+
+    /**
+     * @param array<string, string[]> $permissions
+     */
+    private function setPermission(Role $role, array $permissions): void
+    {
+        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+        $this->em->flush();
     }
 }

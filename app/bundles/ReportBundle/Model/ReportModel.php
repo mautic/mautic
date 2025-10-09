@@ -457,13 +457,12 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $now = new \DateTime();
 
             if (!isset($options['dateTo'])) {
-                $options['dateTo'] = new \DateTime();
+                $options['dateTo'] = $now;
             }
 
-            // Adjust dateTo to be end of day or to current hour if today
-            $now = new \DateTime();
-            if ($now->format('Y-m-d') == $options['dateTo']->format('Y-m-d')) {
-                $options['dateTo'] = $now;
+            // Set time to the last second of the "to date" date
+            if ($now->format('Y-m-d') === $options['dateTo']->format('Y-m-d')) {
+                $options['dateTo'] = $now->setTime(23, 59, 59);
             } else {
                 $options['dateTo']->setTime(23, 59, 59);
             }
