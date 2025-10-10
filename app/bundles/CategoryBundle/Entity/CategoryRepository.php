@@ -27,7 +27,8 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
+     * @param string $bundle
+     * @param mixed  $search
      * @param int    $limit
      * @param int    $start
      *
@@ -55,8 +56,14 @@ class CategoryRepository extends CommonRepository
           ->setParameter('bundle', $bundle);
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('c.title', ':search'))
-                ->setParameter('search', "{$search}%");
+            if (is_array($search)) {
+                $search = array_map('intval', $search);
+                $q->andWhere($q->expr()->in('c.id', ':search'))
+                    ->setParameter('search', $search);
+            } else {
+                $q->andWhere($q->expr()->like('c.title', ':search'))
+                    ->setParameter('search', "{$search}%");
+            }
         }
 
         $q->orderBy('c.title');

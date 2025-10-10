@@ -278,8 +278,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'globalcategory',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'globalcategory'),
+                    'type'     => 'globalcategory',
                 ],
             ],
             'utm_campaign' => [

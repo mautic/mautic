@@ -4,10 +4,12 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/**
+ * @template T of VariantEntityInterface
+ */
 trait VariantEntityTrait
 {
     /**
@@ -17,7 +19,11 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var mixed
+     * @var VariantEntityInterface|null
+     *
+     * @phpstan-var T|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      **/
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
@@ -88,9 +94,6 @@ trait VariantEntityTrait
         return $this->variantChildren;
     }
 
-    /**
-     * Set variantParent.
-     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {
         if (method_exists($this, 'isChanged')) {
@@ -102,9 +105,6 @@ trait VariantEntityTrait
         return $this;
     }
 
-    /**
-     * Get variantParent.
-     */
     public function getVariantParent(): ?VariantEntityInterface
     {
         return $this->variantParent;

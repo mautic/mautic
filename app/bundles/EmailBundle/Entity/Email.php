@@ -61,6 +61,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+/**
+ * @use VariantEntityTrait<Email>
+ * @use TranslationEntityTrait<Email>
+ */
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use VariantEntityTrait;
