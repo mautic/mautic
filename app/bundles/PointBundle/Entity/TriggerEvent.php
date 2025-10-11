@@ -2,6 +2,13 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -10,25 +17,24 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "trigger_event:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "trigger_event:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('point:triggers:viewown')"),
+        new Post(security: "is_granted('point:triggers:create')"),
+        new Get(security: "is_granted('point:triggers:viewown')"),
+        new Put(security: "is_granted('point:triggers:editown')"),
+        new Patch(security: "is_granted('point:triggers:editother')"),
+        new Delete(security: "is_granted('point:triggers:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['trigger_event:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['trigger_event:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class TriggerEvent implements UuidInterface
 {
     use UuidTrait;
@@ -36,36 +42,43 @@ class TriggerEvent implements UuidInterface
     /**
      * @var int|null
      */
+    #[Groups(['trigger_event:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['trigger_event:read', 'trigger_event:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['trigger_event:read', 'trigger_event:write'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['trigger_event:read', 'trigger_event:write'])]
     private $type;
 
     /**
      * @var int
      */
+    #[Groups(['trigger_event:read', 'trigger_event:write'])]
     private $order = 0;
 
     /**
      * @var array
      */
+    #[Groups(['trigger_event:read', 'trigger_event:write'])]
     private $properties = [];
 
     /**
      * @var Trigger
      */
+    #[Groups(['trigger_event:read', 'trigger_event:write'])]
     private $trigger;
 
     /**

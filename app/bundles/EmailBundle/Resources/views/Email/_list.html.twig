@@ -21,6 +21,13 @@
                     'class'      : 'visible-md visible-lg col-email-category',
                 }) -}}
 
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'email',
+                    'orderBy'    : 'e.template',
+                    'text'       : 'mautic.core.form.theme',
+                    'class'      : 'visible-md visible-lg col-email-template',
+                }) -}}
+
                 <th class="visible-sm visible-md visible-lg col-email-stats">{{ 'mautic.core.stats'|trans }}</th>
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
@@ -154,6 +161,13 @@
                     </td>
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% if item.getTemplate() %}
+                            {{ getThemeName(item.getTemplate()) }}
+                        {% else %}
+                            <span class="text-muted">{{ 'mautic.core.form.default'|trans }}</span>
+                        {% endif %}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}

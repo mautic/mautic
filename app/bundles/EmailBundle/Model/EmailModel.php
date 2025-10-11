@@ -671,7 +671,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $this->translator->trans('mautic.email.sent'),
                 $this->translator->trans('mautic.email.read'),
                 $this->translator->trans('mautic.email.failed'),
-                $this->translator->trans('mautic.email.clicked'),
+                $this->translator->trans('mautic.email.unique_clicked'),
                 $this->translator->trans('mautic.email.unsubscribed'),
                 $this->translator->trans('mautic.email.bounced'),
             ]
@@ -886,7 +886,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         );
 
         $chart->setDataset(
-            $this->translator->trans('mautic.email.clicked'),
+            $this->translator->trans('mautic.email.unique_clicked'),
             $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
@@ -2126,6 +2126,35 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         return $results;
+    }
+
+    /**
+     * @param string|array<string> $filter
+     * @param array<string,mixed>  $options
+     *
+     * @return array<string,array<string,string>>
+     */
+    public function getLookupResultsWithIdName(
+        string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = [],
+    ): array {
+        $results    = $this->getLookupResults($type, $filter, $limit, $start, $options);
+        $newResults = [];
+
+        foreach ($results as $language => $emails) {
+            if (!isset($options['name_is_key']) || empty($options['name_is_key'])) {
+                foreach ($emails as $name => $id) {
+                    $newResults[$language][$name] = sprintf('%s (%s)', $id, $name);
+                }
+            } else {
+                foreach ($emails as $id => $name) {
+                    $newResults[$language][$id] = sprintf('%s (%s)', $name, $id);
+                }
+            }
+        }
+        // sort by language
+        ksort($newResults);
+
+        return $newResults;
     }
 
     /**

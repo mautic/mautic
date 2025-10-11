@@ -63,6 +63,16 @@
     }
 ] %}
 
+{# Translation tags #}
+{% set tags = tags
+    |merge(sms.isTranslation and not sms.isTranslation(true)
+    ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+    : [])
+    |merge(sms.isTranslation(true)
+    ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
+    : [])
+%}
+
 {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
 
@@ -71,11 +81,21 @@
     {% set smsType = 'template' %}
 {% endif %}
 
+{% set translationContent = include('@MauticCore/Translation/index.html.twig',
+    {
+        'activeEntity'      : sms,
+        'translations'      : translations,
+        'model'             : 'sms',
+        'actionRoute'       : 'mautic_sms_action',
+    }
+) %}
+{% set showTranslations = translationContent|trim is not empty %}
+
 {% block content %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 height-auto">
+    <div class="col-md-7 col-lg-9 height-auto">
         <div>
             <!-- page detail header -->
             <!-- sms detail collapseable toggler -->
@@ -118,7 +138,7 @@
                         {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
                             {
                                 'title': 'mautic.lead.lead.contacts.sms_sent',
-                                'value': sms.getSentCount(true),
+                                'value': sms.sentCount,
                                 'link': path('mautic_contact_index', {
                                     'search': ('mautic.lead.lead.searchcommand.sms_sent'|trans) ~ ':' ~ sms.id
                                 }),
@@ -161,6 +181,14 @@
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
+
+                {% if showTranslations %}
+                    <li>
+                        <a href="#translation-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.core.translations'|trans }}
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -178,14 +206,21 @@
             <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
                 {{ contacts|raw }}
             </div>
+
+            {% if showTranslations %}
+                <div class="tab-pane bdr-w-0" id="translation-container">
+                    {{ translationContent|raw }}
+                </div>
+            {% endif %}
         </div>
         <!-- end: tab-content -->
     </div>
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-5 col-lg-3 height-auto">
         <!-- activity feed -->
+        <div class="mb-48" style="zoom: 0.8;">{{ include('@MauticSms/Sms/preview.html.twig') }}</div>
         {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
     </div>
     <!--/ right section -->

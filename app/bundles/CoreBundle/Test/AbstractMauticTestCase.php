@@ -167,6 +167,18 @@ abstract class AbstractMauticTestCase extends WebTestCase
     }
 
     /**
+     * @return string[]
+     */
+    protected function createAjaxHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ];
+    }
+
+    /**
      * @param array<mixed,mixed> $params
      */
     protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester

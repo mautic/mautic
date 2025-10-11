@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\LeadBundle\Helper\DncFormatterHelper;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -11,7 +12,6 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportDNCSubscriber implements EventSubscriberInterface
 {
@@ -20,9 +20,9 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
         private CompanyReportData $companyReportData,
-        private TranslatorInterface $translator,
         private RouterInterface $router,
         private ChannelListHelper $channelListHelper,
+        private DncFormatterHelper $dncFormatter,
     ) {
     }
 
@@ -52,7 +52,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
             'dnc.reason' => [
                 'label' => 'mautic.lead.report.dnc_reason',
                 'type'  => 'select',
-                'list'  => $this->getDncReasons(),
+                'list'  => $this->dncFormatter->getDncReasons(),
             ],
             'dnc.comments' => [
                 'label' => 'mautic.lead.report.dnc_comment',
@@ -124,7 +124,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         if (isset($data[0]['reason']) || isset($data[0]['channel']) || isset($data[0]['channel_id'])) {
             foreach ($data as &$row) {
                 if (isset($row['reason'])) {
-                    $row['reason'] = $this->getDncReasonLabel($row['reason']);
+                    $row['reason'] = $this->dncFormatter->getDncReasonLabel($row['reason']);
                 }
 
                 if (isset($row['channel']) && isset($row['channel_id'])) {
@@ -139,31 +139,5 @@ class ReportDNCSubscriber implements EventSubscriberInterface
 
             $event->setData($data);
         }
-    }
-
-    private function getDncReasons(): array
-    {
-        return [
-            0 => $this->translator->trans('mautic.lead.report.dnc_contactable'),
-            1 => $this->translator->trans('mautic.lead.report.dnc_unsubscribed'),
-            2 => $this->translator->trans('mautic.lead.report.dnc_bounced'),
-            3 => $this->translator->trans('mautic.lead.report.dnc_manual'),
-        ];
-    }
-
-    /**
-     * @param int $reasonId
-     *
-     * @return string
-     *
-     * @throws \UnexpectedValueException
-     */
-    private function getDncReasonLabel($reasonId)
-    {
-        if (isset($this->getDncReasons()[$reasonId])) {
-            return $this->getDncReasons()[$reasonId];
-        }
-
-        throw new \UnexpectedValueException("There is no DNC reason with ID '{$reasonId}'");
     }
 }

@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
+class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testEmailReportGraphWithMostClickedLinks(): void
     {
@@ -165,44 +166,54 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
-        // -- test report table in mautic panel
-        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+        $expectedReport = [
+            // id, name, read_count, hits, click_through_count, click_through_rate, click_to_open_rate
+            [(string) $emails[0]->getId(), 'Email 1', '2', '4', '1', '33.3%', '50.0%'],
+            [(string) $emails[1]->getId(), 'Email 2', '1', '1', '1', '33.3%', '100.0%'],
+        ];
+        $this->verifyReport($report->getId(), $expectedReport);
+        $this->verifyApiReport($report->getId(), $expectedReport);
+    }
 
-        // convert html table to php array
-        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 2);
+    public function testEmailReportWithDncStatusList(): void
+    {
+        $email = $this->createEmail('Email');
 
-        $this->assertSame([
-            // no., id, name, read_count, hits, click_through_count, click_through_rate, click_to_open_rate
-            ['1', (string) $emails[0]->getId(), 'Email 1', '2', '4', '1', '33.3%', '50.0%'],
-            ['2', (string) $emails[1]->getId(), 'Email 2', '1', '1', '1', '33.3%', '100.0%'],
-        ], $crawlerReportTable);
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+            $this->createContact('test3@example.com'),
+        ];
+        $this->em->flush();
 
-        // -- test API report data
-        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
-        $clientResponse = $this->client->getResponse();
-        $result         = json_decode($clientResponse->getContent(), true);
-        $this->assertSame([
-            [
-                'e_id'                => (string) $emails[0]->getId(),
-                'e_name'              => 'Email 1',
-                'read_count'          => '2',
-                'hits'                => '4',
-                'click_through_count' => '1',
-                'click_through_rate'  => '33.3%',
-                'click_to_open_rate'  => '50.0%',
+        $this->emulateEmailSend($email, $contacts);
+
+        $this->createDnc('email', $contacts[0], DoNotContact::UNSUBSCRIBED);
+        $this->createDnc('email', $contacts[1], DoNotContact::BOUNCED);
+
+        $report = $this->createReport(
+            source: 'email.stats',
+            columns: ['l.email', 'dnc_preferences'],
+            filters: [
+                [
+                    'column'    => 'dnc_preferences',
+                    'glue'      => 'and',
+                    'dynamic'   => null,
+                    'condition' => 'in',
+                    'value'     => [
+                        'email:'.DoNotContact::UNSUBSCRIBED,
+                        'email:'.DoNotContact::BOUNCED,
+                    ],
+                ],
             ],
-            [
-                'e_id'                => (string) $emails[1]->getId(),
-                'e_name'              => 'Email 2',
-                'read_count'          => '1',
-                'hits'                => '1',
-                'click_through_count' => '1',
-                'click_through_rate'  => '33.3%',
-                'click_to_open_rate'  => '100.0%',
-            ],
-        ], $result['data']);
+            order: [['column' => 'l.id', 'direction' => 'ASC']]
+        );
+
+        $expectedReport = [
+            ['test1@example.com', 'DNC Unsubscribed: Email'],
+            ['test2@example.com', 'DNC Bounced: Email'],
+        ];
+        $this->verifyReport($report->getId(), $expectedReport);
     }
 
     private function createContact(string $email): Lead
@@ -314,6 +325,18 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             $pageHit->setSourceId($email->getId());
             $this->em->persist($pageHit);
         }
+    }
+
+    public function createDnc(string $channel, Lead $contact, int $reason): DoNotContact
+    {
+        $dnc = new DoNotContact();
+        $dnc->setChannel($channel);
+        $dnc->setLead($contact);
+        $dnc->setReason($reason);
+        $dnc->setDateAdded(new \DateTime());
+        $this->em->persist($dnc);
+
+        return $dnc;
     }
 
     /**

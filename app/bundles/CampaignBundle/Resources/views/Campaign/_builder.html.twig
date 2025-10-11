@@ -3,11 +3,15 @@
     - campaignId
     - campaignEvents
     - campaignSources
+    - campaignElements
     - eventSettings
     - canvasSettings
 #}
 <div id="campaign-builder" class="hide builder campaign-builder live animation--slide-in-down">
-    <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
+    <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <span></span>
+    </div>
     {% include '@MauticCore/Components/uishell.html.twig' with {
         Header: {
             ariaLabel: 'mautic.campaign.builder',
@@ -93,6 +97,7 @@
      * is not an option because it does a deep transform to
      * object, whereas typecasting only does the first level.
      */
+    Mautic.campaignBuilderCampaignElements = {% if campaignElements is not empty %}{{ campaignElements|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderCanvasSettings = {% if canvasSettings is not empty %}{{ canvasSettings|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderCanvasSources = {% if campaignSources is not empty %}{{ campaignSources|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderCanvasEvents = {% if campaignEvents is not empty %}{{ campaignEvents|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};

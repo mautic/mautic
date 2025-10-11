@@ -153,10 +153,18 @@ class PublicController extends CommonFormController
                     $data['results'] = $submissionEvent->getResults();
                 }
 
-                if ('redirect' == $postAction) {
-                    $data['redirect'] = $postActionProperty;
-                } elseif (!empty($postActionProperty)) {
-                    $data['successMessage'] = [$postActionProperty];
+                switch ($postAction) {
+                    case 'redirect':
+                        $data['redirect'] = $postActionProperty;
+                        break;
+                    case 'hideform':
+                        $data['hideform'] = true;
+                        // no break
+                    default:
+                        if (!empty($postActionProperty)) {
+                            $data['successMessage'] = [$postActionProperty];
+                        }
+                        break;
                 }
 
                 if (!empty($callbackResponses)) {

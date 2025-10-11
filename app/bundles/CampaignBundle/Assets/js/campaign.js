@@ -11,6 +11,8 @@ Mautic.campaignOnLoad = function (container, response) {
     const $flashes = mQuery('#flashes');
     const $builder = mQuery('#campaign-builder');
     const isCampaignPreview = $builder.hasClass('preview');
+    Mautic.campaignBuilderPostData = [];
+    let extraData = {};
 
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
@@ -41,10 +43,49 @@ Mautic.campaignOnLoad = function (container, response) {
                     event.preventDefault();
                     mQuery(this).find('.btn-edit').first().click();
                 });
-        } else {
-            mQuery("#CampaignCanvas div.list-campaign-event").each(function () {
-                var thisId = mQuery(this).attr('id');
-                var option  = mQuery('#'+thisId+' option[value="' + mQuery(this).val() + '"]');
+
+            // adding delete option ajax for events
+            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
+                event.preventDefault();
+                mQuery('.btns-builder').find('button').prop('disabled', true);
+                extraData = {
+                    'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+                    'deletedEvents': Mautic.campaignBuilderCampaignElements.deletedEvents ? JSON.stringify(Mautic.campaignBuilderCampaignElements.deletedEvents) : '',
+                };
+                return Mautic.ajaxifyLink(this, event, extraData);
+            });
+
+            // adding delete option ajax for sources
+            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
+                event.preventDefault();
+                mQuery('.btns-builder').find('button').prop('disabled', true);
+                extraData = {
+                    'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),
+                };
+                return Mautic.ajaxifyLink(this, event, extraData);
+            });
+
+            // adding ajax model option for sources
+            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajaxmodal']").off('click.ajaxmodal');
+            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+                event.preventDefault();
+                mQuery('.btns-builder').find('button').prop('disabled', true);
+                mQuery(this).data('form-data', {
+                    'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),
+                });
+                Mautic.ajaxifyModal(this, event);
+            });
+
+            // remove handlers from event edit option and add ajax modal option for events
+            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajaxmodal']").off('click.ajaxmodal');
+            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+                event.preventDefault();
+                mQuery('.btns-builder').find('button').prop('disabled', true);
+                mQuery(this).data('form-data', {
+                    "modifiedEvents": JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+                    'deletedEvents': Mautic.campaignBuilderCampaignElements.deletedEvents ? JSON.stringify(Mautic.campaignBuilderCampaignElements.deletedEvents) : '',
+                });
+                Mautic.ajaxifyModal(this, event);
             });
         }
 
@@ -401,6 +442,11 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
     if (response.deleted) {
         Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
+        if (response.deletedEvents) {
+            const existingDeletedEvents =  mQuery.isArray(Mautic.campaignBuilderCampaignElements.deletedEvents) ? Mautic.campaignBuilderCampaignElements.deletedEvents : [];
+            Mautic.campaignBuilderCampaignElements.deletedEvents = mQuery.unique(existingDeletedEvents.concat(response.deletedEvents))
+        }
+        delete Mautic.campaignBuilderCampaignElements.modifiedEvents[response.event.id];
         delete Mautic.campaignBuilderEventPositions[domEventId];
         delete Mautic.campaignBuilderCanvasEvents[response.event.id];
     } else if (response.updateHtml) {
@@ -427,14 +473,33 @@ Mautic.campaignEventOnLoad = function (container, response) {
         //activate new stuff
         mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
-            return Mautic.ajaxifyLink(this, event);
+            mQuery('.btns-builder').find('button').prop('disabled', true);
+            const extraData = {
+                'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+            };
+            return Mautic.ajaxifyLink(this, event, extraData);
         });
 
         //initialize ajax'd modals
         mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
+            mQuery('.btns-builder').find('button').prop('disabled', true);
+            mQuery(this).data('form-data', {
+                'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+            });
 
             Mautic.ajaxifyModal(this, event);
+        });
+
+        // adding delete option ajax for events
+        mQuery(eventId + " a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
+            event.preventDefault();
+            mQuery('.btns-builder').find('button').prop('disabled', true);
+            const extraData = {
+                'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+                'deletedEvents': Mautic.campaignBuilderCampaignElements.deletedEvents ? JSON.stringify(Mautic.campaignBuilderCampaignElements.deletedEvents) : '',
+            };
+            return Mautic.ajaxifyLink(this, event, extraData);
         });
 
         mQuery(eventId).off('.eventbuttons')
@@ -466,6 +531,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
         Mautic.clearCampaignEventClone();
     }
 
+    if(response.modifiedEvents) {
+        Mautic.campaignBuilderCampaignElements.modifiedEvents = response.modifiedEvents;
+    }
+    mQuery('.btns-builder').find('button').prop('disabled', false);
     Mautic.campaignBuilderInstance.repaintEverything();
 };
 
@@ -598,13 +667,19 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         //activate new stuff
         mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
-            return Mautic.ajaxifyLink(this, event);
+            const extraData = {
+                'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),
+            };
+            return Mautic.ajaxifyLink(this, event, extraData);
         });
 
         //initialize ajax'd modals
         mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
 
+            mQuery(this).data('form-data', {
+                'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),
+            });
             Mautic.ajaxifyModal(this, event);
         });
 
@@ -646,6 +721,10 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         }
     }
 
+    if(response.modifiedSources) {
+        Mautic.campaignBuilderCampaignElements.modifiedSources = response.modifiedSources;
+    }
+    mQuery('.btns-builder').find('button').prop('disabled', false);
     Mautic.campaignBuilderInstance.repaintEverything();
 };
 
@@ -1285,7 +1364,8 @@ Mautic.closeCampaignBuilder = function() {
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="ri-loader-3-line ri-spin ri-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
-    mQuery('#builder-errors').hide('fast').text('');
+    mQuery('#builder-errors span').text('');
+    mQuery('#builder-errors').hide('fast');
 
     Mautic.updateConnections(function(err, response) {
         mQuery('body').css('overflow-y', '');
@@ -1300,6 +1380,7 @@ Mautic.closeCampaignBuilder = function() {
             }
         }
     });
+    mQuery('#campaign_campaignElements').val(JSON.stringify(Mautic.campaignBuilderCampaignElements));
 };
 
 Mautic.saveCampaignFromBuilder = function() {
@@ -1309,6 +1390,7 @@ Mautic.saveCampaignFromBuilder = function() {
     Mautic.updateConnections(function(err) {
         if (!err) {
             var applyBtn = mQuery('.btn-apply');
+            mQuery('#campaign_campaignElements').val(JSON.stringify(Mautic.campaignBuilderCampaignElements));
             Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
             applyBtn.trigger('click');
             Mautic.inBuilderSubmissionOff();
@@ -1355,6 +1437,7 @@ Mautic.updateConnections = function(callback) {
     chart.connections  = connections;
     var canvasSettings = {canvasSettings: chart};
 
+    Mautic.campaignBuilderCampaignElements.canvasSettings = chart;
     var campaignId     = mQuery('#campaignId').val();
     var query          = "action=campaign:updateConnections&campaignId=" + campaignId;
 
@@ -1374,8 +1457,21 @@ Mautic.updateConnections = function(callback) {
 };
 
 /**
+ * Cancel the campaign event form
+ */
+Mautic.cancelCampaignEvent = function(e) {
+    e.preventDefault();
+
+    const extraData = {
+        'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+    };
+    Mautic.postForm(mQuery('form[name="campaignevent"]'), function (response) {
+        Mautic.processModalContent(response, '#' + response.modalId);
+    }, extraData);
+};
+
+/**
  * Submit the campaign event form
- * @param e
  */
 Mautic.submitCampaignEvent = function(e) {
     e.preventDefault();
@@ -1388,7 +1484,7 @@ Mautic.submitCampaignEvent = function(e) {
     // Get number of running ajax
     const runningAjax = mQuery.active;
 
-    mQuery('form[name="campaignevent"]').submit();
+    Mautic.refreshModifiedEvents(mQuery('form[name="campaignevent"]'), '#CampaignEventModal');
 
     const waitForElement = function (){
         if(mQuery.active <= runningAjax){
@@ -1402,6 +1498,18 @@ Mautic.submitCampaignEvent = function(e) {
     waitForElement();
 };
 
+Mautic.refreshModifiedEvents = function(form, target) {
+    const extraData = {
+        'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
+    };
+    Mautic.postForm(form, function (response) {
+        if(response.modifiedEvents) {
+            Mautic.campaignBuilderCampaignElements.modifiedEvents = { ...Mautic.campaignBuilderCampaignElements.modifiedEvents, ...response.modifiedEvents };
+        }
+        Mautic.processModalContent(response, target);
+    }, extraData);
+};
+
 /**
  * Submit source form
  * @param e
@@ -1412,7 +1520,19 @@ Mautic.submitCampaignSource = function(e) {
     mQuery('#campaign_leadsource_droppedX').val(mQuery('#droppedX').val());
     mQuery('#campaign_leadsource_droppedY').val(mQuery('#droppedY').val());
 
-    mQuery('form[name="campaign_leadsource"]').submit();
+    Mautic.refreshModifiedSources(mQuery('form[name="campaign_leadsource"]'), '#CampaignEventModal');
+};
+
+Mautic.refreshModifiedSources = function(form, target) {
+    const extraData = {
+        'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),
+    };
+    Mautic.postForm(form, function (response) {
+        if(response.modifiedSources) {
+            Mautic.campaignBuilderCampaignElements.modifiedSources = { ...Mautic.campaignBuilderCampaignElements.modifiedSources, ...response.modifiedSources };
+        }
+        Mautic.processModalContent(response, target);
+    }, extraData);
 };
 
 /**

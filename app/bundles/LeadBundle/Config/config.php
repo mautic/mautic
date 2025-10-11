@@ -670,6 +670,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.user.model.user',
                     'mautic.lead.model.lead',
+                    'mautic.lead.report.dnc_report_service',
                 ],
             ],
             'mautic.lead.factory.device_detector_factory' => [
@@ -916,5 +917,6 @@ return [
         'contact_allow_multiple_companies'                                                      => true,
         'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
         'update_segment_contact_count_in_background'                                            => false,
+        'clear_export_files_after_days'                                                         => 7,
     ],
 ];

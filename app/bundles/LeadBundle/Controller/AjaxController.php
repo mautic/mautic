@@ -9,11 +9,13 @@ use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -112,73 +114,12 @@ class AjaxController extends CommonAjaxController
 
     public function fieldListAction(Request $request): JsonResponse
     {
-        $dataArray  = ['success' => 1];
         $filter     = InputHelper::clean($request->query->get('filter'));
         $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, null, ['_']);
+        $event      = new ListTypeaheadEvent($fieldAlias, $filter);
+        $this->dispatcher->dispatch($event);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-
-        /** @var LeadModel $contactModel */
-        $contactModel = $this->getModel('lead.lead');
-
-        /** @var CompanyModel $companyModel */
-        $companyModel = $this->getModel('lead.company');
-
-        if (empty($fieldAlias)) {
-            $dataArray['error']   = 'Alias cannot be empty';
-            $dataArray['success'] = 0;
-
-            return $this->sendJsonResponse($dataArray);
-        }
-
-        if ('owner_id' === $fieldAlias) {
-            $results = $contactModel->getLookupResults('user', $filter);
-            foreach ($results as $r) {
-                $name        = $r['firstName'].' '.$r['lastName'];
-                $dataArray[] = [
-                    'value' => $name,
-                    'id'    => $r['id'],
-                ];
-            }
-
-            return $this->sendJsonResponse($dataArray);
-        }
-
-        $field      = $fieldModel->getEntityByAlias($fieldAlias);
-        $isBehavior = empty($field);
-
-        if ($isBehavior) {
-            return $this->sendJsonResponse($dataArray);
-        }
-
-        // Selet field types that make sense to provide typeahead for.
-        $isLookup     = in_array($field->getType(), ['lookup']);
-        $shouldLookup = in_array($field->getAlias(), ['city', 'company', 'title']);
-
-        if (!$isLookup && !$shouldLookup) {
-            return $this->sendJsonResponse($dataArray);
-        }
-
-        if ($isLookup && !empty($field->getProperties()['list'])) {
-            foreach ($field->getProperties()['list'] as $predefinedValue) {
-                $dataArray[] = ['value' => $predefinedValue];
-            }
-        }
-
-        if ('company' === $field->getObject()) {
-            $results = $companyModel->getLookupResults('companyfield', [$fieldAlias, $filter]);
-            foreach ($results as $r) {
-                $dataArray[] = ['value' => $r['label']];
-            }
-        } elseif ('lead' === $field->getObject()) {
-            $results = $fieldModel->getLookupResults($fieldAlias, $filter);
-            foreach ($results as $r) {
-                $dataArray[] = ['value' => $r[$fieldAlias]];
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($event->getDataArray());
     }
 
     public function loadSegmentFilterFormAction(
@@ -357,6 +298,8 @@ class AjaxController extends CommonAjaxController
                     $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
                 } elseif ('add' === $action) {
                     $doNotContact->removeDncForContact($leadId, $channel);
+                    $this->addFlashMessage('mautic.lead.event.donotcontact_channel_contactable', ['%channel%' => $channel], FlashBag::LEVEL_SUCCESS);
+                    $dataArray['flashes'] = $this->getFlashContent();
                 }
                 $dataArray['success'] = 1;
             }
@@ -447,6 +390,8 @@ class AjaxController extends CommonAjaxController
             if ($lead) {
                 // Use lead model to trigger listeners
                 $doNotContact->removeDncForContact($lead->getId(), $channel);
+                $this->addFlashMessage('mautic.lead.event.donotcontact_channel_contactable', ['%channel%' => $channel], FlashBag::LEVEL_SUCCESS);
+                $dataArray['flashes'] = $this->getFlashContent();
             } else {
                 $emailModel->getRepository()->deleteDoNotEmailEntry($dncId);
             }

@@ -46,7 +46,6 @@ class FocusApiController extends CommonApiController
             'focusDetails',
             'categoryList',
             'publishDetails',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);

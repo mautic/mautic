@@ -148,3 +148,7 @@ class NeedsSession
     }
 }
 ```
+
+# Notes
+
+- Migration file `app/migrations/Version20230522141144.php` has been removed. If you do not use the Mautic Citrix plugin or a fork of it, you can manually drop the `plugin_citrix_events` table from the database, as it is no longer used.

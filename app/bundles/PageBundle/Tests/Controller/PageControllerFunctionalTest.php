@@ -9,6 +9,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageControllerFunctionalTest extends MauticMysqlTestCase
@@ -73,7 +74,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $page->setIsPublished(true);
         $page->setTitle('Page Title');
         $page->setAlias('page-alias');
-        $page->setTemplate('Blank');
+        $page->setTemplate('blank');
         $page->setCustomHtml('Test Html'.$token);
         $this->em->persist($page);
         $this->em->flush();
@@ -102,5 +103,32 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedPage = $this->em->find(Page::class, $page->getId());
         $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
+    }
+
+    public function testPageWithNullCustomHtmlIsUpdated(): void
+    {
+        $page = new Page();
+
+        $page->setTitle('Page A');
+        $page->setAlias('page-a');
+        $page->setTemplate('mautic_code_mode');
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        $pageId        = $page->getId();
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$pageId);
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+
+        $form['page[title]']->setValue('New Page');
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+
+        Assert::assertEquals('New Page', $this->em->find(Page::class, $pageId)->getTitle());
     }
 }
