@@ -1183,6 +1183,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setPreferenceCenter(?Page $preferenceCenter = null)
     {
+        $this->isChanged('preferenceCenter', $preferenceCenter);
         $this->preferenceCenter = $preferenceCenter;
 
         return $this;

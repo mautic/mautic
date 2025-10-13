@@ -42,7 +42,32 @@
 
 {% block publishStatus %}
     {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': notification}, with_context=false) }}
+
+    {% set tags = [] %}
+
+    {# Translation tags #}
+    {% set tags = tags
+        |merge(notification.isTranslation and not notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+        : [])
+        |merge(notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
+        : [])
+    %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
+
+
+{% set translationContent = include('@MauticCore/Translation/index.html.twig',
+    {
+        'activeEntity'      : notification,
+        'translations'      : translations,
+        'model'             : 'notifications',
+        'actionRoute'       : 'mautic_mobile_notification_action',
+    }
+) %}
+{% set showTranslations = translationContent|trim is not empty %}
 
 {% block content %}
   <!-- start: box layout -->
@@ -121,6 +146,14 @@
                           {{ 'mautic.lead.leads'|trans }}
                       </a>
                   </li>
+
+                  {% if showTranslations %}
+                      <li>
+                          <a href="#translation-container" role="tab" data-toggle="tab">
+                              {{ 'mautic.core.translations'|trans }}
+                          </a>
+                      </li>
+                  {% endif %}
               </ul>
               <!--/ tabs controls -->
           </div>
@@ -138,6 +171,12 @@
               <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
                   {{ contacts|raw }}
               </div>
+
+              {% if showTranslations %}
+                  <div class="tab-pane bdr-w-0" id="translation-container">
+                      {{ translationContent|raw }}
+                  </div>
+              {% endif %}
           </div>
           <!--/ tab-content -->
 
