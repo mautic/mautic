@@ -17,6 +17,8 @@ use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -71,10 +73,8 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param mixed $id
-     *
-     * @return Project|object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null === $id) {
             return new Project();
@@ -85,10 +85,8 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param array<mixed> $options
-     *
-     * @return mixed
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Project) {
             throw new MethodNotAllowedHttpException(['Project'], 'Entity must be of class Project()');
