@@ -265,8 +265,13 @@ final class ProjectEntityLoaderService
 
     private function getEntityLabel(string $entityType): string
     {
-        // Create the translation key
-        $translationKeyString = "mautic.{$entityType}.{$entityType}";
+        // Map entity types to their translation keys
+        $translationKeyMap = [
+            'pointtrigger' => 'mautic.point.trigger.header.index',
+        ];
+
+        // Get the translation key for this entity type
+        $translationKeyString = $translationKeyMap[$entityType] ?? "mautic.{$entityType}.{$entityType}";
 
         // Get the translation
         $translated = $this->translator->trans($translationKeyString);
