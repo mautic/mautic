@@ -143,7 +143,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettings(): array
     {
-        return $this->variantSettings;
+        return $this->variantSettings ?? [];
     }
 
     public function getVariantStartDate(): mixed
