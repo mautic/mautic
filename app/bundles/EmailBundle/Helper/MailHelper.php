@@ -1674,7 +1674,14 @@ class MailHelper
         $emailExists = $this->email && $this->email->getId();
 
         if ($emailExists) {
-            $stat->setEmail($this->entityManager->getReference(Email::class, (int) $this->email->getId()));
+            $reference = $this->entityManager->getReference(Email::class, (int) $this->email->getId());
+            if (!$reference) {
+                $this->logger->warning('Email entity with ID {emailId} does not exist in database.', [
+                    'emailId' => $this->email->getId(),
+                    'message' => $e->getMessage(),
+                ]);
+            }
+            $stat->setEmail($reference);
         }
 
         // Note if a lead

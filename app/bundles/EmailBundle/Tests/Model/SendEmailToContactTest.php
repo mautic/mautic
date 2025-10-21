@@ -403,6 +403,17 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
+        // Create a mock EntityManager that handles getReference properly
+        $entityManagerMock = $this->createMock(EntityManager::class);
+        $entityManagerMock->method('getReference')
+            ->willReturnCallback(function ($class, $id) use ($emailMock) {
+                if (Email::class === $class && 1 == $id) {
+                    return $emailMock;
+                }
+
+                return null;
+            });
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([
                 $mailer,
@@ -417,7 +428,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->createMock(PathsHelper::class),
                 $mockDispatcher,
                 new RequestStack(),
-                $this->createMock(EntityManager::class),
+                $entityManagerMock,
                 $modelFactory,
                 $this->createMock(AssetModel::class),
                 $this->createMock(TrackableModel::class),
