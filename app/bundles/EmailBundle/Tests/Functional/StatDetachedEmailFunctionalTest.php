@@ -44,5 +44,3 @@ final class StatDetachedEmailFunctionalTest extends MauticMysqlTestCase
         $this->addToAssertionCount(1);
     }
 }
-
-
