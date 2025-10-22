@@ -833,10 +833,6 @@ return [
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
             ],
-            'mautic.helper.segment.count.cache' => [
-                'class'     => Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
-                'arguments' => ['mautic.helper.cache_storage'],
-            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [
@@ -917,5 +913,6 @@ return [
         'contact_allow_multiple_companies'                                                      => true,
         'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
         'update_segment_contact_count_in_background'                                            => false,
+        'clear_export_files_after_days'                                                         => 7,
     ],
 ];

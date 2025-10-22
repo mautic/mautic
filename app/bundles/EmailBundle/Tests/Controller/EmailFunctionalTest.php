@@ -10,12 +10,15 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailFunctionalTest extends MauticMysqlTestCase
 {
+    public const SAVE_AND_CLOSE = 'Save & Close';
+
     public function testExcludedSegmentsConflicting(): void
     {
         $listOne   = $this->createLeadList('One');
@@ -33,9 +36,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $this->assertResponseOk();
-
-        $form = $crawler->selectButton('Save')
-            ->form();
+        $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
         // change lists/excludedLists and submit the form
         $form['emailform[excludedLists]']->setValue([$listOne->getId(), $listThree->getId()]); // @phpstan-ignore-line
@@ -64,8 +65,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $this->assertResponseOk();
 
-        $form = $crawler->selectButton('Save')
-            ->form();
+        $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
         /** @var ChoiceFormField $listsField */
         $listsField = $form['emailform[lists]'];
@@ -121,6 +121,57 @@ class EmailFunctionalTest extends MauticMysqlTestCase
             [$listTwo->getId()],
             [$listTwo->getId(), $listThree->getId()],
         ], $details['excludedLists']);
+    }
+
+    public function testPreferenceCenterChangeIsTrackedInAuditLog(): void
+    {
+        $preferenceCenterOne = $this->createPreferenceCenterPage('Preference Center One');
+        $preferenceCenterTwo = $this->createPreferenceCenterPage('Preference Center Two');
+        $listOne             = $this->createLeadList('One');
+
+        $this->em->flush();
+
+        $email = $this->createEmail();
+        $email->addList($listOne);
+        $email->setPreferenceCenter($preferenceCenterOne);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
+        $this->assertResponseOk();
+
+        $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
+
+        $preferenceCenterField = $form['emailform[preferenceCenter]'];
+        Assert::assertSame((string) $preferenceCenterOne->getId(), $preferenceCenterField->getValue());
+
+        $preferenceCenterField->setValue((string) $preferenceCenterTwo->getId());
+        $this->client->submit($form);
+
+        $this->assertResponseOk();
+
+        $email = $this->em->find(Email::class, $email->getId());
+
+        Assert::assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
+
+        $auditLogs = $this->em->getRepository(AuditLog::class)->findBy([
+            'bundle' => 'email',
+            'object' => 'email',
+        ]);
+        Assert::assertCount(1, $auditLogs);
+
+        /** @var AuditLog $auditLog */
+        $auditLog = reset($auditLogs);
+        Assert::assertInstanceOf(AuditLog::class, $auditLog);
+
+        $details = $auditLog->getDetails();
+        Assert::assertIsArray($details);
+        Assert::assertArrayHasKey('preferenceCenter', $details);
+        Assert::assertSame([
+            $preferenceCenterOne->getId(),
+            $preferenceCenterTwo->getId(),
+        ], $details['preferenceCenter']);
     }
 
     /**
@@ -180,6 +231,22 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
+    }
+
+    /**
+     * @throws ORMException
+     */
+    private function createPreferenceCenterPage(string $name): Page
+    {
+        $page = new Page();
+        $page->setTitle($name);
+        $page->setAlias(mb_strtolower(str_replace(' ', '-', $name)));
+        $page->setIsPreferenceCenter(true);
+        $page->setCustomHtml('<html><body>Preference Center Page</body></html>');
+        $page->setIsPublished(true);
+        $this->em->persist($page);
+
+        return $page;
     }
 
     private function assertResponseOk(): void

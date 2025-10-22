@@ -74,7 +74,6 @@ class CampaignApiController extends CommonApiController
             'publishDetails',
             'leadListList',
             'formList',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);

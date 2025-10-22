@@ -843,8 +843,13 @@ class CommonRepository extends ServiceEntityRepository
         $set        = [];
         $update     = [];
         $hasId      = $metadata->containsForeignIdentifier;
+        $fieldNames = $metadata->getFieldNames();
 
-        foreach ($metadata->getFieldNames() as $fieldName) {
+        if ($entity instanceof OptimisticLockInterface) {
+            $fieldNames = array_diff($fieldNames, [$entity->getVersionField()]);
+        }
+
+        foreach ($fieldNames as $fieldName) {
             $value = $metadata->getFieldValue($entity, $fieldName);
             if ($metadata->isIdentifier($fieldName)) {
                 if ($value) {
@@ -1485,7 +1490,8 @@ class CommonRepository extends ServiceEntityRepository
                 if (!empty($filter['where'])) {
                     // build clauses from array
                     $this->buildWhereClauseFromArray($q, $filter['where']);
-                } elseif (!empty($filter['criteria']) || !empty($filter['force'])) {
+                }
+                if (!empty($filter['criteria']) || !empty($filter['force'])) {
                     $criteria = !empty($filter['criteria']) ? $filter['criteria'] : $filter['force'];
                     if (is_array($criteria)) {
                         // defined columns with keys of column, expr, value

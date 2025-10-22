@@ -118,16 +118,19 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         // Test for random operators:
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['text']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['text']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['boolean']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['boolean']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['date']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['boolean']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['date']['include']);
         $this->assertContains(OperatorOptions::DATE, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['number']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['number']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['number']['include']);
         $this->assertContains(OperatorOptions::EMPTY, $operators['country']['include']);
-        $this->assertContains(OperatorOptions::IN, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::INCLUDING_ANY, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::INCLUDING_ALL, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::EXCLUDING_ANY, $operators['multiselect']['include']);
+        $this->assertContains(OperatorOptions::EXCLUDING_ALL, $operators['multiselect']['include']);
         $this->assertNotContains(OperatorOptions::STARTS_WITH, $operators['country']['include']);
     }
 
@@ -422,7 +425,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'select_a';
         $object   = 'lead';
-        $operator = OperatorOptions::IN;
+        $operator = OperatorOptions::INCLUDING_ANY;
         $details  = ['properties' => ['type' => 'unicorn']];
         $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
@@ -455,7 +458,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'select_a';
         $object   = 'lead';
-        $operator = OperatorOptions::IN;
+        $operator = OperatorOptions::INCLUDING_ANY;
         $details  = [
             'properties' => [
                 'type' => 'select',

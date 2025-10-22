@@ -78,10 +78,6 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
 
     // Handle popover shown event
     mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
-        // Initialize code blocks after popover is fully shown
-        Mautic.initializeCodeBlocks();
-
-        // Initialize other elements inside popover
         mQuery('.popover-content select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
@@ -96,7 +92,6 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    Mautic.initializeCodeBlocks();
 });
 
 mQuery( document ).ready(function() {

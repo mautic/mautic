@@ -2,6 +2,13 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -21,6 +28,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('asset:assets:viewown')"),
+        new Post(security: "is_granted('asset:assets:create')"),
+        new Get(security: "is_granted('asset:assets:viewown')"),
+        new Put(security: "is_granted('asset:assets:editown')"),
+        new Patch(security: "is_granted('asset:assets:editother')"),
+        new Delete(security: "is_granted('asset:assets:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['asset:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['asset:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;

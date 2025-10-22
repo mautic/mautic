@@ -47,7 +47,7 @@ class AnalyseCustomFieldCommand extends Command
     {
         $displayAsTable = $input->getOption('display-table');
 
-        $fieldDetails   = $this->getCustomFieldDetails();
+        $fieldDetails = $this->getCustomFieldDetails();
         if (empty($fieldDetails)) {
             $output->writeln('No custom field(s) to analyse!!!');
 
@@ -63,7 +63,7 @@ class AnalyseCustomFieldCommand extends Command
 
         $analysisDetails = array_merge_recursive($fieldDetails, $fieldLengths);
 
-        $headers   = [
+        $headers = [
             $this->translator->trans('mautic.lead.field.analyse.header.name'),
             $this->translator->trans('mautic.lead.field.analyse.header.alias'),
             $this->translator->trans('mautic.lead.field.analyse.header.length'),
@@ -72,14 +72,15 @@ class AnalyseCustomFieldCommand extends Command
             $this->translator->trans('mautic.lead.field.analyse.header.indexed'),
         ];
 
-        $rows      = [];
+        $rows = [];
         foreach ($analysisDetails as $analysisDetail) {
-            $maxLength          = (int) $analysisDetail['max_length'] ?: 0;
-            $columnLength       = (int) $analysisDetail['char_length_limit'] ?: 0;
-            $suggestedMaxSize   = $this->getSuggestedMaxSize($columnLength, $maxLength);
+            $maxLength        = (int) $analysisDetail['max_length'] ?: 0;
+            $columnLength     = (int) $analysisDetail['char_length_limit'] ?: 0;
+            $suggestedMaxSize = $this->getSuggestedMaxSize($columnLength, $maxLength);
 
+            $label  = $analysisDetail['label'];
             $rows[] = [
-                $analysisDetail['label'],
+                "\"$label\"",
                 $analysisDetail['alias'],
                 $columnLength,
                 $maxLength,
@@ -109,8 +110,8 @@ class AnalyseCustomFieldCommand extends Command
      */
     private function getCustomFieldDetails(): array
     {
-        $fields         = $this->fieldModel->getLeadFieldCustomFields();
-        $fieldSchemas   = $this->fieldModel->getLeadFieldCustomFieldSchemaDetails();
+        $fields       = $this->fieldModel->getLeadFieldCustomFields();
+        $fieldSchemas = $this->fieldModel->getLeadFieldCustomFieldSchemaDetails();
 
         $fieldDetails = [];
         foreach ($fields as $field) {
@@ -138,6 +139,10 @@ class AnalyseCustomFieldCommand extends Command
     private function getSuggestedMaxSize(int $columnLength, int $utilisedLength): int
     {
         if ($utilisedLength > 0) {
+            if (191 < $utilisedLength) {
+                return $columnLength;
+            }
+
             return min($utilisedLength * 2, $columnLength, 191);
         }
 

@@ -11,6 +11,9 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\DTO\EntityTypeConfig;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Event\EntityTypeModelMappingEvent;
+use Mautic\ProjectBundle\Event\EntityTypeNormalizationEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ProjectEntityLoaderService
@@ -18,8 +21,13 @@ final class ProjectEntityLoaderService
     /** @var array<string, EntityTypeConfig> */
     private array $entityTypesCache = [];
 
-    public function __construct(private EntityManagerInterface $em, private TranslatorInterface $translator, private ModelFactory $modelFactory, private CorePermissions $security)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private TranslatorInterface $translator,
+        private ModelFactory $modelFactory,
+        private CorePermissions $security,
+        private EventDispatcherInterface $eventDispatcher,
+    ) {
     }
 
     /**
@@ -240,11 +248,19 @@ final class ProjectEntityLoaderService
      */
     private function normalizeEntityType(string $entityType): string
     {
-        return match ($entityType) {
-            'leadlist' => 'segment',
-            'lead'     => 'contact',
-            default    => $entityType,
-        };
+        // Create event with default mappings
+        $event = new EntityTypeNormalizationEvent([
+            'leadlist'       => 'segment',
+            'lead'           => 'contact',
+            'dynamiccontent' => 'dynamicContent',
+            'trigger'        => 'pointtrigger',
+        ]);
+
+        // Dispatch event to allow bundles to add their mappings
+        $this->eventDispatcher->dispatch($event);
+
+        // Return normalized type or original if no mapping exists
+        return $event->getNormalizedType($entityType);
     }
 
     private function getEntityLabel(string $entityType): string
@@ -266,13 +282,20 @@ final class ProjectEntityLoaderService
 
     private function findModelForEntityType(string $entityType): FormModel
     {
-        // Map entity types to their model keys
-        $modelKey = match ($entityType) {
-            'segment' => 'lead.list',
-            'message' => 'channel.message',
-            'company' => 'lead.company',
-            default   => $entityType,
-        };
+        // Create event with default model key mappings
+        $event = new EntityTypeModelMappingEvent([
+            'segment'        => 'lead.list',
+            'message'        => 'channel.message',
+            'company'        => 'lead.company',
+            'dynamicContent' => 'dynamicContent.dynamicContent',
+            'pointtrigger'   => 'point.trigger',
+        ]);
+
+        // Dispatch event to allow bundles to add their model mappings
+        $this->eventDispatcher->dispatch($event);
+
+        // Get model key from event or use entity type as fallback
+        $modelKey = $event->getModelKey($entityType);
 
         $model = $this->modelFactory->getModel($modelKey);
         \assert($model instanceof FormModel);

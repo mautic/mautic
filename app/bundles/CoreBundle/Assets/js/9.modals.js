@@ -32,6 +32,7 @@ Mautic.ajaxifyModal = function (el, event) {
     let modalOpenCallback = element.attr('data-modal-open-callback') ? element.attr('data-modal-open-callback') : null;
     let modalCloseCallback = element.attr('data-modal-close-callback') ? element.attr('data-modal-close-callback') : null;
     let preventDismissal = element.attr('data-prevent-dismiss');
+    let formData = element.data('form-data') ? element.data('form-data') : {};
 
     if (preventDismissal) {
         // Reset
@@ -57,7 +58,7 @@ Mautic.ajaxifyModal = function (el, event) {
         };
     }
 
-    Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal, modalOpenCallbackReal, modalCloseCallbackReal);
+    Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal, modalOpenCallbackReal, modalCloseCallbackReal, formData);
 };
 
 /**
@@ -70,8 +71,9 @@ Mautic.ajaxifyModal = function (el, event) {
  * @param preventDismissal
  * @param modalOpenCallback
  * @param modalCloseCallback
+ * @param formData
  */
-Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal, modalOpenCallback, modalCloseCallback) {
+Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal, modalOpenCallback, modalCloseCallback, formData = {}) {
     let element = mQuery(target);
 
     if (element.find('.loading-placeholder').length) {
@@ -163,6 +165,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
         url: route,
         type: method,
         dataType: "json",
+        data: formData,
         success: function (response) {
             if (response) {
                 Mautic.processModalContent(response, target);

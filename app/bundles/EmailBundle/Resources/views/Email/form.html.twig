@@ -172,9 +172,14 @@
                 {% if isVariant %}
                     {{ form_row(form.variantSettings) }}
                     {{ form_row(form.isPublished) }}
-                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                    <div id="scheduleOptions">
+                        {% if emailType == 'template' %}
+                            {{ form_row(form.publishUp) }}
+                            {{ form_row(form.publishDown) }}
+                        {% else %}
+                            {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+                            {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                        {% endif %}
                     </div>
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
@@ -201,9 +206,14 @@
                             'data-end': 'mautic.core.form.available_until_scheduled_end'
                         }
                     }) }}
-                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                    <div id="scheduleOptions">
+                        {% if emailType == 'template' %}
+                            {{ form_row(form.publishUp) }}
+                            {{ form_row(form.publishDown) }}
+                        {% else %}
+                            {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+                            {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                        {% endif %}
                     </div>
 
                 {% endif %}

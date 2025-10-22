@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/**
+ * @template T of TranslationEntityInterface
+ */
 trait TranslationEntityTrait
 {
     /**
@@ -26,22 +29,20 @@ trait TranslationEntityTrait
     private $translationChildren;
 
     /**
-     * @var mixed
+     * @var TranslationEntityInterface|null
+     *
+     * @phpstan-var T|null
+     *
+     * @Groups({"page:read", "page:write", "download:read", "download:write", "email:read", "email:write", "dynamicContent:read", "dynamicContent:write"})
      **/
     private $translationParent;
 
     /**
-     * @var string
-     *
      * @Groups({"page:read", "download:read", "email:read"})
      */
-    private $language = 'en';
+    private string $language = 'en';
 
-    /**
-     * @param ClassMetadata $builder
-     * @param string        $languageColumnName
-     */
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
+    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
     {
         $builder->createOneToMany('translationChildren', $entityClass)
             ->setIndexBy('id')
@@ -59,10 +60,7 @@ trait TranslationEntityTrait
             ->build();
     }
 
-    /**
-     * @return $this
-     */
-    public function addTranslationChild(TranslationEntityInterface $child)
+    public function addTranslationChild(TranslationEntityInterface $child): static
     {
         if (!$this->translationChildren->contains($child)) {
             $this->translationChildren[] = $child;
@@ -78,18 +76,13 @@ trait TranslationEntityTrait
 
     /**
      * Get translated items.
-     *
-     * @return ?Collection
      */
-    public function getTranslationChildren()
+    public function getTranslationChildren(): ?Collection
     {
         return $this->translationChildren;
     }
 
-    /**
-     * @return $this
-     */
-    public function setTranslationParent(?TranslationEntityInterface $parent = null)
+    public function setTranslationParent(?TranslationEntityInterface $parent = null): self
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('translationParent', $parent);
@@ -100,10 +93,7 @@ trait TranslationEntityTrait
         return $this;
     }
 
-    /**
-     * @return ?TranslationEntityInterface
-     */
-    public function getTranslationParent()
+    public function getTranslationParent(): ?TranslationEntityInterface
     {
         return $this->translationParent;
     }
@@ -117,12 +107,7 @@ trait TranslationEntityTrait
         $this->translationParent = null;
     }
 
-    /**
-     * @param string $language
-     *
-     * @return $this
-     */
-    public function setLanguage($language)
+    public function setLanguage(?string $language): self
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('language', $language);
@@ -133,28 +118,23 @@ trait TranslationEntityTrait
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLanguage()
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
 
     /**
      * @param bool $isChild True to return if the item is a translation of a parent
-     *
-     * @return bool
      */
-    public function isTranslation($isChild = false)
+    public function isTranslation(bool $isChild = false): bool
     {
         $parent   = $this->getTranslationParent();
         $children = $this->getTranslationChildren();
 
         if ($isChild) {
-            return (null === $parent) ? false : true;
+            return null !== $parent;
         } else {
-            return (!empty($parent) || count($children)) ? true : false;
+            return !empty($parent) || ($children && count($children));
         }
     }
 
@@ -165,7 +145,7 @@ trait TranslationEntityTrait
     {
         $children = $this->getTranslationChildren();
 
-        return count($children);
+        return $children ? count($children) : 0;
     }
 
     public function clearTranslations(): void
@@ -177,11 +157,9 @@ trait TranslationEntityTrait
     /**
      * Get translation parent/children.
      *
-     * @param bool $onlyChildren
-     *
-     * @return array|ArrayCollection
+     * @return array<mixed>
      */
-    public function getTranslations($onlyChildren = false)
+    public function getTranslations(bool $onlyChildren = false): array
     {
         $parent = $this->getTranslationParent();
 

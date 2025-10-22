@@ -42,17 +42,6 @@ return [
 
     'services' => [
         'others' => [
-            'mautic.webhook.notificator.webhookkillnotificator' => [
-                'class'     => Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
-                'arguments' => [
-                    'translator',
-                    'router',
-                    'mautic.core.model.notification',
-                    'doctrine.orm.entity_manager',
-                    'mautic.helper.mailer',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
             'mautic.webhook.campaign.helper' => [
                 'class'     => Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
@@ -61,25 +50,24 @@ return [
                     'event_dispatcher',
                 ],
             ],
-            'mautic.webhook.http.client' => [
-                'class'     => Mautic\WebhookBundle\Http\Client::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                ],
-            ],
         ],
     ],
 
     'parameters' => [
-        'webhook_limit'                        => 10, // How many entities can be sent in one webhook
-        'webhook_time_limit'                   => 600, // How long the webhook processing can run in seconds
-        'webhook_log_max'                      => 1000, // How many recent logs to keep
-        'clean_webhook_logs_in_background'     => false,
-        'webhook_disable_limit'                => 100, // How many times the webhook response can fail until the webhook will be unpublished
-        'webhook_timeout'                      => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
-        'queue_mode'                           => Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
-        'events_orderby_dir'                   => Doctrine\Common\Collections\Order::Ascending->value, // Order the queued events chronologically or the other way around
-        'webhook_email_details'                => true, // If enabled, email related webhooks send detailed data
+        'webhook_limit'                            => 10, // How many entities can be sent in one webhook
+        'webhook_time_limit'                       => 600, // How long the webhook processing can run in seconds
+        'webhook_log_max'                          => 1000, // How many recent logs to keep
+        'webhook_health_check_time'                => 300, // Retry webhook after this time once it marked it as unhealthy in seconds.
+        'webhook_retry_delay'                      => 3600, // Retry webhook_queue entry after given time after it is failed in seconds.
+        'clean_webhook_logs_in_background'         => false,
+        'webhook_disable_limit'                    => 100, // How many times the webhook response can fail until the webhook will be unpublished
+        'webhook_timeout'                          => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
+        'queue_mode'                               => Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
+        'events_orderby_dir'                       => Doctrine\Common\Collections\Order::Ascending->value, // Order the queued events chronologically or the other way around
+        'webhook_email_details'                    => true, // If enabled, email related webhooks send detailed data
+        'disable_auto_unpublish'                   => false, // If enabled, webhooks will not be automatically unpublished on errors
+        'first_webhook_failure_notification_time'  => 3600, // 1 hour
+        'webhook_failure_notification_interval'    => 86400, // 1 day
+        'webhook_allowed_private_addresses'        => [],
     ],
 ];

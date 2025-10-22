@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadGetCurrentEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DefaultValueTrait;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -25,15 +26,11 @@ class ContactTracker
 
     private ?Lead $systemContact = null;
 
-    /**
-     * @var Lead|null
-     */
-    private $trackedContact;
+    private ?Lead $trackedContact = null;
 
-    /**
-     * @var FieldModel
-     */
-    private $leadFieldModel;
+    private FieldModel $leadFieldModel;
+
+    private ?bool $useSystemContact = null;
 
     public function __construct(
         private LeadRepository $leadRepository,
@@ -160,6 +157,11 @@ class ContactTracker
         return $this->contactTrackingService->getTrackedIdentifier();
     }
 
+    public function setUseSystemContact(?bool $useSystemContact): void
+    {
+        $this->useSystemContact = $useSystemContact;
+    }
+
     /**
      * @return Lead|null
      */
@@ -183,6 +185,13 @@ class ContactTracker
      */
     private function getCurrentContact()
     {
+        $event = new LeadGetCurrentEvent($this->getRequest());
+        $this->dispatcher->dispatch($event);
+
+        if ($contact = $event->getContact()) {
+            return $contact;
+        }
+
         if ($lead = $this->getContactByTrackedDevice()) {
             return $lead;
         }
@@ -291,7 +300,11 @@ class ContactTracker
 
     private function useSystemContact(): bool
     {
-        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->requestStack->getCurrentRequest();
+        if (null !== $this->useSystemContact) {
+            return $this->useSystemContact;
+        }
+
+        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->getRequest();
     }
 
     private function isUserSession(): bool
@@ -316,8 +329,7 @@ class ContactTracker
 
     private function generateTrackingCookies(): void
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if ($leadId = $this->trackedContact->getId() && null !== $request) {
+        if ($this->trackedContact->getId() && $request = $this->getRequest()) {
             $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $request->server->get('HTTP_USER_AGENT'));
         }
     }

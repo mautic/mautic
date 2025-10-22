@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -517,14 +516,6 @@ class FieldModel extends FormModel
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @return LeadField[]|array<int,mixed>|iterable<LeadField>|\Doctrine\ORM\Internal\Hydration\IterableResult<LeadField>|Paginator<LeadField>|SimplePaginator<LeadField>
-     */
-    public function getEntities(array $args = [])
-    {
-        return $this->getRepository()->getEntities($args);
     }
 
     /**

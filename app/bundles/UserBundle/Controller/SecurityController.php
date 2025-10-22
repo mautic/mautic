@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,11 +14,14 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -62,7 +67,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
     /**
      * Generates login form and processes login.
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
 
@@ -123,6 +128,29 @@ class SecurityController extends CommonController implements EventSubscriberInte
         // The plugin should be handling this in it's listener
 
         return new RedirectResponse($this->generateUrl('login'));
+    }
+
+    public function samlLoginRetryAction(Request $request, SAMLHelper $samlHelper, SessionInterface $session): Response
+    {
+        if (!$samlHelper->isSamlEnabled()) {
+            return new RedirectResponse($this->generateUrl('login'));
+        }
+
+        $session->invalidate();
+
+        $this->addFlashMessage('mautic.user.security.saml.clearsession', [], FlashBag::LEVEL_ERROR);
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'loginRoute' => $this->generateUrl('lightsaml_sp.discovery'),
+            ],
+            'contentTemplate' => '@MauticUser/Security/saml_login_retry.html.twig',
+            'passthroughVars' => [
+                'route'          => $this->generateUrl('mautic_base_index'),
+                'mauticContent'  => 'user',
+                'sessionExpired' => true,
+            ],
+        ]);
     }
 
     /**

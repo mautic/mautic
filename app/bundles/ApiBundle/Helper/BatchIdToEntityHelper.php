@@ -76,6 +76,15 @@ class BatchIdToEntityHelper
         $orderedEntities = [];
         foreach ($this->ids as $key => $id) {
             if (!isset($entitiesKeyedById[$id])) {
+                $hasPreviousId = array_filter(
+                    $entities,
+                    fn ($entity) => $id == $entity->getPreviousId()
+                );
+
+                if ($hasPreviousId) {
+                    $orderedEntities[$key] = array_shift($hasPreviousId);
+                }
+
                 continue;
             }
 
