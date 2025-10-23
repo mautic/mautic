@@ -564,4 +564,161 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
 
         $this->assertTrue($event->wasOperatorHandled());
     }
+
+    public function testOnBooleanEqualsOperatorIfNotEqOperator(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            'paramenter_holder_1'
+        );
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('neq');
+
+        $this->subscriber->onBooleanEqualsOperator($event);
+
+        $this->assertFalse($event->wasOperatorHandled());
+    }
+
+    public function testOnBooleanEqualsOperatorIfNotBooleanField(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            'paramenter_holder_1'
+        );
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('eq');
+
+        $this->contactSegmentFilter->method('isColumnTypeBoolean')
+            ->willReturn(false);
+
+        $this->subscriber->onBooleanEqualsOperator($event);
+
+        $this->assertFalse($event->wasOperatorHandled());
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataBooleanEqualsOperator')]
+    public function testOnBooleanEqualsOperator(mixed $parameterValue, string $expectedOperator, string $expectedValue): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            'paramenter_holder_1'
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('is_active');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('eq');
+
+        $this->contactSegmentFilter->method('getParameterValue')
+            ->willReturn($parameterValue);
+
+        $this->contactSegmentFilter->method('isColumnTypeBoolean')
+            ->willReturn(true);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with(
+                $this->anything(),
+                CompositeExpression::TYPE_AND
+            );
+
+        $this->expressionBuilder->expects($this->once())
+            ->method($expectedOperator)
+            ->with('l.is_active', "'1'");
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('literal')
+            ->with('1')
+            ->willReturn("'1'");
+
+        $this->subscriber->onBooleanEqualsOperator($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    /**
+     * @return iterable<array<mixed>>
+     */
+    public static function dataBooleanEqualsOperator(): iterable
+    {
+        // Boolean = YES (true/1/'1') should generate: field = '1'
+        yield 'true value' => [true, 'eq', '1'];
+        yield '1 value' => [1, 'eq', '1'];
+        yield 'string 1 value' => ['1', 'eq', '1'];
+
+        // Boolean = NO (false/0/'0') should generate: field <> '1' (includes NULL and 0)
+        yield 'false value' => [false, 'neq', '1'];
+        yield '0 value' => [0, 'neq', '1'];
+        yield 'string 0 value' => ['0', 'neq', '1'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataBooleanNeqOperator')]
+    public function testOnNegativeOperatorsWithBooleanField(mixed $parameterValue, string $expectedOperator, string $expectedValue): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            'paramenter_holder_1'
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('is_active');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('neq');
+
+        $this->contactSegmentFilter->method('getParameterValue')
+            ->willReturn($parameterValue);
+
+        $this->contactSegmentFilter->method('isColumnTypeBoolean')
+            ->willReturn(true);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with(
+                $this->anything(),
+                CompositeExpression::TYPE_AND
+            );
+
+        $this->expressionBuilder->expects($this->once())
+            ->method($expectedOperator)
+            ->with('l.is_active', "'1'");
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('literal')
+            ->with('1')
+            ->willReturn("'1'");
+
+        $this->subscriber->onNegativeOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    /**
+     * @return iterable<array<mixed>>
+     */
+    public static function dataBooleanNeqOperator(): iterable
+    {
+        // Boolean != YES (true/1/'1') should generate: field <> '1' (includes NULL and 0)
+        yield 'not true value' => [true, 'neq', '1'];
+        yield 'not 1 value' => [1, 'neq', '1'];
+        yield 'not string 1 value' => ['1', 'neq', '1'];
+
+        // Boolean != NO (false/0/'0') should generate: field = '1' (only exactly 1)
+        yield 'not false value' => [false, 'eq', '1'];
+        yield 'not 0 value' => [0, 'eq', '1'];
+        yield 'not string 0 value' => ['0', 'eq', '1'];
+    }
 }
