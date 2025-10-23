@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
@@ -117,12 +116,6 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'lt':
             case 'lte':
             case 'in':
-            case OperatorOptions::INCLUDING_ANY:
-                $expression = $queryBuilder->expr()->in(
-                    $tableAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
-                );
-                break;
             case 'eq':
                 // Special handling for boolean eq
                 if ($filter->isColumnTypeBoolean()) {
@@ -137,6 +130,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                             ),
                             $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                         );
+                        break;
                     }
                     // Boolean = YES (true) means exactly 1
                     elseif (true === $boolValue) {
@@ -144,19 +138,11 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                             $tableAlias.'.'.$filter->getField(),
                             $queryBuilder->expr()->literal('1')
                         );
+                        break;
                     }
-                } else {
-                    $expression = $queryBuilder->expr()->$filterOperator(
-                        $tableAlias.'.'.$filter->getField(),
-                        $filterParametersHolder
-                    );
                 }
-                break;
-            case OperatorOptions::INCLUDING_ALL:
-                // Note: INCLUDING_ALL for complex relations may not be mathematically meaningful
-                // as it implies a single field value matches ALL provided values simultaneously
-                // This is likely a configuration error, but we'll treat it as INCLUDING_ANY
-                $expression = $queryBuilder->expr()->in(
+                // For non-boolean fields or 'in' operator, use default expression
+                $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
