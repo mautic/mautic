@@ -154,7 +154,19 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $content   = str_replace(array_keys($tokens), array_values($tokens), $content);
+        $leadArray = [];
+        if ($lead instanceof Lead) {
+            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
+        }
+
+        $result = [];
+        foreach ($tokens as $token => $dwc) {
+            $result[$token] = '';
+            if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
+                $result[$token] = $dwc['content'];
+            }
+        }
+        $content = str_replace(array_keys($result), array_values($result), $content);
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
