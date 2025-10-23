@@ -88,11 +88,14 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                             $queryBuilder->expr()->literal('1')
                         );
                     }
-                    // Boolean != YES (true) means "not YES" (not 1) - includes 0 and NULL
+                    // Boolean != YES (true) means "not YES" (0 or NULL)
                     elseif (true === $boolValue) {
-                        $expression = $queryBuilder->expr()->neq(
-                            $tableAlias.'.'.$filter->getField(),
-                            $queryBuilder->expr()->literal('1')
+                        $expression = $queryBuilder->expr()->or(
+                            $queryBuilder->expr()->eq(
+                                $tableAlias.'.'.$filter->getField(),
+                                $queryBuilder->expr()->literal('0')
+                            ),
+                            $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                         );
                     }
                 } else {
@@ -125,11 +128,14 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 if ($filter->isColumnTypeBoolean()) {
                     $boolValue = InputHelper::boolean($filterParameters);
 
-                    // Boolean = NO (false) means "not YES" (not 1) - includes 0 and NULL
+                    // Boolean = NO (false) means "not YES" (0 or NULL)
                     if (false === $boolValue) {
-                        $expression = $queryBuilder->expr()->neq(
-                            $tableAlias.'.'.$filter->getField(),
-                            $queryBuilder->expr()->literal('1')
+                        $expression = $queryBuilder->expr()->or(
+                            $queryBuilder->expr()->eq(
+                                $tableAlias.'.'.$filter->getField(),
+                                $queryBuilder->expr()->literal('0')
+                            ),
+                            $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                         );
                     }
                     // Boolean = YES (true) means exactly 1

@@ -47,10 +47,13 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         $field           = $leadsTableAlias.'.'.$filter->getField();
         $expr            = $event->getQueryBuilder()->expr();
 
-        // Boolean = NO (false) means "not YES" (not 1) - includes 0 and NULL
+        // Boolean = NO (false) means "not YES" (0 or NULL)
         if (false === $parameterValue) {
             $event->addExpression(
-                $expr->neq($field, $expr->literal('1'))
+                $expr->or(
+                    $expr->eq($field, $expr->literal('0')),
+                    $expr->isNull($field)
+                )
             );
             $event->stopPropagation();
         }
@@ -129,10 +132,13 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
                     $expr->eq($field, $expr->literal('1'))
                 );
             }
-            // Boolean != YES (true) means "not YES" (not 1) - includes 0 and NULL
+            // Boolean != YES (true) means "not YES" (0 or NULL)
             elseif (true === $parameterValue) {
                 $event->addExpression(
-                    $expr->neq($field, $expr->literal('1'))
+                    $expr->or(
+                        $expr->eq($field, $expr->literal('0')),
+                        $expr->isNull($field)
+                    )
                 );
             }
         } else {
