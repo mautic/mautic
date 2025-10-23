@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -78,15 +79,17 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'neq':
                 // Special handling for boolean neq
                 if ($filter->isColumnTypeBoolean()) {
-                    // Boolean != NO (0) means "YES" (exactly 1)
-                    if (false === $filterParameters || 0 === $filterParameters || '0' === $filterParameters) {
+                    $boolValue = InputHelper::boolean($filterParameters);
+
+                    // Boolean != NO (false) means "YES" (exactly 1)
+                    if (false === $boolValue) {
                         $expression = $queryBuilder->expr()->eq(
                             $tableAlias.'.'.$filter->getField(),
                             $queryBuilder->expr()->literal('1')
                         );
                     }
-                    // Boolean != YES (1) means "not YES" (not 1) - includes 0 and NULL
-                    elseif (true === $filterParameters || 1 === $filterParameters || '1' === $filterParameters) {
+                    // Boolean != YES (true) means "not YES" (not 1) - includes 0 and NULL
+                    elseif (true === $boolValue) {
                         $expression = $queryBuilder->expr()->neq(
                             $tableAlias.'.'.$filter->getField(),
                             $queryBuilder->expr()->literal('1')
@@ -120,15 +123,17 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'eq':
                 // Special handling for boolean eq
                 if ($filter->isColumnTypeBoolean()) {
-                    // Boolean = NO (0) means "not YES" (not 1) - includes 0 and NULL
-                    if (false === $filterParameters || 0 === $filterParameters || '0' === $filterParameters) {
+                    $boolValue = InputHelper::boolean($filterParameters);
+
+                    // Boolean = NO (false) means "not YES" (not 1) - includes 0 and NULL
+                    if (false === $boolValue) {
                         $expression = $queryBuilder->expr()->neq(
                             $tableAlias.'.'.$filter->getField(),
                             $queryBuilder->expr()->literal('1')
                         );
                     }
-                    // Boolean = YES (1) means exactly 1
-                    elseif (true === $filterParameters || 1 === $filterParameters || '1' === $filterParameters) {
+                    // Boolean = YES (true) means exactly 1
+                    elseif (true === $boolValue) {
                         $expression = $queryBuilder->expr()->eq(
                             $tableAlias.'.'.$filter->getField(),
                             $queryBuilder->expr()->literal('1')

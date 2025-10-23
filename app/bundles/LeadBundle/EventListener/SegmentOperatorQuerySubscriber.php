@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -41,20 +42,20 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         // Get the parameter value - will be cast to boolean
-        $parameterValue  = $filter->getParameterValue();
+        $parameterValue  = InputHelper::boolean($filter->getParameterValue());
         $leadsTableAlias = $event->getLeadsTableAlias();
         $field           = $leadsTableAlias.'.'.$filter->getField();
         $expr            = $event->getQueryBuilder()->expr();
 
-        // Boolean = NO (0) means "not YES" (not 1) - includes 0 and NULL
-        if (false === $parameterValue || 0 === $parameterValue || '0' === $parameterValue) {
+        // Boolean = NO (false) means "not YES" (not 1) - includes 0 and NULL
+        if (false === $parameterValue) {
             $event->addExpression(
                 $expr->neq($field, $expr->literal('1'))
             );
             $event->stopPropagation();
         }
-        // Boolean = YES (1) means exactly 1
-        elseif (true === $parameterValue || 1 === $parameterValue || '1' === $parameterValue) {
+        // Boolean = YES (true) means exactly 1
+        elseif (true === $parameterValue) {
             $event->addExpression(
                 $expr->eq($field, $expr->literal('1'))
             );
@@ -120,16 +121,16 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         // Special handling for boolean neq
         if ($filter->isColumnTypeBoolean() && 'neq' === $filter->getOperator()) {
-            $parameterValue = $filter->getParameterValue();
+            $parameterValue = InputHelper::boolean($filter->getParameterValue());
 
-            // Boolean != NO (0) means "YES" (exactly 1)
-            if (false === $parameterValue || 0 === $parameterValue || '0' === $parameterValue) {
+            // Boolean != NO (false) means "YES" (exactly 1)
+            if (false === $parameterValue) {
                 $event->addExpression(
                     $expr->eq($field, $expr->literal('1'))
                 );
             }
-            // Boolean != YES (1) means "not YES" (not 1) - includes 0 and NULL
-            elseif (true === $parameterValue || 1 === $parameterValue || '1' === $parameterValue) {
+            // Boolean != YES (true) means "not YES" (not 1) - includes 0 and NULL
+            elseif (true === $parameterValue) {
                 $event->addExpression(
                     $expr->neq($field, $expr->literal('1'))
                 );
