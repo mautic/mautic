@@ -17,6 +17,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE => [
+                ['onBooleanEqualsOperator', 10], // Higher priority - runs first
                 ['onEmptyOperator', 0],
                 ['onNotEmptyOperator', 0],
                 ['onNegativeOperators', 0],
@@ -24,6 +25,41 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
                 ['onDefaultOperators', 0],
             ],
         ];
+    }
+
+    public function onBooleanEqualsOperator(SegmentOperatorQueryBuilderEvent $event): void
+    {
+        if (!$event->operatorIsOneOf('eq')) {
+            return;
+        }
+
+        $filter = $event->getFilter();
+
+        // Check if this is a boolean field
+        if (!$filter->isColumnTypeBoolean()) {
+            return;
+        }
+
+        // Get the parameter value - will be cast to boolean
+        $parameterValue  = $filter->getParameterValue();
+        $leadsTableAlias = $event->getLeadsTableAlias();
+        $field           = $leadsTableAlias.'.'.$filter->getField();
+        $expr            = $event->getQueryBuilder()->expr();
+
+        // Boolean = NO (0) means "not YES" (not 1) - includes 0 and NULL
+        if (false === $parameterValue || 0 === $parameterValue || '0' === $parameterValue) {
+            $event->addExpression(
+                $expr->neq($field, $expr->literal('1'))
+            );
+            $event->stopPropagation();
+        }
+        // Boolean = YES (1) means exactly 1
+        elseif (true === $parameterValue || 1 === $parameterValue || '1' === $parameterValue) {
+            $event->addExpression(
+                $expr->eq($field, $expr->literal('1'))
+            );
+            $event->stopPropagation();
+        }
     }
 
     public function onEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
@@ -78,16 +114,38 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
+        $filter          = $event->getFilter();
+        $field           = $leadsTableAlias.'.'.$filter->getField();
+        $expr            = $event->getQueryBuilder()->expr();
 
-        $event->addExpression(
-            $event->getQueryBuilder()->expr()->or(
-                $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
-                    $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                    $event->getParameterHolder()
+        // Special handling for boolean neq
+        if ($filter->isColumnTypeBoolean() && 'neq' === $filter->getOperator()) {
+            $parameterValue = $filter->getParameterValue();
+
+            // Boolean != NO (0) means "YES" (exactly 1)
+            if (false === $parameterValue || 0 === $parameterValue || '0' === $parameterValue) {
+                $event->addExpression(
+                    $expr->eq($field, $expr->literal('1'))
+                );
+            }
+            // Boolean != YES (1) means "not YES" (not 1) - includes 0 and NULL
+            elseif (true === $parameterValue || 1 === $parameterValue || '1' === $parameterValue) {
+                $event->addExpression(
+                    $expr->neq($field, $expr->literal('1'))
+                );
+            }
+        } else {
+            // For non-boolean fields, include NULL in neq operations
+            $event->addExpression(
+                $expr->or(
+                    $expr->isNull($field),
+                    $expr->{$filter->getOperator()}(
+                        $field,
+                        $event->getParameterHolder()
+                    )
                 )
-            )
-        );
+            );
+        }
 
         $event->stopPropagation();
     }
