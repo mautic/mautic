@@ -56,10 +56,10 @@ class Project extends FormEntity implements UuidInterface
     #[Groups(['project:read', 'project:write'])]
     private ?string $name = null;
 
-    #[Groups(['project:read', 'project:write'])]
     /**
      * @var mixed[]
      */
+    #[Groups(['project:read', 'project:write'])]
     private array $properties = [];
 
     /**
