@@ -14,11 +14,11 @@ return [
         ],
     ],
     'api' => [
-        'mautic_projectsstandard' => [
+        'mautic_api_projectsstandard' => [
             'standard_entity' => true,
             'name'            => 'projects',
             'path'            => '/projects',
-            'controller'      => 'MauticProjectBundle:Api\ProjectApi',
+            'controller'      => Mautic\ProjectBundle\Controller\Api\ProjectApiController::class,
             'methods'         => 'GET',
         ],
     ],
