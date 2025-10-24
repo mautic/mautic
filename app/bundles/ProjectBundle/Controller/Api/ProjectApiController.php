@@ -33,7 +33,7 @@ final class ProjectApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->model            = $this->getModel('project');
+        $this->model            = $modelFactory->getModel('project');
         $this->entityClass      = Project::class;
         $this->entityNameOne    = 'project';
         $this->entityNameMulti  = 'projects';
