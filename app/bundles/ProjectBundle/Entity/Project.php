@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -16,60 +22,43 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *     collectionOperations={
- *       "get"={"security"="'project:project:viewother'"},
- *       "post"={"security"="'project:project:create'"}
- *    },
- *    itemOperations={
- *       "get"={"security"="'project:project:view'"},
- *       "put"={"security"="'project:project:edit'"},
- *       "patch"={"security"="'project:project:edit'"},
- *       "delete"={"security"="'project:project:delete'"}
- *    },
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "project:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "project:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(uriTemplate: '/projects', security: "is_granted('project:project:viewother')"),
+        new Get(uriTemplate: '/projects/{id}', security: "is_granted('project:project:view')"),
+        new Post(uriTemplate: '/projects', security: "is_granted('project:project:create')"),
+        new Put(uriTemplate: '/projects/{id}', security: "is_granted('project:project:edit')"),
+        new Patch(uriTemplate: '/projects/{id}', security: "is_granted('project:project:edit')"),
+        new Delete(uriTemplate: '/projects/{id}', security: "is_granted('project:project:delete')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['project:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['project:write'],
+        'swagger_definition_name' => 'Write',
+    ],
+    security: 'false'
+)]
 class Project extends FormEntity implements UuidInterface
 {
     use UuidTrait;
 
     public const TABLE_NAME = 'projects';
 
-    /**
-     * @Groups("project:read")
-     */
+    #[Groups(['project:read'])]
     private ?int $id = null;
 
-    /**
-     * @Groups({"project:read", "project:write"})
-     */
+    #[Groups(['project:read', 'project:write'])]
     private ?string $description = null;
 
-    /**
-     * @Groups({"project:read", "project:write"})
-     */
+    #[Groups(['project:read', 'project:write'])]
     private ?string $name = null;
 
+    #[Groups(['project:read', 'project:write'])]
     /**
      * @var mixed[]
-     *
-     * @Groups({"project:read", "project:write"})
      */
     private array $properties = [];
 

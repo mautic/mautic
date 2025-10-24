@@ -25,10 +25,9 @@ final class ProjectSortingTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider sortingProvider
-     *
      * @param array<int, string> $expectedOrder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('sortingProvider')]
     public function testProjectListSorting(string $orderBy, array $expectedOrder): void
     {
         // When a user clicks the table header for the first time they get a DESC sort
