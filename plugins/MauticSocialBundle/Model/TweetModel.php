@@ -23,13 +23,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
-    /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
-     */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
 

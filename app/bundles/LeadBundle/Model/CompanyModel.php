@@ -569,15 +569,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%', 'onlyNames' => true], $column, $valueColumn);
     }
 
-    /**
-     * Get list of entities for autopopulate fields.
-     *
-     * @param string         $type
-     * @param mixed[]|string $filter
-     * @param int            $limit
-     * @param int            $start
-     */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {
