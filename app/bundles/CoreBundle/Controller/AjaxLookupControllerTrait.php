@@ -22,7 +22,6 @@ trait AjaxLookupControllerTrait
         $limit     = (int) $request->query->get('limit', '0');
         $start     = (int) $request->query->get('start', '0');
 
-
         if (!$modelName) {
             throw new BadRequestException('The searchKey parameter is required.');
         }
