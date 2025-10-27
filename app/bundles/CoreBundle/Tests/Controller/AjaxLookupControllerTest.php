@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\SmsBundle\Entity\Sms;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxLookupControllerTest extends MauticMysqlTestCase
@@ -79,7 +78,6 @@ class AjaxLookupControllerTest extends MauticMysqlTestCase
         $templateSms->setMessage('Test');
         $templateSms->setIsPublished(true);
 
-
         $listSms = new Sms();
         $listSms->setName('Test list Sms');
         $listSms->setSmsType('list');
@@ -123,8 +121,8 @@ class AjaxLookupControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $params = [
-            'action'       => 'channel:getLookupChoiceList',
-            'searchKey'    => 'channel.message',
+            'action'          => 'channel:getLookupChoiceList',
+            'searchKey'       => 'channel.message',
             'channel_message' => 'message',
         ];
 
