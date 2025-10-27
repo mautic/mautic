@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Controller;
 
+use Mautic\ChannelBundle\Entity\Channel;
+use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
@@ -30,7 +32,6 @@ class AjaxLookupControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('[{"text":"Test Company","value":"'.$company->getId().'"}]', $response->getContent());
     }
 
@@ -104,5 +105,36 @@ class AjaxLookupControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $content, 'Should return one group');
         $this->assertCount(1, $content[0]['items'], 'Should return only sms');
         $this->assertSame('Test Template Sms', $content[0]['items'][(string) $templateSms->getId()]);
+    }
+
+    public function testMessageLookupWithOptions(): void
+    {
+        $channel = new Channel();
+        $channel->setChannel('email');
+        $channel->setChannelId(12);
+        $channel->setIsEnabled(true);
+
+        $message = new Message();
+        $message->setName('API message 1');
+        $message->addChannel($channel);
+
+        $this->em->persist($channel);
+        $this->em->persist($message);
+        $this->em->flush();
+
+        $params = [
+            'action'       => 'channel:getLookupChoiceList',
+            'searchKey'    => 'channel.message',
+            'channel_message' => 'message',
+        ];
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax', $params);
+        $this->assertResponseIsSuccessful();
+
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        $this->assertCount(1, $content, 'Should return only Message');
+        $this->assertSame('API message 1', $content[0]['text']);
     }
 }
