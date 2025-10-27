@@ -491,6 +491,7 @@ class PublicController extends AbstractFormController
         $query = $request->query->all();
 
         $ct = $query['ct'] ?? null;
+        unset($query['ct']);
 
         // Tak on anything left to the URL
         if (count($query)) {
