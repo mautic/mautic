@@ -17,9 +17,9 @@ interface AjaxLookupModelInterface
      * @param string|array<int,string> $filter
      * @param array<string, mixed>     $options
      *
-     * @return mixed
+     * @return array<string, array<int, string>>
      */
-    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []);
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array;
 
     /**
      * @return CommonRepository<T>
