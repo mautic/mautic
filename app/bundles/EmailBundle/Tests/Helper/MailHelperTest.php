@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -110,8 +111,6 @@ class MailHelperTest extends TestCase
 
     private EntityManagerInterface&MockObject $entityManager;
 
-    private ModelFactory&MockObject $mockFactory;
-
     /**
      * @var MockObject&AssetModel
      */
@@ -189,7 +188,6 @@ class MailHelperTest extends TestCase
         $this->entityManager        = $this->createMock(EntityManagerInterface::class);
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->requestStack         = new RequestStack();
-        $this->mockFactory          = $this->createMock(ModelFactory::class);
 
         $this->entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
@@ -1724,14 +1722,14 @@ class MailHelperTest extends TestCase
             $this->router,
             $this->twig,
             $this->themeHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->pathsHelper,
+            $this->dispatcher,
             $this->requestStack,
             $this->entityManager,
-            $this->mockFactory,
-            $this->createMock(AssetModel::class),
-            $this->createMock(TrackableModel::class),
-            $this->createMock(RedirectModel::class)
+            $this->assetModel,
+            $this->trackableModel,
+            $this->redirectModel,
+            $this->emailStatModel
         );
 
         $email = new Email();
@@ -2008,6 +2006,8 @@ class MailHelperTest extends TestCase
 
         Assert::assertSame($trackedHtml, $mailer->getBody());
         $mailer->send(true);
+
+        $trackingPixelUrl .= '?ct='.ClickthroughHelper::encodeArrayForUrl(['sent_time' => time()]);
 
         Assert::assertSame(
             'Text <a href="https://mautic.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic.com/fake.jpg">{unsubscribe_url}<img height="1" width="1" src="'.$trackingPixelUrl.'" alt="" />',
