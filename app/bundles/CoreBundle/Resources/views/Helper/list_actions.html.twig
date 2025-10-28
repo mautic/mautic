@@ -83,7 +83,21 @@
                 priority: -1
             }) }}
             {% endif %}
-
+            {% if templateButtons.export is defined and templateButtons.export is not empty %}
+            {{ buttonAdd({
+                attr: {
+                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
+                    href: path(
+                        actionRoute,
+                        query|merge({objectAction: 'export', objectId: id})
+                    ),
+                    'data-toggle': 'download',
+                },
+                iconClass: 'ri-export-line',
+                btnText: 'mautic.core.form.export'|trans,
+                priority: 200
+            }) }}
+            {% endif %}
             {{ buttonsRender()|raw }}
         </ul>
     </div>

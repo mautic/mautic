@@ -17,13 +17,16 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime as DateTimeSchedul
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval as IntervalScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized as OptimizedScheduler;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventScheduler
 {
     public function __construct(
+        #[Autowire(service: 'monolog.logger.mautic')]
         private LoggerInterface $logger,
         private EventLogger $eventLogger,
         private IntervalScheduler $intervalScheduler,
@@ -32,6 +35,7 @@ class EventScheduler
         private EventCollector $collector,
         private EventDispatcherInterface $dispatcher,
         private CoreParametersHelper $coreParametersHelper,
+        private OptimisticLockServiceInterface $optimisticLockService,
     ) {
     }
 
@@ -101,18 +105,6 @@ class EventScheduler
         $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
-    /**
-     * @deprecated since Mautic 3. To be removed in Mautic 4. Use rescheduleFailures instead.
-     */
-    public function rescheduleFailure(LeadEventLog $log): void
-    {
-        try {
-            $this->reschedule($log, $this->getRescheduleDate($log));
-        } catch (IntervalNotConfiguredException) {
-            // Do not reschedule if an interval was not configured.
-        }
-    }
-
     public function rescheduleFailures(ArrayCollection $logs): void
     {
         if (!$logs->count()) {
@@ -122,6 +114,7 @@ class EventScheduler
         foreach ($logs as $log) {
             try {
                 $this->reschedule($log, $this->getRescheduleDate($log));
+                $this->optimisticLockService->resetVersion($log);
             } catch (IntervalNotConfiguredException) {
                 // Do not reschedule if an interval was not configured.
             }
@@ -137,7 +130,7 @@ class EventScheduler
     /**
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
+    public function getExecutionDateTime(Event $event, ?\DateTimeInterface $compareFromDateTime = null, ?\DateTime $comparedToDateTime = null): \DateTimeInterface
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();

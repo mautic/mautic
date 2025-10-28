@@ -4,12 +4,17 @@ namespace MauticPlugin\MauticSocialBundle\Command;
 
 use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'mautic:social:monitoring',
+    description: 'Looks at the records of monitors and iterates through them.'
+)]
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
@@ -20,7 +25,7 @@ class MauticSocialMonitoringCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:social:monitoring')
+        $this
             ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
             ->addOption(
                 'batch-size',
@@ -137,6 +142,4 @@ class MauticSocialMonitoringCommand extends Command
 
         return $returnCode;
     }
-
-    protected static $defaultDescription = 'Looks at the records of monitors and iterates through them. ';
 }

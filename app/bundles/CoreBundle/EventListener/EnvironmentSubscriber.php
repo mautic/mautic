@@ -35,7 +35,8 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->get('default_timezone')));
+        date_default_timezone_set($request->getSession()->get('_timezone',
+            $this->coreParametersHelper->getDefaultTimezone()));
     }
 
     /**

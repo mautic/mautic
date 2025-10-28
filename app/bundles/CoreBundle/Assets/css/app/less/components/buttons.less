@@ -46,7 +46,7 @@
     min-width: 13px;
     order: 2;
     line-height: inherit;
-    font-size: 12px;
+    font-size: calc(1em - 1px);
     vertical-align: -.05em;
   }
 
@@ -90,7 +90,7 @@
     &.btn-info { color: @brand-info; }
   }
 
-  &.btn-block {width: 100%;}
+  &.btn-block, &.btn-wide {width: 100%;}
 }
 
 .btn ~ .btn,
@@ -180,7 +180,7 @@
   padding-right: var(--spacing-10);
   gap: var(--spacing-07);
   &:has(i) {padding-right: var(--spacing-05);}
-  &.btn-icon {
+  &.btn--icon-only {
     padding-right: 0;
     span { width: initial;}
   }
@@ -210,7 +210,7 @@
 
   //// Ghost Danger
   &.btn-danger,
-  &.btn-danger.btn-icon {
+  &.btn-danger.btn--icon-only {
     .button-variant(
       @background: transparent,
       @text-color: var(--button-danger-secondary),
@@ -224,7 +224,7 @@
   }
 
   //// Ghost icon only
-  &.btn-icon {
+  &.btn--icon-only {
     .button-variant(
       @background: transparent,
       @text-color: var(--icon-primary),
@@ -241,7 +241,7 @@
 }
 
 // Ghost icon only
-.btn-icon {
+.btn--icon-only {
   justify-content: center;
   padding: 0;
   align-items: center;
@@ -277,15 +277,42 @@
 
 // Make a button look and behave like a link
 .btn-link {
+  --btn-height: auto;
   font-weight: @btn-font-weight;
   color: var(--link-primary);
-  height: auto;
-  line-height: normal;
-  padding: 0;
+  height: var(--btn-height);
+  line-height: var(--btn-line-height);
+  padding: 0 var(--spacing-05);
   &:hover,
   &:focus { text-decoration: none; }
 
-  i { font-size: 18px; }
+  span {
+    position: relative;
+  }
+
+  span:before {
+    content: '';
+    position: absolute;
+    background-color: transparent;
+    pointer-events: none;
+    width: 100%;
+    height: 1px;
+    bottom: -1px;
+    transition: var(--transition-all-productive);
+  }
+
+  i { font-size: calc(1em + 2px); }
+
+  &:hover {
+    span:before {
+      background-color: var(--link-primary-hover);
+    }
+  }
+
+  &:hover,
+  &:focus { 
+    text-decoration: none;
+  }
 }
 
 .btn-info {
@@ -307,18 +334,18 @@
     justify-content: flex-end;
     gap: 1px;
     margin: -15px;
-
-      .btn {
-        align-items: flex-start;
-        height: var(--spacing-10);
-        width: var(--spacing-13);
-        border-radius: 0;
-        &:only-child { flex-grow: 1; }
-      }
-      .btn + .btn { margin: 0; }
-      &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
-      &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
-   }
+    
+    .btn {
+      align-items: flex-start;
+      height: var(--spacing-10);
+      width: var(--spacing-13);
+      border-radius: 0;
+      &:only-child { flex-grow: 1; }
+    }
+    .btn + .btn { margin: 0; }
+    &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
+    &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
+  }
 }
 
 // Popover footer

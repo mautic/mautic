@@ -7,17 +7,56 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class FormEntity extends CommonEntity
 {
     /**
      * @var bool
      */
+    #[Groups([
+        'category:read', 'category:write',
+        'notification:read', 'notification:write',
+        'company:read', 'company:write',
+        'leadfield:read', 'leadfield:write',
+        'page:read', 'page:write',
+        'campaign:read', 'campaign:write',
+        'point:read', 'point:write',
+        'trigger:read', 'trigger:write',
+        'message:read', 'message:write',
+        'focus:read', 'focus:write',
+        'sms:read', 'sms:write',
+        'asset:read', 'asset:write',
+        'dynamicContent:read', 'dynamicContent:write',
+        'form:read', 'form:write',
+        'stage:read', 'stage:write',
+        'segment:read', 'segment:write',
+        'email:read', 'email:write',
+    ])]
     private $isPublished = true;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups([
+        'category:read', 'category:write',
+        'notification:read', 'notification:write',
+        'company:read', 'company:write',
+        'leadfield:read', 'leadfield:write',
+        'page:read', 'page:write',
+        'campaign:read', 'campaign:write',
+        'point:read', 'point:write',
+        'trigger:read', 'trigger:write',
+        'message:read', 'message:write',
+        'focus:read', 'focus:write',
+        'asset:read', 'asset:write',
+        'sms:read', 'sms:write',
+        'segment:read', 'segment:write',
+        'email:read', 'email:write',
+        'dynamicContent:read', 'dynamicContent:write',
+        'form:read', 'form:write',
+        'stage:read', 'stage:write',
+    ])]
     private $dateAdded;
 
     /**
@@ -33,6 +72,23 @@ class FormEntity extends CommonEntity
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups([
+        'category:read', 'category:write',
+        'notification:read', 'notification:write',
+        'company:read', 'company:write',
+        'leadfield:read', 'leadfield:write',
+        'page:read', 'page:write',
+        'campaign:read', 'campaign:write',
+        'point:read', 'point:write',
+        'trigger:read', 'trigger:write',
+        'message:read', 'message:write',
+        'focus:read', 'focus:write',
+        'dynamicContent:read', 'dynamicContent:write',
+        'form:read', 'form:write',
+        'stage:read', 'stage:write',
+        'segment:read', 'segment:write',
+        'asset:read', 'asset:write',
+    ])]
     private $dateModified;
 
     /**
@@ -188,7 +244,7 @@ class FormEntity extends CommonEntity
                 }
             }
 
-            return ('published' == $status) ? true : false;
+            return 'published' === $status;
         }
 
         return $this->getIsPublished();

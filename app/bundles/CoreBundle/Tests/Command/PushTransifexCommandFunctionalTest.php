@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Command;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Command\PushTransifexCommand;
+use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
+    use ClientMockTrait;
+
     protected function setUp(): void
     {
         $this->configParams['transifex_api_token'] = 'some_api_token';
@@ -23,7 +25,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testPullCommand(): void
     {
-        $handlerStack = static::getContainer()->get(MockHandler::class);
+        $handlerStack = $this->getClientMockHandler();
 
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(

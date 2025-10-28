@@ -13,7 +13,7 @@ trait ExpressionHelperTrait
      *
      * @return mixed
      */
-    public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull, CompositeExpression $appendTo = null)
+    public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull, ?CompositeExpression $appendTo = null)
     {
         // in/notIn for dbal will use a raw array
         if (!is_array($parameter) && !str_starts_with($parameter, ':')) {

@@ -51,10 +51,13 @@ class ContactSegmentFilterFactory
                         continue; // If no value set for the filter, don't consider it
                     }
                     $factorSegmentFilter                    = $this->factorSegmentFilter($nestedFilter, $batchLimiters);
-                    $mergedProperty[$index]['filter_value'] = $factorSegmentFilter->getParameterValue();
-                    $mergedProperty[$index]['operator']     = $factorSegmentFilter->getOperator();
-                    $mergedProperty[$index]['field']        = $factorSegmentFilter->getField();
-                    $mergedProperty[$index]['type']         = $factorSegmentFilter->getType();
+                    $mergedProperty[$index]                 = [
+                        'filter_value' => $factorSegmentFilter->getParameterValue(),
+                        'operator'     => $factorSegmentFilter->getOperator(),
+                        'field'        => $factorSegmentFilter->getField(),
+                        'type'         => $factorSegmentFilter->getType(),
+                        'filter'       => $factorSegmentFilter,
+                    ];
                 }
                 if ($factorSegmentFilter) {
                     $factorSegmentFilter->contactSegmentFilterCrate->setMergedProperty($mergedProperty);

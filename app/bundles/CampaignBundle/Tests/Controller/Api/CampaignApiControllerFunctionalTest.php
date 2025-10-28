@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -15,18 +19,27 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
+final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use UserEntityTrait;
+
     public function setUp(): void
     {
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
+        $this->useCleanupRollback                = false;
 
         parent::setUp();
     }
 
-    public function testCreateNewCampaign(): void
+    /**
+     * Creates and persists common test entities used across multiple tests.
+     *
+     * @return array<string, mixed> Array containing the created entities
+     */
+    private function createTestEntities(): array
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
@@ -76,6 +89,26 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($member1);
         $this->em->persist($member2);
         $this->em->flush();
+
+        return [
+            'user'     => $user,
+            'segment'  => $segment,
+            'email'    => $email,
+            'dwc'      => $dwc,
+            'company'  => $company,
+            'contact1' => $contact1,
+            'contact2' => $contact2,
+        ];
+    }
+
+    public function testCreateNewCampaign(): void
+    {
+        $entities = $this->createTestEntities();
+        $user     = $entities['user'];
+        $segment  = $entities['segment'];
+        $email    = $entities['email'];
+        $dwc      = $entities['dwc'];
+        $company  = $entities['company'];
 
         $payload = [
             'name'        => 'test',
@@ -222,14 +255,14 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // The email is has mailer is owner ON but this contact doesn't have any owner. So it uses default FROM and Reply-To.
         Assert::assertSame('Ahoy contact@one.email', $email1->getSubject());
-        Assert::assertMatchesRegularExpression('#Your email is <b>contact@one\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email1->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@one\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email1->getHtmlBody());
         Assert::assertSame('Your email is contact@one.email', $email1->getTextBody());
         Assert::assertCount(1, $email1->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email1->getFrom()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email1->getFrom()[0]->getAddress());
         Assert::assertCount(1, $email1->getTo());
         Assert::assertSame('', $email1->getTo()[0]->getName());
-        Assert::assertSame($contact1->getEmail(), $email1->getTo()[0]->getAddress());
+        Assert::assertSame($entities['contact1']->getEmail(), $email1->getTo()[0]->getAddress());
         Assert::assertCount(1, $email1->getReplyTo());
         Assert::assertSame('', $email1->getReplyTo()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email1->getReplyTo()[0]->getAddress());
@@ -238,14 +271,14 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // This contact does have an owner so it uses FROM and Rply-to from the owner.
         Assert::assertSame('Ahoy contact@two.email', $email2->getSubject());
-        Assert::assertMatchesRegularExpression('#Your email is <b>contact@two\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email2->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@two\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]*" alt="" \/>#', $email2->getHtmlBody());
         Assert::assertSame('Your email is contact@two.email', $email2->getTextBody());
         Assert::assertCount(1, $email2->getFrom());
         Assert::assertSame($user->getName(), $email2->getFrom()[0]->getName());
         Assert::assertSame($user->getEmail(), $email2->getFrom()[0]->getAddress());
         Assert::assertCount(1, $email2->getTo());
         Assert::assertSame('', $email2->getTo()[0]->getName());
-        Assert::assertSame($contact2->getEmail(), $email2->getTo()[0]->getAddress());
+        Assert::assertSame($entities['contact2']->getEmail(), $email2->getTo()[0]->getAddress());
         Assert::assertCount(1, $email2->getReplyTo());
         Assert::assertSame('', $email2->getReplyTo()[0]->getName());
         Assert::assertSame($user->getEmail(), $email2->getReplyTo()[0]->getAddress());
@@ -259,5 +292,307 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($payload['description'], $response['campaigns'][$campaignId]['description'], $clientResponse->getContent());
         Assert::assertEquals($payload['events'][0]['name'], $response['campaigns'][$campaignId]['events'][0]['name'], $clientResponse->getContent());
         Assert::assertEquals($segment->getId(), $response['campaigns'][$campaignId]['lists'][0]['id'], $clientResponse->getContent());
+    }
+
+    public function testExportCampaignAction(): void
+    {
+        $entities = $this->createTestEntities();
+        $user     = $entities['user'];
+        $segment  = $entities['segment'];
+        $email    = $entities['email'];
+        $dwc      = $entities['dwc'];
+        $company  = $entities['company'];
+
+        // Create the campaign
+        $campaign = new Campaign();
+        $campaign->setName('test campaign');
+        $campaign->setDescription('Test campaign for export');
+
+        // Create events
+        $event1 = new Event();
+        $event1->setName('DWC event test');
+        $event1->setDescription('API test');
+        $event1->setType('dwc.decision');
+        $event1->setEventType('decision'); // Set the event type
+        $event1->setCampaign($campaign);  // Set the campaign for this event
+        $event1->setTriggerWindow(null);
+
+        $event2 = new Event();
+        $event2->setName('Send email');
+        $event2->setDescription('API test');
+        $event2->setType('email.send');
+        $event2->setEventType('action'); // Set the event type
+        $event2->setCampaign($campaign);  // Set the campaign for this event
+        $event2->setTriggerWindow(null);
+
+        // Add events to the campaign (using addEvents)
+        $campaign->addEvents([
+            'new_43' => $event1, // Key for event1
+            'new_44' => $event2, // Key for event2
+        ]);
+
+        // Persist campaign and events
+        $this->em->persist($event1);
+        $this->em->persist($event2);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Export the campaign
+        $this->client->request(Request::METHOD_GET, '/api/campaigns/export/99999');
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(404, (string) $clientResponse->getStatusCode());
+
+        $this->client->request(Request::METHOD_GET, '/api/campaigns/export/'.$campaign->getId());
+        $clientResponse = $this->client->getResponse();
+
+        // Check response status code
+        $this->assertResponseStatusCodeSame(200, (string) $clientResponse->getStatusCode());
+
+        // Decode the response content
+        $responseData = json_decode($clientResponse->getContent(), true);
+
+        // Ensure the response contains campaign data
+        $this->assertNotEmpty($responseData);
+        $this->assertArrayHasKey('campaign', $responseData[0]);
+
+        // Since 'campaign' is an array, we'll need to check the first element
+        $this->assertArrayHasKey('name', $responseData[0]['campaign'][0]);  // Access the first campaign in the array
+        $this->assertEquals($campaign->getName(), $responseData[0]['campaign'][0]['name']);
+        $this->assertEquals($campaign->getDescription(), $responseData[0]['campaign'][0]['description']);
+
+        // Check if the campaign export includes the expected events
+        $this->assertCount(2, $responseData[0]['campaign_event']);
+
+        // Ensure proper serialization of the campaign events
+        foreach ($responseData[0]['campaign_event'] as $event) {
+            $this->assertArrayHasKey('id', $event);
+            $this->assertArrayHasKey('name', $event);
+            // Additional checks for event properties if necessary
+        }
+    }
+
+    public function testExportCampaignActionAccessDenied(): void
+    {
+        // Create a user without export permissions
+        $nonAdminUser = $this->createUserWithPermission([
+            'user-name'  => 'non-admin',
+            'email'      => 'non-admin@mautic-test.com',
+            'first-name' => 'non-admin',
+            'last-name'  => 'non-admin',
+            'role'       => [
+                'name'        => 'perm_non_admin',
+                'permissions' => [
+                    'campaign:campaigns'     => 2,
+                    'campaign:export:enable' => 2,
+                ],
+            ],
+        ]);
+
+        $this->loginUser($nonAdminUser);
+
+        // Create and persist a campaign
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign');
+        $campaign->setDescription('Test description');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Attempt to export the campaign
+        $this->client->request(Request::METHOD_GET, '/api/campaigns/export/'.$campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        // Assert that access is denied
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    public function testImportCampaignActionJson(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/campaigns/import',
+            [],
+            [],
+            [],
+            json_encode(FixtureHelper::getPayload(), JSON_PRETTY_PRINT)
+        );
+
+        $clientResponse = $this->client->getResponse();
+
+        // Debug early exit if something fails
+        if (201 !== $clientResponse->getStatusCode()) {
+            $this->fail('Import failed with error: '.$clientResponse->getContent());
+        }
+
+        // Success check
+        $this->assertResponseStatusCodeSame(201, 'Expected status code 201 for successful import.');
+        $responseData = json_decode($clientResponse->getContent(), true);
+        $this->assertIsArray($responseData);
+        $this->assertContains('Import successful: Imported campaigns are switched off by default.', $responseData);
+    }
+
+    public function testImportCampaignActionZip(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create temporary zip file
+        $zip     = new \ZipArchive();
+        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_zip_test').'.zip';
+
+        if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
+            $zip->addFromString('campaign.json', json_encode(FixtureHelper::getPayload(), JSON_PRETTY_PRINT));
+            $zip->close();
+        } else {
+            $this->fail('Failed to create test ZIP file.');
+        }
+
+        // Upload via API
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/campaigns/import',
+            [],
+            ['file'         => new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'import.zip')],
+            ['CONTENT_TYPE' => 'multipart/form-data']
+        );
+
+        $response = $this->client->getResponse();
+
+        // Clean up file
+        unlink($zipPath);
+
+        if (201 !== $response->getStatusCode()) {
+            $this->fail('Import failed with error: '.$response->getContent());
+        }
+
+        $this->assertResponseStatusCodeSame(201);
+        $decoded = json_decode($response->getContent(), true);
+        $this->assertContains('Import successful: Imported campaigns are switched off by default.', $decoded);
+    }
+
+    public function testImportCampaignAccessDenied(): void
+    {
+        $userWithoutPermission = $this->createUserWithPermission([
+            'user-name'  => 'no-import-user',
+            'email'      => 'no-import@mautic-test.com',
+            'first-name' => 'NoImport',
+            'last-name'  => 'User',
+            'role'       => [
+                'name'        => 'no_import_role',
+                'permissions' => [
+                    // Do not grant 'campaign:imports:create'
+                ],
+            ],
+        ]);
+
+        $this->loginUser($userWithoutPermission);
+
+        // Attempt to import a campaign
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import');
+
+        $response = $this->client->getResponse();
+
+        // Assert that access is denied
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testImportCampaignNoFileUploaded(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Attempt to import with no files
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import');
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('No JSON content found and exactly one ZIP file must be uploaded.', $response->getContent());
+    }
+
+    private function createTemporaryFile(string $extension): string
+    {
+        $filePath = tempnam(sys_get_temp_dir(), 'mautic_test_').'.'.$extension;
+        file_put_contents($filePath, 'test content');
+
+        return $filePath;
+    }
+
+    public function testImportCampaignInvalidFile(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create a temporary file
+        $filePath = $this->createTemporaryFile('txt');
+
+        // Upload the invalid file
+        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testImportCampaignUnsupportedFileType(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create a temporary file with a non-ZIP extension
+        $filePath = $this->createTemporaryFile('txt');
+        $file     = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testImportCampaignMalformedJson(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create a temporary ZIP file with valid structure but malformed JSON
+        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_test_').'.zip';
+        $zip     = new \ZipArchive();
+        if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
+            // Add a valid JSON file with malformed content
+            $zip->addFromString('campaign.json', '{invalid json content}');
+            $zip->close();
+        } else {
+            $this->fail('Failed to create test ZIP file.');
+        }
+
+        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'test.zip', null, null, true);
+
+        try {
+            $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+            $response = $this->client->getResponse();
+
+            $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+            $this->assertStringContainsString('Invalid JSON', $response->getContent());
+        } finally {
+            // Clean up - check if file exists before trying to delete
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+        }
     }
 }

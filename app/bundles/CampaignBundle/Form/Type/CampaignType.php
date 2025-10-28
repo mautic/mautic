@@ -112,7 +112,7 @@ class CampaignType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-ghost btn-dnd',
+                        'class'   => 'btn btn-tertiary btn-dnd',
                         'icon'    => 'ri-organization-chart',
                         'onclick' => 'Mautic.launchCampaignEditor();',
                     ],
@@ -121,6 +121,10 @@ class CampaignType extends AbstractType
         ]);
 
         $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
+        $builder->add('campaignElements', HiddenType::class, [
             'mapped' => false,
         ]);
     }

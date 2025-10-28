@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -29,7 +28,6 @@ use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
-use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -521,14 +519,6 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @return LeadField[]|array<int,mixed>|iterable<LeadField>|\Doctrine\ORM\Internal\Hydration\IterableResult<LeadField>|Paginator<LeadField>|SimplePaginator<LeadField>
-     */
-    public function getEntities(array $args = [])
-    {
-        return $this->getRepository()->getEntities($args);
-    }
-
-    /**
      * @return array
      */
     public function getLeadFields()
@@ -1017,22 +1007,21 @@ class FieldModel extends FormModel
         return $leadFields;
     }
 
-    /**
-     * Get the MySQL database type based on the field type
-     * Use a static function so that it's accessible from DoctrineSubscriber
-     * without causing a circular service injection error.
-     *
-     * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
-     *
-     * @param bool $isUnique
-     */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false): array
-    {
-        return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
-    }
-
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    public function generateUniqueFieldAlias(string $alias): string
+    {
+        $originalAlias = $alias;
+        $i             = 1;
+
+        while ($this->getRepository()->findOneByAlias($alias)) {
+            $alias = $originalAlias.'_'.$i;
+            ++$i;
+        }
+
+        return $alias;
     }
 }

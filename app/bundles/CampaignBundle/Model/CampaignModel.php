@@ -16,6 +16,8 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Form\Type\CampaignType;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
+use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
+use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -172,7 +174,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof CampaignLead) {
             return null;
@@ -228,7 +230,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                     $event->setTempId($v);
                 }
 
-                if (in_array($f, ['id', 'parent'])) {
+                if (in_array($f, ['id', 'parent', 'campaign'])) {
                     continue;
                 }
 
@@ -531,7 +533,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed
      */
-    public function getLeadCampaigns(Lead $lead = null, $forList = false)
+    public function getLeadCampaigns(?Lead $lead = null, $forList = false)
     {
         static $campaigns = [];
 
@@ -746,7 +748,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param int  $limit
      * @param bool $maxLeads
      */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null): int
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, ?OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 
@@ -864,5 +866,31 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
         return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
+    }
+
+    /**
+     * @throws CampaignAlreadyUnpublishedException
+     * @throws CampaignVersionMismatchedException
+     * @throws Exception
+     */
+    public function transactionalCampaignUnPublish(Campaign $campaign): void
+    {
+        $this->em->beginTransaction();
+        $result = $this->getRepository()->getCampaignPublishAndVersionData($campaign->getId());
+
+        if (!(int) $result['is_published']) {
+            $this->em->commit();
+            throw new CampaignAlreadyUnpublishedException('Campaign is unpublished!');
+        }
+
+        if ((int) $result['version'] !== $campaign->getVersion()) {
+            $this->em->commit();
+            throw new CampaignVersionMismatchedException('Version do not match!');
+        }
+
+        $campaign->setIsPublished(false);
+        $campaign->markForVersionIncrement();
+        $this->saveEntity($campaign);
+        $this->em->commit();
     }
 }

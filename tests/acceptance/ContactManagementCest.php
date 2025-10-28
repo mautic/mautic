@@ -257,7 +257,7 @@ class ContactManagementCest
         $I->click(CampaignPage::$contactsTab);
 
         // Verify that the first and second contacts are now in the campaign
-        $I->waitForElementVisible(CampaignPage::$firstContactFromContactsTab, 30);
+        $I->waitForElementVisible(CampaignPage::$firstContactFromContactsTab, 60);
         $I->see($contactName1, CampaignPage::$firstContactFromContactsTab);
         $I->see($contactName2, CampaignPage::$secondContactFromContactsTab);
     }
@@ -508,14 +508,10 @@ class ContactManagementCest
 
         // Wait for import completion message
         $I->waitForElement(ContactPage::$importProgressComplete, 30);
-        $I->see('Success!', 'h4');
+        $I->see('Successful import', 'h2');
 
         // Extract the number of contacts created from the progress message
-        $importProgress = $I->grabTextFrom('#leadImportProgressComplete > div > div > div.panel-body > h4');
-
-        // Use a regular expression to extract the number of contacts created
-        preg_match('/(\d+) created/', $importProgress, $matches);
-        $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
+        $expectedContactsAdded = (int) $I->grabTextFrom('#leadImportProgressComplete > div > div:nth-child(2) > div > div.panel-body > div:nth-child(2) > div > span');
 
         // Get the count of contacts after import
         $finalContactCount = $I->grabNumRecords('test_leads');

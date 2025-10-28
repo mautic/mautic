@@ -173,7 +173,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
-    private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
+    private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();
         $segment->setName($name);
@@ -641,30 +641,32 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentWarningIcon(): void
     {
-        $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
-        $segmentWithFreshLastRebuildDate          = $this->saveSegment('Lead List 2', 'lead-list-2');
-        $segmentWithOldLastRebuildDateUnpublished = $this->saveSegment('Lead List 3', 'lead-list-3');
+        $segmentWithOldLastRebuildDate            = $this->saveSegment('TEST-Warning-Segment', 'test-warning-segment');
+        $segmentWithFreshLastRebuildDate          = $this->saveSegment('TEST-Fresh-Segment', 'test-fresh-segment');
+        $segmentUnpublished                       = $this->saveSegment('TEST-Unpublished-Segment', 'test-unpublished-segment');
 
         $segmentWithOldLastRebuildDate->setLastBuiltDate(new \DateTime('-1 year'));
         $segmentWithFreshLastRebuildDate->setLastBuiltDate(new \DateTime('now'));
-        $segmentWithOldLastRebuildDateUnpublished->isPublished(false);
+        $segmentUnpublished->setIsPublished(false);
 
         $this->em->persist($segmentWithOldLastRebuildDate);
         $this->em->persist($segmentWithFreshLastRebuildDate);
-        $this->em->persist($segmentWithOldLastRebuildDateUnpublished);
-
+        $this->em->persist($segmentUnpublished);
         $this->em->flush();
 
-        // Check segment count UI for no contacts.
-        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
-        $this->assertEquals(3, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
-        $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
-        $this->assertEquals(0, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
-        $this->assertEquals(0, $secondColumnOfLine);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+
+        $warningSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Warning-Segment')]");
+        $warningIcon       = $warningSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
+        $this->assertEquals(1, $warningIcon->count());
+
+        $freshSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Fresh-Segment')]");
+        $warningIcon     = $freshSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
+        $this->assertEquals(0, $warningIcon->count());
+
+        $unpublishedSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Unpublished-Segment')]");
+        $warningIcon           = $unpublishedSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
+        $this->assertEquals(0, $warningIcon->count());
     }
 
     public function testBatchDeleteWithEmptyMembership(): void
@@ -775,5 +777,47 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));
+    }
+
+    public function testActiveContactsStatExcludesDnc(): void
+    {
+        $segment  = $this->saveSegment('active-test', 'active-test');
+        $contact1 = new Lead();
+        $contact1->setFirstname('Active');
+        $this->em->persist($contact1);
+        $contact2 = new Lead();
+        $contact2->setFirstname('DNC');
+        $this->em->persist($contact2);
+        $this->em->flush();
+        $segmentContact1 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact1->setList($segment);
+        $segmentContact1->setLead($contact1);
+        $segmentContact1->setDateAdded(new \DateTime());
+        $segmentContact1->setManuallyAdded(false);
+        $segmentContact1->setManuallyRemoved(false);
+        $this->em->persist($segmentContact1);
+        $segmentContact2 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact2->setList($segment);
+        $segmentContact2->setLead($contact2);
+        $segmentContact2->setDateAdded(new \DateTime());
+        $segmentContact2->setManuallyAdded(false);
+        $segmentContact2->setManuallyRemoved(false);
+        $this->em->persist($segmentContact2);
+        $this->em->flush();
+        $dnc = new \Mautic\LeadBundle\Entity\DoNotContact();
+        $dnc->setChannel('email');
+        $dnc->setLead($contact2);
+        $dnc->setReason(\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED);
+        $dnc->setDateAdded(new \DateTime());
+        $this->em->persist($dnc);
+        $this->em->flush();
+        $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $html = $response->getContent();
+        $this->assertStringContainsString('Total contacts', $html);
+        $this->assertStringContainsString('2', $html);
+        $this->assertStringContainsString('Active contacts', $html);
+        $this->assertStringContainsString('1', $html);
     }
 }

@@ -91,7 +91,18 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
     }
 
-    public function testSuccessfulSubmitActionForm(): void
+    public function testNewActionCheckDisplayMessageOptionsForm(): void
+    {
+        $this->client->request('GET', '/s/forms/new');
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
+        $this->assertStringContainsString('Hide form', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Redirect URL', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Remain at form', $clientResponse->getContent(), $clientResponse->getContent());
+    }
+
+    public function testErrorValidationWithHideFormTypeWithoutMessage(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -101,17 +112,42 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('message', $selectedValue);
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+
         $form->setValues(
             [
-                'mauticform[name]' => 'Test',
+                'mauticform[name]'       => 'Test',
+                'mauticform[postAction]' => 'hideform',
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
+        $this->assertStringContainsString('has-error', $divClass, $crawler->html());
+    }
+
+    public function testSuccessWithHideForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
+
+        $this->assertEquals('message', $selectedValue);
+
+        $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+
+        $form->setValues(
+            [
+                'mauticform[name]'               => 'Test',
+                'mauticform[postAction]'         => 'hideform',
+                'mauticform[postActionProperty]' => 'message',
             ]
         );
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
-
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
-
-        $this->assertStringContainsString('has-error', $divClass);
+        $this->assertStringNotContainsString('has-error', $divClass, $crawler->html());
     }
 
     public function testLanguageForm(): void
@@ -655,6 +691,68 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedForm = $this->em->find(Form::class, $form->getId());
         Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
+    }
+
+    public function testFormDetailsViewWithPreviewPanel(): void
+    {
+        // Create a form
+        $form = $this->createForm('Test Form Details', 'test_form_details');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // Request the form details view
+        $crawler = $this->client->request('GET', sprintf('/s/forms/view/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Check if preview panel exists
+        $previewPanel = $crawler->filter('div.panel.shd-none.bdr-rds-0.bdr-w-0.mt-sm.mb-0');
+
+        if ($previewPanel->count() > 0) {
+            // If preview panel exists, verify its structure
+            $panelHeading = $previewPanel->filter('.panel-heading .panel-title:contains("Preview")');
+            $this->assertCount(1, $panelHeading, 'Preview panel should have correct heading structure');
+
+            $panelBody = $previewPanel->filter('.panel-body.pt-xs');
+            $this->assertCount(1, $panelBody, 'Preview panel should have correct body structure');
+        }
+    }
+
+    public function testSliderFieldRendersWithInputAttributes(): void
+    {
+        // Create a form with a slider field
+        $form = $this->createForm('Test Slider Form', 'test_slider_form');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // Create a slider field
+        $sliderField = $this->createFormField([
+            'label' => 'Test Slider',
+            'type'  => 'slider',
+        ]);
+        $sliderField->setProperties([
+            'min'  => 0,
+            'max'  => 100,
+            'step' => 5,
+        ]);
+        $sliderField->setForm($form);
+        $sliderField->setOrder(1);
+        $this->em->persist($sliderField);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Request the form preview instead of view
+        $crawler = $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Check that the slider input has the oninput attribute
+        $sliderInput = $crawler->filter('input[type="range"]');
+        $this->assertCount(1, $sliderInput, 'Slider input should be present');
+
+        $oninputAttr = $sliderInput->attr('oninput');
+        $this->assertNotNull($oninputAttr, 'Slider input should have oninput attribute');
+        $this->assertStringContainsString('document.getElementById', $oninputAttr, 'Slider input should use getElementById to target output element');
+        $this->assertStringContainsString('.textContent = this.value', $oninputAttr, 'Slider input should set output value to input value');
     }
 
     private function createForm(string $name, string $alias): Form

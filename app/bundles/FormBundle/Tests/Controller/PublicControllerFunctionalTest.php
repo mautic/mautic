@@ -87,7 +87,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    private function createCompany(string $name, string $city = null, string $state = null): Company
+    private function createCompany(string $name, ?string $city = null, ?string $state = null): Company
     {
         $company = new Company();
         $company->setName($name);

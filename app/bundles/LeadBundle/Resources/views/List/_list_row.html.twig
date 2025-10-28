@@ -45,6 +45,7 @@
             {% else %}
                 {{ item.name }} ({{ item.alias }})
             {% endif %}
+            {{ include('@MauticProject/Modules/projects.html.twig') }}
             {% if not item.isGlobal and app.user.id != item.createdBy %}
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>
@@ -54,7 +55,7 @@
             {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
-                       data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt}) }}">
+                       data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt  | number_format(2)}) }}">
                     <i class="text-danger ri-error-warning-line fs-14"></i></label>
             {% endif %}
             {% if item.lastBuiltTime >= segmentBuildWarningThreshold %}

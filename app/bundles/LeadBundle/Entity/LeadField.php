@@ -2,6 +2,13 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -14,29 +21,29 @@ use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Mautic\LeadBundle\Validator\LeadFieldMinimumLength;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "leadfield:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "leadfield:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('lead:leads:viewown')"),
+        new Post(security: "is_granted('lead:leads:create')"),
+        new Get(security: "is_granted('lead:leads:viewown')"),
+        new Put(security: "is_granted('lead:leads:editown')"),
+        new Patch(security: "is_granted('lead:leads:editother')"),
+        new Delete(security: "is_granted('lead:leads:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['leadfield:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['leadfield:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -50,70 +57,86 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         'url',
         'email',
     ];
+    public const ENTITY_NAME        = 'lead_field';
 
     /**
      * @var int
      */
+    #[Groups(['leadfield:read'])]
     private $id;
+
+    private bool $isCloned = false;
 
     /**
      * @var string
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $label;
 
     /**
      * @var string
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $alias;
 
     /**
      * @var string
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $type = 'text';
 
     /**
      * @var string|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $group = 'core';
 
     /**
      * @var string|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $defaultValue;
 
     /**
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isRequired = false;
 
     /**
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isFixed = false;
 
     /**
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isVisible = true;
 
     /**
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isShortVisible = false;
 
     /**
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isListable = true;
 
     /**
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isPubliclyUpdatable = false;
 
     /**
      * @var bool|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isUniqueIdentifer = false;
 
     /**
@@ -121,42 +144,51 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      *
      * @var bool
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $isUniqueIdentifier = false;
 
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private ?int $charLengthLimit = 64;
 
     /**
      * @var int|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $order = 1;
 
     /**
      * @var string|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $object = 'lead';
 
     /**
      * @var array
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $properties = [];
 
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private bool $isIndex = false;
 
     /**
      * The column in lead_fields table was not created yet if this property is true.
      * Entity cannot be published and we cannot work with it until column is created.
      */
+    #[Groups(['leadfield:read'])]
     private bool $columnIsNotCreated = false;
 
     /**
      * The column in lead_fields table was not removed yet if this property is true.
      */
+    #[Groups(['leadfield:read'])]
     private bool $columnIsNotRemoved = false;
 
     /**
      * This property contains an original value for $isPublished.
      * $isPublished is always set on false if $columnIsNotCreated is true.
      */
+    #[Groups(['leadfield:read'])]
     private bool $originalIsPublishedValue = false;
 
     /**
@@ -166,7 +198,10 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id         = null;
+        $this->isCloned   = true;
+        $this->order      =  0;
+        $this->isFixed    = false;
 
         parent::__clone();
     }
@@ -286,8 +321,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
             'message' => 'mautic.lead.field.alias.unique',
         ]));
 
-        $metadata->addConstraint(new Assert\Callback([
-            'callback' => function (LeadField $field, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Assert\Callback(
+            function (LeadField $field, ExecutionContextInterface $context): void {
                 $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
 
                 if ($violations->count() > 0) {
@@ -296,7 +331,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
                         ->addViolation();
                 }
             },
-        ]));
+        ));
 
         $metadata->addConstraint(new LeadFieldMinimumLength());
     }
@@ -350,6 +385,11 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getIsCloned(): bool
+    {
+        return $this->isCloned;
     }
 
     /**

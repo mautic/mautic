@@ -130,7 +130,7 @@ class TableSchemaHelper
                     throw new SchemaException('A column is missing required name key.');
                 }
 
-                if (!isset($columns[$column['name']])) {
+                if (!in_array($column['name'], $columnsAdded, true)) {
                     $type       = $column['type'] ?? 'text';
                     $colOptions = $column['options'] ?? [];
 
@@ -196,7 +196,7 @@ class TableSchemaHelper
      */
     public function checkTableExists($table, $throwException = false): bool
     {
-        if ($this->sm->tablesExist($this->prefix.$table)) {
+        if ($this->sm->tablesExist([$this->prefix.$table])) {
             if ($throwException) {
                 throw new SchemaException($this->prefix."$table already exists");
             }

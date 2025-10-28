@@ -11,6 +11,7 @@
         <div>
             {{ primaryIdentifier }}
         </div>
+        {{ customContent('lead.name.after', _context) }}
         {% if 'company' in columns|keys and primaryIdentifier != item.secondaryIdentifier and item.secondaryIdentifier %}
             <div class="small">{{ item.secondaryIdentifier|purify }}</div>
         {% endif %}

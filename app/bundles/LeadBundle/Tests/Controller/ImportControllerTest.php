@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -28,6 +29,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testImportWithoutFile(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
@@ -193,6 +196,48 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertArrayNotHasKey('error', $logs[2]->getProperties());
     }
 
+    public function testImportPublishAndUnpublish(): void
+    {
+        $permission = [
+            'lead:imports' => ['view', 'create', 'edit'],
+        ];
+        $role = $this->createRole(false, $permission);
+        $this->createPermission('lead:imports', $role, 36);
+        $user = $this->createUser($role);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Login newly created non-admin user
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
+
+        $uploadForm['lead_import[file]']->setValue((string) $file);
+
+        $crawler     = $this->client->submit($uploadForm);
+        $mappingForm = $crawler->selectButton('Import')->form();
+        $crawler     = $this->client->submit($mappingForm);
+
+        Assert::assertStringContainsString(
+            'Import process was successfully created. But it will not be processed as you do not have permission to publish.',
+            $crawler->html()
+        );
+
+        /** @var ImportRepository $importRepository */
+        $importRepository = $this->em->getRepository(Import::class);
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
+
+        Assert::assertNotNull($importEntity);
+        Assert::assertFalse($importEntity->getIsPublished());
+        Assert::assertSame(Import::STOPPED, $importEntity->getStatus());
+    }
+
     public function testImportFailedWithImportFailedException(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
@@ -233,6 +278,75 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString($expectedString, $applicationTester->getDisplay());
     }
 
+    public function testImportWithSkipIfExistsFlagTrue(): void
+    {
+        $this->createBooleanField();
+        $lead = $this->createLead('john@doe.email', 'Johny');
+        $this->createCompanyForLead($lead, 'Company A');
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts-with-custom-field.csv', 'contacs.csv', 'itext/csv');
+
+        $uploadForm['lead_import[file]']->setValue((string) $file);
+
+        $crawler     = $this->client->submit($uploadForm);
+        $mappingForm = $crawler->selectButton('Import')->form();
+        $mappingForm['lead_field_import[skip_if_exists]']->setValue('1');
+
+        // fetch company name mapping value
+        $primaryCompanyOptions = $crawler->filter("#lead_field_import_company > optgroup[label='Primary company']")->filter('option');
+        $optionValues          = $primaryCompanyOptions->each(function ($node) {
+            if ('Company Name' === $node->text()) {
+                return $node->attr('value');
+            }
+        });
+        $companyFieldMapping = array_filter($optionValues);
+        $mappingForm['lead_field_import[company]']->setValue(end($companyFieldMapping));
+        $crawler = $this->client->submit($mappingForm);
+
+        Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html(), $crawler->html());
+
+        $this->em->clear();
+
+        /** @var ImportRepository $importRepository */
+        $importRepository = $this->em->getRepository(Import::class);
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-with-custom-field.csv']);
+
+        $fields = ['email' => 'email', 'firstname' => 'firstname', 'lastname' => 'lastname', 'company' => 'companyname', 'custom_boolean_field' => 'custom_boolean_field'];
+
+        Assert::assertNotNull($importEntity);
+        Assert::assertSame(2, $importEntity->getLineCount());
+        Assert::assertSame('lead', $importEntity->getObject());
+        Assert::assertEquals($fields, $importEntity->getProperties()['fields']);
+        Assert::assertEquals(array_keys($fields), $importEntity->getProperties()['headers']);
+
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
+
+        $this->em->clear();
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-with-custom-field.csv']);
+
+        Assert::assertNotNull($importEntity);
+        Assert::assertSame(2, $importEntity->getLineCount());
+        Assert::assertSame(1, $importEntity->getInsertedCount());
+        Assert::assertSame(1, $importEntity->getUpdatedCount());
+        Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
+
+        /** @var LeadRepository $importRepository */
+        $leadRepository = $this->em->getRepository(Lead::class);
+
+        /** @var Lead[] $contacts */
+        $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
+        Assert::assertSame('Johny', $contacts[0]->getFirstname());
+        Assert::assertSame('Company A', $contacts[0]->getCompany());
+        Assert::assertSame('Company B', $contacts[1]->getCompany());
+        Assert::assertCount(2, $contacts);
+    }
+
     private function setPhoneFieldIsRequired(bool $required): void
     {
         /** @var LeadFieldRepository $fieldRepository */
@@ -245,7 +359,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $fieldRepository->saveEntity($phoneField);
     }
 
-    private function createLead(string $email = null, string $firstName = ''): Lead
+    private function createLead(?string $email = null, string $firstName = ''): Lead
     {
         $lead = new Lead();
         if (!empty($email)) {
@@ -255,25 +369,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->em->persist($lead);
 
         return $lead;
-    }
-
-    private function createCompanyForLead(Lead $lead, string $companyName): void
-    {
-        $company = new Company();
-        $company->setName($companyName);
-        $this->em->persist($company);
-
-        // add company to lead
-        $lead->setCompany($companyName);
-        $this->em->persist($lead);
-
-        // set primary company for lead
-        $companyLead = new CompanyLead();
-        $companyLead->setCompany($company);
-        $companyLead->setLead($lead);
-        $companyLead->setDateAdded(new \DateTime());
-        $companyLead->setPrimary(true);
-        $this->em->persist($companyLead);
     }
 
     /**
@@ -315,6 +410,44 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->em->persist($user);
 
         return $user;
+    }
+
+    private function createBooleanField(): void
+    {
+        $user = $this->em->getRepository(User::class)
+            ->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $this->loginUser($user);
+        $field = new LeadField();
+        $field->setType('boolean');
+        $field->setObject('lead');
+        $field->setGroup('core');
+        $field->setLabel('Test boolean field');
+        $field->setAlias('custom_boolean_field');
+        $field->setDefaultValue('0');
+        $field->setProperties(['no' => 'No', 'yes' => 'Yes']);
+
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel->saveEntity($field);
+    }
+
+    private function createCompanyForLead(Lead $lead, string $companyName): void
+    {
+        $company = new Company();
+        $company->setName($companyName);
+        $this->em->persist($company);
+
+        // add company to lead
+        $lead->setCompany($companyName);
+        $this->em->persist($lead);
+
+        // set primary company for lead
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(true);
+        $this->em->persist($companyLead);
     }
 
     /**

@@ -3,7 +3,11 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,6 +17,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CompanyListType extends AbstractType
 {
     public const DEFAULT_LIMIT = 100;
+
+    public function __construct(
+        private CompanyRepository $companyRepository,
+    ) {
+    }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -33,6 +42,27 @@ class CompanyListType extends AbstractType
                 'main_entity'         => null,
             ]
         );
+    }
+
+    public function buildView(FormView $view, FormInterface $form, array $options): void
+    {
+        $data = $form->getData();
+        if ($data) {
+            $selectedIds     = is_array($data) ? $data : [$data];
+            $existingChoices = array_column($view->vars['choices'], 'value');
+            $missingIds      = array_diff($selectedIds, $existingChoices);
+
+            if ($missingIds) {
+                $missingCompanies = $this->companyRepository->findBy(['id' => $missingIds]);
+                foreach ($missingCompanies as $company) {
+                    $view->vars['choices'][] = new ChoiceView(
+                        $company->getId(),
+                        (string) $company->getId(),
+                        $company->getName()
+                    );
+                }
+            }
+        }
     }
 
     public function getParent(): ?string

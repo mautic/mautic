@@ -7,6 +7,7 @@ use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Event as Events;
+use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
@@ -53,6 +54,15 @@ class FormValidationSubscriber implements EventSubscriberInterface
                 ]
             );
         }
+
+        $event->addValidator(
+            'checkboxgrp.validation',
+            [
+                'eventName' => FormEvents::ON_FORM_VALIDATE,
+                'fieldType' => 'checkboxgrp',
+                'formType'  => FormFieldCheckboxGroupType::class,
+            ]
+        );
     }
 
     /**
@@ -66,6 +76,8 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $this->fieldTelValidation($event);
             $this->fieldEmailValidation($event);
         }
+
+        $this->fieldCheckboxGroupValidation($event);
     }
 
     private function fieldEmailValidation(Events\ValidationEvent $event): void
@@ -98,6 +110,55 @@ class FormValidationSubscriber implements EventSubscriberInterface
                     $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
                 }
             }
+        }
+    }
+
+    private function fieldCheckboxGroupValidation(Events\ValidationEvent $event): void
+    {
+        $field = $event->getField();
+        if ('checkboxgrp' !== $field->getType()) {
+            return;
+        }
+
+        $value       = $event->getValue();
+        $selectedCnt = 0;
+
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
+        foreach ($value as $v) {
+            if ('' !== $v && null !== $v) {
+                ++$selectedCnt;
+            }
+        }
+
+        $validation = $field->getValidation();
+
+        if (!empty($validation['minimum']) && $selectedCnt < (int) $validation['minimum']) {
+            $message = !empty($validation['min_message'])
+                ? $validation['min_message']
+                : $this->translator->trans(
+                    'mautic.form.submission.checkboxgrp.minimum',
+                    ['%min%' => (int) $validation['minimum']],
+                    'validators'
+                );
+
+            $event->failedValidation($message);
+
+            return;
+        }
+
+        if (!empty($validation['maximum']) && $selectedCnt > (int) $validation['maximum']) {
+            $message = !empty($validation['max_message'])
+                ? $validation['max_message']
+                : $this->translator->trans(
+                    'mautic.form.submission.checkboxgrp.maximum',
+                    ['%max%' => (int) $validation['maximum']],
+                    'validators'
+                );
+
+            $event->failedValidation($message);
         }
     }
 }

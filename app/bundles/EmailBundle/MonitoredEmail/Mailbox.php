@@ -323,7 +323,7 @@ class Mailbox
      * @param int $options
      * @param int $retriesNum
      */
-    public function setConnectionArgs($options = 0, $retriesNum = 0, array $params = null): void
+    public function setConnectionArgs($options = 0, $retriesNum = 0, ?array $params = null): void
     {
         $this->imapOptions    = $options;
         $this->imapRetriesNum = $retriesNum;
@@ -391,7 +391,15 @@ class Mailbox
      */
     protected function isConnected(): bool
     {
-        return $this->isConfigured() && $this->imapStream && @imap_ping($this->imapStream);
+        if (!$this->isConfigured() || !$this->imapStream) {
+            return false;
+        }
+
+        try {
+            return @imap_ping($this->imapStream);
+        } catch (\ValueError|\TypeError) {
+            return false;
+        }
     }
 
     /**

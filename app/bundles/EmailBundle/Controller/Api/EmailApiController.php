@@ -60,7 +60,6 @@ class EmailApiController extends CommonApiController
             'assetList',
             'formList',
             'leadListList',
-            'projectList',
         ];
         $this->dataInputMasks   = [
             'customHtml'     => 'html',
@@ -221,7 +220,7 @@ class EmailApiController extends CommonApiController
         );
     }
 
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         if (isset($params['publicPreview']) && $entity instanceof Email) {
             $entity->setPublicPreview(InputHelper::boolean($params['publicPreview']) ?? false);

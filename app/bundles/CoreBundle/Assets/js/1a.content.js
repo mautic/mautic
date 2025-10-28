@@ -400,6 +400,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(document).ready(callback(this));
     });
 
+    mQuery(container + " *[data-copy]").off('click.copy').on('click.copy', function (event) {
+        event.preventDefault();
+        Mautic.copyToClipboard(mQuery(this).data('copy'));
+    });
 
     mQuery(container + " input[data-toggle='color']").each(function() {
         Mautic.activateColorPicker(this);
@@ -814,9 +818,11 @@ Mautic.onPageUnload = function (container, response) {
 
         if (ckEditors.size > 0) {
             ckEditors.forEach(function(value, key, map){
-                map.get(key).destroy()
-            })
-            ckEditors.clear();
+                if (container === '#app-content' || container === 'body' || mQuery(container).find(key).length > 0 || mQuery(key).closest(container).length > 0) {
+                    map.get(key).destroy();
+                    map.delete(key);
+                }
+            });
         }
 
         mQuery(container + " input[data-toggle='color']").each(function() {
@@ -873,7 +879,7 @@ Mautic.onPageUnload = function (container, response) {
  * @param event
  * @returns {boolean}
  */
-Mautic.ajaxifyLink = function (el, event) {
+Mautic.ajaxifyLink = function (el, event, extraData = {}) {
     if (mQuery(el).hasClass('disabled')) {
         return false;
     }
@@ -923,7 +929,7 @@ Mautic.ajaxifyLink = function (el, event) {
     //give an ajaxified link the option of not displaying the global loading bar
     var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
 
-    Mautic.loadContent(route, link, method, target, showLoadingBar);
+    Mautic.loadContent(route, link, method, target, showLoadingBar, undefined, extraData);
 };
 
 /**
@@ -1147,10 +1153,7 @@ Mautic.activateMultiSelect = function(el) {
             if (isSortable) {
                 mQuery(el).parent('.choice-wrapper').find('.ms-selection').first().sortable({
                     items: '.ms-elem-selection',
-                    helper: function (e, ui) {
-                        ui.width(mQuery(el).width());
-                        return ui;
-                    },
+                    helper: 'clone',
                     axis: 'y',
                     scroll: false,
                     update: function(event, ui) {
@@ -1739,10 +1742,29 @@ Mautic.processCsvContactExport = function (route) {
 };
 
 /**
- * Quick Filters
- * This module handles the quick filtering functionality in Mautic's list views.
- * Includes initialization, toggling, applying, and resetting.
- * @namespace Mautic
+ * Copies text to the clipboard.
+ *
+ * @param {string} text
+ */
+Mautic.copyToClipboard = function (text) {
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    const decodedText = textArea.value || textArea.innerText;
+
+    navigator.clipboard.writeText(decodedText).then(function () {
+        const message = Mautic.translate('mautic.core.notice.copiedtoclipboard');
+        const flashMessage = Mautic.addInfoFlashMessage(message);
+        Mautic.setFlashes(flashMessage);
+    }).catch(function (err) {
+        console.error('Clipboard write error:', err);
+        const message = Mautic.translate('mautic.core.error.copyfailed');
+        const flashMessage = Mautic.addErrorFlashMessage(message);
+        Mautic.setFlashes(flashMessage);
+    });
+};
+
+/**
+ * Quick filters for list views
  */
 
 /**

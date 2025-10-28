@@ -366,6 +366,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     continue;
                 }
 
+                $dncCondition = $this->getDncCondition($filter);
+                if ($dncCondition) {
+                    $andGroup[] = $dncCondition;
+                    continue;
+                }
+
                 switch ($exprFunction) {
                     case 'notEmpty':
                         $andGroup[] = $expr->isNotNull($filter['column']);
@@ -493,6 +499,71 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         return null;
+    }
+
+    /**
+     * Get the Do Not Contact (DNC) condition for a query based on the provided filter.
+     *
+     * @param array{
+     *     column: string,
+     *     condition: string,
+     *     value: string[]
+     * } $filter The filter array containing 'column', 'condition', and 'value' keys
+     */
+    public function getDncCondition(array $filter): ?string
+    {
+        if ('dnc_preferences' !== $filter['column']) {
+            return null;
+        }
+
+        // Handle empty/notEmpty conditions early to avoid unnecessary processing
+        if (in_array($filter['condition'], ['empty', 'notEmpty'], true)) {
+            $operator = 'empty' === $filter['condition'] ? 'NOT IN' : 'IN';
+
+            return sprintf(
+                'l.id %s (SELECT DISTINCT lead_id FROM %slead_donotcontact)',
+                $operator,
+                MAUTIC_TABLE_PREFIX
+            );
+        }
+
+        // Parse and validate filter values
+        $conditions = array_map(
+            function (string $item) {
+                $parts = explode(':', $item);
+                if (2 !== count($parts)) {
+                    throw new \InvalidArgumentException('Invalid DNC filter format');
+                }
+
+                return [
+                    'channel' => $this->db->quote($parts[0]),
+                    'reason'  => (int) $parts[1],
+                ];
+            },
+            $filter['value']
+        );
+
+        if (empty($conditions)) {
+            return null;
+        }
+
+        // Build the subquery
+        $dncSubQuery = $this->db->createQueryBuilder()
+            ->select('DISTINCT lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'ldnc')
+            ->where(implode(' OR ', array_map(
+                fn ($condition) => sprintf(
+                    '(ldnc.channel = %s AND ldnc.reason = %d)',
+                    $condition['channel'],
+                    $condition['reason']
+                ),
+                $conditions
+            )));
+
+        // Generate final condition
+        $operator = 'in' === $filter['condition'] ? 'IN' : 'NOT IN';
+
+        return sprintf('l.id %s (%s)', $operator, $dncSubQuery->getSQL());
     }
 
     /**

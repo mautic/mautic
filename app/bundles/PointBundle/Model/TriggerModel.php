@@ -20,6 +20,7 @@ use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
@@ -37,9 +38,9 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     protected $triggers = [];
 
     /**
-     * @var array<string,array<string,mixed>>
+     * @var array<string, mixed[]>
      */
-    private static array $events;
+    private $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
@@ -199,7 +200,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -276,15 +277,13 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getEvents()
     {
-        if (empty(self::$events)) {
-            // build them
-            self::$events = [];
-            $event        = new Events\TriggerBuilderEvent($this->translator);
+        if (empty($this->cachedEvents)) {
+            $event = new TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
-            self::$events = $event->getEvents();
+            $this->cachedEvents = $event->getEvents();
         }
 
-        return self::$events;
+        return $this->cachedEvents;
     }
 
     /**
@@ -311,7 +310,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, Lead $lead = null, $force = false)
+    public function triggerEvent($event, ?Lead $lead = null, $force = false)
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {

@@ -22,7 +22,7 @@ class DataExporterHelper
         $start,
         AbstractCommonModel $model,
         array $args,
-        callable $resultsCallback = null,
+        ?callable $resultsCallback = null,
         bool $skipOrdering = false,
     ) {
         $args['limit']        = max($args['limit'], 200);

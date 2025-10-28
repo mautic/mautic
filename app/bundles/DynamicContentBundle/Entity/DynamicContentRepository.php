@@ -5,12 +5,15 @@ namespace Mautic\DynamicContentBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<DynamicContent>
  */
 class DynamicContentRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * Get a list of entities.
      *
@@ -23,7 +26,7 @@ class DynamicContentRepository extends CommonRepository
             ->select('e')
             ->from(DynamicContent::class, 'e', 'e.id');
 
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
@@ -64,6 +67,16 @@ class DynamicContentRepository extends CommonRepository
                     $q->expr()->like('e.language', ":$langUnique")
                 );
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'dynamic_content_id',
+                    'dynamic_content_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -92,6 +105,7 @@ class DynamicContentRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

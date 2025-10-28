@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -88,7 +89,32 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
-    private function createAndLoginUser(string $permission = null): User
+    public function testDwcWithProject(): void
+    {
+        $dynamicContent = new DynamicContent();
+        $dynamicContent->setName('test');
+        $this->em->persist($dynamicContent);
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/dwc/edit/'.$dynamicContent->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['dwc[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedAsset = $this->em->find(DynamicContent::class, $dynamicContent->getId());
+        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
+    }
+
+    private function createAndLoginUser(?string $permission = null): User
     {
         // Create non-admin role
         $role = $this->createRole();

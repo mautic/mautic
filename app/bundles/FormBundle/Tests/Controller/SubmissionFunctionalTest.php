@@ -507,7 +507,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
-            $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
+            $this->connection->executeStatement("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
     }
 
@@ -1326,5 +1326,73 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                 'test2@test.com',
             ],
         ];
+    }
+
+    public function testAllRelatedEntitiesGetsDeletedIfFormGetsDeleted(): void
+    {
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'     => 'Name',
+                    'type'      => 'text',
+                    'alias'     => 'name',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+        $formAlias      = $response['form']['alias'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[name]' => 'Name',
+        ]);
+        $this->client->submit($form);
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        /** @var SubmissionRepository $submissionRepository */
+        $submissionRepository = $this->em->getRepository(Submission::class);
+
+        // Ensure the submission was created properly.
+        $submissions = $submissionRepository->findBy(['form' => $formId]);
+
+        Assert::assertCount(1, $submissions);
+
+        // The previous request changes user to anonymous. We have to configure API again.
+        $this->setUpSymfony($this->configParams);
+
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+
+        // we are expecting form results table to be deleted in background, so the table should exists
+        $this->assertTrue($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_{$formId}_{$formAlias}"));
+
+        $submissions = $submissionRepository->findBy(['form' => $formId]);
+
+        Assert::assertCount(0, $submissions);
     }
 }

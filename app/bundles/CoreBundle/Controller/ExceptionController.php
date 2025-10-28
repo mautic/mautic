@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class ExceptionController extends CommonController
 {
-    public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, ?DebugLoggerInterface $logger = null)
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
         $class          = $exception->getClass();

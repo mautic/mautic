@@ -12,11 +12,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Webhook extends FormEntity
+class Webhook extends FormEntity implements SkipModifiedInterface
 {
     public const LOGS_DISPLAY_LIMIT = 100;
 
@@ -86,6 +87,10 @@ class Webhook extends FormEntity
      */
     private $eventsOrderbyDir;
 
+    private ?\DateTimeImmutable $markedUnhealthyAt      = null;
+    private ?\DateTimeImmutable $unHealthySince         = null;
+    private ?\DateTimeImmutable $lastNotificationSentAt = null;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -122,6 +127,9 @@ class Webhook extends FormEntity
         $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
         $builder->addField('secret', Types::STRING);
         $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
+        $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
+        $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');
+        $builder->addNullableField('lastNotificationSentAt', Types::DATETIME_IMMUTABLE, 'last_notification_sent_at');
     }
 
     /**
@@ -281,7 +289,7 @@ class Webhook extends FormEntity
     /**
      * @return Webhook
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(?Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -534,5 +542,57 @@ class Webhook extends FormEntity
         } else {
             parent::isChanged($prop, $val);
         }
+    }
+
+    public function getMarkedUnhealthyAt(): ?\DateTimeImmutable
+    {
+        return $this->markedUnhealthyAt;
+    }
+
+    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): Webhook
+    {
+        $this->isChanged('markedUnhealthyAt', $markedUnhealthyAt);
+        $this->markedUnhealthyAt = $markedUnhealthyAt;
+
+        return $this;
+    }
+
+    public function getUnHealthySince(): ?\DateTimeImmutable
+    {
+        return $this->unHealthySince;
+    }
+
+    public function setUnHealthySince(?\DateTimeImmutable $unHealthySince): self
+    {
+        $this->unHealthySince = $unHealthySince;
+
+        return $this;
+    }
+
+    public function getLastNotificationSentAt(): ?\DateTimeImmutable
+    {
+        return $this->lastNotificationSentAt;
+    }
+
+    public function setLastNotificationSentAt(?\DateTimeImmutable $lastNotificationSentAt): self
+    {
+        $this->lastNotificationSentAt = $lastNotificationSentAt;
+
+        return $this;
+    }
+
+    /**
+     * Do not update modified_by and date_modified fields if only DNC or manipulator was changed.
+     * Avoid unnecessary update queries.
+     */
+    public function shouldSkipSettingModifiedProperties(): bool
+    {
+        $changes = $this->changes;
+
+        unset($changes['markedUnhealthyAt']);
+        unset($changes['unHealthySince']);
+        unset($changes['lastNotificationSentAt']);
+
+        return 0 === count($changes);
     }
 }

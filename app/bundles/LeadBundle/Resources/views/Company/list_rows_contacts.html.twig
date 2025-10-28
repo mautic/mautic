@@ -193,6 +193,7 @@
                     <td>
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
                             <div>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ contact.primaryIdentifier|purify }}{% endif %}</div>
+                            {{ customContent('lead.name.after', _context) }}
                             <div class="small">{{ contact.secondaryIdentifier|purify }}</div>
                         </a>
                     </td>

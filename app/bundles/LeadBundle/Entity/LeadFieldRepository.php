@@ -108,7 +108,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return string[]
      */
-    public function getSearchableFieldAliases(string $object = null): array
+    public function getSearchableFieldAliases(?string $object = null): array
     {
         $fq = $this->createQueryBuilder($this->getTableAlias());
         $fq->select($this->getTableAlias().'.alias')
@@ -371,6 +371,30 @@ class LeadFieldRepository extends CommonRepository
 
             return !empty($result['id']);
         }
+    }
+
+    /**
+     * Compare a form result value with empty value for defined lead.
+     */
+    public function compareEmptyDateValue(int $lead, string $field, string $operatorExpr): bool
+    {
+        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $property = $this->getPropertyByField($field, $q);
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    ('empty' === $operatorExpr) ?
+                        $q->expr()->isNull($property)
+                        :
+                        $q->expr()->isNotNull($property)
+                )
+            )
+            ->setParameter('lead', $lead, \PDO::PARAM_INT);
+        $result = $q->executeQuery()->fetchAssociative();
+
+        return !empty($result['id']);
     }
 
     /**

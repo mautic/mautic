@@ -227,7 +227,7 @@ class UrlHelper
             parse_str($query, $parsedQuery);
 
             if ($parsedQuery) {
-                $encodedQuery = http_build_query($parsedQuery);
+                $encodedQuery = http_build_query($parsedQuery, '', null, PHP_QUERY_RFC3986);
                 $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
@@ -267,9 +267,11 @@ class UrlHelper
      */
     public static function isValidUrl($url): bool
     {
-        $path         = parse_url($url, PHP_URL_PATH);
-        $encodedPath  = array_map('urlencode', explode('/', $path));
-        $url          = str_replace($path, implode('/', $encodedPath), $url);
+        $path = parse_url($url, PHP_URL_PATH);
+        if (null !== $path) {
+            $encodedPath = array_map('urlencode', explode('/', $path));
+            $url         = str_replace($path, implode('/', $encodedPath), $url);
+        }
 
         return (bool) filter_var($url, FILTER_VALIDATE_URL);
     }

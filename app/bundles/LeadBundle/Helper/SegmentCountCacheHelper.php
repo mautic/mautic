@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Psr\Cache\InvalidArgumentException;
 
 class SegmentCountCacheHelper
 {
     public function __construct(
-        private CacheStorageHelper $cacheStorageHelper,
+        private CacheProviderInterface $cacheProvider,
     ) {
     }
 
@@ -19,7 +19,7 @@ class SegmentCountCacheHelper
      */
     public function getSegmentContactCount(int $segmentId): int
     {
-        return (int) $this->cacheStorageHelper->get($this->generateCacheKey($segmentId));
+        return (int) $this->cacheProvider->getItem($this->generateCacheKey($segmentId))->get();
     }
 
     /**
@@ -27,20 +27,29 @@ class SegmentCountCacheHelper
      */
     public function setSegmentContactCount(int $segmentId, int $count): void
     {
-        $this->cacheStorageHelper->set($this->generateCacheKey($segmentId), $count);
+        $item = $this->cacheProvider->getItem($this->generateCacheKey($segmentId));
+        $item->set($count);
+        $this->cacheProvider->save($item);
+
         if ($this->hasSegmentIdForReCount($segmentId)) {
-            $this->cacheStorageHelper->delete($this->generateCacheKeyForRecount($segmentId));
+            $this->cacheProvider->deleteItem($this->generateCacheKeyForRecount($segmentId));
         }
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function hasSegmentContactCount(int $segmentId): bool
     {
-        return $this->cacheStorageHelper->has($this->generateCacheKey($segmentId));
+        return $this->cacheProvider->hasItem($this->generateCacheKey($segmentId));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function hasSegmentIdForReCount(int $segmentId): bool
     {
-        return $this->cacheStorageHelper->has($this->generateCacheKeyForRecount($segmentId));
+        return $this->cacheProvider->hasItem($this->generateCacheKeyForRecount($segmentId));
     }
 
     /**
@@ -48,7 +57,9 @@ class SegmentCountCacheHelper
      */
     public function invalidateSegmentContactCount(int $segmentId): void
     {
-        $this->cacheStorageHelper->set($this->generateCacheKeyForRecount($segmentId), true);
+        $item = $this->cacheProvider->getItem($this->generateCacheKeyForRecount($segmentId));
+        $item->set(true);
+        $this->cacheProvider->save($item);
     }
 
     /**
@@ -60,10 +71,13 @@ class SegmentCountCacheHelper
         $this->setSegmentContactCount($segmentId, ++$count);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function deleteSegmentContactCount(int $segmentId): void
     {
         if ($this->hasSegmentContactCount($segmentId)) {
-            $this->cacheStorageHelper->delete($this->generateCacheKey($segmentId));
+            $this->cacheProvider->deleteItem($this->generateCacheKey($segmentId));
         }
     }
 
@@ -90,6 +104,6 @@ class SegmentCountCacheHelper
 
     private function generateCacheKeyForRecount(int $segmentId): string
     {
-        return sprintf('%s.%s.%s.%s', 'segment', $segmentId, 'lead', 'recount');
+        return sprintf('%s.%s', $this->generateCacheKey($segmentId), 'recount');
     }
 }

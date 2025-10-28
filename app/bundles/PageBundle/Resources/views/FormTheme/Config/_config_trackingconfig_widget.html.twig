@@ -6,19 +6,21 @@
         <div class="panel-body">
             <div class="form-group">
                 <p>{{ 'mautic.config.tab.pagetracking.info'|trans|purify }}</p>
-                <pre>&lt;script&gt;
-    (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+                {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                    variant: 'multi',
+                    innerText: '&lt;script&gt;
+    (function(w,d,t,u,n,a,m){w[\'MauticTrackingObject\']=n;
         w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
         m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','{{ url('mautic_js') }}','mt');
-
-    mt('send', 'pageview');
-&lt;/script&gt;</pre>
+    })(window,document,\'script\',\'{{ url(\'mautic_js\') }}\',\'mt\');
+    mt(\'send\', \'pageview\');
+&lt;/script&gt;',
+                } %}
             </div>
             <div class="row">
                 <hr>
                 {% for name, f in form.children %}
-                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'do_not_track_404_anonymous'] %}
+                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'do_not_track_404_anonymous'] %}
                         <div class="col-xs-12">
                             {{ form_row(f) }}
                             {% if name == 'anonymize_ip' %}

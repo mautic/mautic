@@ -267,7 +267,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen($newValue) > 0 || $overwriteWithBlank)) {
+                    if ($curValue !== $newValue && (strlen((string) $newValue) > 0 || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -572,12 +572,15 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Get list of entities for autopopulate fields.
      *
-     * @param string         $type
-     * @param mixed[]|string $filter
-     * @param int            $limit
-     * @param int            $start
+     * @param string                   $type
+     * @param string|array<int,string> $filter
+     * @param int                      $limit
+     * @param int                      $start
+     * @param array<string, mixed>     $options
+     *
+     * @return array<mixed>
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0): array
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -629,7 +632,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -888,7 +891,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
 
             if (isset($fieldData[$entityField['alias']])) {
-                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
+                $fieldData = $this->getCleanedFieldData($entityField, $fieldData);
 
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;
@@ -1003,5 +1006,20 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $uniqueData = $this->companyDeduper->getUniqueData($updateData);
 
         return (bool) array_diff_assoc($updateData, $uniqueData);
+    }
+
+    /**
+     * @param array<mixed> $fieldData
+     *
+     * @return array<mixed>
+     */
+    private function getCleanedFieldData(mixed $entityField, array $fieldData): array
+    {
+        $fieldData[$entityField['alias']] = InputHelper::_(
+            $fieldData[$entityField['alias']],
+            'html' === $entityField['type'] ? 'html' : 'string'
+        );
+
+        return $fieldData;
     }
 }

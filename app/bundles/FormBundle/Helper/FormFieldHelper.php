@@ -47,6 +47,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'number'        => [
             'filter' => 'float',
         ],
+        'slider'        => [
+            'filter' => 'float',
+        ],
         'pagebreak' => [],
         'password'  => [],
         'radiogrp'  => [],
@@ -63,7 +66,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'file' => [],
     ];
 
-    public function __construct(Translator $translator, ValidatorInterface $validator = null)
+    public function __construct(Translator $translator, ?ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
 
@@ -81,18 +84,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
-    }
-
-    /**
-     * @param array $customFields
-     *
-     * @deprecated  to be removed in 3.0; use getChoiceList($customFields = []) instead
-     *
-     * @return array
-     */
-    public function getList($customFields = [])
-    {
-        return $this->getChoiceList($customFields);
     }
 
     public function getTypes(): array
@@ -191,7 +182,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'checkboxgrp':
-                $separator = urlencode('|');
+                $isUrlEncoded = is_string($value) && str_contains($value, '%7C');
+                $separator    = $isUrlEncoded ? urlencode('|') : '|';
                 if (is_string($value) && strrpos($value, $separator) > 0) {
                     $value = explode($separator, $value);
                 } elseif (!is_array($value)) {

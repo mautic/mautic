@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
@@ -10,6 +11,7 @@ use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,6 +21,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to import data.
  */
+#[AsCommand(
+    name: ImportCommand::COMMAND_NAME,
+    description: 'Imports data to Mautic'
+)]
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
@@ -29,13 +35,14 @@ class ImportCommand extends Command
         private ProcessSignalService $processSignalService,
         private UserTokenSetter $userTokenSetter,
         private LoggerInterface $logger,
+        private NotificationModel $notificationModel,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
             ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(
@@ -91,7 +98,7 @@ EOT
         ).'</info>');
 
         try {
-            $this->importModel->beginImport($import, $progress, $limit);
+            $this->importModel->beginImport($import, $progress, $limit, $start);
         } catch (ImportFailedException $e) {
             $output->writeln('<error>'.$this->translator->trans(
                 'mautic.lead.import.failed',
@@ -101,6 +108,13 @@ EOT
             ).'</error>');
 
             $this->logError($import, $e);
+
+            $this->notify(
+                $import,
+                $start,
+                $this->translator->trans('mautic.lead.import.failed', ['%reason%' => $import->getStatusInfo()]),
+                'error'
+            );
 
             return Command::FAILURE;
         } catch (ImportDelayedException $e) {
@@ -112,6 +126,13 @@ EOT
             ).'</info>');
 
             $this->logError($import, $e);
+
+            $this->notify(
+                $import,
+                $start,
+                $this->translator->trans('mautic.lead.import.delayed', ['%reason%' => $import->getStatusInfo()]),
+                'warning'
+            );
 
             return Command::FAILURE;
         }
@@ -128,10 +149,11 @@ EOT
             ]
         ).'</info>');
 
+        // Notification is now handled in ImportModel::beginImport to avoid duplicates
+        // and to include the link to the imported file
+
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Imports data to Mautic';
 
     private function logError(Import $import, \Exception $exception): void
     {
@@ -141,5 +163,25 @@ EOT
         $message .= ' Exception: '.$exception;
 
         $this->logger->warning($message);
+    }
+
+    private function notify(Import $import, float $start, string $header, string $type = 'info'): void
+    {
+        $this->notificationModel->addNotification(
+            $this->translator->trans(
+                'mautic.lead.import.result',
+                [
+                    '%lines%'   => $import->getProcessedRows(),
+                    '%created%' => $import->getInsertedCount(),
+                    '%updated%' => $import->getUpdatedCount(),
+                    '%ignored%' => $import->getIgnoredCount(),
+                    '%time%'    => round(microtime(true) - $start, 2),
+                ]
+            ),
+            $type,
+            false,
+            $header,
+            'ri-download-line'
+        );
     }
 }

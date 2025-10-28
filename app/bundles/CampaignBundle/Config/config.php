@@ -35,7 +35,7 @@ return [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
-            'mautic_campaign_map_stats' => [
+            'mautic_campaign_map_stats'    => [
                 'path'       => '/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMapStatsController::viewAction',
             ],
@@ -46,6 +46,14 @@ return [
             'mautic_campaign_metrics_email_hours' => [
                 'path'       => '/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::emailHoursAction',
+            ],
+            'mautic_campaign_import_index' => [
+                'path'       => '/campaign/import',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::indexAction',
+            ],
+            'mautic_campaign_import_action' => [
+                'path'       => '/campaign/import/{objectAction}',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::executeAction',
             ],
         ],
         'api'  => [
@@ -102,6 +110,16 @@ return [
             'mautic_api_contact_clone_campaign' => [
                 'path'       => '/campaigns/clone/{campaignId}',
                 'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::cloneCampaignAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_export_campaign' => [
+                'path'       => '/campaigns/export/{campaignId}',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::exportCampaignAction',
+                'method'     => 'GET',
+            ],
+            'mautic_api_import_campaign' => [
+                'path'       => '/campaigns/import',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::importCampaignAction',
                 'method'     => 'POST',
             ],
         ],
@@ -189,26 +207,6 @@ return [
                 'arguments' => [
                     'monolog.logger.mautic',
                     'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.campaign.scheduler'               => [
-                'class'     => Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'mautic.campaign.event_logger',
-                    'mautic.campaign.scheduler.interval',
-                    'mautic.campaign.scheduler.datetime',
-                    'mautic.campaign.scheduler.optimized',
-                    'mautic.campaign.event_collector',
-                    'event_dispatcher',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.campaign.executioner.action' => [
-                'class'     => Mautic\CampaignBundle\Executioner\Event\ActionExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.dispatcher.action',
-                    'mautic.campaign.event_logger',
                 ],
             ],
             'mautic.campaign.executioner.condition' => [
@@ -366,5 +364,6 @@ return [
         'peak_interaction_timer_fetch_interactions_from'                                        => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_INTERACTIONS_FROM,
         'peak_interaction_timer_fetch_limit'                                                    => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_LIMIT,
         'peak_interaction_timer_max_optimal_days'                                               => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_MAX_OPTIMAL_DAYS,
+        'import_campaigns_dir'                                                                  => '%kernel.project_dir%/var/import',
     ],
 ];

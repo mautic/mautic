@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void

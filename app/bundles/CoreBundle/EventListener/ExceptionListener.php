@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\EventListener;
 
+use LightSaml\Context\Profile\ProfileContext;
+use LightSaml\Error\LightSamlContextException;
 use LightSaml\Error\LightSamlException;
+use LightSaml\Model\Protocol\Response as LightSamlResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -13,6 +18,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -20,28 +26,62 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ExceptionListener extends ErrorListener
 {
     /**
-     * @param LoggerInterface $controller
+     * @param mixed $controller
      */
     public function __construct(
         protected Router $router,
         $controller,
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct($controller, $logger);
     }
 
-    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null): void
+    public function onKernelException(ExceptionEvent $event, ?string $eventName = null, ?EventDispatcherInterface $eventDispatcher = null): void
     {
         $exception = $event->getThrowable();
 
-        if ($exception instanceof LightSamlException) {
+        if ($exception instanceof LightSamlContextException) {
+            $context = $exception->getContext(); // Get context BEFORE overwriting $exception
             // Convert the LightSamlException to a AuthenticationException so it can be passed in the session.
             $exception = new AuthenticationException($exception->getMessage());
             // Redirect to login page with message
-            $event->getRequest()->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
+            if (
+                $context instanceof ProfileContext
+                && $context->getInboundContext()->getMessage() instanceof LightSamlResponse
+            ) {
+                $message = $context->getInboundContext()->getMessage();
+                if (
+                    method_exists($message, 'getStatus')
+                    && 'urn:oasis:names:tc:SAML:2.0:status:Success' === $message->getStatus()->getStatusCode()->getValue()
+                ) {
+                    $session = $event->getRequest()->attributes->get('_session');
+                    if ($session) {
+                        $session->clear();
+                    }
+                    $event->setResponse(new RedirectResponse($this->router->generate('mautic_saml_login_retry')));
+
+                    return;
+                }
+            }
+        }
+        // not keeping elseif statement to prevent prevent inner if condition above
+        if ($exception instanceof LightSamlException) {
+            $session = $event->getRequest()->attributes->get('_session');
+            if ($session) {
+                $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
+            }
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
 
             return;
+        }
+
+        // The authentication wraps a response in the LazyResponseException @see \Symfony\Component\Security\Http\Event\LazyResponseEvent::setResponse
+        if ($exception instanceof LazyResponseException) {
+            $response = $exception->getResponse();
+
+            if ($response instanceof RedirectResponse) {
+                return;
+            }
         }
 
         // Check for exceptions we don't want to handle

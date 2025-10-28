@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use PHPUnit\Framework\Assert;
@@ -65,10 +66,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     {
         $this->logger              = new NullLogger();
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParamtersHelper->method('get')
-            ->willReturnCallback(
-                fn () => 'America/New_York'
-            );
+        $this->coreParamtersHelper->method('getDefaultTimezone')
+            ->willReturn('America/New_York');
         $this->eventLogger                = $this->createMock(EventLogger::class);
         $this->peakInteractionTimer       = $this->createMock(PeakInteractionTimer::class);
         $this->intervalScheduler          = new Interval($this->logger, $this->coreParamtersHelper);
@@ -84,7 +83,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
-            $this->coreParamtersHelper
+            $this->coreParamtersHelper,
+            $this->createMock(OptimisticLockServiceInterface::class),
         );
     }
 
@@ -385,7 +385,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
-            $coreParamtersHelper
+            $coreParamtersHelper,
+            $this->createMock(OptimisticLockServiceInterface::class),
         );
 
         $scheduler->rescheduleFailures(new ArrayCollection([$logWithRescheduleInterval, $logWithNoRescheduleInterval]));

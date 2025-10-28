@@ -2,7 +2,13 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -24,25 +30,28 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('page:pages:viewown')"),
+        new Post(security: "is_granted('page:pages:create')"),
+        new Get(security: "is_granted('page:pages:viewown')"),
+        new Put(security: "is_granted('page:pages:editown')"),
+        new Patch(security: "is_granted('page:pages:editother')"),
+        new Delete(security: "is_granted('page:pages:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['page:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'translationChildren'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['page:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 /**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "page:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "translationChildren"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "page:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
+ * @use TranslationEntityTrait<Page>
+ * @use VariantEntityTrait<Page>
  */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
 {
@@ -50,6 +59,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     use VariantEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    public const ENTITY_NAME = 'page';
 
     public const TABLE_NAME = 'pages';
 
@@ -169,9 +179,14 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private ?bool $publicPreview = true;
 
+    /**
+     * @Groups({"page:read", "page:write", "download:read", "email:read"})
+     */
+    private bool $isDuplicate = false;
+
     public function __clone()
     {
-        $this->cloneObjectId = $this->id;
+        $this->cloneObjectId = (int) $this->id;
         $this->isCloned      = true;
         $this->id            = null;
         $this->clearTranslations();
@@ -286,8 +301,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
             'message' => 'mautic.core.title.required',
         ]));
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Page $page, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
                 if (!is_null($type)) {
                     $validator  = $context->getValidator();
@@ -324,7 +339,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     }
                 }
             },
-        ]));
+        ));
 
         $metadata->addConstraint(new EntityEvent());
     }
@@ -685,7 +700,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      *
      * @return Page
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(?Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -912,5 +927,15 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->publicPreview = $publicPreview;
 
         return $this;
+    }
+
+    public function isDuplicate(): bool
+    {
+        return $this->isDuplicate;
+    }
+
+    public function setIsDuplicate(bool $isDuplicate): void
+    {
+        $this->isDuplicate = $isDuplicate;
     }
 }

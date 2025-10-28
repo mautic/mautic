@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -43,6 +44,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
+    use TranslationModelTrait;
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
@@ -80,6 +83,13 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     public function getPermissionBase(): string
     {
         return 'sms:smses';
+    }
+
+    public function saveEntity($entity, $unlock = true): void
+    {
+        parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
     }
 
     /**
@@ -281,6 +291,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         continue;
                     }
 
+                    list($ignore, $sms) = $this->getTranslatedEntity($sms, $lead);
+                    \assert($sms instanceof Sms);
+
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
                     $smsEvent->setSmsId($sms->getId());
                     $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
@@ -379,7 +392,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -521,7 +534,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['sms_type'] ?? null
+                    $options['sms_type'] ?? null,
+                    $options['top_level'] ?? '',
+                    $options['ignore_ids'] ?? [],
                 );
 
                 foreach ($entities as $entity) {

@@ -1,6 +1,3 @@
-{# content-item-row.html.twig - Unified for 'default', 'featured', 'media' #}
-
-{# Common blocks #}
 {% set common_header_content %}
     {% if eyebrow is defined %}
         <div class="content-item__eyebrow type-label-01 text-secondary mb-xs">{{ eyebrow|trans }}</div>
@@ -18,7 +15,7 @@
 
 {% set common_image_content %}
     {% if image is defined %}
-        <img src="{{ asset(image.path) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-32">
+        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-32">
     {% endif %}
 {% endset %}
 

@@ -28,7 +28,8 @@
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
 }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': list.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': list.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': list}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ list.name }}{% endblock %}
@@ -48,8 +49,8 @@
 
 {% block publishStatus %}
   {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': list}) -}}
-
-    {# Dynamic/Static segment tag - must be first #}
+  <div class="label__divider"></div>
+    {# Dynamic/Static segment tag #}
     {% set segmentType = list.filters is defined and list.filters|length > 0 ? 'dynamic' : 'static' %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [
@@ -96,7 +97,7 @@
 {% endblock %}
 
 {% block content %}
-{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadList') %}
+{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadlist') %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
@@ -145,14 +146,21 @@
                 <div class="row">
                     <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
-                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
-                            {
-                                'title': 'mautic.lead.segments.contacts.view',
-                                'value': segmentCount,
-                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
-                                'icon': 'ri-user-6-line'
-                            }
-                        ]}) }}
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                                {
+                                    'title': 'mautic.lead.segments.total.contacts'|trans,
+                                    'value': segmentCount,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
+                                    'icon': 'ri-group-line'
+                                },
+                                {
+                                    'title': 'mautic.lead.segments.active.contacts'|trans,
+                                    'value': activeSegmentCount,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' !' ~ ('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)}),
+                                    'icon': 'ri-user-follow-line',
+                                    tooltip: 'mautic.lead.segments.active.contacts.tooltip'|trans
+                                }
+                            ]}) }}
                         {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
@@ -169,7 +177,7 @@
                                     }) }}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': stats,
                                       'chartType': 'line',

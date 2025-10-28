@@ -2,6 +2,13 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -15,79 +22,91 @@ use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "segment:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "segment:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    shortName: 'Segments',
+    operations: [
+        new GetCollection(uriTemplate: '/segments', security: "is_granted('lead:lists:viewown')"),
+        new Post(uriTemplate: '/segments', security: "is_granted('lead:lists:create')"),
+        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown')"),
+        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown')"),
+        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother')"),
+        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['segment:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['segment:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+
     use ProjectTrait;
 
-    public const TABLE_NAME = 'lead_lists';
+    public const TABLE_NAME  = 'lead_lists';
+    public const ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $name;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $publicName;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 
     /**
      * @var string|null
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $alias;
 
     /**
      * @var array
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $filters = [];
 
     /**
      * @var bool
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $isGlobal = true;
 
     /**
      * @var bool
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $isPreferenceCenter = false;
 
     /**
@@ -98,11 +117,13 @@ class LeadList extends FormEntity implements UuidInterface
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltDate;
 
     /**
      * @var float|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltTime;
 
     public function __construct()
@@ -140,7 +161,6 @@ class LeadList extends FormEntity implements UuidInterface
             ->build();
 
         $builder->createOneToMany('leads', 'ListLead')
-            ->setIndexBy('id')
             ->mappedBy('list')
             ->fetchExtraLazy()
             ->build();
@@ -252,7 +272,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(Category $category = null): LeadList
+    public function setCategory(?Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -473,13 +493,6 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $now = (new DateTimeHelper())->getUtcDateTime();
         $this->setLastBuiltDate($now);
-    }
-
-    /**
-     * @deprecated Initialisation is no longer necessary and lastBuiltDate is allowed to be null
-     */
-    public function initializeLastBuiltDate(): void
-    {
     }
 
     public function getLastBuiltTime(): ?float

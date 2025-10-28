@@ -17,6 +17,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -74,6 +75,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $fieldsBuilderMock;
 
+    /**
+     * @var MockObject|DncReportService
+     */
+    private MockObject $dncReportService;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -84,13 +90,15 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailRepository           = $this->createMock(EmailRepository::class);
         $this->generatedColumnsProvider  = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
+        $this->dncReportService          = $this->createMock(DncReportService::class);
         $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
             $this->statRepository,
             $this->emailRepository,
             $this->generatedColumnsProvider,
-            $this->fieldsBuilderMock
+            $this->fieldsBuilderMock,
+            $this->dncReportService,
         );
 
         $this->report             = $this->createMock(Report::class);

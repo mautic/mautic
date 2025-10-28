@@ -2,7 +2,7 @@
     {% set toolbarButtons = [
         {
             'attr': {
-            'class': 'hidden-xs btn btn-ghost btn-icon btn-sm btn-nospin',
+            'class': 'hidden-xs btn btn-ghost btn--icon-only btn-sm btn-nospin',
             'href': 'javascript: void(0)',
             'onclick': 'Mautic.toggleLiveLeadListUpdate();',
             'id': 'liveModeButton',
@@ -16,7 +16,7 @@
     {% if 'list' == indexMode %}
         {% set toolbarButtons = toolbarButtons|merge([{
             'attr': {
-                'class': 'hidden-xs btn btn-icon btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ' btn-ghost'),
+                'class': 'hidden-xs btn btn--icon-only btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ' btn-ghost'),
                 'href': 'javascript: void(0)',
                 'onclick': 'Mautic.toggleAnonymousLeads();',
                 'id': 'anonymousLeadButton',
@@ -165,8 +165,16 @@
             'label': 'mautic.lead.lead.searchcommand.isunowned.label',
             'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
             'icon': 'ri-user-unfollow-line'
+        },
+        {
+            'search': (('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)),
+            'label': 'mautic.lead.lead.searchcommand.dnc.label',
+            'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
+            'icon': 'ri-prohibited-line'
         }
-    ]
+    ],
+    toolbarOptionsLabel: 'mautic.lead.import_export',
+    toolbarOptionsIcon: 'ri-arrow-up-down-fill ri-1x'
 }) -}}
 <div class="btn-group ml-5 sr-only ">
     <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">

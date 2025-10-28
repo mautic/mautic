@@ -3,7 +3,6 @@
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -16,7 +15,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -408,7 +406,18 @@ class CommonApiController extends FetchCommonApiController
             $errors[$key] = $formResponse;
         }
 
-        $this->doctrine->getManager()->detach($entity);
+        $lastEntityIndex = -1;
+        foreach ($entities as $index => $moreEntities) {
+            if ($moreEntities !== $entity) {
+                continue;
+            }
+
+            $lastEntityIndex = $index;
+        }
+
+        if (-1 === $lastEntityIndex || $lastEntityIndex === $key) {
+            $this->detachEntity($entity);
+        }
 
         $this->inBatchMode = false;
     }
@@ -464,6 +473,7 @@ class CommonApiController extends FetchCommonApiController
                 if (!$this->checkEntityAccess($entity, 'publish')) {
                     if ('new' === $action) {
                         $parameters['isPublished'] = 0;
+                        unset($parameters['publishUp'], $parameters['publishDown']);
                     } else {
                         unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown']);
                     }
@@ -576,5 +586,13 @@ class CommonApiController extends FetchCommonApiController
 
             $entity->setCategory($category);
         }
+    }
+
+    /**
+     * Entity not to be detached in case of Lead Batch API.
+     */
+    protected function detachEntity(object $entity): void
+    {
+        $this->doctrine->getManager()->detach($entity);
     }
 }

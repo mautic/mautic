@@ -1,6 +1,6 @@
 {% if quickFilters is defined and quickFilters is not empty %}
     {% set filterGroups = {
-        'mautic.core.quick_filters.status': 'ispublished|isunpublished',
+        'mautic.core.quick_filters.status': 'ispublished|isunpublished|isexpired|ispending',
         'mautic.core.quick_filters.ownership': 'ismine|isunowned',
         'mautic.core.quick_filters.others': ''
     } %}
@@ -9,7 +9,7 @@
     {% for header, pattern in filterGroups %}
         {% set groupFilters = pattern
             ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
-            : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|ismine|isunowned/'))
+                            : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|isexpired|ispending|ismine|isunowned/'))
         %}
         {% if groupFilters is not empty %}
             {% set visibleGroups = visibleGroups|merge([header]) %}
@@ -20,7 +20,7 @@
         {% for header, pattern in filterGroups %}
             {% set groupFilters = pattern
                 ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
-                : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|ismine|isunowned/'))
+                : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|isexpired|ispending|ismine|isunowned/'))
             %}
 
             {% if groupFilters is not empty %}
