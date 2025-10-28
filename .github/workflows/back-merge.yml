@@ -2,9 +2,9 @@ name: Check 7.x Backmerge Compatibility
 
 on:
   pull_request:
-    branches: [6.x]
+    branches: [6.0]
 
-permissions: 
+permissions:
   pull-requests: write
 
 jobs:
