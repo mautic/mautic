@@ -537,6 +537,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
      */
     public function testSegmentCacheCountInBackground(): void
     {
+        // remove redis key if exist
+        $this->segmentCountCacheHelper->deleteSegmentContactCount(1);
+
         // Execute the command again to trigger related events.
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
 

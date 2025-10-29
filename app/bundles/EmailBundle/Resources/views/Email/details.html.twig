@@ -61,6 +61,7 @@
             'iconClass' : 'ri-send-plane-line',
             'btnText'   : 'mautic.email.send',
             'primary'   : true,
+            'priority'  : 500,
         } %}
         {% if email.isBackgroundSending() %}
             {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
@@ -68,6 +69,23 @@
         {% endif %}
 
         {% set customButtons = customButtons|merge([sendButton]) %}
+    {% endif %}
+    {% set sendButtons = [] %}
+    {% if 'list' == emailType %}
+        {% set scheduleButton = {
+            'attr': {
+                'class'       : 'btn btn-tertiary btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': email.getId()}),
+                'data-header': 'mautic.email.send.schedule'|trans
+            },
+            'iconClass': 'ri-calendar-schedule-line',
+            'btnText': 'mautic.email.send.schedule',
+            'primary': true,
+            'priority': 400
+        } %}
+        {% set customButtons = customButtons|merge([scheduleButton]) %}
     {% endif %}
     {% set sendExampleButton = {
         'attr' : {
@@ -80,6 +98,8 @@
         },
         'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
+        'primary'   : true,
+        'priority': 300
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
     {% set heatmapButton = {
@@ -104,7 +124,8 @@
     {% if not isEmbedded %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
         'entity': email,
-        'status': email.getPublishUp() is not null ? 'sending' : 'available'
+        'status': email.getPublishUp() is not null ? 'sending' : 'available',
+        'sendingStatus': email.getSendingStatus(),
     }) -}}
     <div class="label__divider"></div>
 

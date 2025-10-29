@@ -30,6 +30,7 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\EmailBundle\Validator\EmailLists;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
+use Mautic\EmailBundle\Validator\ScheduleDateRange;
 use Mautic\EmailBundle\Validator\TextOnlyDynamicContent;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -320,6 +321,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $clonedId;
 
+    private bool $continueSending = false;
+
     /**
      * @Groups({"email:read", "email:write", "download:read"})
      */
@@ -341,6 +344,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->plainText         = null;
         $this->publishUp         = null;
         $this->publishDown       = null;
+        $this->continueSending   = false;
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
@@ -391,6 +395,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Types::TEXT, 'email_type');
         $builder->addPublishDates();
+        $builder->addField('continueSending', Types::BOOLEAN, [
+            'columnName' => 'continue_sending',
+            'nullable'   => false,
+            'options'    => [
+                'default' => false,
+            ],
+        ]);
         $builder->addNamedField('readCount', Types::INTEGER, 'read_count');
         $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
         $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
@@ -531,6 +542,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addConstraint(new EmailLists());
         $metadata->addConstraint(new EntityEvent());
+        $metadata->addConstraint(new ScheduleDateRange());
 
         $metadata->addConstraint(new Callback(
             function (Email $email, ExecutionContextInterface $context): void {
@@ -957,6 +969,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getPublishDown()
     {
+        if ($this->isSegmentEmail() && !$this->isContinueSending()) {
+            return null;
+        }
+
         return $this->publishDown;
     }
 
@@ -1108,6 +1124,24 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function isContinueSending(): bool
+    {
+        return $this->continueSending;
+    }
+
+    public function getContinueSending(): bool
+    {
+        return $this->continueSending;
+    }
+
+    public function setContinueSending(bool $continueSending): self
+    {
+        $this->isChanged('continueSending', $continueSending);
+        $this->continueSending = $continueSending;
+
+        return $this;
+    }
+
     /**
      * @return mixed
      */
@@ -1183,6 +1217,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setPreferenceCenter(?Page $preferenceCenter = null)
     {
+        $this->isChanged('preferenceCenter', $preferenceCenter);
         $this->preferenceCenter = $preferenceCenter;
 
         return $this;
@@ -1439,6 +1474,46 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         }
 
         return $keys;
+    }
+
+    public function isSegmentEmail(): bool
+    {
+        return 'list' === $this->getEmailType();
+    }
+
+    public function getSendingStatus(): string
+    {
+        $publishStatus = $this->getPublishStatus();
+
+        switch ($publishStatus) {
+            case 'published':
+            case 'unpublished':
+                if ($this->isSegmentEmail() && $this->getIsPublished()) {
+                    if (!$this->isContinueSending() && !$this->getPendingCount() && $this->getSentCount(true)) {
+                        return 'sent';
+                    }
+
+                    if ($this->getPendingCount()) {
+                        return 'sending';
+                    }
+                }
+                break;
+        }
+
+        return $publishStatus;
+    }
+
+    public function shouldCheckForUnpublishEmail(): bool
+    {
+        if ($this->isContinueSending()) {
+            return false;
+        }
+
+        if (empty($this->getSentCount(true))) {
+            return false;
+        }
+
+        return true;
     }
 
     public function isDuplicate(): bool

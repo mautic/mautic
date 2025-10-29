@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\ManualWinnerEvent;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -1511,6 +1512,92 @@ class EmailController extends FormController
                     'flashes' => $flashes,
                 ]
             )
+        );
+    }
+
+    public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int $objectId): JsonResponse|Response
+    {
+        $entity = $model->getEntity($objectId);
+
+        // not found or not allowed
+        if (null === $entity
+            || (!$security->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $entity->getCreatedBy()
+            ))
+        ) {
+            return $this->postActionRedirect(
+                [
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                        'route'      => false,
+                    ],
+                ]
+            );
+        }
+
+        // Get the quick add form
+        $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'scheduleSend', 'objectId' => $objectId]);
+
+        $data = [
+            'publishUp'       => $entity->getPublishUp(),
+            'publishDown'     => $entity->getPublishDown(),
+            'continueSending' => $entity->getContinueSending(),
+        ];
+
+        $form = $this->createForm(ScheduleSendType::class, $data, ['action' => $action]);
+
+        if ('POST' === $request->getMethod()) {
+            $isCancelled = $this->isFormCancelled($form);
+            $isValid     = $this->isFormValid($form);
+            if (!$isCancelled && $isValid) {
+                $data = $form->getData();
+                if ($form->get('buttons')->has('apply') && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
+                    $entity->setPublishUp(null);
+                    $entity->setPublishDown(null);
+                    $entity->setContinueSending(false);
+
+                    $this->addFlashMessage('mautic.email.notice.schedule.cancel');
+                } else {
+                    $entity->setPublishUp($data['publishUp']);
+                    $entity->setPublishDown($data['publishDown']);
+                    $entity->setContinueSending($data['continueSending'] ?? false);
+                    $entity->setIsPublished(true);
+
+                    $this->addFlashMessage('mautic.email.notice.schedule.sent');
+                }
+
+                $model->saveEntity($entity);
+            }
+
+            if ($isValid || $isCancelled) {
+                $viewParameters = [
+                    'objectAction' => 'view',
+                    'objectId'     => $objectId,
+                ];
+
+                return $this->postActionRedirect(
+                    [
+                        'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::viewAction',
+                        'passthroughVars' => [
+                            'mauticContent' => 'email',
+                            'closeModal'    => 1,
+                        ],
+                    ]
+                );
+            }
+        }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $form->createView(),
+                ],
+                'contentTemplate' => '@MauticEmail/Email/schedule.html.twig',
+            ]
         );
     }
 

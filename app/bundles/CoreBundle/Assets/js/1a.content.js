@@ -1153,10 +1153,7 @@ Mautic.activateMultiSelect = function(el) {
             if (isSortable) {
                 mQuery(el).parent('.choice-wrapper').find('.ms-selection').first().sortable({
                     items: '.ms-elem-selection',
-                    helper: function (e, ui) {
-                        ui.width(mQuery(el).width());
-                        return ui;
-                    },
+                    helper: 'clone',
                     axis: 'y',
                     scroll: false,
                     update: function(event, ui) {
