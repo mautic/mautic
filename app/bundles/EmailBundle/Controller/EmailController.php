@@ -97,7 +97,6 @@ class EmailController extends FormController
         $filter = [
             'string' => $search,
             'force'  => [
-                ['column' => 'e.variantParent', 'expr' => 'isNull'],
                 ['column' => 'e.translationParent', 'expr' => 'isNull'],
             ],
         ];
