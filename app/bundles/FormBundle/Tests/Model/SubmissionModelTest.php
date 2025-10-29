@@ -632,4 +632,280 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains($formId, $row2);
         $this->assertNotContains($email, $row1);
     }
+
+    public function testGetSubmissionsByForm(): void
+    {
+        $formId     = 1;
+        $formAlias  = 'test_form';
+        $submission = new Submission();
+        $submission->setId(10);
+
+        $expectedResults = [
+            [
+                'submission_id' => 10,
+                'form_id'       => 1,
+                'email'         => 'test@example.com',
+                'name'          => 'John Doe',
+            ],
+        ];
+
+        $tableName = 'form_results_1_test_form';
+
+        $this->submissioRepository->expects($this->once())
+            ->method('getResultsTableName')
+            ->with($formId, $formAlias)
+            ->willReturn($tableName);
+
+        $qb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
+
+        $this->entityManager->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        $connection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $qb->expects($this->once())
+            ->method('select')
+            ->with('*')
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('from')
+            ->with($tableName)
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('where')
+            ->with('submission_id = :submissionId')
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('submissionId', $submission->getId())
+            ->willReturnSelf();
+
+        $result = $this->createMock(\Doctrine\DBAL\Result::class);
+        $qb->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($result);
+
+        $result->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn($expectedResults);
+
+        $results = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
+
+        $this->assertIsArray($results);
+        $this->assertCount(1, $results);
+        $this->assertEquals($expectedResults, $results);
+    }
+
+    public function testUpdateSubmissionAnonymizeByLead(): void
+    {
+        $formId     = 1;
+        $formAlias  = 'test_form';
+        $submission = new Submission();
+        $submission->setId(10);
+
+        $dataForm = [
+            'test@example.com' => 'anonymized@example.com',
+            'John Doe'         => 'Anonymous User',
+        ];
+
+        $tableName = 'form_results_1_test_form';
+
+        $columns = [
+            $this->createColumnMock('submission_id', 1),
+            $this->createColumnMock('form_id', 1),
+            $this->createColumnMock('email', 2),
+            $this->createColumnMock('name', 2),
+        ];
+
+        $submissionResults = [
+            [
+                'submission_id' => 10,
+                'form_id'       => 1,
+                'email'         => 'test@example.com',
+                'name'          => 'John Doe',
+            ],
+        ];
+
+        $this->submissioRepository->expects($this->exactly(2))
+            ->method('getResultsTableName')
+            ->with($formId, $formAlias)
+            ->willReturn($tableName);
+
+        $connection      = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $schemaManager   = $this->createMock(\Doctrine\DBAL\Schema\AbstractSchemaManager::class);
+        $qb              = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $result          = $this->createMock(\Doctrine\DBAL\Result::class);
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        $connection->expects($this->once())
+            ->method('createSchemaManager')
+            ->willReturn($schemaManager);
+
+        $schemaManager->expects($this->once())
+            ->method('listTableColumns')
+            ->with($tableName)
+            ->willReturn($columns);
+
+        $connection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $qb->expects($this->once())
+            ->method('select')
+            ->with('*')
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('from')
+            ->with($tableName)
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('where')
+            ->with('submission_id = :submissionId')
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('submissionId', $submission->getId())
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($result);
+
+        $result->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn($submissionResults);
+
+        $connection->expects($this->once())
+            ->method('update')
+            ->with(
+                $tableName,
+                [
+                    'email' => 'anonymized@example.com',
+                    'name'  => 'Anonymous User',
+                ],
+                ['submission_id' => $submission->getId()]
+            )
+            ->willReturn(1);
+
+        $this->submissionModel->updateSubmissionAnonymizeByLead($formId, $formAlias, $submission, $dataForm);
+    }
+
+    public function testUpdateSubmissionAnonymizeByLeadWithNoColumnsToUpdate(): void
+    {
+        $formId     = 1;
+        $formAlias  = 'test_form';
+        $submission = new Submission();
+        $submission->setId(10);
+        $dataForm   = [];
+
+        $tableName = 'form_results_1_test_form';
+
+        $columns = [
+            $this->createColumnMock('submission_id', 1),
+            $this->createColumnMock('form_id', 1),
+        ];
+
+        $submissionResults = [
+            [
+                'submission_id' => 10,
+                'form_id'       => 1,
+            ],
+        ];
+
+        $this->submissioRepository->expects($this->exactly(2))
+            ->method('getResultsTableName')
+            ->with($formId, $formAlias)
+            ->willReturn($tableName);
+
+        $connection      = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $schemaManager   = $this->createMock(\Doctrine\DBAL\Schema\AbstractSchemaManager::class);
+        $qb              = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $result          = $this->createMock(\Doctrine\DBAL\Result::class);
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        $connection->expects($this->once())
+            ->method('createSchemaManager')
+            ->willReturn($schemaManager);
+
+        $schemaManager->expects($this->once())
+            ->method('listTableColumns')
+            ->with($tableName)
+            ->willReturn($columns);
+
+        $connection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $qb->expects($this->once())
+            ->method('select')
+            ->with('*')
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('from')
+            ->with($tableName)
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('where')
+            ->with('submission_id = :submissionId')
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('submissionId', $submission->getId())
+            ->willReturnSelf();
+
+        $qb->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($result);
+
+        $result->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn($submissionResults);
+
+        $connection->expects($this->never())
+            ->method('update');
+
+        $this->submissionModel->updateSubmissionAnonymizeByLead($formId, $formAlias, $submission, $dataForm);
+    }
+
+    /**
+     * @param int $bindingType 1 for integer, 2 for string
+     */
+    private function createColumnMock(string $name, int $bindingType): \Doctrine\DBAL\Schema\Column
+    {
+        $column = $this->createMock(\Doctrine\DBAL\Schema\Column::class);
+        $type   = $this->createMock(\Doctrine\DBAL\Types\Type::class);
+
+        $column->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+
+        $column->expects($this->any())
+            ->method('getType')
+            ->willReturn($type);
+
+        $type->expects($this->any())
+            ->method('getBindingType')
+            ->willReturn($bindingType);
+
+        return $column;
+    }
 }
