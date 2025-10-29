@@ -123,7 +123,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithPseudonymizeFalse(): void
     {
-        $lead = $this->createMock(Lead::class);
+        $lead  = $this->createMock(Lead::class);
         $leads = new ArrayCollection([$lead]);
 
         $form = $this->createMock(Form::class);
@@ -161,7 +161,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithPseudonymizeTrueAnonymizesForms(): void
     {
-        $lead = $this->createMock(Lead::class);
+        $lead  = $this->createMock(Lead::class);
         $leads = new ArrayCollection([$lead]);
 
         $form = $this->createMock(Form::class);
@@ -261,6 +261,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
                 if ($criteria['lead'] === $lead2) {
                     return [$submissionForm2];
                 }
+
                 return [];
             });
 
@@ -272,7 +273,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
         $this->submissionModel->expects($this->exactly(2))
             ->method('getSubmissionsByForm')
             ->willReturnCallback(function ($id) use ($formData1, $formData2) {
-                return $id === 1 ? $formData1 : $formData2;
+                return 1 === $id ? $formData1 : $formData2;
             });
 
         // Both forms should be updated
@@ -291,7 +292,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithEmptySubmissions(): void
     {
-        $lead = $this->createMock(Lead::class);
+        $lead  = $this->createMock(Lead::class);
         $leads = new ArrayCollection([$lead]);
 
         $submissionRepo = $this->createMock(SubmissionRepository::class);
@@ -319,7 +320,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithEmptyFormData(): void
     {
-        $lead = $this->createMock(Lead::class);
+        $lead  = $this->createMock(Lead::class);
         $leads = new ArrayCollection([$lead]);
 
         $form = $this->createMock(Form::class);
@@ -359,7 +360,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsAccumulatesAnonymizedDataAcrossMultipleForms(): void
     {
-        $lead = $this->createMock(Lead::class);
+        $lead  = $this->createMock(Lead::class);
         $leads = new ArrayCollection([$lead]);
 
         // Setup two forms for the same lead
@@ -396,8 +397,8 @@ class AnonymizeContactCompanyDataTest extends TestCase
         $this->submissionModel->expects($this->exactly(2))
             ->method('updateSubmissionAnonymizeByLead')
             ->willReturnCallback(function ($id, $alias, $submission, $data) use (&$callCount) {
-                $callCount++;
-                if ($callCount === 2) {
+                ++$callCount;
+                if (2 === $callCount) {
                     // Second call should have data from both forms
                     $this->assertCount(2, $data);
                     $this->assertArrayHasKey('test1@example.com', $data);

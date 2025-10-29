@@ -72,15 +72,15 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     {
         // Create form and submit
         [$formId, $formAlias] = $this->createFormWithoutCompanies();
-        $email = 'test.submissions@example.com';
-        $firstname = 'John';
-        $lastname = 'Doe';
+        $email                = 'test.submissions@example.com';
+        $firstname            = 'John';
+        $lastname             = 'Doe';
 
         $this->submitFormWithoutCompanies($formId, $formAlias, $email, $firstname, $lastname);
 
         // Get the submission
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions = $submissionRepository->findBy(['form' => $formId]);
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
         Assert::assertNotEmpty($submissions, 'Should have at least one submission');
 
         $submission = $submissions[0];
@@ -107,7 +107,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         [$formId, $formAlias] = $this->createFormWithoutCompanies();
 
         // Create a submission that won't be found (don't actually submit the form)
-        $form = $this->em->getRepository(Form::class)->find($formId);
+        $form       = $this->em->getRepository(Form::class)->find($formId);
         $submission = new Submission();
         $submission->setForm($form);
         $submission->setDateSubmitted(new \DateTime());
@@ -130,16 +130,16 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     {
         // Create form and submit
         [$formId, $formAlias] = $this->createFormWithoutCompanies();
-        $email = 'test.anonymize1@example.com';
-        $firstname = 'Jane';
-        $lastname = 'Smith';
+        $email                = 'test.anonymize1@example.com';
+        $firstname            = 'Jane';
+        $lastname             = 'Smith';
 
         $this->submitFormWithoutCompanies($formId, $formAlias, $email, $firstname, $lastname);
 
         // Get the submission
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions = $submissionRepository->findBy(['form' => $formId]);
-        $submission = $submissions[0];
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
+        $submission           = $submissions[0];
 
         // Get original data
         $originalResults = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
@@ -153,7 +153,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotEmpty($updatedResults);
 
         $originalRow = $originalResults[0];
-        $updatedRow = $updatedResults[0];
+        $updatedRow  = $updatedResults[0];
 
         // Verify submission_id is unchanged (integer field)
         Assert::assertEquals($originalRow['submission_id'], $updatedRow['submission_id']);
@@ -168,20 +168,20 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     {
         // Create form and submit
         [$formId, $formAlias] = $this->createFormWithoutCompanies();
-        $email = 'test.anonymize2@example.com';
-        $firstname = 'Bob';
-        $lastname = 'Johnson';
+        $email                = 'test.anonymize2@example.com';
+        $firstname            = 'Bob';
+        $lastname             = 'Johnson';
 
         $this->submitFormWithoutCompanies($formId, $formAlias, $email, $firstname, $lastname);
 
         // Get the submission
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions = $submissionRepository->findBy(['form' => $formId]);
-        $submission = $submissions[0];
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
+        $submission           = $submissions[0];
 
         // Prepare custom anonymized data
-        $customAnonymizedEmail = 'anonymized_email_' . uniqid();
-        $dataForm = [
+        $customAnonymizedEmail = 'anonymized_email_'.uniqid();
+        $dataForm              = [
             $email => $customAnonymizedEmail,
         ];
 
@@ -190,7 +190,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
 
         // Get updated data
         $updatedResults = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
-        $updatedRow = $updatedResults[0];
+        $updatedRow     = $updatedResults[0];
 
         // Verify email was replaced with our custom value
         Assert::assertEquals($customAnonymizedEmail, $updatedRow['email'], 'Email should use provided anonymized value');
@@ -204,31 +204,31 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     {
         // Create form and submit
         [$formId, $formAlias] = $this->createFormWithoutCompanies();
-        $email = 'test.anonymize3@example.com';
-        $firstname = 'Alice';
-        $lastname = 'Williams';
+        $email                = 'test.anonymize3@example.com';
+        $firstname            = 'Alice';
+        $lastname             = 'Williams';
 
         $this->submitFormWithoutCompanies($formId, $formAlias, $email, $firstname, $lastname);
 
         // Get the submission
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions = $submissionRepository->findBy(['form' => $formId]);
-        $submission = $submissions[0];
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
+        $submission           = $submissions[0];
 
-        $originalResults = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
+        $originalResults      = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
         $originalSubmissionId = $originalResults[0]['submission_id'];
-        $originalFormId = $originalResults[0]['form_id'] ?? null;
+        $originalFormId       = $originalResults[0]['form_id'] ?? null;
 
         // Update submission
         $this->submissionModel->updateSubmissionAnonymizeByLead($formId, $formAlias, $submission, []);
 
         // Get updated data
         $updatedResults = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
-        $updatedRow = $updatedResults[0];
+        $updatedRow     = $updatedResults[0];
 
         // Verify integer fields remain unchanged
         Assert::assertEquals($originalSubmissionId, $updatedRow['submission_id'], 'Submission ID should not be anonymized');
-        if ($originalFormId !== null) {
+        if (null !== $originalFormId) {
             Assert::assertEquals($originalFormId, $updatedRow['form_id'], 'Form ID should not be anonymized');
         }
     }
@@ -244,11 +244,11 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
 
         // Get submissions
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions = $submissionRepository->findBy(['form' => $formId]);
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
         Assert::assertCount(2, $submissions, 'Should have 2 submissions');
 
         // Anonymize first submission only
-        $firstSubmission = $submissions[0];
+        $firstSubmission  = $submissions[0];
         $secondSubmission = $submissions[1];
 
         $this->submissionModel->updateSubmissionAnonymizeByLead($formId, $formAlias, $firstSubmission, []);
@@ -260,7 +260,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         // Verify second submission is NOT anonymized
         $secondResults = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $secondSubmission);
         Assert::assertTrue(
-            $secondResults[0]['email'] === 'user2@example.com',
+            'user2@example.com' === $secondResults[0]['email'],
             'Second submission should not be affected'
         );
     }
@@ -287,8 +287,8 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->submitFormWithoutCompanies($formId, $formAlias, 'test.columns@example.com', 'Column', 'Test');
 
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions = $submissionRepository->findBy(['form' => $formId]);
-        $submission = $submissions[0];
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
+        $submission           = $submissions[0];
 
         $results = $this->submissionModel->getSubmissionsByForm($formId, $formAlias, $submission);
 

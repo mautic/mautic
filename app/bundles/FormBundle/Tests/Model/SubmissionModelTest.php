@@ -220,6 +220,19 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper->method('getFieldFilter')->willReturn('string');
 
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturnCallback(function ($entityClass) {
+                if (Lead::class === $entityClass) {
+                    return $this->leadRepository;
+                }
+                if (Submission::class === $entityClass) {
+                    return $this->submissioRepository;
+                }
+
+                return null;
+            });
+
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
             $this->twigMock,
@@ -638,7 +651,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $formId     = 1;
         $formAlias  = 'test_form';
         $submission = new Submission();
-        $submission->setId(10);
+        $submission = $this->setSubmissionId($submission, 10);
 
         $expectedResults = [
             [
@@ -656,7 +669,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->with($formId, $formAlias)
             ->willReturn($tableName);
 
-        $qb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $qb         = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
 
         $this->entityManager->expects($this->once())
@@ -708,7 +721,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $formId     = 1;
         $formAlias  = 'test_form';
         $submission = new Submission();
-        $submission->setId(10);
+        $submission = $this->setSubmissionId($submission, 10);
 
         $dataForm = [
             'test@example.com' => 'anonymized@example.com',
@@ -808,7 +821,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $formId     = 1;
         $formAlias  = 'test_form';
         $submission = new Submission();
-        $submission->setId(10);
+        $submission = $this->setSubmissionId($submission, 10);
         $dataForm   = [];
 
         $tableName = 'form_results_1_test_form';
@@ -907,5 +920,15 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($bindingType);
 
         return $column;
+    }
+
+    private function setSubmissionId(Submission $submission, int $id): Submission
+    {
+        $reflection = new \ReflectionClass($submission);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($submission, $id);
+
+        return $submission;
     }
 }

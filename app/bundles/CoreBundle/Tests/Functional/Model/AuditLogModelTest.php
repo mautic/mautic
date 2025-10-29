@@ -191,7 +191,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
     public function testDeleteAuditLogByLeadsWithoutDeletingCompanyLogs(): void
     {
         // Create test lead and company
-        $lead = $this->createLead('John', 'Doe', 'john.doe@example.com');
+        $lead    = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $company = $this->createCompany('Test Company', 'company@example.com');
         $this->createPrimaryCompanyForLead($lead, $company);
         $this->em->flush();
@@ -242,7 +242,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
     public function testDeleteAuditLogByLeadsWithDeletingCompanyLogs(): void
     {
         // Create test lead and company
-        $lead = $this->createLead('John', 'Doe', 'john.doe@example.com');
+        $lead    = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $company = $this->createCompany('Test Company', 'company@example.com');
         $this->createPrimaryCompanyForLead($lead, $company);
         $this->em->flush();
@@ -292,7 +292,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
     public function testDeleteAuditLogByLeadsWithMultipleCompanies(): void
     {
         // Create test lead with multiple companies
-        $lead = $this->createLead('John', 'Doe', 'john.doe@example.com');
+        $lead     = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $company1 = $this->createCompany('Test Company 1', 'company1@example.com');
         $company2 = $this->createCompany('Test Company 2', 'company2@example.com');
         $this->createPrimaryCompanyForLead($lead, $company1, true);

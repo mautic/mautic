@@ -218,7 +218,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            if (isset($components['viewOnlyFields']) && in_array($type, $components['viewOnlyFields'])) {
+            if (isset($components['viewOnlyFields']) && is_array($components['viewOnlyFields']) && in_array($type, $components['viewOnlyFields'])) {
                 // don't save items that don't have a value associated with it
                 continue;
             }
@@ -1162,10 +1162,10 @@ class SubmissionModel extends CommonFormModel
      */
     public function updateSubmissionAnonymizeByLead(int $formId, string $formAlias, Submission $submissionForm, array $dataForm): void
     {
-        $connection = $this->em->getConnection();
-        $nameTable  = $this->getRepository()->getResultsTableName($formId, $formAlias);
-        $columns    = $connection->createSchemaManager()->listTableColumns($nameTable);
-
+        $connection      = $this->em->getConnection();
+        $nameTable       = $this->getRepository()->getResultsTableName($formId, $formAlias);
+        $columns         = $connection->createSchemaManager()->listTableColumns($nameTable);
+        $columnsToUpdate = [];
         foreach ($columns as $column) {
             // 1 = IntegerType
             if (1 === $column->getType()->getBindingType()) {
@@ -1180,7 +1180,7 @@ class SubmissionModel extends CommonFormModel
 
         foreach ($results as $resultForm) {
             foreach ($resultForm as $key => $value) {
-                if (!in_array($key, $columnsToUpdate)) {
+                if (!is_array($columnsToUpdate) || !in_array($key, $columnsToUpdate)) {
                     continue;
                 }
 
