@@ -244,4 +244,69 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $property->setAccessible(true);
         $property->setValue($companyModel, $security);
     }
+
+    public function testGetCompaniesByLeadsReturnsEntities(): void
+    {
+        $leadIds = [10, 20];
+
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getRepository'])
+            ->getMock();
+
+        $repoMock = $this->createMock(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+
+        $companiesByLead = [
+            [['id' => 1], ['id' => 2]],
+            [['id' => 3]],
+        ];
+        $repoMock->expects($this->once())
+            ->method('getCompaniesForContacts')
+            ->with($leadIds)
+            ->willReturn($companiesByLead);
+
+        $company1 = $this->createMock(Company::class);
+        $company1->method('getId')->willReturn(1);
+        $company2 = $this->createMock(Company::class);
+        $company2->method('getId')->willReturn(2);
+        $company3 = $this->createMock(Company::class);
+        $company3->method('getId')->willReturn(3);
+
+        $repoMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([$company1, $company2, $company3]);
+
+        $companyModel->method('getRepository')->willReturn($repoMock);
+
+        $result = $companyModel->getCompaniesByLeads($leadIds);
+
+        $this->assertSame([$company1, $company2, $company3], $result);
+    }
+
+    public function testGetCompaniesByLeadsReturnsEmptyWhenNone(): void
+    {
+        $leadIds = [99];
+
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getRepository'])
+            ->getMock();
+
+        $repoMock = $this->createMock(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+
+        $repoMock->expects($this->once())
+            ->method('getCompaniesForContacts')
+            ->with($leadIds)
+            ->willReturn([]);
+
+        $repoMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([]);
+
+        $companyModel->method('getRepository')->willReturn($repoMock);
+
+        $result = $companyModel->getCompaniesByLeads($leadIds);
+
+        $this->assertSame([], $result);
+    }
 }

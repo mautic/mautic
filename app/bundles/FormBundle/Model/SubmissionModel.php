@@ -1180,7 +1180,7 @@ class SubmissionModel extends CommonFormModel
 
         foreach ($results as $resultForm) {
             foreach ($resultForm as $key => $value) {
-                if (!is_array($columnsToUpdate) || !in_array($key, $columnsToUpdate)) {
+                if (!in_array($key, $columnsToUpdate)) {
                     continue;
                 }
 
