@@ -207,6 +207,44 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame('<option value="'.$email->getId().'">'.$email->getName().' ('.$email->getId().')</option>', trim($html));
     }
 
+    public function testSegmentEmailVariationChildrenParents(): void
+    {
+        $segment         = $this->createSegment('Segment A', 'segment-a');
+        $emailGrandPah   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'test html', $segment);
+        $this->em->persist($emailGrandPah);
+        $this->em->flush();
+
+        $emailParent = $this->createEmail('Email B', 'Subject B', 'list', 'blank', 'test html', $segment);
+        $emailParent->setVariantParent($emailGrandPah);
+        $this->em->persist($emailParent);
+        $emailGrandPah->addVariantChild($emailParent);
+        $this->em->flush();
+
+        $emailChild = $this->createEmail('Email C', 'Subject C', 'list', 'blank', 'test html', $segment);
+        $emailChild->setVariantParent($emailParent);
+        $this->em->persist($emailChild);
+        $emailParent->addVariantChild($emailChild);
+        $this->em->persist($emailChild);
+        $this->em->flush();
+
+        $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $htmlLine1    = $crawler->filter('.email-list > tbody > tr:nth-child(1)')->html();
+        $htmlLine2    = $crawler->filter('.email-list > tbody > tr:nth-child(2)')->html();
+        $htmlLine3    = $crawler->filter('.email-list > tbody > tr:nth-child(3)')->html();
+
+        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine3);
+        Assert::assertStringContainsString('Is A/B variant', $htmlLine3);
+        Assert::assertStringContainsString('Email C', $htmlLine3);
+        Assert::assertStringContainsString('Email B', $htmlLine2);
+        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine2);
+        Assert::assertStringContainsString('Is A/B variant', $htmlLine2);
+        Assert::assertStringContainsString('ri-organization-chart', $htmlLine2);
+        Assert::assertStringContainsString('Has A/B tests', $htmlLine2);
+        Assert::assertStringContainsString('Has A/B tests', $htmlLine1);
+        Assert::assertStringContainsString('ri-organization-chart', $htmlLine1);
+        Assert::assertStringContainsString('Email A', $htmlLine1);
+    }
+
     public function testSegmentEmailSend(): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');

@@ -1652,6 +1652,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kniziol",
+      "name": "Krzysztof Nizioł",
+      "avatar_url": "https://avatars.githubusercontent.com/u/947620?v=4",
+      "profile": "https://niziol.me",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

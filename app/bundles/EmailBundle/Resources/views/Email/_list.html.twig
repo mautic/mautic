@@ -63,7 +63,8 @@
             </thead>
             <tbody>
             {% for item in items %}
-                {% set hasVariants  = item.isVariant() %}
+                {% set hasVariants  = item.isVariant(true) %}
+                {% set hasChildrenVariants  = item.hasVariants() %}
                 {% set hasTranslations  = item.isTranslation() %}
                 {% set type = item.getEmailType() %}
                 {% set hasDraft  = item.hasDraft() %}
@@ -136,8 +137,11 @@
                             <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}"
                                data-toggle="ajax">
                                 {{ item.getName() }}
+                                {% if hasChildrenVariants > 0 %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.ab_test.has.children'|trans }}"><i class="ri-fw ri-organization-chart fs-14"></i></span>
+                                {% endif %}
                                 {% if hasVariants %}
-                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="ri-fw ri-organization-chart fs-14"></i></span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.ab_test.has.parent'|trans }}"><i class="ri-fw ri-a-b fs-14"></i></span>
                                 {% endif %}
                                 {% if hasTranslations %}
                                   <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="ri-fw ri-translate fs-14"></i></span>
