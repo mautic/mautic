@@ -81,7 +81,7 @@ final class StatTest extends Stat
         $this->id = $id;
     }
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }

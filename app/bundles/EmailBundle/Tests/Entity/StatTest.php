@@ -22,7 +22,9 @@ final class StatTest extends TestCase
 
         // Add as many openDetails entries as specified in $count
         for ($i = 0; $i < $count; ++$i) {
-            $stat->addOpenDetails(sprintf('Open %d of %d', $i + 1, $count));
+            $stat->addOpenDetails([
+                'data' => sprintf('Open %d of %d', $i + 1, $count),
+            ]);
         }
 
         // Assert that the openCount reflects the total number of openDetails

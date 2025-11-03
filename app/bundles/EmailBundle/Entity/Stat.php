@@ -19,7 +19,7 @@ class Stat
 
     public const TABLE_NAME = 'email_stats';
 
-    private ?string $id = null;
+    private ?int $id = null;
 
     /**
      * @var Email|null
@@ -113,13 +113,26 @@ class Stat
     private $replies;
 
     /**
+     * @var ?StatData
+     */
+    private $data;
+
+    /**
+     * @var ArrayCollection|StatOpenDetail[]
+     */
+    private $dataOpenDetails = [];
+
+    /**
      * @var array<string,mixed[]>
      */
     private array $changes = [];
 
     public function __construct()
     {
-        $this->replies = new ArrayCollection();
+        $this->replies         = new ArrayCollection();
+        $this->data            = new StatData();
+        $this->dataOpenDetails = new ArrayCollection();
+        $this->data->setStat($this);
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -217,6 +230,27 @@ class Stat
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
+
+        // NOTE: All open details and tokens data for new entries are now stored in
+        // separate tables to allow for better performance and easier compaction,
+        // as that table can be truncated over time freeing up space in the table
+        // by clearing entire rows, rather than just shrinking rows in place in an
+        // existing table that leaves fragmentation.
+        // Existing data is maintained for backward compatibility, and to prevent
+        // upgrades from needing a massive long migration process on extremely
+        // large tables. Users are free to shrink the existing table manually if
+        // they wish to do so. But going forward, there is now a separate table
+        // that is fully maintained and recycled over time for open details and
+        // tokens that was the largest bulk of the data stored in this table.
+        $builder->createOneToOne('data', StatData::class)
+            ->mappedBy('stat')
+            ->cascadeAll()
+            ->build();
+
+        $builder->createOneToMany('dataOpenDetails', StatOpenDetail::class)
+            ->mappedBy('stat')
+            ->cascadeAll()
+            ->build();
     }
 
     /**
@@ -270,6 +304,10 @@ class Stat
         $dateSent = $this->toDateTime($dateSent);
         $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
+        $this->data->setDateSent($dateSent);
+        foreach ($this->dataOpenDetails as $detail) {
+            $detail->setDateSent($dateSent);
+        }
     }
 
     /**
@@ -285,7 +323,7 @@ class Stat
         $this->email = $email;
     }
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -490,19 +528,6 @@ class Stat
     }
 
     /**
-     * @return array|null
-     */
-    public function getTokens()
-    {
-        return $this->tokens;
-    }
-
-    public function setTokens(array $tokens): void
-    {
-        $this->tokens = $tokens;
-    }
-
-    /**
      * @return int
      */
     public function getOpenCount()
@@ -519,18 +544,6 @@ class Stat
         $this->openCount = $openCount;
 
         return $this;
-    }
-
-    /**
-     * @param string $details
-     */
-    public function addOpenDetails($details): void
-    {
-        if (self::MAX_OPEN_DETAILS > $this->openCount) {
-            $this->openDetails[] = $details;
-        }
-
-        ++$this->openCount;
     }
 
     /**
@@ -555,21 +568,6 @@ class Stat
         $lastOpened = $this->toDateTime($lastOpened);
         $this->addChange('lastOpened', $this->lastOpened, $lastOpened);
         $this->lastOpened = $lastOpened;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOpenDetails()
-    {
-        return $this->openDetails;
-    }
-
-    public function setOpenDetails(array $openDetails): static
-    {
-        $this->openDetails = $openDetails;
 
         return $this;
     }
@@ -601,6 +599,81 @@ class Stat
     {
         $this->addChange('replyAdded', false, true);
         $this->replies[] = $reply;
+    }
+
+    public function getData(): StatData
+    {
+        if (null === $this->data) {
+            $this->data = new StatData();
+            $this->data->setStat($this);
+            $this->data->setDateSent($this->dateSent);
+        }
+
+        return $this->data;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getTokens()
+    {
+        // Maintain existing data from email_stats
+        return array_merge($this->tokens, $this->data ? $this->data->getTokens() : []);
+    }
+
+    public function setTokens(array $tokens): void
+    {
+        // Migrate data to the new data table
+        $this->tokens = [];
+        $this->getData()->setTokens($tokens);
+    }
+
+    /**
+     * @param array $details
+     */
+    public function addOpenDetails($details): void
+    {
+        $entity = new StatOpenDetail();
+        $entity->setStat($this);
+        $entity->setDateSent($this->dateSent);
+        $entity->setOpenDetail($details);
+        $this->dataOpenDetails->add($entity);
+
+        ++$this->openCount;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOpenDetails()
+    {
+        // Maintain existing data from email_stats
+        $openDetails = $this->openDetails;
+        foreach ($this->dataOpenDetails as $entity) {
+            $openDetails[] = $entity->getOpenDetail();
+        }
+
+        return $openDetails;
+    }
+
+    /**
+     * @return Stat
+     */
+    public function setOpenDetails(array $openDetails)
+    {
+        // Migrate data to the new data table
+        // Since we are setting, we clear existing data
+        $this->openDetails = [];
+        $this->dataOpenDetails->clear();
+        foreach ($openDetails as $detail) {
+            $entity = new StatOpenDetail();
+            $entity->setStat($this);
+            $entity->setDateSent($this->dateSent);
+            $entity->setOpenDetail($detail);
+            $this->dataOpenDetails->add($entity);
+        }
+
+        return $this;
     }
 
     /**

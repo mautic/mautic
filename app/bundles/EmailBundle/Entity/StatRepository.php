@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -517,11 +518,44 @@ class StatRepository extends CommonRepository
             $options,
             'storedSubject, e.subject',
             $timestampColumn,
-            ['openDetails'],
+            [],
             ['dateRead', 'dateSent'],
             $timeToReadParser,
-            's.id'
+            's.id',
+            postCallback: [$this, 'loadAndDeserializeOpenDetails'],
         );
+    }
+
+    /**
+     * Load and deserialize open details for a set of stats.
+     *
+     * @param array<int,array<string,mixed>> $results
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function loadAndDeserializeOpenDetails(array &$results): array
+    {
+        $statIds = array_column($results, 'id');
+        if (!$statIds) {
+            return $results;
+        }
+        $query   = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats_open_details', 'sod')
+            ->select('sod.stat_id, sod.open_detail')
+            ->where(
+                $query->expr()->in('sod.stat_id', $statIds)
+            );
+        $openDetails = $query->executeQuery()->fetchAllAssociative();
+        $resultById  = [];
+        foreach ($results as &$stat) {
+            $stat['openDetails']     = [];
+            $resultById[$stat['id']] = &$stat;
+        }
+        foreach ($openDetails as $detail) {
+            $resultById[$detail['stat_id']]['openDetails'][] = Serializer::decode($detail['open_detail']);
+        }
+
+        return $results;
     }
 
     /**

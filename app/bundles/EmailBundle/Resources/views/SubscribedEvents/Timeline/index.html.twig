@@ -7,13 +7,7 @@
 {% if item != false %}
     <p>
         {% if item.isFailed is not empty and item.isFailed %}
-            {% if item.openDetails.bouces is defined %}
-                <span class="label label-warning" data-toggle="tooltip" title="{{ 'mautic.email.timeline.event.bounced'|trans }}">
-                    {{ 'mautic.email.timeline.event.bounced'|trans }}
-                </span>
-            {% else %}
-                {{ 'mautic.email.timeline.event.failed'|trans }}
-            {% endif %}
+            {{ 'mautic.email.timeline.event.failed'|trans }}
         {% elseif item.dateRead is empty %}
             {{ 'mautic.email.timeline.event.not.read'|trans|purify }}
         {% else %}
