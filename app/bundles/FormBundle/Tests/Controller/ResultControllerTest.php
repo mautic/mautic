@@ -223,8 +223,8 @@ final class ResultControllerTest extends TestCase
         $submissionModel = $this->createMock(SubmissionModel::class);
         $submissionModel->method('getEntity')->willReturnCallback(function (int $id): ?Submission {
             return match ($id) {
-                1 => $this->createSubmission('first@example.com'),
-                2 => $this->createSubmission('second@test.com'),
+                1       => $this->createSubmission('first@example.com'),
+                2       => $this->createSubmission('second@test.com'),
                 default => null,
             };
         });
@@ -383,9 +383,6 @@ final class ResultControllerTest extends TestCase
         $this->assertSame('', $form->getCachedHtml());
     }
 
-    /**
-     * @return TestResultController
-     */
     private function createController(ManagerRegistry $managerRegistry, ModelFactory $modelFactory, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack, CorePermissions $security): TestResultController
     {
         return new TestResultController(
@@ -429,13 +426,16 @@ final class ResultControllerTest extends TestCase
 /**
  * @internal
  *
- * Simplifies assertions around redirects by capturing arguments.
+ * Simplifies assertions around redirects by capturing arguments
  */
 final class TestResultController extends ResultController
 {
     /** @var array<string, mixed> */
     public array $postActionRedirectArgs = [];
 
+    /**
+     * @param array<string, mixed> $args
+     */
     public function postActionRedirect(array $args = []): Response
     {
         $this->postActionRedirectArgs = $args;
@@ -443,6 +443,9 @@ final class TestResultController extends ResultController
         return new Response('redirect');
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!$parameters) {
