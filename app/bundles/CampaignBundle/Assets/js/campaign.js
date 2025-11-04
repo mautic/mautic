@@ -14,6 +14,8 @@ Mautic.campaignOnLoad = function (container, response) {
     Mautic.campaignBuilderPostData = [];
     let extraData = {};
 
+    Mautic.reinitializeCampaignEventDeleteHandlers();
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
@@ -44,16 +46,8 @@ Mautic.campaignOnLoad = function (container, response) {
                     mQuery(this).find('.btn-edit').first().click();
                 });
 
-            // adding delete option ajax for events
-            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
-                event.preventDefault();
-                mQuery('.btns-builder').find('button').prop('disabled', true);
-                extraData = {
-                    'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
-                    'deletedEvents': Mautic.campaignBuilderCampaignElements.deletedEvents ? JSON.stringify(Mautic.campaignBuilderCampaignElements.deletedEvents) : '',
-                };
-                return Mautic.ajaxifyLink(this, event, extraData);
-            });
+            // adding delete option modal for events
+            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax-delete']").on("click.ajax", Mautic.handleEventDeleteClick);
 
             // adding delete option ajax for sources
             mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
@@ -443,8 +437,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
     if (response.deleted) {
         Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
         if (response.deletedEvents) {
-            const existingDeletedEvents =  mQuery.isArray(Mautic.campaignBuilderCampaignElements.deletedEvents) ? Mautic.campaignBuilderCampaignElements.deletedEvents : [];
-            Mautic.campaignBuilderCampaignElements.deletedEvents = mQuery.unique(existingDeletedEvents.concat(response.deletedEvents))
+            // Process each deleted event
+            mQuery.each(response.deletedEvents, function(i, eventData) {
+                Mautic.addEventToDeletedEvents(eventData.id, eventData.redirectEvent);
+            });
         }
         delete Mautic.campaignBuilderCampaignElements.modifiedEvents[response.event.id];
         delete Mautic.campaignBuilderEventPositions[domEventId];
@@ -491,16 +487,8 @@ Mautic.campaignEventOnLoad = function (container, response) {
             Mautic.ajaxifyModal(this, event);
         });
 
-        // adding delete option ajax for events
-        mQuery(eventId + " a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
-            event.preventDefault();
-            mQuery('.btns-builder').find('button').prop('disabled', true);
-            const extraData = {
-                'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
-                'deletedEvents': Mautic.campaignBuilderCampaignElements.deletedEvents ? JSON.stringify(Mautic.campaignBuilderCampaignElements.deletedEvents) : '',
-            };
-            return Mautic.ajaxifyLink(this, event, extraData);
-        });
+        // adding delete option modal for events
+        mQuery(eventId + " a[data-toggle='ajax-delete']").off("click.ajax").on("click.ajax", Mautic.handleEventDeleteClick);
 
         mQuery(eventId).off('.eventbuttons')
             .on('mouseover.eventbuttons', function() {
@@ -589,7 +577,16 @@ Mautic.campaignEventSelectDOW = function() {
  * @param event
  */
 Mautic.getAnchorsForEvent = function (event) {
-    var restrictions = Mautic.campaignBuilderConnectionRestrictions[event.type].target;
+    var eventRestrictions = Mautic.campaignBuilderConnectionRestrictions[event.type];
+
+    if (!eventRestrictions || !eventRestrictions.target) {
+        // Default fallback if restrictions not found
+        console.warn(`No restrictions found for the event type: ${event.type}. Probably the plugin was disabled.`);
+
+        return ['top', 'bottom'];
+    }
+
+    var restrictions = eventRestrictions.target;
 
     // If all connections are restricted, only anchor the top
     if (
@@ -1297,6 +1294,33 @@ Mautic.campaignBeforeStartDetachCallback = function(endpoint, source, sourceId, 
 };
 
 /**
+ * Adds an event to the deletedEvents array in campaignBuilderCampaignElements
+ *
+ * @param {string} eventId - The ID of the event to delete
+ * @param {string|null} redirectEventId - Optional ID of the event to redirect to
+ */
+Mautic.addEventToDeletedEvents = function(eventId, redirectEventId) {
+    if (!Mautic.campaignBuilderCampaignElements.deletedEvents) {
+        Mautic.campaignBuilderCampaignElements.deletedEvents = [];
+    }
+    // Check if this event is already in the deletedEvents array
+    let exists = false;
+    for (const event of Mautic.campaignBuilderCampaignElements.deletedEvents) {
+        if (event.id === eventId) {
+            exists = true;
+            break;
+        }
+    }
+    // Add to deletedEvents if it doesn't exist yet
+    if (!exists) {
+        Mautic.campaignBuilderCampaignElements.deletedEvents.push({
+            id: eventId,
+            redirectEvent: redirectEventId
+        });
+    }
+};
+
+/**
  * Process beforeDetach event callbacks
  *
  * @param connection
@@ -1394,6 +1418,12 @@ Mautic.saveCampaignFromBuilder = function() {
             Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
             applyBtn.trigger('click');
             Mautic.inBuilderSubmissionOff();
+
+            // Trigger an event for components to listen to
+            mQuery(document).trigger('mauticCampaignBuilderCanvasLoaded');
+
+            // Call our handler initialization function
+            Mautic.ensureCampaignEventHandlers();
         }
     });
 };
@@ -2393,6 +2423,88 @@ Mautic.updateJumpToEventOptions = function() {
     }
 
     jumpToEventSelectNode.trigger("chosen:updated");
+};
+
+/**
+ * Handles the deletion of a campaign event
+ *
+ * @param {string} eventId - The ID of the event to delete
+ * @param {string} redirectEventId - Optional ID of another event to redirect contacts to
+ * @param {string} deleteUrl - The URL to send the delete request to
+ * @param {function} successCallback - Function to call on successful deletion
+ * @param {function} errorCallback - Function to call on error
+ */
+Mautic.campaignBuilderDeleteEvent = function(eventId, redirectEventId, deleteUrl, successCallback, errorCallback) {
+    // Prepare the URL
+    let ajaxUrl = deleteUrl || '';
+    if (redirectEventId && ajaxUrl) {
+        ajaxUrl += (ajaxUrl.indexOf('?') !== -1 ? '&' : '?') + 'redirectTo=' + redirectEventId;
+    }
+
+    // Make sure deletedEvents is initialized properly
+    if (!Mautic.campaignBuilderCampaignElements.deletedEvents) {
+        Mautic.campaignBuilderCampaignElements.deletedEvents = [];
+    }
+
+    // Prepare data for the AJAX call
+    const data = {
+        eventId: eventId,
+        campaignId: mQuery('#campaignId').val(),
+        redirectTo: redirectEventId,
+        modifiedEvents: JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents || {}),
+        deletedEvents: JSON.stringify(Mautic.campaignBuilderCampaignElements.deletedEvents)
+    };
+
+    // Execute the delete request
+    mQuery.ajax({
+        url: ajaxUrl,
+        type: 'POST',
+        data: data,
+        success: function(response) {
+            if (response.success) {
+                // Remove the event from the canvas
+                if (typeof Mautic.campaignBuilderInstance !== 'undefined') {
+                    Mautic.campaignBuilderInstance.remove(document.getElementById('CampaignEvent_' + eventId));
+                }
+
+                // Update all campaign builder data structures to mark the event as deleted
+                if (Mautic.campaignBuilderCanvasEvents[eventId]) {
+                    // Mark the event as deleted
+                    Mautic.campaignBuilderCanvasEvents[eventId].deleted = true;
+                }
+
+                // Add to the deletedEvents array using the helper function
+                Mautic.addEventToDeletedEvents(eventId, redirectEventId);
+
+                // Update the campaignElements for when the campaign is saved
+                mQuery('#campaign_campaignEvents').val(JSON.stringify(Mautic.campaignBuilderCampaignElements));
+
+                // Store connected events as deleted events as well if provided in the response
+                if (typeof response.deletedEvents !== 'undefined' && response.deletedEvents.length) {
+                    mQuery.each(response.deletedEvents, function(i, eventData) {
+                        if (Mautic.campaignBuilderCanvasEvents[eventData.id]) {
+                            Mautic.campaignBuilderCanvasEvents[eventData.id].deleted = true;
+                        }
+
+                        Mautic.addEventToDeletedEvents(eventData.id, eventData.redirectEvent);
+                    });
+                }
+
+                // Call the success callback if provided
+                if (typeof successCallback === 'function') {
+                    successCallback(response);
+                }
+            } else if (typeof errorCallback === 'function') {
+                errorCallback(response);
+            }
+        },
+        error: function(response) {
+            // Call the error callback if provided
+            if (typeof errorCallback === 'function') {
+                errorCallback(response);
+            }
+        }
+    });
 };
 
 Mautic.highlightJumpTarget = function(event, el) {

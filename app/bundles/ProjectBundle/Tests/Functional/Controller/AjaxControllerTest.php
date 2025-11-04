@@ -60,4 +60,56 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             $payload['projects']
         );
     }
+
+    public function testCreatingDuplicateProject(): void
+    {
+        $projectModel = self::getContainer()->get('mautic.project.model.project');
+        \assert($projectModel instanceof ProjectModel);
+
+        $this->assertCount(
+            0,
+            $this->em->getRepository(Project::class)->findAll(),
+            'There should be no projects at the beginning of the test.'
+        );
+
+        $project = new Project();
+        $project->setName('Yellow Project');
+        $projectModel->saveEntity($project);
+
+        $this->assertCount(
+            1,
+            $this->em->getRepository(Project::class)->findAll(),
+            'There should be 1 project after creating the first one.'
+        );
+
+        $this->client->request(
+            'POST',
+            '/s/ajax?action=project:addProjects',
+            [
+                'newProjectNames'    => json_encode(['yellow project']),
+                'existingProjectIds' => json_encode([$project->getId()]),
+            ]
+        );
+
+        $this->assertCount(
+            1,
+            $this->em->getRepository(Project::class)->findAll(),
+            'There should be still 1 project after an attempt to create a duplicate project.'
+        );
+
+        $this->client->request(
+            'POST',
+            '/s/ajax?action=project:addProjects',
+            [
+                'newProjectNames'    => json_encode(['green project']),
+                'existingProjectIds' => json_encode([$project->getId()]),
+            ]
+        );
+
+        $this->assertCount(
+            2,
+            $this->em->getRepository(Project::class)->findAll(),
+            'There should be 2 projects after an attempt to create a unique project.'
+        );
+    }
 }

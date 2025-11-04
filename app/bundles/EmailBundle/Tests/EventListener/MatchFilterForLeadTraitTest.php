@@ -37,6 +37,92 @@ class MatchFilterForLeadTraitTest extends TestCase
     protected function setUp(): void
     {
         $this->matchFilterForLeadTrait = new MatchFilterForLeadTraitTestable();
+
+        // Set required environment variable for FormFieldHelper
+        if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = '/tmp';
+        }
+    }
+
+    /**
+     * @param string|array<int, string> $filter
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('regionFilterDataProvider')]
+    public function testMatchFilterForLeadWithRegionFilter(string|array $filter, string $operator, bool $expected): void
+    {
+        $this->assertSame(
+            $expected,
+            $this->matchFilterForLeadTrait->match(
+                [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'region',
+                        'object'   => 'lead',
+                        'field'    => 'region',
+                        'operator' => $operator,
+                        'filter'   => $filter,
+                    ],
+                ],
+                [
+                    'id'     => 123,
+                    'region' => 'California',
+                ]
+            )
+        );
+    }
+
+    /**
+     * @return iterable<string, array{filter: string|string[], operator: string, expected: bool}>
+     */
+    public static function regionFilterDataProvider(): iterable
+    {
+        yield 'Region equals by state name is the same' => [
+            'filter'   => 'California',
+            'operator' => '=',
+            'expected' => true,
+        ];
+
+        yield 'Region equals by state ID is the same' => [
+            'filter'   => '4', // index starts at 0 for single select
+            'operator' => '=',
+            'expected' => true,
+        ];
+
+        yield 'Region equals by state name is NOT the same' => [
+            'filter'   => 'Texas',
+            'operator' => '=',
+            'expected' => false,
+        ];
+
+        yield 'Region equals by state ID is NOT the same' => [
+            'filter'   => '555',
+            'operator' => '=',
+            'expected' => false,
+        ];
+
+        yield 'Region including by state name is the same' => [
+            'filter'   => ['California'],
+            'operator' => 'in',
+            'expected' => true,
+        ];
+
+        yield 'Region including by state ID is the same' => [
+            'filter'   => ['5'], // index starts at 1 for muli-select
+            'operator' => 'in',
+            'expected' => true,
+        ];
+
+        yield 'Region including by state name is NOT the same' => [
+            'filter'   => ['Texas'],
+            'operator' => 'in',
+            'expected' => false,
+        ];
+
+        yield 'Region including by state ID is NOT the same' => [
+            'filter'   => ['555'],
+            'operator' => 'in',
+            'expected' => false,
+        ];
     }
 
     public function testDWCContactStartWidth(): void

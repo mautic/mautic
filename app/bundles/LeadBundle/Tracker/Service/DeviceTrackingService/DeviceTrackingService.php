@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
-    /**
-     * @var LeadDevice
-     */
-    private $trackedDevice;
+    private ?LeadDevice $trackedDevice = null;
 
     public function __construct(
         private CookieHelper $cookieHelper,
@@ -67,21 +64,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return $trackedDevice;
         }
 
-        // Check for an existing device for this contact to prevent blowing up the devices table
-        $existingDevice = $this->leadDeviceRepository->findOneBy(
-            [
-                'lead'        => $device->getLead(),
-                'device'      => $device->getDevice(),
-                'deviceBrand' => $device->getDeviceBrand(),
-                'deviceModel' => $device->getDeviceModel(),
-            ]
-        );
-
-        if (null !== $existingDevice) {
+        if (null !== $existingDevice = $this->leadDeviceRepository->findExistingDevice($device)) {
             $device = $existingDevice;
         }
 
-        if (null === $device->getTrackingId()) {
+        if (empty($device->getTrackingId())) {
             // Ensure all devices have a tracking ID (new devices will not and pre 2.13.0 devices may not)
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
 

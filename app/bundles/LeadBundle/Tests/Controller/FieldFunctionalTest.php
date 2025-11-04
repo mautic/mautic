@@ -171,6 +171,15 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testFieldsSearchByIds(): void
+    {
+        $urlEncodedSearch = urlencode('ids:2,3');
+        $this->client->request(Request::METHOD_GET, "/s/contacts/fields?search={$urlEncodedSearch}");
+        $this->assertResponseIsSuccessful();
+        Assert::assertStringContainsString('First Name', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('Last Name', $this->client->getResponse()->getContent());
+    }
+
     /**
      * @param array<string, mixed> $parameters
      */

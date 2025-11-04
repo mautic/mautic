@@ -49,6 +49,15 @@ parameters:
 		-
 			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
 			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+		# Doctrine expects concrete types but traits use interfaces with generics
+		-
+			message: '#Property .+::\$translationParent type mapping mismatch: property can contain .+TranslationEntityInterface\|null but database expects#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+			identifier: doctrine.associationType
+		-
+			message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
+			path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
+			identifier: doctrine.associationType
 		# mocks
 		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
