@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
@@ -57,7 +58,7 @@ class IpLookupHelper
      */
     public function getIpAddressFromRequest()
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->getRequest();
 
         if (null !== $request) {
             $ipHolders = [
@@ -149,7 +150,7 @@ class IpLookupHelper
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 
-            if ($ipAddress->isTrackable() && $request) {
+            if ($ipAddress->isTrackable() && $request = $this->getRequest()) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (str_contains($userAgent, $bot)) {
@@ -245,5 +246,10 @@ class IpLookupHelper
     public function getRealIp()
     {
         return $this->realIp;
+    }
+
+    private function getRequest(): ?Request
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 }
