@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const ROLE_NAME_FIELD = 'role[name]';
+    private const ROLE_NAME_FIELD        = 'role[name]';
+    private const ROLE_DESCRIPTION_FIELD = 'role[description]';
 
     public function testNewRoleAction(): void
     {
@@ -22,7 +23,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
         $form = $saveButton->form();
         $form[self::ROLE_NAME_FIELD]->setValue($name);
-        $form['role[description]']->setValue($desc);
+        $form[self::ROLE_DESCRIPTION_FIELD]->setValue($desc);
 
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
