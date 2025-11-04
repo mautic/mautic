@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
@@ -9,47 +11,36 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class WebhookQueue
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    public const TABLE_NAME = 'webhook_queue';
 
-    /**
-     * @var Webhook
-     */
-    private $webhook;
+    private ?string $id = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateAdded;
+    private ?Webhook $webhook;
 
-    /**
-     * @var string|null
-     */
-    private $payload; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+    private ?\DateTime $dateAdded;
+
+    private ?\DateTimeImmutable $dateModified; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
 
     /**
      * @var string|resource|null
      */
     private $payloadCompressed;
 
-    /**
-     * @var Event
-     **/
-    private $event;
+    private ?Event $event;
+
+    private int $retries = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhook_queue')
+        $builder->setTable(WebhookQueue::TABLE_NAME)
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
-        $builder->addId();
+        $builder->addBigIntIdField();
         $builder->createManyToOne('webhook', 'Webhook')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
-        $builder->addNullableField('payload', Types::TEXT);
+        $builder->addNullableField('dateModified', Types::DATETIME_IMMUTABLE, 'date_modified');
         $builder->createField('payloadCompressed', Types::BLOB)
             ->columnName('payload_compressed')
             ->nullable()
@@ -59,10 +50,15 @@ class WebhookQueue
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
+        $builder->createField('retries', Types::SMALLINT)
+            ->columnName('retries')
+            ->option('unsigned', true)
+            ->option('default', 0)
+            ->build();
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
     public function getId()
     {
@@ -114,11 +110,6 @@ class WebhookQueue
      */
     public function getPayload()
     {
-        if (null !== $this->payload) {
-            // BC: plain payload is fetched by ORM
-            return $this->payload;
-        }
-
         if (null === $this->payloadCompressed) {
             // no payload is set
             return null;
@@ -162,6 +153,30 @@ class WebhookQueue
     public function setEvent($event)
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getRetries(): int
+    {
+        return $this->retries;
+    }
+
+    public function setRetries(int $retries): WebhookQueue
+    {
+        $this->retries = $retries;
+
+        return $this;
+    }
+
+    public function getDateModified(): ?\DateTimeImmutable
+    {
+        return $this->dateModified;
+    }
+
+    public function setDateModified(?\DateTimeImmutable $dateModified): WebhookQueue
+    {
+        $this->dateModified = $dateModified;
 
         return $this;
     }

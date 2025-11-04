@@ -38,8 +38,9 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
         foreach ($routes as $route) {
             $crawler = $this->client->request(Request::METHOD_GET, $route.'?search='.urlencode($searchTerm));
             $this->assertResponseIsSuccessful();
+            $isApiRequest = str_starts_with($route, '/api/');
 
-            $content = $crawler->count() ? $crawler->filter('body')->text() : $this->client->getResponse()->getContent();
+            $content = $isApiRequest ? $this->client->getResponse()->getContent() : $crawler->filter('body')->text();
 
             foreach ($expectedEntities as $expectedEntity) {
                 Assert::assertStringContainsString($expectedEntity, $content);
@@ -47,6 +48,11 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
 
             foreach ($unexpectedEntities as $unexpectedEntity) {
                 Assert::assertStringNotContainsString($unexpectedEntity, $content);
+            }
+
+            if ($isApiRequest) {
+                Assert::assertJson($content, 'API response should be of type JSON.');
+                $this->assertProjectDataInApiResponse(json_decode($content, true));
             }
         }
     }
@@ -58,5 +64,46 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
         $this->em->persist($project);
 
         return $project;
+    }
+
+    /**
+     * @param mixed[] $data
+     */
+    private function assertProjectDataInApiResponse(array $data): void
+    {
+        $projectData = $this->getProjectData($data);
+
+        if (null === $projectData) {
+            return;
+        }
+
+        Assert::assertEqualsCanonicalizing(['id', 'name'], array_keys(reset($projectData)),
+            'Project data should contain only "id" and "name".');
+    }
+
+    /**
+     * @param mixed[] $data
+     *
+     * @return mixed[]|null
+     */
+    private function getProjectData(array $data): ?array
+    {
+        foreach ($data as $key => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            if ('projects' === $key && $item) {
+                return $item;
+            }
+
+            $projectData = $this->getProjectData($item);
+
+            if (null !== $projectData) {
+                return $projectData;
+            }
+        }
+
+        return null;
     }
 }

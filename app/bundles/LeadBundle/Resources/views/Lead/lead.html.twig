@@ -551,10 +551,10 @@
                                     'attributes': {
                                         'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
                                         'data-toggle': 'ajax',
-                                        'onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ');'
                                     },
                                     'color': 'blue',
                                     'type': 'dismissible',
+                                    'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
                                 }]} %}
                             </div>
                         {% endfor %}
@@ -586,10 +586,10 @@
                                 'attributes': {
                                     'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
                                     'data-toggle': 'ajax',
-                                    'onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ');'
                                 },
                                 'color': 'blue',
-                                'type': 'dismissible'
+                                'type': 'dismissible',
+                                'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
                             }]} %}
                         </div>
                     {% endfor %}
@@ -605,10 +605,10 @@
                                 'attributes': {
                                     'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
                                     'data-toggle': 'ajax',
-                                    'onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ');'
                                 },
                                 'color': 'blue',
-                                'type': 'dismissible'
+                                'type': 'dismissible',
+                                'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
                             }]} %}
                         </div>
                     {% endfor %}

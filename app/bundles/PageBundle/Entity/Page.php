@@ -49,6 +49,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+/**
+ * @use TranslationEntityTrait<Page>
+ * @use VariantEntityTrait<Page>
+ */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;

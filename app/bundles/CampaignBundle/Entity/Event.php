@@ -204,10 +204,22 @@ class Event implements ChannelInterface, UuidInterface
 
     private int $failedCount = 0;
 
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    private ?Event $redirectEvent;
+
+    /**
+     * Collection of events that redirect to this event.
+     *
+     * @var ArrayCollection<int, Event>
+     */
+    private Collection $redirectingEvents;
+
     public function __construct()
     {
-        $this->log      = new ArrayCollection();
-        $this->children = new ArrayCollection();
+        $this->log               = new ArrayCollection();
+        $this->children          = new ArrayCollection();
+        $this->redirectEvent     = null;
+        $this->redirectingEvents = new ArrayCollection();
     }
 
     /**
@@ -215,10 +227,12 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function __clone()
     {
-        $this->tempId    = null;
-        $this->campaign  = null;
-        $this->channel   = null;
-        $this->channelId = null;
+        $this->tempId            = null;
+        $this->campaign          = null;
+        $this->channel           = null;
+        $this->channelId         = null;
+        $this->redirectEvent     = null;
+        $this->redirectingEvents = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -249,6 +263,16 @@ class Event implements ChannelInterface, UuidInterface
         $builder->addField('properties', 'array');
 
         $builder->addNullableField('deleted', 'datetime');
+
+        $builder->createManyToOne('redirectEvent', 'Event')
+            ->cascadePersist()
+            ->addJoinColumn('redirect_event_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createOneToMany('redirectingEvents', 'Event')
+            ->mappedBy('redirectEvent')
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
@@ -785,11 +809,14 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerDate;
     }
 
-    /**
-     * @param \DateTime|null $triggerDate
-     */
-    public function setTriggerDate($triggerDate): void
+    public function setTriggerDate(mixed $triggerDate = 'now'): void
     {
+        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
+            $triggerDate = new \DateTime($triggerDate['date']);
+        } elseif (is_string($triggerDate)) {
+            $triggerDate = new \DateTime($triggerDate);
+        }
+
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
     }
@@ -1090,8 +1117,14 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function setDeleted(?\DateTimeInterface $deleted): Event
+    public function setDeleted(mixed $deleted = 'now'): Event
     {
+        if (is_array($deleted) && array_key_exists('date', $deleted)) {
+            $deleted = new \DateTime($deleted['date']);
+        } elseif (is_string($deleted)) {
+            $deleted = new \DateTime($deleted);
+        }
+
         $this->isChanged('deleted', $deleted);
         $this->deleted = $deleted;
 
@@ -1119,10 +1152,37 @@ class Event implements ChannelInterface, UuidInterface
             $triggerDate = null;
         } elseif (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
             $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (!$triggerDate instanceof \DateTime) {
+        } elseif (is_string($triggerDate)) {
             $triggerDate = new \DateTime($triggerDate);
         }
 
         return $triggerDate;
+    }
+
+    public function setRedirectEvent(?Event $redirectEvent = null): Event
+    {
+        $this->isChanged('redirectEvent', $redirectEvent);
+        $this->redirectEvent = $redirectEvent;
+
+        return $this;
+    }
+
+    public function getRedirectEvent(): ?Event
+    {
+        return $this->redirectEvent;
+    }
+
+    public function shouldBeRedirected(): bool
+    {
+        return $this->isDeleted() && null !== $this->redirectEvent;
+    }
+
+    /**
+     * Check if this event is used as a redirect target by any other event.
+     */
+    #[Groups(['event:read', 'campaign:read'])]
+    public function isRedirectTarget(): bool
+    {
+        return $this->redirectingEvents->count() > 0;
     }
 }

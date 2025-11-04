@@ -25,18 +25,25 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
 
     public function testCommandWithEmailQueue(): void
     {
-        $lead   = $this->createLead('John', 'Doe', 'jd@example.com');
-        $email1 = $this->createEmail('Test Email 1');
-        $email2 = $this->createEmail('Test Email 2');
+        $email = $this->createEmail('Test Email');
         $this->em->flush();
 
         $scheduledDate = new \DateTime('-10 minutes');
         $datePublished = new \DateTime('-1 day');
 
-        $messages = [
-            $this->createMessageQueue($email1, $lead, $scheduledDate, $datePublished),
-            $this->createMessageQueue($email2, $lead, $scheduledDate, $datePublished),
-        ];
+        // Create 60 different leads and message queue items
+        $leads    = [];
+        $messages = [];
+        for ($i = 0; $i < 60; ++$i) {
+            $leads[$i] = $this->createLead("John{$i}", "Doe{$i}", "jd{$i}@example.com");
+            $this->em->persist($leads[$i]);
+        }
+        $this->em->flush();
+
+        // Create a message for each lead
+        foreach ($leads as $lead) {
+            $messages[] = $this->createMessageQueue($email, $lead, $scheduledDate, $datePublished);
+        }
 
         foreach ($messages as $message) {
             $this->em->persist($message);
@@ -45,10 +52,39 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
 
         $commandTester = $this->testSymfonyCommand('mautic:messages:send');
         Assert::assertSame(0, $commandTester->getStatusCode());
+        Assert::assertStringContainsString('Messages sent: 60', $commandTester->getDisplay());
 
-        // Check if email stats are created for each email sent
-        $this->assertEmailStatCreated($email1, $lead);
-        $this->assertEmailStatCreated($email2, $lead);
+        // Verify that stats were created for a sample of leads
+        $this->assertEmailStatCreated($email, $leads[0]);
+        $this->assertEmailStatCreated($email, $leads[29]);
+        $this->assertEmailStatCreated($email, $leads[59]);
+    }
+
+    public function testCommandWithLimitParameter(): void
+    {
+        $lead   = $this->createLead('John', 'Doe', 'jd@example.com');
+        $email1 = $this->createEmail('Test Email 1');
+        $email2 = $this->createEmail('Test Email 2');
+        $email3 = $this->createEmail('Test Email 3');
+        $this->em->flush();
+
+        $scheduledDate = new \DateTime('-10 minutes');
+        $datePublished = new \DateTime('-1 day');
+
+        $messages = [
+            $this->createMessageQueue($email1, $lead, $scheduledDate, $datePublished),
+            $this->createMessageQueue($email2, $lead, $scheduledDate, $datePublished),
+            $this->createMessageQueue($email3, $lead, $scheduledDate, $datePublished),
+        ];
+
+        foreach ($messages as $message) {
+            $this->em->persist($message);
+        }
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand('mautic:messages:send', ['--limit' => 2]);
+        Assert::assertSame(0, $commandTester->getStatusCode());
+        Assert::assertStringContainsString('Messages sent: 2', $commandTester->getDisplay());
     }
 
     private function createMessageQueue(Email $email, Lead $lead, \DateTime $scheduledDate, \DateTime $datePublished): MessageQueue

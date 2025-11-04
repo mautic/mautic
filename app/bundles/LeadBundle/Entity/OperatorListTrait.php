@@ -33,8 +33,10 @@ trait OperatorListTrait
                 OperatorOptions::NOT_EMPTY,
                 OperatorOptions::REGEXP,
                 OperatorOptions::NOT_REGEXP,
-                OperatorOptions::IN,
-                OperatorOptions::NOT_IN,
+                OperatorOptions::INCLUDING_ANY,
+                OperatorOptions::EXCLUDING_ANY,
+                OperatorOptions::INCLUDING_ALL,
+                OperatorOptions::EXCLUDING_ALL,
             ],
         ],
         'bool' => [
@@ -66,8 +68,10 @@ trait OperatorListTrait
         ],
         'multiselect' => [
             'include' => [
-                OperatorOptions::IN,
-                OperatorOptions::NOT_IN,
+                OperatorOptions::INCLUDING_ANY,
+                OperatorOptions::EXCLUDING_ANY,
+                OperatorOptions::INCLUDING_ALL,
+                OperatorOptions::EXCLUDING_ALL,
                 OperatorOptions::EMPTY,
                 OperatorOptions::NOT_EMPTY,
             ],

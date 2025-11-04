@@ -856,6 +856,8 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
         selectedVal = 'select';
     }
 
+    mQuery('#leadfield_properties [data-toggle="tooltip"]').tooltip('destroy');
+
     if (mQuery('#field-templates .' + selectedVal).length) {
         mQuery('#leadfield_properties').html(
             mQuery('#field-templates .' + selectedVal).html()
@@ -901,6 +903,8 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
                 }
             }, 500);
         });
+
+        mQuery('#leadfield_properties [data-toggle="tooltip"]').tooltip();
     } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }
@@ -1280,8 +1284,12 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
     });
 };
 
-Mautic.removeTagFromLead = function (el, leadId, tagId) {
-    mQuery(el).removeClass('ri-close-line').addClass('ri-loader-3-line ri-spin');
+Mautic.removeTagFromLead = function (el, leadId, tagId, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    mQuery(el).find('i').removeClass('ri-close-line').addClass('ri-loader-3-line ri-spin');
 
     Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
         mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });

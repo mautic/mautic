@@ -109,6 +109,7 @@
                                         {% else %}
                                             {{ item.getTag() }}
                                         {% endif %}
+                                        {{ customContent('tag.name', _context) }}
                                     </div>
                                     {% set description = item.getDescription() %}
                                     {% if description %}

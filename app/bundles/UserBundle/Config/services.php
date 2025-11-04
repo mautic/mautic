@@ -47,6 +47,7 @@ return function (ContainerConfigurator $configurator): void {
             '$oAuth2' => service('fos_oauth_server.server'),
         ]);
 
+    $services->set(Mautic\UserBundle\Security\SAML\Helper::class);
     $services->set('security.token.permissions', TokenPermissions::class);
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');

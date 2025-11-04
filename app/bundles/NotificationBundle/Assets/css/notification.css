@@ -1,0 +1,101 @@
+.notification-preview__before {
+	top: -275.039px;
+	left: calc(50% - 50vw);
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+    pointer-events: none;
+	z-index: -1;
+	background: #B27247 url('../img/sand-dunes-day-GeReAnOMiZ8.jpg') no-repeat center center / cover;
+}
+
+:root[theme="dark"] .notification-preview__before {
+	background: #151F33 url('../img/sand-dunes-night-0O6ZE9oX68k.jpg') no-repeat center center / cover;
+}
+
+.notification-preview {
+    will-change: opacity, transform;
+    perspective: 800px;
+}
+
+.notification-preview__body {
+	position: relative;
+}
+
+.notification-preview__body:nth-child(1) {
+	z-index: 3;
+}
+
+.notification-preview__body:nth-child(1) .notification-preview__notification {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.notification-preview__body:nth-child(1) .notification-preview__notification .notification-preview__before {
+	filter: saturate(160%);
+}
+
+.notification-preview__body:nth-child(2) {
+    margin-top: -100px;
+	transform: translateZ(calc(-16px*4));
+	z-index: 2;
+}
+
+.notification-preview__body:nth-child(2) .notification-preview__notification {
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.notification-preview__body:nth-child(3) {
+    margin-top: -100px;
+	transform: translateZ(calc(-16px*8));
+	z-index: 1;
+}
+
+.notification-preview__body:nth-child(3) .notification-preview__notification {
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.notification-preview__container {
+	clip-path: inset(0 0 0 0 round 16px 16px 16px 16px);
+}
+
+.notification-preview__notification {
+	position: relative;
+	overflow: hidden;
+	min-height: 116px;
+	padding: 16px;
+	border-radius: 16px;
+	background-color: rgba(0, 0, 0, 0.9);
+	color: white;
+}
+
+.notification-preview__header,
+.notification-preview__more {
+	opacity: 0.75;
+}
+
+.notification-preview__header {
+	display: flex;
+	justify-content: space-between;
+	padding-bottom: 8px;
+	font-size: 12px;
+}
+
+.notification-preview__timestamp {
+	text-transform: lowercase;
+}
+
+.notification-preview__content span {
+	display: block;
+	line-height: 1.4;
+}
+
+.notification-preview__message {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.notification-preview__more {
+	margin-top: 4px;
+	font-size: 12px;
+}

@@ -1,24 +1,27 @@
 {
-	"image": "mcr.microsoft.com/devcontainers/universal:2",
-	"features": {
-	  "ghcr.io/ddev/ddev/install-ddev:latest": {}
-	},
-	"portsAttributes": {
-	  "3306": {
-		"label": "database"
-	  },
-	  "8027": {
-		"label": "mailpit"
-	  },
-	  "8036": {
-		"label": "phpmyadmin"
-	  },
-	  "80": {
-		"label": "mautic (http)"
-	  },
-	  "8443": {
-		"label": "mautic (https)"
-	  }
-	},
-	"postCreateCommand": "chmod +x .devcontainer/setup-project.sh && .devcontainer/setup-project.sh"
-  }
+    "image": "mcr.microsoft.com/devcontainers/base:debian-12",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest"
+        },
+        "ghcr.io/ddev/ddev/install-ddev:latest": {}
+    },
+    "portsAttributes": {
+        "80": {
+            "label": "Mautic (HTTP)"
+        },
+        "3306": {
+            "label": "Database"
+        },
+        "8027": {
+            "label": "Mailpit"
+        },
+        "8036": {
+            "label": "phpMyAdmin"
+        },
+        "8443": {
+            "label": "Mautic (HTTPS)"
+        }
+    },
+    "postCreateCommand": "chmod +x .devcontainer/setup-project.sh && .devcontainer/setup-project.sh"
+}
