@@ -283,10 +283,10 @@
       ]
     },
     {
-      "login": "ts-navghane",
+      "login": "tejasync",
       "name": "Tejas Navghane",
       "avatar_url": "https://avatars.githubusercontent.com/u/54406786?v=4",
-      "profile": "https://github.com/ts-navghane",
+      "profile": "https://github.com/tejasync",
       "contributions": [
         "test",
         "code",
@@ -1640,6 +1640,24 @@
       "name": "naoya-kawakatsu",
       "avatar_url": "https://avatars.githubusercontent.com/u/49386563?v=4",
       "profile": "https://github.com/naoya-kawakatsu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "BeniShoga1",
+      "name": "Benisyoga",
+      "avatar_url": "https://avatars.githubusercontent.com/u/197698659?v=4",
+      "profile": "https://github.com/BeniShoga1",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "kniziol",
+      "name": "Krzysztof Nizioł",
+      "avatar_url": "https://avatars.githubusercontent.com/u/947620?v=4",
+      "profile": "https://niziol.me",
       "contributions": [
         "code"
       ]

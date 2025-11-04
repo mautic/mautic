@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait MatchFilterForLeadTrait
@@ -95,6 +96,30 @@ trait MatchFilterForLeadTrait
                 case 'number':
                     $leadVal   = (float) $leadVal;
                     $filterVal = (float) $filterVal;
+                    break;
+                case 'region':
+                    $regionChoices = FormFieldHelper::getRegionChoices();
+                    $regions       = [];
+                    $currentIndex  = is_array($filterVal) ? 1 : 0; // The index starts at 0 for single value, 1 for array
+
+                    foreach ($regionChoices as $countryRegions) {
+                        foreach ($countryRegions as $region) {
+                            $regions[$currentIndex] = $region;
+                            ++$currentIndex;
+                        }
+                    }
+
+                    if (is_numeric($filterVal) && isset($regions[$filterVal])) {
+                        $filterVal = $regions[$filterVal];
+                    }
+
+                    if (is_array($filterVal)) {
+                        foreach ($filterVal as $key => $value) {
+                            if (is_numeric($value) && isset($regions[$value])) {
+                                $filterVal[$key] = $regions[$value];
+                            }
+                        }
+                    }
                     break;
                 case 'select':
                     if (!is_array($filterVal)) {

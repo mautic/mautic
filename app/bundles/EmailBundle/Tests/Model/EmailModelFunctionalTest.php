@@ -169,6 +169,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
+        $email->setContinueSending(true);
         $email->setIsPublished(true);
         $email->addList($segment);
         $this->em->persist($email);
@@ -200,6 +201,32 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email                                                  = $this->createEmail($segment);
         [$sentCount, $failedCount, $failedRecipientsByList]     = $this->emailModel->sendEmailToLists($email, [$segment], null, 2);
         $this->assertEquals($sentCount, 10);
+    }
+
+    public function testSendEmailToListsWithContinueSendingFalse(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment($contacts, $segment);
+
+        // Create email with continueSending = false
+        $email = new Email();
+        $email->setName('Email with Continue Sending False');
+        $email->setSubject('Email Subject');
+        $email->setCustomHtml('Email content');
+        $email->setEmailType('list');
+        $email->setPublishUp(new \DateTime('-1 day'));
+        $email->setContinueSending(false); // This should prevent sending
+        $email->setIsPublished(true);
+        $email->addList($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // Attempt to send emails - should send 0 because continueSending is false
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment]);
+        $this->assertEquals(0, $sentCount, 'No emails should be sent when continueSending is false');
+        $this->assertEquals(0, $failedCount, 'No emails should fail when continueSending is false');
+        $this->assertEmpty($failedRecipientsByList, 'No failed recipients when continueSending is false');
     }
 
     public function testNotOverwriteChildrenTranslationEmailAfterSaveParent(): void

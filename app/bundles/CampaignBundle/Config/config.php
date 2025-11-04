@@ -235,20 +235,6 @@ return [
                     'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
-            'mautic.campaign.executioner.realtime'     => [
-                'class'     => Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'mautic.lead.model.lead',
-                    'mautic.campaign.repository.event',
-                    'mautic.campaign.event_executioner',
-                    'mautic.campaign.executioner.decision',
-                    'mautic.campaign.event_collector',
-                    'mautic.campaign.scheduler',
-                    'mautic.tracker.contact',
-                    'mautic.campaign.helper.decision',
-                ],
-            ],
             'mautic.campaign.helper.decision' => [
                 'class'     => Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class,
                 'arguments' => [

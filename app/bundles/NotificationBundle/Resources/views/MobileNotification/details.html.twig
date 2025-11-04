@@ -42,13 +42,38 @@
 
 {% block publishStatus %}
     {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': notification}, with_context=false) }}
+
+    {% set tags = [] %}
+
+    {# Translation tags #}
+    {% set tags = tags
+        |merge(notification.isTranslation and not notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+        : [])
+        |merge(notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
+        : [])
+    %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
+
+
+{% set translationContent = include('@MauticCore/Translation/index.html.twig',
+    {
+        'activeEntity'      : notification,
+        'translations'      : translations,
+        'model'             : 'notifications',
+        'actionRoute'       : 'mautic_mobile_notification_action',
+    }
+) %}
+{% set showTranslations = translationContent|trim is not empty %}
 
 {% block content %}
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-lg-9 col-md-8 height-auto">
+      <div class="col-lg-8 col-md-7 height-auto">
           <div>
               <!-- notification detail collapseable -->
               <div class="collapse pr-md pl-md" id="notification-details">
@@ -121,6 +146,14 @@
                           {{ 'mautic.lead.leads'|trans }}
                       </a>
                   </li>
+
+                  {% if showTranslations %}
+                      <li>
+                          <a href="#translation-container" role="tab" data-toggle="tab">
+                              {{ 'mautic.core.translations'|trans }}
+                          </a>
+                      </li>
+                  {% endif %}
               </ul>
               <!--/ tabs controls -->
           </div>
@@ -138,6 +171,12 @@
               <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
                   {{ contacts|raw }}
               </div>
+
+              {% if showTranslations %}
+                  <div class="tab-pane bdr-w-0" id="translation-container">
+                      {{ translationContent|raw }}
+                  </div>
+              {% endif %}
           </div>
           <!--/ tab-content -->
 
@@ -145,7 +184,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-lg-3 col-md-4 height-auto">
+      <div class="col-lg-4 col-md-5 height-auto">
         <div class="pa-md mb-32 animation--slide-in-down">
             {{ include('@MauticNotification/MobileNotification/preview.html.twig') }}
         </div>
