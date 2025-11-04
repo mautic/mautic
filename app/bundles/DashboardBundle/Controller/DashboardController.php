@@ -172,7 +172,9 @@ class DashboardController extends AbstractFormController
                 $passthroughVars['widgetId']     = $widget->getId();
                 $passthroughVars['widgetWidth']  = $widget->getWidth();
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
+                $this->addFlashMessage('mautic.dashboard.widget.created');
             }
+            $passthroughVars['flashes'] = $this->getFlashContent();
 
             return new JsonResponse($passthroughVars);
         } else {

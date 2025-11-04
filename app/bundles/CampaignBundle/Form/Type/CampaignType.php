@@ -123,6 +123,10 @@ class CampaignType extends AbstractType
         $builder->add('version', HiddenType::class, [
             'mapped' => false,
         ]);
+
+        $builder->add('campaignElements', HiddenType::class, [
+            'mapped' => false,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

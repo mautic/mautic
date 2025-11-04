@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -173,12 +174,17 @@ class EmailRepository extends CommonRepository
         $maxDate = null,
         ?int $maxThreads = null,
         ?int $threadId = null,
+        ?\DateTimeInterface $sendStopDate = null,
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-            ->where($dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email')));
+            ->where(
+                $dncQb->expr()->and(
+                    $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
+                    $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
+                ));
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -186,6 +192,7 @@ class EmailRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
             ->where(
                 $mqQb->expr()->and(
+                    $mqQb->expr()->eq('mq.lead_id', 'l.id'),
                     $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT)),
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email'))
                 )
@@ -229,12 +236,16 @@ class EmailRepository extends CommonRepository
             $listIds = [$listIds];
         }
 
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
         // Only include those in associated segments
         $segmentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $segmentQb->select('ll.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $segmentQb->expr()->and(
+                    $segmentQb->expr()->eq('ll.lead_id', 'l.id'),
                     $segmentQb->expr()->in('ll.leadlist_id', $listIds),
                     $segmentQb->expr()->eq('ll.manually_removed', ':false')
                 )
@@ -245,8 +256,11 @@ class EmailRepository extends CommonRepository
             $segmentQb->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
         }
 
-        // Main query
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        if ($sendStopDate) {
+            $segmentQb->andWhere($segmentQb->expr()->lt('ll.date_added', ':sendStopDate'));
+            $q->setParameter('sendStopDate', (new DateTimeHelper($sendStopDate))->toUtcString());
+        }
+
         if ($countOnly) {
             $q->select('count(*) as count');
             if ($countWithMaxMin) {
@@ -322,6 +336,7 @@ class EmailRepository extends CommonRepository
         $countWithMaxMin = false,
         ?int $maxThreads = null,
         ?int $threadId = null,
+        ?\DateTimeInterface $sendStopDate = null,
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -334,7 +349,8 @@ class EmailRepository extends CommonRepository
             $countWithMaxMin,
             null,
             $maxThreads,
-            $threadId
+            $threadId,
+            $sendStopDate
         );
 
         if (!($q instanceof QueryBuilder)) {
@@ -554,6 +570,22 @@ class EmailRepository extends CommonRepository
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
+            case $this->translator->trans('mautic.email.email.searchcommand.isexpired'):
+            case $this->translator->trans('mautic.email.email.searchcommand.isexpired', [], null, 'en_US'):
+                $expr = sprintf(
+                    "(e.isPublished = :%1\$s AND e.publishDown IS NOT NULL AND e.publishDown <> '' AND e.publishDown < CURRENT_TIMESTAMP())",
+                    $unique
+                );
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.email.email.searchcommand.ispending'):
+            case $this->translator->trans('mautic.email.email.searchcommand.ispending', [], null, 'en_US'):
+                $expr = sprintf(
+                    "(e.isPublished = :%1\$s AND e.publishUp IS NOT NULL AND e.publishUp <> '' AND e.publishUp > CURRENT_TIMESTAMP())",
+                    $unique
+                );
+                $forceParameters = [$unique => true];
+                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
@@ -561,10 +593,7 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
-                );
+                $expr            = '('.$q->expr()->eq('e.language', ":$unique").' OR '.$q->expr()->like('e.language', ":$langUnique").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -603,6 +632,8 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
+            'mautic.email.email.searchcommand.isexpired',
+            'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
             'mautic.project.searchcommand.name',

@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    use ProjectTrait;
     public const ENTITY_NAME = 'point';
 
     /**
@@ -124,6 +126,7 @@ class Point extends FormEntity implements UuidInterface
     public function __construct()
     {
         $this->log = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -163,6 +166,7 @@ class Point extends FormEntity implements UuidInterface
             ->build();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'point_projects_xref', 'point_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -210,6 +214,8 @@ class Point extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'point');
     }
 
     /**

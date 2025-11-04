@@ -366,7 +366,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['weight' => '25']);
 
         $this->emailEntity->method('getVariantChildren')
-            ->willReturn([$variantA, $variantB]);
+            ->willReturn(new ArrayCollection([$variantA, $variantB]));
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -500,7 +500,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['weight' => '25']);
 
         $this->emailEntity->method('getVariantChildren')
-            ->willReturn([$variantA, $variantB]);
+            ->willReturn(new ArrayCollection([$variantA, $variantB]));
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);

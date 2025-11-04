@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
+use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -395,28 +396,33 @@ class PageController extends FormController
                     $entity->setCustomHtml($content);
                     $entity->setDateModified(new \DateTime());
 
-                    // form is valid so process the data
-                    $model->saveEntity($entity);
+                    try {
+                        // form is valid so process the data
+                        $model->saveEntity($entity);
 
-                    $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $entity->getTitle(),
-                        '%menu_link%' => 'mautic_page_index',
-                        '%url%'       => $this->generateUrl('mautic_page_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]),
-                    ]);
+                        $this->addFlashMessage('mautic.core.notice.created', [
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_page_index',
+                            '%url%'       => $this->generateUrl('mautic_page_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]),
+                        ]);
 
-                    if ($this->isButtonClicked($form, 'save')) {
-                        $viewParameters = [
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId(),
-                        ];
-                        $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
-                        $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
-                    } else {
-                        // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
+                        if ($this->isButtonClicked($form, 'save')) {
+                            $viewParameters = [
+                                'objectAction' => 'view',
+                                'objectId'     => $entity->getId(),
+                            ];
+                            $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
+                            $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
+                        } else {
+                            // return edit view so that all the session stuff is loaded
+                            return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
+                        }
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid = false;
+                        $this->addFlash('error', $e->getMessage());
                     }
                 }
             } else {
@@ -538,29 +544,34 @@ class PageController extends FormController
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    // form is valid so process the data
-                    $model->saveEntity($entity, $this->isButtonClicked($form, 'save'));
+                    try {
+                        // form is valid so process the data
+                        $model->saveEntity($entity, $this->isButtonClicked($form, 'save'));
 
-                    if ($pageConfig->isDraftEnabled() && !empty($entity->getId())) {
-                        $this->dispatcher->dispatch(new PageEditSubmitEvent(
-                            $existingPage,
-                            $entity,
-                            $this->isButtonClicked($form, 'save'),
-                            $this->isButtonClicked($form, 'apply'),
-                            $this->isButtonClicked($form, 'save_draft'),
-                            $this->isButtonClicked($form, 'apply_draft'),
-                            $this->isButtonClicked($form, 'discard_draft'),
-                        ));
+                        if ($pageConfig->isDraftEnabled() && !empty($entity->getId())) {
+                            $this->dispatcher->dispatch(new PageEditSubmitEvent(
+                                $existingPage,
+                                $entity,
+                                $this->isButtonClicked($form, 'save'),
+                                $this->isButtonClicked($form, 'apply'),
+                                $this->isButtonClicked($form, 'save_draft'),
+                                $this->isButtonClicked($form, 'apply_draft'),
+                                $this->isButtonClicked($form, 'discard_draft'),
+                            ));
+                        }
+
+                        $this->addFlashMessage('mautic.core.notice.updated', [
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_page_index',
+                            '%url%'       => $this->generateUrl('mautic_page_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]),
+                        ]);
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid = false;
+                        $this->addFlash('error', $e->getMessage());
                     }
-
-                    $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $entity->getTitle(),
-                        '%menu_link%' => 'mautic_page_index',
-                        '%url%'       => $this->generateUrl('mautic_page_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]),
-                    ]);
                 }
             } else {
                 // clear any modified content

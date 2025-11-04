@@ -296,6 +296,160 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
     }
 
+    /**
+     * @dataProvider publishNewPermissionProvider
+     *
+     * @param string[] $permissions
+     */
+    public function testCreateEmailWithoutPublishPermissionWillBeIgnored(array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
+    {
+        $user = $this->getUser('sales');
+        Assert::assertNotNull($user);
+
+        $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $payload = [
+            'name'        => 'API email',
+            'subject'     => 'Email created via API test',
+            'customHtml'  => '<h1>Email content created by an API test</h1>',
+            'isPublished' => true,
+            'publishUp'   => '2024-11-21 15:45',
+            'publishDown' => '2024-12-21 15:45',
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+
+        Assert::assertSame(
+            Response::HTTP_CREATED,
+            $this->client->getResponse()->getStatusCode(),
+            $this->client->getResponse()->getContent()
+        );
+
+        $createdEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
+        Assert::assertSame($expectedIsPublished, $createdEmail['isPublished']);
+        Assert::assertSame($expectedPublishUp, $createdEmail['publishUp']);
+        Assert::assertSame($expectedPublishDown, $createdEmail['publishDown']);
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public static function publishNewPermissionProvider(): iterable
+    {
+        yield 'User without the publish permission cannot publish' => [
+            'permissions'         => ['create'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+        yield 'User with the publish permission can publish other ownly' => [
+            'permissions'         => ['create', 'publishother'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+        yield 'User with the publish permission can publish own only' => [
+            'permissions'         => ['create', 'publishown'],
+            'expectedIsPublished' => true,
+            'expectedPublishUp'   => '2024-11-21T15:45:00+00:00',
+            'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
+        ];
+    }
+
+    /**
+     * @dataProvider publishExistingPermissionProvider
+     *
+     * @param string[] $permissions
+     */
+    public function testEditEmailWithoutPublishPermissionWillBeIgnored(string $creatorUsername, array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
+    {
+        $owner = $this->getUser($creatorUsername);
+        $email = $this->createEmail('Email C', 'Email C Subject', 'template', 'empty', 'Test html');
+        $email->setIsPublished(false);
+        $email->setCreatedBy($owner->getId());
+        $this->em->flush();
+
+        $emailId = $email->getId();
+
+        $user = $this->getUser('sales');
+        $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $payload = [
+            'isPublished' => true,
+            'publishUp'   => '2024-11-21 15:45',
+            'publishDown' => '2024-12-21 15:45',
+        ];
+
+        $this->client->request(Request::METHOD_PATCH, "/api/emails/{$emailId}/edit", $payload);
+
+        $this->assertResponseIsSuccessful();
+
+        $editedEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
+        Assert::assertSame($expectedIsPublished, $editedEmail['isPublished']);
+        Assert::assertSame($expectedPublishUp, $editedEmail['publishUp']);
+        Assert::assertSame($expectedPublishDown, $editedEmail['publishDown']);
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public static function publishExistingPermissionProvider(): iterable
+    {
+        yield 'Sales user without the publish permission cannot publish own email' => [
+            'creatorUsername'     => 'sales',
+            'permissions'         => ['editown'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+
+        yield 'Sales user without the publish permission cannot publish admin\'s email' => [
+            'creatorUsername'     => 'admin',
+            'permissions'         => ['editother'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+
+        yield 'Sales user with the publish other permission cannot publish own email' => [
+            'creatorUsername'     => 'sales',
+            'permissions'         => ['editown', 'publishother'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+
+        yield 'Sales user with the publish other permission can publish admin\'s email' => [
+            'creatorUsername'     => 'admin',
+            'permissions'         => ['editother', 'publishother'],
+            'expectedIsPublished' => true,
+            'expectedPublishUp'   => '2024-11-21T15:45:00+00:00',
+            'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
+        ];
+
+        yield 'Sales user with the publish own permission can publish own email' => [
+            'creatorUsername'     => 'sales',
+            'permissions'         => ['editown', 'publishown'],
+            'expectedIsPublished' => true,
+            'expectedPublishUp'   => '2024-11-21T15:45:00+00:00',
+            'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
+        ];
+
+        yield 'Sales user with the publish own permission cannot publish admin\'s email' => [
+            'creatorUsername'     => 'admin',
+            'permissions'         => ['editother', 'publishown'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+    }
+
     public function testReplyAction(): void
     {
         $trackingHash = 'tracking_hash_123';
@@ -648,5 +802,27 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
                 'name' => 'Updated Child Email',
             ],
         ];
+    }
+
+    private function getUser(string $userName): ?User
+    {
+        $repository = $this->em->getRepository(User::class);
+        $user       = $repository->findOneBy(['username' => $userName]);
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
+     * @param array<string, string[]> $permissions
+     */
+    private function setPermission(Role $role, array $permissions): void
+    {
+        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+        $this->em->flush();
     }
 }

@@ -160,6 +160,9 @@ $container->loadFromExtension(
     'light_saml_symfony_bridge',
     [
         'own' => [
+            'entity_descriptor_provider' => [
+                'id' => 'mautic.security.saml.entity_descriptor_provider',
+            ],
             'entity_id' => '%mautic.saml_idp_entity_id%',
         ],
         'store' => [

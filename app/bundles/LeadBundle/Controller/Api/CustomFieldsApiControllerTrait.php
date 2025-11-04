@@ -129,7 +129,7 @@ trait CustomFieldsApiControllerTrait
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
 
-        if (isset($this->fieldCache[$object])) {
+        if (!empty($this->fieldCache[$object])) {
             return $this->fieldCache[$object];
         }
 

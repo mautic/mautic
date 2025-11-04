@@ -637,10 +637,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             return false;
         }
 
-        // Extract event IDs from canvas nodes (excludes 'lists' and other non-event nodes)
+        // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
         $eventIds = array_filter(
             array_column($canvasSettings['nodes'], 'id'),
-            fn ($id) => 'lists' !== $id
+            fn ($id) => !in_array($id, ['lists', 'forms'])
         );
 
         if (empty($eventIds)) {

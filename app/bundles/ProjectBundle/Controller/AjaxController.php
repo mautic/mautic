@@ -59,8 +59,8 @@ final class AjaxController extends CommonAjaxController
             foreach ($newProjectNames as $projectName) {
                 $project = new Project();
                 $project->setName($projectName);
-                $projectModel->saveEntity($project);
-                $existingProjectIds[] = $project->getId();
+
+                $existingProjectIds[] = $this->createProjectIfNotExists(trim($projectName), $projectModel, $projectRepository);
             }
         }
 
@@ -74,5 +74,18 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse(['projects' => $projectOptions]);
+    }
+
+    private function createProjectIfNotExists(string $name, ProjectModel $projectModel, ProjectRepository $projectRepository): int
+    {
+        if ($project = $projectRepository->findOneBy(['name' => $name])) {
+            return $project->getId();
+        }
+
+        $project = new Project();
+        $project->setName($name);
+        $projectModel->saveEntity($project);
+
+        return $project->getId();
     }
 }

@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -63,6 +64,12 @@ class Project extends FormEntity implements UuidInterface
      */
     private array $properties = [];
 
+    /**
+     * Transient property to store the count of entities associated with this project.
+     * This is not persisted to the database.
+     */
+    public int $entitiesCount = 0;
+
     public function __clone()
     {
         $this->id = null;
@@ -76,7 +83,7 @@ class Project extends FormEntity implements UuidInterface
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(ProjectRepository::class)
-            ->addIndex(['name'], 'project_name');
+            ->addUniqueConstraint(['name'], 'unique_project_name');
 
         $builder->addIdColumns();
 
@@ -109,6 +116,7 @@ class Project extends FormEntity implements UuidInterface
             'name',
             new NotBlank(['message' => 'mautic.core.name.required'])
         );
+        $metadata->addConstraint(new UniqueName());
     }
 
     public function getId(): ?int
