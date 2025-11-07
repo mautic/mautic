@@ -21,6 +21,7 @@ final class AjaxController extends CommonAjaxController
     public function getLookupChoiceListAction(Request $request, ProjectModel $projectModel): JsonResponse
     {
         $entityType  = $request->query->get('entityType');
+        $projectId   = $request->query->getInt('projectId', 0) ?: null;
 
         if (empty($entityType)) {
             return new JsonResponse([]);
@@ -32,7 +33,9 @@ final class AjaxController extends CommonAjaxController
         $limit       = (int) $request->query->get('limit', '10');
         $start       = (int) $request->query->get('start', '0');
 
-        $results = $projectModel->getLookupResults($entityType, $filter, $limit, $start);
+        $results = $projectModel->getLookupResults($entityType, $filter, $limit, $start, [
+            'projectId' => $projectId,
+        ]);
 
         // Format results to match AjaxLookupControllerTrait structure
         $dataArray = [];

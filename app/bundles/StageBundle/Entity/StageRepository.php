@@ -191,7 +191,7 @@ class StageRepository extends CommonRepository
     /**
      * @param string|int $value
      *
-     * @return array
+     * @return Stage|null
      */
     public function findByIdOrName($value)
     {
