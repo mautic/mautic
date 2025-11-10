@@ -1,4 +1,5 @@
 <?php
+// php
 
 declare(strict_types=1);
 
@@ -23,23 +24,62 @@ class AuditLogModelTest extends MauticMysqlTestCase
         parent::setUp();
         self::bootKernel();
         $this->container = static::getContainer();
-        // Service id used in project convention
-        $this->model = $this->container->get('mautic.core.model.auditlog');
-        $this->repo  = $this->model->getRepository();
+        $this->model      = $this->container->get('mautic.core.model.auditlog');
+        $this->repo       = $this->model->getRepository();
+    }
+
+    // Helpers to reduce duplication
+    private function addAuditLog(string $bundle, string $object, int $objectId, string $action = 'create'): void
+    {
+        $this->model->writeToLog([
+            'bundle'    => $bundle,
+            'object'    => $object,
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'ipAddress' => '127.0.0.1',
+        ]);
+    }
+
+    private function assertLogsCount(string $bundle, string $object, int $objectId, int $expected, string $message = ''): void
+    {
+        $logs = $this->repo->findBy([
+            'objectId' => $objectId,
+            'bundle'   => $bundle,
+            'object'   => $object,
+        ]);
+        $this->assertCount($expected, $logs, $message);
+    }
+
+    private function assertLogsEmpty(string $bundle, string $object, int $objectId, string $message = ''): void
+    {
+        $logs = $this->repo->findBy([
+            'objectId' => $objectId,
+            'bundle'   => $bundle,
+            'object'   => $object,
+        ]);
+        $this->assertEmpty($logs, $message);
+    }
+
+    private function cleanupLogsByCriteria(array $criteria): void
+    {
+        $logs = $this->repo->findBy($criteria);
+        if (!empty($logs)) {
+            $this->repo->deleteEntities($logs);
+        }
+    }
+
+    private function removeAndFlushEntities(...$entities): void
+    {
+        foreach ($entities as $e) {
+            $this->em->remove($e);
+        }
+        $this->em->flush();
     }
 
     public function testWriteToLogCreatesEntry(): void
     {
         $objectId = 1;
-        $args     = [
-            'bundle'    => 'test',
-            'object'    => 'object',
-            'objectId'  => $objectId,
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ];
-
-        $this->model->writeToLog($args);
+        $this->addAuditLog('test', 'object', $objectId, 'create');
 
         $logs = $this->repo->findBy([
             'objectId' => $objectId,
@@ -56,242 +96,103 @@ class AuditLogModelTest extends MauticMysqlTestCase
     public function testGetLogForObjectReturnsEntries(): void
     {
         $objectId = 2;
-        $args     = [
-            'bundle'    => 'test',
-            'object'    => 'object',
-            'objectId'  => $objectId,
-            'action'    => 'update',
-            'ipAddress' => '127.0.0.1',
-        ];
-
-        $this->model->writeToLog($args);
+        $this->addAuditLog('test', 'object', $objectId, 'update');
 
         $result = $this->model->getLogForObject('object', $objectId, null, 10, 'test');
 
         $this->assertIsArray($result, 'getLogForObject should return an array or collection.');
         $this->assertNotEmpty($result, 'getLogForObject should return the previously written audit log.');
 
-        // cleanup: repository may return AuditLog entities; remove them
-        $logs = $this->repo->findBy([
+        // cleanup
+        $this->cleanupLogsByCriteria([
             'objectId' => $objectId,
             'bundle'   => 'test',
             'object'   => 'object',
         ]);
-        $this->repo->deleteEntities($logs);
     }
 
     public function testDeleteAuditLogByLeadsDeletesLeadLogs(): void
     {
-        // Create a test lead
         $lead = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $this->em->flush();
 
-        // Create audit logs for the lead
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->addAuditLog('lead', 'lead', $lead->getId(), 'create');
+        $this->addAuditLog('lead', 'lead', $lead->getId(), 'update');
 
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead->getId(),
-            'action'    => 'update',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->assertLogsCount('lead', 'lead', $lead->getId(), 2, 'Two audit logs should exist before deletion.');
 
-        // Verify logs were created
-        $logsBefore = $this->repo->findBy([
-            'objectId' => $lead->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertCount(2, $logsBefore, 'Two audit logs should exist before deletion.');
-
-        // Delete audit logs
         $this->model->deleteAuditLogByLeads([$lead->getId()], false);
 
-        // Verify logs were deleted
-        $logsAfter = $this->repo->findBy([
-            'objectId' => $lead->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertEmpty($logsAfter, 'Audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'lead', $lead->getId(), 'Audit logs should be deleted.');
 
         // Cleanup
-        $this->em->remove($lead);
-        $this->em->flush();
+        $this->removeAndFlushEntities($lead);
     }
 
     public function testDeleteAuditLogByLeadsWithMultipleLeads(): void
     {
-        // Create multiple test leads
         $lead1 = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $lead2 = $this->createLead('Jane', 'Smith', 'jane.smith@example.com');
         $this->em->flush();
 
-        // Create audit logs for both leads
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead1->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->addAuditLog('lead', 'lead', $lead1->getId(), 'create');
+        $this->addAuditLog('lead', 'lead', $lead2->getId(), 'create');
 
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead2->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->assertLogsCount('lead', 'lead', $lead1->getId(), 1);
+        $this->assertLogsCount('lead', 'lead', $lead2->getId(), 1);
 
-        // Verify logs were created
-        $logs1Before = $this->repo->findBy([
-            'objectId' => $lead1->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $logs2Before = $this->repo->findBy([
-            'objectId' => $lead2->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertCount(1, $logs1Before);
-        $this->assertCount(1, $logs2Before);
-
-        // Delete audit logs for both leads
         $this->model->deleteAuditLogByLeads([$lead1->getId(), $lead2->getId()], false);
 
-        // Verify all logs were deleted
-        $logs1After = $this->repo->findBy([
-            'objectId' => $lead1->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $logs2After = $this->repo->findBy([
-            'objectId' => $lead2->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertEmpty($logs1After, 'Lead 1 audit logs should be deleted.');
-        $this->assertEmpty($logs2After, 'Lead 2 audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'lead', $lead1->getId(), 'Lead 1 audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'lead', $lead2->getId(), 'Lead 2 audit logs should be deleted.');
 
-        // Cleanup
-        $this->em->remove($lead1);
-        $this->em->remove($lead2);
-        $this->em->flush();
+        $this->removeAndFlushEntities($lead1, $lead2);
     }
 
     public function testDeleteAuditLogByLeadsWithoutDeletingCompanyLogs(): void
     {
-        // Create test lead and company
         $lead    = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $company = $this->createCompany('Test Company', 'company@example.com');
         $this->createPrimaryCompanyForLead($lead, $company);
         $this->em->flush();
 
-        // Create audit logs for lead and company
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->addAuditLog('lead', 'lead', $lead->getId(), 'create');
+        $this->addAuditLog('lead', 'company', $company->getId(), 'create');
 
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'company',
-            'objectId'  => $company->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
-
-        // Delete audit logs for lead only (deleteCompaniesByLeads = false)
         $this->model->deleteAuditLogByLeads([$lead->getId()], false);
 
-        // Verify lead logs were deleted
-        $leadLogsAfter = $this->repo->findBy([
-            'objectId' => $lead->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertEmpty($leadLogsAfter, 'Lead audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'lead', $lead->getId(), 'Lead audit logs should be deleted.');
+        $this->assertLogsCount('lead', 'company', $company->getId(), 1, 'Company audit logs should NOT be deleted.');
 
-        // Verify company logs were NOT deleted
-        $companyLogsAfter = $this->repo->findBy([
+        // Cleanup
+        $this->cleanupLogsByCriteria([
             'objectId' => $company->getId(),
             'bundle'   => 'lead',
             'object'   => 'company',
         ]);
-        $this->assertCount(1, $companyLogsAfter, 'Company audit logs should NOT be deleted.');
-
-        // Cleanup
-        $this->repo->deleteEntities($companyLogsAfter);
-        $this->em->remove($lead);
-        $this->em->remove($company);
-        $this->em->flush();
+        $this->removeAndFlushEntities($lead, $company);
     }
 
     public function testDeleteAuditLogByLeadsWithDeletingCompanyLogs(): void
     {
-        // Create test lead and company
         $lead    = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $company = $this->createCompany('Test Company', 'company@example.com');
         $this->createPrimaryCompanyForLead($lead, $company);
         $this->em->flush();
 
-        // Create audit logs for lead and company
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->addAuditLog('lead', 'lead', $lead->getId(), 'create');
+        $this->addAuditLog('lead', 'company', $company->getId(), 'create');
 
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'company',
-            'objectId'  => $company->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
-
-        // Delete audit logs for lead AND company (deleteCompaniesByLeads = true)
         $this->model->deleteAuditLogByLeads([$lead->getId()], true);
 
-        // Verify lead logs were deleted
-        $leadLogsAfter = $this->repo->findBy([
-            'objectId' => $lead->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertEmpty($leadLogsAfter, 'Lead audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'lead', $lead->getId(), 'Lead audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'company', $company->getId(), 'Company audit logs should be deleted.');
 
-        // Verify company logs were also deleted
-        $companyLogsAfter = $this->repo->findBy([
-            'objectId' => $company->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'company',
-        ]);
-        $this->assertEmpty($companyLogsAfter, 'Company audit logs should be deleted.');
-
-        // Cleanup
-        $this->em->remove($lead);
-        $this->em->remove($company);
-        $this->em->flush();
+        $this->removeAndFlushEntities($lead, $company);
     }
 
     public function testDeleteAuditLogByLeadsWithMultipleCompanies(): void
     {
-        // Create test lead with multiple companies
         $lead     = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $company1 = $this->createCompany('Test Company 1', 'company1@example.com');
         $company2 = $this->createCompany('Test Company 2', 'company2@example.com');
@@ -299,60 +200,17 @@ class AuditLogModelTest extends MauticMysqlTestCase
         $this->createPrimaryCompanyForLead($lead, $company2, false);
         $this->em->flush();
 
-        // Create audit logs
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->addAuditLog('lead', 'lead', $lead->getId(), 'create');
+        $this->addAuditLog('lead', 'company', $company1->getId(), 'create');
+        $this->addAuditLog('lead', 'company', $company2->getId(), 'create');
 
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'company',
-            'objectId'  => $company1->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
-
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'company',
-            'objectId'  => $company2->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
-
-        // Delete audit logs including companies
         $this->model->deleteAuditLogByLeads([$lead->getId()], true);
 
-        // Verify all logs were deleted
-        $leadLogsAfter = $this->repo->findBy([
-            'objectId' => $lead->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $company1LogsAfter = $this->repo->findBy([
-            'objectId' => $company1->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'company',
-        ]);
-        $company2LogsAfter = $this->repo->findBy([
-            'objectId' => $company2->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'company',
-        ]);
+        $this->assertLogsEmpty('lead', 'lead', $lead->getId(), 'Lead audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'company', $company1->getId(), 'Company 1 audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'company', $company2->getId(), 'Company 2 audit logs should be deleted.');
 
-        $this->assertEmpty($leadLogsAfter, 'Lead audit logs should be deleted.');
-        $this->assertEmpty($company1LogsAfter, 'Company 1 audit logs should be deleted.');
-        $this->assertEmpty($company2LogsAfter, 'Company 2 audit logs should be deleted.');
-
-        // Cleanup
-        $this->em->remove($lead);
-        $this->em->remove($company1);
-        $this->em->remove($company2);
-        $this->em->flush();
+        $this->removeAndFlushEntities($lead, $company1, $company2);
     }
 
     public function testDeleteAuditLogByLeadsWithEmptyArray(): void
@@ -364,50 +222,23 @@ class AuditLogModelTest extends MauticMysqlTestCase
 
     public function testDeleteAuditLogByLeadsWithNonExistentLeadId(): void
     {
-        // Should handle non-existent lead IDs gracefully
         $nonExistentId = 999999;
-
-        // This should not throw an exception
         $this->model->deleteAuditLogByLeads([$nonExistentId], false);
         $this->model->deleteAuditLogByLeads([$nonExistentId], true);
     }
 
     public function testDeleteAuditLogByLeadsOnlyDeletesLeadBundleLogs(): void
     {
-        // Create a test lead
         $lead = $this->createLead('John', 'Doe', 'john.doe@example.com');
         $this->em->flush();
 
-        // Create audit logs for lead in 'lead' bundle
-        $this->model->writeToLog([
-            'bundle'    => 'lead',
-            'object'    => 'lead',
-            'objectId'  => $lead->getId(),
-            'action'    => 'create',
-            'ipAddress' => '127.0.0.1',
-        ]);
+        $this->addAuditLog('lead', 'lead', $lead->getId(), 'create');
+        $this->addAuditLog('email', 'email_stat', $lead->getId(), 'sent');
 
-        // Create audit logs for lead in different bundle (should NOT be deleted)
-        $this->model->writeToLog([
-            'bundle'    => 'email',
-            'object'    => 'email_stat',
-            'objectId'  => $lead->getId(),
-            'action'    => 'sent',
-            'ipAddress' => '127.0.0.1',
-        ]);
-
-        // Delete audit logs
         $this->model->deleteAuditLogByLeads([$lead->getId()], false);
 
-        // Verify lead bundle logs were deleted
-        $leadBundleLogs = $this->repo->findBy([
-            'objectId' => $lead->getId(),
-            'bundle'   => 'lead',
-            'object'   => 'lead',
-        ]);
-        $this->assertEmpty($leadBundleLogs, 'Lead bundle audit logs should be deleted.');
+        $this->assertLogsEmpty('lead', 'lead', $lead->getId(), 'Lead bundle audit logs should be deleted.');
 
-        // Verify other bundle logs were NOT deleted
         $emailBundleLogs = $this->repo->findBy([
             'objectId' => $lead->getId(),
             'bundle'   => 'email',
@@ -417,7 +248,6 @@ class AuditLogModelTest extends MauticMysqlTestCase
 
         // Cleanup
         $this->repo->deleteEntities($emailBundleLogs);
-        $this->em->remove($lead);
-        $this->em->flush();
+        $this->removeAndFlushEntities($lead);
     }
 }

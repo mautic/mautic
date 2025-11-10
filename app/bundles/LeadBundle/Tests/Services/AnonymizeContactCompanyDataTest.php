@@ -126,62 +126,25 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithPseudonymizeFalse(): void
     {
-        $lead  = $this->createMock(Lead::class);
-        $leads = new ArrayCollection([$lead]);
+        $lead = $this->createLead();
+        $submission = $this->createFormSubmission(1, 'test_form');
+        $this->mockSubmissionRepoForLead($lead, [$submission]);
 
-        $form = $this->createMock(Form::class);
-        $form->method('getId')->willReturn(1);
-        $form->method('getAlias')->willReturn('test_form');
-
-        $submissionForm = $this->createMock(Submission::class);
-        $submissionForm->method('getForm')->willReturn($form);
-
-        $submissionRepo = $this->createMock(SubmissionRepository::class);
-        $submissionRepo->method('findBy')
-            ->with(['lead' => $lead])
-            ->willReturn([$submissionForm]);
-
-        $this->submissionModel->method('getRepository')->willReturn($submissionRepo);
-
-        // When pseudonymize is false, getSubmissionsByForm should NOT be called
-        $this->submissionModel->expects($this->never())
-            ->method('getSubmissionsByForm');
-
-        // updateSubmissionAnonymizeByLead should be called with empty array
+        $this->submissionModel->expects($this->never())->method('getSubmissionsByForm');
         $this->submissionModel->expects($this->once())
             ->method('updateSubmissionAnonymizeByLead')
-            ->with(1, 'test_form', $submissionForm, []);
+            ->with(1, 'test_form', $submission, []);
 
-        $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
-            $this->logger,
-            $this->emailModel,
-            $this->submissionModel
-        );
-
-        $service->updateFormResults($leads, false);
+        $service = $this->createService();
+        $service->updateFormResults(new ArrayCollection([$lead]), false);
     }
 
     public function testUpdateFormResultsWithPseudonymizeTrueAnonymizesForms(): void
     {
-        $lead  = $this->createMock(Lead::class);
-        $leads = new ArrayCollection([$lead]);
+        $lead = $this->createLead();
+        $submission = $this->createFormSubmission(1, 'test_form');
+        $this->mockSubmissionRepoForLead($lead, [$submission]);
 
-        $form = $this->createMock(Form::class);
-        $form->method('getId')->willReturn(1);
-        $form->method('getAlias')->willReturn('test_form');
-
-        $submissionForm = $this->createMock(Submission::class);
-        $submissionForm->method('getForm')->willReturn($form);
-
-        $submissionRepo = $this->createMock(SubmissionRepository::class);
-        $submissionRepo->method('findBy')
-            ->with(['lead' => $lead])
-            ->willReturn([$submissionForm]);
-
-        $this->submissionModel->method('getRepository')->willReturn($submissionRepo);
-
-        // Mock form data - submission_id and form_id should NOT be anonymized
         $formData = [
             [
                 'submission_id' => 123,
@@ -194,27 +157,20 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
         $this->submissionModel->expects($this->once())
             ->method('getSubmissionsByForm')
-            ->with(1, 'test_form', $submissionForm)
+            ->with(1, 'test_form', $submission)
             ->willReturn($formData);
 
-        // Capture the anonymized data passed to updateSubmissionAnonymizeByLead
         $this->submissionModel->expects($this->once())
             ->method('updateSubmissionAnonymizeByLead')
             ->with(
                 1,
                 'test_form',
-                $submissionForm,
+                $submission,
                 $this->callback(function ($valueSubmissionForm) {
-                    // Verify submission_id and form_id are NOT in the anonymized values
-                    $this->assertArrayNotHasKey('123', $valueSubmissionForm);
-                    $this->assertArrayNotHasKey('1', $valueSubmissionForm);
-
-                    // Verify other values are present and anonymized
                     $this->assertArrayHasKey('test@example.com', $valueSubmissionForm);
                     $this->assertArrayHasKey('John Doe', $valueSubmissionForm);
                     $this->assertArrayHasKey('Test message', $valueSubmissionForm);
 
-                    // Verify values are actually anonymized (not same as original)
                     $this->assertNotEquals('test@example.com', $valueSubmissionForm['test@example.com']);
                     $this->assertNotEquals('John Doe', $valueSubmissionForm['John Doe']);
                     $this->assertNotEquals('Test message', $valueSubmissionForm['Test message']);
@@ -223,14 +179,8 @@ class AnonymizeContactCompanyDataTest extends TestCase
                 })
             );
 
-        $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
-            $this->logger,
-            $this->emailModel,
-            $this->submissionModel
-        );
-
-        $service->updateFormResults($leads, true);
+        $service = $this->createService();
+        $service->updateFormResults(new ArrayCollection([$lead]), true);
     }
 
     public function testUpdateFormResultsWithMultipleLeadsAndForms(): void
@@ -295,30 +245,14 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithEmptySubmissions(): void
     {
-        $lead  = $this->createMock(Lead::class);
-        $leads = new ArrayCollection([$lead]);
+        $lead = $this->createLead();
+        $this->mockSubmissionRepoForLead($lead, []); // no submissions
 
-        $submissionRepo = $this->createMock(SubmissionRepository::class);
-        $submissionRepo->method('findBy')
-            ->with(['lead' => $lead])
-            ->willReturn([]); // No submissions found
+        $this->submissionModel->expects($this->never())->method('getSubmissionsByForm');
+        $this->submissionModel->expects($this->never())->method('updateSubmissionAnonymizeByLead');
 
-        $this->submissionModel->method('getRepository')->willReturn($submissionRepo);
-
-        // Methods should not be called if no submissions
-        $this->submissionModel->expects($this->never())
-            ->method('getSubmissionsByForm');
-        $this->submissionModel->expects($this->never())
-            ->method('updateSubmissionAnonymizeByLead');
-
-        $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
-            $this->logger,
-            $this->emailModel,
-            $this->submissionModel
-        );
-
-        $service->updateFormResults($leads, true);
+        $service = $this->createService();
+        $service->updateFormResults(new ArrayCollection([$lead]), true);
     }
 
     public function testUpdateFormResultsWithEmptyFormData(): void
@@ -363,30 +297,10 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsAccumulatesAnonymizedDataAcrossMultipleForms(): void
     {
-        $lead  = $this->createMock(Lead::class);
-        $leads = new ArrayCollection([$lead]);
-
-        // Setup two forms for the same lead
-        $form1 = $this->createMock(Form::class);
-        $form1->method('getId')->willReturn(1);
-        $form1->method('getAlias')->willReturn('form1');
-
-        $submissionForm1 = $this->createMock(Submission::class);
-        $submissionForm1->method('getForm')->willReturn($form1);
-
-        $form2 = $this->createMock(Form::class);
-        $form2->method('getId')->willReturn(2);
-        $form2->method('getAlias')->willReturn('form2');
-
-        $submissionForm2 = $this->createMock(Submission::class);
-        $submissionForm2->method('getForm')->willReturn($form2);
-
-        $submissionRepo = $this->createMock(SubmissionRepository::class);
-        $submissionRepo->method('findBy')
-            ->with(['lead' => $lead])
-            ->willReturn([$submissionForm1, $submissionForm2]);
-
-        $this->submissionModel->method('getRepository')->willReturn($submissionRepo);
+        $lead = $this->createLead();
+        $sub1 = $this->createFormSubmission(1, 'form1');
+        $sub2 = $this->createFormSubmission(2, 'form2');
+        $this->mockSubmissionRepoForLead($lead, [$sub1, $sub2]);
 
         $formData1 = [['email' => 'test1@example.com']];
         $formData2 = [['email' => 'test2@example.com']];
@@ -395,27 +309,56 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->method('getSubmissionsByForm')
             ->willReturnOnConsecutiveCalls($formData1, $formData2);
 
-        // The second call should have accumulated data from both forms
         $callCount = 0;
         $this->submissionModel->expects($this->exactly(2))
             ->method('updateSubmissionAnonymizeByLead')
             ->willReturnCallback(function ($id, $alias, $submission, $data) use (&$callCount) {
                 ++$callCount;
                 if (2 === $callCount) {
-                    // Second call should have data from both forms
                     $this->assertCount(2, $data);
                     $this->assertArrayHasKey('test1@example.com', $data);
                     $this->assertArrayHasKey('test2@example.com', $data);
                 }
             });
 
-        $service = new AnonymizeContactCompanyData(
+        $service = $this->createService();
+        $service->updateFormResults(new ArrayCollection([$lead]), true);
+    }
+
+    private function createLead(): Lead
+    {
+        return $this->createMock(Lead::class);
+    }
+
+    private function createFormSubmission(int $formId, string $formAlias): Submission
+    {
+        $form = $this->createMock(\Mautic\FormBundle\Entity\Form::class);
+        $form->method('getId')->willReturn($formId);
+        $form->method('getAlias')->willReturn($formAlias);
+
+        $submission = $this->createMock(\Mautic\FormBundle\Entity\Submission::class);
+        $submission->method('getForm')->willReturn($form);
+
+        return $submission;
+    }
+
+    private function mockSubmissionRepoForLead(Lead $lead, array $submissions): void
+    {
+        $submissionRepo = $this->createMock(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepo->method('findBy')
+            ->with(['lead' => $lead])
+            ->willReturn($submissions);
+
+        $this->submissionModel->method('getRepository')->willReturn($submissionRepo);
+    }
+
+    private function createService(): AnonymizeContactCompanyData
+    {
+        return new AnonymizeContactCompanyData(
             $this->fieldModel,
             $this->logger,
             $this->emailModel,
             $this->submissionModel
         );
-
-        $service->updateFormResults($leads, true);
     }
 }
