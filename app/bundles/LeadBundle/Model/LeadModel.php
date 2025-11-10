@@ -566,7 +566,7 @@ class LeadModel extends FormModel
                         $this->translator->trans('mautic.stage.event.changed')
                     );
                 } else {
-                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageIdOrName]));
+                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['%id%' => $newLeadStageIdOrName]));
                 }
             }
         }
