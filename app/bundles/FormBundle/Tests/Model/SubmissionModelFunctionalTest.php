@@ -276,9 +276,6 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
 
         // Should not throw exception with non-existent submission
         $this->submissionModel->updateSubmissionAnonymizeByLead($formId, $formAlias, $mockSubmission, []);
-
-        // If we get here without exception, test passes
-        $this->assertTrue(true);
     }
 
     public function testGetSubmissionsByFormReturnsAllColumns(): void

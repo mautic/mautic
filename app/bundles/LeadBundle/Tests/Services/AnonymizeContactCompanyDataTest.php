@@ -22,8 +22,11 @@ class AnonymizeContactCompanyDataTest extends TestCase
 {
     /** @var FieldModel&MockObject */
     private FieldModel $fieldModel;
+    /** @var LoggerInterface&MockObject */
     private LoggerInterface $logger;
+    /** @var EmailModel&MockObject */
     private EmailModel $emailModel;
+    /** @var SubmissionModel&MockObject */
     private SubmissionModel $submissionModel;
 
     protected function setUp(): void

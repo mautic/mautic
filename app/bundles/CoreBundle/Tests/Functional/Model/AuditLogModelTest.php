@@ -360,9 +360,6 @@ class AuditLogModelTest extends MauticMysqlTestCase
         // Should not throw exception with empty array
         $this->model->deleteAuditLogByLeads([], false);
         $this->model->deleteAuditLogByLeads([], true);
-
-        // No assertions needed - just verifying no exceptions are thrown
-        $this->assertTrue(true);
     }
 
     public function testDeleteAuditLogByLeadsWithNonExistentLeadId(): void
@@ -373,9 +370,6 @@ class AuditLogModelTest extends MauticMysqlTestCase
         // This should not throw an exception
         $this->model->deleteAuditLogByLeads([$nonExistentId], false);
         $this->model->deleteAuditLogByLeads([$nonExistentId], true);
-
-        // No assertions needed - just verifying no exceptions are thrown
-        $this->assertTrue(true);
     }
 
     public function testDeleteAuditLogByLeadsOnlyDeletesLeadBundleLogs(): void
