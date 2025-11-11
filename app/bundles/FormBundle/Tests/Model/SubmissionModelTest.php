@@ -683,7 +683,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         array $columns,
         array $submissionResults,
         ?array $expectedUpdateData = null,
-        int $entityManagerGetConnectionTimes = 2
+        int $entityManagerGetConnectionTimes = 2,
     ): void {
         $qb            = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $connection    = $this->createMock(\Doctrine\DBAL\Connection::class);
@@ -738,8 +738,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubmissionsByForm(): void
     {
-        $formId    = 1;
-        $formAlias = 'test_form';
+        $formId     = 1;
+        $formAlias  = 'test_form';
         $submission = new Submission();
         $submission = $this->setSubmissionId($submission, 10);
 
@@ -766,8 +766,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdateSubmissionAnonymizeByLead(): void
     {
-        $formId    = 1;
-        $formAlias = 'test_form';
+        $formId     = 1;
+        $formAlias  = 'test_form';
         $submission = new Submission();
         $submission = $this->setSubmissionId($submission, 10);
 
@@ -808,11 +808,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdateSubmissionAnonymizeByLeadWithNoColumnsToUpdate(): void
     {
-        $formId    = 1;
-        $formAlias = 'test_form';
+        $formId     = 1;
+        $formAlias  = 'test_form';
         $submission = new Submission();
         $submission = $this->setSubmissionId($submission, 10);
-        $dataForm = [];
+        $dataForm   = [];
 
         $tableName = 'form_results_1_test_form';
 

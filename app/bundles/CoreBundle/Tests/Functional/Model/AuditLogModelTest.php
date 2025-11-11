@@ -1,4 +1,5 @@
 <?php
+
 // php
 
 declare(strict_types=1);
@@ -23,7 +24,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
     {
         parent::setUp();
         self::bootKernel();
-        $this->container = static::getContainer();
+        $this->container  = static::getContainer();
         $this->model      = $this->container->get('mautic.core.model.auditlog');
         $this->repo       = $this->model->getRepository();
     }

@@ -23,7 +23,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
 
     private function createFieldModelWithRepository(array $fieldsChoices, int $findByCalls = 2): FieldModel
     {
-        $fieldModel = $this->createMock(FieldModel::class);
+        $fieldModel      = $this->createMock(FieldModel::class);
         $fieldRepository = $this->createMock(LeadFieldRepository::class);
         $fieldRepository->expects($this->exactly($findByCalls))
             ->method('findBy')
@@ -35,7 +35,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
 
     private function createFieldModelWithRepositoryCallback(callable $callback, int $findByCalls = 2): FieldModel
     {
-        $fieldModel = $this->createMock(FieldModel::class);
+        $fieldModel      = $this->createMock(FieldModel::class);
         $fieldRepository = $this->createMock(LeadFieldRepository::class);
         $fieldRepository->expects($this->exactly($findByCalls))
             ->method('findBy')
@@ -48,7 +48,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
     private function createBuilderMockForAdd(int $expectedAddCalls = 4, ?callable $callback = null): FormBuilderInterface
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $expect = $builder->expects($this->exactly($expectedAddCalls))->method('add');
+        $expect  = $builder->expects($this->exactly($expectedAddCalls))->method('add');
         if ($callback) {
             $expect->willReturnCallback($callback);
         } else {
@@ -75,9 +75,9 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
 
     public function testBuildForm(): void
     {
-        $lead = $this->createLeadFieldMock();
+        $lead       = $this->createLeadFieldMock();
         $fieldModel = $this->createFieldModelWithRepository([$lead], 2);
-        $builder = $this->createBuilderMockForAdd(4);
+        $builder    = $this->createBuilderMockForAdd(4);
         $translator = $this->createTranslatorMock();
 
         $type = $this->createTypeInstance($fieldModel, $translator);
@@ -88,14 +88,14 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
     {
         $fieldModel = $this->createMock(FieldModel::class);
         $translator = $this->createTranslatorMock();
-        $type = $this->createTypeInstance($fieldModel, $translator);
+        $type       = $this->createTypeInstance($fieldModel, $translator);
 
         $this->assertEquals('lead_action_anonymizeuserdata', $type->getBlockPrefix());
     }
 
     public function testBuildFormWithDefaultValues(): void
     {
-        $lead = $this->createLeadFieldMock();
+        $lead       = $this->createLeadFieldMock();
         $fieldModel = $this->createFieldModelWithRepository([$lead], 2);
 
         $builder = $this->createBuilderMockForAdd(4, function ($name, $type, $options) {
@@ -119,13 +119,13 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
         });
 
         $translator = $this->createTranslatorMock();
-        $type = $this->createTypeInstance($fieldModel, $translator);
+        $type       = $this->createTypeInstance($fieldModel, $translator);
         $type->buildForm($builder, ['data' => []]);
     }
 
     public function testBuildFormWithCustomData(): void
     {
-        $lead = $this->createLeadFieldMock();
+        $lead       = $this->createLeadFieldMock();
         $fieldModel = $this->createFieldModelWithRepository([$lead], 2);
 
         $customData = [
@@ -149,7 +149,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
         });
 
         $translator = $this->createTranslatorMock();
-        $type = $this->createTypeInstance($fieldModel, $translator);
+        $type       = $this->createTypeInstance($fieldModel, $translator);
         $type->buildForm($builder, ['data' => $customData]);
     }
 
@@ -162,10 +162,11 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
             if (isset($criteria['isUniqueIdentifer']) && false === $criteria['isUniqueIdentifer']) {
                 return [$normalField];
             }
+
             return [$uniqueField, $normalField];
         }, 2);
 
-        $builder = $this->createBuilderMockForAdd(4);
+        $builder    = $this->createBuilderMockForAdd(4);
         $translator = $this->createTranslatorMock();
 
         $type = $this->createTypeInstance($fieldModel, $translator);
@@ -174,7 +175,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
 
     public function testValidationCallbackIsAttached(): void
     {
-        $lead = $this->createLeadFieldMock();
+        $lead       = $this->createLeadFieldMock();
         $fieldModel = $this->createFieldModelWithRepository([$lead], 2);
 
         $builder = $this->createBuilderMockForAdd(4, function ($name, $type, $options) {
@@ -192,7 +193,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
         });
 
         $translator = $this->createTranslatorMock();
-        $type = $this->createTypeInstance($fieldModel, $translator);
+        $type       = $this->createTypeInstance($fieldModel, $translator);
         $type->buildForm($builder, ['data' => []]);
     }
 
@@ -204,10 +205,11 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
                 CampaignActionAnonymizeUserDataType::FIELD_TYPE_ALLOWED,
                 $criteria['type']
             );
+
             return [];
         }, 2);
 
-        $builder = $this->createBuilderMockForAdd(4);
+        $builder    = $this->createBuilderMockForAdd(4);
         $translator = $this->createTranslatorMock();
 
         $type = $this->createTypeInstance($fieldModel, $translator);
@@ -216,7 +218,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
 
     public function testCustomTextFieldConfiguration(): void
     {
-        $lead = $this->createLeadFieldMock();
+        $lead       = $this->createLeadFieldMock();
         $fieldModel = $this->createFieldModelWithRepository([$lead], 2);
 
         $builder = $this->createBuilderMockForAdd(4, function ($name, $type, $options) {
@@ -226,11 +228,12 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
                 $this->assertTrue($options['attr']['readonly']);
                 $this->assertStringContainsString('display: none', $options['attr']['style']);
             }
+
             return $this->createMock(FormBuilderInterface::class);
         });
 
         $translator = $this->createTranslatorMock('Audit log message');
-        $type = $this->createTypeInstance($fieldModel, $translator);
+        $type       = $this->createTypeInstance($fieldModel, $translator);
         $type->buildForm($builder, ['data' => []]);
     }
 }

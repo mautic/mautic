@@ -126,7 +126,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithPseudonymizeFalse(): void
     {
-        $lead = $this->createLead();
+        $lead       = $this->createLead();
         $submission = $this->createFormSubmission(1, 'test_form');
         $this->mockSubmissionRepoForLead($lead, [$submission]);
 
@@ -141,7 +141,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     public function testUpdateFormResultsWithPseudonymizeTrueAnonymizesForms(): void
     {
-        $lead = $this->createLead();
+        $lead       = $this->createLead();
         $submission = $this->createFormSubmission(1, 'test_form');
         $this->mockSubmissionRepoForLead($lead, [$submission]);
 
@@ -332,11 +332,11 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     private function createFormSubmission(int $formId, string $formAlias): Submission
     {
-        $form = $this->createMock(\Mautic\FormBundle\Entity\Form::class);
+        $form = $this->createMock(Form::class);
         $form->method('getId')->willReturn($formId);
         $form->method('getAlias')->willReturn($formAlias);
 
-        $submission = $this->createMock(\Mautic\FormBundle\Entity\Submission::class);
+        $submission = $this->createMock(Submission::class);
         $submission->method('getForm')->willReturn($form);
 
         return $submission;
@@ -344,7 +344,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     private function mockSubmissionRepoForLead(Lead $lead, array $submissions): void
     {
-        $submissionRepo = $this->createMock(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepo = $this->createMock(SubmissionRepository::class);
         $submissionRepo->method('findBy')
             ->with(['lead' => $lead])
             ->willReturn($submissions);
