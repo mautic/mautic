@@ -61,9 +61,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
         $this->assertEmpty($logs, $message);
     }
 
-    /*
-     * @param array<string,mixed>
-     */
+    /** @param array<string,mixed> $criteria */
     private function cleanupLogsByCriteria(array $criteria): void
     {
         $logs = $this->repo->findBy($criteria);
@@ -72,17 +70,14 @@ class AuditLogModelTest extends MauticMysqlTestCase
         }
     }
 
-    /*
-     * @param array<Audit> @entities
-     */
-    private function removeAndFlushEntities(...$entities): void
+    /** @param object ...$entities */
+    private function removeAndFlushEntities(object ...$entities): void
     {
         foreach ($entities as $e) {
             $this->em->remove($e);
         }
         $this->em->flush();
     }
-
     public function testWriteToLogCreatesEntry(): void
     {
         $objectId = 1;

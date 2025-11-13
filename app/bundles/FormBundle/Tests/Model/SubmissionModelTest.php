@@ -36,6 +36,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Model\UserModel;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -218,6 +219,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->router                     = $this->createMock(RouterInterface::class);
         $this->contactTracker             = $this->createMock(ContactTracker::class);
         $this->contactMerger              = $this->createMock(ContactMerger::class);
+        $this->userModel                  = $this->createMock(UserModel::class);
 
         $this->fieldHelper->method('getFieldFilter')->willReturn('string');
 
@@ -260,7 +262,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->mockLogger,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
+            $this->userModel
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
@@ -658,8 +661,10 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($tableName);
     }
 
-    private function mockQueryFetchAll(string $tableName, int $submissionId, array $expectedResults, int $entityManagerGetConnectionTimes = 1): void
-    {
+    /**
+     * @param array<int, array<string, mixed>> $expectedResults
+     */
+    private function mockQueryFetchAll(string $tableName, int $submissionId, array $expectedResults, int $entityManagerGetConnectionTimes = 1): void {
         $qb         = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
         $result     = $this->createMock(\Doctrine\DBAL\Result::class);
@@ -681,6 +686,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $result->expects($this->once())->method('fetchAllAssociative')->willReturn($expectedResults);
     }
 
+    /**
+     * @param array<int, \Doctrine\DBAL\Schema\Column>        $columns
+     * @param array<int, array<string, mixed>>               $submissionResults
+     * @param array<string, mixed>|null                      $expectedUpdateData
+     */
     private function mockQueryWithSchemaAndUpdate(
         string $tableName,
         int $submissionId,

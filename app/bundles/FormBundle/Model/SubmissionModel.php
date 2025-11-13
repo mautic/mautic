@@ -57,6 +57,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Model\UserModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
@@ -99,6 +100,7 @@ class SubmissionModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private UserModel $userModel,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -1086,9 +1088,9 @@ class SubmissionModel extends CommonFormModel
         }
 
         // Set owner
-        /** @var UserRepository|\Doctrine\Persistence\ObjectRepository $userRepo */
-        $userRepo = $this->em->getRepository(User::class);
+        $userRepo = $this->userModel->getRepository();
         \assert($userRepo instanceof UserRepository);
+
 
         $user = null;
         if (!empty($data['ownerbyemail'])) {
