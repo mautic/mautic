@@ -342,6 +342,9 @@ class AnonymizeContactCompanyDataTest extends TestCase
         return $submission;
     }
 
+    /**
+     * @param array<Submission> $submissions
+     */
     private function mockSubmissionRepoForLead(Lead $lead, array $submissions): void
     {
         $submissionRepo = $this->createMock(SubmissionRepository::class);

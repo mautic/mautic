@@ -21,6 +21,9 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
         return $lead;
     }
 
+    /**
+     * @param LeadField[] $fieldsChoices
+     */
     private function createFieldModelWithRepository(array $fieldsChoices, int $findByCalls = 2): FieldModel
     {
         $fieldModel      = $this->createMock(FieldModel::class);
@@ -58,7 +61,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
         return $builder;
     }
 
-    private function createTranslatorMock(?string $transReturn = null)
+    private function createTranslatorMock(?string $transReturn = null): \Mautic\CoreBundle\Translation\Translator
     {
         $translator = $this->createMock(\Mautic\CoreBundle\Translation\Translator::class);
         if (null !== $transReturn) {
@@ -68,7 +71,7 @@ class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCas
         return $translator;
     }
 
-    private function createTypeInstance(FieldModel $fieldModel, $translator): CampaignActionAnonymizeUserDataType
+    private function createTypeInstance(FieldModel $fieldModel, \Mautic\CoreBundle\Translation\Translator $translator): CampaignActionAnonymizeUserDataType
     {
         return new CampaignActionAnonymizeUserDataType($fieldModel, $translator);
     }
