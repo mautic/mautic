@@ -48,13 +48,13 @@ class FailedLeadEventLog
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaignEventFailedLog')
-                 ->addProperties(
-                     [
-                         'dateAdded',
-                         'reason',
-                     ]
-                 )
-                 ->build();
+            ->addProperties(
+                [
+                    'dateAdded',
+                    'reason',
+                ]
+            )
+            ->build();
     }
 
     /**

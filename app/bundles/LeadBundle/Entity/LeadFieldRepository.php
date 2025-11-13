@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -302,14 +301,14 @@ class LeadFieldRepository extends CommonRepository
                     $q->expr()->eq('l.id', ':lead')
                 );
 
-                $innerExpr = [];
+                $innerExpr  = [];
+                $paramCount = 0;
                 foreach ($values as $v) {
-                    $v = $q->expr()->literal(
-                        InputHelper::clean($v)
-                    );
-
-                    $v           = trim($v, "'");
-                    $innerExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
+                    // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
+                    $paramName   = 'value'.$paramCount++;
+                    $v           = trim((string) $v, "'");
+                    $innerExpr[] = $property." $operator :".$paramName;
+                    $q->setParameter($paramName, "\\|?$v\\|?");
                 }
 
                 if (str_starts_with($operatorExpr, 'not')) {
@@ -322,8 +321,7 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $q->where($expr)
-                    ->setParameter('lead', (int) $lead)
-                    ->setParameter('values', $values, ArrayParameterType::STRING);
+                    ->setParameter('lead', (int) $lead);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
