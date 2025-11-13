@@ -61,6 +61,9 @@ class AuditLogModelTest extends MauticMysqlTestCase
         $this->assertEmpty($logs, $message);
     }
 
+    /*
+     * @param array<string,mixed>
+     */
     private function cleanupLogsByCriteria(array $criteria): void
     {
         $logs = $this->repo->findBy($criteria);
@@ -69,6 +72,9 @@ class AuditLogModelTest extends MauticMysqlTestCase
         }
     }
 
+    /*
+     * @param array<Audit> @entities
+     */
     private function removeAndFlushEntities(...$entities): void
     {
         foreach ($entities as $e) {
