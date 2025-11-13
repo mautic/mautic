@@ -82,9 +82,10 @@ class LeadEventLogRepository extends CommonRepository
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
-                    fl.reason as fail_reason
-                    '
-                      )
+                    fl.reason as fail_reason,
+                    e.deleted AS event_deleted_timestamp,
+                    e.redirect_event_id,
+                    ll.metadata')
                         ->add('from', [
                             'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                             'alias' => 'll',
@@ -457,8 +458,7 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->in('o.id', $ids),
                     $q->expr()->eq('o.isScheduled', 1),
                     $q->expr()->eq('c.isPublished', 1),
-                    $q->expr()->isNull('c.deleted'),
-                    $q->expr()->isNull('e.deleted')
+                    $q->expr()->isNull('c.deleted')
                 )
             );
 
@@ -627,20 +627,6 @@ SQL;
         $deleteEntries = true;
         while ($deleteEntries) {
             $deleteEntries = $conn->executeStatement($sql, [$campaignId], [Types::INTEGER]);
-        }
-    }
-
-    /**
-     * @param string[] $eventIds
-     */
-    public function removeEventLogs(array $eventIds): void
-    {
-        $table_name    = $this->getTableName();
-        $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
-        $conn          = $this->getEntityManager()->getConnection();
-        $deleteEntries = true;
-        while ($deleteEntries) {
-            $deleteEntries = $conn->executeStatement($sql, [$eventIds], [ArrayParameterType::INTEGER]);
         }
     }
 

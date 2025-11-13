@@ -34,4 +34,14 @@ return function (ContainerConfigurator $configurator): void {
         ->tag('controller.service_arguments');
 
     $services->alias('mautic.api.model.client', Mautic\ApiBundle\Model\ClientModel::class);
+
+    // Register custom PUT processor to fix PUT operations globally
+    // This ensures PUT requests update existing entities instead of creating new ones
+    // This decorates the default persist processor so it applies to all entities automatically
+    $services->set(Mautic\ApiBundle\State\PutProcessor::class)
+        ->decorate('api_platform.doctrine.orm.state.persist_processor')
+        ->args([
+            service('.inner'),
+            service('doctrine.orm.entity_manager'),
+        ]);
 };
