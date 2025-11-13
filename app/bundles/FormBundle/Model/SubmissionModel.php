@@ -1086,6 +1086,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         // Set owner
+        /** @var UserRepository|\Doctrine\Persistence\ObjectRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);
         \assert($userRepo instanceof UserRepository);
 
