@@ -22,11 +22,14 @@ class CampaignAuditService
     public function addWarningForUnpublishedEmails(Campaign $campaign): void
     {
         $emailIds = $this->campaignRepository->fetchEmailIdsById($campaign->getId());
-        $emails   = $this->emailRepository->findBy(['id' => $emailIds]);
 
-        foreach ($emails as $email) {
-            if (!$email->isPublished()) {
-                $this->setEmailWarningFlashMessage($email);
+        if (!empty($emailIds)) {
+            $emails = $this->emailRepository->findBy(['id' => $emailIds]);
+
+            foreach ($emails as $email) {
+                if (!$email->isPublished()) {
+                    $this->setEmailWarningFlashMessage($email);
+                }
             }
         }
     }
