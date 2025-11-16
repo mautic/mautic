@@ -275,7 +275,7 @@ class FormModel extends AbstractCommonModel
 
     private function setModifiedData(object $entity): void
     {
-        if (method_exists($entity, 'setDateModified') && method_exists($entity, 'getId') && $entity->getId()) {
+        if (method_exists($entity, 'setDateModified')) {
             $entity->setDateModified(
                 defined('MAUTIC_DATE_MODIFIED_OVERRIDE') ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE) : new \DateTime()
             );
