@@ -1479,6 +1479,7 @@ class LeadController extends FormController
                         }
 
                         // Set Content
+                        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
                         $mailer->setReplyTo($email['from']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
