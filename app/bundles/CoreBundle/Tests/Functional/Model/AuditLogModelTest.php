@@ -70,7 +70,6 @@ class AuditLogModelTest extends MauticMysqlTestCase
         }
     }
 
-    /** @param object ...$entities */
     private function removeAndFlushEntities(object ...$entities): void
     {
         foreach ($entities as $e) {
@@ -78,6 +77,7 @@ class AuditLogModelTest extends MauticMysqlTestCase
         }
         $this->em->flush();
     }
+
     public function testWriteToLogCreatesEntry(): void
     {
         $objectId = 1;

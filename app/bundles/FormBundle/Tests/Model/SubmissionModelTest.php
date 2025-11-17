@@ -182,6 +182,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     private \ReflectionClass $submissionModelReflection;
 
+    /**
+     * @var UserModel|(UserModel&object&MockObject)|(UserModel&MockObject)|(object&MockObject)|MockObject
+     */
+    private UserModel $userModel;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -664,7 +669,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<int, array<string, mixed>> $expectedResults
      */
-    private function mockQueryFetchAll(string $tableName, int $submissionId, array $expectedResults, int $entityManagerGetConnectionTimes = 1): void {
+    private function mockQueryFetchAll(string $tableName, int $submissionId, array $expectedResults, int $entityManagerGetConnectionTimes = 1): void
+    {
         $qb         = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
         $result     = $this->createMock(\Doctrine\DBAL\Result::class);
@@ -687,9 +693,9 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array<int, \Doctrine\DBAL\Schema\Column>        $columns
-     * @param array<int, array<string, mixed>>               $submissionResults
-     * @param array<string, mixed>|null                      $expectedUpdateData
+     * @param array<int, \Doctrine\DBAL\Schema\Column> $columns
+     * @param array<int, array<string, mixed>>         $submissionResults
+     * @param array<string, mixed>|null                $expectedUpdateData
      */
     private function mockQueryWithSchemaAndUpdate(
         string $tableName,
