@@ -4,57 +4,86 @@ namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\WebhookBundle\Exception\PrivateAddressException;
 use Mautic\WebhookBundle\Http\Client;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
-    public function sendHookTestAction(Request $request, Client $client): \Symfony\Component\HttpFoundation\JsonResponse
+    public function sendHookTestAction(Request $request, Client $client): JsonResponse
+    {
+        try {
+            return $this->processWebhookTest($request, $client);
+        } catch (PrivateAddressException) {
+            return $this->createErrorResponse(
+                'mautic.webhook.error.private_address'
+            );
+        } catch (\Exception) {
+            return $this->createErrorResponse(
+                'mautic.webhook.label.warning'
+            );
+        }
+    }
+
+    private function processWebhookTest(Request $request, Client $client): JsonResponse
+    {
+        $url = $this->validateUrl($request);
+        if (!$url) {
+            return $this->createErrorResponse('mautic.webhook.label.no.url');
+        }
+
+        $selectedTypes        = InputHelper::cleanArray($request->request->get('types'));
+        $payloadPaths         = $this->getPayloadPaths($selectedTypes);
+        $payload              = $this->loadPayloads($payloadPaths);
+        $payload['timestamp'] = (new \DateTimeImmutable())->format('c');
+        $secret               = InputHelper::string($request->request->get('secret'));
+
+        $response = $client->post($url, $payload, $secret);
+
+        return $this->createResponseFromStatusCode($response->getStatusCode());
+    }
+
+    private function validateUrl(Request $request): ?string
     {
         $url = InputHelper::url($request->request->get('url'));
 
-        // validate the URL
-        if ('' == $url || !$url) {
-            // default to an error message
-            $dataArray = [
-                'success' => 1,
-                'html'    => '<div class="has-error"><span class="help-block">'
-                    .$this->translator->trans('mautic.webhook.label.no.url')
-                    .'</span></div>',
-            ];
+        return '' !== $url ? $url : null;
+    }
 
-            return $this->sendJsonResponse($dataArray);
-        }
+    private function createResponseFromStatusCode(int $statusCode): JsonResponse
+    {
+        $isSuccess = str_starts_with((string) $statusCode, '2');
+        $message   = $isSuccess
+            ? 'mautic.webhook.label.success'
+            : 'mautic.webhook.label.warning';
 
-        // get the selected types
-        $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
-        $payloadPaths  = $this->getPayloadPaths($selectedTypes);
-        $payloads      = $this->loadPayloads($payloadPaths);
-        $now           = new \DateTime();
+        $cssClass = $isSuccess ? 'has-success' : 'has-error';
 
-        $payloads['timestamp'] = $now->format('c');
+        return $this->createJsonResponse($message, $cssClass);
+    }
 
-        // set the response
-        /** @var Psr\Http\Message\ResponseInterface $response */
-        $response = $client->post($url, $payloads, InputHelper::string($request->request->get('secret')));
+    private function createErrorResponse(string $message): JsonResponse
+    {
+        return $this->createJsonResponse($message, 'has-error', Response::HTTP_BAD_REQUEST);
+    }
 
-        // default to an error message
-        $dataArray = [
-            'success' => 1,
-            'html'    => '<div class="has-error"><span class="help-block">'
-                .$this->translator->trans('mautic.webhook.label.warning')
-                .'</span></div>',
-        ];
+    private function createJsonResponse(
+        string $message,
+        string $cssClass,
+        int $status = Response::HTTP_OK
+    ): JsonResponse {
+        $html = sprintf(
+            '<div class="%s"><span class="help-block">%s</span></div>',
+            $cssClass,
+            $this->translator->trans($message)
+        );
 
-        // if we get a 2xx response convert to success message
-        if (2 == substr($response->getStatusCode(), 0, 1)) {
-            $dataArray['html'] =
-                '<div class="has-success"><span class="help-block">'
-                .$this->translator->trans('mautic.webhook.label.success')
-                .'</span></div>';
-        }
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse(
+            ['html' => $html],
+            $status
+        );
     }
 
     /*

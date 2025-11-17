@@ -28,7 +28,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -60,7 +61,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -111,7 +113,8 @@ class AuditLogRepository extends CommonRepository
             ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {

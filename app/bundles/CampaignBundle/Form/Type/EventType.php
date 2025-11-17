@@ -236,6 +236,17 @@ class EventType extends AbstractType
                     'placeholder'       => false,
                 ]
             );
+
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
+                $data        = $event->getData();
+                $triggerMode = $data['triggerMode'] ?? 'immediate';
+
+                // Do not set any trigger window when optimized mode is not used
+                if ('optimized' !== $triggerMode) {
+                    $data['triggerWindow'] = null;
+                    $event->setData($data);
+                }
+            });
         }
 
         if (!empty($options['settings']['formType'])) {
@@ -289,17 +300,6 @@ class EventType extends AbstractType
                 'mapped' => false,
             ]
         );
-
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
-            $data        = $event->getData();
-            $triggerMode = $data['triggerMode'] ?? 'immediate';
-
-            // Do not set any trigger window when optimized mode is not used
-            if ('optimized' !== $triggerMode) {
-                $data['triggerWindow'] = null;
-                $event->setData($data);
-            }
-        });
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 

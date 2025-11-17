@@ -132,7 +132,7 @@ class MembershipManager
         }
 
         // Clear entities from RAM
-        $this->leadRepository->detachEntities($contacts->toArray());
+        $this->leadRepository->detachEntities($campaignMembers);
     }
 
     /**

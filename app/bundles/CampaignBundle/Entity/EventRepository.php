@@ -81,6 +81,14 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('c.publishUp'),
+                        $q->expr()->lt('c.publishUp', 'CURRENT_TIMESTAMP()'),
+                    ),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('c.publishDown'),
+                        $q->expr()->gt('c.publishDown', 'CURRENT_TIMESTAMP()'),
+                    ),
                     $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
                     $q->expr()->isNull('e.deleted'),

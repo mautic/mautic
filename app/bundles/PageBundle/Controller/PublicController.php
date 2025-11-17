@@ -334,8 +334,8 @@ class PublicController extends AbstractFormController
             && (
                 (!$page->isPublished())
                 || (!$security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
+                    'page:pages:viewown',
+                    'page:pages:viewother',
                     $page->getCreatedBy()
                 )))
         ) {

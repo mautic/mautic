@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
@@ -193,6 +194,50 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $options = $crawler->filterXPath('//select[@name="formfield[mappedField]"]')->html();
         $this->assertStringContainsString('<option value="email">Email</option>', $options, 'Email option should not be pre-selected.');
+    }
+
+    public function testMappedFieldCheckboxGroup(): void
+    {
+        // Create custom boolean field.
+        $customField = new LeadField();
+        $customField->setObject('lead');
+        $customField->setType('boolean');
+        $customField->setLabel('Custom Bool Field');
+        $customField->setAlias('custom_boolean_field');
+        $customField->setProperties([
+            'yes' => 'Absolutely yes',
+            'no'  => 'Obviously No',
+        ]);
+
+        // Create & add checkbox group type field to form.
+        $form  = $this->createForm('Test form', 'test_form');
+        $field = $this->createFormField([
+            'label' => 'Test Checkbox Group',
+            'type'  => 'checkboxgrp',
+        ]);
+        $field->setMappedObject('contact');
+        $field->setMappedField('custom_boolean_field');
+        $fieldProperties = [
+            'list' => [
+                'option1' => 'First Option',
+                'option2' => 'Second Option',
+            ],
+        ];
+        $field->setProperties($fieldProperties);
+        $field->setForm($form);
+        $this->em->persist($field);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Verify form creation
+        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Visit the form preview page
+        $crawler = $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('First Option', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Second Option', $this->client->getResponse()->getContent());
     }
 
     private function createForm(string $name, string $alias): Form

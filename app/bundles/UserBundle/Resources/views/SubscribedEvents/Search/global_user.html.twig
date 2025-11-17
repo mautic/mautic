@@ -1,21 +1,30 @@
 {% if showMore is defined and showMore is not empty %}
 <a href="{{ url('mautic_user_index', {'filter-user' : searchString}) }}" data-toggle="ajax">
-    <span><{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
+    <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
 </a>
 {% else %}
-<div>
-    <span class="pull-left pr-xs pt-xs" style="width:36px">
+<div class="d-flex ai-center">
+    <span class="pull-left mr-sm pt-xs" style="width:36px">
         <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(user.getEmail(), '100') }}" /></span>
     </span>
-    {% if canEdit %}
-        <a href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : user.getId()}) }}" data-toggle="ajax">
-            {{ user.getName(true) }}
-        </a>
-    {% else %}
-        {{ user.getName(true) }}
-    {% endif %}
+    <div class="d-flex fd-column">
+        <div>
+            {% if canEdit %}
+                <a class="fw-sb mr-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : user.getId()}) }}" data-toggle="ajax">
+                    {{ user.getName() }}
+                </a>
+            {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+                'entity': user,
+                'status': 'active',
+                'simplified': 'true'
+            }) -}}
+            {% else %}
+                {{ user.getName() }}
+            {% endif %}
+        </div>
 
-    <div><small>{{ user.getPosition() }}</small></div>
+        <div class="small text-muted">{{ user.getPosition() }}</div>
+    </div>
     <div class="clearfix"></div>
 </div>
 {% endif %}
