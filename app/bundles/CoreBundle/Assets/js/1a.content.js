@@ -671,32 +671,28 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         });
 
-        if (mQuery('#globalSearchContainer').length) {
-            mQuery('#globalSearchContainer .search-button').click(function () {
-                mQuery('#globalSearchContainer').addClass('active');
-                if (mQuery('#globalSearchInput').val()) {
-                    mQuery('#globalSearchDropdown').addClass('open');
-                }
-                setTimeout(function () {
-                    mQuery('#globalSearchInput').focus();
-                }, 100);
-                mQuery('body').on('click.globalsearch', function (event) {
-                    var target = event.target;
-                    if (!mQuery(target).parents('#globalSearchContainer').length && !mQuery(target).parents('#globalSearchDropdown').length) {
-                        Mautic.closeGlobalSearchResults();
-                    }
-                });
+        const $modal = mQuery('#gsearchModal'),
+        $input = mQuery('#globalSearchInput'),
+        $results = mQuery('.gsearch--results'),
+        $panel = mQuery('#globalSearchPanel');
+
+        $input.on('change keyup paste', function () {
+            const hasValue = mQuery(this).val();
+            $results.toggleClass('hide', !hasValue);
+            if (!hasValue) $panel.empty();
+        });
+
+        Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
+
+        $modal
+            .on('shown.bs.modal', () => setTimeout(() => $input.focus(), 100))
+            .on('hidden.bs.modal', () => {
+                $input.val('');
+                $results.addClass('hide');
+                $panel.empty();
             });
 
-            mQuery("#globalSearchInput").on('change keyup paste', function () {
-                if (mQuery(this).val()) {
-                    mQuery('#globalSearchDropdown').addClass('open');
-                } else {
-                    mQuery('#globalSearchDropdown').removeClass('open');
-                }
-            });
-            Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
-        }
+        $results.on('click', 'a', () => $modal.modal('hide'));
     }
 
     Mautic.renderCharts(container);
@@ -741,11 +737,11 @@ Mautic.setDynamicContentEditors = function(container) {
         console.log('[Builder] Using CKEditor for the Dynamic Content editor');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = [ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']
-            let minButtons = ['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline'];
+            const maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'TokenPlugin', 'sourceEditing'];
+            let minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = ['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize'];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
             }
 
             let ckEditorToolbar = minButtons;
@@ -923,7 +919,7 @@ Mautic.ajaxifyLink = function (el, event) {
 
     var link = mQuery(el).attr('data-menu-link');
     if (link !== undefined && link.charAt(0) != '#') {
-        link = "#" + link;
+        link = "#" + CSS.escape(link);
     }
 
     var method = mQuery(el).attr('data-method');
@@ -940,11 +936,6 @@ Mautic.ajaxifyLink = function (el, event) {
 
     //give an ajaxified link the option of not displaying the global loading bar
     var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
-
-    //close the global search results if opened
-    if (mQuery('#globalSearchContainer').length && mQuery('#globalSearchContainer').hasClass('active')) {
-        Mautic.closeGlobalSearchResults();
-    }
 
     Mautic.loadContent(route, link, method, target, showLoadingBar);
 };
@@ -1708,15 +1699,6 @@ Mautic.activateSortable = function(el) {
 };
 
 /**
- * Close global search results
- */
-Mautic.closeGlobalSearchResults = function () {
-    mQuery('#globalSearchContainer').removeClass('active');
-    mQuery('#globalSearchDropdown').removeClass('open');
-    mQuery('body').off('click.globalsearch');
-};
-
-/**
  * Download a link via iframe
  *
  * @param link
@@ -1904,6 +1886,9 @@ Mautic.removeFilterCommands = function (searchValue) {
  */
 Mautic.getActiveFilterCommands = function () {
     const searchInput = document.getElementById('list-search');
+    if (!searchInput) {
+        return []; // Return an empty array if there's no search input
+    }
     const searchValue = searchInput.value || '';
 
     if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {

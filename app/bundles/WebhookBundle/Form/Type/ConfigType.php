@@ -3,9 +3,11 @@
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;
+use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -60,6 +62,23 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.webhook.config.email.details.tooltip',
                 ],
             ]
+        );
+
+        $builder->add(
+            $builder->create(
+                'webhook_allowed_private_addresses',
+                TextareaType::class,
+                [
+                    'label'      => 'mautic.webhook.config.allowed_private_addresses',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.webhook.config.allowed_private_addresses.tooltip',
+                        'rows'    => 8,
+                    ],
+                    'required' => false,
+                ]
+            )->addViewTransformer(new ArrayLinebreakTransformer())
         );
     }
 

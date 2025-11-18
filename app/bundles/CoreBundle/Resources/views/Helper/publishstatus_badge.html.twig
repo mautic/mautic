@@ -29,10 +29,10 @@
 
 {% set labelTextKey = (labelMappings[status|default('active')][entity.getPublishStatus()]) %}
 
-<div class="label label-{{ statusColors[entity.getPublishStatus()].text }} d-flex ai-center gap-xs fw-b">
-    <span title="{{ labelTextKey|trans }}"
-          aria-label="{{ labelTextKey|trans }}"
-          class="bg-{{ statusColors[entity.getPublishStatus()].icon }} publishstatus_pulse">
-    </span>
+<div class="label label-{{ statusColors[entity.getPublishStatus()].text }} d-inline-flex ai-center gap-xs fw-b"{% if simplified is defined and simplified %} size="sm"{% endif %}>
+    {% if not (simplified is defined and simplified) %}
+        <span aria-hidden="true" focusable="false" class="bg-{{ statusColors[entity.getPublishStatus()].icon }} publishstatus_pulse">
+        </span>
+    {% endif %}
     {{ labelTextKey|trans }}
 </div>

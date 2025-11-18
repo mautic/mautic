@@ -61,13 +61,6 @@ return [
                     'event_dispatcher',
                 ],
             ],
-            'mautic.webhook.http.client' => [
-                'class'     => Mautic\WebhookBundle\Http\Client::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                ],
-            ],
         ],
     ],
 
@@ -81,5 +74,6 @@ return [
         'queue_mode'                           => Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
         'events_orderby_dir'                   => Doctrine\Common\Collections\Criteria::ASC, // Order the queued events chronologically or the other way around
         'webhook_email_details'                => true, // If enabled, email related webhooks send detailed data
+        'webhook_allowed_private_addresses'    => [],
     ],
 ];

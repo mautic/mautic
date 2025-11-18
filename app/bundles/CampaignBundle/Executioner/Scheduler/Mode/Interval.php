@@ -121,11 +121,12 @@ class Interval implements ScheduleModeInterface
                 $endTime,
                 $daysOfWeek
             );
-            if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
-                $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
+            $key = $groupExecutionDate->format(DateTimeHelper::FORMAT_DB);
+            if (!isset($groupedExecutionDates[$key])) {
+                $groupedExecutionDates[$key] = new GroupExecutionDateDAO($groupExecutionDate);
             }
 
-            $groupedExecutionDates[$groupExecutionDate->getTimestamp()]->addContact($contact);
+            $groupedExecutionDates[$key]->addContact($contact);
         }
 
         return $groupedExecutionDates;
@@ -256,11 +257,11 @@ class Interval implements ScheduleModeInterface
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
 
         if ($groupExecutionDate <= $testGroupHour) {
+            // Schedule for the configured hour today if it's not passed yet.
             return $testGroupHour;
-        } else {
-            $groupExecutionDate->modify('+1 day')->setTime($groupHour->format('H'), $groupHour->format('i'));
         }
 
+        // Execute rigt away if the hour has passed.
         return $groupExecutionDate;
     }
 

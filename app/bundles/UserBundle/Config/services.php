@@ -30,4 +30,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.permission.repository', Mautic\UserBundle\Entity\PermissionRepository::class);
     $services->alias('mautic.user.model.password_strength_estimator', Mautic\UserBundle\Model\PasswordStrengthEstimatorModel::class);
     $services->get(Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class)->tag('validator.constraint_validator');
+
+    $services->load('Mautic\\UserBundle\\Security\\SAML\Store\\Request\\', '../Security/SAML/Store/Request/*.php');
+    $services->get(Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore::class)
+        ->arg('$prefix', '%lightsaml.store.request_session_prefix%')
+        ->arg('$suffix', '%lightsaml.store.request_session_sufix%');
 };

@@ -25,7 +25,10 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -151,6 +154,7 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                    new Callback([$this, 'validateImagePath']),
                 ],
             ]
         );
@@ -296,7 +300,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cached_data_timeout',
-            TextType::class,
+            NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -307,11 +311,12 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotBlank([
+                        'message' => 'mautic.core.value.required',
+                    ]),
+                    new GreaterThanOrEqual([
+                        'value' => 0,
+                    ]),
                 ],
             ]
         );
@@ -692,6 +697,37 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+    }
+
+    // Validate $value to check ../ and denied system folders
+    public function validateImagePath(?string $value, ExecutionContextInterface $context): void
+    {
+        $isValid = true;
+
+        $normalizedValue = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $value);
+
+        if (
+            empty($normalizedValue)
+            || str_contains($normalizedValue, '..')
+            || str_contains($normalizedValue, '.'.DIRECTORY_SEPARATOR)
+            || DIRECTORY_SEPARATOR === $normalizedValue
+        ) {
+            $isValid = false;
+        }
+
+        $mediaFile = substr($value, 0, 6);
+
+        if ('media/' !== $mediaFile) {
+            $isValid = false;
+        }
+
+        if (!is_dir($value)) {
+            $isValid = false;
+        }
+
+        if (!$isValid) {
+            $context->buildViolation('mautic.core.config.form.image.path.invalid')->atPath('image_path')->addViolation();
+        }
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
