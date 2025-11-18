@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\DashboardBundle\Tests\Entity;
+namespace Mautic\DashboardBundle\Tests\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
