@@ -618,7 +618,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                     var containerId = Form.getFieldContainerId(formId, fieldKey);
 
-                    // Skip conditonal hidden field
+                    // Skip conditional hidden field
                     if (document.getElementById(containerId).getAttribute('data-validate-disable')) {
                         return true;
                     }
