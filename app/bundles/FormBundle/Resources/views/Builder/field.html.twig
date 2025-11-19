@@ -157,22 +157,32 @@
                           {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
                       </div>
                       {% if validation %}
-                        <div class="row">
+                      <div class="row">
                           {% if validation.minimum is defined %}
-                            <div class="col-md-4">{{ form_row(validation.minimum) }}</div>
+                          <div class="col-md-4">{{ form_row(validation.minimum) }}</div>
                           {% endif %}
                           {% if validation.min_message is defined %}
-                            <div class="col-md-8">{{ form_row(validation.min_message) }}</div>
+                          <div class="col-md-8">{{ form_row(validation.min_message) }}</div>
                           {% endif %}
                         </div>
                         <div class="row">
-                          {% if validation.maximum is defined %}
+                            {% if validation.maximum is defined %}
                             <div class="col-md-4">{{ form_row(validation.maximum) }}</div>
-                          {% endif %}
-                          {% if validation.max_message is defined %}
+                            {% endif %}
+                            {% if validation.max_message is defined %}
                             <div class="col-md-8">{{ form_row(validation.max_message) }}</div>
-                          {% endif %}
+                            {% endif %}
                         </div>
+                        {% if validation.country is defined %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-5 col-xs-12">{{ form_row(validation.country) }}</div>
+                            {% if validation.country_validationmsg is defined %}
+                            <div class="col-md-7 col-xs-12">{{ form_row(validation.country_validationmsg) }}</div>
+                            {% endif %}
+                            </div>
+                            <hr>
+                        {% endif %}
                         <div class="row">
                             {% for name, property in validation %}
                                 {% if validation[name] is defined and not validation[name].isRendered and 'labelAttributes' != name %}
