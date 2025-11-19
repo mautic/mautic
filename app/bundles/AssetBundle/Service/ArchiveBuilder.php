@@ -14,12 +14,33 @@ final class ArchiveBuilder
      */
     public function buildArchive(array $assets): string
     {
+        $zipPath = $this->createTempZipFile();
+        $zipArchive = $this->openZipArchive($zipPath);
+
+        try {
+            $this->addAssetsToArchive($zipArchive, $assets);
+            $this->closeZipArchive($zipArchive, $zipPath);
+        } catch (\Throwable $e) {
+            $this->cleanupZipArchive($zipArchive, $zipPath);
+            throw $e;
+        }
+
+        return $zipPath;
+    }
+
+    private function createTempZipFile(): string
+    {
         $zipPath = tempnam(sys_get_temp_dir(), 'mautic_asset_batch_');
 
         if (false === $zipPath) {
             throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
         }
 
+        return $zipPath;
+    }
+
+    private function openZipArchive(string $zipPath): \ZipArchive
+    {
         $zipArchive = new \ZipArchive();
 
         if (true !== $zipArchive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
@@ -27,48 +48,61 @@ final class ArchiveBuilder
             throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
         }
 
-        try {
-            $usedNames = [];
+        return $zipArchive;
+    }
 
-            foreach ($assets as $asset) {
-                $filename = $this->generateFilename($asset, $usedNames);
+    /**
+     * @param array<Asset> $assets
+     */
+    private function addAssetsToArchive(\ZipArchive $zipArchive, array $assets): void
+    {
+        $usedNames = [];
 
-                if ($asset->isRemote()) {
-                    $content = @file_get_contents($asset->getFilePath());
+        foreach ($assets as $asset) {
+            $filename = $this->generateFilename($asset, $usedNames);
 
-                    if (false === $content || false === $zipArchive->addFromString($filename, $content)) {
-                        $zipArchive->close();
-                        @unlink($zipPath);
-                        throw new \RuntimeException('mautic.asset.asset.batch_download.error.unavailable');
-                    }
-
-                    continue;
-                }
-
-                $absolutePath = $asset->getAbsolutePath();
-
-                if (empty($absolutePath) || false === $zipArchive->addFile($absolutePath, $filename)) {
-                    $zipArchive->close();
-                    @unlink($zipPath);
-                    throw new \RuntimeException('mautic.asset.asset.batch_download.error.unavailable');
-                }
+            if ($asset->isRemote()) {
+                $this->addRemoteAsset($zipArchive, $asset, $filename);
+            } else {
+                $this->addLocalAsset($zipArchive, $asset, $filename);
             }
-
-            if (true !== $zipArchive->close()) {
-                @unlink($zipPath);
-                throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
-            }
-        } catch (\Throwable $e) {
-            if ($zipArchive->numFiles > 0) {
-                $zipArchive->close();
-            }
-            if (is_file($zipPath)) {
-                @unlink($zipPath);
-            }
-            throw $e;
         }
+    }
 
-        return $zipPath;
+    private function addRemoteAsset(\ZipArchive $zipArchive, Asset $asset, string $filename): void
+    {
+        $content = @file_get_contents($asset->getFilePath());
+
+        if (false === $content || false === $zipArchive->addFromString($filename, $content)) {
+            throw new \RuntimeException('mautic.asset.asset.batch_download.error.unavailable');
+        }
+    }
+
+    private function addLocalAsset(\ZipArchive $zipArchive, Asset $asset, string $filename): void
+    {
+        $absolutePath = $asset->getAbsolutePath();
+
+        if (empty($absolutePath) || false === $zipArchive->addFile($absolutePath, $filename)) {
+            throw new \RuntimeException('mautic.asset.asset.batch_download.error.unavailable');
+        }
+    }
+
+    private function closeZipArchive(\ZipArchive $zipArchive, string $zipPath): void
+    {
+        if (true !== $zipArchive->close()) {
+            @unlink($zipPath);
+            throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
+        }
+    }
+
+    private function cleanupZipArchive(\ZipArchive $zipArchive, string $zipPath): void
+    {
+        if ($zipArchive->numFiles > 0) {
+            $zipArchive->close();
+        }
+        if (is_file($zipPath)) {
+            @unlink($zipPath);
+        }
     }
 
     /**
@@ -81,20 +115,34 @@ final class ArchiveBuilder
 
         $filename = InputHelper::transliterateFilename($filename);
 
-        $index     = 1;
-        $finalName = $filename;
-
-        while (in_array(mb_strtolower($finalName), $usedNames, true)) {
-            $pathInfo  = pathinfo($filename);
-            $baseName  = $pathInfo['filename'] ?? $filename;
-            $ext       = $pathInfo['extension'] ?? '';
-            $candidate = $ext ? sprintf('%s (%d).%s', $baseName, $index, $ext) : sprintf('%s (%d)', $baseName, $index);
-            $finalName = $candidate;
-            ++$index;
-        }
-
+        $finalName = $this->ensureUniqueFilename($filename, $usedNames);
         $usedNames[] = mb_strtolower($finalName);
 
         return $finalName;
+    }
+
+    /**
+     * @param array<string> $usedNames
+     */
+    private function ensureUniqueFilename(string $filename, array &$usedNames): string
+    {
+        $finalName = $filename;
+        $index = 1;
+
+        while (in_array(mb_strtolower($finalName), $usedNames, true)) {
+            $finalName = $this->generateUniqueName($filename, $index);
+            ++$index;
+        }
+
+        return $finalName;
+    }
+
+    private function generateUniqueName(string $filename, int $index): string
+    {
+        $pathInfo  = pathinfo($filename);
+        $baseName  = $pathInfo['filename'] ?? $filename;
+        $ext       = $pathInfo['extension'] ?? '';
+
+        return $ext ? sprintf('%s (%d).%s', $baseName, $index, $ext) : sprintf('%s (%d)', $baseName, $index);
     }
 }

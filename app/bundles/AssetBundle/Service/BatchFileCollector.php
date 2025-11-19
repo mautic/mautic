@@ -54,7 +54,7 @@ final class BatchFileCollector
             $downloadableAssets[] = $asset;
         }
 
-        if (0 === count($downloadableAssets)) {
+        if (empty($downloadableAssets)) {
             throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.none_available');
         }
 
