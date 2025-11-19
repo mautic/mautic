@@ -104,21 +104,10 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $validation = $field->getValidation();
 
             if (!empty($validation['country'])) {
-                $patterns = PhoneCountryValidationHelper::getCountryPatterns();
-                $country  = $validation['country'];
+                $country     = $validation['country'];
+                $countryCode = PhoneCountryValidationHelper::getCountryCodeFromName($country);
 
-                $countryCode = null;
-                $countries   = PhoneCountryValidationHelper::getCountries();
-                foreach ($countries as $code => $name) {
-                    if ($name === $country) {
-                        $countryCode = $code;
-                        break;
-                    }
-                }
-
-                $regex = $countryCode ? ($patterns[$countryCode] ?? null) : null;
-
-                if (empty($regex) || 0 === preg_match('~'.$regex.'~', $value)) {
+                if ($countryCode && !PhoneCountryValidationHelper::isValidForCountry($value, $countryCode)) {
                     $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => $country], 'validators');
                     $event->failedValidation($message);
 
