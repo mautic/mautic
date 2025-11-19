@@ -14,7 +14,7 @@ final class ArchiveBuilder
      */
     public function buildArchive(array $assets): string
     {
-        $zipPath = $this->createTempZipFile();
+        $zipPath    = $this->createTempZipFile();
         $zipArchive = $this->openZipArchive($zipPath);
 
         try {
@@ -115,7 +115,7 @@ final class ArchiveBuilder
 
         $filename = InputHelper::transliterateFilename($filename);
 
-        $finalName = $this->ensureUniqueFilename($filename, $usedNames);
+        $finalName   = $this->ensureUniqueFilename($filename, $usedNames);
         $usedNames[] = mb_strtolower($finalName);
 
         return $finalName;
@@ -127,7 +127,7 @@ final class ArchiveBuilder
     private function ensureUniqueFilename(string $filename, array &$usedNames): string
     {
         $finalName = $filename;
-        $index = 1;
+        $index     = 1;
 
         while (in_array(mb_strtolower($finalName), $usedNames, true)) {
             $finalName = $this->generateUniqueName($filename, $index);
