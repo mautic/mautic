@@ -16,6 +16,7 @@
         'select': 'ri-list-check',
         'country': 'ri-map-pin-line',
         'number': 'ri-increase-decrease-line',
+        'slider': 'ri-equalizer-line',
         'tel': 'ri-phone-line',
         'email': 'ri-mail-line',
         'date': 'ri-calendar-line',
@@ -43,13 +44,14 @@
 
     {% if field.mappedObject is not empty and field.mappedField is not empty and mappedFields[field.mappedObject] is defined %}
     <!-- Mapped field -->
+    {% set fieldCollection = mappedFields[field.mappedObject] %}
     {% set objectLabel = field.mappedObject == 'company' ? 'mautic.company.company'|trans|lower : (field.mappedObject == 'contact' ? 'mautic.lead.contact'|trans|lower : field.mappedObject|lower) %}
 
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         'tags': [{
             'color': 'green',
             'icon': field.mappedObject == 'company' ? 'ri-building-3-line' : (field.mappedObject == 'contact' ? 'ri-contacts-book-line' : 'ri-shape-line'),
-            'label': fieldCollection[field.mappedField] is defined ? fieldCollection[field.mappedField].name :
+            'label': fieldCollection.getFieldByKey(field.mappedField, false) is not empty ? fieldCollection.getFieldByKey(field.mappedField).name :
                     (field.mappedObject == 'contact' ? ('mautic.lead.field.' ~ field.mappedField) :
                     (field.mappedObject == 'company' ? ('mautic.lead.field.' ~ field.mappedField) : field.mappedField)),
             'attributes': {

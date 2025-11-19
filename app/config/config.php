@@ -71,7 +71,9 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        'transports' => [
+            'main' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        ],
     ],
     'messenger'            => [
         'failure_transport'  => 'failed',
@@ -394,10 +396,37 @@ $container->loadFromExtension('api_platform', [
         'json'    => ['application/merge-patch+json'],
         'jsonapi' => ['application/vnd.api+json'],
     ],
+    'formats' => [
+        'jsonld'  => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+        'json'    => [
+            'mime_types' => [
+                'application/json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
+            ],
+        ],
+        'html' => [
+            'mime_types' => [
+                'text/html',
+            ],
+        ],
+    ],
     'error_formats' => [
         'jsonproblem' => [
             'mime_types' => [
                 'application/problem+json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
             ],
         ],
         'jsonld' => [
@@ -412,16 +441,5 @@ $container->loadFromExtension('api_platform', [
         'ApiPlatform\Validator\Exception\ValidationException'             => 400,
         'Doctrine\ORM\OptimisticLockException'                            => 409,
         'Symfony\Component\Security\Core\Exception\AccessDeniedException' => 403,
-    ],
-    'formats' => [
-        'jsonld' => [
-            'mime_types' => ['application/ld+json'],
-        ],
-        'json' => [
-            'mime_types' => ['application/json'],
-        ],
-        'html' => [
-            'mime_types' => ['text/html'],
-        ],
     ],
 ]);

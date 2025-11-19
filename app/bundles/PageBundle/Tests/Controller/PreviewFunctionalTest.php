@@ -129,7 +129,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
         self::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        self::assertEquals('Hello', $crawler->text());
+        self::assertEquals('Hello', $crawler->filter('body')->text());
 
         // Create landing page with public preview OFF.
         $page = $this->createPage(null, '', true, false);
@@ -204,7 +204,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->loginUser($user);
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
         self::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        self::assertEquals('Hello', $crawler->text());
+        self::assertEquals('Hello', $crawler->filter('body')->text());
 
         // Check public preview without login.
         $this->client->request(Request::METHOD_GET, '/s/logout');
@@ -236,7 +236,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
-        self::assertSame($expectedContent, $crawler->text());
+        self::assertSame($expectedContent, $crawler->filter('body')->text());
     }
 
     private function createPage(

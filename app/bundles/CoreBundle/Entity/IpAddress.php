@@ -2,10 +2,28 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('lead:leads:viewown')"),
+        new Get(security: "is_granted('lead:leads:viewown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['ipaddress:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['ipaddress:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class IpAddress
 {
     public const TABLE_NAME = 'ip_addresses';
@@ -13,16 +31,19 @@ class IpAddress
     /**
      * Set by factory of configured IPs to not track.
      */
+    #[Groups(['ipaddress:read', 'download:read'])]
     private array $doNotTrack = [];
 
     /**
      * @var int
      */
+    #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
     private $id;
 
     /**
-     * @var array<string,string>
+     * @var mixed[]
      */
+    #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
     private $ipDetails;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -72,13 +93,12 @@ class IpAddress
      * @param string|null $ipAddress
      */
     public function __construct(
+        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
         private $ipAddress = null,
     ) {
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -87,8 +107,6 @@ class IpAddress
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return $this
      */
     public function setIpAddress($ipAddress)
@@ -99,8 +117,6 @@ class IpAddress
     }
 
     /**
-     * Get ipAddress.
-     *
      * @return string
      */
     public function getIpAddress()
@@ -109,8 +125,6 @@ class IpAddress
     }
 
     /**
-     * Set ipDetails.
-     *
      * @param array<string,string> $ipDetails
      *
      * @return IpAddress
@@ -123,8 +137,6 @@ class IpAddress
     }
 
     /**
-     * Get ipDetails.
-     *
      * @return array<string,string>|null
      */
     public function getIpDetails()

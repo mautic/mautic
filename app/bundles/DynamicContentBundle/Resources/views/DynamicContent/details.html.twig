@@ -11,10 +11,11 @@
         'entity': entity,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {% set tags = [
         {
-            color: 'warm-gray',
+            color: 'high-contrast',
             label: entity.isCampaignBased
                 ? 'mautic.dwc.form.is.campaign'
                 : 'mautic.dwc.form.is.standalone'
@@ -23,10 +24,18 @@
 
     {% set tags = tags
         |merge(entity.isTranslation and not entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+            ? [{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon_only: true, icon: 'ri-translate' }]
             : [])
         |merge(entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
+            ? [{ 
+                color: 'warm-gray', 
+                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+                icon: 'ri-translate',
+                attributes: {
+                    'href': path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
+                    'data-toggle': 'ajax'
+                }
+            }]
             : [])
     %}
 

@@ -74,7 +74,6 @@ class CampaignApiController extends CommonApiController
             'publishDetails',
             'leadListList',
             'formList',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
@@ -184,7 +183,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($entity->getEvents() as $currentEvent) {
                 if (!in_array($currentEvent->getId(), $requestEventIds)) {
-                    $deletedEvents[] = $currentEvent->getId();
+                    $deletedEvents[] = ['id' => $currentEvent->getId()];
                 }
             }
 

@@ -47,7 +47,7 @@ class NotificationTypeTest extends TypeTestCase
         $form = $this->factory->create(NotificationType::class);
 
         $expected = new Notification();
-        $expected->setLanguage(null);
+        $expected->setLanguage('en');
         $expected->setUtmTags([
             'utmSource'   => null,
             'utmMedium'   => null,
@@ -56,7 +56,9 @@ class NotificationTypeTest extends TypeTestCase
         ]);
         $expected->setIsPublished(false);
 
-        $form->submit([]);
+        $form->submit([
+            'language' => 'en',
+        ]);
 
         Assert::assertTrue($form->isSynchronized());
 
@@ -93,7 +95,7 @@ class NotificationTypeTest extends TypeTestCase
         $form = $this->factory->create(NotificationType::class);
 
         $expected = new Notification();
-        $expected->setLanguage(null);
+        $expected->setLanguage('en');
         $expected->setName('The name');
         $expected->setHeading('The heading');
         $expected->setMessage('The message');
@@ -106,9 +108,10 @@ class NotificationTypeTest extends TypeTestCase
         $expected->setIsPublished(false);
 
         $form->submit([
-            'name'    => 'The name',
-            'heading' => 'The heading',
-            'message' => 'The message',
+            'name'     => 'The name',
+            'heading'  => 'The heading',
+            'message'  => 'The message',
+            'language' => 'en',
         ]);
 
         Assert::assertTrue($form->isSynchronized());

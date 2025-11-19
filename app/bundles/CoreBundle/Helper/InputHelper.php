@@ -47,7 +47,7 @@ class InputHelper
         if (empty(self::$htmlFilter)) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
-            self::$htmlFilter->tagBlacklist = [
+            self::$htmlFilter->blockedTags  = [
                 'applet',
                 'bgsound',
                 'base',
@@ -60,7 +60,7 @@ class InputHelper
                 'object',
             ];
 
-            self::$htmlFilter->attrBlacklist = [
+            self::$htmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -78,7 +78,7 @@ class InputHelper
                     'span',
                 ], [], 0, 1);
 
-            self::$strictHtmlFilter->attrBlacklist = [
+            self::$strictHtmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -303,8 +303,9 @@ class InputHelper
                 }
             }
 
-            // http_build_query urlencodes by default
-            $parts['query'] = http_build_query($query);
+            // http_build_query urlencodes to RFC 1738 by default
+            // We change the encoding_type to RFC 3986 so that spaces are encoded as %20 instead of +
+            $parts['query'] = http_build_query($query, '', null, PHP_QUERY_RFC3986);
         }
 
         return

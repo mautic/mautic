@@ -49,6 +49,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $repo = $this->em->getRepository(DynamicContent::class);
 
         $repo->setTranslator($this->translator);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
     }

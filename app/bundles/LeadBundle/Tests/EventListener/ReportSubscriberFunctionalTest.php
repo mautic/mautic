@@ -182,6 +182,29 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $this->verifyApiReport($report->getId(), $expectedReport);
     }
 
+    public function testLeadReportWithEmailDomainColumn(): void
+    {
+        $leads[] = $this->createContact('test1@d1.example.com');
+        $leads[] = $this->createContact('test2@d2.example.com');
+        $leads[] = $this->createContact('test3@d3.example.com');
+        $this->em->flush();
+
+        $report = $this->createReport(
+            source: 'leads',
+            columns: ['l.id', 'l.generated_email_domain'],
+            order: [['column' => 'l.id', 'direction' => 'ASC']]
+        );
+
+        $expectedReport = [
+            // id, generated_email_domain
+            [(string) $leads[0]->getId(), 'd1.example.com'],
+            [(string) $leads[1]->getId(), 'd2.example.com'],
+            [(string) $leads[2]->getId(), 'd3.example.com'],
+        ];
+        $this->verifyReport($report->getId(), $expectedReport);
+        $this->verifyApiReport($report->getId(), $expectedReport);
+    }
+
     public function createDnc(string $channel, Lead $contact, int $reason): DoNotContact
     {
         $dnc = new DoNotContact();

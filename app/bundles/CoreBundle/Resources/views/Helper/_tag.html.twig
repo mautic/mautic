@@ -5,6 +5,7 @@
     {% set attributes = tag.attributes|default({}) %}
     {% set icon_only = tag.icon_only|default(false) %}
     {% set size = tag.size|default('md') %}
+    {% set dismissible_onclick = tag.dismissible_onclick|default('') %}
 
     {# ID generation #}
     {% if attributes.id is defined %}

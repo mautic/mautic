@@ -14,6 +14,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -84,7 +85,7 @@ class Form extends FormEntity implements UuidInterface
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
@@ -181,6 +182,7 @@ class Form extends FormEntity implements UuidInterface
      *
      * @var bool
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read'])]
     private $usesProgressiveProfiling;
 
     public function __clone()
@@ -237,7 +239,7 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->createOneToMany('fields', 'Field')
             ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
+            ->setOrderBy(['order' => 'ASC', 'id' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -306,6 +308,11 @@ class Form extends FormEntity implements UuidInterface
             'groups'  => ['urlRequiredPassTwo'],
         ]));
 
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
+            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
+            'groups'  => ['hideformRequired'],
+        ]));
+
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
@@ -328,6 +335,8 @@ class Form extends FormEntity implements UuidInterface
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        } elseif ('hideform' == $postAction) {
+            $groups[] = 'hideformRequired';
         }
 
         if ('' != $data->getProgressiveProfilingLimit()) {
@@ -628,7 +637,6 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
      * @return string[]

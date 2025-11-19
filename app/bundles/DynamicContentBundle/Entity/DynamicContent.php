@@ -14,6 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -26,6 +27,7 @@ use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
 use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameType;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -53,12 +55,17 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+/**
+ * @use TranslationEntityTrait<DynamicContent>
+ * @use VariantEntityTrait<DynamicContent>
+ */
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use FiltersEntityTrait;
     use UuidTrait;
+    use ProjectTrait;
 
     public const ENTITY_NAME = 'dynamic_content';
 
@@ -68,29 +75,17 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     #[Groups(['dynamicContent:read'])]
     private $id;
 
-    /**
-     * @var string
-     */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @Groups({"dynamicContent:read", "dynamicContent:write"})
-     */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private string $type = TypeList::HTML;
 
-    /**
-     * @var string|null
-     */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    private $description;
+    private ?string $description = null;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var \DateTimeInterface
@@ -145,11 +140,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $this->stats               = new ArrayCollection();
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
+        $this->initializeProjects();
     }
 
-    /**
-     * Clone method.
-     */
     public function __clone()
     {
         $this->id                  = null;
@@ -161,9 +154,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         parent::__clone();
     }
 
-    /**
-     * Clear stats.
-     */
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
@@ -231,6 +221,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->build();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }
 
     /**
@@ -312,6 +303,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'dwc');
     }
 
     protected function isChanged($prop, $val)
@@ -392,7 +385,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \Mautic\CategoryBundle\Entity\Category
+     * @return Category
      */
     public function getCategory()
     {
@@ -400,7 +393,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @param \Mautic\CategoryBundle\Entity\Category $category
+     * @param Category $category
      *
      * @return $this
      */

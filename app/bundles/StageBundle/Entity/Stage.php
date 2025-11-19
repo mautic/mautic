@@ -12,10 +12,12 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -42,6 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    use ProjectTrait;
 
     /**
      * @var int
@@ -85,7 +88,7 @@ class Stage extends FormEntity implements UuidInterface
     private $log;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     #[Groups(['stage:read', 'stage:write'])]
     private $category;
@@ -97,12 +100,10 @@ class Stage extends FormEntity implements UuidInterface
         parent::__clone();
     }
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->log = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -128,6 +129,7 @@ class Stage extends FormEntity implements UuidInterface
         $builder->addCategory();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -159,6 +161,8 @@ class Stage extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'stage');
     }
 
     /**
@@ -201,8 +205,6 @@ class Stage extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -222,8 +224,6 @@ class Stage extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -282,8 +282,6 @@ class Stage extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishDown()

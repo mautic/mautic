@@ -147,6 +147,10 @@ class FieldsBuilder
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
             ],
+            'l.generated_email_domain' => [
+                'label' => 'mautic.lead.report.generated_email_domain',
+                'type'  => 'string',
+            ],
         ];
     }
 

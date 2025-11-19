@@ -33,8 +33,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected array $clientOptions = [];
 
-    // Credentials for API authentication
-    protected array $clientServer  = [
+    /**
+     * Credentials for API authentication.
+     *
+     * @var array<string,string>
+     */
+    protected array $clientServer = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'Maut1cR0cks!',
     ];
@@ -164,6 +168,18 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function getCsrfToken(string $intention): string
     {
         return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function createAjaxHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ];
     }
 
     /**

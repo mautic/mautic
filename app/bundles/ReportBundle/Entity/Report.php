@@ -21,7 +21,7 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -49,123 +49,106 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @var int
-     *
-     * @Groups({"report:read"})
      */
+    #[Groups(['report:read'])]
     private $id;
 
     /**
      * @var string
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $name;
 
     /**
      * @var string|null
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $description;
 
     /**
      * @var bool
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $system = false;
 
     /**
      * @var string
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $source;
 
     /**
      * @var array
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $columns = [];
 
     /**
      * @var array
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $filters = [];
 
     /**
      * @var array
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $tableOrder = [];
 
     /**
      * @var array
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $graphs = [];
 
     /**
      * @var array
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $groupBy = [];
 
     /**
      * @var array
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $aggregators = [];
 
     /**
      * @var array|null
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $settings = [];
 
     /**
      * @var bool
      *
-     * @Groups({"report:read", "report:write"})
-     *
      * @ApiProperty(readable=true)
      */
+    #[Groups(['report:read', 'report:write'])]
     private $isScheduled = false;
 
     /**
      * @var string|null
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $toAddress;
 
     /**
      * @var string|null
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $scheduleUnit;
 
     /**
      * @var string|null
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $scheduleDay;
 
     /**
      * @var string|null
-     *
-     * @Groups({"report:read", "report:write"})
      */
+    #[Groups(['report:read', 'report:write'])]
     private $scheduleMonthFrequency;
     private bool $hasScheduleChanged = false;
 
