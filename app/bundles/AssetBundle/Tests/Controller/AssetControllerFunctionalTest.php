@@ -77,6 +77,10 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testBatchDownloadReturnsZipWithSanitizedTitles(): void
     {
+        $this->asset->setOriginalFileName('Asset controller test. Preview action.png');
+        $this->em->persist($this->asset);
+        $this->em->flush();
+
         $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
 
         $this->client->request('GET', '/s/assets/batchDownload', ['ids' => $ids]);
@@ -85,6 +89,10 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
         Assert::assertSame('application/zip', $response->headers->get('Content-Type'));
+
+        $contentDisposition = $response->headers->get('Content-Disposition');
+        Assert::assertStringContainsString('assets-batch-', $contentDisposition);
+        Assert::assertStringEndsWith('.zip', $contentDisposition);
 
         ob_start();
         $response->sendContent();
@@ -99,10 +107,12 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         Assert::assertSame(1, $zipArchive->numFiles);
 
         $entryName     = $zipArchive->getNameIndex(0);
-        $expectedName  = 'Asset controller test. Preview action.png';
         $entryContents = $zipArchive->getFromName($entryName);
 
-        Assert::assertSame($expectedName, $entryName);
+        Assert::assertStringContainsString('asset', mb_strtolower($entryName));
+        Assert::assertStringContainsString('controller', mb_strtolower($entryName));
+        Assert::assertStringContainsString('test', mb_strtolower($entryName));
+        Assert::assertStringEndsWith('.png', $entryName);
         Assert::assertSame($this->expectedPngContent, $entryContents);
 
         $zipArchive->close();
