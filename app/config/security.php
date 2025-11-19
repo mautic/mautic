@@ -98,10 +98,14 @@ $firewalls = [
             'domain'   => '%mautic.rememberme_domain%',
             'samesite' => 'lax',
         ],
-        'entry_point' => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
-        'mautic_sso'  => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
-        'fos_oauth'   => true,
-        'context'     => 'mautic',
+        'entry_point'      => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
+        'mautic_sso'       => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
+        'fos_oauth'        => true,
+        'context'          => 'mautic',
+        'login_throttling' => [
+            'max_attempts' => 3,
+            'interval'     => '30 minutes',
+        ],
     ],
     'public' => [
         'pattern' => '^/',

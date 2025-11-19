@@ -6152,7 +6152,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "2f385c2e07fc61e2a8a5bfc3621d7b31412a2d5b"
+                "reference": "5d37bab883e686a3f74ba22a3669e39c0dbe657d"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6231,6 +6231,7 @@
                 "symfony/polyfill-mbstring": "~1.0",
                 "symfony/process": "^7.3",
                 "symfony/property-access": "^7.3",
+                "symfony/rate-limiter": "^7.3",
                 "symfony/routing": "^7.3",
                 "symfony/security-bundle": "^7.3",
                 "symfony/security-core": "^7.3",
@@ -12191,6 +12192,80 @@
                 }
             ],
             "time": "2025-10-05T22:12:41+00:00"
+        },
+        {
+            "name": "symfony/rate-limiter",
+            "version": "v7.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/rate-limiter.git",
+                "reference": "7e855541d302ba752f86fb0e97932e7969fe9c04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/rate-limiter/zipball/7e855541d302ba752f86fb0e97932e7969fe9c04",
+                "reference": "7e855541d302ba752f86fb0e97932e7969fe9c04",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/options-resolver": "^7.3"
+            },
+            "require-dev": {
+                "psr/cache": "^1.0|^2.0|^3.0",
+                "symfony/lock": "^6.4|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\RateLimiter\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wouter de Jong",
+                    "email": "wouter@wouterj.nl"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides a Token Bucket implementation to rate limit input and output in your application",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "limiter",
+                "rate-limiter"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/rate-limiter/tree/v7.3.2"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-07-07T08:17:57+00:00"
         },
         {
             "name": "symfony/routing",
