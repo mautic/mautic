@@ -35,6 +35,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -282,12 +283,15 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->companyModel->method('fetchCompanyFields')->willReturn([]);
 
+        $userMock = $this->createMock(UserRepository::class);
+
         $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->willReturnMap(
                 [
                     [Lead::class, $this->leadRepository],
                     [Submission::class, $this->submissioRepository],
+                    [User::class, $userMock],
                 ]
             );
 

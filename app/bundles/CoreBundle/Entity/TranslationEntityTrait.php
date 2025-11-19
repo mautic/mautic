@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @template T of TranslationEntityInterface
@@ -16,30 +16,27 @@ trait TranslationEntityTrait
      * Set by AbstractCommonModel::getEntityBySlugs() if a language slug was used to fetch the entity.
      *
      * @var string
-     *
-     * @Groups({"page:read", "download:read", "email:read"})
      */
+    #[Groups(['page:read', 'download:read', 'email:read'])]
     public $languageSlug;
 
     /**
-     * @var mixed
+     * @var Collection
      *
-     * @Groups({"page:read", "download:read", "email:read"})
+     * @phpstan-var Collection<int, T>
      **/
+    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationChildren;
 
     /**
      * @var TranslationEntityInterface|null
      *
      * @phpstan-var T|null
-     *
-     * @Groups({"page:read", "page:write", "download:read", "download:write", "email:read", "email:write", "dynamicContent:read", "dynamicContent:write"})
      **/
+    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationParent;
 
-    /**
-     * @Groups({"page:read", "download:read", "email:read"})
-     */
+    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private string $language = 'en';
 
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void

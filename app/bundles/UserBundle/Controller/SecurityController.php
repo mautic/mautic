@@ -80,11 +80,14 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
+            } elseif ($error instanceof Exception\AuthenticationException) {
+                $msg = $error->getMessageKey();
             } else {
                 $msg = $error->getMessage();
             }
 
-            $this->addFlashMessage($msg, [], FlashBag::LEVEL_ERROR, null, false);
+            $messageVars = $error instanceof Exception\AuthenticationException ? $error->getMessageData() : [];
+            $this->addFlashMessage($msg, $messageVars, FlashBag::LEVEL_ERROR, null);
         }
         $request->query->set('tmpl', 'login');
 
