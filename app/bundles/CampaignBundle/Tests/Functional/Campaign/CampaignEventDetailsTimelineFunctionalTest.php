@@ -85,13 +85,13 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
         $this->assertStringContainsString(
-            $translator->trans('mautic.campaign.parent.details', ['%path%' => 'yes', '%type%' => 'condition', '%name%' => 'Field Value Condition']),
+            $translator->trans('mautic.campaign.event.condition.details', ['%path%' => 'yes', '%field%' => 'select_field', '%operator%' => 'in', '%comparisonValue%' => 'v1,v3', '%value%' => 'v1,v3']),
             $this->client->getResponse()->getContent()
         );
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead2->getId()));
         $this->assertStringContainsString(
-            $translator->trans('mautic.campaign.parent.details', ['%path%' => 'no', '%type%' => 'condition', '%name%' => 'Field Value Condition']),
+            $translator->trans('mautic.campaign.event.condition.details', ['%path%' => 'no', '%field%' => 'select_field', '%operator%' => 'in', '%comparisonValue%' => 'v2', '%value%' => 'v2']),
             $this->client->getResponse()->getContent()
         );
     }
