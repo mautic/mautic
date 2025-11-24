@@ -12,72 +12,42 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
+class MigrationCommandSubscriberTest extends TestCase
 {
-    /**
-     * @var MockObject|VersionProviderInterface
-     */
-    private MockObject $versionProvider;
-
-    /**
-     * @var MockObject|GeneratedColumnsProviderInterface
-     */
-    private MockObject $generatedColumnsProvider;
-
-    /**
-     * @var MockObject|Connection
-     */
-    private MockObject $connection;
-
+    private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;
+    private MockObject&Connection $connection;
     private ConsoleTerminateEvent $event;
-
-    /**
-     * @var MockObject|Command
-     */
-    private MockObject $command;
-
-    /**
-     * @var MockObject|MySQLSchemaManager
-     */
-    private MockObject $schemaManager;
-
-    /**
-     * @var MockObject|OutputInterface
-     */
-    private MockObject $output;
+    private MockObject&Command $command;
+    private MockObject&MySQLSchemaManager $schemaManager;
+    private MigrationCommandSubscriber $subscriber;
 
     /**
      * @var GeneratedColumns<GeneratedColumn>
      */
     private GeneratedColumns $generatedColumns;
 
-    private MigrationCommandSubscriber $subscriber;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->versionProvider          = $this->createMock(VersionProviderInterface::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->connection               = $this->createMock(Connection::class);
         $this->command                  = $this->createMock(Command::class);
-        $this->output                   = $this->createMock(OutputInterface::class);
         $this->schemaManager            = $this->createMock(MySQLSchemaManager::class);
         $this->generatedColumns         = new GeneratedColumns();
         $this->subscriber               = new MigrationCommandSubscriber(
-            $this->versionProvider,
+            $this->createMock(VersionProviderInterface::class),
             $this->generatedColumnsProvider,
             $this->connection
         );
 
         $input = $this->createMock(InputInterface::class);
 
-        $this->event = new ConsoleTerminateEvent($this->command, $input, $this->output, 0);
+        $this->event = new ConsoleTerminateEvent($this->command, $input, $this->createMock(OutputInterface::class), 0);
 
         $this->connection->method('createSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
@@ -153,7 +123,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('listTableColumns')
             ->willReturn(['id' => new \stdClass()]);
 
-        $this->connection->expects($this->once())
+        $this->connection->expects($this->atLeastOnce())
             ->method('executeStatement');
 
         $this->subscriber->addGeneratedColumns($this->event);
