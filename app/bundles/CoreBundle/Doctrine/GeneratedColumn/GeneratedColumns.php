@@ -10,35 +10,61 @@ final class GeneratedColumns implements GeneratedColumnsInterface
 
     /**
      * Simple array of generated columns.
+     *
+     * @var GeneratedColumn[]
      */
     private array $generatedColumns = [];
 
     /**
      * Array structure holding the generated columns that allows to
-     * search by date column and unit without need for a loop.
+     * search by date table, column and unit without need for a loop.
      */
     private array $dateColumnIndex = [];
 
     public function add(GeneratedColumn $generatedColumn): void
     {
         $this->generatedColumns[] = $generatedColumn;
+        $originalDateColumn       = $generatedColumn->getOriginalDateColumn();
+        $timeUnit                 = $generatedColumn->getTimeUnit();
 
-        if ($generatedColumn->getOriginalDateColumn() && $generatedColumn->getTimeUnit()) {
-            if (!isset($this->dateColumnIndex[$generatedColumn->getOriginalDateColumn()])) {
-                $this->dateColumnIndex[$generatedColumn->getOriginalDateColumn()] = [];
-            }
-
-            $this->dateColumnIndex[$generatedColumn->getOriginalDateColumn()][$generatedColumn->getTimeUnit()] = $generatedColumn;
+        if (!$originalDateColumn || !$timeUnit) {
+            return;
         }
+
+        $tableName = $generatedColumn->getTableName();
+
+        if (!isset($this->dateColumnIndex[$tableName])) {
+            $this->dateColumnIndex[$tableName] = [];
+        }
+
+        if (!isset($this->dateColumnIndex[$tableName][$originalDateColumn])) {
+            $this->dateColumnIndex[$tableName][$originalDateColumn] = [];
+        }
+
+        $this->dateColumnIndex[$tableName][$originalDateColumn][$timeUnit] = $generatedColumn;
     }
 
+    /**
+     * @deprecated use self::getGeneratedColumnForDateColumn() instead
+     */
     public function getForOriginalDateColumnAndUnit(string $originalDateColumn, string $unit): GeneratedColumnInterface
     {
-        if (isset($this->dateColumnIndex[$originalDateColumn][$unit])) {
-            return $this->dateColumnIndex[$originalDateColumn][$unit];
+        foreach (array_reverse($this->generatedColumns) as $generatedColumn) {
+            if ($generatedColumn->getOriginalDateColumn() === $originalDateColumn && $generatedColumn->getTimeUnit() === $unit) {
+                return $generatedColumn;
+            }
         }
 
         throw new \UnexpectedValueException("Generated column for original date column {$originalDateColumn} with unit {$unit} does not exist.");
+    }
+
+    public function getGeneratedColumnForDateColumn(string $table, string $column, string $unit): GeneratedColumn
+    {
+        if (isset($this->dateColumnIndex[$table][$column][$unit])) {
+            return $this->dateColumnIndex[$table][$column][$unit];
+        }
+
+        throw new \UnexpectedValueException("Generated column for original date column {$column} in table {$table} with unit {$unit} does not exist.");
     }
 
     public function rewind(): void

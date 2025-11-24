@@ -97,7 +97,7 @@ class EmailController extends FormController
         $filter = [
             'string' => $search,
             'force'  => [
-                ['column' => 'e.translationParent', 'expr' => 'isNull'],
+                ['column' => 'e.variantParent,e.translationParent', 'expr' => 'isNull'],
             ],
         ];
         if (!$permissions['email:emails:viewother']) {

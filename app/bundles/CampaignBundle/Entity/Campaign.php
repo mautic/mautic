@@ -69,7 +69,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     private $name;
@@ -291,8 +291,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return Campaign
@@ -306,8 +304,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -316,8 +312,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set name.
-     *
      * @return Campaign
      */
     public function setName(string $name)
@@ -329,8 +323,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -353,8 +345,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add events.
-     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)
@@ -367,9 +357,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove events.
-     */
     public function removeEvent(Event $event): void
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
@@ -378,8 +365,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get events.
-     *
      * @return ArrayCollection<int, Event>
      */
     public function getEvents()
@@ -449,8 +434,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set publishUp.
-     *
      * @param ?\DateTime $publishUp
      *
      * @return Campaign
@@ -464,8 +447,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -474,8 +455,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set publishDown.
-     *
      * @param ?\DateTime $publishDown
      *
      * @return Campaign
@@ -489,8 +468,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishDown()
@@ -516,8 +493,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add lead.
-     *
      * @return Campaign
      */
     public function addLead($key, Lead $lead)
@@ -531,9 +506,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove lead.
-     */
     public function removeLead(Lead $lead): void
     {
         $leadEntity                                              = $lead->getLead();
@@ -542,8 +514,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get leads.
-     *
      * @return Lead[]|Collection
      */
     public function getLeads()
@@ -560,8 +530,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add list.
-     *
      * @return Campaign
      */
     public function addList(LeadList $list)
@@ -573,9 +541,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
@@ -591,8 +556,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add form.
-     *
      * @return Campaign
      */
     public function addForm(Form $form)
@@ -604,9 +567,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove form.
-     */
     public function removeForm(Form $form): void
     {
         $this->changes['forms']['removed'][$form->getId()] = $form->getName();

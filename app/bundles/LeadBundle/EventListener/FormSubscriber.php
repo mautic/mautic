@@ -140,6 +140,13 @@ class FormSubscriber implements EventSubscriberInterface
                 )
             );
         }
+
+        // Add the owner and stage fields to the form
+        if ('lead' === $object) {
+            $event->appendField(new FieldCrate('ownerbyemail', 'mautic.lead.field.ownerbyemail', 'email', []));
+            $event->appendField(new FieldCrate('ownerbyid', 'mautic.lead.field.ownerbyid', 'text', []));
+            $event->appendField(new FieldCrate('stagebyname', 'mautic.lead.field.stagebyname', 'text', []));
+        }
     }
 
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void

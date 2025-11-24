@@ -267,7 +267,7 @@ return [
         'mailer_append_tracking_pixel'   => true,
         'mailer_convert_embed_images'    => false,
         'mailer_custom_headers'          => [],
-        'mailer_dsn'                     => 'smtp://localhost:25',
+        'mailer_dsn'                     => 'smtp://localhost:1025',
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,

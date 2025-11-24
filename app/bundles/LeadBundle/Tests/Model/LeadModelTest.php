@@ -539,7 +539,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']])
+            ->with('mautic.lead.import.stage.not.exists', ['%id%' => $data['stage']])
             ->willReturn('Stage not found');
 
         $this->expectException(ImportFailedException::class);

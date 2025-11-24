@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Http;
+namespace Mautic\WebhookBundle\Tests\Unit\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Request;
