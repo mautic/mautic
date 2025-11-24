@@ -1875,7 +1875,7 @@ Mautic.initSlotListeners = function() {
             if (dynConName === '') {
                 dynConTarget.find('a.remove-item:first').click();
                 // remove vertical tab in outside form
-                parent.mQuery('.dynamicContentFilterContainer').find('a[href=' + dynConId + ']').parent().remove();
+                parent.mQuery('.dynamicContentFilterContainer').find('a[href="' + dynConId + '"]').parent().remove();
                 params.slot.remove();
             }
         }
