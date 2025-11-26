@@ -42,7 +42,7 @@ class DncReportService
                 'alias'   => 'dnc_preferences',
                 'label'   => 'mautic.lead.report.dnc_preferences',
                 'type'    => 'string',
-                'formula' => '(SELECT $groupConcat FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
+                'formula' => "(SELECT $groupConcat FROM ".MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
             ],
         ];
     }
