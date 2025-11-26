@@ -31,7 +31,12 @@ final class VersionProvider implements VersionProviderInterface
 
     public function isMySql(): bool
     {
-        return !$this->isMariaDb();
+        return !$this->isMariaDb() && !$this->isPostgreSQL();
+    }
+
+    public function isPostgreSql(): bool
+    {
+        return str_contains($this->getVersion(), 'PostgreSQL');
     }
 
     private function fetchVersionFromDb(): string

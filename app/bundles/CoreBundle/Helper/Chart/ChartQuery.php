@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -533,8 +534,14 @@ class ChartQuery extends AbstractChart
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
-        $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
-        $query->andWhere('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') < :endSecond');
+
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $query->where('EXTRACT(EPOCH FROM ('.$tablePrefix.'.'.$dateColumn1.' - '.$tablePrefix.'.'.$dateColumn2.')) >= :startSecond');
+            $query->andWhere('EXTRACT(EPOCH FROM ('.$tablePrefix.'.'.$dateColumn1.' - '.$tablePrefix.'.'.$dateColumn2.')) < :endSecond');
+        } else {
+            $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
+            $query->andWhere('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') < :endSecond');
+        }
 
         $query->setParameter('startSecond', $startSecond);
         $query->setParameter('endSecond', $endSecond);

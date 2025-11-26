@@ -31,7 +31,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      *
      * @var string[]
      */
-    protected array $supported = ['mysql'];
+    protected array $supported = ['mysql', 'postgresql'];
 
     /**
      * Database prefix.

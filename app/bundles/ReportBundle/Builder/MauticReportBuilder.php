@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -209,9 +210,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build GROUP BY
+        $groupByColumns = [];
         if ($groupByOptions = $this->entity->getGroupBy()) {
-            $groupByColumns = [];
-
             foreach ($groupByOptions as $groupBy) {
                 if (isset($options['columns'][$groupBy])) {
                     $fieldOptions = $options['columns'][$groupBy];
@@ -230,6 +230,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
             $queryBuilder->addGroupBy($options['groupby']);
         }
+
+        // Get any existing GROUP BY columns from the query builder
+        $existingGroupBy = $queryBuilder->getQueryPart('groupBy') ?: [];
+        $groupByColumns  = array_merge($groupByColumns, (array) $existingGroupBy);
 
         // Build LIMIT clause
         if (!empty($options['limit'])) {
@@ -304,8 +308,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder->addSelect($selectColumns);
 
         // Add Aggregators
-        $aggregators      = $this->entity->getAggregators();
-        $aggregatorSelect = [];
+        $aggregators       = $this->entity->getAggregators();
+        $aggregatorSelect  = [];
+        $aggregatedColumns = [];
 
         if ($aggregators && $groupByOptions) {
             foreach ($aggregators as $aggregator) {
@@ -317,10 +322,49 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
 
-                $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
+                $aggregatorSelect[]  = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
+                $aggregatedColumns[] = $columnSelect; // Track aggregated columns
             }
 
             $queryBuilder->addSelect($aggregatorSelect);
+        }
+
+        // Ensure all non-aggregated SELECT columns are in GROUP BY
+        $allSelectColumns = array_merge($selectColumns, $event->getSelectColumns() ?: []);
+        if ($allSelectColumns && ($groupByColumns || $existingGroupBy || $aggregators)) {
+            $nonAggregatedColumns = [];
+
+            // Extract base column names from selectColumns
+            foreach ($allSelectColumns as $select) {
+                // Handle cases like "column AS alias" or "CONCAT(..., column, ...) AS alias"
+                if (preg_match('/^CONCAT\(/', $select)) {
+                    // Extract the column from CONCAT
+                    if (preg_match('/CONCAT\(\'.*?\',\s*([^\s,]+)\s*,.*?\)/', $select, $matches)) {
+                        $column = $matches[1];
+                    } else {
+                        continue; // Skip if we can't parse
+                    }
+                } else {
+                    // Handle "column AS alias" or just "column"
+                    $column = preg_replace('/\s+AS\s+.*/i', '', $select);
+                    // Only include simple column names (e.g., ad.date_download, a.title)
+                    if (!preg_match('/^[\"\`a-zA-Z0-9_\.]+$/', $column)) {
+                        continue; // Skip complex expressions like COUNT(*) or CASE
+                    }
+                }
+
+                // Skip if the column is already in groupByColumns or aggregatedColumns
+                if (!in_array($column, $groupByColumns) && !in_array($column, $aggregatedColumns)) {
+                    $nonAggregatedColumns[] = $column;
+                }
+            }
+
+            // Add missing non-aggregated columns to groupByColumns
+            $groupByColumns = array_merge($groupByColumns, $nonAggregatedColumns);
+            $queryBuilder->resetQueryPart('groupBy'); // Clear existing GROUP BY
+            if ($groupByColumns) {
+                $queryBuilder->addGroupBy($groupByColumns); // Add updated GROUP BY
+            }
         }
 
         return $queryBuilder;
@@ -574,8 +618,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private function sanitizeColumnName(string $fullColumnName): string
     {
         [$tableAlias, $columnName] = explode('.', $fullColumnName);
+        $isPostgreSql              = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform;
 
-        return "`{$tableAlias}`.`{$columnName}`";
+        return $isPostgreSql ? "\"$tableAlias\".\"$columnName\"" : "`$tableAlias`.`$columnName`";
     }
 
     /**

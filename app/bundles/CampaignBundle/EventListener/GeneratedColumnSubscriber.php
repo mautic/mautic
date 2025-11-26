@@ -25,31 +25,78 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
-        if (!$this->versionProvider->isMySql()) {
+        $isPostgreSQL = str_contains($this->versionProvider->getVersion(), 'PostgreSQL');
+        $isMySQL      = $this->versionProvider->isMySql();
+
+        if (!$isMySQL && !$isPostgreSQL) {
             return;
         }
 
-        $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', '%Y-%m-%d %H:00', 'H'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', '%Y-%m-%d', 'd', true));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', '%Y %U', 'W'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
+        $event->addGeneratedColumn($this->buildHourColumn($isMySQL));
+        $event->addGeneratedColumn($this->buildDayColumn($isMySQL));
+        $event->addGeneratedColumn($this->buildWeekColumn($isMySQL));
+        $event->addGeneratedColumn($this->buildMonthColumn($isMySQL));
+        $event->addGeneratedColumn($this->buildYearColumn($isMySQL));
     }
 
-    private function buildGeneratedColumn(string $name, string $type, string $format, string $unit, bool $filterDateColumn = false): GeneratedColumn
+    private function buildHourColumn(bool $my): GeneratedColumn
     {
-        $columnName      = 'generated_date_added_'.$name;
-        $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, 'DATE_FORMAT(date_added, "'.$format.'")');
-        $generatedColumn->prependIndexColumn('campaign_id');
-        $generatedColumn->setOriginalDateColumn('date_added', $unit);
-        $generatedColumn->setStored(true);
+        $expr = $my
+            ? 'DATE_FORMAT(date_added, "%Y-%m-%d %H:00")'
+            : "to_char(date_added, 'YYYY-MM-DD HH24:00')";
 
-        if ($filterDateColumn) {
-            $generatedColumn->setFilterDateColumn($columnName);
-        } else {
-            $generatedColumn->addIndexColumn('date_added');
-        }
+        return (new GeneratedColumn('campaign_leads', 'generated_date_added_hour', 'varchar(16)', $expr))
+            ->prependIndexColumn('campaign_id')
+            ->setOriginalDateColumn('date_added', 'H')
+            ->setStored(true);
+    }
 
-        return $generatedColumn;
+    private function buildDayColumn(bool $my): GeneratedColumn
+    {
+        $expr = $my
+            ? 'DATE_FORMAT(date_added, "%Y-%m-%d")'
+            : 'date_added::date';
+
+        return (new GeneratedColumn('campaign_leads', 'generated_date_added_day', 'date', $expr))
+            ->prependIndexColumn('campaign_id')
+            ->setOriginalDateColumn('date_added', 'd')
+            ->setStored(true)
+            ->setFilterDateColumn('generated_date_added_day');
+    }
+
+    private function buildWeekColumn(bool $my): GeneratedColumn
+    {
+        $expr = $my
+            ? 'DATE_FORMAT(date_added, "%Y %U")'
+            : "to_char(date_added, 'IYYY IW')";               // ISO year + week
+
+        return (new GeneratedColumn('campaign_leads', 'generated_date_added_week', 'char(8)', $expr))
+            ->prependIndexColumn('campaign_id')
+            ->setOriginalDateColumn('date_added', 'W')
+            ->setStored(true);
+    }
+
+    private function buildMonthColumn(bool $my): GeneratedColumn
+    {
+        $expr = $my
+            ? 'DATE_FORMAT(date_added, "%Y-%m")'
+            : "to_char(date_added, 'YYYY-MM')";
+
+        return (new GeneratedColumn('campaign_leads', 'generated_date_added_month', 'char(7)', $expr))
+            ->prependIndexColumn('campaign_id')
+            ->setOriginalDateColumn('date_added', 'm')
+            ->setStored(true);
+    }
+
+    private function buildYearColumn(bool $my): GeneratedColumn
+    {
+        $expr = $my
+            ? 'DATE_FORMAT(date_added, "%Y")'
+            : 'EXTRACT(YEAR FROM date_added)::smallint';
+
+        return (new GeneratedColumn('campaign_leads', 'generated_date_added_year', 'smallint', $expr))
+            ->prependIndexColumn('campaign_id')
+            ->setOriginalDateColumn('date_added', 'Y')
+            ->setStored(true);
     }
 }

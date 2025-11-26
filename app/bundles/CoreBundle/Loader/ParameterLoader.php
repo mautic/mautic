@@ -177,9 +177,11 @@ class ParameterLoader
             $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
         }
 
-        // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
-        // We set in here, to ensure it is always set to this value.
-        $compiledParameters['db_driver'] = 'pdo_mysql';
+        // Hardcode the db_driver to pdo_mysql only if not exists before.
+        // We set in here, to ensure it is always set to this value by default.
+        if (empty($compiledParameters['db_driver'])) {
+            $compiledParameters['db_driver'] = 'pdo_mysql';
+        }
 
         $this->localParameters = $compiledParameters;
     }

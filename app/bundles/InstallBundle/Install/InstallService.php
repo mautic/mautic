@@ -277,9 +277,10 @@ class InstallService
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.database.version',
                 [
-                    '%currentversion%'    => $e->getCurrentVersion(),
-                    '%mysqlminversion%'   => $metadata->getMinSupportedMySqlVersion(),
-                    '%mariadbminversion%' => $metadata->getMinSupportedMariaDbVersion(),
+                    '%currentversion%'       => $e->getCurrentVersion(),
+                    '%mysqlminversion%'      => $metadata->getMinSupportedMySqlVersion(),
+                    '%mariadbminversion%'    => $metadata->getMinSupportedMariaDbVersion(),
+                    '%postgresqlminversion%' => $metadata->getMinSupportedPostgreSqlVersion(),
                 ],
                 'flashes'
             );

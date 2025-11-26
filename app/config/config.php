@@ -117,9 +117,9 @@ $connectionSettings = [
     'dbname'                => '%mautic.db_name%',
     'user'                  => '%mautic.db_user%',
     'password'              => '%mautic.db_password%',
-    'charset'               => 'utf8mb4',
+    'charset'               => '%mautic.db_charset%',
     'default_table_options' => [
-        'charset'    => 'utf8mb4',
+        'charset'    => '%mautic.db_charset%',
         'row_format' => 'DYNAMIC',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
@@ -143,7 +143,7 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
             'dbname'                => '%mautic.db_name%',
             'user'                  => '%mautic.db_user%',
             'password'              => '%mautic.db_password%',
-            'charset'               => 'utf8mb4',
+            'charset'               => '%mautic.db_charset%',
         ],
     ];
 }

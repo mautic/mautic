@@ -5,6 +5,7 @@ namespace Mautic\InstallBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
@@ -51,7 +52,6 @@ class SchemaHelper
             }
         }
 
-        $dbParams['charset'] = 'utf8mb4';
         if (isset($dbParams['name'])) {
             $dbParams['dbname'] = $dbParams['name'];
             unset($dbParams['name']);
@@ -151,7 +151,7 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $isSqlite = $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
+        $isSqlite = $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform || $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
@@ -180,7 +180,7 @@ class SchemaHelper
     public function validateDatabaseVersion(): void
     {
         // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
-        $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
+        $version  = str_replace('PostgreSQL ', '', $this->db->executeQuery('SELECT VERSION()')->fetchOne());
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($this->db->getDatabasePlatform()::class);
@@ -194,8 +194,10 @@ class SchemaHelper
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
         } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
+        } elseif (str_contains($platform, 'postgresql')) {
+            $minSupported = $metadata->getMinSupportedPostgreSqlVersion();
         } else {
-            throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
+            throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL, MariaDB and PostgreSQL.');
         }
 
         if (true !== version_compare($version, $minSupported, 'gt')) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Report;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Helper\DncFormatterHelper;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -19,6 +20,7 @@ class DncReportService
     public function __construct(
         private DoNotContact $doNotContactModel,
         private DncFormatterHelper $dncFormatterHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -29,12 +31,18 @@ class DncReportService
      */
     public function getDncColumns(): array
     {
+        $groupConcat = 'pdo_pgsql' == $this->coreParametersHelper->get('db_driver')
+            // PostgreSQL: STRING_AGG is the native equivalent of GROUP_CONCAT
+            ? "STRING_AGG(CONCAT(dnc.reason, ':', dnc.channel), ',' ORDER BY dnc.date_added DESC)"
+            // MySQL: keep original (with SEPARATOR for MySQL 8+ compatibility)
+            : "GROUP_CONCAT(CONCAT(dnc.reason, ':', dnc.channel) ORDER BY dnc.date_added DESC SEPARATOR ',')";
+
         return [
             'dnc_preferences' => [
                 'alias'   => 'dnc_preferences',
                 'label'   => 'mautic.lead.report.dnc_preferences',
                 'type'    => 'string',
-                'formula' => '(SELECT GROUP_CONCAT(CONCAT(dnc.reason, \':\', dnc.channel) ORDER BY dnc.date_added DESC SEPARATOR \',\') FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
+                'formula' => '(SELECT $groupConcat FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
             ],
         ];
     }
