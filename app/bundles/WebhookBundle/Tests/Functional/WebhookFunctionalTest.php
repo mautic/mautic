@@ -51,7 +51,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(
             function (RequestInterface $request) use (&$sendRequestCounter) {
-                Assert::assertSame('://whatever.url', $request->getUri()->getPath());
+                Assert::assertSame('/post', $request->getUri()->getPath());
                 $jsonPayload = json_decode($request->getBody()->getContents(), true);
                 Assert::assertCount(3, $jsonPayload['mautic.lead_post_save_new']);
                 Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
@@ -92,7 +92,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $webhook->addEvent($event);
         $webhook->setName('Webhook from a functional test');
-        $webhook->setWebhookUrl('https:://whatever.url');
+        $webhook->setWebhookUrl('https://httpbin.org/post');
         $webhook->setSecret('any_secret_will_do');
         $webhook->isPublished(true);
         $webhook->setCreatedBy(1);

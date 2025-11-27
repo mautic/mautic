@@ -47,7 +47,7 @@ class InputHelper
         if (empty(self::$htmlFilter)) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
-            self::$htmlFilter->tagBlacklist = [
+            self::$htmlFilter->blockedTags  = [
                 'applet',
                 'bgsound',
                 'base',
@@ -60,7 +60,7 @@ class InputHelper
                 'object',
             ];
 
-            self::$htmlFilter->attrBlacklist = [
+            self::$htmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -78,7 +78,7 @@ class InputHelper
                     'span',
                 ], [], 0, 1);
 
-            self::$strictHtmlFilter->attrBlacklist = [
+            self::$strictHtmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -417,11 +417,8 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
-            try {
-                $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
-            } catch (\ErrorException) {
-                $hasUnicode = 'UTF-8"' === mb_detect_encoding($value);
-            }
+            // Check for non-ASCII characters
+            $hasUnicode = mb_check_encoding($value, 'UTF-8') && preg_match('/[^\x00-\x7F]/', $value);
 
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 

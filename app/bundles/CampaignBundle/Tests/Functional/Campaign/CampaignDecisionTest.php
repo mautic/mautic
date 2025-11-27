@@ -15,17 +15,17 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use PHPUnit\Framework\Assert;
 
 class CampaignDecisionTest extends MauticMysqlTestCase
 {
+    use LeadFieldTestTrait;
     protected $useCleanupRollback = false;
 
     /**
@@ -58,7 +58,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
                 ],
             ],
         ];
-        $this->makeField($fieldDetails);
+        $this->createField($fieldDetails);
 
         $segment  = $this->createSegment('seg1', []);
         $lead1    = $this->createLeadData($segment, $object, $fieldDetails, $additionalValue, 1);
@@ -162,24 +162,6 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         }
 
         return $leadIds;
-    }
-
-    /**
-     * @param array<mixed> $fieldDetails
-     */
-    private function makeField(array $fieldDetails): void
-    {
-        $field = new LeadField();
-        $field->setLabel($fieldDetails['alias']);
-        $field->setType($fieldDetails['type']);
-        $field->setObject($fieldDetails['object'] ?? 'lead');
-        $field->setGroup($fieldDetails['group'] ?? 'core');
-        $field->setAlias($fieldDetails['alias']);
-        $field->setProperties($fieldDetails['properties']);
-
-        $fieldModel = self::$container->get('mautic.lead.model.field');
-        \assert($fieldModel instanceof FieldModel);
-        $fieldModel->saveEntity($field);
     }
 
     /**
