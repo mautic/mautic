@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
@@ -356,12 +357,23 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @return $this
      */
-    public function setTriggerDate(?\DateTimeInterface $triggerDate = null)
+    public function setTriggerDate(?\DateTimeInterface $triggerDate = null, ?string $note = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
+        $this->logTriggerDateChange($triggerDate, $note);
 
         return $this;
+    }
+
+    private function logTriggerDateChange(?\DateTimeInterface $newTriggerDate, ?string $note): void
+    {
+        $this->metadata['triggerDateLog'] ??= [];
+        $this->metadata['triggerDateLog'][] = [
+            'date'      => (new \DateTime())->format(DateTimeHelper::FORMAT_DB),
+            'changedTo' => $newTriggerDate ? $newTriggerDate->format(DateTimeHelper::FORMAT_DB) : null,
+            'note'      => $note,
+        ];
     }
 
     /**
