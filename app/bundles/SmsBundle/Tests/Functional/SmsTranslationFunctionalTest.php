@@ -61,6 +61,9 @@ final class SmsTranslationFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($found, "Expected string '{$expectedString}' not found in timeline types.");
     }
 
+    /**
+     * @return array<string, array{string, bool, string}>
+     */
     public function smsTimelineStatusProvider(): array
     {
         return [
