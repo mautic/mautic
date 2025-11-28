@@ -84,7 +84,7 @@ class PointsChangeLog
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->addDateAdded();
+        $builder->addDateAdded(false, 3);
     }
 
     /**

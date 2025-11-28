@@ -35,6 +35,12 @@ class UTCDateTimeType extends DateTimeType
 
         $value->setTimezone(self::$utc);
 
+        if ($value instanceof \DateTimeInterface) {
+            $dateTimeFormat = $platform->getDateTimeFormatString();
+
+            return $value->format("{$dateTimeFormat}.u");
+        }
+
         return parent::convertToDatabaseValue($value, $platform);
     }
 
