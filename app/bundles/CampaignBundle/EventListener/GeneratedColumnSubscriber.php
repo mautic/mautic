@@ -45,10 +45,12 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
             ? 'DATE_FORMAT(date_added, "%Y-%m-%d %H:00")'
             : "to_char(date_added, 'YYYY-MM-DD HH24:00')";
 
-        return (new GeneratedColumn('campaign_leads', 'generated_date_added_hour', 'varchar(16)', $expr))
-            ->prependIndexColumn('campaign_id')
-            ->setOriginalDateColumn('date_added', 'H')
-            ->setStored(true);
+        $generatedColumn = new GeneratedColumn('campaign_leads', 'generated_date_added_hour', 'varchar(16)', $expr);
+        $generatedColumn->prependIndexColumn('campaign_id');
+        $generatedColumn->setOriginalDateColumn('date_added', 'H');
+        $generatedColumn->setStored(true);
+
+        return $generatedColumn;
     }
 
     private function buildDayColumn(bool $my): GeneratedColumn
@@ -57,11 +59,12 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
             ? 'DATE_FORMAT(date_added, "%Y-%m-%d")'
             : 'date_added::date';
 
-        return (new GeneratedColumn('campaign_leads', 'generated_date_added_day', 'date', $expr))
-            ->prependIndexColumn('campaign_id')
-            ->setOriginalDateColumn('date_added', 'd')
-            ->setStored(true)
-            ->setFilterDateColumn('generated_date_added_day');
+        $generatedColumn = new GeneratedColumn('campaign_leads', 'generated_date_added_day', 'date', $expr);
+        $generatedColumn->prependIndexColumn('campaign_id');
+        $generatedColumn->setOriginalDateColumn('date_added', 'd');
+        $generatedColumn->setStored(true);
+        $generatedColumn->setFilterDateColumn('generated_date_added_day');
+        return $generatedColumn;
     }
 
     private function buildWeekColumn(bool $my): GeneratedColumn
@@ -70,10 +73,11 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
             ? 'DATE_FORMAT(date_added, "%Y %U")'
             : "to_char(date_added, 'IYYY IW')";               // ISO year + week
 
-        return (new GeneratedColumn('campaign_leads', 'generated_date_added_week', 'char(8)', $expr))
-            ->prependIndexColumn('campaign_id')
-            ->setOriginalDateColumn('date_added', 'W')
-            ->setStored(true);
+        $generatedColumn = new GeneratedColumn('campaign_leads', 'generated_date_added_week', 'char(8)', $expr);
+        $generatedColumn->prependIndexColumn('campaign_id');
+        $generatedColumn->setOriginalDateColumn('date_added', 'W');
+        $generatedColumn->setStored(true);
+        return $generatedColumn;
     }
 
     private function buildMonthColumn(bool $my): GeneratedColumn
@@ -82,10 +86,11 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
             ? 'DATE_FORMAT(date_added, "%Y-%m")'
             : "to_char(date_added, 'YYYY-MM')";
 
-        return (new GeneratedColumn('campaign_leads', 'generated_date_added_month', 'char(7)', $expr))
-            ->prependIndexColumn('campaign_id')
-            ->setOriginalDateColumn('date_added', 'm')
-            ->setStored(true);
+        $generatedColumn = new GeneratedColumn('campaign_leads', 'generated_date_added_month', 'char(7)', $expr);
+        $generatedColumn->prependIndexColumn('campaign_id');
+        $generatedColumn->setOriginalDateColumn('date_added', 'm');
+        $generatedColumn->setStored(true);
+        return $generatedColumn;
     }
 
     private function buildYearColumn(bool $my): GeneratedColumn
@@ -94,9 +99,10 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
             ? 'DATE_FORMAT(date_added, "%Y")'
             : 'EXTRACT(YEAR FROM date_added)::smallint';
 
-        return (new GeneratedColumn('campaign_leads', 'generated_date_added_year', 'smallint', $expr))
-            ->prependIndexColumn('campaign_id')
-            ->setOriginalDateColumn('date_added', 'Y')
-            ->setStored(true);
+        $generatedColumn = new GeneratedColumn('campaign_leads', 'generated_date_added_year', 'smallint', $expr);
+        $generatedColumn->prependIndexColumn('campaign_id');
+        $generatedColumn->setOriginalDateColumn('date_added', 'Y');
+        $generatedColumn->setStored(true);
+        return $generatedColumn;
     }
 }
