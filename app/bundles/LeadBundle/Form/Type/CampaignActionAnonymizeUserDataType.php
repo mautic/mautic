@@ -60,7 +60,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
             'pseudonymize',
             YesNoButtonGroupType::class,
             [
-                'label' => 'mautic.lead.lead.events.anonymize_user_data',
+                'label' => 'mautic.lead.lead.events.anonymizeuserdata',
                 'data'  => $options['data']['pseudonymize'] ?? false,
                 'attr'  => [
                     'tooltip' => 'mautic.campaign.lead.action_anonymizeuserdata.tooltip',
@@ -74,7 +74,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
             'fieldsToAnonymize',
             FieldListType::class,
             [
-                'label'   => 'mautic.lead.lead.events.fields_to_anonymize',
+                'label'   => 'mautic.lead.lead.events.fieldstoanonymize',
                 'choices' => $choicesAnonymize,
                 'data'    => $options['data']['fieldsToAnonymize'] ?? self::DEFAULT_VALUES_TO_ANONYMIZE,
             ]
@@ -86,7 +86,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
             'fieldsToDelete',
             FieldListType::class,
             [
-                'label'       => 'mautic.lead.lead.events.delete_user_data',
+                'label'       => 'mautic.lead.lead.events.deleteuserdata',
                 'choices'     => $choicesToDelete,
                 'constraints' => [$this->validateFieldSelection()],
                 'data'        => $options['data']['fieldsToDelete'] ?? self::DEFAULT_VALUES_TO_DELETE,
