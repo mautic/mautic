@@ -60,7 +60,9 @@ final class AuditLogModelTest extends MauticMysqlTestCase
         $this->assertEmpty($logs, $message);
     }
 
-    /** @param array<string,mixed> $criteria */
+    /** 
+     * @param array<string,mixed> $criteria 
+     */
     private function cleanupLogsByCriteria(array $criteria): void
     {
         $logs = $this->repo->findBy($criteria);
