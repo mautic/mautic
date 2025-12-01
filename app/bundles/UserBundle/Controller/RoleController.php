@@ -223,7 +223,7 @@ class RoleController extends FormController
         $response = null;
 
         if (null === $source) {
-            $response = $this->postActionRedirect(
+            return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
                         [
@@ -234,58 +234,58 @@ class RoleController extends FormController
                     ],
                 ])
             );
-        } else {
-            $entity            = $model->cloneEntity($source);
-            $permissionsConfig = $this->getPermissionsConfig($source);
-            $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
-            $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        }
 
-            if ($request->isMethod('POST')) {
-                $cancelled = $this->isFormCancelled($form);
-                $valid     = !$cancelled && $this->isFormValid($form);
+        $entity            = $model->cloneEntity($source);
+        $permissionsConfig = $this->getPermissionsConfig($source);
+        $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
+        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
-                if ($valid) {
-                    $role        = $request->request->all()['role'] ?? [];
-                    $permissions = $role['permissions'] ?? null;
+        if ($request->isMethod('POST')) {
+            $cancelled = $this->isFormCancelled($form);
+            $valid     = !$cancelled && $this->isFormValid($form);
 
-                    if (null !== $permissions) {
-                        $model->setRolePermissions($entity, $permissions);
-                    }
+            if ($valid) {
+                $role        = $request->request->all()['role'] ?? [];
+                $permissions = $role['permissions'] ?? null;
 
-                    $model->saveEntity($entity);
-
-                    $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'              => $entity->getName(),
-                        self::FLASH_MENU_LINK => 'mautic_role_index',
-                        self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]),
-                    ]);
+                if (null !== $permissions) {
+                    $model->setRolePermissions($entity, $permissions);
                 }
 
-                if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                    $response = $this->postActionRedirect($postActionVars);
-                } elseif ($valid) {
-                    $response = $this->editAction($request, $entity->getId(), true);
-                }
-            }
+                $model->saveEntity($entity);
 
-            if (!$response instanceof Response) {
-                $response = $this->delegateView([
-                    'viewParameters' => [
-                        'form'              => $form->createView(),
-                        'permissionsConfig' => $permissionsConfig,
-                    ],
-                    'contentTemplate' => self::TEMPLATE_FORM,
-                    'passthroughVars' => [
-                        'activeLink'     => '#mautic_role_new',
-                        'route'          => $action,
-                        'mauticContent'  => 'role',
-                        'permissionList' => $permissionsConfig['list'],
-                    ],
+                $this->addFlashMessage('mautic.core.notice.created', [
+                    '%name%'              => $entity->getName(),
+                    self::FLASH_MENU_LINK => 'mautic_role_index',
+                    self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
+                        'objectAction' => 'edit',
+                        'objectId'     => $entity->getId(),
+                    ]),
                 ]);
             }
+
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
+                $response = $this->postActionRedirect($postActionVars);
+            } elseif ($valid) {
+                $response = $this->editAction($request, $entity->getId(), true);
+            }
+        }
+
+        if (!$response instanceof Response) {
+            $response = $this->delegateView([
+                'viewParameters' => [
+                    'form'              => $form->createView(),
+                    'permissionsConfig' => $permissionsConfig,
+                ],
+                'contentTemplate' => self::TEMPLATE_FORM,
+                'passthroughVars' => [
+                    'activeLink'     => '#mautic_role_new',
+                    'route'          => $action,
+                    'mauticContent'  => 'role',
+                    'permissionList' => $permissionsConfig['list'],
+                ],
+            ]);
         }
 
         return $response;
