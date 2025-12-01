@@ -17,7 +17,7 @@
                     justify-content: center;">
             {{ include('@MauticEmail/Lead/' ~ message_type ~ '.html.twig') }}
         </div>
-    {% elseif message_type == 'preference_center' %}
+    {% else %}
         {{ message|raw }}
     {% endif %}
 
