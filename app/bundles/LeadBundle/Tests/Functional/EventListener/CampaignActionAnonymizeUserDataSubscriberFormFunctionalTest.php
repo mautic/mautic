@@ -25,7 +25,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 
-class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends MauticMysqlTestCase
+final class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends MauticMysqlTestCase
 {
     public const EVENT_LEAD_TYPE = 'lead.action_anonymizeuserdata';
 
