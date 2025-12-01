@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
@@ -28,6 +29,7 @@ class CampaignType extends AbstractType
     public function __construct(
         private CorePermissions $security,
         private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -65,18 +67,23 @@ class CampaignType extends AbstractType
         ]);
 
         $attr = [];
-        if (!empty($options['data']) && $options['data']->getId()) {
-            $readonly = !$this->security->isGranted('campaign:campaigns:publish');
-            $data     = $options['data']->isPublished(false);
-            $attr     = [
-                'onchange'              => 'Mautic.showCampaignConfirmation(mQuery(this));',
-                'data-toggle'           => 'confirmation',
-                'data-message'          => $this->translator->trans('mautic.campaign.form.confirmation.message'),
-                'data-confirm-text'     => $this->translator->trans('mautic.campaign.form.confirmation.confirm_text'),
-                'data-confirm-callback' => 'dismissConfirmation',
-                'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
-                'data-cancel-callback'  => 'setPublishedButtonToYes',
-                'class'                 => 'btn btn-ghost',
+        /** @var ?Campaign $campaign */
+        $campaign = $options['data'] ?? null;
+        if ($campaign && $campaign->getId()) {
+            $readonly          = !$this->security->isGranted('campaign:campaigns:publish');
+            $data              = $campaign->isPublished(false);
+            $republishBehavior = $campaign->getRepublishBehavior() ?? $this->coreParametersHelper->get('campaign_republish_behavior');
+            $republishBehavior = $this->translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$republishBehavior);
+            $attr              = [
+                'onchange'               => 'Mautic.showCampaignConfirmation(mQuery(this));',
+                'data-toggle'            => 'confirmation',
+                'data-message-publish'   => $this->translator->trans('mautic.campaign.form.confirmation.message.publish', ['%republishBehavior%' => $republishBehavior]),
+                'data-message-unpublish' => $this->translator->trans('mautic.campaign.form.confirmation.message'),
+                'data-confirm-text'      => $this->translator->trans('mautic.campaign.form.confirmation.confirm_text'),
+                'data-confirm-callback'  => 'dismissConfirmation',
+                'data-cancel-text'       => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
+                'data-cancel-callback'   => 'setPublishedButtonToYes',
+                'class'                  => 'btn btn-ghost',
             ];
         } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
             $readonly = true;
@@ -95,6 +102,14 @@ class CampaignType extends AbstractType
 
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
+
+        $builder->add(
+            'republishBehavior',
+            RepublishBehaviorType::class,
+            [
+                'include_global_option' => true,
+            ]
+        );
 
         $builder->add('sessionId', HiddenType::class, [
             'mapped' => false,

@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CampaignBundle\Validator\Constraints\NoOrphanEvents;
@@ -21,7 +22,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
-use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
@@ -51,7 +51,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface, UuidInterface
+class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
 
@@ -94,6 +94,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     #[Groups(['campaign:read', 'campaign:write'])]
     public ?\DateTimeInterface $deleted = null;
+
+    // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
+    #[Groups(['campaign:read', 'campaign:write'])]
+    private ?string $republishBehavior = null;
 
     /**
      * @var Category|null
@@ -161,6 +165,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder->addIdColumns();
 
         $builder->addPublishDates();
+
+        $builder->createField('republishBehavior', Types::STRING)
+            ->columnName('republish_behavior')
+            ->nullable()
+            ->length(32)
+            ->build();
 
         $builder->addCategory();
 
@@ -237,6 +247,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'allowRestart',
                     'publishUp',
                     'publishDown',
+                    'republishBehavior',
                     'events',
                     'forms',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
@@ -467,6 +478,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
+    public function getRepublishBehavior(): ?string
+    {
+        return $this->republishBehavior;
+    }
+
+    public function setRepublishBehavior(?string $republishBehavior): self
+    {
+        $this->isChanged('republishBehavior', $republishBehavior);
+        $this->republishBehavior = $republishBehavior;
+
+        return $this;
+    }
+
     /**
      * @return \DateTimeInterface
      */
@@ -664,11 +688,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         );
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     */
     public function getOnclickMethod(): string
     {
         return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     *
+     * @return array<string, string>
+     */
     public function getDataAttributes(): array
     {
         return [
@@ -678,6 +710,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         ];
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     *
+     * @return array<string, string>
+     */
     public function getTranslationKeysDataAttributes(): array
     {
         return [

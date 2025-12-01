@@ -2542,7 +2542,9 @@ Mautic.highlightJumpTarget = function(event, el) {
 Mautic.showCampaignConfirmation = function (el) {
     let element = mQuery(el);
     if (element.prop('checked') && element.val() !== "1") {
-        Mautic.showConfirmation(element);
+        Mautic.showConfirmation(element, element.data('message-unpublish'));
+    } else {
+        Mautic.showConfirmation(element, element.data('message-publish'));
     }
 };
 
@@ -2569,13 +2571,10 @@ Mautic.setPublishedButtonToYes = function (el) {
 Mautic.confirmationCampaignPublishStatus = function (el) {
     let element = mQuery(el);
 
-    // Add the confirmation modal, if current status is published
     if (element.data('status') === 'published') {
-        Mautic.showConfirmation(element);
-    }
-    else {
-        // Otherwise just change the status.
-        Mautic.confirmCallbackCampaignPublishStatus('', el);
+        Mautic.showConfirmation(element, element.data('message-unpublish'));
+    } else {
+        Mautic.showConfirmation(element, element.data('message-publish'));
     }
 }
 
