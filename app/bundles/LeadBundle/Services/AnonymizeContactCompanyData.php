@@ -112,7 +112,6 @@ class AnonymizeContactCompanyData
         return $leadsCompanies;
     }
 
-    // To do, run tests here
     public function updateFormResults(ArrayCollection $leads, bool $pseudonymize): void
     {
         $valueSubmissionForm = [];
