@@ -282,7 +282,7 @@ Mautic.processModalContent = function (response, target) {
 /**
  * Display confirmation modal
  */
-Mautic.showConfirmation = function (el) {
+Mautic.showConfirmation = function (el, customMessage) {
     var precheck = mQuery(el).data('precheck');
 
     if (precheck) {
@@ -297,7 +297,7 @@ Mautic.showConfirmation = function (el) {
         }
     }
 
-    var message = mQuery(el).data('message');
+    var message = customMessage ?? mQuery(el).data('message');
     var confirmText = mQuery(el).data('confirm-text');
     var confirmAction = mQuery(el).attr('href');
     var confirmCallback = mQuery(el).data('confirm-callback');
