@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Symfony\Component\DependencyInjection\Container;
 
-class AuditLogModelTest extends MauticMysqlTestCase
+final class AuditLogModelTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
