@@ -36,19 +36,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     private const EMAIL_ALIAS = 'email';
 
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        private LeadModel $leadModel,
-        private ListModel $listModel,
-        private CampaignModel $campaignModel,
-        private EmailModel $emailModel,
-        private StageModel $stageModel,
-        private CategoryModel $categoryModel,
-        private AssetModel $assetModel,
-        TranslatorInterface $translator,
-    ) {
-        $this->translator    = $translator;
+    public function __construct(private LeadModel $leadModel, private ListModel $listModel, private CampaignModel $campaignModel, private EmailModel $emailModel, private StageModel $stageModel, private CategoryModel $categoryModel, private AssetModel $assetModel, private TranslatorInterface $translator)
+    {
     }
 
     public static function getSubscribedEvents(): array

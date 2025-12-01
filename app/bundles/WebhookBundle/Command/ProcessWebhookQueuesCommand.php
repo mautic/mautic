@@ -39,22 +39,19 @@ class ProcessWebhookQueuesCommand extends Command
             '--webhook-id',
             '-i',
             InputOption::VALUE_OPTIONAL,
-            'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
-            null
+            'Process payload for a specific webhook.  If not specified, all webhooks will be processed.'
         )
             ->addOption(
                 '--min-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Sets the minimum webhook queue ID to process (so called range mode).',
-                null
+                'Sets the minimum webhook queue ID to process (so called range mode).'
             )
             ->addOption(
                 '--max-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Sets the maximum webhook queue ID to process (so called range mode).',
-                null
+                'Sets the maximum webhook queue ID to process (so called range mode).'
             );
     }
 

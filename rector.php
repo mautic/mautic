@@ -6,6 +6,7 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
+use Rector\DeadCode\Rector\Plus\RemoveDeadZeroAndOneOperationRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
@@ -43,6 +44,11 @@ return static function (RectorConfig $rectorConfig): void {
         ReturnTypeFromReturnNewRector::class => [
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Integration/ObjectChangeGenerator.php',
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
+        ],
+
+        // It's removing code that isn't dead
+        RemoveDeadZeroAndOneOperationRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Model/IteratorExportDataModel.php',
         ],
 
         // lets handle later, once we have more type declaratoins

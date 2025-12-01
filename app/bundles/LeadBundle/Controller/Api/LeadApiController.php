@@ -96,9 +96,9 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter  = $request->query->get('filter', null);
-        $limit   = $request->query->get('limit', null);
-        $start   = $request->query->get('start', null);
+        $filter  = $request->query->get('filter');
+        $limit   = $request->query->get('limit');
+        $start   = $request->query->get('start');
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['userList']);

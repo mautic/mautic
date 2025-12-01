@@ -28,10 +28,8 @@ class LeadTimelineEvent extends Event
      *  search => (string) search term
      *  includeEvents => (array) event types to include
      *  excludeEvents => (array) event types to exclude.
-     *
-     * @var array
      */
-    protected $filters = [];
+    protected array $filters;
 
     /**
      * @var array<string, int>

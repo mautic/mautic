@@ -12,7 +12,7 @@ class IteratorExportDataModel implements \Iterator
 
     private int $total;
 
-    private $data;
+    private int $data;
 
     private int $totalResult;
 

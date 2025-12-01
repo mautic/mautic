@@ -36,7 +36,7 @@ class Remover
             // Contact was removed by the change campaign action or a segment
             $campaignMember->setDateLastExited(new \DateTime());
         } else {
-            $campaignMember->setDateLastExited(null);
+            $campaignMember->setDateLastExited();
         }
 
         if ($campaignMember->wasManuallyRemoved()) {

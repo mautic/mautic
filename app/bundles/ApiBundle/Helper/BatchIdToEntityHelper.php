@@ -6,10 +6,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 
 class BatchIdToEntityHelper
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     private array $originalKeys = [];
 

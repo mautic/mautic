@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class MaxMindDoNotSellDownloadHelper
 {
     /**
-     * @const REMOTE_DATA
+     * @var REMOTE_DATA
      */
     public const REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
 

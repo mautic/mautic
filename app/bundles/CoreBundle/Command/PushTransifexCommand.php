@@ -42,7 +42,7 @@ class PushTransifexCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 

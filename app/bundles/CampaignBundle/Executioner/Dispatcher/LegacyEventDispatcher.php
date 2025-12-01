@@ -102,7 +102,7 @@ class LegacyEventDispatcher
             $this->scheduler->rescheduleFailures($rescheduleFailures);
         }
 
-        $this->contactTracker->setSystemContact(null);
+        $this->contactTracker->setSystemContact();
     }
 
     /**

@@ -34,8 +34,7 @@ class SyncCommand extends Command
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,
-                'Fetch objects from integration.',
-                null
+                'Fetch objects from integration.'
             )
             ->addOption(
                 '--start-datetime',

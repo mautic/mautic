@@ -28,25 +28,12 @@ class ContactTracker
 
     private ?Lead $trackedContact = null;
 
-    private FieldModel $leadFieldModel;
-
     private ?bool $useSystemContact = null;
 
     private bool $contactLastActiveLogged = false;
 
-    public function __construct(
-        private LeadRepository $leadRepository,
-        private ContactTrackingServiceInterface $contactTrackingService,
-        private DeviceTracker $deviceTracker,
-        private CorePermissions $security,
-        private LoggerInterface $logger,
-        private IpLookupHelper $ipLookupHelper,
-        private RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
-        private EventDispatcherInterface $dispatcher,
-        FieldModel $leadFieldModel,
-    ) {
-        $this->leadFieldModel         = $leadFieldModel;
+    public function __construct(private LeadRepository $leadRepository, private ContactTrackingServiceInterface $contactTrackingService, private DeviceTracker $deviceTracker, private CorePermissions $security, private LoggerInterface $logger, private IpLookupHelper $ipLookupHelper, private RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, private EventDispatcherInterface $dispatcher, private FieldModel $leadFieldModel)
+    {
     }
 
     /**

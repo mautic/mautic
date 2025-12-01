@@ -100,7 +100,7 @@ class ResultController extends CommonFormController
         $start = $pageHelper->getStart();
 
         // Set order direction to desc if not set
-        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir', null)) {
+        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir')) {
             $session->set('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         }
 

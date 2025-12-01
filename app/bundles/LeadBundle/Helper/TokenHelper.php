@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 class TokenHelper
 {
     /**
-     * @const REGEX
+     * @var REGEX
      */
     public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 
