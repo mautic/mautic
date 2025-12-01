@@ -60,7 +60,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->client->request('GET', '/s/assets/batchDownload');
 
-        $response  = $this->client->getResponse();
+        $response   = $this->client->getResponse();
         $translator = static::getContainer()->get('translator');
 
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
