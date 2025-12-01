@@ -14,7 +14,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class StageController extends AbstractFormController
 {
+    private const PERMISSION_VIEW = 'stage:stages:view';
+    private const PERMISSION_CREATE = 'stage:stages:create';
     private const PERMISSION_EDIT = 'stage:stages:edit';
+    private const PERMISSION_DELETE = 'stage:stages:delete';
+    private const PERMISSION_PUBLISH = 'stage:stages:publish';
 
     /**
      * @param int $page
@@ -26,16 +30,16 @@ final class StageController extends AbstractFormController
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-                'stage:stages:view',
-                'stage:stages:create',
+                self::PERMISSION_VIEW,
+                self::PERMISSION_CREATE,
                 self::PERMISSION_EDIT,
-                'stage:stages:delete',
-                'stage:stages:publish',
+                self::PERMISSION_DELETE,
+                self::PERMISSION_PUBLISH,
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['stage:stages:view']) {
+        if (!$permissions[self::PERMISSION_VIEW]) {
             return $this->accessDenied();
         }
 
@@ -125,7 +129,7 @@ final class StageController extends AbstractFormController
             $entity = $model->getEntity();
         }
 
-        if (!$this->security->isGranted('stage:stages:create')) {
+        if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             return $this->accessDenied();
         }
 
@@ -392,7 +396,7 @@ final class StageController extends AbstractFormController
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->security->isGranted('stage:stages:create')) {
+            if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
                 return $this->accessDenied();
             }
 
@@ -527,7 +531,7 @@ final class StageController extends AbstractFormController
                     'msg'     => 'mautic.stage.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->security->isGranted('stage:stages:delete')) {
+            } elseif (!$this->security->isGranted(self::PERMISSION_DELETE)) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'stage');
@@ -591,7 +595,7 @@ final class StageController extends AbstractFormController
                         'msg'     => 'mautic.stage.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->security->isGranted('stage:stages:delete')) {
+                } elseif (!$this->security->isGranted(self::PERMISSION_DELETE)) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);
