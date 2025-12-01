@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Form\Type\CampaignActionAnonymizeUserDataType;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCase
+final class CampaignActionAnonymizeUserDataTypeTest extends \PHPUnit\Framework\TestCase
 {
     private function createLeadFieldMock(int $id = 1, string $label = 'email'): LeadField
     {
