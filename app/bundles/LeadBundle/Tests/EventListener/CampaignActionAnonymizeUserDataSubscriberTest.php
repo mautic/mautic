@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\TestCase;
 
-class CampaignActionAnonymizeUserDataSubscriberTest extends TestCase
+final class CampaignActionAnonymizeUserDataSubscriberTest extends TestCase
 {
     protected CampaignActionAnonymizeUserDataSubscriber $campaignActionAnonymizeUserDataSubscriber;
 
