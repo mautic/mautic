@@ -92,7 +92,6 @@ class AnonymizeContactCompanyData
         }
     }
 
-    // To do, run tests here
     /**
      * @param array<Lead|Company> $leadsCompanies
      *
