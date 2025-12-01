@@ -64,5 +64,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('admin@test-beta.mautibot.com', $message->getFrom()[0]->getAddress());
         Assert::assertStringContainsString('Admin', $message->getFrom()[0]->getName());
         Assert::assertStringNotContainsString('This should be overwritten by the form content', $email);
+
+        Assert::assertFalse($message->getHeaders()->has('List-Unsubscribe'));
+        Assert::assertFalse($message->getHeaders()->has('List-Unsubscribe-Post'));
     }
 }

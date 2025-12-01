@@ -32,6 +32,8 @@ class ContactTracker
 
     private ?bool $useSystemContact = null;
 
+    private bool $contactLastActiveLogged = false;
+
     public function __construct(
         private LeadRepository $leadRepository,
         private ContactTrackingServiceInterface $contactTrackingService,
@@ -72,9 +74,9 @@ class ContactTracker
         }
 
         // Log last active for the tracked contact
-        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
+        if (!$this->contactLastActiveLogged) {
             $this->leadRepository->updateLastActive($this->trackedContact->getId());
-            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
+            $this->contactLastActiveLogged = true;
         }
 
         return $this->trackedContact;
@@ -160,6 +162,17 @@ class ContactTracker
     public function setUseSystemContact(?bool $useSystemContact): void
     {
         $this->useSystemContact = $useSystemContact;
+    }
+
+    /**
+     * Resets cache.
+     */
+    public function reset(): void
+    {
+        $this->trackedContact          = null;
+        $this->contactLastActiveLogged = false;
+        $this->deviceTracker->reset();
+        $this->ipLookupHelper->reset();
     }
 
     /**

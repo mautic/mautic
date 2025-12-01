@@ -159,13 +159,13 @@ class ColumnSchemaHelper
      * @throws SchemaException
      * @throws \OutOfRangeException
      */
-    public function updateColumnLength(string $column, int $length): ColumnSchemaHelper
+    public function updateColumnLength(string $column, ?int $length): ColumnSchemaHelper
     {
         if (empty($column)) {
             throw new SchemaException('The column name is should not be empty/missing.');
         }
 
-        if ($length < 1 || $length > LeadField::MAX_VARCHAR_LENGTH) {
+        if (null !== $length && ($length < 1 || $length > LeadField::MAX_VARCHAR_LENGTH)) {
             throw new \OutOfRangeException('Column length should be between 1 and 191.');
         }
 

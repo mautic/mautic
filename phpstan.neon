@@ -55,6 +55,10 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
 			identifier: doctrine.associationType
 		-
+			message: '#Property .+::\$translationChildren type mapping mismatch: property can contain .+but database expects#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+			identifier: doctrine.associationType
+		-
 			message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
 			path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
 			identifier: doctrine.associationType
