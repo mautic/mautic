@@ -21,6 +21,7 @@ final class AjaxController extends CommonAjaxController
     public function getLookupChoiceListAction(Request $request, ProjectModel $projectModel): JsonResponse
     {
         $entityType  = $request->query->get('entityType');
+        $projectId   = $request->query->getInt('projectId', 0) ?: null;
 
         if (empty($entityType)) {
             return new JsonResponse([]);
@@ -32,7 +33,9 @@ final class AjaxController extends CommonAjaxController
         $limit       = (int) $request->query->get('limit', '10');
         $start       = (int) $request->query->get('start', '0');
 
-        $results = $projectModel->getLookupResults($entityType, $filter, $limit, $start);
+        $results = $projectModel->getLookupResults($entityType, $filter, $limit, $start, [
+            'projectId' => $projectId,
+        ]);
 
         // Format results to match AjaxLookupControllerTrait structure
         $dataArray = [];
@@ -59,8 +62,8 @@ final class AjaxController extends CommonAjaxController
             foreach ($newProjectNames as $projectName) {
                 $project = new Project();
                 $project->setName($projectName);
-                $projectModel->saveEntity($project);
-                $existingProjectIds[] = $project->getId();
+
+                $existingProjectIds[] = $this->createProjectIfNotExists(trim($projectName), $projectModel, $projectRepository);
             }
         }
 
@@ -74,5 +77,18 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse(['projects' => $projectOptions]);
+    }
+
+    private function createProjectIfNotExists(string $name, ProjectModel $projectModel, ProjectRepository $projectRepository): int
+    {
+        if ($project = $projectRepository->findOneBy(['name' => $name])) {
+            return $project->getId();
+        }
+
+        $project = new Project();
+        $project->setName($name);
+        $projectModel->saveEntity($project);
+
+        return $project->getId();
     }
 }

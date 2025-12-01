@@ -141,6 +141,9 @@ class FieldType extends AbstractType
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
+                case 'slider':
+                    $addIsRequired = false;
+                    break;
             }
         }
 
@@ -482,7 +485,7 @@ class FieldType extends AbstractType
 
                 $fields       = $this->fieldCollector->getFields($mappedObject);
                 $mappedFields = [];
-                if (in_array('formId', $fieldData)) {
+                if (!empty($fieldData['formId'])) {
                     $mappedFields = $this->mappedFieldCollector->getFields((string) $fieldData['formId'], $mappedObject);
                 }
                 $fields = $fields->removeFieldsWithKeys($mappedFields, (string) $mappedField);
@@ -618,6 +621,16 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldNumberType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'slider':
+                    $builder->add(
+                        'properties',
+                        FormFieldSliderType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,

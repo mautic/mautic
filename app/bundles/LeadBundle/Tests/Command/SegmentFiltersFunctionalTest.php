@@ -196,7 +196,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
                 'filter'    => [
                     'value1',
                 ],
-                'operator'  => OperatorOptions::NOT_IN,
+                'operator'  => OperatorOptions::EXCLUDING_ANY,
             ],
         ];
         // to test excluding filter, should contain blank values as well
@@ -223,7 +223,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         ];
 
         // to test including filter, should NOT contain blank values
-        $segmentData['filterToSave']['operator'] = OperatorOptions::IN;
+        $segmentData['filterToSave']['operator'] = OperatorOptions::INCLUDING_ANY;
         $segmentData['filterToSave']['filter']   = ['value1'];
         yield [
             // custom field

@@ -1,6 +1,6 @@
 /**
  * Autocomplete library.
- * 
+ *
  * @see https://github.com/TarekRaafat/autoComplete.js/blob/master/dist/autoComplete.min.js
  * @version 10.2.8
  */
@@ -220,9 +220,32 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
 
+                    const theForm = forms[i];
+                    const hasPageBreak = theForm.querySelectorAll('[data-mautic-form-page]').length > 1;
+                    if (hasPageBreak) {
+                        const inputs = theForm.querySelectorAll('input, select, button');
+                        Array.prototype.forEach.call(inputs, function(input) {
+                            if (input.tagName.toLowerCase() !== 'textarea') {
+                                input.addEventListener('keydown', function(e) {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        return false;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
                     Form.populateValuesWithGetParameters();
                 }
             }
+        };
+
+        Form.syncSliderOutputs = function(formId) {
+            const theForm = document.getElementById('mauticform_' + formId);
+            if (!theForm) return;
+            const outputs = theForm.querySelectorAll('output.mauticform-slider-value');
+            [].forEach.call(outputs, function(out) { out.textContent = ''; });
         };
 
         Form.prepareMessengerForm = function(formId) {
@@ -326,7 +349,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
             Object.keys((parents[key])).forEach(function(key2) {
                 [].forEach.call(selectedValues, function (selectedValue) {
-                    
+
                     var el = document.getElementById(key2);
                     if (selectedValue) {
                         if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
@@ -826,6 +849,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     document.getElementById('mauticform_' + formId).reset();
 
                     Form.prepareShowOn(formId); // Hides conditional fields again.
+                    Form.syncSliderOutputs(formId);
                 },
 
                 disableSubmitButton: function() {

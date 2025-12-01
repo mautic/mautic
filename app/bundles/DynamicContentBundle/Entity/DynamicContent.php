@@ -14,6 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -54,6 +55,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+/**
+ * @use TranslationEntityTrait<DynamicContent>
+ * @use VariantEntityTrait<DynamicContent>
+ */
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
@@ -70,29 +75,17 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     #[Groups(['dynamicContent:read'])]
     private $id;
 
-    /**
-     * @var string
-     */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @Groups({"dynamicContent:read", "dynamicContent:write"})
-     */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private string $type = TypeList::HTML;
 
-    /**
-     * @var string|null
-     */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    private $description;
+    private ?string $description = null;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var \DateTimeInterface
@@ -392,7 +385,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \Mautic\CategoryBundle\Entity\Category
+     * @return Category
      */
     public function getCategory()
     {
@@ -400,7 +393,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @param \Mautic\CategoryBundle\Entity\Category $category
+     * @param Category $category
      *
      * @return $this
      */

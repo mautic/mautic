@@ -49,7 +49,6 @@ class ListApiController extends CommonApiController
             'publishDetails',
             'ipAddress',
             'categoryList',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);

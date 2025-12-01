@@ -2,6 +2,7 @@ type: php
 docroot: ""
 php_version: "8.4"
 webserver_type: apache-fpm
+timezone: UTC
 database:
     type: mariadb
     version: "10.11"

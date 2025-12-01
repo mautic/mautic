@@ -29,8 +29,12 @@ trait CampaignControllerTrait
     /**
      * @param array<string,mixed> $formValues
      */
-    private function submitForm(Crawler $crawler, Campaign $campaign, int $expectedVersion, array $formValues = []): Crawler
-    {
+    private function submitForm(
+        Crawler $crawler,
+        Campaign $campaign,
+        int $expectedVersion,
+        array $formValues = [],
+    ): Crawler {
         $form = $crawler->selectButton('Save')->form();
         $form->setValues($formValues);
         $newCrawler = $this->client->submit($form);
@@ -44,16 +48,16 @@ trait CampaignControllerTrait
     }
 
     /**
-     * Create canvas settings with a single connection from lists to an event.
+     * Create canvas settings with a single connection from a source to an event.
      *
      * @return array<string, mixed>
      */
-    private function createCanvasSettings(int $eventId): array
+    private function createCanvasSettings(int $eventId, string $sourceType = 'lists'): array
     {
         return [
             'nodes' => [
                 [
-                    'id'        => 'lists',
+                    'id'        => $sourceType,
                     'positionX' => 100,
                     'positionY' => 100,
                 ],
@@ -65,7 +69,7 @@ trait CampaignControllerTrait
             ],
             'connections' => [
                 [
-                    'sourceId' => 'lists',
+                    'sourceId' => $sourceType,
                     'targetId' => $eventId,
                     'anchors'  => [
                         'source' => 'leadsource',
@@ -81,12 +85,15 @@ trait CampaignControllerTrait
      *
      * @return array<string, mixed>
      */
-    private function createCanvasSettingsWithMultipleEvents(int $firstEventId, int $secondEventId): array
-    {
+    private function createCanvasSettingsWithMultipleEvents(
+        int $firstEventId,
+        int $secondEventId,
+        string $sourceType = 'lists',
+    ): array {
         return [
             'nodes' => [
                 [
-                    'id'        => 'lists',
+                    'id'        => $sourceType,
                     'positionX' => 100,
                     'positionY' => 100,
                 ],
@@ -103,7 +110,7 @@ trait CampaignControllerTrait
             ],
             'connections' => [
                 [
-                    'sourceId' => 'lists',
+                    'sourceId' => $sourceType,
                     'targetId' => $firstEventId,
                     'anchors'  => [
                         'source' => 'leadsource',

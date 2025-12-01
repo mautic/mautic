@@ -48,6 +48,59 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount($expectedCount, $repository->getContactPendingEvents($lead->getId(), $event->getType()));
     }
 
+    public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
+    {
+        $repository = static::getContainer()->get('mautic.campaign.repository.event');
+        \assert($repository instanceof EventRepository);
+
+        $campaign = $this->createCampaign();
+
+        $eventA = $this->createEvent($campaign);
+        $eventA->setName('Event A');
+
+        $eventB = $this->createEvent($campaign);
+        $eventB->setName('Event B');
+
+        $eventC = $this->createEvent($campaign);
+        $eventC->setName('Event C');
+
+        $eventD = $this->createEvent($campaign);
+        $eventD->setName('Event D');
+
+        $eventA->setDeleted();
+        $eventA->setRedirectEvent($eventC);
+
+        $eventB->setDeleted();
+        $eventB->setRedirectEvent($eventC);
+
+        $this->em->persist($eventA);
+        $this->em->persist($eventB);
+        $this->em->persist($eventC);
+        $this->em->persist($eventD);
+        $this->em->flush();
+
+        $eventCId = $eventC->getId();
+        $eventDId = $eventD->getId();
+
+        $repository->setEventsAsDeletedWithRedirect([
+            [
+                'id'            => $eventCId,
+                'redirectEvent' => $eventDId,
+            ],
+        ]);
+
+        $this->em->clear();
+
+        $reloadedEventA = $this->em->find(Event::class, $eventA->getId());
+        $reloadedEventB = $this->em->find(Event::class, $eventB->getId());
+        $reloadedEventC = $this->em->find(Event::class, $eventCId);
+
+        Assert::assertNotNull($reloadedEventC->getDeleted());
+        Assert::assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
+        Assert::assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
+        Assert::assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
+    }
+
     private function createLead(): Lead
     {
         $lead = new Lead();

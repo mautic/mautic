@@ -193,4 +193,91 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
         return $user;
     }
+
+    /**
+     * Test creating a user via API Platform v2 endpoint.
+     *
+     * @param array<string, mixed> $userData
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('userCreateDataProvider')]
+    public function testCreateUserViaApiPlatform(array $userData, int $expectedStatusCode): void
+    {
+        // Create a role first
+        $role = new Role();
+        $role->setName('Test Role');
+        $role->setDescription('Test role for API');
+        $this->em->persist($role);
+        $this->em->flush();
+
+        // Set the role IRI in the user data
+        $userData['role'] = sprintf('/api/v2/roles/%d', $role->getId());
+
+        $this->client->request(
+            'POST',
+            '/api/v2/users',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_ACCEPT'  => 'application/ld+json',
+            ],
+            json_encode($userData)
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        if (Response::HTTP_CREATED === $expectedStatusCode) {
+            $responseData = json_decode($response->getContent(), true);
+
+            $this->assertIsArray($responseData);
+            $this->assertArrayHasKey('id', $responseData);
+            $this->assertArrayHasKey('username', $responseData);
+
+            // Verify the user was actually created in the database
+            $userRepository = $this->em->getRepository(User::class);
+            $user           = $userRepository->find($responseData['id']);
+
+            $this->assertInstanceOf(User::class, $user);
+            $this->assertSame($userData['username'], $user->getUsername());
+            $this->assertSame($userData['firstName'], $user->getFirstName());
+            $this->assertSame($userData['lastName'], $user->getLastName());
+            $this->assertSame($userData['email'], $user->getEmail());
+
+            // Verify the password was hashed correctly by checking if we can verify it
+            $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+            \assert($hasher instanceof PasswordHasherInterface);
+            $this->assertTrue(
+                $hasher->verify($user->getPassword(), $userData['plainPassword']),
+                'Password should be properly hashed and verifiable'
+            );
+
+            // Verify we can log in with the new user (simulates authentication)
+            $this->loginUser($user);
+            $this->client->request('GET', '/s/dashboard');
+
+            // Assert we can access the dashboard successfully
+            $this->assertResponseIsSuccessful();
+            $this->assertStringContainsString('/s/dashboard', $this->client->getRequest()->getRequestUri());
+        }
+    }
+
+    /**
+     * @return array<string, array{userData: array<string, mixed>, expectedStatusCode: int}>
+     */
+    public static function userCreateDataProvider(): array
+    {
+        return [
+            'valid user with password' => [
+                'userData' => [
+                    'username'      => 'john',
+                    'plainPassword' => 'jjohn@123',
+                    'firstName'     => 'John',
+                    'lastName'      => 'Doe',
+                    'email'         => 'john.doe@email.com',
+                ],
+                'expectedStatusCode' => Response::HTTP_CREATED,
+            ],
+        ];
+    }
 }

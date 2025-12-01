@@ -352,4 +352,33 @@ class InputHelperTest extends TestCase
             [[[null]], [[null]]],
         ];
     }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that clean filter converts special characters to HTML entities')]
+    public function testCleanConvertsSpecialCharacters(): void
+    {
+        $valueWithApostrophe = "administrator's";
+        $cleanResult         = InputHelper::clean($valueWithApostrophe);
+        $rawResult           = InputHelper::raw($valueWithApostrophe);
+
+        $this->assertNotEquals($valueWithApostrophe, $cleanResult);
+        $this->assertStringContainsString('&#', $cleanResult);
+
+        $this->assertEquals($valueWithApostrophe, $rawResult);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that raw filter preserves special characters')]
+    public function testRawPreservesSpecialCharacters(): void
+    {
+        $testValues = [
+            "administrator's",
+            'manager&supervisor',
+            '"quoted value"',
+            '<tag>content</tag>',
+        ];
+
+        foreach ($testValues as $originalValue) {
+            $rawResult = InputHelper::raw($originalValue);
+            $this->assertEquals($originalValue, $rawResult, "Raw filter should preserve: {$originalValue}");
+        }
+    }
 }

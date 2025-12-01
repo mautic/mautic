@@ -478,10 +478,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     private function getInterval(): Interval
     {
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
-            ->willReturnCallback(
-                fn ($param, $default) => 'America/New_York'
-            );
+        $coreParametersHelper->method('getDefaultTimezone')
+            ->willReturn('America/New_York');
 
         return new Interval(new NullLogger(), $coreParametersHelper);
     }
