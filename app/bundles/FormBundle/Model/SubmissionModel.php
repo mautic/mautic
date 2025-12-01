@@ -1210,7 +1210,6 @@ class SubmissionModel extends CommonFormModel
         $columns         = $connection->createSchemaManager()->listTableColumns($nameTable);
         $columnsToUpdate = [];
         foreach ($columns as $column) {
-            // 1 = IntegerType
             if (1 === $column->getType()->getBindingType()) {
                 continue;
             }

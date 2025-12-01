@@ -28,7 +28,6 @@ final class AuditLogModelTest extends MauticMysqlTestCase
         $this->repo       = $this->model->getRepository();
     }
 
-    // Helpers to reduce duplication
     private function addAuditLog(string $bundle, string $object, int $objectId, string $action = 'create'): void
     {
         $this->model->writeToLog([
