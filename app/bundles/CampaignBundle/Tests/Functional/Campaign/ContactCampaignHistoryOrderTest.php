@@ -10,12 +10,17 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
 {
-    public function testContactCampaignHistoryOrderIsCorrect(): void
+    /**
+     * @param string[] $expectedOrder
+     */
+    #[DataProvider('provideTimelineOrderData')]
+    public function testContactCampaignHistoryOrderIsCorrectTimeline(string $orderByDir, array $expectedOrder): void
     {
         // Create a test segment
         $segment = new LeadList();
@@ -39,22 +44,111 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaign->getId()]);
         $this->em->clear();
 
-        // Request the contact page (full UI page)
-        $this->client->request(Request::METHOD_GET, "/s/contacts/view/{$contact->getId()}");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        /** @var LeadModel $contactModal */
+        $contactModal = static::getContainer()->get('mautic.lead.model.lead');
 
+        $filters = [
+            'search'        => '',
+            'includeEvents' => ['campaign.event'],
+            'excludeEvents' => [],
+        ];
+        $orderBy = ['timestamp', $orderByDir];
+
+        $engagements    = $contactModal->getEngagements($contact, $filters, $orderBy);
+        $timelineEvents = $engagements['events'];
+
+        $historyOrder = [];
+        foreach ($timelineEvents as $timelineEvent) {
+            $historyOrder[] = trim(explode('/', $timelineEvent['eventLabel']['label'])[0]);
+        }
+
+        Assert::assertSame(
+            $expectedOrder,
+            $historyOrder,
+            'The campaign history is not sorted by creation order in '.$orderByDir
+        );
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string[]}>
+     */
+    public static function provideTimelineOrderData(): iterable
+    {
+        $expectedOrder = [
+            'Update Contact',
+            'Adjust Points',
+            'Add to Company',
+        ];
+
+        yield 'ASC' => [
+            'ASC',
+            $expectedOrder,
+        ];
+
+        yield 'DESC' => [
+            'DESC',
+            array_reverse($expectedOrder),
+        ];
+    }
+
+    public function testContactCampaignHistoryOrderIsCorrect(): void
+    {
+        // Create a test segment
+        $segment = new LeadList();
+        $segment->setName('Test Segment');
+        $segment->setPublicName('Test Segment');
+        $segment->setAlias('test-segment');
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        // Create a campaign with action events
+        $campaign = $this->createCampaignWithEvents($segment);
+        $this->em->flush();
+
+        // Create a contact & ensure included in the segment
+        $contact = $this->createContactAndAddToSegment($segment);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Trigger campaign execution
+        $this->testSymfonyCommand('mautic:campaigns:rebuild', ['-i' => $campaign->getId()]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaign->getId()]);
+        $this->em->clear();
+
+        $this->client->request('GET', '');
+        $session = $this->client->getRequest()->getSession();
+        self::assertResponseIsSuccessful();
+        $session->set('mautic.lead.'.$contact->getId().'.timeline.orderby', 'timestamp');
+        $session->set('mautic.lead.'.$contact->getId().'.timeline.orderbydir', 'ASC');
+        $session->save();
+
+        $this->client->request('POST', '/s/contacts/timeline/'.$contact->getId(), [
+            'includeEvents' => ['campaign.event'],
+            'orderby'       => 'timestamp',
+        ]);
+        $session = $this->client->getRequest()->getSession();
         $crawler = $this->client->getCrawler();
 
-        // Select only rows where event type is "Campaign action triggered"
         $actionRows = $crawler
-            ->filter('tr.timeline-row')
-            ->reduce(function ($row) {
-                $typeCell = $row->filter('td.timeline-type');
+            ->filter('tr.timeline-row');
 
-                return $typeCell->count() && 'Campaign action triggered' === trim($typeCell->text());
-            });
+        Assert::assertCount(11, $actionRows, 'All timeline events.');
+
+        $actionRows = $actionRows->reduce(function ($row) {
+            $typeCell = $row->filter('td.timeline-type');
+
+            return $typeCell->count() && 'Campaign action triggered' === trim($typeCell->text());
+        });
 
         Assert::assertCount(3, $actionRows, 'Expected 3 campaign action timeline items.');
+
+        // The order should be by the order they were added to the campaign.
+        $expectedOrder = [
+            'Update Contact',
+            'Adjust Points',
+            'Add to Company',
+        ];
 
         // Extract timeline labels in the order shown on the UI (newest first)
         $historyOrder = $actionRows->each(function ($row) {
@@ -64,15 +158,45 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
             return trim(explode('/', $text)[0]);
         });
 
-        // The order should be by the order they were added to the campaign.
-        $expectedOrder = [
-            'Update Contact',
-            'Adjust Points',
-            'Add to Company',
-        ];
-
         Assert::assertSame(
             $expectedOrder,
+            $historyOrder,
+            'The campaign history is not sorted by creation order.'
+        );
+
+        // Simulate import summary with NEW entities to trigger undo
+        $session->set('mautic.lead.'.$contact->getId().'.timeline.orderby', 'timestamp');
+        $session->set('mautic.lead.'.$contact->getId().'.timeline.orderbydir', 'DESC');
+        $session->save();
+
+        $this->client->request('POST', '/s/contacts/timeline/'.$contact->getId(), [
+            'includeEvents' => ['campaign.event'],
+            'orderby'       => 'timestamp',
+        ]);
+
+        $crawler = $this->client->getCrawler();
+
+        $actionRows = $crawler
+            ->filter('tr.timeline-row');
+
+        Assert::assertCount(11, $actionRows, 'All timeline events.');
+
+        $actionRows = $actionRows->reduce(function ($row) {
+            $typeCell = $row->filter('td.timeline-type');
+
+            return $typeCell->count() && 'Campaign action triggered' === trim($typeCell->text());
+        });
+
+        // Extract timeline labels in the order shown on the UI (newest first)
+        $historyOrder = $actionRows->each(function ($row) {
+            $text = trim($row->filter('td.timeline-name')->text());
+
+            // Remove "/ History Order Test" suffix
+            return trim(explode('/', $text)[0]);
+        });
+
+        Assert::assertSame(
+            array_reverse($expectedOrder),
             $historyOrder,
             'The campaign history is not sorted by creation order.'
         );
