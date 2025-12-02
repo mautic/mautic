@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class StageController extends AbstractFormController
 {
-    private const PERMISSION_VIEW = 'stage:stages:view';
-    private const PERMISSION_CREATE = 'stage:stages:create';
-    private const PERMISSION_EDIT = 'stage:stages:edit';
-    private const PERMISSION_DELETE = 'stage:stages:delete';
+    private const PERMISSION_VIEW    = 'stage:stages:view';
+    private const PERMISSION_CREATE  = 'stage:stages:create';
+    private const PERMISSION_EDIT    = 'stage:stages:edit';
+    private const PERMISSION_DELETE  = 'stage:stages:delete';
     private const PERMISSION_PUBLISH = 'stage:stages:publish';
 
     /**
