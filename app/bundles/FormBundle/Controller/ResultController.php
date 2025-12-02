@@ -394,18 +394,14 @@ class ResultController extends CommonFormController
         );
     }
 
-    public function markSpamAction(Request $request, Configurator $configurator): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function markSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
-        $session  = $request->getSession();
-        $page     = $session->get('mautic.formresult.'.$formId.'.page', 1);
+        $page     = $request->getSession()->get('mautic.formresult.'.$formId.'.page', 1);
         $flashes  = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('form.submission');
-            \assert($model instanceof SubmissionModel);
-
             /** @var Submission|null $submission */
             $submission = $model->getEntity($objectId);
 
@@ -418,7 +414,7 @@ class ResultController extends CommonFormController
             } elseif (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
                 return $this->accessDenied();
             } else {
-                $domain = $this->getDomainFromSubmission($submission);
+                $domain = $submission->getEmailDomain();
 
                 if ($domain) {
                     $formatted     = '*@'.$domain;
@@ -426,12 +422,10 @@ class ResultController extends CommonFormController
                     $isNewDomain   = !in_array($formatted, $domains, true);
 
                     if ($isNewDomain) {
-                        $domains[] = $formatted;
-                        $configurator->mergeParameters(['do_not_submit_emails' => $domains]);
-                        $configurator->write();
+                        $this->saveBlockedDomains($configurator, array_merge($domains, [$formatted]));
                     }
 
-                    $this->enableDonotSubmitValidationOnUnconfiguredForms();
+                    $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                     $flashes[] = [
                         'type'    => 'notice',
@@ -465,17 +459,13 @@ class ResultController extends CommonFormController
         );
     }
 
-    public function batchMarkSpamAction(Request $request, Configurator $configurator): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function batchMarkSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $formId  = $this->getFormIdFromRequest();
-        $session = $request->getSession();
-        $page    = $session->get('mautic.formresult.'.$formId.'.page', 1);
+        $page    = $request->getSession()->get('mautic.formresult.'.$formId.'.page', 1);
         $flashes = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('form.submission');
-            \assert($model instanceof SubmissionModel);
-
             $ids           = json_decode($request->query->get('ids', '[]'), true);
             $domainsToSave = [];
 
@@ -489,35 +479,24 @@ class ResultController extends CommonFormController
                     $flashes[] = $this->accessDenied(true);
                     continue;
                 }
-                $domain = $this->getDomainFromSubmission($submission);
+                $domain = $submission->getEmailDomain();
                 if ($domain) {
                     $domainsToSave['*@'.$domain] = true;
                 }
             }
 
-            if ($domainsToSave) {
-                $existing      = $this->coreParametersHelper->get('do_not_submit_emails', []);
-                $hasNewDomains = false;
-
-                foreach (array_keys($domainsToSave) as $d) {
-                    if (!in_array($d, $existing, true)) {
-                        $existing[]    = $d;
-                        $hasNewDomains = true;
-                    }
-                }
-                $configurator->mergeParameters(['do_not_submit_emails' => $existing]);
-                $configurator->write();
-
-                $this->enableDonotSubmitValidationOnUnconfiguredForms();
+            if (!$domainsToSave) {
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.result.markspam.batch.none',
+                ];
+            } else {
+                $this->saveBlockedDomains($configurator, array_keys($domainsToSave));
+                $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                 $flashes[] = [
                     'type' => 'notice',
                     'msg'  => 'mautic.form.result.markspam.batch.success',
-                ];
-            } else {
-                $flashes[] = [
-                    'type' => 'notice',
-                    'msg'  => 'mautic.form.result.markspam.batch.none',
                 ];
             }
         }
@@ -540,70 +519,24 @@ class ResultController extends CommonFormController
         );
     }
 
-    private function getDomainFromSubmission(Submission $submission): ?string
+    /**
+     * @param array<string> $domains
+     */
+    private function saveBlockedDomains(Configurator $configurator, array $domains): void
     {
-        $results = $submission->getResults();
-        $form    = $submission->getForm();
-        foreach ($form->getFields() as $field) {
-            if ('email' === $field->getType()) {
-                $alias = $field->getAlias();
-                if (!empty($results[$alias]) && str_contains($results[$alias], '@')) {
-                    return strtolower(substr(strrchr($results[$alias], '@'), 1));
-                }
-            }
-        }
-
-        return null;
+        $configurator->mergeParameters(['do_not_submit_emails' => $domains]);
+        $configurator->write();
     }
 
-    private function enableDonotSubmitValidationOnUnconfiguredForms(): void
+    private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
     {
-        /** @var FormModel $formModel */
-        $formModel  = $this->getModel('form.form');
-        $connection = $this->doctrine->getConnection();
-
-        $fieldsToUpdate = $connection->executeQuery(
-            'SELECT ff.id, ff.form_id, ff.validation 
-             FROM form_fields ff 
-             WHERE ff.type = ? 
-             AND (ff.validation IS NULL OR ff.validation = ? OR ff.validation = ?)',
-            ['email', '[]', '{}']
-        )->fetchAllAssociative();
+        $fieldsToUpdate = $formModel->findEmailFieldsWithMissingDonotSubmitValidation();
 
         if (empty($fieldsToUpdate)) {
             return;
         }
 
-        $fieldIds = [];
-        foreach ($fieldsToUpdate as $fieldData) {
-            $validation = json_decode($fieldData['validation'] ?? '[]', true) ?: [];
-            if (!array_key_exists('donotsubmit', $validation)) {
-                $fieldIds[] = $fieldData['id'];
-            }
-        }
-
-        if (empty($fieldIds)) {
-            return;
-        }
-
-        $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
-        $connection->executeStatement(
-            "UPDATE form_fields 
-             SET validation = JSON_SET(COALESCE(validation, '{}'), '$.donotsubmit', true) 
-             WHERE id IN ($placeholders)",
-            $fieldIds
-        );
-
-        $updatedFormIds = array_unique(array_column($fieldsToUpdate, 'form_id'));
-
-        foreach ($updatedFormIds as $formId) {
-            $form = $formModel->getEntity($formId);
-            if ($form) {
-                $form->setCachedHtml('');
-                $formModel->saveEntity($form);
-                $formModel->generateHtml($form);
-            }
-        }
+        $formModel->enableDonotSubmitValidationOnEmailFields($fieldsToUpdate);
     }
 
     /**

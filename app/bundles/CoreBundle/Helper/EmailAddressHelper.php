@@ -20,12 +20,26 @@ class EmailAddressHelper
     public function getVariations(string $email): array
     {
         $emails = [$email, $this->cleanEmail($email)];
-        // email without suffix
         preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
         if (!empty($parts)) {
             $emails[] = $parts[1].'@'.$parts[3];
         }
 
         return array_values(array_unique($emails));
+    }
+
+    public static function getDomain(string $email): ?string
+    {
+        if (!str_contains($email, '@')) {
+            return null;
+        }
+
+        $domain = substr(strrchr($email, '@'), 1);
+
+        if ('' === $domain) {
+            return null;
+        }
+
+        return strtolower($domain);
     }
 }

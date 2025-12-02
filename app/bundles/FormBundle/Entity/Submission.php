@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
@@ -329,6 +330,26 @@ class Submission
         foreach ($this->getForm()->getFields() as $field) {
             if ($field->getAlias() === $alias) {
                 return $field;
+            }
+        }
+
+        return null;
+    }
+
+    public function getEmailDomain(): ?string
+    {
+        $results = $this->getResults();
+        $form    = $this->getForm();
+
+        foreach ($form->getFields() as $field) {
+            if ('email' !== $field->getType()) {
+                continue;
+            }
+
+            $alias = $field->getAlias();
+
+            if (!empty($results[$alias])) {
+                return EmailAddressHelper::getDomain((string) $results[$alias]);
             }
         }
 

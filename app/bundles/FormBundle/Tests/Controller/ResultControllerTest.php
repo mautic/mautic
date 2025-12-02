@@ -56,6 +56,12 @@ final class ResultControllerTest extends TestCase
         $submissionModel->expects($this->once())->method('getEntity')->with($submissionId)->willReturn($submission);
 
         $formModel = $this->createMock(FormModel::class);
+        $formModel->expects($this->once())
+            ->method('findEmailFieldsWithMissingDonotSubmitValidation')
+            ->willReturn([]);
+        $formModel->expects($this->once())
+            ->method('enableDonotSubmitValidationOnEmailFields')
+            ->with([]);
 
         $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')->willReturnMap([
@@ -83,7 +89,7 @@ final class ResultControllerTest extends TestCase
 
         $controller = $this->createController($managerRegistry, $modelFactory, $coreParametersHelper, $requestStack, $security);
 
-        $response = $controller->markSpamAction($request, $configurator);
+        $response = $controller->markSpamAction($request, $configurator, $submissionModel, $formModel);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame('mautic_form_results?objectId=123&page=3', $controller->postActionRedirectArgs['returnUrl']);
@@ -114,6 +120,8 @@ final class ResultControllerTest extends TestCase
         $submissionModel = $this->createMock(SubmissionModel::class);
         $submissionModel->expects($this->once())->method('getEntity')->with($submissionId)->willReturn($submission);
         $formModel = $this->createMock(FormModel::class);
+        $formModel->expects($this->never())->method('findEmailFieldsWithMissingDonotSubmitValidation');
+        $formModel->expects($this->never())->method('enableDonotSubmitValidationOnEmailFields');
 
         $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')->willReturnMap([
@@ -135,7 +143,7 @@ final class ResultControllerTest extends TestCase
 
         $controller = $this->createController($managerRegistry, $modelFactory, $coreParametersHelper, $requestStack, $security);
 
-        $response = $controller->markSpamAction($request, $configurator);
+        $response = $controller->markSpamAction($request, $configurator, $submissionModel, $formModel);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(
@@ -169,6 +177,8 @@ final class ResultControllerTest extends TestCase
         $submissionModel = $this->createMock(SubmissionModel::class);
         $submissionModel->expects($this->once())->method('getEntity')->with($submissionId)->willReturn($submission);
         $formModel = $this->createMock(FormModel::class);
+        $formModel->expects($this->never())->method('findEmailFieldsWithMissingDonotSubmitValidation');
+        $formModel->expects($this->never())->method('enableDonotSubmitValidationOnEmailFields');
 
         $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')->willReturnMap([
@@ -194,7 +204,7 @@ final class ResultControllerTest extends TestCase
 
         $controller = $this->createController($managerRegistry, $modelFactory, $coreParametersHelper, $requestStack, $security);
 
-        $controller->markSpamAction($request, $configurator);
+        $controller->markSpamAction($request, $configurator, $submissionModel, $formModel);
 
         $this->assertSame(
             'mautic.form.result.markspam.success',
@@ -229,6 +239,12 @@ final class ResultControllerTest extends TestCase
             };
         });
         $formModel = $this->createMock(FormModel::class);
+        $formModel->expects($this->once())
+            ->method('findEmailFieldsWithMissingDonotSubmitValidation')
+            ->willReturn([]);
+        $formModel->expects($this->once())
+            ->method('enableDonotSubmitValidationOnEmailFields')
+            ->with([]);
 
         $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')->willReturnMap([
@@ -256,7 +272,7 @@ final class ResultControllerTest extends TestCase
 
         $controller = $this->createController($managerRegistry, $modelFactory, $coreParametersHelper, $requestStack, $security);
 
-        $controller->batchMarkSpamAction($request, $configurator);
+        $controller->batchMarkSpamAction($request, $configurator, $submissionModel, $formModel);
 
         $this->assertSame(
             'mautic.form.result.markspam.batch.success',
@@ -277,6 +293,8 @@ final class ResultControllerTest extends TestCase
         $submissionModel = $this->createMock(SubmissionModel::class);
         $submissionModel->method('getEntity')->willReturn(null);
         $formModel = $this->createMock(FormModel::class);
+        $formModel->expects($this->never())->method('findEmailFieldsWithMissingDonotSubmitValidation');
+        $formModel->expects($this->never())->method('enableDonotSubmitValidationOnEmailFields');
 
         $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')->willReturnMap([
@@ -298,7 +316,7 @@ final class ResultControllerTest extends TestCase
 
         $controller = $this->createController($managerRegistry, $modelFactory, $coreParametersHelper, $requestStack, $security);
 
-        $controller->batchMarkSpamAction($request, $configurator);
+        $controller->batchMarkSpamAction($request, $configurator, $submissionModel, $formModel);
 
         $this->assertSame(
             'mautic.form.result.markspam.batch.none',
@@ -306,81 +324,11 @@ final class ResultControllerTest extends TestCase
         );
     }
 
-    public function testGetDomainFromSubmissionExtractsDomain(): void
+    public function testGetEmailDomainFromSubmissionExtractsDomain(): void
     {
         $submission = $this->createSubmission('Person@Example.org');
 
-        $controller = $this->createController(
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(CoreParametersHelper::class),
-            new RequestStack(),
-            $this->createMock(CorePermissions::class)
-        );
-
-        $method = new \ReflectionMethod(ResultController::class, 'getDomainFromSubmission');
-        $method->setAccessible(true);
-
-        $this->assertSame('example.org', $method->invoke($controller, $submission));
-    }
-
-    public function testEnableDonotSubmitValidationOnUnconfiguredFormsUpdatesFields(): void
-    {
-        $fieldsToUpdate = [
-            [
-                'id'         => 15,
-                'form_id'    => 200,
-                'validation' => null,
-            ],
-        ];
-
-        $result = $this->createMock(Result::class);
-        $result->method('fetchAllAssociative')->willReturn($fieldsToUpdate);
-
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                $this->stringContains('SELECT ff.id, ff.form_id, ff.validation'),
-                ['email', '[]', '{}']
-            )
-            ->willReturn($result);
-        $connection->expects($this->once())
-            ->method('executeStatement')
-            ->with(
-                $this->stringContains('UPDATE form_fields'),
-                [15]
-            );
-
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->method('getConnection')->willReturn($connection);
-
-        $form           = new Form();
-        $form->setCachedHtml('cached');
-
-        $formModel = $this->createMock(FormModel::class);
-        $formModel->expects($this->once())->method('getEntity')->with(200)->willReturn($form);
-        $formModel->expects($this->once())->method('saveEntity')->with($form);
-        $formModel->expects($this->once())->method('generateHtml')->with($form);
-
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')->willReturnMap([
-            ['form.form', $formModel],
-        ]);
-
-        $controller = $this->createController(
-            $managerRegistry,
-            $modelFactory,
-            $this->createMock(CoreParametersHelper::class),
-            new RequestStack(),
-            $this->createMock(CorePermissions::class)
-        );
-
-        $method = new \ReflectionMethod(ResultController::class, 'enableDonotSubmitValidationOnUnconfiguredForms');
-        $method->setAccessible(true);
-        $method->invoke($controller);
-
-        $this->assertSame('', $form->getCachedHtml());
+        $this->assertSame('example.org', $submission->getEmailDomain());
     }
 
     private function createController(ManagerRegistry $managerRegistry, ModelFactory $modelFactory, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack, CorePermissions $security): TestResultController

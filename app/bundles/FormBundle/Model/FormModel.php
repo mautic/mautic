@@ -713,6 +713,75 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function findEmailFieldsWithMissingDonotSubmitValidation(): array
+    {
+        $connection = $this->em->getConnection();
+
+        $fieldsToUpdate = $connection->executeQuery(
+            'SELECT ff.id, ff.form_id, ff.validation 
+             FROM form_fields ff 
+             WHERE ff.type = ? 
+             AND (ff.validation IS NULL OR ff.validation = ? OR ff.validation = ?)',
+            ['email', '[]', '{}']
+        )->fetchAllAssociative();
+
+        if (empty($fieldsToUpdate)) {
+            return [];
+        }
+
+        $fieldIds = [];
+
+        foreach ($fieldsToUpdate as $fieldData) {
+            $validation = json_decode($fieldData['validation'] ?? '[]', true) ?: [];
+
+            if (!array_key_exists('donotsubmit', $validation)) {
+                $fieldIds[] = $fieldData['id'];
+            }
+        }
+
+        if (empty($fieldIds)) {
+            return [];
+        }
+
+        $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
+
+        $connection->executeStatement(
+            "UPDATE form_fields 
+             SET validation = JSON_SET(COALESCE(validation, '{}'), '$.donotsubmit', true) 
+             WHERE id IN ($placeholders)",
+            $fieldIds
+        );
+
+        return $fieldsToUpdate;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $fieldsToUpdate
+     */
+    public function enableDonotSubmitValidationOnEmailFields(array $fieldsToUpdate): void
+    {
+        if (empty($fieldsToUpdate)) {
+            return;
+        }
+
+        $updatedFormIds = array_unique(array_column($fieldsToUpdate, 'form_id'));
+
+        foreach ($updatedFormIds as $formId) {
+            $form = $this->getEntity($formId);
+
+            if (!$form) {
+                continue;
+            }
+
+            $form->setCachedHtml('');
+            $this->saveEntity($form);
+            $this->generateHtml($form);
+        }
+    }
+
+    /**
      * Writes in form values from get parameters.
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml): void
