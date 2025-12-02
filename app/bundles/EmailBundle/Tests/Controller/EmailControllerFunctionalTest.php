@@ -273,6 +273,34 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
+    public function testSegmentEmailTranslationChildrenParents(): void
+    {
+        $segment         = $this->createSegment('Segment A', 'segment-a');
+        $emailGrandPah   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'test html', $segment);
+        $this->em->persist($emailGrandPah);
+        $this->em->flush();
+
+        $emailParent = $this->createEmail('Email B', 'Subject B', 'list', 'blank', 'test html', $segment);
+        $emailParent->setTranslationParent($emailGrandPah);
+        $this->em->persist($emailParent);
+        $emailGrandPah->addTranslationChild($emailParent);
+        $this->em->flush();
+
+        $emailChild = $this->createEmail('Email C', 'Subject C', 'list', 'blank', 'test html', $segment);
+        $emailChild->setTranslationParent($emailParent);
+        $this->em->persist($emailChild);
+        $emailParent->addTranslationChild($emailChild);
+        $this->em->persist($emailChild);
+        $this->em->flush();
+
+        $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $iconNodes1   = $crawler->filter('.email-list .ri-translate.fs-14');
+        Assert::assertGreaterThanOrEqual(2, $iconNodes1->count(), 'Translate icon not found in the email list rows.');
+
+        $iconNodes2 = $crawler->filter('.email-list .ri-translate-2');
+        Assert::assertGreaterThanOrEqual(1, $iconNodes2->count(), 'Translate icon not found in the email list rows.');
+    }
+
     public function testSegmentEmailSendWithAdvancedOptions(): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');

@@ -384,5 +384,6 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $body     = json_decode($response->getContent(), true);
         self::assertCount(2, $body);
         self::arrayHasKey('actions');
+        self::assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
     }
 }

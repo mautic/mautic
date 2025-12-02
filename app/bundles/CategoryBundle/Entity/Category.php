@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -43,44 +43,38 @@ class Category extends FormEntity implements UuidInterface
 
     /**
      * @var int
-     *
-     * @Groups({"category:read", "stage:read", "asset:read", "download:read", "event:read", "leadcategory:read", "notification:read", "dynamicContent:read", "webhook:read", "sms:read", "page:read", "campaign:read", "email:read", "point:read", "trigger:read", "message:read", "focus:read", "form:read", "beeFreeRow:read", "segment:read"})
      */
+    #[Groups(['category:read', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $id;
 
     /**
      * @var string
-     *
-     * @Groups({"category:read", "category:write", "stage:read", "asset:read", "download:read", "event:read", "leadcategory:read", "notification:read", "dynamicContent:read", "webhook:read", "sms:read", "page:read", "campaign:read", "email:read", "point:read", "trigger:read", "message:read", "focus:read", "form:read", "beeFreeRow:read", "segment:read"})
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $title;
 
     /**
      * @var string|null
-     *
-     * @Groups({"category:read", "category:write", "stage:read", "asset:read", "download:read", "event:read", "leadcategory:read", "notification:read", "dynamicContent:read", "webhook:read", "sms:read", "page:read", "campaign:read", "email:read", "point:read", "trigger:read", "message:read", "focus:read", "form:read", "beeFreeRow:read", "segment:read"})
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $description;
 
     /**
      * @var string
-     *
-     * @Groups({"category:read", "category:write", "stage:read", "asset:read", "download:read", "event:read", "leadcategory:read", "notification:read", "dynamicContent:read", "webhook:read", "sms:read", "page:read", "campaign:read", "email:read", "point:read", "trigger:read", "message:read", "focus:read", "form:read", "beeFreeRow:read", "segment:read"})
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $alias;
 
     /**
      * @var string|null
-     *
-     * @Groups({"category:read", "category:write", "stage:read", "asset:read", "download:read", "event:read", "leadcategory:read", "notification:read", "dynamicContent:read", "webhook:read", "sms:read", "page:read", "campaign:read", "email:read", "point:read", "trigger:read", "message:read", "focus:read", "form:read", "beeFreeRow:read", "segment:read"})
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $color;
 
     /**
      * @var string
-     *
-     * @Groups({"category:read", "category:write", "stage:read", "asset:read", "download:read", "event:read", "leadcategory:read", "notification:read", "dynamicContent:read", "webhook:read", "sms:read", "page:read", "campaign:read", "email:read", "point:read", "trigger:read", "message:read", "focus:read", "form:read", "beeFreeRow:read", "segment:read"})
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $bundle;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

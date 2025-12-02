@@ -183,7 +183,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($entity->getEvents() as $currentEvent) {
                 if (!in_array($currentEvent->getId(), $requestEventIds)) {
-                    $deletedEvents[] = $currentEvent->getId();
+                    $deletedEvents[] = ['id' => $currentEvent->getId()];
                 }
             }
 

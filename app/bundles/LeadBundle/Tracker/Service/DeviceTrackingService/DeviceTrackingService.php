@@ -90,6 +90,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->cookieHelper->deleteCookie('mtc_id');
     }
 
+    public function reset(): void
+    {
+        $this->trackedDevice = null;
+    }
+
     private function getTrackedIdentifier(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();

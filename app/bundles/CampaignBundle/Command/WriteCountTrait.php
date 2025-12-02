@@ -25,6 +25,13 @@ trait WriteCountTrait
             )
             .'</comment>'
         );
+        $output->writeln(
+            '<comment>'.$translator->trans(
+                'mautic.campaign.trigger.events_rescheduled',
+                ['%count%' => $counter->getRescheduled()]
+            )
+            .'</comment>'
+        );
         $output->writeln('');
     }
 }

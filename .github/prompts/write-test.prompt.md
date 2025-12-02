@@ -27,6 +27,6 @@ Suggestions for AI:
 - Do not modify the production code unless requested. Always just modify the test code.
 - Make the simplest test possible. The human will suggest improvements if needed.
 
-You can take an inspiration of existing functional tests. They all extend the `MysqlFunctionalTestCase` class and are located in the `app/bundles/*Bundle/Tests` or `plugins/*Bundle/Tests` directory. The tests are written in PHPUNIT. You can read the version in the `composer.json` file.
+You can take an inspiration of existing functional tests. They all extend the `MauticMysqlTestCase` class and are located in the `app/bundles/*Bundle/Tests` or `plugins/*Bundle/Tests` directory. The tests are written in PHPUNIT. You can read the version in the `composer.json` file.
 
 To execute a test you have to run it in DDEV. Example: `ddev exec composer test app/bundles/ExampleBundle/tests/ExampleTest.php`.

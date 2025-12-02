@@ -1012,6 +1012,47 @@ class FieldModel extends FormModel
         return $this->getRepository()->findOneByAlias($alias);
     }
 
+    /**
+     * Get the owner and stage fields.
+     *
+     * @return array<string, mixed>
+     */
+    public function getSpecialLeadFields(): array
+    {
+        return [
+            'ownerbyemail' => [
+                'label'        => $this->translator->trans('mautic.lead.field.ownerbyemail'),
+                'alias'        => 'ownerbyemail',
+                'type'         => 'email',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'ownerbyid' => [
+                'label'        => $this->translator->trans('mautic.lead.field.ownerbyid'),
+                'alias'        => 'ownerbyid',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'stagebyname' => [
+                'label'        => $this->translator->trans('mautic.lead.field.stagebyname'),
+                'alias'        => 'stagebyname',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+        ];
+    }
+
     public function generateUniqueFieldAlias(string $alias): string
     {
         $originalAlias = $alias;
