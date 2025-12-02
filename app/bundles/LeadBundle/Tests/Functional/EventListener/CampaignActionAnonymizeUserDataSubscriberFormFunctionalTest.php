@@ -291,9 +291,9 @@ final class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends 
 
         $this->addLeadToList([$lead1, $lead2, $lead3], $list);
         $campaign    = $this->createCampaign($list);
-        // Fields Anonymize: First Name, Last Name, Email, Company Address 1
+        // Fields Anonymize: First Name, Last Name, Email, Company Address 1, City, State
         // Fields to deleted: Primary Company, Position, Address Line 1, Company Address 2
-        $event = $this->createCampaignEvent($campaign, 'Event Test', ['2', '3', '6', '29'], ['4', '5', '11', '30'], true);
+        $event = $this->createCampaignEvent($campaign, 'Event Test', ['2', '3', '6', '29', '13', '14'], ['4', '5', '11', '30'], true);
 
         // add event
         $campaign->addEvent('lead.action_anonymizeuserdata', $event);
@@ -384,11 +384,12 @@ final class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends 
         $this->assertCount(3, $resultForm1Table);
         $this->assertSame($resultForm1Table[1]['field_lastname'], $resultForm1Table[2]['field_lastname']);
         $this->assertEmpty($resultForm2Table);
-
         $this->assertSame($newLead1->getEmail(), $newLead2->getEmail());
         $this->assertStringContainsString('@pseudo.nym', $newLead1->getEmail());
         $this->assertNotSame($newLead1->getEmail(), $lead1->getEmail());
         $this->assertNotSame($newLead1->getFirstname(), $lead1->getFirstname());
+        $this->assertNotSame($newLead1->getCity(), $lead1->getCity());
+        $this->assertNotSame($newLead1->getState(), $lead1->getState());
         $this->assertNotSame($newLead3->getLastname(), $lead3->getLastname());
         $this->assertNotEmpty($lead1->getAddress1());
         $this->assertEmpty($newLead1->getAddress1());
@@ -903,6 +904,7 @@ final class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends 
         $lead->setCountry('US');
         $lead->setCity('New York');
         $lead->setZipcode('10001');
+        $lead->setState('MA');
         $lead->setDateAdded(new \DateTime());
         $lead->setDateModified(new \DateTime());
         $lead->setCreatedBy(1);
