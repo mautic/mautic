@@ -1,0 +1,68 @@
+{% set formName = formName|default('') %}
+{% set inputId = 'mauticform_input' ~ formName ~ '_' ~ field.alias %}
+{% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
+{% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
+{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+
+{% if not (ignoreName is defined and ignoreName) %}
+    {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+    {% set inputAttributes = inputAttributes|merge({'name': inputName}) %}
+{% endif %}
+
+{% set inputAttributes = inputAttributes|merge({
+    'value': field.defaultValue|default(field.properties.min|default(0)),
+    'oninput': 'document.getElementById(\'' ~ inputId ~ '_value\').textContent = this.value'
+}) %}
+
+{% if not (ignoreId is defined and ignoreId) %}
+    {% set inputAttributes = inputAttributes|merge({'id': inputId}) %}
+    {% set labelAttributes = labelAttributes|merge({
+        'id': 'mauticform_label' ~ formName ~ '_' ~ field.alias,
+        'for': inputId,
+    }) %}
+{% endif %}
+
+{% if inForm is defined and inForm %}
+    {% set inputAttributes = inputAttributes|merge({'disabled': 'disabled'}) %}
+{% endif %}
+
+{% set labelAttributes = labelAttributes|merge({'class': labelAttributes.class|default([])|merge(['mauticform-label'])}) %}
+{% set inputAttributes = inputAttributes|merge({'class': inputAttributes.class|default([])|merge(['mauticform-input', 'mauticform-slider'])}) %}
+
+{% set containerAttributes = containerAttributes|merge({
+    'id': 'mauticform' ~ formName ~ '_' ~ id,
+    'class': containerAttributes.class|default([])|merge(['mauticform-row', 'mauticform-range', 'mauticform-field-' ~ field.order|default(0)]),
+    'style': 'width: ' ~ field.fieldWidth
+}) %}
+
+{% if field.parent and fields[field.parent] is defined %}
+    {% set values = field.conditions.any and 'notIn' != field.conditions.expr ? '*' : field.conditions.values|join('|') %}
+    {% set containerAttributes = containerAttributes|merge({
+        'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
+        'data-mautic-form-expr': field.conditions.expr,
+        'class': containerAttributes.class|merge(['mauticform-field-hidden']),
+    }) %}
+{% endif %}
+
+<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+    {% if field.showLabel %}
+    <div>
+        <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>
+        <output class="mauticform-slider-value" id="{{ inputId }}_value"></output>
+    </div>
+    {% endif %}
+
+    {% if field.helpMessage is not empty %}
+        <span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>
+    {% endif %}
+
+    <input type="range"
+           min="{{ field.properties.min|default(0) }}"
+           max="{{ field.properties.max|default(100) }}"
+           step="{{ field.properties.step|default(1) }}"
+           {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}/>
+    
+    {% if not field.showLabel %}
+    <output class="mauticform-slider-value" id="{{ inputId }}_value"></output>
+    {% endif %}
+</div>

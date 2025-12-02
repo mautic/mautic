@@ -2,7 +2,6 @@
     width: 75px;
 }
 
-
 .campaign-builder .btns-builder {
     position: fixed;
     top: 15px;
@@ -473,4 +472,9 @@
     display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
+}
+
+#campaignEventDeleteRedirect.error {
+    border-color: #a94442;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }

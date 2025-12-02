@@ -160,6 +160,9 @@
                             ) -}}
                             <a href="{{ path('mautic_sms_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}" data-toggle="ajax">
                                 {{ item.getName() }}
+                                {% if item.isTranslation() %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="ri-fw ri-translate fs-14"></i></span>
+                                {% endif %}
                                 {% if 'list' == type %}
                                     <span data-toggle="tooltip" title="{{ 'mautic.sms.icon_tooltip.list_sms'|trans }}">
                                         <i class="ri-pie-chart-line fs-14"></i>

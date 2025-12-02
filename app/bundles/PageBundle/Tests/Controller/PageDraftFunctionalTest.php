@@ -53,10 +53,10 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $page = $this->createNewPage();
         $this->saveDraft($page);
         $crawler = $this->client->request(Request::METHOD_GET, "/page/preview/{$page->getId()}");
-        $this->assertEquals('Test html', $crawler->text());
+        $this->assertEquals('Test html', $crawler->filter('body')->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/page/preview/{$page->getId()}/draft");
-        $this->assertEquals('Test html Draft', $crawler->text());
+        $this->assertEquals('Test html Draft', $crawler->filter('body')->text());
     }
 
     public function testSaveDraftAndApplyDraft(): void

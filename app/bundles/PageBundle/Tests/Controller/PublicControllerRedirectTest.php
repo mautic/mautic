@@ -6,7 +6,9 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -53,5 +55,23 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/page-a');
 
         Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testRedirectWithSpacesInQuery(): void
+    {
+        $url      = 'https://google.com?q=this%20has%20spaces';
+        $redirect = new Redirect();
+        $redirect->setUrl($url);
+        $redirect->setRedirectId('57cf5a66a9f9414f301082cf0');
+        $this->em->persist($redirect);
+        $this->em->flush();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, sprintf('/r/%s', $redirect->getRedirectId()));
+
+        $response = $this->client->getResponse();
+        \assert($response instanceof RedirectResponse);
+        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        Assert::assertSame($url, $response->getTargetUrl(), 'The spaces in the query part must not be encoded with plus signs.');
     }
 }

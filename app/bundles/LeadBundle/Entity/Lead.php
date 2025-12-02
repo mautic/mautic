@@ -2,6 +2,13 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -20,8 +27,29 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'Contacts',
+    operations: [
+        new GetCollection(uriTemplate: '/contacts', security: "is_granted('lead:leads:viewown')"),
+        new Post(uriTemplate: '/contacts', security: "is_granted('lead:leads:create')"),
+        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown')"),
+        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown')"),
+        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother')"),
+        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['contact:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['owner', 'stage', 'tags'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['contact:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface
 {
     use CustomFieldEntityTrait;
@@ -50,49 +78,67 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var string
      */
+    #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $title;
 
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $firstname;
 
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastname;
 
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $company;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $position;
 
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $email;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $phone;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $mobile;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $address1;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $address2;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $city;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $state;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $zipcode;
 
     /**
      * @var string|null
      */
+    #[Groups(['contact:read', 'contact:write'])]
     private $timezone;
 
+    #[Groups(['contact:read', 'contact:write'])]
     private $country;
 
     /**
      * @var User|null
      */
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $owner;
 
     /**
      * @var int
      */
+    #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $points = 0;
 
     /**
@@ -140,6 +186,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['contact:read'])]
     private $lastActive;
 
     /**
@@ -172,6 +219,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['contact:read'])]
     private $dateIdentified;
 
     /**
@@ -192,11 +240,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<string, Tag>
      */
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $tags;
 
     /**
      * @var Stage|null
      */
+    #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $stage;
 
     /**
@@ -218,6 +268,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var ArrayCollection<int,GroupContactScore>
      */
     private $groupScores;
+
+    private int $previousId = 0;
 
     private $primaryCompany;
 
@@ -1966,6 +2018,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
 
         return $rules;
+    }
+
+    public function setPreviousId(int $id): void
+    {
+        $this->previousId = $id;
+    }
+
+    public function getPreviousId(): int
+    {
+        return $this->previousId;
     }
 
     /**

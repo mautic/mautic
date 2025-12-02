@@ -69,7 +69,7 @@ class RedirectRepository extends CommonRepository
             ->addSelect('count(distinct ph.tracking_id) as unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->join('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'pr.id = ph.redirect_id')
-            ->join('ph', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'ph.source = "email" and ph.source_id = es.email_id and ph.lead_id = es.lead_id')
+            ->join('ph', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'ph.source = \'email\' and ph.source_id = es.email_id and ph.lead_id = es.lead_id')
             ->join('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id')
             ->addSelect('e.id AS email_id')
             ->addSelect('e.name AS email_name');

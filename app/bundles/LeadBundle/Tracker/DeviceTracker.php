@@ -83,4 +83,13 @@ class DeviceTracker
     {
         $this->deviceTrackingService->clearTrackingCookies();
     }
+
+    /**
+     * Resets cache.
+     */
+    public function reset(): void
+    {
+        $this->trackedDevice = [];
+        $this->deviceTrackingService->reset();
+    }
 }

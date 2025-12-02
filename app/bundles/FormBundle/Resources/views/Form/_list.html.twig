@@ -34,6 +34,13 @@
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'form',
+                    'orderBy': 'f.template',
+                    'text': 'mautic.core.form.theme',
+                    'class': 'visible-md visible-lg col-form-template',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'submission_count',
                         'text': 'mautic.form.form.results',
@@ -122,6 +129,13 @@
                     </td>
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% if item.template %}
+                            {{ getThemeName(item.template) }}
+                        {% else %}
+                            <span class="text-muted">{{ 'mautic.core.form.default'|trans }}</span>
+                        {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
                         <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>

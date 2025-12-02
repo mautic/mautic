@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -59,7 +60,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleTags', 1000],
                 ['onSegmentFilterFormHandleLookupId', 800],
                 ['onSegmentFilterFormHandleLookup', 600],
-                ['onSegmentFilterFormHandleSelect', 400],
+                ['onSegmentFilterFormHandleGlobalCategory', 400],
+                ['onSegmentFilterFormHandleSelect', 200],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
         ];
@@ -238,11 +240,45 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    public function onSegmentFilterFormHandleGlobalCategory(FormAdjustmentEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('globalcategory')) {
+            return;
+        }
+
+        $form = $event->getForm();
+
+        // This field will hold the label of the lookup item.
+        $form->add(
+            'filter',
+            GlobalCategoryType::class,
+            [
+                'label'       => false,
+                'multiple'    => true,
+                'required'    => $event->filterShouldBeRequired(),
+                'disabled'    => $event->filterShouldBeDisabled(),
+                'constraints' => $event->filterShouldBeRequired() ? [
+                    new NotBlank(
+                        ['message' => $this->translator->trans('mautic.core.value.required')]
+                    ),
+                ] : [],
+            ]
+        );
+
+        $event->stopPropagation();
+    }
+
     public function onSegmentFilterFormHandleSelect(FormAdjustmentEvent $event): void
     {
         $form       = $event->getForm();
         $data       = $form->getData();
-        $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
+        $multiple   = $event->operatorIsOneOf(
+            OperatorOptions::INCLUDING_ANY,
+            OperatorOptions::EXCLUDING_ANY,
+            OperatorOptions::INCLUDING_ALL,
+            OperatorOptions::EXCLUDING_ALL,
+        )
+            || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
         $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'assets', 'lead_email_received');
 

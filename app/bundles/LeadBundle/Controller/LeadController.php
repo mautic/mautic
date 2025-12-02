@@ -1011,6 +1011,12 @@ class LeadController extends FormController
                         'passthroughVars' => [
                             'closeModal' => 1,
                         ],
+                        'flashes' => [
+                            [
+                                'type' => 'notice',
+                                'msg'  => 'mautic.lead.lead.notice.merged',
+                            ],
+                        ],
                     ]
                 );
             }
@@ -1451,6 +1457,15 @@ class LeadController extends FormController
                         $emailEntity = null;
                         $subject     = $email['subject'];
 
+                        // Set default settings for email.
+                        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
+                        $mailer->setReplyTo($email['from']);
+                        $mailer->setBody($email['body']);
+                        $mailer->parsePlainText($email['body']);
+                        $mailer->setLead($leadFields);
+                        $mailer->setIdHash();
+                        $mailer->setSubject($subject);
+
                         // Set the email entity template so the email configuration like preheader would apply.
                         if ($email['templates']) {
                             $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
@@ -1476,16 +1491,9 @@ class LeadController extends FormController
 
                         if ($emailEntity) {
                             $emailEntity->setSubject($subject);
+                            $emailEntity->setCustomHtml($email['body']);
                             $mailer->setEmail($emailEntity);
                         }
-
-                        // Set Content
-                        $mailer->setReplyTo($email['from']);
-                        $mailer->setBody($email['body']);
-                        $mailer->parsePlainText($email['body']);
-                        $mailer->setLead($leadFields);
-                        $mailer->setIdHash();
-                        $mailer->setSubject($subject);
 
                         // Ensure safe emoji for notification
                         if ($mailer->send(true, false)) {

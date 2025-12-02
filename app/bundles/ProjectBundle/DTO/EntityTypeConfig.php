@@ -10,6 +10,7 @@ final readonly class EntityTypeConfig
         public string $entityClass,
         public string $label,
         public ?object $model = null,
+        public ?DetailRoute $detailRoute = null,
     ) {
     }
 }

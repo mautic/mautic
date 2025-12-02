@@ -209,26 +209,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.campaign.scheduler'               => [
-                'class'     => Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'mautic.campaign.event_logger',
-                    'mautic.campaign.scheduler.interval',
-                    'mautic.campaign.scheduler.datetime',
-                    'mautic.campaign.scheduler.optimized',
-                    'mautic.campaign.event_collector',
-                    'event_dispatcher',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.campaign.executioner.action' => [
-                'class'     => Mautic\CampaignBundle\Executioner\Event\ActionExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.dispatcher.action',
-                    'mautic.campaign.event_logger',
-                ],
-            ],
             'mautic.campaign.executioner.condition' => [
                 'class'     => Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class,
                 'arguments' => [
@@ -253,20 +233,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.removed_contact_tracker',
-                ],
-            ],
-            'mautic.campaign.executioner.realtime'     => [
-                'class'     => Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'mautic.lead.model.lead',
-                    'mautic.campaign.repository.event',
-                    'mautic.campaign.event_executioner',
-                    'mautic.campaign.executioner.decision',
-                    'mautic.campaign.event_collector',
-                    'mautic.campaign.scheduler',
-                    'mautic.tracker.contact',
-                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.helper.decision' => [
@@ -385,5 +351,6 @@ return [
         'peak_interaction_timer_fetch_limit'                                                    => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_LIMIT,
         'peak_interaction_timer_max_optimal_days'                                               => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_MAX_OPTIMAL_DAYS,
         'import_campaigns_dir'                                                                  => '%kernel.project_dir%/var/import',
+        'campaign_republish_behavior'                                                           => Mautic\CampaignBundle\Enum\RepublishBehavior::COUNT_ALL_TIME->value,
     ],
 ];

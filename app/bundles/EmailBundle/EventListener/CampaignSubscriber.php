@@ -224,6 +224,13 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $config  = $event->getEvent()->getProperties();
+
+        if (!isset($config['email'])) {
+            $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
+
+            return;
+        }
+
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
 

@@ -879,7 +879,7 @@ Mautic.onPageUnload = function (container, response) {
  * @param event
  * @returns {boolean}
  */
-Mautic.ajaxifyLink = function (el, event) {
+Mautic.ajaxifyLink = function (el, event, extraData = {}) {
     if (mQuery(el).hasClass('disabled')) {
         return false;
     }
@@ -929,7 +929,7 @@ Mautic.ajaxifyLink = function (el, event) {
     //give an ajaxified link the option of not displaying the global loading bar
     var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
 
-    Mautic.loadContent(route, link, method, target, showLoadingBar);
+    Mautic.loadContent(route, link, method, target, showLoadingBar, undefined, extraData);
 };
 
 /**
@@ -1153,10 +1153,7 @@ Mautic.activateMultiSelect = function(el) {
             if (isSortable) {
                 mQuery(el).parent('.choice-wrapper').find('.ms-selection').first().sortable({
                     items: '.ms-elem-selection',
-                    helper: function (e, ui) {
-                        ui.width(mQuery(el).width());
-                        return ui;
-                    },
+                    helper: 'clone',
                     axis: 'y',
                     scroll: false,
                     update: function(event, ui) {
@@ -1750,14 +1747,18 @@ Mautic.processCsvContactExport = function (route) {
  * @param {string} text
  */
 Mautic.copyToClipboard = function (text) {
-    navigator.clipboard.writeText(text).then(function () {
-        var message = Mautic.translate('mautic.core.notice.copiedtoclipboard');
-        var flashMessage = Mautic.addInfoFlashMessage(message);
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    const decodedText = textArea.value || textArea.innerText;
+
+    navigator.clipboard.writeText(decodedText).then(function () {
+        const message = Mautic.translate('mautic.core.notice.copiedtoclipboard');
+        const flashMessage = Mautic.addInfoFlashMessage(message);
         Mautic.setFlashes(flashMessage);
     }).catch(function (err) {
         console.error('Clipboard write error:', err);
-        var message = Mautic.translate('mautic.core.error.copyfailed');
-        var flashMessage = Mautic.addErrorFlashMessage(message);
+        const message = Mautic.translate('mautic.core.error.copyfailed');
+        const flashMessage = Mautic.addErrorFlashMessage(message);
         Mautic.setFlashes(flashMessage);
     });
 };

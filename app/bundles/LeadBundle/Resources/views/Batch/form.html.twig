@@ -3,5 +3,8 @@
     - form
 #}
 
-{% set attr = form.vars.attr|merge({'data-submit-callback': 'leadBatchSubmit'}) %}
+{% set attr = form.vars.attr %}
+{% if attr['data-submit-callback'] is not defined %}
+    {% set attr = attr|merge({'data-submit-callback': 'leadBatchSubmit'}) %}
+{% endif %}
 {{ form(form, {'attr': attr}) }}
