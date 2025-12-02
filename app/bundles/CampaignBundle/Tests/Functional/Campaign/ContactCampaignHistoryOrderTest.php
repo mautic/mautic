@@ -17,6 +17,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
 {
     /**
+     * @var bool
+     */
+    protected $useCleanupRollback = false;
+
+    /**
      * @param string[] $expectedOrder
      */
     #[DataProvider('provideTimelineOrderData')]
