@@ -49,8 +49,8 @@ final class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends 
         $this->client->request('GET', self::URI_EVENT_NEW, [], [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
         Assert::assertTrue($response->isOk(), $response->getContent());
-        Assert::assertStringContainsString('Anonymize User Data', $response->getContent());
-        Assert::assertStringContainsString('Anonymize User Data in these fields', $response->getContent());
+        Assert::assertStringContainsString('Anonymize Contact Data', $response->getContent());
+        Assert::assertStringContainsString('Anonymize Contact Data in these fields', $response->getContent());
         Assert::assertStringContainsString('Zip Code', $response->getContent());
         Assert::assertStringContainsString('Address Line 1', $response->getContent());
         Assert::assertStringContainsString('Instagram', $response->getContent());

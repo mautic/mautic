@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Model;
@@ -59,8 +58,8 @@ final class AuditLogModelTest extends MauticMysqlTestCase
         $this->assertEmpty($logs, $message);
     }
 
-    /** 
-     * @param array<string,mixed> $criteria 
+    /**
+     * @param array<string,mixed> $criteria
      */
     private function cleanupLogsByCriteria(array $criteria): void
     {
