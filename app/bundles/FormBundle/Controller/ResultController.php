@@ -417,15 +417,14 @@ class ResultController extends CommonFormController
                 $domain = $submission->getEmailDomain();
 
                 if ($domain) {
-                    $formatted     = '*@'.$domain;
-                    $domains       = $this->coreParametersHelper->get('do_not_submit_emails', []);
-                    $isNewDomain   = !in_array($formatted, $domains, true);
+                    $formatted   = '*@'.$domain;
+                    $domains     = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                    $isNewDomain = !in_array($formatted, $domains, true);
 
                     if ($isNewDomain) {
                         $this->saveBlockedDomains($configurator, array_merge($domains, [$formatted]));
+                        $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
                     }
-
-                    $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                     $flashes[] = [
                         'type'    => 'notice',
@@ -491,7 +490,11 @@ class ResultController extends CommonFormController
                     'msg'  => 'mautic.form.result.markspam.batch.none',
                 ];
             } else {
-                $this->saveBlockedDomains($configurator, array_keys($domainsToSave));
+                $existingDomains = $this->coreParametersHelper->get('do_not_submit_emails', []);
+                $newDomains      = array_keys($domainsToSave);
+                $mergedDomains   = array_values(array_unique(array_merge($existingDomains, $newDomains)));
+
+                $this->saveBlockedDomains($configurator, $mergedDomains);
                 $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                 $flashes[] = [
@@ -531,11 +534,6 @@ class ResultController extends CommonFormController
     private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
     {
         $fieldsToUpdate = $formModel->findEmailFieldsWithMissingDonotSubmitValidation();
-
-        if (empty($fieldsToUpdate)) {
-            return;
-        }
-
         $formModel->enableDonotSubmitValidationOnEmailFields($fieldsToUpdate);
     }
 
