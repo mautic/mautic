@@ -706,6 +706,13 @@ class ReportController extends FormController
                     'dateRangeForm'          => $dateRangeForm->createView(),
                     'dynamicFilterForm'      => $dynamicFilterForm->createView(),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
+                    'baseUrl'                => $this->generateUrl(
+                        'mautic_report_view',
+                        [
+                            'objectId'   => $objectId,
+                            'reportPage' => $reportPage,
+                        ]
+                    ),
                 ],
                 'contentTemplate' => $reportData['contentTemplate'],
                 'passthroughVars' => [

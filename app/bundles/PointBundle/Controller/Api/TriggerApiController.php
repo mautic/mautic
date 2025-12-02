@@ -50,7 +50,7 @@ class TriggerApiController extends CommonApiController
         $this->entityClass      = Trigger::class;
         $this->entityNameOne    = 'trigger';
         $this->entityNameMulti  = 'triggers';
-        $this->serializerGroups = ['triggerDetails', 'categoryList', 'publishDetails', 'projectList'];
+        $this->serializerGroups = ['triggerDetails', 'categoryList', 'publishDetails'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

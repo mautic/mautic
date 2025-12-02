@@ -285,6 +285,14 @@ class DateTimeHelper
         return new \DateInterval($spec);
     }
 
+    public function intervalToSeconds(\DateInterval $interval): int
+    {
+        $reference = new \DateTimeImmutable();
+        $endTime   = $reference->add($interval);
+
+        return $endTime->getTimestamp() - $reference->getTimestamp();
+    }
+
     /**
      * Modify datetime.
      *
@@ -379,5 +387,18 @@ class DateTimeHelper
             $parameterLoader            = new ParameterLoader();
             self::$defaultLocalTimezone = $parameterLoader->getParameterBag()->get('default_timezone') ?? date_default_timezone_get();
         }
+    }
+
+    /**
+     * Ensures a date string has a time component. If no time is present, adds the specified default time.
+     */
+    public static function setTimeIfMissing(string $dateString, string $defaultTime = '00:00:00', string $timezone = 'UTC'): \DateTimeImmutable
+    {
+        // Check for time format with either space or T separator (ISO 8601)
+        if (!preg_match('/[T ]\d{2}:\d{2}(:\d{2})?/', $dateString)) {
+            $dateString .= ' '.$defaultTime;
+        }
+
+        return new \DateTimeImmutable($dateString, new \DateTimeZone($timezone));
     }
 }

@@ -6,10 +6,10 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\UuidHelper;
 
 /**
  * Trait providing common import/export functionality for entity subscribers.
@@ -48,7 +48,7 @@ trait ImportExportTrait
         $repository = $entityManager->getRepository($entityClass);
 
         foreach ($event->getEntityData() as $item) {
-            if (!empty($item['uuid']) && !UuidTrait::isValidUuid($item['uuid'])) {
+            if (!empty($item['uuid']) && !UuidHelper::isValidUuid($item['uuid'])) {
                 $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
                 break;
             }

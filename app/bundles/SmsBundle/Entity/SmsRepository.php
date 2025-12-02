@@ -213,16 +213,19 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param string $smsType
+     * @param array<int> $ignoreIds
      *
      * @return array
      */
-    public function getSmsList($search = '', $limit = 10, $start = 0, $viewOther = false, $smsType = null)
-    {
+    public function getSmsList(
+        mixed $search = '',
+        int $limit = 10,
+        int $start = 0,
+        bool $viewOther = false,
+        ?string $smsType = null,
+        ?string $topLevel = null,
+        array $ignoreIds = [],
+    ) {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
 
@@ -246,6 +249,15 @@ class SmsRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('e.smsType', $q->expr()->literal($smsType))
             );
+        }
+
+        if ('translation' === $topLevel) {
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        }
+
+        if (!empty($ignoreIds)) {
+            $q->andWhere($q->expr()->notIn('e.id', ':smsIds'))
+                ->setParameter('smsIds', $ignoreIds);
         }
 
         $q->orderBy('e.name');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Mautic\CoreBundle\Shortener;
+namespace Mautic\CoreBundle\Tests\Unit\Shortener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Shortener\Shortener;

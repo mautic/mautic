@@ -3,23 +3,22 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * Trait FiltersEntityTrait.
- */
 trait FiltersEntityTrait
 {
     /**
      * @var array
      */
+    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $filters = [];
 
     protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
     {
         $builder->createField('filters', 'array')
-                ->columnName('filters')
-                ->nullable()
-                ->build();
+            ->columnName('filters')
+            ->nullable()
+            ->build();
     }
 
     /**

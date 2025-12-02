@@ -879,7 +879,7 @@ Mautic.onPageUnload = function (container, response) {
  * @param event
  * @returns {boolean}
  */
-Mautic.ajaxifyLink = function (el, event) {
+Mautic.ajaxifyLink = function (el, event, extraData = {}) {
     if (mQuery(el).hasClass('disabled')) {
         return false;
     }
@@ -929,7 +929,7 @@ Mautic.ajaxifyLink = function (el, event) {
     //give an ajaxified link the option of not displaying the global loading bar
     var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
 
-    Mautic.loadContent(route, link, method, target, showLoadingBar);
+    Mautic.loadContent(route, link, method, target, showLoadingBar, undefined, extraData);
 };
 
 /**
@@ -1153,10 +1153,7 @@ Mautic.activateMultiSelect = function(el) {
             if (isSortable) {
                 mQuery(el).parent('.choice-wrapper').find('.ms-selection').first().sortable({
                     items: '.ms-elem-selection',
-                    helper: function (e, ui) {
-                        ui.width(mQuery(el).width());
-                        return ui;
-                    },
+                    helper: 'clone',
                     axis: 'y',
                     scroll: false,
                     update: function(event, ui) {

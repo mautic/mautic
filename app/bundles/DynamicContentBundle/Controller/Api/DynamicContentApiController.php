@@ -31,7 +31,7 @@ class DynamicContentApiController extends CommonApiController
         $this->entityClass      = DynamicContent::class;
         $this->entityNameOne    = 'dynamicContent';
         $this->entityNameMulti  = 'dynamicContents';
-        $this->serializerGroups = ['dwcDetails', 'categoryList', 'projectList'];
+        $this->serializerGroups = ['dwcDetails', 'categoryList'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

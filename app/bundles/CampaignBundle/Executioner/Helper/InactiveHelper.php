@@ -36,7 +36,7 @@ class InactiveHelper
          */
         foreach ($decisions as $key => $decision) {
             $negativeChildren = $decision->getNegativeChildren();
-            if (!$negativeChildren->count()) {
+            if (!$negativeChildren->count() && !$decision->shouldBeRedirected()) {
                 $decisions->remove($key);
             }
         }
@@ -113,7 +113,7 @@ class InactiveHelper
 
         /** @var Event|null $decision */
         $decision = $this->eventRepository->find($decisionId);
-        if ($decision && !$decision->isDeleted()) {
+        if ($decision && (!$decision->isDeleted() || $decision->shouldBeRedirected())) {
             $collection->set($decision->getId(), $decision);
         }
 

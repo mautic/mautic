@@ -38,31 +38,35 @@
 									<tr id="row_{{ entityType }}_{{ entity.getId() }}">
 										<td class="col-xs-1">
 											{{- include('@MauticCore/Helper/list_actions.html.twig', {
-                                        'item': entity,
-                                        'templateButtons': {
-                                            'edit': false,
-                                            'clone': false,
-                                            'delete': false
-                                        },
-                                        'customButtons': {
-                                            'remove': {
-                                                'confirm': {
-                                                    'btnClass': false,
-                                                    'btnText': 'mautic.project.remove_from_project'|trans,
-                                                    'message': 'mautic.project.form.confirm_remove'|trans({'%name%': entity.getName(), '%project%': project.getName()}),
-                                                    'confirmAction': path('mautic_project_action', {'objectAction': 'remove', 'objectId': project.getId(), 'entityType': entityType, 'entityId': entity.getId()}),
-                                                    'template': 'delete'
-                                                },
-                                                'iconClass': 'ri-subtract-line',
-                                                'priority': 100
-                                            }
-                                        },
-                                    }) -}}
+																				'item': entity,
+																				'templateButtons': {
+																						'edit': false,
+																						'clone': false,
+																						'delete': false
+																				},
+																				'customButtons': {
+																						'remove': {
+																								'confirm': {
+																										'btnClass': false,
+																										'btnText': 'mautic.project.remove_from_project'|trans,
+																										'message': 'mautic.project.form.confirm_remove'|trans({'%name%': entity.getName(), '%project%': project.getName()}),
+																										'confirmAction': path('mautic_project_action', {'objectAction': 'remove', 'objectId': project.getId(), 'entityType': entityType, 'entityId': entity.getId()}),
+																										'template': 'delete'
+																								},
+																								'iconClass': 'ri-subtract-line',
+																								'priority': 100
+																						}
+																				},
+																		}) -}}
 										</td>
 										<td>
-											<a href="{{ path('mautic_' ~ entityType ~ '_action', {'objectAction': 'view', 'objectId': entity.getId()}) }}" data-toggle="ajax">
+										{% if entityData.detailRoute %}
+												<a href="{{ path(entityData.detailRoute.route, entityData.detailRoute.getParameters(entity.getId())) }}" data-toggle="ajax">
+														{{ entity.getName()|purify }}
+												</a>
+										{% else %}
 												{{ entity.getName()|purify }}
-											</a>
+										{% endif %}
 										</td>
 										<td class="visible-lg" title="{{ entity.getDateAdded() ? dateToFullConcat(entity.getDateAdded()) : '' }}">
 											{{ entity.getDateAdded() ? dateToDate(entity.getDateAdded()) : '' }}
@@ -71,7 +75,7 @@
 											{{ entity.getDateModified() ? dateToDate(entity.getDateModified()) : '' }}
 										</td>
 										<td class="visible-lg">
-											{{ entity.getCreatedByUser() ? entity.getCreatedByUser()|escape : '' }}
+											{{ entity.getCreatedByUser() ? entity.getCreatedByUser() : '' }}
 										</td>
 										<td class="visible-md visible-lg">
 											<span class="text-muted">{{ entity.getId() }}</span>

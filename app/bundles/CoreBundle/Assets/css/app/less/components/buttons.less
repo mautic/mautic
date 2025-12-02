@@ -180,6 +180,11 @@
   padding-right: var(--spacing-10);
   gap: var(--spacing-07);
   &:has(i) {padding-right: var(--spacing-05);}
+  &:not(:has(i)) {
+    padding-left: var(--spacing-07);
+    padding-right: var(--spacing-07);
+    span { display: initial }
+  }
   &.btn--icon-only {
     padding-right: 0;
     span { width: initial;}

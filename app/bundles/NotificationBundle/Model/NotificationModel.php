@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -36,6 +37,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
+    use TranslationModelTrait;
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         EntityManager $em,
@@ -133,6 +136,13 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         }
 
         return $entity;
+    }
+
+    public function saveEntity($entity, $unlock = true): void
+    {
+        parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
     }
 
     /**
@@ -300,7 +310,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['notification_type'] ?? null
+                    $options
                 );
 
                 foreach ($entities as $entity) {

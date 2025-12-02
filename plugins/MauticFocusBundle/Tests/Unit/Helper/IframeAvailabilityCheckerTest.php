@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
+namespace MauticPlugin\MauticFocusBundle\Tests\Unit\Helper;
 
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -25,7 +25,7 @@ class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
     public function testCheckProtocolMismatch(): void
     {
         $currentScheme           = 'https';
-        $url                     = 'http://google.com';
+        $url                     = 'http://google.com'; // NOSONAR
         $translatedErrorMessage  = 'error';
         $expectedResponseContent = [
             'status'       => 0,

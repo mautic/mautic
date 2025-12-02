@@ -161,8 +161,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createMock(TranslatorInterface::class)
         );
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
+        $mockCoreParametersHelper->method('getDefaultTimezone')
             ->willReturn('UTC');
 
         $this->subscriber = new CampaignSubscriber(

@@ -31,6 +31,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
+    $services->set(Mautic\UserBundle\ApiPlatform\UserProcessor::class)
+        ->args([
+            service('api_platform.doctrine.orm.state.persist_processor'),
+            service('security.user_password_hasher'),
+        ])
+        ->tag('api_platform.state_processor');
+
     $services->set('security.authenticator.mautic_sso', SsoAuthenticator::class)
         ->abstract()
         ->args([
@@ -47,6 +54,7 @@ return function (ContainerConfigurator $configurator): void {
             '$oAuth2' => service('fos_oauth_server.server'),
         ]);
 
+    $services->set(Mautic\UserBundle\Security\SAML\Helper::class);
     $services->set('security.token.permissions', TokenPermissions::class);
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
