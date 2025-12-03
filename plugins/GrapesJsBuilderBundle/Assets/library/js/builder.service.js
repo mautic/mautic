@@ -11,6 +11,7 @@ import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsckeditor from './plugins/grapesjs.ckeditor';
+import grapesjstypography from './plugins/grapesjs.typography';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
@@ -301,7 +302,7 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, grapesjsckeditor, ...BuilderService.getPluginNames('email-mjml')],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, grapesjsckeditor, grapesjstypography, ...BuilderService.getPluginNames('email-mjml')],
       pluginsOpts: {
         [grapesjsmjml]: {
           hideSelector: false,
@@ -310,6 +311,7 @@ export default class BuilderService {
         },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         [grapesjsckeditor]: BuilderService.getCkeConf('email:getBuilderTokens'),
+        [grapesjstypography]: { mode: 'email-mjml' },
         ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
@@ -390,13 +392,14 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, grapesjsckeditor, ...BuilderService.getPluginNames('email-html')],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, grapesjsckeditor, grapesjstypography, ...BuilderService.getPluginNames('email-html')],
       pluginsOpts: {
         grapesjsnewsletter: {
           useCustomTheme: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         [grapesjsckeditor]: BuilderService.getCkeConf('email:getBuilderTokens'),
+        [grapesjstypography]: { mode: 'email-html' },
         ...BuilderService.getPluginOptions('email-html'),
       },
     });
