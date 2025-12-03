@@ -27,7 +27,8 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
     #[DataProvider('provideTimelineOrderData')]
     public function testContactCampaignHistoryOrderIsCorrectTimeline(string $orderByDir, array $expectedOrder): void
     {
-        dump($this->em->getConnection()->executeQuery(sprintf('desc %slead_points_change_log', MAUTIC_TABLE_PREFIX))->fetchAllAssociative());
+        $this->fail(print_r($this->em->getConnection()->executeQuery(sprintf('desc %slead_points_change_log', MAUTIC_TABLE_PREFIX))->fetchAllAssociative(), true));
+
         // Create a test segment
         $segment = new LeadList();
         $segment->setName('Test Segment');
