@@ -34,8 +34,8 @@ class ContactScheduledExportCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--ids', mode: InputOption::VALUE_REQUIRED, description: 'Comma separated contact_export_scheduler ids.')]
-        $ids, OutputInterface $output): int
+    public function __invoke(OutputInterface $output, #[\Symfony\Component\Console\Attribute\Option(name: '--ids', mode: InputOption::VALUE_REQUIRED, description: 'Comma separated contact_export_scheduler ids.')]
+        $ids = null): int
     {
         $this->processSignalService->registerSignalHandler(
             fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal))

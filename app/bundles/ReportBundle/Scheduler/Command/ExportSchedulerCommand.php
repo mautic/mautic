@@ -25,8 +25,8 @@ class ExportSchedulerCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--report', shortcut: 'report', mode: InputOption::VALUE_OPTIONAL, description: 'ID of report. Process all reports if not set.')]
-        $report, OutputInterface $output): int
+    public function __invoke(OutputInterface $output, #[\Symfony\Component\Console\Attribute\Option(name: '--report', shortcut: 'report', mode: InputOption::VALUE_OPTIONAL, description: 'ID of report. Process all reports if not set.')]
+        $report = null): int
     {
         $report = $report;
 

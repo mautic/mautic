@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
 
 /**
  * The main goal of this extension is to move a lot of PHP logic that was previously
@@ -19,21 +17,16 @@ class CoreHelpersExtension
     ) {
     }
 
-    public function getFunctions()
+    #[\Twig\Attribute\AsTwigFunction('md5', isSafe: ['all'])]
+    public function md5(string $string): string
     {
-        return [
-            new TwigFunction('md5', fn (string $string) => md5($string), ['is_safe' => 'all']),
-        ];
+        return md5($string);
     }
 
-    /**
-     * @return TwigFilter[]
-     */
-    public function getFilters(): array
+    #[\Twig\Attribute\AsTwigFilter('json_decode')]
+    public function jsonDecode(string $json): mixed
     {
-        return [
-            new TwigFilter('json_decode', fn (string $json) => json_decode($json, true)),
-        ];
+        return json_decode($json, true);
     }
 
     /**

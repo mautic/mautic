@@ -23,10 +23,10 @@ class MauticSocialMonitoringCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'mid', shortcut: 'i', mode: InputOption::VALUE_OPTIONAL, description: 'The id of a specific monitor record to process')]
-        $mid, #[\Symfony\Component\Console\Attribute\Option(name: 'batch-size', mode: InputOption::VALUE_REQUIRED, description: 'The maximum number of iterations the cron runs per cycle. This value gets distributed by the number of monitor records published')]
-        $batchSize, #[\Symfony\Component\Console\Attribute\Option(name: 'query-count', mode: InputOption::VALUE_OPTIONAL, description: 'The number of records to search for per iteration. Default is 100.')]
-        int $queryCount = 100, OutputInterface $output): int
+    public function __invoke(OutputInterface $output, #[\Symfony\Component\Console\Attribute\Option(name: 'mid', shortcut: 'i', mode: InputOption::VALUE_OPTIONAL, description: 'The id of a specific monitor record to process')]
+        $mid = null, #[\Symfony\Component\Console\Attribute\Option(name: 'batch-size', mode: InputOption::VALUE_REQUIRED, description: 'The maximum number of iterations the cron runs per cycle. This value gets distributed by the number of monitor records published')]
+        $batchSize = null, #[\Symfony\Component\Console\Attribute\Option(name: 'query-count', mode: InputOption::VALUE_OPTIONAL, description: 'The number of records to search for per iteration. Default is 100.')]
+        ?int $queryCount = 100): int
     {
         // monitor record
         $monitorId   = $mid;
