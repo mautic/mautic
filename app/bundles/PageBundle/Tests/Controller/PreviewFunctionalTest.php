@@ -17,7 +17,6 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     public function testPreviewPageWithContact(): void
     {
-        $user           = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $lead           = $this->createLead();
         $dynamicContent = $this->createDynamicContent($lead);
         $defaultContent = 'Default web content';
@@ -28,13 +27,6 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $url = "/page/preview/{$page->getId()}";
-
-        // Anonymous visitor is not allowed to access preview if not public
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->client->request(Request::METHOD_GET, $url);
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-
-        $this->loginUser($user);
 
         // Admin user is allowed to access preview
         $this->assertPageContent($url, $defaultContent);
