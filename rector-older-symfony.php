@@ -17,6 +17,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         // helps with rebase of PRs for Symfony 3 and 4, @see https://github.com/mautic/mautic/pull/12676#issuecomment-1695531274
         // remove when not needed to keep memory usage lower
         SymfonySetList::SYMFONY_70,
+        // SymfonySetList::SYMFONY_71,
+        // SymfonySetList::SYMFONY_72,
+        // SymfonySetList::SYMFONY_73,
+        // SymfonySetList::SYMFONY_74,
 
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
         DoctrineSetList::DOCTRINE_CODE_QUALITY,
@@ -25,7 +29,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         DoctrineSetList::DOCTRINE_DBAL_30,
         DoctrineSetList::DOCTRINE_ORM_213,
         DoctrineSetList::DOCTRINE_ORM_214,
-        DoctrineSetList::DOCTRINE_ORM_29,
+        // DoctrineSetList::DOCTRINE_ORM_29, // This constant doesn't exist
         DoctrineSetList::DOCTRINE_ORM_25,
     ]);
 };
