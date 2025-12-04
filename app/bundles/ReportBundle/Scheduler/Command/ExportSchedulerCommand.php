@@ -28,8 +28,6 @@ class ExportSchedulerCommand
     public function __invoke(OutputInterface $output, #[\Symfony\Component\Console\Attribute\Option(name: '--report', shortcut: 'report', mode: InputOption::VALUE_OPTIONAL, description: 'ID of report. Process all reports if not set.')]
         $report = null): int
     {
-        $report = $report;
-
         if (!is_null($report) && !is_numeric($report)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 

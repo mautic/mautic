@@ -6,18 +6,13 @@ namespace MauticPlugin\MauticFocusBundle\Twig\Extension;
 
 use MatthiasMullie\Minify;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Twig\TwigTest;
 
 class FocusBundleExtension
 {
-    /**
-     * @return TwigTest[]
-     */
-    public function getTests(): array
+    #[\Twig\Attribute\AsTwigTest('color light')]
+    public function isColorLight(string $hexColor): bool
     {
-        return [
-            new TwigTest('color light', fn (string $hexColor) => FocusModel::isLightColor($hexColor)),
-        ];
+        return FocusModel::isLightColor($hexColor);
     }
 
     #[\Twig\Attribute\AsTwigFilter('less_compile', isSafe: ['all'])]

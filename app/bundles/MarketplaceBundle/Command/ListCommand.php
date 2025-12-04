@@ -24,11 +24,16 @@ class ListCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'page', shortcut: 'p', mode: InputOption::VALUE_OPTIONAL, description: 'Page number')]
-        int $page = 1, #[\Symfony\Component\Console\Attribute\Option(name: 'limit', shortcut: 'l', mode: InputOption::VALUE_OPTIONAL, description: 'Packages per page')]
-        int $limit = 15, #[\Symfony\Component\Console\Attribute\Option(name: 'filter', shortcut: 'f', mode: InputOption::VALUE_OPTIONAL, description: 'Filter the packages')]
-        string $filter = '', OutputInterface $output, \Symfony\Component\Console\Style\SymfonyStyle $io): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        \Symfony\Component\Console\Style\SymfonyStyle $io,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'page', shortcut: 'p', mode: InputOption::VALUE_OPTIONAL, description: 'Page number')]
+        int $page = 1,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'limit', shortcut: 'l', mode: InputOption::VALUE_OPTIONAL, description: 'Packages per page')]
+        int $limit = 15,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'filter', shortcut: 'f', mode: InputOption::VALUE_OPTIONAL, description: 'Filter the packages')]
+        string $filter = '',
+    ): int {
         $stopwatch = new Stopwatch();
         $stopwatch->start('command');
 

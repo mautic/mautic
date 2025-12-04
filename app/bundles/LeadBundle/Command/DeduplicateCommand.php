@@ -30,11 +30,15 @@ class DeduplicateCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', mode: InputOption::VALUE_NONE, description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
-        bool $newerIntoOlder = false, #[\Symfony\Component\Console\Attribute\Option(name: '--batch', mode: InputOption::VALUE_REQUIRED, description: 'How many contact duplicates to process at once. Defaults to 100.')]
-        int $batch = 100, #[\Symfony\Component\Console\Attribute\Option(name: '--processes', mode: InputOption::VALUE_REQUIRED, description: 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.')]
-        int $processes = 1, OutputInterface $output): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', mode: InputOption::VALUE_NONE, description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
+        bool $newerIntoOlder = false,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--batch', mode: InputOption::VALUE_REQUIRED, description: 'How many contact duplicates to process at once. Defaults to 100.')]
+        int $batch = 100,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--processes', mode: InputOption::VALUE_REQUIRED, description: 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.')]
+        int $processes = 1,
+    ): int {
         $newerIntoOlder  = (bool) $newerIntoOlder;
         $batch           = (int) $batch;
         $processes       = (int) $processes;

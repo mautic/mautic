@@ -33,8 +33,10 @@ class InstallCommand
     }
 
     public function __invoke(
+        InputInterface $input,
+        OutputInterface $output,
         #[\Symfony\Component\Console\Attribute\Argument(name: 'site_url', description: 'Site URL.')]
-        string $siteUrl,
+        string $siteUrl = '',
         #[\Symfony\Component\Console\Attribute\Argument(name: 'step', description: 'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration, 4 for final step. Each successful step will trigger the next until completion.')]
         ?string $step = '0',
         #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Do not ask confirmation if recommendations triggered.')]
@@ -65,8 +67,6 @@ class InstallCommand
         ?string $adminEmail = null,
         #[\Symfony\Component\Console\Attribute\Option(name: '--admin_password', mode: InputOption::VALUE_REQUIRED, description: 'Admin user.')]
         ?string $adminPassword = null,
-        InputInterface $input,
-        OutputInterface $output,
     ): int {
         // Check Mautic is not already installed
         if ($this->installer->checkIfInstalled()) {
@@ -125,20 +125,17 @@ class InstallCommand
 
         // Initialize DB and admin params from cli options
         foreach ($options as $opt => $value) {
-            if (isset($value)) {
-                if (str_starts_with($opt, 'db_')) {
-                    $dbParams[substr($opt, 3)] = $value;
-                    $allParams[$opt]           = $value;
-                } elseif (str_starts_with($opt, 'admin_')) {
-                    $adminParam[substr($opt, 6)] = $value;
-                }
+            if (str_starts_with($opt, 'db_')) {
+                $dbParams[substr($opt, 3)] = $value;
+                $allParams[$opt]           = $value;
+            } elseif (str_starts_with($opt, 'admin_')) {
+                $adminParam[substr($opt, 6)] = $value;
             }
         }
 
         if (!empty($allParams['site_url'])) {
             $siteUrl = $allParams['site_url'];
         } else {
-            $siteUrl               = $siteUrl;
             $allParams['site_url'] = $siteUrl;
         }
 

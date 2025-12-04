@@ -37,9 +37,9 @@ class MaxMindDoNotSellPurgeCommand
     }
 
     public function __invoke(
+        OutputInterface $output,
         #[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', shortcut: 'd', mode: InputOption::VALUE_NONE, description: 'Get a list of data that will be purged.')]
         bool $dryRun = false,
-        OutputInterface $output,
     ): int {
         try {
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');

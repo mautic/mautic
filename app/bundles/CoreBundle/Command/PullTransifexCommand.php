@@ -55,7 +55,6 @@ class PullTransifexCommand
     ): int {
         $languageFilter = $language;
         $bundleFilter   = $bundle;
-        $path           = $path;
         $files          = $this->languageHelper->getLanguageFiles();
         $translationDir = ($path ?? $this->pathsHelper->getTranslationsPath()).'/';
 

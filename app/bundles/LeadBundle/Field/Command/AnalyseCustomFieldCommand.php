@@ -24,9 +24,11 @@ class AnalyseCustomFieldCommand
     {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'display-table', shortcut: 't', mode: InputOption::VALUE_NONE, description: 'Display results in table format')]
-        bool $displayTable = false, OutputInterface $output): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'display-table', shortcut: 't', mode: InputOption::VALUE_NONE, description: 'Display results in table format')]
+        bool $displayTable = false,
+    ): int {
         $displayAsTable = $displayTable;
 
         $fieldDetails = $this->getCustomFieldDetails();

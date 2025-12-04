@@ -24,16 +24,19 @@ class PushLeadActivityCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--integration', shortcut: '-i', mode: InputOption::VALUE_REQUIRED, description: 'Integration name. Integration must be enabled and authorised.')]
-        $integration, #[\Symfony\Component\Console\Attribute\Option(name: '--start-date', shortcut: '-d', mode: InputOption::VALUE_REQUIRED, description: 'Set start date for updated values.')]
-        $startDate, #[\Symfony\Component\Console\Attribute\Option(name: '--end-date', shortcut: '-t', mode: InputOption::VALUE_REQUIRED, description: 'Set end date for updated values.')]
-        $endDate, #[\Symfony\Component\Console\Attribute\Option(name: '--time-interval', shortcut: '-a', mode: InputOption::VALUE_OPTIONAL, description: 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)')]
-        $timeInterval, #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Force execution even if another process is assumed running.')]
-        bool $force = false, OutputInterface $output): int
-    {
-        $integration = $integration;
-        $startDate   = $startDate;
-        $endDate     = $endDate;
+    public function __invoke(
+        OutputInterface $output,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--integration', shortcut: '-i', mode: InputOption::VALUE_REQUIRED, description: 'Integration name. Integration must be enabled and authorised.')]
+        $integration = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--start-date', shortcut: '-d', mode: InputOption::VALUE_REQUIRED, description: 'Set start date for updated values.')]
+        $startDate = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--end-date', shortcut: '-t', mode: InputOption::VALUE_REQUIRED, description: 'Set end date for updated values.')]
+        $endDate = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--time-interval', shortcut: '-a', mode: InputOption::VALUE_OPTIONAL, description: 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)')]
+        $timeInterval = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Force execution even if another process is assumed running.')]
+        bool $force = false,
+    ): int {
         $interval    = $timeInterval;
 
         if (!$interval) {
