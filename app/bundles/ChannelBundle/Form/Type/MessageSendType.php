@@ -33,7 +33,7 @@ class MessageSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.channel.choosemessage.notblank']
+                        message: 'mautic.channel.choosemessage.notblank'
                     ),
                 ],
             ]

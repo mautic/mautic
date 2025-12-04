@@ -34,7 +34,7 @@ class VariantType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.email.variant.weight.notblank']
+                        message: 'mautic.email.variant.weight.notblank'
                     ),
                 ],
             ]
@@ -61,7 +61,7 @@ class VariantType extends AbstractType
                     'placeholder' => 'mautic.core.form.chooseone',
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                            message: 'mautic.core.ab_test.winner_criteria.not_blank'
                         ),
                     ],
                 ]

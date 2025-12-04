@@ -166,11 +166,11 @@ class Import extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
-            ['message' => 'mautic.lead.import.dir.notblank']
+            message: 'mautic.lead.import.dir.notblank'
         ));
 
         $metadata->addPropertyConstraint('file', new Assert\NotBlank(
-            ['message' => 'mautic.lead.import.file.notblank']
+            message: 'mautic.lead.import.file.notblank'
         ));
     }
 

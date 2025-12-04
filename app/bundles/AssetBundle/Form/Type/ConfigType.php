@@ -26,9 +26,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.asset.config.form.upload.dir.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );
@@ -44,9 +42,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.asset.config.form.max.size.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );

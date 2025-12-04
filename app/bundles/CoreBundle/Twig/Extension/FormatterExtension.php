@@ -5,31 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
 
-class FormatterExtension extends AbstractExtension
+class FormatterExtension
 {
     public function __construct(
         protected FormatterHelper $formatterHelper,
     ) {
-    }
-
-    public function getFilters()
-    {
-        return [
-            new TwigFilter('formatter_simple_array_to_html', [$this, 'simpleArrayToHtml'], ['is_safe' => ['html']]),
-        ];
-    }
-
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('format', [$this, '_'], ['is_safe' => ['all']]),
-            new TwigFunction('normalizeStringValue', [$this, 'normalizeStringValue']),
-            new TwigFunction('formatter_simple_array_to_html', [$this, 'simpleArrayToHtml'], ['is_safe' => ['html']]),
-        ];
     }
 
     /**
@@ -37,6 +18,7 @@ class FormatterExtension extends AbstractExtension
      *
      * @param mixed $val
      */
+    #[\Twig\Attribute\AsTwigFunction('format', isSafe: ['all'])]
     public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1): string
     {
         return (string) $this->formatterHelper->_($val, $type, $textOnly, $round);
@@ -45,6 +27,7 @@ class FormatterExtension extends AbstractExtension
     /**
      * @see FormatterHelper::normalizeStringValue
      */
+    #[\Twig\Attribute\AsTwigFunction('normalizeStringValue')]
     public function normalizeStringValue(string $string): string
     {
         return $this->formatterHelper->normalizeStringValue($string);
@@ -53,6 +36,8 @@ class FormatterExtension extends AbstractExtension
     /**
      * @param array<mixed> $array
      */
+    #[\Twig\Attribute\AsTwigFilter('formatter_simple_array_to_html', isSafe: ['html'])]
+    #[\Twig\Attribute\AsTwigFunction('formatter_simple_array_to_html', isSafe: ['html'])]
     public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
     {
         return $this->formatterHelper->simpleArrayToHtml($array, $delimeter);

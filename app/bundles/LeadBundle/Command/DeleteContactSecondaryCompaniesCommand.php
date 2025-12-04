@@ -10,42 +10,23 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(
-    name: DeleteContactSecondaryCompaniesCommand::NAME,
-    description: "Deletes all contact\'s secondary companies."
-)]
-class DeleteContactSecondaryCompaniesCommand extends Command
-{
-    public const NAME                    = 'mautic:contact:delete:secondary-companies';
-
-    public function __construct(private LoggerInterface $logger, private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper, private CompanyLeadRepository $companyLeadsRepository)
-    {
-        parent::__construct();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
+#[AsCommand(name: DeleteContactSecondaryCompaniesCommand::NAME, description: "Deletes all contact\'s secondary companies.", help: <<<'TXT'
 The <info>%command.name%</info> command deletes non-primary companies of every contact.
 
 <info>php %command.full_name%</info>
-EOT
-            );
+TXT)]
+class DeleteContactSecondaryCompaniesCommand
+{
+    public const NAME = 'mautic:contact:delete:secondary-companies';
+
+    public function __construct(private LoggerInterface $logger, private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper, private CompanyLeadRepository $companyLeadsRepository)
+    {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         $allowMultiple = $this->coreParametersHelper->get('contact_allow_multiple_companies');
 

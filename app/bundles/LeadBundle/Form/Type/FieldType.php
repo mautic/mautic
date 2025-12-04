@@ -375,7 +375,7 @@ class FieldType extends AbstractType
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate(
                                                 $object,
-                                                new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/'])
+                                                new Assert\Regex(pattern: '/(2[0-3]|[01][0-9]):([0-5][0-9])/')
                                             );
 
                                             if (count($violations) > 0) {
@@ -587,7 +587,7 @@ class FieldType extends AbstractType
         $constraints = [];
 
         if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
-            $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
+            $constraints[] = new IsFalse(message: 'mautic.lead.field.form.index_count.error');
         }
 
         $builder->add(
@@ -735,8 +735,8 @@ class FieldType extends AbstractType
                      }',
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['groups' => 'indexableFieldWithLimits']),
-                    new Assert\Range(['min' => 1, 'max' => SchemaDefinition::MAX_VARCHAR_LENGTH, 'groups' => 'indexableFieldWithLimits']),
+                    new Assert\NotBlank(groups: 'indexableFieldWithLimits'),
+                    new Assert\Range(min: 1, max: SchemaDefinition::MAX_VARCHAR_LENGTH, groups: 'indexableFieldWithLimits'),
                 ],
             ]
         );

@@ -5,23 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class ContentExtension extends AbstractExtension
+class ContentExtension
 {
     public function __construct(
         protected ContentHelper $contentHelper,
     ) {
-    }
-
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('customContent', [$this, 'getCustomContent'], ['is_safe' => ['all']]),
-            new TwigFunction('showScriptTags', [$this, 'showScriptTags'], ['is_safe' => ['all']]),
-            new TwigFunction('getSortedEditorFonts', [$this, 'sortEditorFonts']),
-        ];
     }
 
     /**
@@ -31,6 +20,7 @@ class ContentExtension extends AbstractExtension
      * @param array<string,mixed> $vars     twig vars
      * @param ?string             $viewName The main identifier for the content requested. Will be etracted from $vars if get_defined
      */
+    #[\Twig\Attribute\AsTwigFunction('customContent', isSafe: ['all'])]
     public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string
     {
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
@@ -40,6 +30,7 @@ class ContentExtension extends AbstractExtension
      * Replaces HTML script tags with non HTML tags so the JS inside them won't
      * execute and will be readable.
      */
+    #[\Twig\Attribute\AsTwigFunction('showScriptTags', isSafe: ['all'])]
     public function showScriptTags(string $html): string
     {
         return $this->contentHelper->showScriptTags($html);
@@ -50,6 +41,7 @@ class ContentExtension extends AbstractExtension
      *
      * @return array<mixed>
      */
+    #[\Twig\Attribute\AsTwigFunction('getSortedEditorFonts')]
     public function sortEditorFonts(array $fonts): array
     {
         usort($fonts, static function ($fontA, $fontB): int {

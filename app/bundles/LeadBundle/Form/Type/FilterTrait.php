@@ -305,9 +305,7 @@ trait FilterTrait
             $attr['disabled'] = 'disabled';
         } elseif ($operator) {
             $customOptions['constraints'][] = new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
+                message: 'mautic.core.value.required'
             );
 
             if (in_array($operator, ['regexp', '!regexp']) && $this->connection) {

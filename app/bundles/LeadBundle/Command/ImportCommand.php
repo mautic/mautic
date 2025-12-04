@@ -13,7 +13,6 @@ use Mautic\UserBundle\Security\UserTokenSetter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,11 +20,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to import data.
  */
-#[AsCommand(
-    name: ImportCommand::COMMAND_NAME,
-    description: 'Imports data to Mautic'
-)]
-class ImportCommand extends Command
+#[AsCommand(name: ImportCommand::COMMAND_NAME, description: 'Imports data to Mautic', help: <<<'TXT'
+The <info>%command.name%</info> command starts to import CSV files when some are created.
+
+<info>php %command.full_name%</info>
+TXT)]
+class ImportCommand
 {
     public const COMMAND_NAME = 'mautic:import';
 
@@ -37,29 +37,16 @@ class ImportCommand extends Command
         private LoggerInterface $logger,
         private NotificationModel $notificationModel,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
-            ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command starts to import CSV files when some are created.
-
-<info>php %command.full_name%</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Specific ID to import. Defaults to next in the queue.')]
+        false $id = false, #[\Symfony\Component\Console\Attribute\Option(name: '--limit', shortcut: '-l', mode: InputOption::VALUE_OPTIONAL, description: 'Maximum number of records to import for this script execution.')]
+        int $limit = 0, OutputInterface $output): int
     {
         $start    = microtime(true);
         $progress = new Progress($output);
-        $id       = (int) $input->getOption('id');
-        $limit    = (int) $input->getOption('limit');
+        $id       = (int) $id;
+        $limit    = (int) $limit;
 
         $this->processSignalService->registerSignalHandler(fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal)));
 

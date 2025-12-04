@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -19,33 +18,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:fields:analyse',
     description: 'Analyse actual usage of custom columns in leads table.'
 )]
-class AnalyseCustomFieldCommand extends Command
+class AnalyseCustomFieldCommand
 {
     public function __construct(private FieldModel $fieldModel, private LeadModel $leadModel, private TranslatorInterface $translator)
     {
-        parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'display-table', shortcut: 't', mode: InputOption::VALUE_NONE, description: 'Display results in table format')]
+        bool $displayTable = false, OutputInterface $output): int
     {
-        $this
-            ->addOption(
-                'display-table',
-                't',
-                InputOption::VALUE_NONE,
-                'Display results in table format'
-            );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $displayAsTable = $input->getOption('display-table');
+        $displayAsTable = $displayTable;
 
         $fieldDetails = $this->getCustomFieldDetails();
         if (empty($fieldDetails)) {

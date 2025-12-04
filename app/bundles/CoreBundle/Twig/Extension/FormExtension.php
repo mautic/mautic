@@ -6,22 +6,13 @@ namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormView;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class FormExtension extends AbstractExtension
+class FormExtension
 {
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('formFieldFormatList', [$this, 'formatList'], ['is_safe' => ['all']]),
-            new TwigFunction('formContainsErrors', [$this, 'containsErrors'], ['is_safe' => ['all']]),
-        ];
-    }
-
     /**
      * @param array<string> $v
      */
+    #[\Twig\Attribute\AsTwigFunction('formFieldFormatList', isSafe: ['all'])]
     public function formatList(string $format, array $v): string
     {
         return FormFieldHelper::formatList($format, $v);
@@ -32,6 +23,7 @@ class FormExtension extends AbstractExtension
      *
      * @param array<string> $excluding
      */
+    #[\Twig\Attribute\AsTwigFunction('formContainsErrors', isSafe: ['all'])]
     public function containsErrors(FormView $form, array $excluding = []): bool
     {
         if (count($form->vars['errors'])) {

@@ -13,10 +13,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
-#[AsCommand(
-    name: 'mautic:unusedip:delete',
-    description: 'Deletes IP addresses that are not used in any other database table'
-)]
+#[AsCommand(name: 'mautic:unusedip:delete', description: 'Deletes IP addresses that are not used in any other database table', help: <<<'TXT'
+                The <info>%command.name%</info> command is used to delete IP addresses that are not used in any other database table.
+
+<info>php %command.full_name%</info>
+TXT)]
 class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
@@ -38,13 +39,6 @@ class UnusedIpDeleteCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'LIMIT for deleted rows',
                 self::DEFAULT_LIMIT
-            )
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is used to delete IP addresses that are not used in any other database table.
-
-<info>php %command.full_name%</info>
-EOT
             );
         parent::configure();
     }

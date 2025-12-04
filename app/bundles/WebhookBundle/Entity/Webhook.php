@@ -196,27 +196,21 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 

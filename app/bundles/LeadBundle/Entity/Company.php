@@ -256,10 +256,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
-        $metadata->addPropertyConstraint('score', new Assert\Range([
-            'min' => 0,
-            'max' => 2147483647,
-        ]));
+        $metadata->addPropertyConstraint('score', new Assert\Range(min: 0, max: 2147483647));
     }
 
     public static function getDefaultIdentifierFields(): array

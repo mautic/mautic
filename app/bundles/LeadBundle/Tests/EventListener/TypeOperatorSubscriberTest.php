@@ -231,7 +231,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'multiple'                  => true,
                     'choice_translation_domain' => false,
                     'disabled'                  => false,
-                    'constraints'               => [new NotBlank(['message' => 'mautic.core.value.required'])],
+                    'constraints'               => [new NotBlank(message: 'mautic.core.value.required')],
                     'attr'                      => [
                         'class'                => 'form-control',
                         'data-placeholder'     => 'mautic.lead.tags.select_or_create',
@@ -482,7 +482,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'multiple'                  => true,
                     'choice_translation_domain' => false,
                     'disabled'                  => false,
-                    'constraints'               => [new NotBlank(['message' => 'mautic.core.value.required'])],
+                    'constraints'               => [new NotBlank(message: 'mautic.core.value.required')],
                 ]
             );
 

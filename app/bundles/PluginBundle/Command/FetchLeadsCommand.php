@@ -6,7 +6,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,63 +17,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:integration:synccontacts',
     ]
 )]
-class FetchLeadsCommand extends Command
+class FetchLeadsCommand
 {
     public function __construct(
         private TranslatorInterface $translator,
         private IntegrationHelper $integrationHelper,
     ) {
-        parent::__construct();
     }
 
-    protected function configure()
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--integration', shortcut: '-i', mode: InputOption::VALUE_REQUIRED, description: 'Fetch leads from integration. Integration must be enabled and authorised.')]
+        $integration, #[\Symfony\Component\Console\Attribute\Option(name: '--start-date', shortcut: '-d', mode: InputOption::VALUE_REQUIRED, description: 'Set start date for updated values.')]
+        $startDate, #[\Symfony\Component\Console\Attribute\Option(name: '--end-date', shortcut: '-t', mode: InputOption::VALUE_REQUIRED, description: 'Set end date for updated values.')]
+        $endDate, #[\Symfony\Component\Console\Attribute\Option(name: '--fetch-all', mode: InputOption::VALUE_NONE, description: 'Get all CRM contacts whatever the date is. Should be used at instance initialization only')]
+        bool $fetchAll = false, #[\Symfony\Component\Console\Attribute\Option(name: '--time-interval', shortcut: '-a', mode: InputOption::VALUE_OPTIONAL, description: 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(10 minutes)')]
+        $timeInterval, #[\Symfony\Component\Console\Attribute\Option(name: '--limit', shortcut: '-l', mode: InputOption::VALUE_OPTIONAL, description: 'Number of records to process when syncing objects')]
+        int $limit = 100, #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Force execution even if another process is assumed running.')]
+        bool $force = false, OutputInterface $output): int
     {
-        $this
-            ->addOption(
-                '--integration',
-                '-i',
-                InputOption::VALUE_REQUIRED,
-                'Fetch leads from integration. Integration must be enabled and authorised.'
-            )
-            ->addOption('--start-date', '-d', InputOption::VALUE_REQUIRED, 'Set start date for updated values.')
-            ->addOption(
-                '--end-date',
-                '-t',
-                InputOption::VALUE_REQUIRED,
-                'Set end date for updated values.'
-            )
-            ->addOption(
-                '--fetch-all',
-                null,
-                InputOption::VALUE_NONE,
-                'Get all CRM contacts whatever the date is. Should be used at instance initialization only'
-            )
-            ->addOption(
-                '--time-interval',
-                '-a',
-                InputOption::VALUE_OPTIONAL,
-                'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(10 minutes)'
-            )
-            ->addOption(
-                '--limit',
-                '-l',
-                InputOption::VALUE_OPTIONAL,
-                'Number of records to process when syncing objects',
-                100
-            )
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
-
-        parent::configure();
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $integration   = $input->getOption('integration');
-        $startDate     = $input->getOption('start-date');
-        $endDate       = $input->getOption('end-date');
-        $interval      = $input->getOption('time-interval');
-        $limit         = $input->getOption('limit');
-        $fetchAll      = $input->getOption('fetch-all');
+        $integration   = $integration;
+        $startDate     = $startDate;
+        $endDate       = $endDate;
+        $interval      = $timeInterval;
+        $limit         = $limit;
+        $fetchAll      = $fetchAll;
         $leadsExecuted = $contactsExecuted = null;
 
         // @TODO Since integration is mandatory it should really be turned into an agument, but that would not be B.C.

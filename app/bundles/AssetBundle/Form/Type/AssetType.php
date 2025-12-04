@@ -101,9 +101,7 @@ class AssetType extends AbstractType
                 'required'    => false,
                 'constraints' => [
                     new Url(
-                        [
-                            'message' => 'mautic.asset.validation.error.url',
-                        ]
+                        message: 'mautic.asset.validation.error.url'
                     ),
                 ],
             ]
@@ -164,9 +162,7 @@ class AssetType extends AbstractType
             'required'    => true,
             'constraints' => [
                 new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ],
         ]);

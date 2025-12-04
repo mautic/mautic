@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
@@ -13,7 +12,7 @@ use Twig\TwigFunction;
  * The main goal of this extension is to move a lot of PHP logic that was previously
  * present in PHP templates into an extension, which can then be parsed by Twig.
  */
-class CoreHelpersExtension extends AbstractExtension
+class CoreHelpersExtension
 {
     public function __construct(
         private TranslatorInterface $translate,
@@ -23,10 +22,6 @@ class CoreHelpersExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            // Used by CoreBundle:Helper:list_filters.html.twig
-            new TwigFunction('getFilterAttributes', [$this, 'getFilterAttributes'], ['is_safe' => 'all']),
-            // Used by CoreBundle:Helper:pagination.html.twig
-            new TwigFunction('getPaginationAction', [$this, 'getPaginationAction'], ['is_safe' => 'all']),
             new TwigFunction('md5', fn (string $string) => md5($string), ['is_safe' => 'all']),
         ];
     }
@@ -38,13 +33,13 @@ class CoreHelpersExtension extends AbstractExtension
     {
         return [
             new TwigFilter('json_decode', fn (string $json) => json_decode($json, true)),
-            new TwigFilter('parse_str', [$this, 'parseString']),
         ];
     }
 
     /**
      * @return array<string, mixed>
      */
+    #[\Twig\Attribute\AsTwigFilter('parse_str')]
     public function parseString(string $string): array
     {
         parse_str($string, $result);
@@ -57,6 +52,7 @@ class CoreHelpersExtension extends AbstractExtension
      *
      * @return array<string>
      */
+    #[\Twig\Attribute\AsTwigFunction('getFilterAttributes', isSafe: ['all'])]
     public function getFilterAttributes(string $filterName, array $filter, string $target, string $tmpl): array
     {
         $attr       = [
@@ -92,6 +88,7 @@ class CoreHelpersExtension extends AbstractExtension
     /**
      * @param array<string,mixed> $jsArguments
      */
+    #[\Twig\Attribute\AsTwigFunction('getPaginationAction', isSafe: ['all'])]
     public function getPaginationAction(
         int $page,
         bool $active,

@@ -9,44 +9,28 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: CampaignDeleteEventLogsCommand::COMMAND_NAME,
     description: 'Delete campaign event logs'
 )]
-class CampaignDeleteEventLogsCommand extends Command
+class CampaignDeleteEventLogsCommand
 {
     public const COMMAND_NAME = 'mautic:campaign:delete-event-logs';
 
     public function __construct(private LeadEventLogRepository $leadEventLogRepository, private CampaignModel $campaignModel, private EventModel $eventModel)
     {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addArgument(
-                'campaign_event_ids',
-                InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
-                'Campaign event ids to delete event logs.'
-            )
-            ->addOption(
-                '--campaign-id',
-                '-i',
-                InputOption::VALUE_OPTIONAL,
-                'Delete campaign also otherwise will delete event and event log only.'
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $eventIds   = $input->getArgument('campaign_event_ids');
-        $campaignId = (int) $input->getOption('campaign-id');
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Argument(name: 'campaign_event_ids', description: 'Campaign event ids to delete event logs.')]
+        array $campaignEventIds,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--campaign-id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Delete campaign also otherwise will delete event and event log only.')]
+        $campaignId,
+    ): int {
+        $eventIds   = $campaignEventIds;
+        $campaignId = (int) $campaignId;
 
         if (!empty($campaignId)) {
             // For entire campaign deletion, remove both events and logs

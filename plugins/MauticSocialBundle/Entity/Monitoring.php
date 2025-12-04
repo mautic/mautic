@@ -97,11 +97,11 @@ class Monitoring extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(
-            ['message' => 'mautic.core.title.required']
+            message: 'mautic.core.title.required'
         ));
 
         $metadata->addPropertyConstraint('networkType', new Assert\NotBlank(
-            ['message' => 'mautic.social.network.type']
+            message: 'mautic.social.network.type'
         ));
     }
 

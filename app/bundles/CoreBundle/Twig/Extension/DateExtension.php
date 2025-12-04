@@ -5,28 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class DateExtension extends AbstractExtension
+class DateExtension
 {
     public function __construct(
         protected DateHelper $dateHelper,
     ) {
-    }
-
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('dateToText', [$this, 'toText'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFullConcat', [$this, 'toFullConcat'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToDate', [$this, 'toDate'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToTime', [$this, 'toTime'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToShort', [$this, 'toShort'], ['is_safe' => ['all']]),
-            new TwigFunction('dateFormatRange', [$this, 'formatRange'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToHumanized', [$this, 'toHumanized'], ['is_safe' => ['all']]),
-        ];
     }
 
     /**
@@ -35,6 +19,7 @@ class DateExtension extends AbstractExtension
      * @param mixed $datetime
      * @param bool  $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToText', isSafe: ['all'])]
     public function toText($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         return $this->dateHelper->toText($datetime, $timezone, $fromFormat, $forceDateForNonText);
@@ -45,6 +30,7 @@ class DateExtension extends AbstractExtension
      *
      * @param \DateTime|string $datetime
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToHumanized', isSafe: ['all'])]
     public function toHumanized($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toHumanized($datetime, $timezone, $fromFormat);
@@ -55,6 +41,7 @@ class DateExtension extends AbstractExtension
      *
      * @param \DateTime|string $datetime
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToFull', isSafe: ['all'])]
     public function toFull($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toFull($datetime, $timezone, $fromFormat);
@@ -69,6 +56,7 @@ class DateExtension extends AbstractExtension
      *
      * @return string
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToFullConcat', isSafe: ['all'])]
     public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
@@ -81,6 +69,7 @@ class DateExtension extends AbstractExtension
      *
      * @return string
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToDate', isSafe: ['all'])]
     public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
@@ -91,6 +80,7 @@ class DateExtension extends AbstractExtension
      *
      * @param \DateTime|string $datetime
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToTime', isSafe: ['all'])]
     public function toTime($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
@@ -101,6 +91,7 @@ class DateExtension extends AbstractExtension
      *
      * @param \DateTime|string $datetime
      */
+    #[\Twig\Attribute\AsTwigFunction('dateToShort', isSafe: ['all'])]
     public function toShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toShort($datetime, $timezone, $fromFormat);
@@ -109,6 +100,7 @@ class DateExtension extends AbstractExtension
     /**
      * @see DateHelper::formatRange
      */
+    #[\Twig\Attribute\AsTwigFunction('dateFormatRange', isSafe: ['all'])]
     public function formatRange(\DateInterval $range): string
     {
         return $this->dateHelper->formatRange($range);

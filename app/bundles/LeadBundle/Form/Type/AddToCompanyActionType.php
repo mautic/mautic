@@ -29,7 +29,7 @@ class AddToCompanyActionType extends AbstractType
                 'modal_route' => false,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.company.choosecompany.notblank']
+                        message: 'mautic.company.choosecompany.notblank'
                     ),
                 ],
             ]

@@ -45,10 +45,7 @@ final class FormFieldSliderType extends AbstractType
             'attr'        => ['class' => 'form-control'],
             'data'        => $options['data']['step'] ?? 1,
             'constraints' => [
-                new Range([
-                    'min'        => 1,
-                    'minMessage' => 'mautic.form.field.form.slider_step_min_error',
-                ]),
+                new Range(min: 1, minMessage: 'mautic.form.field.form.slider_step_min_error'),
                 new SliderStepLessThanMax([
                     'message' => 'mautic.form.field.form.slider_step_lt_max_error',
                 ]),

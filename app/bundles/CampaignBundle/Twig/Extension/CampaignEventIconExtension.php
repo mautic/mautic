@@ -4,21 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Twig\Extension;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
-
-final class CampaignEventIconExtension extends AbstractExtension
+final class CampaignEventIconExtension
 {
-    /**
-     * @see Twig_Extension::getFunctions()
-     */
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('getCampaignEventIcon', [$this, 'getCampaignEventIcon']),
-        ];
-    }
-
+    #[\Twig\Attribute\AsTwigFunction('getCampaignEventIcon')]
     public function getCampaignEventIcon(string $eventType): string
     {
         return match ($eventType) {

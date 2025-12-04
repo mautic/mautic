@@ -6,9 +6,6 @@ namespace Mautic\CoreBundle\Test;
 
 use Mautic\CoreBundle\Helper\ExitCode;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -17,18 +14,14 @@ use Symfony\Component\Finder\Finder;
     name: 'mautic:phpunit:config',
     description: 'Outputs PHPUnit configuration with <testsuites> split into passed [numberOfSuites]'
 )]
-final class PhpUnitConfigCommand extends Command
+final class PhpUnitConfigCommand
 {
-    protected function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Argument(name: 'numberOfSuites', description: 'Number of test suites')]
+        string $numberOfSuites, #[\Symfony\Component\Console\Attribute\Option(name: '--slow-tests', mode: InputOption::VALUE_REQUIRED, description: 'Path to a PHP file containing an array of slow tests with keys "slowTests" and "extraChunks"')]
+        $slowTests, OutputInterface $output): int
     {
-        $this->addArgument('numberOfSuites', InputArgument::REQUIRED, 'Number of test suites')
-            ->addOption('--slow-tests', null, InputOption::VALUE_REQUIRED, 'Path to a PHP file containing an array of slow tests with keys "slowTests" and "extraChunks"');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $numberOfSuites = (int) $input->getArgument('numberOfSuites');
-        $slowTestsPath  = $input->getOption('slow-tests');
+        $numberOfSuites = (int) $numberOfSuites;
+        $slowTestsPath  = $slowTests;
         $functional     = [];
         $unit           = [];
 

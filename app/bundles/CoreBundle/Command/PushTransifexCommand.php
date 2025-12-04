@@ -15,7 +15,6 @@ use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -23,11 +22,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to push language resources to Transifex.
  */
-#[AsCommand(
-    name: PushTransifexCommand::NAME,
-    description: 'Pushes Mautic translation resources to Transifex'
-)]
-class PushTransifexCommand extends Command
+#[AsCommand(name: PushTransifexCommand::NAME, description: 'Pushes Mautic translation resources to Transifex', help: <<<'TXT'
+The <info>%command.name%</info> command is used to push translation resources to Transifex
+
+<info>php %command.full_name%</info>
+
+You can optionally choose to update resources for one bundle only with the --bundle option:
+
+<info>php %command.full_name% --bundle AssetBundle</info>
+TXT)]
+class PushTransifexCommand
 {
     public const NAME = 'mautic:transifex:push';
 
@@ -36,28 +40,14 @@ class PushTransifexCommand extends Command
         private TranslatorInterface $translator,
         private LanguageHelper $languageHelper,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command is used to push translation resources to Transifex
-
-<info>php %command.full_name%</info>
-
-You can optionally choose to update resources for one bundle only with the --bundle option:
-
-<info>php %command.full_name% --bundle AssetBundle</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $bundleFilter = $input->getOption('bundle');
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: 'bundle', mode: InputOption::VALUE_OPTIONAL, description: 'Optional bundle to pull. Example value: WebhookBundle')]
+        $bundle,
+        OutputInterface $output,
+    ): int {
+        $bundleFilter = $bundle;
         $files        = $this->languageHelper->getLanguageFiles($bundleFilter ? [$bundleFilter] : []);
 
         try {

@@ -24,12 +24,7 @@ class CompanyChangeScoreActionType extends AbstractType
                 'scale'       => 0,
                 'data'        => $options['data']['score'] ?? 0,
                 'constraints' => [
-                    new NotEqualTo(
-                        [
-                            'value'   => 0,
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotEqualTo(value: 0, message: 'mautic.core.value.required'),
                 ],
             ]
         );

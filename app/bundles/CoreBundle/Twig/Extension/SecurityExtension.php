@@ -6,31 +6,21 @@ namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\SecurityHelper;
 use Mautic\UserBundle\Entity\User;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class SecurityExtension extends AbstractExtension
+class SecurityExtension
 {
     public function __construct(
         private SecurityHelper $securityHelper,
     ) {
     }
 
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('securityGetAuthenticationContext', [$this, 'getContext']),
-            new TwigFunction('securityGetCsrfToken', [$this, 'getCsrfToken']),
-            new TwigFunction('securityHasEntityAccess', [$this, 'hasEntityAccess']),
-            new TwigFunction('securityIsGranted', [$this, 'isGranted']),
-        ];
-    }
-
+    #[\Twig\Attribute\AsTwigFunction('securityGetAuthenticationContext')]
     public function getContext(): string
     {
         return $this->securityHelper->getAuthenticationContent();
     }
 
+    #[\Twig\Attribute\AsTwigFunction('securityGetCsrfToken')]
     public function getCsrfToken(string $intention): string
     {
         return $this->securityHelper->getCsrfToken($intention);
@@ -43,6 +33,7 @@ class SecurityExtension extends AbstractExtension
      * @param string|bool $otherPermission
      * @param User|int    $ownerId
      */
+    #[\Twig\Attribute\AsTwigFunction('securityHasEntityAccess')]
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
     {
         return $this->securityHelper->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
@@ -51,6 +42,7 @@ class SecurityExtension extends AbstractExtension
     /**
      * @return mixed
      */
+    #[\Twig\Attribute\AsTwigFunction('securityIsGranted')]
     public function isGranted(string $permission)
     {
         return $this->securityHelper->isGranted($permission);

@@ -43,9 +43,7 @@ class TweetType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.name.required',
-                        ]
+                        message: 'mautic.core.name.required'
                     ),
                 ],
             ]
@@ -78,9 +76,7 @@ class TweetType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

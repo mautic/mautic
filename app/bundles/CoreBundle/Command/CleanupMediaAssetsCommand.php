@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -13,32 +14,19 @@ use Symfony\Component\Finder\Finder;
 /**
  * CLI Command to clean up obsolete files in the media folder.
  */
-#[AsCommand(
-    name: 'mautic:assets:cleanup',
-    description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder'
-)]
-class CleanupMediaAssetsCommand extends Command
+#[AsCommand(name: 'mautic:assets:cleanup', description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder', help: <<<'TXT'
+                The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
+
+<info>php %command.full_name%</info>
+TXT)]
+class CleanupMediaAssetsCommand
 {
     public function __construct(
         private PathsHelper $pathsHelper,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-          ->setHelp(
-              <<<'EOT'
-                The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
-
-<info>php %command.full_name%</info>
-EOT
-          );
-        parent::configure();
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output, InputInterface $input): int
     {
         $assetsPath = $this->pathsHelper->getAssetsPath();
         $mediaPath  = $this->pathsHelper->getMediaPath();
@@ -70,8 +58,7 @@ EOT
             }
             $output->writeln('');
 
-            /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
-            $helper   = $this->getHelperSet()->get('question');
+            $helper   = new SymfonyQuestionHelper();
             $question = new ConfirmationQuestion(
                 '<question>delete files?</question> ', false
             );

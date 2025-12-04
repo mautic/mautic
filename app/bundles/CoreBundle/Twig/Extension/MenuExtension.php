@@ -7,23 +7,12 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Mautic\CoreBundle\Twig\Helper\MenuHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class MenuExtension extends AbstractExtension
+class MenuExtension
 {
     public function __construct(
         protected MenuHelper $menuHelper,
     ) {
-    }
-
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('menuRender', [$this, 'menuRender'], ['is_safe' => ['all']]),
-            new TwigFunction('parseMenuAttributes', [$this, 'parseMenuAttributes'], ['is_safe' => ['all']]),
-            new TwigFunction('buildMenuClasses', [$this, 'buildMenuClasses'], ['is_safe' => ['all']]),
-        ];
     }
 
     /**
@@ -32,6 +21,7 @@ class MenuExtension extends AbstractExtension
      * @param ItemInterface|string|array<mixed> $menu
      * @param array<mixed>                      $options
      */
+    #[\Twig\Attribute\AsTwigFunction('menuRender', isSafe: ['all'])]
     public function menuRender($menu, array $options = [], ?string $renderer = null): string
     {
         return $this->menuHelper->render($menu, $options, $renderer);
@@ -43,6 +33,7 @@ class MenuExtension extends AbstractExtension
      * @param array<string,string> $attributes
      * @param array<string,string> $overrides
      */
+    #[\Twig\Attribute\AsTwigFunction('parseMenuAttributes', isSafe: ['all'])]
     public function parseMenuAttributes(array $attributes, array $overrides = []): string
     {
         return $this->menuHelper->parseAttributes($attributes, $overrides);
@@ -55,6 +46,7 @@ class MenuExtension extends AbstractExtension
      *
      * @return array<mixed>
      */
+    #[\Twig\Attribute\AsTwigFunction('buildMenuClasses', isSafe: ['all'])]
     public function buildMenuClasses(ItemInterface $item, ?MatcherInterface $matcher, array $options, ?string $extraClasses): array
     {
         $isAncestor = null !== $matcher && $matcher->isAncestor($item, (int) $options['matchingDepth']);

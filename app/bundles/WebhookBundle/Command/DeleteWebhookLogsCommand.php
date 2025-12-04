@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -18,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: DeleteWebhookLogsCommand::COMMAND_NAME,
     description: 'Retains a rolling number of log records.'
 )]
-class DeleteWebhookLogsCommand extends Command
+class DeleteWebhookLogsCommand
 {
     public const COMMAND_NAME = 'mautic:webhooks:delete_logs';
 
@@ -28,12 +27,10 @@ class DeleteWebhookLogsCommand extends Command
         WebhookModel $webhookModel,
         private CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->logRepository        = $webhookModel->getLogRepository();
-
-        parent::__construct();
+        $this->logRepository = $webhookModel->getLogRepository();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         $logMaxLimit  = (int) $this->coreParametersHelper->get('webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX);
         $webHookIds   = $this->logRepository->getWebhooksBasedOnLogLimit($logMaxLimit);

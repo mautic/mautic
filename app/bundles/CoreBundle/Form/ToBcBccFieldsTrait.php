@@ -23,9 +23,7 @@ trait ToBcBccFieldsTrait
                 ],
                 'required'    => false,
                 'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
+                    message: 'mautic.core.email.required'
                 ),
             ]
         );
@@ -43,9 +41,7 @@ trait ToBcBccFieldsTrait
                 ],
                 'required'    => false,
                 'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
+                    message: 'mautic.core.email.required'
                 ),
             ]
         );
@@ -63,9 +59,7 @@ trait ToBcBccFieldsTrait
                 ],
                 'required'    => false,
                 'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
+                    message: 'mautic.core.email.required'
                 ),
             ]
         );

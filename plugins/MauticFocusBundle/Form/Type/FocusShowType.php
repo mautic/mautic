@@ -36,7 +36,7 @@ class FocusShowType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.focus.choosefocus.notblank']
+                        message: 'mautic.focus.choosefocus.notblank'
                     ),
                 ],
                 'data' => $options['data']['focus'] ?? null,

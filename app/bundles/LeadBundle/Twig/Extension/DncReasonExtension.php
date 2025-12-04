@@ -6,10 +6,8 @@ namespace Mautic\LeadBundle\Twig\Extension;
 
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class DncReasonExtension extends AbstractExtension
+class DncReasonExtension
 {
     public function __construct(
         protected DncReasonHelper $helper,
@@ -17,20 +15,11 @@ class DncReasonExtension extends AbstractExtension
     }
 
     /**
-     * @see Twig_Extension::getFunctions()
-     */
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('dncReasonToText', [$this, 'toText']),
-        ];
-    }
-
-    /**
      * Convert DNC reason ID to text.
      *
      * @throws UnknownDncReasonException
      */
+    #[\Twig\Attribute\AsTwigFunction('dncReasonToText')]
     public function toText(int $reasonId): string
     {
         return $this->helper->toText($reasonId);

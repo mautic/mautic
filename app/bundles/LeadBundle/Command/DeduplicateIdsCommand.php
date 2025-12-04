@@ -8,55 +8,30 @@ use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-#[AsCommand(
-    name: DeduplicateIdsCommand::NAME,
-    description: 'Merge contacts based on same unique identifiers'
-)]
-class DeduplicateIdsCommand extends Command
+#[AsCommand(name: DeduplicateIdsCommand::NAME, description: 'Merge contacts based on same unique identifiers', help: <<<'TXT'
+The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
+
+<info>php %command.full_name%</info>
+TXT)]
+class DeduplicateIdsCommand
 {
     public const NAME = 'mautic:contacts:deduplicate:ids';
 
     public function __construct(
         private ContactDeduper $contactDeduper,
     ) {
-        parent::__construct();
     }
 
-    public function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', mode: InputOption::VALUE_NONE, description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
+        bool $newerIntoOlder = false, #[\Symfony\Component\Console\Attribute\Option(name: '--contact-ids', mode: InputOption::VALUE_REQUIRED, description: 'Comma separated list of contact IDs to deduplicate. If not provided, all contacts will be deduplicated. Example: --contact-ids=23,3,11')]
+        $contactIds, OutputInterface $output): int
     {
-        parent::configure();
-
-        $this
-            ->addOption(
-                '--newer-into-older',
-                null,
-                InputOption::VALUE_NONE,
-                'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.'
-            )
-            ->addOption(
-                '--contact-ids',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Comma separated list of contact IDs to deduplicate. If not provided, all contacts will be deduplicated. Example: --contact-ids=23,3,11'
-            )
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
-
-<info>php %command.full_name%</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $newerIntoOlder = (bool) $input->getOption('newer-into-older');
-        $contactIds     = array_filter(explode(',', $input->getOption('contact-ids')));
+        $newerIntoOlder = (bool) $newerIntoOlder;
+        $contactIds     = array_filter(explode(',', $contactIds));
         $duplicateCount = count($contactIds);
         $progressBar    = new ProgressBar($output, $duplicateCount);
         $stopwatch      = new Stopwatch();

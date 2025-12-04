@@ -416,7 +416,7 @@ class InstallService
         $emailConstraint          = new Assert\Email();
         $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint             = new Assert\Length(min: 6);
         $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
         $validations[] = $this->validator->validate($data['email'], $emailConstraint);

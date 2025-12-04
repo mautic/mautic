@@ -5,30 +5,20 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-final class ThemesExtension extends AbstractExtension
+final class ThemesExtension
 {
     public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
     }
 
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('getTextOnBrandColor', [$this, 'getTextOnBrandColor']),
-            new TwigFunction('getTextOnBrandHelperColor', [$this, 'getTextOnBrandHelperColor']),
-            new TwigFunction('getBrandPrimaryColor', [$this, 'getBrandPrimaryColor']),
-            new TwigFunction('getRoundedCorners', [$this, 'getRoundedCorners']),
-        ];
-    }
-
+    #[\Twig\Attribute\AsTwigFunction('getBrandPrimaryColor')]
     public function getBrandPrimaryColor(): string
     {
         return $this->coreParametersHelper->get('primary_brand_color', '000000');
     }
 
+    #[\Twig\Attribute\AsTwigFunction('getTextOnBrandColor')]
     public function getTextOnBrandColor(): string
     {
         $primaryColor = $this->getBrandPrimaryColor();
@@ -44,11 +34,13 @@ final class ThemesExtension extends AbstractExtension
         return $brightness > 125 ? '000000' : 'ffffff';
     }
 
+    #[\Twig\Attribute\AsTwigFunction('getTextOnBrandHelperColor')]
     public function getTextOnBrandHelperColor(): string
     {
         return '000000' === $this->getTextOnBrandColor() ? '6d6d6d' : 'b3b3b3';
     }
 
+    #[\Twig\Attribute\AsTwigFunction('getRoundedCorners')]
     public function getRoundedCorners(string $size = 'lg'): int
     {
         $baseRadius = (int) $this->coreParametersHelper->get('rounded_corners', 0);

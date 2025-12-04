@@ -6,7 +6,6 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -15,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:execute',
     description: 'Execute specific scheduled events.'
 )]
-class ExecuteEventCommand extends Command
+class ExecuteEventCommand
 {
     use WriteCountTrait;
 
@@ -24,37 +23,22 @@ class ExecuteEventCommand extends Command
         private TranslatorInterface $translator,
         private FormatterHelper $formatterHelper,
     ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->addOption(
-                '--scheduled-log-ids',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'CSV of specific scheduled log IDs to execute.'
-            )
-            ->addOption(
-                '--execution-time',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Scheduled execution time of event log'
-            );
-
-        parent::configure();
     }
 
     /**
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: '--scheduled-log-ids', mode: InputOption::VALUE_REQUIRED, description: 'CSV of specific scheduled log IDs to execute.')]
+        $scheduledLogIds,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--execution-time', mode: InputOption::VALUE_REQUIRED, description: 'Scheduled execution time of event log')]
+        $executionTime,
+        OutputInterface $output,
+    ): int {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $now     = empty($input->getOption('execution-time')) ? null : new \DateTime($input->getOption('execution-time'));
-        $ids     = $this->formatterHelper->simpleCsvToArray($input->getOption('scheduled-log-ids'), 'int');
+        $now     = empty($executionTime) ? null : new \DateTime($executionTime);
+        $ids     = $this->formatterHelper->simpleCsvToArray($scheduledLogIds, 'int');
         $counter = $this->scheduledExecutioner->executeByIds($ids, $output, $now);
 
         $this->writeCounts($output, $this->translator, $counter);

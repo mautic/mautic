@@ -40,7 +40,7 @@ class SmsSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.sms.choosesms.notblank']
+                        message: 'mautic.sms.choosesms.notblank'
                     ),
                 ],
             ]

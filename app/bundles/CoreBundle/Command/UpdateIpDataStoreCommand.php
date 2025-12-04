@@ -6,39 +6,26 @@ use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to fetch updated Maxmind database.
  */
-#[AsCommand(
-    name: 'mautic:iplookup:download',
-    description: 'Fetch remote datastores for IP lookup services that leverage local lookups'
-)]
-class UpdateIpDataStoreCommand extends Command
+#[AsCommand(name: 'mautic:iplookup:download', description: 'Fetch remote datastores for IP lookup services that leverage local lookups', help: <<<'TXT'
+                The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
+
+<info>php %command.full_name%</info>
+TXT)]
+class UpdateIpDataStoreCommand
 {
     public function __construct(
         private TranslatorInterface $translator,
         private AbstractLookup $ipService,
     ) {
-        parent::__construct();
     }
 
-    protected function configure()
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
-
-<info>php %command.full_name%</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         if ($this->ipService instanceof AbstractLocalDataLookup) {
             if ($this->ipService->downloadRemoteDataStore()) {

@@ -6,15 +6,13 @@ use Mautic\CoreBundle\Helper\ComposerHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: RemoveCommand::NAME,
     description: 'Removes a plugin that is currently installed'
 )]
-class RemoveCommand extends Command
+class RemoveCommand
 {
     public const NAME = 'mautic:marketplace:remove';
 
@@ -22,20 +20,13 @@ class RemoveCommand extends Command
         private ComposerHelper $composer,
         private LoggerInterface $logger,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Argument(name: 'package', description: 'The Packagist package of the plugin to remove (e.g. mautic/example-plugin)')]
+        string $package, OutputInterface $output): int
     {
-        $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package of the plugin to remove (e.g. mautic/example-plugin)');
-
-        parent::configure();
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $output->writeln('Removing '.$input->getArgument('package').', this might take a while...');
-        $packageVendorAndName = $input->getArgument('package');
+        $output->writeln('Removing '.$package.', this might take a while...');
+        $packageVendorAndName = $package;
 
         // Just checking the package type so that the user doesn't accidentially removes a core package
         if (!in_array($packageVendorAndName, $this->composer->getMauticPluginPackages())) {
@@ -54,7 +45,7 @@ class RemoveCommand extends Command
             return Command::FAILURE;
         }
 
-        $output->writeln($input->getArgument('package').' has successfully been removed.');
+        $output->writeln($package.' has successfully been removed.');
 
         return Command::SUCCESS;
     }

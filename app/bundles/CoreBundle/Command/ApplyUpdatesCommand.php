@@ -19,41 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to update the application.
  */
-#[AsCommand(
-    name: 'mautic:update:apply',
-    description: 'Updates the Mautic application'
-)]
-class ApplyUpdatesCommand extends Command
-{
-    public function __construct(
-        private TranslatorInterface $translator,
-        private StepProvider $stepProvider,
-        private CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->setDefinition(
-                [
-                    new InputOption(
-                        'force', null, InputOption::VALUE_NONE,
-                        'Bypasses the verification check.'
-                    ),
-                    new InputOption(
-                        'update-package',
-                        'p', InputOption::VALUE_OPTIONAL, 'Optional full path to the update package to apply.'
-                    ),
-                    new InputOption(
-                        'finish', null, InputOption::VALUE_NONE,
-                        'Finalize the upgrade.'
-                    ),
-                ]
-            )
-            ->setHelp(
-                <<<'EOT'
+#[AsCommand(name: 'mautic:update:apply', description: 'Updates the Mautic application', help: <<<'TXT'
                 The <info>%command.name%</info> command updates the Mautic application.
 
 <info>php %command.full_name%</info>
@@ -65,12 +31,24 @@ You can optionally specify to bypass the verification check with the --force opt
 To force install a local package, pass the full path to the package as follows:
 
 <info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
-EOT
-            );
+TXT)]
+class ApplyUpdatesCommand
+{
+    public function __construct(
+        private TranslatorInterface $translator,
+        private StepProvider $stepProvider,
+        private CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: '--force', mode: InputOption::VALUE_NONE, description: 'Bypasses the verification check.')]
+        $force,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--finish', mode: InputOption::VALUE_NONE, description: 'Finalize the upgrade.')]
+        $finish,
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         /** @var array<string, mixed> $options */
         $options = $input->getOptions();
 
@@ -90,8 +68,8 @@ EOT
         }
 
         try {
-            if (empty($options['finish'])) {
-                $returnCode = $this->startUpgrade($input, $output, $progressBar);
+            if (empty($finish)) {
+                $returnCode = $this->startUpgrade($input, $output, $progressBar, $force);
 
                 $output->writeln(
                     "\n\n<warning>".$this->translator->trans('mautic.core.command.update.finalize_instructions').'</warning>'
@@ -114,11 +92,10 @@ EOT
     /**
      * @throws UpdateFailedException
      */
-    private function startUpgrade(InputInterface $input, OutputInterface $output, ProgressBar $progressBar): int
+    private function startUpgrade(InputInterface $input, OutputInterface $output, ProgressBar $progressBar, bool $force): int
     {
-        if (!$input->getOption('force')) {
-            /** @var SymfonyQuestionHelper $helper */
-            $helper   = $this->getHelperSet()->get('question');
+        if (!$force) {
+            $helper   = new SymfonyQuestionHelper();
             $question = new ConfirmationQuestion($this->translator->trans('mautic.core.update.confirm_application_update').' ', false);
 
             if (!$helper->ask($input, $output, $question)) {
@@ -130,7 +107,7 @@ EOT
             $step->execute($progressBar, $input, $output);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
@@ -142,6 +119,6 @@ EOT
             $step->execute($progressBar, $input, $output);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -8,7 +8,6 @@ use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -17,25 +16,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:reports:scheduler',
     description: "Processes scheduler for report's export"
 )]
-class ExportSchedulerCommand extends Command
+class ExportSchedulerCommand
 {
     public function __construct(
         private ReportExporter $reportExporter,
         private ReportCleanup $reportCleanup,
         private TranslatorInterface $translator,
     ) {
-        parent::__construct();
     }
 
-    protected function configure()
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--report', shortcut: 'report', mode: InputOption::VALUE_OPTIONAL, description: 'ID of report. Process all reports if not set.')]
+        $report, OutputInterface $output): int
     {
-        $this
-            ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $report = $input->getOption('report');
+        $report = $report;
 
         if (!is_null($report) && !is_numeric($report)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');

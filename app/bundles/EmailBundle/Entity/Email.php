@@ -441,49 +441,30 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'name',
-            new Length(
-                [
-                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
-                    'maxMessage' => 'mautic.email.name.length',
-                ]
-            )
+            new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')
         );
 
         $metadata->addPropertyConstraint(
             'subject',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.subject.required',
-                ]
+                message: 'mautic.core.subject.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'subject',
-            new Length(
-                [
-                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
-                    'maxMessage' => 'mautic.email.subject.length',
-                ]
-            )
+            new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')
         );
 
         $metadata->addPropertyConstraint(
             'preheaderText',
-            new Length(
-                [
-                    'max'        => 130,
-                    'maxMessage' => 'mautic.email.preheader_text.length',
-                ]
-            )
+            new Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')
         );
 
         $metadata->addPropertyConstraint(
@@ -494,18 +475,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addPropertyConstraint(
             'replyToAddress',
             new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
+                message: 'mautic.core.email.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'bccAddress',
             new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
+                message: 'mautic.core.email.required'
             )
         );
 

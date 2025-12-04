@@ -74,12 +74,8 @@ class EmailType extends AbstractType
                 'required'    => false,
                 'data'        => $default,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.email.required',
-                    ]),
-                    new Email([
-                        'message' => 'mautic.core.email.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.email.required'),
+                    new Email(message: 'mautic.core.email.required'),
                 ],
             ]
         );

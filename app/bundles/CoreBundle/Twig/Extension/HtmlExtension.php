@@ -4,19 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
-
-final class HtmlExtension extends AbstractExtension
+final class HtmlExtension
 {
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('htmlAttributesStringToArray', [$this, 'convertHtmlAttributesToArray']),
-            new TwigFunction('htmlEntityDecode', [$this, 'htmlEntityDecode']),
-        ];
-    }
-
     /**
      * Takes a string of HTML attributes and returns them as a key => value array.
      * Attribute strings which represent a single value are still output as a string
@@ -34,6 +23,7 @@ final class HtmlExtension extends AbstractExtension
      *
      * @return array<string, mixed>
      */
+    #[\Twig\Attribute\AsTwigFunction('htmlAttributesStringToArray')]
     public function convertHtmlAttributesToArray(string $attributes): array
     {
         if (empty($attributes)) {
@@ -74,6 +64,7 @@ final class HtmlExtension extends AbstractExtension
         return $attributes;
     }
 
+    #[\Twig\Attribute\AsTwigFunction('htmlEntityDecode')]
     public function htmlEntityDecode(string $content): string
     {
         return html_entity_decode($content);

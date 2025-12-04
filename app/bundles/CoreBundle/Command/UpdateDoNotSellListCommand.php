@@ -5,36 +5,23 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(
-    name: 'mautic:donotsell:download',
-    description: 'Fetch remote do not sell list from MaxMind'
-)]
-class UpdateDoNotSellListCommand extends Command
+#[AsCommand(name: 'mautic:donotsell:download', description: 'Fetch remote do not sell list from MaxMind', help: <<<'TXT'
+                The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
+
+<info>php %command.full_name%</info>
+TXT)]
+class UpdateDoNotSellListCommand
 {
     public function __construct(
         private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
         private TranslatorInterface $translator,
     ) {
-        parent::__construct();
     }
 
-    protected function configure()
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
-
-<info>php %command.full_name%</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         if ($this->maxMindDoNotSellDownloadHelper->downloadRemoteDataStore()) {
             $output->writeln('<info>'.$this->translator->trans('mautic.core.success').'</info>');

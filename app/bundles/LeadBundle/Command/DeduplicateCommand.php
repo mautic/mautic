@@ -9,18 +9,18 @@ use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-#[AsCommand(
-    name: DeduplicateCommand::NAME,
-    description: 'Merge contacts based on same unique identifiers'
-)]
-class DeduplicateCommand extends Command
+#[AsCommand(name: DeduplicateCommand::NAME, description: 'Merge contacts based on same unique identifiers', help: <<<'TXT'
+The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
+
+<info>php %command.full_name%</info>
+TXT)]
+class DeduplicateCommand
 {
     public const NAME = 'mautic:contacts:deduplicate';
 
@@ -28,48 +28,16 @@ class DeduplicateCommand extends Command
         private ContactDeduper $contactDeduper,
         private ParameterBagInterface $params,
     ) {
-        parent::__construct();
     }
 
-    public function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', mode: InputOption::VALUE_NONE, description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
+        bool $newerIntoOlder = false, #[\Symfony\Component\Console\Attribute\Option(name: '--batch', mode: InputOption::VALUE_REQUIRED, description: 'How many contact duplicates to process at once. Defaults to 100.')]
+        int $batch = 100, #[\Symfony\Component\Console\Attribute\Option(name: '--processes', mode: InputOption::VALUE_REQUIRED, description: 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.')]
+        int $processes = 1, OutputInterface $output): int
     {
-        parent::configure();
-
-        $this
-            ->addOption(
-                '--newer-into-older',
-                null,
-                InputOption::VALUE_NONE,
-                'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.'
-            )
-            ->addOption(
-                '--batch',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'How many contact duplicates to process at once. Defaults to 100.',
-                100
-            )
-            ->addOption(
-                '--processes',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.',
-                1
-            )
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
-
-<info>php %command.full_name%</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $newerIntoOlder  = (bool) $input->getOption('newer-into-older');
-        $batch           = (int) $input->getOption('batch');
-        $processes       = (int) $input->getOption('processes');
+        $newerIntoOlder  = (bool) $newerIntoOlder;
+        $batch           = (int) $batch;
+        $processes       = (int) $processes;
         $uniqueFields    = $this->contactDeduper->getUniqueFields('lead');
         $duplicateCount  = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
         $stopwatch       = new Stopwatch();

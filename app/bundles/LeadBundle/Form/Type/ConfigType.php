@@ -75,9 +75,7 @@ class ConfigType extends AbstractType
             'required'    => false,
             'data'        => $options['data']['contact_export_limit'] ?? 0,
             'constraints' => [
-                new GreaterThanOrEqual([
-                    'value' => 0,
-                ]),
+                new GreaterThanOrEqual(value: 0),
             ],
         ]);
 
@@ -104,7 +102,7 @@ class ConfigType extends AbstractType
                     'expanded'    => false,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'data'=> array_flip($orderColumns),

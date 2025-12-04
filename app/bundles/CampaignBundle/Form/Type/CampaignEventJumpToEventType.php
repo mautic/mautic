@@ -32,9 +32,7 @@ class CampaignEventJumpToEventType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

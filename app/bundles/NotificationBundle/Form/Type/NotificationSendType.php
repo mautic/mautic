@@ -35,7 +35,7 @@ class NotificationSendType extends AbstractType
                 'multiple'    => false,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.notification.choosenotification.notblank']
+                        message: 'mautic.notification.choosenotification.notblank'
                     ),
                 ],
             ]

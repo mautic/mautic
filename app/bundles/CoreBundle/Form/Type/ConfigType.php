@@ -57,9 +57,7 @@ class ConfigType extends AbstractType
                 'default_protocol' => 'https',
                 'constraints'      => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -112,9 +110,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -132,9 +128,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -152,9 +146,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                     new Callback([$this, 'validateImagePath']),
                 ],
@@ -315,12 +307,8 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
-                    new GreaterThanOrEqual([
-                        'value' => 0,
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ]
         );
@@ -337,9 +325,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -357,9 +343,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -377,9 +361,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -397,9 +379,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

@@ -8,10 +8,8 @@ use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class ButtonExtension extends AbstractExtension
+class ButtonExtension
 {
     public function __construct(
         protected ButtonHelper $buttonHelper,
@@ -21,21 +19,7 @@ class ButtonExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
-    {
-        return [
-            new TwigFunction('buttonReset', [$this, 'reset'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonAdd', [$this, 'addButton'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetMenuLink', [$this, 'setMenuLink'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetWrappingTags', [$this, 'setWrappingTags'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetGroupType', [$this, 'setGroupType'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonGetCount', [$this, 'getButtonCount']),
-            new TwigFunction('buttonsRender', [$this, 'render'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonsAdd', [$this, 'addButtons'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonsAddFromTemplate', [$this, 'addButtonsFromTemplate'], ['is_safe' => ['all']]),
-        ];
-    }
-
+    #[\Twig\Attribute\AsTwigFunction('buttonReset', isSafe: ['all'])]
     public function reset(string $location, string $groupType = ButtonHelper::TYPE_GROUP, $item = null): void
     {
         $this->buttonHelper->reset(
@@ -49,26 +33,31 @@ class ButtonExtension extends AbstractExtension
     /**
      * @param array<string,mixed> $button
      */
+    #[\Twig\Attribute\AsTwigFunction('buttonAdd', isSafe: ['all'])]
     public function addButton(array $button): void
     {
         $this->buttonHelper->addButton($button);
     }
 
+    #[\Twig\Attribute\AsTwigFunction('buttonSetMenuLink', isSafe: ['all'])]
     public function setMenuLink(?string $menuLink): void
     {
         $this->buttonHelper->setMenuLink($menuLink);
     }
 
+    #[\Twig\Attribute\AsTwigFunction('buttonSetWrappingTags', isSafe: ['all'])]
     public function setWrappingTags(?string $wrapOpeningTag, ?string $wrapClosingTag): void
     {
         $this->buttonHelper->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
     }
 
+    #[\Twig\Attribute\AsTwigFunction('buttonSetGroupType', isSafe: ['all'])]
     public function setGroupType(string $groupType): void
     {
         $this->buttonHelper->setGroupType($groupType);
     }
 
+    #[\Twig\Attribute\AsTwigFunction('buttonGetCount')]
     public function getButtonCount(): int
     {
         return $this->buttonHelper->getButtonCount();
@@ -77,11 +66,13 @@ class ButtonExtension extends AbstractExtension
     /**
      * @param array<array<string,mixed>> $buttons
      */
+    #[\Twig\Attribute\AsTwigFunction('buttonsAdd', isSafe: ['all'])]
     public function addButtons(array $buttons): void
     {
         $this->buttonHelper->addButtons($buttons);
     }
 
+    #[\Twig\Attribute\AsTwigFunction('buttonsRender', isSafe: ['all'])]
     public function render(string $dropdownHtml = '', string $closingDropdownHtml = ''): string
     {
         return $this->buttonHelper->renderButtons($dropdownHtml, $closingDropdownHtml);
@@ -94,6 +85,7 @@ class ButtonExtension extends AbstractExtension
      * @param array<string,string> $routeVars
      * @param mixed                $item
      */
+    #[\Twig\Attribute\AsTwigFunction('buttonsAddFromTemplate', isSafe: ['all'])]
     public function addButtonsFromTemplate(
         array $templateButtons,
         array $query,

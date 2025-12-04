@@ -201,7 +201,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new Assert\NotBlank(
-                        ['message' => 'mautic.form.field.label.notblank']
+                        message: 'mautic.form.field.label.notblank'
                     ),
                 ],
             ]

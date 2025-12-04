@@ -16,7 +16,6 @@ use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -24,11 +23,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to pull language resources from Transifex.
  */
-#[AsCommand(
-    name: PullTransifexCommand::NAME,
-    description: 'Fetches translations for Mautic from Transifex'
-)]
-class PullTransifexCommand extends Command
+#[AsCommand(name: PullTransifexCommand::NAME, description: 'Fetches translations for Mautic from Transifex', help: <<<'TXT'
+The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
+
+<info>php %command.full_name%</info>
+
+The command can optionally only pull files for a specific language with the --language option
+
+<info>php %command.full_name% --language=<language_code></info>
+TXT)]
+class PullTransifexCommand
 {
     public const NAME = 'mautic:transifex:pull';
 
@@ -38,32 +42,20 @@ class PullTransifexCommand extends Command
         private PathsHelper $pathsHelper,
         private LanguageHelper $languageHelper,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull')
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
-            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.')
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
-
-<info>php %command.full_name%</info>
-
-The command can optionally only pull files for a specific language with the --language option
-
-<info>php %command.full_name% --language=<language_code></info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $languageFilter = $input->getOption('language');
-        $bundleFilter   = $input->getOption('bundle');
-        $path           = $input->getOption('path');
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: 'language', mode: InputOption::VALUE_OPTIONAL, description: 'Optional language to pull')]
+        $language,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'bundle', mode: InputOption::VALUE_OPTIONAL, description: 'Optional bundle to pull. Example value: WebhookBundle')]
+        $bundle,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'path', mode: InputOption::VALUE_OPTIONAL, description: 'Optional path to a directory where to store the traslations.')]
+        $path,
+        OutputInterface $output,
+    ): int {
+        $languageFilter = $language;
+        $bundleFilter   = $bundle;
+        $path           = $path;
         $files          = $this->languageHelper->getLanguageFiles();
         $translationDir = ($path ?? $this->pathsHelper->getTranslationsPath()).'/';
 

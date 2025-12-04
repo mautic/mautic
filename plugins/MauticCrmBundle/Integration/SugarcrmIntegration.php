@@ -928,9 +928,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ],
                 'label'             => 'mautic.sugarcrm.form.version',
                 'constraints'       => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
                 'required' => true,
             ]);

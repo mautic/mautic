@@ -7,7 +7,6 @@ use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -15,34 +14,22 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'mautic:social:monitoring',
     description: 'Looks at the records of monitors and iterates through them.'
 )]
-class MauticSocialMonitoringCommand extends Command
+class MauticSocialMonitoringCommand
 {
     public function __construct(
         private MonitoringModel $monitoringModel,
+        private MonitorTwitterHashtagsCommand $hashtagsCommand,
+        private MonitorTwitterMentionsCommand $mentionsCommand,
     ) {
-        parent::__construct();
     }
 
-    protected function configure()
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'mid', shortcut: 'i', mode: InputOption::VALUE_OPTIONAL, description: 'The id of a specific monitor record to process')]
+        $mid, #[\Symfony\Component\Console\Attribute\Option(name: 'batch-size', mode: InputOption::VALUE_REQUIRED, description: 'The maximum number of iterations the cron runs per cycle. This value gets distributed by the number of monitor records published')]
+        $batchSize, #[\Symfony\Component\Console\Attribute\Option(name: 'query-count', mode: InputOption::VALUE_OPTIONAL, description: 'The number of records to search for per iteration. Default is 100.')]
+        int $queryCount = 100, OutputInterface $output): int
     {
-        $this
-            ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
-            ->addOption(
-                'batch-size',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The maximum number of iterations the cron runs per cycle. This value gets distributed by the number of monitor records published'
-            )
-            ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        // get the mid from the cli
-        $batchSize = $input->getOption('batch-size');
-
         // monitor record
-        $monitorId   = $input->getOption('mid');
+        $monitorId   = $mid;
         $monitorList = $this->getMonitors($monitorId);
 
         // no mid found, quit now
@@ -55,7 +42,7 @@ class MauticSocialMonitoringCommand extends Command
         if (!is_numeric($batchSize)) {
             $output->writeln('batch-size is not number.');
 
-            return self::FAILURE;
+            return Command::FAILURE;
         }
 
         // max iterations
@@ -63,7 +50,7 @@ class MauticSocialMonitoringCommand extends Command
 
         foreach ($monitorList as $monitor) {
             $output->writeln('Executing Monitor Item '.$monitor->getId());
-            $resultCode = $this->processMonitorListItem($monitor, $maxPerIterations, $input, $output);
+            $resultCode = $this->processMonitorListItem($monitor, $maxPerIterations, $output, $queryCount);
             $output->writeln('Result Code: '.$resultCode);
         }
 
@@ -103,38 +90,38 @@ class MauticSocialMonitoringCommand extends Command
      *
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output)
+    protected function processMonitorListItem($listItem, float $maxPerIterations, OutputInterface $output, int $queryCount)
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();
 
+        $command     = null;
         $commandName = '';
 
         // hashtag command
         if ('twitter_hashtag' == $networkType) {
+            $command     = $this->hashtagsCommand;
             $commandName = 'social:monitor:twitter:hashtags';
         }
 
         // mention command
         if ('twitter_handle' == $networkType) {
+            $command     = $this->mentionsCommand;
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ('' == $commandName) {
+        if (null === $command) {
             $output->writeln('Matching command not found.');
 
             return 1;
         }
-
-        // monitor hash command
-        $command = $this->getApplication()->find($commandName);
 
         // create command options
         $cliArgs = [
             'command'       => $commandName,
             '--mid'         => $listItem->getId(),
             '--max-runs'    => $maxPerIterations,
-            '--query-count' => $input->getOption('query-count'),
+            '--query-count' => $queryCount,
         ];
 
         // execute the command

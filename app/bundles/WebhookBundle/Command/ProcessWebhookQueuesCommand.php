@@ -8,7 +8,6 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\Service\WebhookService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: ProcessWebhookQueuesCommand::COMMAND_NAME,
     description: 'Process queued webhook payloads'
 )]
-class ProcessWebhookQueuesCommand extends Command
+class ProcessWebhookQueuesCommand
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
 
@@ -27,35 +26,12 @@ class ProcessWebhookQueuesCommand extends Command
         private CoreParametersHelper $coreParametersHelper,
         private WebhookService $webhookService,
     ) {
-        parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        $this->addOption(
-            '--webhook-id',
-            '-i',
-            InputOption::VALUE_OPTIONAL,
-            'Process payload for a specific webhook.  If not specified, all webhooks will be processed.'
-        )
-            ->addOption(
-                '--min-id',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Sets the minimum webhook queue ID to process (so called range mode).'
-            )
-            ->addOption(
-                '--max-id',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Sets the maximum webhook queue ID to process (so called range mode).'
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--webhook-id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Process payload for a specific webhook.  If not specified, all webhooks will be processed.')]
+        $webhookId, #[\Symfony\Component\Console\Attribute\Option(name: '--min-id', mode: InputOption::VALUE_OPTIONAL, description: 'Sets the minimum webhook queue ID to process (so called range mode).')]
+        $minId, #[\Symfony\Component\Console\Attribute\Option(name: '--max-id', mode: InputOption::VALUE_OPTIONAL, description: 'Sets the maximum webhook queue ID to process (so called range mode).')]
+        $maxId, OutputInterface $output): int
     {
         // check to make sure we are in queue mode
         if ($this->coreParametersHelper->get('queue_mode') != $this->webhookModel::COMMAND_PROCESS) {
@@ -64,9 +40,9 @@ class ProcessWebhookQueuesCommand extends Command
             return Command::SUCCESS;
         }
 
-        $id    = $input->getOption('webhook-id');
-        $minId = (int) $input->getOption('min-id');
-        $maxId = (int) $input->getOption('max-id');
+        $id    = $webhookId;
+        $minId = (int) $minId;
+        $maxId = (int) $maxId;
 
         $queueRangeMode = false;
 

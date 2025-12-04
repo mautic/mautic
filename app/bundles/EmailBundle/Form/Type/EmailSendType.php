@@ -41,7 +41,7 @@ class EmailSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.email.chooseemail.notblank']
+                        message: 'mautic.email.chooseemail.notblank'
                     ),
                 ],
             ]

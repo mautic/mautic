@@ -11,43 +11,33 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to generate production assets.
  */
-#[AsCommand(
-    name: 'mautic:assets:generate',
-    description: 'Combines and minifies asset files into single production files'
-)]
-class GenerateProductionAssetsCommand extends Command
+#[AsCommand(name: 'mautic:assets:generate', description: 'Combines and minifies asset files into single production files', help: <<<'TXT'
+                The <info>%command.name%</info> command Combines and minifies files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively. It allso runs the command elfinder:install internally to install ElFinder assets.
+
+<info>php %command.full_name%</info>
+TXT)]
+class GenerateProductionAssetsCommand
 {
     public function __construct(
         private AssetGenerationHelper $assetGenerationHelper,
         private PathsHelper $pathsHelper,
         private TranslatorInterface $translator,
         private Filesystem $filesystem,
+        #[Autowire(service: 'fm_elfinder.command.installer')]
+        private Command $elfinderInstallerCommand,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command Combines and minifies files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively. It allso runs the command elfinder:install internally to install ElFinder assets.
-
-<info>php %command.full_name%</info>
-EOT
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
         $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
@@ -122,9 +112,7 @@ EOT
 
     private function installElFinderAssets(string $mediaDir): void
     {
-        $command = $this->getApplication()->find('elfinder:install');
-
-        $command->run(new ArrayInput(['--docroot' => $mediaDir]), new NullOutput());
+        $this->elfinderInstallerCommand->run(new ArrayInput(['--docroot' => $mediaDir]), new NullOutput());
     }
 
     /**

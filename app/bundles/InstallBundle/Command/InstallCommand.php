@@ -11,7 +11,6 @@ use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,11 +19,10 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * CLI Command to install Mautic.
  */
-#[AsCommand(
-    name: InstallCommand::COMMAND,
-    description: 'Installs Mautic'
-)]
-class InstallCommand extends Command
+#[AsCommand(name: InstallCommand::COMMAND, description: 'Installs Mautic', help: <<<'TXT'
+This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
+TXT)]
+class InstallCommand
 {
     public const COMMAND = 'mautic:install';
 
@@ -32,124 +30,44 @@ class InstallCommand extends Command
         private InstallService $installer,
         private ManagerRegistry $doctrineRegistry,
     ) {
-        parent::__construct();
     }
 
-    /**
-     * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
-     */
-    protected function configure()
-    {
-        $this
-            ->setName(self::COMMAND)
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
-            ->addArgument(
-                'site_url',
-                InputArgument::REQUIRED,
-                'Site URL.'
-            )
-            ->addArgument(
-                'step',
-                InputArgument::OPTIONAL,
-                'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration, 4 for final step. Each successful step will trigger the next until completion.',
-                '0'
-            )
-            ->addOption(
-                '--force',
-                '-f',
-                InputOption::VALUE_NONE,
-                'Do not ask confirmation if recommendations triggered.'
-            )
-            ->addOption(
-                '--db_driver',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database driver.'
-            )
-            ->addOption(
-                '--db_host',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database host.'
-            )
-            ->addOption(
-                '--db_port',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database port.'
-            )
-            ->addOption(
-                '--db_name',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database name.'
-            )
-            ->addOption(
-                '--db_user',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database user.'
-            )
-            ->addOption(
-                '--db_password',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database password.'
-            )
-            ->addOption(
-                '--db_table_prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database tables prefix.'
-            )
-            ->addOption(
-                '--db_backup_tables',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Backup database tables if they exist; otherwise drop them. (true|false)'
-            )
-            ->addOption(
-                '--db_backup_prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Database backup tables prefix.'
-            )
-            ->addOption(
-                '--admin_firstname',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Admin first name.'
-            )
-            ->addOption(
-                '--admin_lastname',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Admin last name.'
-            )
-            ->addOption(
-                '--admin_username',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Admin username.'
-            )
-            ->addOption(
-                '--admin_email',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Admin email.'
-            )
-            ->addOption(
-                '--admin_password',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Admin user.'
-            );
-
-        parent::configure();
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Argument(name: 'site_url', description: 'Site URL.')]
+        string $siteUrl,
+        #[\Symfony\Component\Console\Attribute\Argument(name: 'step', description: 'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration, 4 for final step. Each successful step will trigger the next until completion.')]
+        ?string $step = '0',
+        #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Do not ask confirmation if recommendations triggered.')]
+        bool $force = false,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_host', mode: InputOption::VALUE_REQUIRED, description: 'Database host.')]
+        ?string $dbHost = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_port', mode: InputOption::VALUE_REQUIRED, description: 'Database port.')]
+        ?string $dbPort = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_name', mode: InputOption::VALUE_REQUIRED, description: 'Database name.')]
+        ?string $dbName = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_user', mode: InputOption::VALUE_REQUIRED, description: 'Database user.')]
+        ?string $dbUser = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_password', mode: InputOption::VALUE_REQUIRED, description: 'Database password.')]
+        ?string $dbPassword = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_table_prefix', mode: InputOption::VALUE_REQUIRED, description: 'Database tables prefix.')]
+        ?string $dbTablePrefix = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_backup_tables', mode: InputOption::VALUE_REQUIRED, description: 'Backup database tables if they exist; otherwise drop them. (true|false)')]
+        ?string $dbBackupTables = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_backup_prefix', mode: InputOption::VALUE_REQUIRED, description: 'Database backup tables prefix.')]
+        ?string $dbBackupPrefix = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_firstname', mode: InputOption::VALUE_REQUIRED, description: 'Admin first name.')]
+        ?string $adminFirstname = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_lastname', mode: InputOption::VALUE_REQUIRED, description: 'Admin last name.')]
+        ?string $adminLastname = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_username', mode: InputOption::VALUE_REQUIRED, description: 'Admin username.')]
+        ?string $adminUsername = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_email', mode: InputOption::VALUE_REQUIRED, description: 'Admin email.')]
+        ?string $adminEmail = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_password', mode: InputOption::VALUE_REQUIRED, description: 'Admin user.')]
+        ?string $adminPassword = null,
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         // Check Mautic is not already installed
         if ($this->installer->checkIfInstalled()) {
             $output->writeln('Mautic already installed');
@@ -170,10 +88,9 @@ class InstallCommand extends Command
 
         // Build objects to pass to the install service from local.php or command line options
         $output->writeln('Parsing options and arguments...');
-        $options = $input->getOptions();
 
         // Convert boolean options to actual booleans.
-        $options['db_backup_tables'] = (bool) filter_var($options['db_backup_tables'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $options['db_backup_tables'] = (bool) filter_var($dbBackupTables, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
         /**
          * We need to have some default database parameters, as it could be the case that the
@@ -221,11 +138,11 @@ class InstallCommand extends Command
         if (!empty($allParams['site_url'])) {
             $siteUrl = $allParams['site_url'];
         } else {
-            $siteUrl               = $input->getArgument('site_url');
+            $siteUrl               = $siteUrl;
             $allParams['site_url'] = $siteUrl;
         }
 
-        $step = (float) $input->getArgument('step');
+        $step = (float) $step;
 
         switch ($step) {
             default:
@@ -244,11 +161,10 @@ class InstallCommand extends Command
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 
-                        if (empty($options['force'])) {
+                        if (!$force) {
                             // Ask user to confirm install when optional settings missing
 
-                            /** @var QuestionHelper $helper */
-                            $helper   = $this->getHelper('question');
+                            $helper   = new QuestionHelper();
                             $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 
                             if (!$helper->ask($input, $output, $question)) {

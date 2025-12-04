@@ -186,9 +186,7 @@ class Tweet extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new Assert\Length(
-            [
-                'max' => 280,
-            ]
+            max: 280
         ));
     }
 

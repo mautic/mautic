@@ -207,9 +207,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
@@ -222,9 +220,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
                         $sms->getLists(),
                         [
                             new NotBlank(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
+                                message: 'mautic.lead.lists.required'
                             ),
                             new LeadListAccess(),
                         ]

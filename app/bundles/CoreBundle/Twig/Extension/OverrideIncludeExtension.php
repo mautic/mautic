@@ -9,28 +9,14 @@ use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
-use Twig\Extension\AbstractExtension;
 use Twig\Extension\CoreExtension;
-use Twig\TwigFunction;
 
-final class OverrideIncludeExtension extends AbstractExtension
+final class OverrideIncludeExtension
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private RequestStack $requestStack,
     ) {
-    }
-
-    public function getFunctions(): array
-    {
-        return [
-            // Override the built-in include function with higher priority
-            new TwigFunction('include', [$this, 'includeWithEvent'], [
-                'needs_environment' => true,
-                'needs_context'     => true,
-                'is_safe'           => ['html'],
-            ]),
-        ];
     }
 
     /**
@@ -40,6 +26,7 @@ final class OverrideIncludeExtension extends AbstractExtension
      * @param string|string[] $template
      * @param mixed[]         $variables
      */
+    #[\Twig\Attribute\AsTwigFunction('include', needsEnvironment: true, needsContext: true, isSafe: ['html'])]
     public function includeWithEvent(Environment $env, array $context, $template, array $variables = [], bool $withContext = true, bool $ignoreMissing = false, bool $sandboxed = false): string
     {
         if ($withContext) {

@@ -7,15 +7,13 @@ use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: InstallCommand::NAME,
     description: 'Installs a plugin that is available at Packagist.org'
 )]
-class InstallCommand extends Command
+class InstallCommand
 {
     public const NAME = 'mautic:marketplace:install';
 
@@ -23,21 +21,14 @@ class InstallCommand extends Command
         private ComposerHelper $composer,
         private PackageModel $packageModel,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Argument(name: 'package', description: 'The Packagist package to install (e.g. mautic/example-plugin)')]
+        string $package, #[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', description: 'Simulate the installation of the package. Doesn\'t actually install it.')]
+        $dryRun, OutputInterface $output): int
     {
-        $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
-        $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
-
-        parent::configure();
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $packageName = $input->getArgument('package');
-        $dryRun      = true === $input->getOption('dry-run') ? true : false;
+        $packageName = (string) $package;
+        $dryRun      = (bool) $dryRun;
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);
@@ -57,8 +48,8 @@ class InstallCommand extends Command
             $output->writeLn('Note: dry-running this installation!');
         }
 
-        $output->writeln('Installing '.$input->getArgument('package').', this might take a while...');
-        $result = $this->composer->install($input->getArgument('package'), $dryRun);
+        $output->writeln('Installing '.$packageName.', this might take a while...');
+        $result = $this->composer->install($packageName, $dryRun);
 
         if (0 !== $result->exitCode) {
             $output->writeln('<error>Error while installing this plugin.</error>');
@@ -73,7 +64,7 @@ class InstallCommand extends Command
             return $result->exitCode;
         }
 
-        $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
+        $output->writeln('All done! '.$package.' has successfully been installed.');
 
         return Command::SUCCESS;
     }

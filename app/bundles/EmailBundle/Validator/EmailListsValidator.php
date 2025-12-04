@@ -37,9 +37,7 @@ final class EmailListsValidator extends ConstraintValidator
             [
                 new LeadListAccess(),
                 new NotBlank(
-                    [
-                        'message' => 'mautic.lead.lists.required',
-                    ]
+                    message: 'mautic.lead.lists.required'
                 ),
             ]
         );

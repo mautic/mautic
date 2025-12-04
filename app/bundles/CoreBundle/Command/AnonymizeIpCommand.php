@@ -10,14 +10,13 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: AnonymizeIpCommand::COMMAND_NAME,
     description: 'Delete all stored ip addresses.'
 )]
-class AnonymizeIpCommand extends Command
+class AnonymizeIpCommand
 {
     /**
      * @var string
@@ -26,10 +25,9 @@ class AnonymizeIpCommand extends Command
 
     public function __construct(private IpAddressRepository $ipAddressRepository, private CoreParametersHelper $coreParametersHelper, private AuditLogRepository $auditLogRepository)
     {
-        parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         if (!$this->coreParametersHelper->get('anonymize_ip')) {
             return $this->exitWithError('Anonymization could not be done because anonymize Ip feature is disabled for this instance.', $output);

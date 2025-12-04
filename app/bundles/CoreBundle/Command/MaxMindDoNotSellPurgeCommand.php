@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -17,30 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * CLI Command to purge data from Mautic that appears on the
  * MaxMind Do Not Sell list.
  */
-#[AsCommand(
-    name: 'mautic:max-mind:purge',
-    description: 'Purge data connected to MaxMind Do Not Sell list.'
-)]
-class MaxMindDoNotSellPurgeCommand extends Command
-{
-    public function __construct(
-        private EntityManager $em,
-        private LeadRepository $leadRepository,
-        private MaxMindDoNotSellList $doNotSellList,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->addOption(
-                'dry-run',
-                'd',
-                InputOption::VALUE_NONE,
-                'Get a list of data that will be purged.'
-            )
-            ->setHelp(<<<'EOT'
+#[AsCommand(name: 'mautic:max-mind:purge', description: 'Purge data connected to MaxMind Do Not Sell list.', help: <<<'TXT'
 The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
 
 <info>php %command.full_name% --dry-run</info>
@@ -50,15 +26,22 @@ Performs a dry-run which will not actually purge any data, but will produce a li
 <info>php %command.full_name% --batch-size</info>
 
 Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
-EOT
-            );
+TXT)]
+class MaxMindDoNotSellPurgeCommand
+{
+    public function __construct(
+        private EntityManager $em,
+        private LeadRepository $leadRepository,
+        private MaxMindDoNotSellList $doNotSellList,
+    ) {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', shortcut: 'd', mode: InputOption::VALUE_NONE, description: 'Get a list of data that will be purged.')]
+        bool $dryRun = false,
+        OutputInterface $output,
+    ): int {
         try {
-            $dryRun = $input->getOption('dry-run');
-
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();

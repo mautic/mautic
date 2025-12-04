@@ -20,10 +20,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to purge old data per settings.
  */
-#[AsCommand(
-    name: CleanupMaintenanceCommand::NAME,
-    description: 'Updates the Mautic application'
-)]
+#[AsCommand(name: CleanupMaintenanceCommand::NAME, description: 'Updates the Mautic application', help: <<<'TXT'
+<info>%command.name%</info> purges records of anonymous contacts (<comment>unless the <info>--gdpr</info> flag is set</comment>) that are older than 365 days.
+Adjust the threshold by using <info>--days-old</info>.
+
+<comment><info>%command.name% --gdpr</info> purges records of anonymous <options=bold>and identified</> contacts.
+The command purges only identified contacts that were <options=bold>inactive for more than 3 years</> (1095 days).</comment>
+
+If you set <info>--gdpr</info> then <info>%command.name%</info> will ignore <info>--days-old</info>.
+The threshold is hard coded to <info>1095</info> days. This is security measure to prevent accidental loss of contact data.
+
+<comment>Examples:</comment>
+
+<info>php %command.full_name%</info>
+Deletes records of anonymous contacts older than 365 days.
+
+<info>php %command.full_name% --days-old=90</info>
+Deletes records of anonymous contacts older than 90 days.
+
+<info>php %command.full_name% --gdpr</info>
+Deletes records of anonymous <options=bold>and inactive identified</> contacts older than 1095 days.
+
+<comment>Add <info>--dry-run</info> to do a dry run without deleting any records.</comment>
+
+<info>php %command.full_name% --dry-run</info>
+Shows you how many records of anonymous contacts <info>%command.name%</info> will purge.
+
+The <info>%command.name%</info> command dispatches the <info>CoreEvents::MAINTENANCE_CLEANUP_DATA</info> event in order to purge old data (data must be supported by event listeners, as not all data is applicable to be purged).
+TXT)]
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:maintenance:cleanup';
@@ -54,36 +78,6 @@ class CleanupMaintenanceCommand extends ModeratedCommand
                     new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Performs a dry run. Shows no. of affected rows. Won\'t actually delete anything.'),
                     new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Deletes records of inactive users to fulfill GDPR requirements.'),
                 ]
-            )
-            ->setHelp(
-                <<<'EOT'
-<info>%command.name%</info> purges records of anonymous contacts (<comment>unless the <info>--gdpr</info> flag is set</comment>) that are older than 365 days.
-Adjust the threshold by using <info>--days-old</info>.
-
-<comment><info>%command.name% --gdpr</info> purges records of anonymous <options=bold>and identified</> contacts.
-The command purges only identified contacts that were <options=bold>inactive for more than 3 years</> (1095 days).</comment>
-
-If you set <info>--gdpr</info> then <info>%command.name%</info> will ignore <info>--days-old</info>.
-The threshold is hard coded to <info>1095</info> days. This is security measure to prevent accidental loss of contact data.
-
-<comment>Examples:</comment>
-
-<info>php %command.full_name%</info>
-Deletes records of anonymous contacts older than 365 days.
-
-<info>php %command.full_name% --days-old=90</info>
-Deletes records of anonymous contacts older than 90 days.
-
-<info>php %command.full_name% --gdpr</info>
-Deletes records of anonymous <options=bold>and inactive identified</> contacts older than 1095 days.
-
-<comment>Add <info>--dry-run</info> to do a dry run without deleting any records.</comment>
-
-<info>php %command.full_name% --dry-run</info>
-Shows you how many records of anonymous contacts <info>%command.name%</info> will purge.
-
-The <info>%command.name%</info> command dispatches the <info>CoreEvents::MAINTENANCE_CLEANUP_DATA</info> event in order to purge old data (data must be supported by event listeners, as not all data is applicable to be purged).
-EOT
             );
         parent::configure();
     }
@@ -110,7 +104,7 @@ EOT
 
         if (empty($dryRun) && empty($noInteraction)) {
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
-            $helper   = $this->getHelperSet()->get('question');
+            $helper   = new \Symfony\Component\Console\Helper\SymfonyQuestionHelper();
             $question = new ConfirmationQuestion(
                 '<info>'.$this->translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]).'</info> ', false
             );
