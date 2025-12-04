@@ -16,7 +16,6 @@ use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -45,12 +44,12 @@ class PullTransifexCommand
     }
 
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: 'language', mode: InputOption::VALUE_OPTIONAL, description: 'Optional language to pull')]
-        $language,
-        #[\Symfony\Component\Console\Attribute\Option(name: 'bundle', mode: InputOption::VALUE_OPTIONAL, description: 'Optional bundle to pull. Example value: WebhookBundle')]
-        $bundle,
-        #[\Symfony\Component\Console\Attribute\Option(name: 'path', mode: InputOption::VALUE_OPTIONAL, description: 'Optional path to a directory where to store the traslations.')]
-        $path,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'language', description: 'Optional language to pull')]
+        $language = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'bundle', description: 'Optional bundle to pull. Example value: WebhookBundle')]
+        $bundle = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'path', description: 'Optional path to a directory where to store the traslations.')]
+        $path = null,
         OutputInterface $output,
     ): int {
         $languageFilter = $language;

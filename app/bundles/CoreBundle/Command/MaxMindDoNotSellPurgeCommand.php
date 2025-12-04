@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -38,7 +37,7 @@ class MaxMindDoNotSellPurgeCommand
 
     public function __invoke(
         OutputInterface $output,
-        #[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', shortcut: 'd', mode: InputOption::VALUE_NONE, description: 'Get a list of data that will be purged.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', shortcut: 'd', description: 'Get a list of data that will be purged.')]
         bool $dryRun = false,
     ): int {
         try {

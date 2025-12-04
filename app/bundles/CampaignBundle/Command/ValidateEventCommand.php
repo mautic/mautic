@@ -7,7 +7,6 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,12 +26,12 @@ class ValidateEventCommand
     }
 
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: '--decision-id', mode: InputOption::VALUE_REQUIRED, description: 'ID of the decision to evaluate.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--decision-id', description: 'ID of the decision to evaluate.')]
         $decisionId,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--contact-id', mode: InputOption::VALUE_OPTIONAL, description: 'Evaluate for specific contact')]
-        $contactId,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--contact-ids', mode: InputOption::VALUE_OPTIONAL, description: 'CSV of contact IDs to evaluate.')]
-        $contactIds,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--contact-id', description: 'Evaluate for specific contact')]
+        $contactId = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--contact-ids', description: 'CSV of contact IDs to evaluate.')]
+        $contactIds = null,
         OutputInterface $output,
     ): int {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);

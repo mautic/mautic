@@ -13,7 +13,6 @@ use Mautic\UserBundle\Security\UserTokenSetter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -41,9 +40,9 @@ class ImportCommand
 
     public function __invoke(
         OutputInterface $output,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Specific ID to import. Defaults to next in the queue.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', description: 'Specific ID to import. Defaults to next in the queue.')]
         $id = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--limit', shortcut: '-l', mode: InputOption::VALUE_OPTIONAL, description: 'Maximum number of records to import for this script execution.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--limit', shortcut: '-l', description: 'Maximum number of records to import for this script execution.')]
         ?int $limit = 0,
     ): int {
         $start    = microtime(true);

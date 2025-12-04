@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,7 +25,7 @@ class AnalyseCustomFieldCommand
 
     public function __invoke(
         OutputInterface $output,
-        #[\Symfony\Component\Console\Attribute\Option(name: 'display-table', shortcut: 't', mode: InputOption::VALUE_NONE, description: 'Display results in table format')]
+        #[\Symfony\Component\Console\Attribute\Option(name: 'display-table', shortcut: 't', description: 'Display results in table format')]
         bool $displayTable = false,
     ): int {
         $displayAsTable = $displayTable;

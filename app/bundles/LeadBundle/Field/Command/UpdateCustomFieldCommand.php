@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,10 +26,13 @@ class UpdateCustomFieldCommand
     {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', mode: InputOption::VALUE_REQUIRED, description: 'LeadField ID.')]
-        $id, #[\Symfony\Component\Console\Attribute\Option(name: '--user', shortcut: '-u', mode: InputOption::VALUE_OPTIONAL, description: 'User ID - User which receives a notification.')]
-        $user, OutputInterface $output): int
-    {
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', description: 'LeadField ID.')]
+        $id,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--user', shortcut: '-u', description: 'User ID - User which receives a notification.')]
+        $user,
+        OutputInterface $output,
+    ): int {
         $leadFieldId = (int) $id;
         $userId      = (int) $user;
 

@@ -9,7 +9,6 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(
     name: CampaignDeleteEventLogsCommand::COMMAND_NAME,
@@ -26,8 +25,8 @@ class CampaignDeleteEventLogsCommand
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Argument(name: 'campaign_event_ids', description: 'Campaign event ids to delete event logs.')]
         array $campaignEventIds,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--campaign-id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Delete campaign also otherwise will delete event and event log only.')]
-        $campaignId,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--campaign-id', shortcut: '-i', description: 'Delete campaign also otherwise will delete event and event log only.')]
+        $campaignId = null,
     ): int {
         $eventIds   = $campaignEventIds;
         $campaignId = (int) $campaignId;

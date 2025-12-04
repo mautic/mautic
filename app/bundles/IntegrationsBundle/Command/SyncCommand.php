@@ -10,7 +10,6 @@ use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
@@ -31,25 +30,25 @@ class SyncCommand
         SymfonyStyle $io,
         #[\Symfony\Component\Console\Attribute\Argument(name: 'integration', description: 'Fetch objects from integration.')]
         ?string $integration = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--start-datetime', shortcut: '-t', mode: InputOption::VALUE_OPTIONAL, description: 'Set start date/time for updated values in UTC timezone.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--start-datetime', shortcut: '-t', description: 'Set start date/time for updated values in UTC timezone.')]
         $startDatetime = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--end-datetime', mode: InputOption::VALUE_OPTIONAL, description: 'Set start date/time for updated values in UTC timezone.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--end-datetime', description: 'Set start date/time for updated values in UTC timezone.')]
         $endDatetime = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--mautic-object-id', mode: InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, description: 'Provide specific Mautic object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --mautic-object-id=contact:12 --mautic-object-id=company:13')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--mautic-object-id', description: 'Provide specific Mautic object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --mautic-object-id=contact:12 --mautic-object-id=company:13')]
         array $mauticObjectId = [],
-        #[\Symfony\Component\Console\Attribute\Option(name: '--integration-object-id', mode: InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, description: 'Provide specific integration object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. It depends on each integration if this is supported. Example: --integration-object-id=Account:12 --integration-object-id=Lead:13')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--integration-object-id', description: 'Provide specific integration object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. It depends on each integration if this is supported. Example: --integration-object-id=Account:12 --integration-object-id=Lead:13')]
         array $integrationObjectId = [],
-        #[\Symfony\Component\Console\Attribute\Option(name: '--first-time-sync', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--first-time-sync', shortcut: '-f', description: 'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes')]
         bool $firstTimeSync = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--disable-push', mode: InputOption::VALUE_NONE, description: 'Notate if the sync should execute only pushing items from Mautic to the integration')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--disable-push', description: 'Notate if the sync should execute only pushing items from Mautic to the integration')]
         bool $disablePush = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--disable-pull', mode: InputOption::VALUE_NONE, description: 'Notate if the sync should execute only pulling items from integration to the Mautic')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--disable-pull', description: 'Notate if the sync should execute only pulling items from integration to the Mautic')]
         bool $disablePull = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--option', mode: InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, description: 'Provide option pass to InputOptions Example: --option="type:1" --option="channel_id:1"')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--option', description: 'Provide option pass to InputOptions Example: --option="type:1" --option="channel_id:1"')]
         array $option = [],
-        #[\Symfony\Component\Console\Attribute\Option(name: '--disable-activity-push', mode: InputOption::VALUE_NONE, description: 'Notate if the sync should disable the activities sync if the integration supports it')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--disable-activity-push', description: 'Notate if the sync should disable the activities sync if the integration supports it')]
         bool $disableActivityPush = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--env', shortcut: '-e', mode: InputOption::VALUE_OPTIONAL, description: 'Environment')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--env', shortcut: '-e', description: 'Environment')]
         ?string $env = null,
     ): int {
         try {

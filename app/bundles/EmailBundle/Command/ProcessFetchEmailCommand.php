@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -28,8 +27,8 @@ class ProcessFetchEmailCommand
     }
 
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: '--message-limit', shortcut: '-m', mode: InputOption::VALUE_OPTIONAL, description: 'Limit number of messages to process at a time.')]
-        $messageLimit,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--message-limit', shortcut: '-m', description: 'Limit number of messages to process at a time.')]
+        $messageLimit = null,
         OutputInterface $output,
     ): int {
         $limit     = $messageLimit;

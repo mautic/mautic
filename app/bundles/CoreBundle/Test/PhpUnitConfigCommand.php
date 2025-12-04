@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Test;
 
 use Mautic\CoreBundle\Helper\ExitCode;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -16,10 +15,13 @@ use Symfony\Component\Finder\Finder;
 )]
 final class PhpUnitConfigCommand
 {
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Argument(name: 'numberOfSuites', description: 'Number of test suites')]
-        string $numberOfSuites, #[\Symfony\Component\Console\Attribute\Option(name: '--slow-tests', mode: InputOption::VALUE_REQUIRED, description: 'Path to a PHP file containing an array of slow tests with keys "slowTests" and "extraChunks"')]
-        $slowTests, OutputInterface $output): int
-    {
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Argument(name: 'numberOfSuites', description: 'Number of test suites')]
+        string $numberOfSuites,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--slow-tests', description: 'Path to a PHP file containing an array of slow tests with keys "slowTests" and "extraChunks"')]
+        $slowTests,
+        OutputInterface $output,
+    ): int {
         $numberOfSuites = (int) $numberOfSuites;
         $slowTestsPath  = $slowTests;
         $functional     = [];

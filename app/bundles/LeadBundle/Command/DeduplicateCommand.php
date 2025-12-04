@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Process\Process;
@@ -32,11 +31,11 @@ class DeduplicateCommand
 
     public function __invoke(
         OutputInterface $output,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', mode: InputOption::VALUE_NONE, description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
         bool $newerIntoOlder = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--batch', mode: InputOption::VALUE_REQUIRED, description: 'How many contact duplicates to process at once. Defaults to 100.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--batch', description: 'How many contact duplicates to process at once. Defaults to 100.')]
         int $batch = 100,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--processes', mode: InputOption::VALUE_REQUIRED, description: 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--processes', description: 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.')]
         int $processes = 1,
     ): int {
         $newerIntoOlder  = (bool) $newerIntoOlder;

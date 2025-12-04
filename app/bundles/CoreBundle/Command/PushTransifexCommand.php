@@ -15,7 +15,6 @@ use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -43,8 +42,8 @@ class PushTransifexCommand
     }
 
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: 'bundle', mode: InputOption::VALUE_OPTIONAL, description: 'Optional bundle to pull. Example value: WebhookBundle')]
-        $bundle,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'bundle', description: 'Optional bundle to pull. Example value: WebhookBundle')]
+        $bundle = null,
         OutputInterface $output,
     ): int {
         $bundleFilter = $bundle;

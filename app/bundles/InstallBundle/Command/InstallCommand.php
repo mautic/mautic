@@ -12,7 +12,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
@@ -36,37 +35,37 @@ class InstallCommand
         InputInterface $input,
         OutputInterface $output,
         #[\Symfony\Component\Console\Attribute\Argument(name: 'site_url', description: 'Site URL.')]
-        string $siteUrl = '',
+        string $siteUrl,
         #[\Symfony\Component\Console\Attribute\Argument(name: 'step', description: 'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration, 4 for final step. Each successful step will trigger the next until completion.')]
         ?string $step = '0',
-        #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', mode: InputOption::VALUE_NONE, description: 'Do not ask confirmation if recommendations triggered.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--force', shortcut: '-f', description: 'Do not ask confirmation if recommendations triggered.')]
         bool $force = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_host', mode: InputOption::VALUE_REQUIRED, description: 'Database host.')]
-        ?string $dbHost = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_port', mode: InputOption::VALUE_REQUIRED, description: 'Database port.')]
-        ?string $dbPort = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_name', mode: InputOption::VALUE_REQUIRED, description: 'Database name.')]
-        ?string $dbName = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_user', mode: InputOption::VALUE_REQUIRED, description: 'Database user.')]
-        ?string $dbUser = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_password', mode: InputOption::VALUE_REQUIRED, description: 'Database password.')]
-        ?string $dbPassword = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_table_prefix', mode: InputOption::VALUE_REQUIRED, description: 'Database tables prefix.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_host', description: 'Database host.')]
+        string $dbHost,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_port', description: 'Database port.')]
+        $dbPort,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_name', description: 'Database name.')]
+        string $dbName,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_user', description: 'Database user.')]
+        string $dbUser,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_password', description: 'Database password.')]
+        string $dbPassword,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_table_prefix', description: 'Database tables prefix.')]
         ?string $dbTablePrefix = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_backup_tables', mode: InputOption::VALUE_REQUIRED, description: 'Backup database tables if they exist; otherwise drop them. (true|false)')]
-        ?string $dbBackupTables = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--db_backup_prefix', mode: InputOption::VALUE_REQUIRED, description: 'Database backup tables prefix.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_backup_tables', description: 'Backup database tables if they exist; otherwise drop them. (true|false)')]
+        $dbBackupTables = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--db_backup_prefix', description: 'Database backup tables prefix.')]
         ?string $dbBackupPrefix = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_firstname', mode: InputOption::VALUE_REQUIRED, description: 'Admin first name.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_firstname', description: 'Admin first name.')]
         ?string $adminFirstname = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_lastname', mode: InputOption::VALUE_REQUIRED, description: 'Admin last name.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_lastname', description: 'Admin last name.')]
         ?string $adminLastname = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_username', mode: InputOption::VALUE_REQUIRED, description: 'Admin username.')]
-        ?string $adminUsername = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_email', mode: InputOption::VALUE_REQUIRED, description: 'Admin email.')]
-        ?string $adminEmail = null,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_password', mode: InputOption::VALUE_REQUIRED, description: 'Admin user.')]
-        ?string $adminPassword = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_username', description: 'Admin username.')]
+        string $adminUsername,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_email', description: 'Admin email.')]
+        string $adminEmail,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--admin_password', description: 'Admin user.')]
+        string $adminPassword,
     ): int {
         // Check Mautic is not already installed
         if ($this->installer->checkIfInstalled()) {

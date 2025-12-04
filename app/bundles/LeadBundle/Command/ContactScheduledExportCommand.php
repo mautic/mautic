@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -34,9 +33,11 @@ class ContactScheduledExportCommand
     ) {
     }
 
-    public function __invoke(OutputInterface $output, #[\Symfony\Component\Console\Attribute\Option(name: '--ids', mode: InputOption::VALUE_REQUIRED, description: 'Comma separated contact_export_scheduler ids.')]
-        $ids = null): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--ids', description: 'Comma separated contact_export_scheduler ids.')]
+        $ids,
+    ): int {
         $this->processSignalService->registerSignalHandler(
             fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal))
         );

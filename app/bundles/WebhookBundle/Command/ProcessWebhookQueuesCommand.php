@@ -8,7 +8,6 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\Service\WebhookService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -28,11 +27,15 @@ class ProcessWebhookQueuesCommand
     ) {
     }
 
-    public function __invoke(OutputInterface $output, #[\Symfony\Component\Console\Attribute\Option(name: '--webhook-id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Process payload for a specific webhook.  If not specified, all webhooks will be processed.')]
-        $webhookId = null, #[\Symfony\Component\Console\Attribute\Option(name: '--min-id', mode: InputOption::VALUE_OPTIONAL, description: 'Sets the minimum webhook queue ID to process (so called range mode).')]
-        $minId = null, #[\Symfony\Component\Console\Attribute\Option(name: '--max-id', mode: InputOption::VALUE_OPTIONAL, description: 'Sets the maximum webhook queue ID to process (so called range mode).')]
-        $maxId = null): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--webhook-id', shortcut: '-i', description: 'Process payload for a specific webhook.  If not specified, all webhooks will be processed.')]
+        $webhookId = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--min-id', description: 'Sets the minimum webhook queue ID to process (so called range mode).')]
+        $minId = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--max-id', description: 'Sets the maximum webhook queue ID to process (so called range mode).')]
+        $maxId = null,
+    ): int {
         // check to make sure we are in queue mode
         if ($this->coreParametersHelper->get('queue_mode') != $this->webhookModel::COMMAND_PROCESS) {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');

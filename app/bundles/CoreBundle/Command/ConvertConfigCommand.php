@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -32,10 +31,10 @@ class ConvertConfigCommand
     }
 
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: '--theme', mode: InputOption::VALUE_REQUIRED, description: 'The name of the theme whose config you are converting.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--theme', description: 'The name of the theme whose config you are converting.')]
         $theme,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--save-php-config', mode: InputOption::VALUE_NONE, description: 'When used, the theme\'s PHP config file will be saved.')]
-        $savePhpConfig,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--save-php-config', description: 'When used, the theme\'s PHP config file will be saved.')]
+        bool $savePhpConfig,
         OutputInterface $output,
     ): int {
         $themePath = realpath($this->pathsHelper->getSystemPath('themes', true).'/'.$theme);

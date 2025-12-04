@@ -11,7 +11,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -42,10 +41,10 @@ class ApplyUpdatesCommand
     }
 
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: '--force', mode: InputOption::VALUE_NONE, description: 'Bypasses the verification check.')]
-        $force,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--finish', mode: InputOption::VALUE_NONE, description: 'Finalize the upgrade.')]
-        $finish,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--force', description: 'Bypasses the verification check.')]
+        $force = false,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--finish', description: 'Finalize the upgrade.')]
+        $finish = null,
         InputInterface $input,
         OutputInterface $output,
     ): int {

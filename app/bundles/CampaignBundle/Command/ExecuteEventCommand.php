@@ -6,7 +6,6 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,9 +28,9 @@ class ExecuteEventCommand
      * @throws \Exception
      */
     public function __invoke(
-        #[\Symfony\Component\Console\Attribute\Option(name: '--scheduled-log-ids', mode: InputOption::VALUE_REQUIRED, description: 'CSV of specific scheduled log IDs to execute.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--scheduled-log-ids', description: 'CSV of specific scheduled log IDs to execute.')]
         $scheduledLogIds,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--execution-time', mode: InputOption::VALUE_REQUIRED, description: 'Scheduled execution time of event log')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--execution-time', description: 'Scheduled execution time of event log')]
         $executionTime,
         OutputInterface $output,
     ): int {

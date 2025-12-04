@@ -8,7 +8,6 @@ use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -28,9 +27,9 @@ class DeduplicateIdsCommand
 
     public function __invoke(
         OutputInterface $output,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', mode: InputOption::VALUE_NONE, description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--newer-into-older', description: 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.')]
         bool $newerIntoOlder = false,
-        #[\Symfony\Component\Console\Attribute\Option(name: '--contact-ids', mode: InputOption::VALUE_REQUIRED, description: 'Comma separated list of contact IDs to deduplicate. If not provided, all contacts will be deduplicated. Example: --contact-ids=23,3,11')]
+        #[\Symfony\Component\Console\Attribute\Option(name: '--contact-ids', description: 'Comma separated list of contact IDs to deduplicate. If not provided, all contacts will be deduplicated. Example: --contact-ids=23,3,11')]
         $contactIds = null,
     ): int {
         $newerIntoOlder = (bool) $newerIntoOlder;
