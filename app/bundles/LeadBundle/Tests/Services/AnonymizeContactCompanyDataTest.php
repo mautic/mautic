@@ -20,8 +20,6 @@ use Psr\Log\LoggerInterface;
 
 class AnonymizeContactCompanyDataTest extends TestCase
 {
-    /** @var FieldModel&MockObject */
-    private FieldModel $fieldModel;
     /** @var LoggerInterface&MockObject */
     private LoggerInterface $logger;
     /** @var EmailModel&MockObject */
@@ -31,7 +29,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fieldModel      = $this->createMock(FieldModel::class);
         $this->logger          = $this->createMock(LoggerInterface::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $this->submissionModel = $this->createMock(SubmissionModel::class);
@@ -71,7 +68,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->onlyMethods(['getEntity'])
             ->getMock();
         $repo->method('getEntity')->with($leadFieldArray['id'])->willReturn($fieldEntity);
-        $this->fieldModel->method('getRepository')->willReturn($repo);
 
         // Create a Lead mock that will respond to getField() and expect addUpdatedField() to be called
         $lead = $this->getMockBuilder(Lead::class)
@@ -84,7 +80,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->with($alias, $this->isType('string'));
 
         $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
             $this->logger,
             $this->emailModel,
             $this->submissionModel
@@ -114,7 +109,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->with($alias, null);
 
         $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
             $this->logger,
             $this->emailModel,
             $this->submissionModel
@@ -234,7 +228,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->method('updateSubmissionAnonymizeByLead');
 
         $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
             $this->logger,
             $this->emailModel,
             $this->submissionModel
@@ -286,7 +279,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->with(1, 'test_form', $submissionForm, []);
 
         $service = new AnonymizeContactCompanyData(
-            $this->fieldModel,
             $this->logger,
             $this->emailModel,
             $this->submissionModel
@@ -358,7 +350,6 @@ class AnonymizeContactCompanyDataTest extends TestCase
     private function createService(): AnonymizeContactCompanyData
     {
         return new AnonymizeContactCompanyData(
-            $this->fieldModel,
             $this->logger,
             $this->emailModel,
             $this->submissionModel

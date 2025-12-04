@@ -9,15 +9,15 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\AnonymizeHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Psr\Log\LoggerInterface;
+
+use function Symfony\Component\String\s;
 
 class AnonymizeContactCompanyData
 {
     public const COLUMNS_NOT_ACCEPTED = ['submission_id', 'form_id'];
 
     public function __construct(
-        private readonly FieldModel $fieldModel,
         private readonly LoggerInterface $logger,
         private readonly EmailModel $emailModel,
         private readonly SubmissionModel $submissionModel,
@@ -32,44 +32,50 @@ class AnonymizeContactCompanyData
     public function setHashes(array $leadsCompanies, LeadField $field, bool $pseudonymize): array
     {
         foreach ($leadsCompanies as $key => $leadCompany) {
-            $leadField = $leadCompany->getField($field->getAlias());
-            if (false === $leadField) {
-                continue;
+            $alias = $field->getAlias();
+
+            $leadFieldValue = $leadCompany->getFieldValue($alias);
+            if (null === $leadFieldValue) {
+                if (!str_contains($field->getAlias(), 'company')) {
+                    continue;
+                }
+                $alias          = s($field->getAlias())->replace('company', '')->toString();
+                $leadFieldValue = $leadCompany->getFieldValue($alias);
+                if (null === $leadFieldValue) {
+                    continue;
+                }
             }
-            $fieldTmp     = $this->fieldModel->getRepository()->getEntity($leadField['id']);
-            if (!$fieldTmp instanceof LeadField) {
-                continue;
-            }
-            $leadsCompanies[$key] = $this->setHash($leadCompany, $leadField, $fieldTmp, $pseudonymize);
+
+            $leadsCompanies[$key] = $this->setHash($leadCompany, $leadFieldValue, $field, $pseudonymize, $alias);
         }
 
         return $leadsCompanies;
     }
 
-    /**
-     * @param array<string, string|null> $field
-     */
     private function setHash(
         Company|Lead $leadOrCompany,
-        array $field,
+        string $fieldValue,
         LeadField $leadField,
         bool $isToPseudonymize,
+        string $alias,
     ): Lead|Company {
-        if (!array_key_exists('value', $field) || empty($field['value'])) {
-            return $leadOrCompany;
-        }
-        $isEmail = ('email' === ($field['type'] ?? ''));
+        $isEmail = ('email' === $leadField->getType());
         $limit   = (int) $leadField->getCharLengthLimit();
 
         try {
             if ($isEmail) {
-                $valueAnonymized = AnonymizeHelper::anonymizeEmail($field['value'], $isToPseudonymize, $limit);
-                $this->updateEmailStatusValues($field['value'], $valueAnonymized, $isToPseudonymize);
+                $valueAnonymized = AnonymizeHelper::anonymizeEmail($fieldValue, $isToPseudonymize, $limit);
+                $this->updateEmailStatusValues($fieldValue, $valueAnonymized, $isToPseudonymize);
             } else {
-                $valueAnonymized = AnonymizeHelper::anonymizeText($field['value'], $isToPseudonymize, $limit);
+                $valueAnonymized = AnonymizeHelper::anonymizeText($fieldValue, $isToPseudonymize, $limit);
+            }
+            if ($leadOrCompany instanceof Lead) {
+                $leadOrCompany->addUpdatedField($alias, $valueAnonymized);
             }
 
-            $leadOrCompany->addUpdatedField($leadField->getAlias(), $valueAnonymized);
+            if ($leadOrCompany instanceof Company && str_contains($alias, 'company')) {
+                $leadOrCompany->addUpdatedField($alias, $valueAnonymized);
+            }
         } catch (\Exception $e) {
             // Do nothing
             $this->logger->error('AnonymizeUserDataSubscriber setHash fail: '.$e->getMessage());
@@ -100,12 +106,21 @@ class AnonymizeContactCompanyData
     public function setLeadsCompaniesFieldNull(array $leadsCompanies, LeadField $field): array
     {
         foreach ($leadsCompanies as $key => $leadCompany) {
-            $leadField = $leadCompany->getField($field->getAlias());
-            if (false === $leadField) {
-                continue;
+            //            $leadField = $leadCompany->getField($field->getAlias());
+            $alias          = $field->getAlias();
+            $leadFieldValue = $leadCompany->getFieldValue($alias);
+            if (null === $leadFieldValue) {
+                if (!str_contains($field->getAlias(), 'company')) {
+                    continue;
+                }
+                $alias          = s($field->getAlias())->replace('company', '')->toString();
+                $leadFieldValue = $leadCompany->getFieldValue($alias);
+                if (null === $leadFieldValue) {
+                    continue;
+                }
             }
 
-            $leadCompany->addUpdatedField($field->getAlias(), null);
+            $leadCompany->addUpdatedField($alias, null);
             $leadsCompanies[$key] = $leadCompany;
         }
 
