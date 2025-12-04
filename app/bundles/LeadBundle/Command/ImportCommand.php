@@ -39,10 +39,13 @@ class ImportCommand
     ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Specific ID to import. Defaults to next in the queue.')]
-        $id = false, #[\Symfony\Component\Console\Attribute\Option(name: '--limit', shortcut: '-l', mode: InputOption::VALUE_OPTIONAL, description: 'Maximum number of records to import for this script execution.')]
-        ?int $limit = 0, OutputInterface $output): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--id', shortcut: '-i', mode: InputOption::VALUE_OPTIONAL, description: 'Specific ID to import. Defaults to next in the queue.')]
+        $id = false,
+        #[\Symfony\Component\Console\Attribute\Option(name: '--limit', shortcut: '-l', mode: InputOption::VALUE_OPTIONAL, description: 'Maximum number of records to import for this script execution.')]
+        ?int $limit = 0,
+    ): int {
         $start    = microtime(true);
         $progress = new Progress($output);
         $id       = (int) $id;

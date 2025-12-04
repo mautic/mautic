@@ -18,9 +18,7 @@ class FocusBundleExtension
     #[\Twig\Attribute\AsTwigFilter('less_compile', isSafe: ['all'])]
     public function compileLess(string $less): string
     {
-        $parser = new \Less_Parser();
-
-        return $parser->parse($less)->getCss();
+        return (new \Less_Parser())->parse($less)->getCss();
     }
 
     #[\Twig\Attribute\AsTwigFilter('css_minify', isSafe: ['all'])]
