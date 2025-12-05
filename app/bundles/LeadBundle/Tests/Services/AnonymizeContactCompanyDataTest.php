@@ -78,6 +78,17 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->getMock();
 
         $lead->method('getField')->with($alias)->willReturn($leadFieldArray);
+        $lead->expects($this->once())
+            ->method('addUpdatedField')
+            ->with($alias, $this->isType('string'));
+
+        $paginator = $this->createMock(\Doctrine\ORM\Tools\Pagination\Paginator::class);
+        $paginator->method('count')->willReturn(1);
+        $paginator->method('getIterator')->willReturn(new \ArrayIterator([['alias' => $alias]]));
+
+        $this->fieldModel->method('getPublishedFieldArrays')
+            ->with('lead')
+            ->willReturn($paginator);
 
         $service = new AnonymizeContactCompanyData(
             $this->logger,
@@ -85,11 +96,12 @@ class AnonymizeContactCompanyDataTest extends TestCase
             $this->submissionModel,
             $this->fieldModel
         );
+
         $leads  = new ArrayCollection([$lead]);
         $result = $service->setHashes($leads, $requestedField, true);
 
         // Ensure the returned array contains the same lead instance (method replaces element with returned object)
-        $this->assertSame($lead, $result[0]);
+        $this->assertSame($lead, $result->first());
     }
 
     public function testSetLeadsCompaniesFieldNullSetsFieldToNullAndReturnsSameInstance(): void
@@ -104,7 +116,18 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->getMock();
 
         // getField must return a truthy value for the alias so the method sets it to null
-        $leadCompany->method('getField')->with($alias)->willReturn(['id' => 1, 'value' => 'foo']);
+        $leadCompany->method('getField')->with($alias)->willReturn(['id' => 1, 'value' => 'foo', 'type' => 'text']);
+        $leadCompany->expects($this->once())
+            ->method('addUpdatedField')
+            ->with($alias, null);
+
+        $paginator = $this->createMock(\Doctrine\ORM\Tools\Pagination\Paginator::class);
+        $paginator->method('count')->willReturn(1);
+        $paginator->method('getIterator')->willReturn(new \ArrayIterator([['alias' => $alias]]));
+
+        $this->fieldModel->method('getPublishedFieldArrays')
+            ->with('lead')
+            ->willReturn($paginator);
 
         $service = new AnonymizeContactCompanyData(
             $this->logger,
@@ -115,7 +138,7 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
         $leadCompanies  = new ArrayCollection([$leadCompany]);
         $result         = $service->setLeadsCompaniesFieldNull($leadCompanies, $requestedField);
-        $this->assertSame($leadCompany, $result[0]);
+        $this->assertSame($leadCompany, $result->first());
     }
 
     public function testUpdateFormResultsWithPseudonymizeFalse(): void
