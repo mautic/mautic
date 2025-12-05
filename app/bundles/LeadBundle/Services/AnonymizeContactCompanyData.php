@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\AnonymizeHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Psr\Log\LoggerInterface;
 
 use function Symfony\Component\String\s;
@@ -21,15 +22,16 @@ class AnonymizeContactCompanyData
         private readonly LoggerInterface $logger,
         private readonly EmailModel $emailModel,
         private readonly SubmissionModel $submissionModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 
     /**
-     * @param array<Lead>|array<Company> $leadsCompanies
+     * @param array<Lead>|array<Company>||ArrayCollection<Company> $leadsCompanies
      *
-     * @return array<mixed>
+     * @return array<mixed>|ArrayCollection<mixed>
      */
-    public function setHashes(array $leadsCompanies, LeadField $field, bool $pseudonymize): array
+    public function setHashes($leadsCompanies, LeadField $field, bool $pseudonymize)
     {
         foreach ($leadsCompanies as $key => $leadCompany) {
             $alias = $field->getAlias();
@@ -69,11 +71,15 @@ class AnonymizeContactCompanyData
             } else {
                 $valueAnonymized = AnonymizeHelper::anonymizeText($fieldValue, $isToPseudonymize, $limit);
             }
-            if ($leadOrCompany instanceof Lead) {
-                $leadOrCompany->addUpdatedField($alias, $valueAnonymized);
-            }
 
-            if ($leadOrCompany instanceof Company && str_contains($alias, 'company')) {
+            if (
+                (
+                    $leadOrCompany instanceof Lead && $this->isObjectField('lead', $alias)
+                )
+                || (
+                    $leadOrCompany instanceof Company && $this->isObjectField('company', $alias)
+                )
+            ) {
                 $leadOrCompany->addUpdatedField($alias, $valueAnonymized);
             }
         } catch (\Exception $e) {
@@ -101,9 +107,9 @@ class AnonymizeContactCompanyData
     /**
      * @param array<Lead|Company> $leadsCompanies
      *
-     * @return array<mixed>
+     * @return array<mixed>|ArrayCollection<mixed>
      */
-    public function setLeadsCompaniesFieldNull(array $leadsCompanies, LeadField $field): array
+    public function setLeadsCompaniesFieldNull($leadsCompanies, LeadField $field)
     {
         foreach ($leadsCompanies as $key => $leadCompany) {
             //            $leadField = $leadCompany->getField($field->getAlias());
@@ -120,8 +126,17 @@ class AnonymizeContactCompanyData
                 }
             }
 
-            $leadCompany->addUpdatedField($alias, null);
-            $leadsCompanies[$key] = $leadCompany;
+            if (
+                (
+                    $leadCompany instanceof Lead && $this->isObjectField('lead', $alias)
+                )
+                || (
+                    $leadCompany instanceof Company && $this->isObjectField('company', $alias)
+                )
+            ) {
+                $leadCompany->addUpdatedField($alias, null);
+                $leadsCompanies[$key] = $leadCompany;
+            }
         }
 
         return $leadsCompanies;
@@ -167,5 +182,20 @@ class AnonymizeContactCompanyData
         }
 
         return $results;
+    }
+
+    private function isObjectField(string $object, string $alias): bool
+    {
+        $fields = $this->fieldModel->getPublishedFieldArrays($object);
+        if (!$fields instanceof \Doctrine\ORM\Tools\Pagination\Paginator) {
+            return false;
+        }
+        if (0 === $fields->count()) {
+            return false;
+        }
+        $fields = $fields->getIterator()->getArrayCopy();
+        $fields = array_column($fields, null, 'alias');
+
+        return array_key_exists($alias, $fields);
     }
 }

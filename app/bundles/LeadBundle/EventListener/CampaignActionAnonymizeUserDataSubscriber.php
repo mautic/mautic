@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
@@ -71,7 +72,8 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
                 ['column' => 'l.id', 'expr' => 'in', 'value' => $event->getContactIds()],
             ],
         ];
-        $leads            = $this->leadModel->getEntities($leadFilter);
+
+        $leads            = $event->getContacts();
         $companies        = $this->companyModel->getCompaniesByLeads($event->getContactIds());
         $idFields         = array_merge($properties['fieldsToAnonymize'], $properties['fieldsToDelete']);
         $fieldFilter      = [
@@ -120,7 +122,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
      *
      * @return array<int,array<mixed>>
      */
-    private function setDeleteFields(array $leads, array $companies, LeadField $field): array
+    private function setDeleteFields(ArrayCollection $leads, array $companies, LeadField $field): array
     {
         return [
             $this->anonymizeContactCompanyData->setLeadsCompaniesFieldNull($leads, $field),
@@ -134,7 +136,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
      *
      * @return array<int,array<mixed>>
      */
-    private function setHashFields(array $leads, array $companies, LeadField $field, bool $pseudonymize): array
+    private function setHashFields(ArrayCollection $leads, array $companies, LeadField $field, bool $pseudonymize): array
     {
         return [
             $this->anonymizeContactCompanyData->setHashes($leads, $field, $pseudonymize),
