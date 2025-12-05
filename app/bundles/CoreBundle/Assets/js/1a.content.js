@@ -1348,13 +1348,27 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         return;
     }
 
+    let activeIndex = -1;
+
     //find associated button
     var btn = "button[data-livesearch-parent='" + mQuery(el).attr('id') + "']";
 
     mQuery(el).on('focus', function () {
         Mautic.currentSearchString = mQuery(this).val().trim();
     });
+
     mQuery(el).on('change keyup paste', {}, function (event) {
+        // Prevent LiveSearch from re-triggering on navigation keys
+        const key = event.key || event.keyCode;
+        if (
+            key === 'ArrowDown' || key === 40 ||
+            key === 'ArrowUp'   || key === 38 ||
+            key === 'Tab'       || key === 9  ||
+            key === 'Escape'    || key === 27
+        ) {
+            return; // Do NOT trigger filtering
+        }
+
         var searchStr = mQuery(el).val().trim();
 
         var spaceKeyPressed = (event.which == 32 || event.keyCode == 32);
@@ -1390,7 +1404,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         }
 
         if (!deleteKeyPressed && overlayEnabled) {
-            var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
+            var overlay = mQuery('<div />', {"class": "content-overlay"})
+                .html(mQuery(el).attr('data-overlay-text'));
+
             if (mQuery(el).attr('data-overlay-background')) {
                 overlay.css('background', mQuery(el).attr('data-overlay-background'));
             }
@@ -1400,11 +1416,22 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         }
 
         //searchStr in MauticVars[liveCacheVar] ||
-        if ((!searchStr && MauticVars[searchStrVar].length) || diff >= 3 || spaceKeyPressed || enterKeyPressed) {
+        if ((!searchStr && MauticVars[searchStrVar].length)
+            || diff >= 3
+            || spaceKeyPressed
+            || enterKeyPressed
+        ) {
             MauticVars[searchStrVar] = searchStr;
             event.data.livesearch = true;
 
-            Mautic.filterList(event,
+            // Reset active index for global search
+            if (mQuery(el).attr('id') === 'globalSearchInput') {
+                activeIndex = -1;
+                mQuery('#globalSearchResults .gsearch--results-item').removeClass('active');
+            }
+
+            Mautic.filterList(
+                event,
                 mQuery(el).attr('id'),
                 mQuery(el).attr('data-action'),
                 target,
@@ -1425,7 +1452,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             MauticVars[searchStrVar] = searchStr;
 
             Mautic.filterButtonClicked = true;
-            Mautic.filterList(event,
+
+            Mautic.filterList(
+                event,
                 event.data.parent,
                 mQuery('#' + event.data.parent).attr('data-action'),
                 mQuery('#' + event.data.parent).attr('data-target'),
@@ -1441,6 +1470,49 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             mQuery(btn).attr('data-livesearch-action', 'search');
             mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('ri-search-line');
         }
+    }
+
+    /**
+     * Keyboard navigation for Global Search modal.
+     * Supports: ArrowUp, ArrowDown, Tab, Enter, Escape
+     */
+    if (mQuery(el).attr('id') === 'globalSearchInput') {
+        mQuery(el).off('keydown.globalSearchNav').on('keydown.globalSearchNav', function (e) {
+            const items = mQuery('#globalSearchResults .gsearch--results-item');
+            if (!items.length) return;
+
+            const key = e.key || e.keyCode;
+
+            if (key === 'ArrowDown' || key === 40 || key === 'Tab') {
+                e.preventDefault();
+                activeIndex = (activeIndex + 1) % items.length;
+            } else if (key === 'ArrowUp' || key === 38) {
+                e.preventDefault();
+                activeIndex = (activeIndex - 1 + items.length) % items.length;
+            } else if (key === 'Enter' || key === 13) {
+                const link = items.eq(activeIndex).find('a').get(0);
+                if (link) link.click();
+                return;
+            } else if (key === 'Escape' || key === 'Esc' || key === 27) {
+                mQuery('#gsearchModal').modal('hide');
+                return;
+            } else {
+                return;
+            }
+
+            items.removeClass('active');
+
+            items.eq(activeIndex)
+                .addClass('active')
+                .get(0)
+                .scrollIntoView({ block: 'nearest' });
+        });
+
+        // Reset index on input change
+        mQuery(el).off('input.globalSearchNav').on('input.globalSearchNav', function () {
+            activeIndex = -1;
+            mQuery('#globalSearchResults .gsearch--results-item').removeClass('active');
+        });
     }
 };
 
