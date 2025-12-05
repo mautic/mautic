@@ -26,12 +26,15 @@ class AnonymizeContactCompanyDataTest extends TestCase
     private EmailModel $emailModel;
     /** @var SubmissionModel&MockObject */
     private SubmissionModel $submissionModel;
+    /** @var FieldModel&MockObject */
+    protected FieldModel $fieldModel;
 
     protected function setUp(): void
     {
         $this->logger          = $this->createMock(LoggerInterface::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $this->submissionModel = $this->createMock(SubmissionModel::class);
+        $this->fieldModel      = $this->createMock(FieldModel::class);
 
         // Use the actual StatRepository class so the mocked return type matches the declared return type
         $statRepo = $this->getMockBuilder(StatRepository::class)
@@ -75,17 +78,15 @@ class AnonymizeContactCompanyDataTest extends TestCase
             ->getMock();
 
         $lead->method('getField')->with($alias)->willReturn($leadFieldArray);
-        $lead->expects($this->once())
-            ->method('addUpdatedField')
-            ->with($alias, $this->isType('string'));
 
         $service = new AnonymizeContactCompanyData(
             $this->logger,
             $this->emailModel,
-            $this->submissionModel
+            $this->submissionModel,
+            $this->fieldModel
         );
-
-        $result = $service->setHashes([$lead], $requestedField, true);
+        $leads  = new ArrayCollection([$lead]);
+        $result = $service->setHashes($leads, $requestedField, true);
 
         // Ensure the returned array contains the same lead instance (method replaces element with returned object)
         $this->assertSame($lead, $result[0]);
@@ -104,17 +105,16 @@ class AnonymizeContactCompanyDataTest extends TestCase
 
         // getField must return a truthy value for the alias so the method sets it to null
         $leadCompany->method('getField')->with($alias)->willReturn(['id' => 1, 'value' => 'foo']);
-        $leadCompany->expects($this->once())
-            ->method('addUpdatedField')
-            ->with($alias, null);
 
         $service = new AnonymizeContactCompanyData(
             $this->logger,
             $this->emailModel,
-            $this->submissionModel
+            $this->submissionModel,
+            $this->fieldModel
         );
 
-        $result = $service->setLeadsCompaniesFieldNull([$leadCompany], $requestedField);
+        $leadCompanies  = new ArrayCollection([$leadCompany]);
+        $result         = $service->setLeadsCompaniesFieldNull($leadCompanies, $requestedField);
         $this->assertSame($leadCompany, $result[0]);
     }
 
@@ -230,7 +230,8 @@ class AnonymizeContactCompanyDataTest extends TestCase
         $service = new AnonymizeContactCompanyData(
             $this->logger,
             $this->emailModel,
-            $this->submissionModel
+            $this->submissionModel,
+            $this->fieldModel
         );
 
         $service->updateFormResults($leads, true);
@@ -281,7 +282,8 @@ class AnonymizeContactCompanyDataTest extends TestCase
         $service = new AnonymizeContactCompanyData(
             $this->logger,
             $this->emailModel,
-            $this->submissionModel
+            $this->submissionModel,
+            $this->fieldModel
         );
 
         $service->updateFormResults($leads, true);
@@ -352,7 +354,8 @@ class AnonymizeContactCompanyDataTest extends TestCase
         return new AnonymizeContactCompanyData(
             $this->logger,
             $this->emailModel,
-            $this->submissionModel
+            $this->submissionModel,
+            $this->fieldModel
         );
     }
 }

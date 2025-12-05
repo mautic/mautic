@@ -67,11 +67,6 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         if (array_key_exists('pseudonymize', $properties)) {
             $isToPseudonymize = (bool) $properties['pseudonymize'];
         }
-        $leadFilter           = [
-            'force' => [
-                ['column' => 'l.id', 'expr' => 'in', 'value' => $event->getContactIds()],
-            ],
-        ];
 
         $leads            = $event->getContacts();
         $companies        = $this->companyModel->getCompaniesByLeads($event->getContactIds());
@@ -117,8 +112,8 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param array<Lead>    $leads
-     * @param array<Company> $companies
+     * @param ArrayCollection<Lead> $leads
+     * @param array<Company>        $companies
      *
      * @return array<int,array<mixed>>
      */
@@ -131,8 +126,8 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param array<Lead>    $leads
-     * @param array<Company> $companies
+     * @param ArrayCollection<Lead> $leads
+     * @param array<Company>        $companies
      *
      * @return array<int,array<mixed>>
      */

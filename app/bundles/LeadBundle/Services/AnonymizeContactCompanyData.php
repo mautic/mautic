@@ -27,7 +27,7 @@ class AnonymizeContactCompanyData
     }
 
     /**
-     * @param array<Lead>|array<Company>||ArrayCollection<Company> $leadsCompanies
+     * @param ArrayCollection<Lead>|array<Company> $leadsCompanies
      *
      * @return array<mixed>|ArrayCollection<mixed>
      */
@@ -105,7 +105,7 @@ class AnonymizeContactCompanyData
     }
 
     /**
-     * @param array<Lead|Company> $leadsCompanies
+     * @param ArrayCollection<Lead>|array<Company> $leadsCompanies
      *
      * @return array<mixed>|ArrayCollection<mixed>
      */
