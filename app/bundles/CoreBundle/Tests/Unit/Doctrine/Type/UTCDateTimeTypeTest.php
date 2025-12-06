@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Type;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
@@ -20,7 +21,8 @@ final class UTCDateTimeTypeTest extends TestCase
     }
 
     /**
-     * @param array<string, int> $column
+     * @param class-string<AbstractPlatform> $platformClass
+     * @param array<string, int>             $column
      */
     #[DataProvider('sqlDeclarationProvider')]
     public function testGetSQLDeclaration(string $platformClass, array $column, string $expectedSql, bool $expectFallback): void
@@ -38,7 +40,12 @@ final class UTCDateTimeTypeTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{0: string, 1: array<string, int>, 2: string, 3: bool}>
+     * @return iterable<string, array{
+     *     0: class-string<AbstractPlatform>,
+     *     1: array<string, int>|array<empty>,
+     *     2: string,
+     *     3: bool
+     * }>
      */
     public static function sqlDeclarationProvider(): iterable
     {
