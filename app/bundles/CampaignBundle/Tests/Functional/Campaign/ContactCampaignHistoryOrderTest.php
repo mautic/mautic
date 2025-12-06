@@ -72,8 +72,6 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
             $historyOrder,
             'The campaign history is not sorted by creation order in '.$orderByDir
         );
-
-        $this->fail(print_r($this->em->getConnection()->executeQuery(sprintf('desc %slead_points_change_log', MAUTIC_TABLE_PREFIX))->fetchAllAssociative(), true));
     }
 
     /**
