@@ -19,7 +19,7 @@ final class PhpUnitConfigCommand
         #[\Symfony\Component\Console\Attribute\Argument(name: 'numberOfSuites', description: 'Number of test suites')]
         string $numberOfSuites,
         #[\Symfony\Component\Console\Attribute\Option(name: '--slow-tests', description: 'Path to a PHP file containing an array of slow tests with keys "slowTests" and "extraChunks"')]
-        $slowTests,
+        $slowTests = null,
         OutputInterface $output,
     ): int {
         $numberOfSuites = (int) $numberOfSuites;

@@ -39,7 +39,7 @@ class InstallDataCommand
 
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: '--force', description: 'Bypasses the verification check.')]
-        $force = false,
+        bool $force = false,
         InputInterface $input,
         OutputInterface $output,
     ): int {

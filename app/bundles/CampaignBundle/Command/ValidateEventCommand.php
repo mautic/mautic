@@ -27,7 +27,7 @@ class ValidateEventCommand
 
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: '--decision-id', description: 'ID of the decision to evaluate.')]
-        $decisionId,
+        $decisionId = null,
         #[\Symfony\Component\Console\Attribute\Option(name: '--contact-id', description: 'Evaluate for specific contact')]
         $contactId = null,
         #[\Symfony\Component\Console\Attribute\Option(name: '--contact-ids', description: 'CSV of contact IDs to evaluate.')]

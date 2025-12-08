@@ -32,9 +32,9 @@ class ConvertConfigCommand
 
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: '--theme', description: 'The name of the theme whose config you are converting.')]
-        $theme,
+        $theme = null,
         #[\Symfony\Component\Console\Attribute\Option(name: '--save-php-config', description: 'When used, the theme\'s PHP config file will be saved.')]
-        bool $savePhpConfig,
+        bool $savePhpConfig = false,
         OutputInterface $output,
     ): int {
         $themePath = realpath($this->pathsHelper->getSystemPath('themes', true).'/'.$theme);

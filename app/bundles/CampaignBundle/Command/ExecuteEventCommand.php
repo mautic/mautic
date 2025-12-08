@@ -29,9 +29,9 @@ class ExecuteEventCommand
      */
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: '--scheduled-log-ids', description: 'CSV of specific scheduled log IDs to execute.')]
-        $scheduledLogIds,
+        $scheduledLogIds = null,
         #[\Symfony\Component\Console\Attribute\Option(name: '--execution-time', description: 'Scheduled execution time of event log')]
-        $executionTime,
+        $executionTime = null,
         OutputInterface $output,
     ): int {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);

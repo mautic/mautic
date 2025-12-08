@@ -42,7 +42,7 @@ class ApplyUpdatesCommand
 
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: '--force', description: 'Bypasses the verification check.')]
-        $force = false,
+        bool $force = false,
         #[\Symfony\Component\Console\Attribute\Option(name: '--finish', description: 'Finalize the upgrade.')]
         $finish = null,
         InputInterface $input,

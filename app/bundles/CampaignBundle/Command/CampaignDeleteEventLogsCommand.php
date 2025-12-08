@@ -26,7 +26,7 @@ class CampaignDeleteEventLogsCommand
         #[\Symfony\Component\Console\Attribute\Argument(name: 'campaign_event_ids', description: 'Campaign event ids to delete event logs.')]
         array $campaignEventIds,
         #[\Symfony\Component\Console\Attribute\Option(name: '--campaign-id', shortcut: '-i', description: 'Delete campaign also otherwise will delete event and event log only.')]
-        $campaignId = null,
+        ?int $campaignId = null,
     ): int {
         $eventIds   = $campaignEventIds;
         $campaignId = (int) $campaignId;
