@@ -89,7 +89,9 @@ class DynamicContentHelper
             if ($dwc->getIsCampaignBased()) {
                 continue;
             }
-            if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadArray)) {
+            // enrich lead array with company data if this DWC has company filters
+            $leadWithCompanies = $this->loadLeadPrimaryCompanyIfNeeded($leadArray, [$dwc->getSlotName() => [$dwc]]);
+            if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadWithCompanies)) {
                 return $lead ? $this->getRealDynamicContent($lead, $dwc, $event) : '';
             }
         }
@@ -192,6 +194,7 @@ class DynamicContentHelper
         return array_merge(
             $lead->getProfileFields(),
             [
+                'id'   => $lead->getId(),
                 'tags' => array_map(
                     fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
@@ -295,11 +298,26 @@ class DynamicContentHelper
      */
     private function loadLeadPrimaryCompanyIfNeeded(array $lead, array $tokens): array
     {
-        if (isset($lead['companies']) || !$this->doFiltersContainCompanyFilter($this->flattenTokenFilters($tokens))) {
+        if (!$this->doFiltersContainCompanyFilter($this->flattenTokenFilters($tokens))) {
             return $lead;
         }
 
-        $lead['companies'] = array_values($this->companyLeadRepository->getPrimaryCompaniesByLeadIds([$lead['id']]));
+        // If companies are missing OR contain placeholders (id = 0 or “[...” values)
+        if (
+            empty($lead['companies'])
+            || (
+                isset($lead['companies'][0]['id'])
+                && 0 === (int) $lead['companies'][0]['id']
+            )
+            || (
+                isset($lead['companies'][0]['companyname'])
+                && str_starts_with((string) $lead['companies'][0]['companyname'], '[')
+            )
+        ) {
+            $lead['companies'] = array_values(
+                $this->companyLeadRepository->getPrimaryCompaniesByLeadIds([$lead['id']])
+            );
+        }
 
         return $lead;
     }

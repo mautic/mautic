@@ -192,7 +192,12 @@ trait MatchFilterForLeadTrait
         if ($this->isFilterCompany($data)) {
             $primaryCompany = $lead['companies'][0] ?? null;
 
-            return empty($primaryCompany) ? null : [$primaryCompany[$data['field']]];
+            // new behavior: if no company, return empty string so it fails !empty or equals checks
+            if (empty($primaryCompany)) {
+                return [''];
+            }
+
+            return [$primaryCompany[$data['field']]];
         }
 
         return !array_key_exists($data['field'], $lead) ? null : [$lead[$data['field']]];
