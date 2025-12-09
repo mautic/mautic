@@ -6,6 +6,8 @@ use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,16 +17,6 @@ class FileController extends AjaxController
     public const EDITOR_FROALA   = 'froala';
 
     public const EDITOR_CKEDITOR = 'ckeditor';
-
-    protected $imageMimes = [
-        'image/gif',
-        'image/jpeg',
-        'image/pjpeg',
-        'image/jpeg',
-        'image/pjpeg',
-        'image/png',
-        'image/x-png',
-    ];
 
     protected $response = [];
 
@@ -41,10 +33,12 @@ class FileController extends AjaxController
         $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {
-                if (in_array($file->getMimeType(), $this->imageMimes)) {
+                /** @var UploadedFile $file */
+                try {
+                    $fileUploader->validateImage($file);
                     $fileName = $fileUploader->upload($mediaDir, $file);
                     $this->successfulResponse($request, $fileName, $editor);
-                } else {
+                } catch (FileUploadException) {
                     $this->failureResponse($editor);
                 }
             }
@@ -56,7 +50,7 @@ class FileController extends AjaxController
     /**
      * List the files in /media directory.
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper): JsonResponse
+    public function listAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
     {
         $fnames = scandir($this->getMediaAbsolutePath($pathsHelper));
 
@@ -64,12 +58,17 @@ class FileController extends AjaxController
             foreach ($fnames as $name) {
                 $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.$name;
                 $imageUrl  = $this->getMediaUrl($request).'/'.$name;
-                if (!is_dir($name) && in_array(mime_content_type($imagePath), $this->imageMimes)) {
-                    $this->response[] = [
-                        'url'   => $imageUrl,
-                        'thumb' => $imageUrl,
-                        'name'  => $name,
-                    ];
+                $imageFile = new File($imagePath, checkPath: false);
+                if (!is_dir($name)) {
+                    try {
+                        $fileUploader->validateImage($imageFile);
+                        $this->response[] = [
+                            'url'   => $imageUrl,
+                            'thumb' => $imageUrl,
+                            'name'  => $name,
+                        ];
+                    } catch (FileUploadException) {
+                    }
                 }
             }
         } else {

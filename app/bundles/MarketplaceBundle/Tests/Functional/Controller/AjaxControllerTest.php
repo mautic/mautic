@@ -17,7 +17,10 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
+use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
+use Mautic\MarketplaceBundle\Service\Config;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,10 +28,32 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AjaxControllerTest extends AbstractMauticTestCase
 {
+    /**
+     * @var MockObject|CorePermissions
+     */
+    private MockObject $security;
+
+    /**
+     * @var MockObject|Config
+     */
+    private MockObject $marketplaceConfig;
+
+    /**
+     * @var MockObject|RequestStack
+     */
+    private MockObject $requestStack;
+
     public function testInstallPackageAction(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"mautic","package":"test-plugin-bundle"}');
         $controller = $this->generateController(false);
+
+        $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
+        $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
+        $this->security->expects($this->any())
+            ->method('isGranted')
+            ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
+            ->willReturn(true);
 
         $response = $controller->installPackageAction($request);
 
@@ -40,6 +65,13 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"mautic","package":"test-plugin-bundle"}');
         $controller = $this->generateController(true);
+
+        $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
+        $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
+        $this->security->expects($this->any())
+            ->method('isGranted')
+            ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
+            ->willReturn(true);
 
         $response = $controller->removePackageAction($request);
 
@@ -66,13 +98,16 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $dispatcher           = $this->createMock(EventDispatcherInterface::class);
         $translator           = $this->createMock(Translator::class);
         $flashBag             = $this->createMock(FlashBag::class);
-        $requestStack         = new RequestStack();
-        $security             = $this->createMock(CorePermissions::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
+
+        $this->security          = $this->createMock(CorePermissions::class);
+        $this->marketplaceConfig = $this->createMock(Config::class);
 
         $controller = new AjaxController(
             $composer,
             $cacheHelper,
             $logger,
+            $this->marketplaceConfig,
             $doctrine,
             $factory,
             $modelFactory,
@@ -81,8 +116,8 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $dispatcher,
             $translator,
             $flashBag,
-            $requestStack,
-            $security
+            $this->requestStack,
+            $this->security
         );
         $controller->setContainer(static::getContainer());
 

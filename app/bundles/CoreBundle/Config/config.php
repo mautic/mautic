@@ -347,6 +347,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
                 'arguments' => [
                     'mautic.helper.file_path_resolver',
+                    'translator',
                 ],
             ],
             'mautic.helper.file_path_resolver' => [

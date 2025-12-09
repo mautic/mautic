@@ -15,12 +15,15 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
+use Mautic\MarketplaceBundle\Service\Config;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
@@ -28,6 +31,7 @@ class AjaxController extends CommonAjaxController
         private ComposerHelper $composer,
         private CacheHelper $cacheHelper,
         private LoggerInterface $logger,
+        private Config $config,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -44,6 +48,19 @@ class AjaxController extends CommonAjaxController
 
     public function installPackageAction(Request $request): JsonResponse
     {
+        if (!$this->config->marketplaceIsEnabled()) {
+            return $this->sendJsonResponse([
+                'error' => $this->translator->trans('marketplace.package.request.marketplace_disabled'),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
+            || !$this->config->isComposerEnabled()) {
+            return $this->sendJsonResponse([
+                'error' => $this->translator->trans('marketplace.package.request.no_permissions'),
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $data   = json_decode($request->getContent(), true);
 
         if (empty($data['vendor']) || empty($data['package'])) {
@@ -82,6 +99,19 @@ class AjaxController extends CommonAjaxController
 
     public function removePackageAction(Request $request): JsonResponse
     {
+        if (!$this->config->marketplaceIsEnabled()) {
+            return $this->sendJsonResponse([
+                'error' => $this->translator->trans('marketplace.package.request.marketplace_disabled'),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)
+            || !$this->config->isComposerEnabled()) {
+            return $this->sendJsonResponse([
+                'error' => $this->translator->trans('marketplace.package.request.no_permissions'),
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $data   = json_decode($request->getContent(), true);
 
         if (empty($data['vendor']) || empty($data['package'])) {
