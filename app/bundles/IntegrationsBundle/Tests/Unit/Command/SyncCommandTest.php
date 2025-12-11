@@ -34,7 +34,7 @@ class SyncCommandTest extends TestCase
         $this->syncService = $this->createMock(SyncServiceInterface::class);
         $application       = new Application();
 
-        $application->add(new SyncCommand($this->syncService));
+        $application->addCommand(new SyncCommand($this->syncService));
 
         // env is global option. Must be defined.
         $application->getDefinition()->addOption(

@@ -827,6 +827,21 @@ class FieldModel extends FormModel
 
         // validate properties
         $type   = $entity->getType();
+
+        // Trim select field option values BEFORE validation + save
+        if (('select' === $type || 'multiselect' === $type)
+            && isset($properties['list']) && is_array($properties['list'])
+        ) {
+            foreach ($properties['list'] as &$item) {
+                if (isset($item['label'])) {
+                    $item['label'] = trim($item['label']);
+                }
+                if (isset($item['value'])) {
+                    $item['value'] = trim($item['value']);
+                }
+            }
+        }
+
         $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
             $entity->setProperties($properties);
