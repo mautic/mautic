@@ -827,6 +827,21 @@ class FieldModel extends FormModel
 
         // validate properties
         $type   = $entity->getType();
+
+        // Trim select field option values BEFORE validation + save
+        if (('select' === $type || 'multiselect' === $type)
+            && isset($properties['list']) && is_array($properties['list'])
+        ) {
+            foreach ($properties['list'] as &$item) {
+                if (isset($item['label'])) {
+                    $item['label'] = trim($item['label']);
+                }
+                if (isset($item['value'])) {
+                    $item['value'] = trim($item['value']);
+                }
+            }
+        }
+
         $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
             $entity->setProperties($properties);
@@ -1010,6 +1025,47 @@ class FieldModel extends FormModel
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    /**
+     * Get the owner and stage fields.
+     *
+     * @return array<string, mixed>
+     */
+    public function getSpecialLeadFields(): array
+    {
+        return [
+            'ownerbyemail' => [
+                'label'        => $this->translator->trans('mautic.lead.field.ownerbyemail'),
+                'alias'        => 'ownerbyemail',
+                'type'         => 'email',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'ownerbyid' => [
+                'label'        => $this->translator->trans('mautic.lead.field.ownerbyid'),
+                'alias'        => 'ownerbyid',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'stagebyname' => [
+                'label'        => $this->translator->trans('mautic.lead.field.stagebyname'),
+                'alias'        => 'stagebyname',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+        ];
     }
 
     public function generateUniqueFieldAlias(string $alias): string

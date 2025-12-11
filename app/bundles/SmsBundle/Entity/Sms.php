@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
@@ -24,7 +25,7 @@ use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -103,7 +104,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     private $sentCount = 0;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     #[Groups(['sms:read', 'sms:write'])]
     private $category;
@@ -150,9 +151,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         $this->translationChildren = new ArrayCollection();
     }
 
-    /**
-     * Clear stats.
-     */
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
@@ -326,8 +324,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -433,8 +429,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     }
 
     /**
-     * Add list.
-     *
      * @return Sms
      */
     public function addList(LeadList $list)
@@ -444,9 +438,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->lists->removeElement($list);

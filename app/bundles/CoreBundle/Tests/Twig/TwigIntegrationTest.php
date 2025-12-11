@@ -15,10 +15,12 @@ use Symfony\Component\Asset\Packages;
 use Twig\Extension\ExtensionInterface;
 
 /**
- * @see https://twig.symfony.com/doc/2.x/advanced.html#functional-tests
+ * @see https://twig.symfony.com/doc/3.x/advanced.html#functional-tests
  */
-class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
+final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
+    use TwigIntegrationTestTrait;
+
     /**
      * @return ExtensionInterface[]
      */
@@ -48,10 +50,5 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             new ClassExtension(),
             new FormExtension(),
         ];
-    }
-
-    public static function getFixturesDirectory(): string
-    {
-        return __DIR__.'/Fixtures/';
     }
 }

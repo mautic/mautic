@@ -23,7 +23,7 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $this->repository = $this->em->getRepository(LeadEventLog::class);
     }
 
-    public function testThatRemoveEventLogsMethodRemovesLogs(): void
+    public function testThatRemoveEventLogsByCampaignIdMethodRemovesLogs(): void
     {
         $campaign = $this->createCampaign();
         $event    = $this->createEvent($campaign);
@@ -33,7 +33,7 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $this->em->flush();
 
         Assert::assertCount(3, $this->repository->findAll());
-        $this->repository->removeEventLogs([(string) $event->getId()]);
+        $this->repository->removeEventLogsByCampaignId($campaign->getId());
         Assert::assertCount(0, $this->repository->findAll());
     }
 

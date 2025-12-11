@@ -342,10 +342,148 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             1,
             $response['success']
         );
-        Assert::assertContains(
-            (string) $event1->getId(),
-            $response['deletedEvents']
+
+        // Check that the deleted event is in the response
+        $eventFound = false;
+        foreach ($response['deletedEvents'] as $deletedEvent) {
+            if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
+                $eventFound = true;
+                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
+                Assert::assertNull($deletedEvent['redirectEvent']);
+                break;
+            }
+        }
+        Assert::assertTrue($eventFound, 'Deleted event not found in response');
+    }
+
+    public function testEventsAreDeletedWithRedirectId(): void
+    {
+        $campaign = $this->createCampaign();
+        $event1   = $this->createEvent('Event1', $campaign);
+        $event2   = $this->createEvent('Event2', $campaign);
+
+        $redirectEventId = $event2->getId();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/campaigns/events/delete/'.$event1->getId().'?redirectTo='.$redirectEventId,
+            [
+                'modifiedEvents' => json_encode([$event1->getId() => $event1]),
+            ],
+            [],
+            $this->createAjaxHeaders(),
+            '{}'
         );
+        $this->assertResponseIsSuccessful();
+
+        $response = $this->client->getResponse();
+        $response = json_decode($response->getContent(), true);
+        Assert::assertSame(1, $response['success']);
+
+        // Check that the deleted event with redirect ID is properly stored
+        $eventFound = false;
+        foreach ($response['deletedEvents'] as $deletedEvent) {
+            if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
+                $eventFound = true;
+                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
+                Assert::assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
+                break;
+            }
+        }
+        Assert::assertTrue($eventFound, 'Deleted event with redirect ID not found in response');
+    }
+
+    public function testEventsAreUndeleted(): void
+    {
+        $campaign = $this->createCampaign();
+        $event1   = $this->createEvent('Event1', $campaign);
+        $event2   = $this->createEvent('Event2', $campaign);
+
+        $redirectEventId = $event2->getId();
+
+        // First delete the event
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/campaigns/events/delete/'.$event1->getId().'?redirectTo='.$redirectEventId,
+            [
+                'modifiedEvents' => json_encode([$event1->getId() => $event1]),
+            ],
+            [],
+            $this->createAjaxHeaders(),
+            '{}'
+        );
+        $this->assertResponseIsSuccessful();
+
+        $deleteResponse = $this->client->getResponse();
+        $deleteResponse = json_decode($deleteResponse->getContent(), true);
+        Assert::assertSame(1, $deleteResponse['success']);
+
+        // Now undelete the event, passing the deletedEvents from the previous response
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/campaigns/events/undelete/'.$event1->getId().'?campaignId='.$campaign->getId(),
+            [
+                'modifiedEvents' => json_encode([$event1->getId() => $event1]),
+                'deletedEvents'  => json_encode($deleteResponse['deletedEvents']),
+            ],
+            [],
+            $this->createAjaxHeaders(),
+            '{}'
+        );
+        $this->assertResponseIsSuccessful();
+
+        $undeleteResponse = $this->client->getResponse();
+        $undeleteResponse = json_decode($undeleteResponse->getContent(), true);
+        Assert::assertSame(1, $undeleteResponse['success']);
+
+        // Verify the event is no longer in the deletedEvents list
+        $eventStillExists = false;
+        foreach ($undeleteResponse['deletedEvents'] as $deletedEvent) {
+            if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
+                $eventStillExists = true;
+                break;
+            }
+        }
+        Assert::assertFalse($eventStillExists, 'Event should no longer be in the deletedEvents list');
+    }
+
+    public function testEventsAreDeletedWithRedirectIdInPostRequest(): void
+    {
+        $campaign = $this->createCampaign();
+        $event1   = $this->createEvent('Event1', $campaign);
+        $event2   = $this->createEvent('Event2', $campaign);
+
+        $redirectEventId = $event2->getId();
+
+        // Pass the redirectTo parameter in the POST data instead of query parameter
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/campaigns/events/delete/'.$event1->getId(),
+            [
+                'modifiedEvents' => json_encode([$event1->getId() => $event1]),
+                'redirectTo'     => $redirectEventId,
+            ],
+            [],
+            $this->createAjaxHeaders(),
+            '{}'
+        );
+        $this->assertResponseIsSuccessful();
+
+        $response = $this->client->getResponse();
+        $response = json_decode($response->getContent(), true);
+        Assert::assertSame(1, $response['success']);
+
+        // Check that the deleted event with redirect ID is properly stored
+        $eventFound = false;
+        foreach ($response['deletedEvents'] as $deletedEvent) {
+            if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
+                $eventFound = true;
+                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
+                Assert::assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
+                break;
+            }
+        }
+        Assert::assertTrue($eventFound, 'Deleted event with redirect ID from POST data not found in response');
     }
 
     private function createCampaign(): Campaign

@@ -26,6 +26,7 @@ use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
@@ -482,8 +483,8 @@ class PublicController extends AbstractFormController
     ): RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->getModel('page.redirect');
+        /** @var RedirectModel $redirectModel */
+        $redirectModel = $this->getModel(RedirectModel::class);
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
         $logger->debug('Executing Redirect: '.$redirect);
@@ -502,7 +503,12 @@ class PublicController extends AbstractFormController
         // Get query string
         $query = $request->query->all();
 
-        $ct = $query['ct'] ?? null;
+        $ct = null;
+        // Remove click-trough parameter, so it won't be duplicated later.
+        if (isset($query['ct'])) {
+            $ct = $query['ct'];
+            unset($query['ct']);
+        }
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -514,14 +520,12 @@ class PublicController extends AbstractFormController
         $ipAddress = $ipLookupHelper->getIpAddress();
 
         $isHitTrackable = false;
-        if ($ct) {
+        if (null !== $ct && '' !== $ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
-                /** @var LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
 
                 /** @var PageModel $pageModel */
-                $pageModel = $this->getModel('page');
+                $pageModel = $this->getModel(PageModel::class);
 
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
@@ -532,19 +536,19 @@ class PublicController extends AbstractFormController
 
                     $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
-                    $request->request->set('ct', '');
-                    $request->query->set('ct', '');
+                    $request->request->remove('ct');
+                    $request->query->remove('ct');
                     $lead           = $contactRequestHelper->getContactFromQuery();
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
 
-                $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+                $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
                 $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
             if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
-                if (strpos($url, '&')) {
+                if (str_contains($url, '?')) {
                     $url .= '&ct='.$ct;
                 } else {
                     $url .= '?ct='.$ct;

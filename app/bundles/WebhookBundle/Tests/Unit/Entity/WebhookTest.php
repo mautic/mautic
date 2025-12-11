@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Entity;
+namespace Mautic\WebhookBundle\Tests\Unit\Entity;
 
 use Mautic\WebhookBundle\Entity\Webhook;
 use PHPUnit\Framework\Assert;

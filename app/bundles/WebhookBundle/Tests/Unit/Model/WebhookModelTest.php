@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Model;
+namespace Mautic\WebhookBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Psr7\Response;

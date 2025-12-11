@@ -32,6 +32,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\PageEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Container;
@@ -321,25 +322,22 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
-        $matcher = self::exactly(3);
+        $matcher = self::exactly(2);
 
         $this->modelFactory->expects($matcher)
             ->method('getModel')->willReturnCallback(function (...$parameters) use ($matcher) {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('page.redirect', $parameters[0]);
+                    $this->assertSame(RedirectModel::class, $parameters[0]);
 
                     return $this->redirectModel;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('lead', $parameters[0]);
-
-                    return $this->leadModel;
-                }
-                if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('page', $parameters[0]);
+                    $this->assertSame(PageModel::class, $parameters[0]);
 
                     return $this->pageModel;
                 }
+
+                self::fail('The index '.$matcher->numberOfInvocations().' is not set.');
             });
 
         $this->redirect->expects(self::once())
@@ -415,42 +413,39 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->logger,
             $redirectId
         );
-        self::assertSame('https://someurl.test/?ct=someClickTroughValue', $response->getTargetUrl());
+
+        self::assertSame('https://someurl.test/', $response->getTargetUrl());
     }
 
     /**
      * @throws \Exception
      */
-    public function testAssetRedirectUrlWithClickThrough(): void
+    #[DataProvider('provideRedirectUrls')]
+    public function testAssetRedirectUrlWithClickThrough(string $redirectUrl, string $targetUrl): void
     {
         $redirectId   = 'dummy_redirect_id';
         $clickThrough = 'dummy_click_through';
-        $redirectUrl  = 'https://some.test.url/asset/1:examplefilejpg';
-        $targetUrl    = 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through%3Fct%3Ddummy_click_through';
 
         $this->redirectModel->expects(self::once())
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
-        $matcher = self::exactly(3);
+        $matcher = self::exactly(2);
 
         $this->modelFactory->expects($matcher)
             ->method('getModel')->willReturnCallback(function (...$parameters) use ($matcher) {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('page.redirect', $parameters[0]);
+                    $this->assertSame(RedirectModel::class, $parameters[0]);
 
                     return $this->redirectModel;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('lead', $parameters[0]);
-
-                    return $this->leadModel;
-                }
-                if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('page', $parameters[0]);
+                    $this->assertSame(PageModel::class, $parameters[0]);
 
                     return $this->pageModel;
                 }
+
+                self::fail('Unknown invocation.');
             });
 
         $this->redirect->expects(self::once())
@@ -529,6 +524,24 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
         self::assertSame($targetUrl, $response->getTargetUrl());
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+    }
+
+    public static function provideRedirectUrls(): \Generator
+    {
+        yield 'No query parameters' => [
+            'https://some.test.url/asset/1:examplefilejpg',
+            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+        ];
+
+        yield 'With query parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?param=value',
+            'https://some.test.url/asset/1:examplefilejpg?param=value&ct=dummy_click_through',
+        ];
+
+        yield 'With click-through parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?ct=parameter',
+            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+        ];
     }
 
     /**

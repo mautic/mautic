@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -51,6 +52,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private EventCollector $eventCollector,
         private MembershipBuilder $membershipBuilder,
         private ContactTracker $contactTracker,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -234,6 +236,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                     continue;
                 }
 
+                if ('redirectEvent' === $f) {
+                    $this->setRedirectEvent($v, $event);
+                    continue;
+                }
+
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
                     $event->$func($v);
@@ -246,18 +253,21 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             $events[$properties['id']] = $event;
         }
 
-        foreach ($deletedEvents as $deleteMe) {
-            if (isset($existingEvents[$deleteMe])) {
+        // Process deleted events for the entity
+        foreach ($deletedEvents as $deleteInfo) {
+            $eventId = $deleteInfo['id'];
+
+            if (isset($existingEvents[$eventId])) {
                 // Remove child from parent
-                $parent = $existingEvents[$deleteMe]->getParent();
+                $parent = $existingEvents[$eventId]->getParent();
                 if ($parent) {
-                    $parent->removeChild($existingEvents[$deleteMe]);
-                    $existingEvents[$deleteMe]->removeParent();
+                    $parent->removeChild($existingEvents[$eventId]);
+                    $existingEvents[$eventId]->removeParent();
                 }
 
-                $entity->removeEvent($existingEvents[$deleteMe]);
+                $entity->removeEvent($existingEvents[$eventId]);
 
-                unset($events[$deleteMe]);
+                unset($events[$eventId]);
             }
         }
 
@@ -342,6 +352,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         // Persist events if campaign is being edited
         if ($entity->getId()) {
             $this->getEventRepository()->saveEntities($events);
+
+            $this->handleDeletedEventsWithRedirect($deletedEvents);
         }
 
         return $events;
@@ -668,6 +680,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query  = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
 
         $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
         $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
@@ -892,5 +905,54 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $campaign->markForVersionIncrement();
         $this->saveEntity($campaign);
         $this->em->commit();
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $deletedEvents
+     */
+    private function handleDeletedEventsWithRedirect(array $deletedEvents): void
+    {
+        if (empty($deletedEvents)) {
+            return;
+        }
+
+        $deletedIds  = [];
+        $deletedData = [];
+
+        foreach ($deletedEvents as $deleteInfo) {
+            $eventId       = $deleteInfo['id'];
+            $redirectEvent = $deleteInfo['redirectEvent'] ?? null;
+
+            if (str_starts_with($eventId, 'new')) {
+                continue;
+            }
+
+            $deletedIds[]  = $eventId;
+
+            $deletedData[] = [
+                'id'            => $eventId,
+                'redirectEvent' => $redirectEvent,
+            ];
+        }
+
+        if ($deletedIds) {
+            $this->getEventRepository()->nullEventRelationships($deletedIds);
+
+            $this->getEventRepository()->setEventsAsDeletedWithRedirect($deletedData);
+        }
+    }
+
+    private function setRedirectEvent(mixed $redirectEventValue, Event $event): void
+    {
+        if (empty($redirectEventValue) || is_array($redirectEventValue)) {
+            return;
+        }
+
+        if (is_numeric($redirectEventValue) || is_string($redirectEventValue)) {
+            $redirectEvent = $this->getEventRepository()->find($redirectEventValue);
+            if ($redirectEvent) {
+                $event->setRedirectEvent($redirectEvent);
+            }
+        }
     }
 }

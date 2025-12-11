@@ -285,6 +285,14 @@ class DateTimeHelper
         return new \DateInterval($spec);
     }
 
+    public function intervalToSeconds(\DateInterval $interval): int
+    {
+        $reference = new \DateTimeImmutable();
+        $endTime   = $reference->add($interval);
+
+        return $endTime->getTimestamp() - $reference->getTimestamp();
+    }
+
     /**
      * Modify datetime.
      *

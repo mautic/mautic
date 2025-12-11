@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
+namespace MauticPlugin\MauticFocusBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;

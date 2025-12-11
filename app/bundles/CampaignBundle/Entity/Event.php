@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
@@ -72,98 +72,118 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @var int
      */
+    #[Groups(['event:read', 'campaign:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $type;
 
     /**
      * @var string
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $eventType;
 
     /**
      * @var int
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $order = 0;
 
     /**
      * @var array
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $properties = [];
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerDate;
 
     /**
      * @var int|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerInterval = 0;
 
     /**
      * @var string|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerIntervalUnit;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerHour;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerRestrictedStartHour;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerRestrictedStopHour;
 
     /**
      * @var array|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerRestrictedDaysOfWeek = [];
 
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?int $triggerWindow;
 
     /**
      * @var string|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $triggerMode;
 
     /**
      * @var Campaign
      */
+    #[Groups(['event:write'])]
     private $campaign;
 
     /**
      * @var ArrayCollection<int, Event>
      **/
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $children;
 
     /**
      * @var Event|null
      **/
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $parent;
 
     /**
      * @var string|null
      **/
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $decisionPath;
 
     /**
@@ -181,18 +201,19 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @var array
      */
+    #[Groups(['event:read', 'event:write'])]
     private $contactLog = [];
 
     /**
      * @var string|null
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channel;
 
     /**
      * @var string|null
-     *
-     * @Groups({"event:read", "event:write", "campaign:read"})
      */
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channelId;
 
     /**
@@ -200,25 +221,37 @@ class Event implements ChannelInterface, UuidInterface
      */
     private $changes = [];
 
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
 
     private int $failedCount = 0;
 
-    public function __construct()
-    {
-        $this->log      = new ArrayCollection();
-        $this->children = new ArrayCollection();
-    }
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    private ?Event $redirectEvent;
 
     /**
-     * Clean up after clone.
+     * Collection of events that redirect to this event.
+     *
+     * @var ArrayCollection<int, Event>
      */
+    private Collection $redirectingEvents;
+
+    public function __construct()
+    {
+        $this->log               = new ArrayCollection();
+        $this->children          = new ArrayCollection();
+        $this->redirectEvent     = null;
+        $this->redirectingEvents = new ArrayCollection();
+    }
+
     public function __clone()
     {
-        $this->tempId    = null;
-        $this->campaign  = null;
-        $this->channel   = null;
-        $this->channelId = null;
+        $this->tempId            = null;
+        $this->campaign          = null;
+        $this->channel           = null;
+        $this->channelId         = null;
+        $this->redirectEvent     = null;
+        $this->redirectingEvents = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -249,6 +282,16 @@ class Event implements ChannelInterface, UuidInterface
         $builder->addField('properties', 'array');
 
         $builder->addNullableField('deleted', 'datetime');
+
+        $builder->createManyToOne('redirectEvent', 'Event')
+            ->cascadePersist()
+            ->addJoinColumn('redirect_event_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createOneToMany('redirectingEvents', 'Event')
+            ->mappedBy('redirectEvent')
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
@@ -1133,5 +1176,32 @@ class Event implements ChannelInterface, UuidInterface
         }
 
         return $triggerDate;
+    }
+
+    public function setRedirectEvent(?Event $redirectEvent = null): Event
+    {
+        $this->isChanged('redirectEvent', $redirectEvent);
+        $this->redirectEvent = $redirectEvent;
+
+        return $this;
+    }
+
+    public function getRedirectEvent(): ?Event
+    {
+        return $this->redirectEvent;
+    }
+
+    public function shouldBeRedirected(): bool
+    {
+        return $this->isDeleted() && null !== $this->redirectEvent;
+    }
+
+    /**
+     * Check if this event is used as a redirect target by any other event.
+     */
+    #[Groups(['event:read', 'campaign:read'])]
+    public function isRedirectTarget(): bool
+    {
+        return $this->redirectingEvents->count() > 0;
     }
 }

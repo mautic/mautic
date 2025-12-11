@@ -1,6 +1,6 @@
 <?php
 
-namespace FormBundle\Tests\EventListener;
+namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;

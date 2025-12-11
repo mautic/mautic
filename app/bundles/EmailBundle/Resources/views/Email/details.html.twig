@@ -132,6 +132,7 @@
         {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
             {
                 color: 'high-contrast',
+                icon: emailType == 'list' ? 'ri-pie-chart-line' : 'ri-mail-open-line',
                 label: emailType == 'list'
                     ? 'mautic.email.type.list.header'
                     : (emailType == 'template' ? 'mautic.email.type.template.header' : type)
@@ -150,7 +151,8 @@
                     label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
                     icon: 'ri-organization-chart',
                     attributes: {
-                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id})
+                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}),
+                        'data-toggle': 'ajax'
                     }
                 }
             ] } %}
@@ -168,7 +170,8 @@
                     label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}),
                     icon: 'ri-translate',
                     attributes: {
-                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id})
+                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id}),
+                        'data-toggle': 'ajax'
                     }
                 }
             ] } %}

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -14,20 +15,17 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
+class CampaignTestAbstract extends TestCase
 {
-    protected static $mockId   = 232;
+    protected static int $mockId      = 232;
+    protected static string $mockName = 'Mock name';
 
-    protected static $mockName = 'Mock name';
-
-    /**
-     * @return CampaignModel
-     */
-    protected function initCampaignModel()
+    protected function initCampaignModel(): CampaignModel
     {
         $entityManager = $this->createMock(EntityManager::class);
 
@@ -63,17 +61,13 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($formRepository);
 
-        $eventCollector    = $this->createMock(EventCollector::class);
-        $membershipBuilder = $this->createMock(MembershipBuilder::class);
-
-        $contactTracker = $this->createMock(ContactTracker::class);
-
-        $campaignModel = new CampaignModel(
+        return new CampaignModel(
             $leadListModel,
             $formModel,
-            $eventCollector,
-            $membershipBuilder,
-            $contactTracker,
+            $this->createMock(EventCollector::class),
+            $this->createMock(MembershipBuilder::class),
+            $this->createMock(ContactTracker::class),
+            $this->createMock(GeneratedColumnsProviderInterface::class),
             $entityManager,
             $security,
             $this->createMock(EventDispatcherInterface::class),
@@ -81,9 +75,7 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             $this->createMock(Translator::class),
             $userHelper,
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
         );
-
-        return $campaignModel;
     }
 }

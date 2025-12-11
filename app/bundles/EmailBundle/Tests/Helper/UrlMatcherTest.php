@@ -89,4 +89,48 @@ class UrlMatcherTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(UrlMatcher::hasMatch($urls, 'ftp://google.com'));
     }
+
+    public function testUrlWithQueryParametersEncoded(): void
+    {
+        $urls = [
+            'https://someurl.com/advanced-search?body_standard[0]=Car&body_standard[1]=Sedan',
+        ];
+
+        // Test matching with original URL (not encoded)
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://someurl.com/advanced-search?body_standard[0]=Car&body_standard[1]=Sedan'));
+
+        // Test matching with URL encoded version
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://someurl.com/advanced-search?body_standard%5B0%5D=Car&body_standard%5B1%5D=Sedan'));
+    }
+
+    public function testUrlWithQueryParametersDecoded(): void
+    {
+        $urls = [
+            'https://someurl.com/advanced-search?body_standard%5B0%5D=Car&body_standard%5B1%5D=Sedan',
+        ];
+
+        // Test matching with URL encoded version (original)
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://someurl.com/advanced-search?body_standard%5B0%5D=Car&body_standard%5B1%5D=Sedan'));
+
+        // Test matching with decoded version
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://someurl.com/advanced-search?body_standard[0]=Car&body_standard[1]=Sedan'));
+    }
+
+    public function testUrlWithArrayParameterNotation(): void
+    {
+        // Test the specific case where empty array notation [] should match indexed notation [0], [1]
+        $urls = [
+            'someurl.com/advanced-search?body_standard[]=Car&body_standard[]=Sedan',
+        ];
+
+        // Should match the indexed array notation
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'someurl.com/advanced-search?body_standard[0]=Car&body_standard[1]=Sedan'));
+
+        // Should also work in reverse - indexed notation in list should match empty array notation in search
+        $urlsIndexed = [
+            'someurl.com/advanced-search?body_standard[0]=Car&body_standard[1]=Sedan',
+        ];
+
+        $this->assertTrue(UrlMatcher::hasMatch($urlsIndexed, 'someurl.com/advanced-search?body_standard[]=Car&body_standard[]=Sedan'));
+    }
 }
