@@ -25,7 +25,7 @@ class Connection
     {
         $offset = ($page - 1) * $limit + 1;
 
-        return $this->makeRequest("https://marketplace.mautic.org/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}&_order=");
+        return $this->makeRequest("https://marketplace.mautic.org/functions/v1/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}&_order=");
     }
 
     /**
@@ -35,7 +35,7 @@ class Connection
      */
     public function getPackage(string $pluginName): array
     {
-        return $this->makeRequest("https://marketplace.mautic.org/api-marketplace-package?packag_name={$pluginName}");
+        return $this->makeRequest("https://marketplace.mautic.org/functions/v1/api-marketplace-package?package={$pluginName}");
     }
 
     /**
