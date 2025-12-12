@@ -30,6 +30,8 @@ parameters:
 		# not all IDEs are as smart as PHPSTAN and need the type hint
 		- identifier: function.alreadyNarrowedType
 		- identifier: instanceof.alwaysTrue
+		# Symfony 7.4 deprecation - Request->get() to be fixed before Symfony 8.0
+		- '#Call to deprecated method get\(\) of class Symfony\\Component\\HttpFoundation\\Request#'
 		- '/Variable \$\w+ might not be defined\./'
 		# resolve later with translator interface generics
 		- '#Method (.*?)::getTranslatedEntity\(\) return type has no value type specified in iterable type array#'

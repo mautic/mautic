@@ -931,6 +931,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         ?int $threadId = null,
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
+
         $total      = $this->getRepository()->getEmailPendingLeads(
             $email->getId(),
             $variantIds,
@@ -1339,6 +1340,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         if ($isMarketing && count($sendTo)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
+
             $this->messageQueueModel->processFrequencyRules(
                 $sendTo,
                 'email',
