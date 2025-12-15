@@ -52,6 +52,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
             $response->getContent()
         );
 
+        /** @var MauticMessage[] $messages */
         $messages = [
             $this->getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
             $this->getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
@@ -126,9 +127,11 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
             $response->getContent()
         );
 
-        $message = self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0];
+        $rawMessage = self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0];
+        Assert::assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
+        \assert($rawMessage instanceof \Symfony\Component\Mime\Message);
 
-        $body = quoted_printable_decode($message->getBody()->bodyToString());
+        $body = quoted_printable_decode($rawMessage->getBody()->bodyToString());
         preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
         Assert::assertArrayHasKey(1, $match, $body);
         $urlParts    = parse_url($match[1]);
