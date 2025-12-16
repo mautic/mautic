@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -25,7 +26,6 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
             $this->configParams['unsubscribe_text']  = '';
         }
 
-        $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
     }
 
@@ -53,6 +53,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(3);
 
         foreach ($this->getMailerMessages() as $message) {
+            \assert($message instanceof MauticMessage);
             $clickThrough = $this->parseClickThrough($message->getHtmlBody());
             $email        = $message->getTo()[0]->getAddress();
             Assert::assertSame((string) $leads[$email]->getId(), $clickThrough['lead'], '"lead" parameter within the click through should match the contact\'s ID.');
