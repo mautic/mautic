@@ -4020,34 +4020,34 @@
         },
         {
             "name": "helios-ag/fm-elfinder-bundle",
-            "version": "12.7.3",
+            "version": "13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/helios-ag/FMElfinderBundle.git",
-                "reference": "8041092383efda82faee697dc1119840a4345eca"
+                "reference": "4b62c623bd3e724078810ced0f87c4f84866a5fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/helios-ag/FMElfinderBundle/zipball/8041092383efda82faee697dc1119840a4345eca",
-                "reference": "8041092383efda82faee697dc1119840a4345eca",
+                "url": "https://api.github.com/repos/helios-ag/FMElfinderBundle/zipball/4b62c623bd3e724078810ced0f87c4f84866a5fe",
+                "reference": "4b62c623bd3e724078810ced0f87c4f84866a5fe",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": "^8.1",
                 "studio-42/elfinder": "~2.1.62",
-                "symfony/asset": "^6.4 || ^7.0",
-                "symfony/form": "^6.4 || ^7.0",
-                "symfony/framework-bundle": "^6.4 || ^7.0",
-                "symfony/twig-bundle": "^6.4 || ^7.0"
+                "symfony/asset": "^6.4 || ^7.0 || ^8.0",
+                "symfony/form": "^6.4 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "dev-master",
                 "matthiasnoback/symfony-config-test": "^6.0",
                 "matthiasnoback/symfony-dependency-injection-test": "^6.0",
                 "php-coveralls/php-coveralls": "^2.0",
-                "symfony/finder": "^6.4 || ^7.0",
-                "symfony/phpunit-bridge": "^6.4 || ^7.0.1"
+                "symfony/finder": "^6.4 || ^7.0 || ^8.0",
+                "symfony/phpunit-bridge": "^6.4 || ^7.0.1 || ^8.0"
             },
             "suggest": {
                 "barryvdh/elfinder-flysystem-driver": "Flysystem driver for elfinder",
@@ -4090,9 +4090,9 @@
             ],
             "support": {
                 "issues": "https://github.com/helios-ag/FMElfinderBundle/issues",
-                "source": "https://github.com/helios-ag/FMElfinderBundle/tree/12.7.3"
+                "source": "https://github.com/helios-ag/FMElfinderBundle/tree/13"
             },
-            "time": "2025-06-19T11:47:45+00:00"
+            "time": "2025-12-09T05:04:37+00:00"
         },
         {
             "name": "illuminate/collections",
@@ -6153,7 +6153,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "2d44db4b08ad18a3223304ba04b8817b3a6c390a"
+                "reference": "df7477843ebd157ca35a8abfd52c339117dfa75c"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6184,7 +6184,7 @@
                 "giggsey/libphonenumber-for-php": "^8.12",
                 "guzzlehttp/guzzle": "^7.6",
                 "guzzlehttp/oauth-subscriber": "^0.8.1",
-                "helios-ag/fm-elfinder-bundle": "^12.3",
+                "helios-ag/fm-elfinder-bundle": "^13.0",
                 "illuminate/collections": "^10.48",
                 "ip2location/ip2location-php": "^7.2",
                 "javer/sp-bundle": "^2.0",
