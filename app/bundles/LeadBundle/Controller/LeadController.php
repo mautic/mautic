@@ -1458,6 +1458,7 @@ class LeadController extends FormController
                         $subject     = $email['subject'];
 
                         // Set default settings for email.
+                        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
                         $mailer->setReplyTo($email['from']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);

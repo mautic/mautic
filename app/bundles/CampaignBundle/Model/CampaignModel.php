@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -51,6 +52,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private EventCollector $eventCollector,
         private MembershipBuilder $membershipBuilder,
         private ContactTracker $contactTracker,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -678,6 +680,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query  = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
 
         $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
         $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);

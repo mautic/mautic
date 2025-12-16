@@ -2717,7 +2717,7 @@ fieldset[disabled] .btn-primary.focus,
 fieldset[disabled] .btn-primary + .dropdown-toggle.focus {
   background-color: var(--button-disabled);
   color: var(--text-on-color-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-primary[disabled] i,
 .btn-primary + .dropdown-toggle[disabled] i,
@@ -2880,7 +2880,7 @@ fieldset[disabled] .btn-primary.btn-danger.focus,
 fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
   background-color: var(--button-disabled);
   color: var(--text-on-color-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-primary.btn-danger[disabled] i,
 .btn-primary + .dropdown-toggle.btn-danger[disabled] i,
@@ -2995,7 +2995,7 @@ fieldset[disabled] .btn-secondary:focus,
 fieldset[disabled] .btn-secondary.focus {
   background-color: var(--button-disabled);
   color: var(--text-on-color-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-secondary[disabled] i,
 .btn-secondary.disabled i,
@@ -3098,7 +3098,7 @@ fieldset[disabled] .btn-tertiary:focus,
 fieldset[disabled] .btn-tertiary.focus {
   background-color: transparent;
   color: var(--text-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-tertiary[disabled] i,
 .btn-tertiary.disabled i,
@@ -3201,7 +3201,7 @@ fieldset[disabled] .btn-tertiary.btn-danger:focus,
 fieldset[disabled] .btn-tertiary.btn-danger.focus {
   background-color: var(--button-disabled);
   color: var(--text-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-tertiary.btn-danger[disabled] i,
 .btn-tertiary.btn-danger.disabled i,
@@ -3228,6 +3228,17 @@ fieldset[disabled] .btn-tertiary.btn-danger.focus i {
 .btn-secondary:has(i),
 .btn-tertiary:has(i) {
   padding-right: var(--spacing-05);
+}
+.btn-primary:not(:has(i)),
+.btn-secondary:not(:has(i)),
+.btn-tertiary:not(:has(i)) {
+  padding-left: var(--spacing-07);
+  padding-right: var(--spacing-07);
+}
+.btn-primary:not(:has(i)) span,
+.btn-secondary:not(:has(i)) span,
+.btn-tertiary:not(:has(i)) span {
+  display: initial;
 }
 .btn-primary.btn--icon-only,
 .btn-secondary.btn--icon-only,
@@ -3336,7 +3347,7 @@ fieldset[disabled] .btn-ghost:focus,
 fieldset[disabled] .btn-ghost.focus {
   background-color: transparent;
   color: var(--text-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-ghost[disabled] i,
 .btn-ghost.disabled i,
@@ -3490,7 +3501,7 @@ fieldset[disabled] .btn-ghost.btn-danger.focus,
 fieldset[disabled] .btn-ghost.btn-danger.btn--icon-only.focus {
   background-color: transparent;
   color: var(--text-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-ghost.btn-danger[disabled] i,
 .btn-ghost.btn-danger.btn--icon-only[disabled] i,
@@ -3605,7 +3616,7 @@ fieldset[disabled] .btn-ghost.btn--icon-only:focus,
 fieldset[disabled] .btn-ghost.btn--icon-only.focus {
   background-color: transparent;
   color: var(--icon-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-ghost.btn--icon-only[disabled] i,
 .btn-ghost.btn--icon-only.disabled i,
@@ -4497,22 +4508,31 @@ kbd {
   color: var(--text-inverse);
 }
 .alert-growl--warning {
-  border-left-color: #FDB933;
+  border-left-color: var(--support-warning);
 }
 .alert-growl--warning a {
-  color: #FDB933;
+  color: var(--support-warning);
 }
 .alert-growl--warning a:hover {
-  color: #fedc98;
+  color: var(--support-warning-inverse);
 }
 .alert-growl--error {
-  border-left-color: #F86B4F;
+  border-left-color: var(--support-error);
 }
 .alert-growl--error a {
-  color: #F86B4F;
+  color: var(--support-error);
 }
 .alert-growl--error a:hover {
-  color: #fcbdb1;
+  color: var(--support-error-inverse);
+}
+.alert-growl--success {
+  border-left-color: var(--support-success);
+}
+.alert-growl--success a {
+  color: var(--support-success);
+}
+.alert-growl--success a:hover {
+  color: var(--support-success-inverse);
 }
 .alert-growl-container {
   position: fixed;

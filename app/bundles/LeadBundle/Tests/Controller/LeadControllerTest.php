@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
@@ -509,7 +510,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertQueuedEmailCount(1);
 
-        $email      = $this->getMailerMessage();
+        $email = $this->getMailerMessage();
+        \assert($email instanceof MauticMessage);
+
         $userHelper = static::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
@@ -557,7 +560,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertQueuedEmailCount(1);
 
-        $email      = $this->getMailerMessage();
+        $email = $this->getMailerMessage();
+        \assert($email instanceof MauticMessage);
+
         $userHelper = static::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 

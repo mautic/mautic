@@ -98,9 +98,9 @@ class CustomFieldHelperTest extends TestCase
         ];
 
         $expected = [
-            'customdate'         => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d'),
-            'customdatetime'     => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d H:i:s'),
-            'customtime'         => (new DateTimeHelper('-20 minutes'))->toLocalString('H:i:s'),
+            'customdate'         => (new DateTimeHelper('-1 day'))->toUtcString('Y-m-d'),
+            'customdatetime'     => (new DateTimeHelper('-1 day'))->toUtcString('Y-m-d H:i:s'),
+            'customtime'         => (new DateTimeHelper('-20 minutes'))->toUtcString('H:i:s'),
             'customnulldatetime' => null,
         ];
 
@@ -177,7 +177,7 @@ class CustomFieldHelperTest extends TestCase
     public function testFieldValueTransformerWithDateTimeFields(): void
     {
         $mockDateTimeHelper = $this->createMock(DateTimeHelper::class);
-        $mockDateTimeHelper->method('toLocalString')
+        $mockDateTimeHelper->method('toUtcString')
             ->willReturn('2023-05-20 00:00:00');
 
         $field  = ['type' => 'datetime'];
@@ -194,6 +194,41 @@ class CustomFieldHelperTest extends TestCase
         $value  = 'now';
         $result = CustomFieldHelper::fieldValueTransfomer($field, $value, $mockDateTimeHelper);
         $this->assertEquals('2023-05-20 00:00:00', $result, 'FieldValueTransformer was not able to transform time field properly');
+    }
+
+    public function testFieldValueTransformerUsesTimezoneConversion(): void
+    {
+        $originalTimezone = date_default_timezone_get();
+        $reflection       = new \ReflectionClass(DateTimeHelper::class);
+        $property         = $reflection->getProperty('defaultLocalTimezone');
+        $property->setAccessible(true);
+        $originalDefaultLocalTimezone = $property->getValue();
+
+        // Simulate a non-UTC default timezone (fixed offset) to exercise real conversion
+        $property->setValue(null, 'Etc/GMT-2');
+        date_default_timezone_set('UTC');
+
+        try {
+            $field  = ['type' => 'datetime'];
+            $value  = '2025-01-24 00:30:00';
+            $result = CustomFieldHelper::fieldValueTransfomer($field, $value);
+            $this->assertEquals('2025-01-23 22:30:00', $result, 'Datetime was not converted from Etc/GMT-2 to UTC correctly');
+
+            $field  = ['type' => 'date'];
+            $value  = '2025-01-24 00:30:00';
+            $result = CustomFieldHelper::fieldValueTransfomer($field, $value);
+            $this->assertEquals('2025-01-23', $result, 'Date was not converted from Etc/GMT-2 to UTC correctly');
+
+            $field  = ['type' => 'date'];
+            $value  = '2025-01-24';
+            $result = CustomFieldHelper::fieldValueTransfomer($field, $value);
+            // Date strings without a time component are parsed using PHP's default timezone (UTC here),
+            // so the date remains unchanged.
+            $this->assertEquals('2025-01-24', $result, 'Date was not converted from Etc/GMT-2 to UTC correctly');
+        } finally {
+            $property->setValue(null, $originalDefaultLocalTimezone);
+            date_default_timezone_set($originalTimezone);
+        }
     }
 
     protected function tearDown(): void
