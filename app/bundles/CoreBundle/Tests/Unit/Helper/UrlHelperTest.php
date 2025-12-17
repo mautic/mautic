@@ -83,14 +83,14 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
     public function testSanitizeAbsoluteUrlSanitizeQuery(): void
     {
         $this->assertEquals(
-            'http://username:password@hostname:9090/path?ar_g1=value&arg2=some%20email%40address.com#anchor',
+            'http://username:password@hostname:9090/path?ar%20g1=value&arg2=some%20email%40address.com#anchor',
             UrlHelper::sanitizeAbsoluteUrl(
                 'http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor'
             )
         );
 
         $this->assertEquals(
-            'http://username:password@hostname:9090/path?a=',
+            'http://username:password@hostname:9090/path?a',
             UrlHelper::sanitizeAbsoluteUrl(
                 'http://username:password@hostname:9090/path?a'
             )

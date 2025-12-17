@@ -998,6 +998,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
             'mautic.lead.lead.searchcommand.list',
+            'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
             'mautic.lead.lead.searchcommand.company_id',

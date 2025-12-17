@@ -540,7 +540,7 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         yield 'With click-through parameter' => [
             'https://some.test.url/asset/1:examplefilejpg?ct=parameter',
-            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+            'https://some.test.url/asset/1:examplefilejpg?ct=parameter&ct=dummy_click_through',
         ];
     }
 

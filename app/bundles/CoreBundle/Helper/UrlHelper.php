@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use GuzzleHttp\Psr7\Query;
+
 class UrlHelper
 {
     /**
@@ -224,10 +226,10 @@ class UrlHelper
         $query = parse_url($url, PHP_URL_QUERY);
 
         if (!empty($query)) {
-            parse_str($query, $parsedQuery);
+            $parsedQuery = Query::parse($query);
 
             if ($parsedQuery) {
-                $encodedQuery = http_build_query($parsedQuery, '', null, PHP_QUERY_RFC3986);
+                $encodedQuery = Query::build($parsedQuery, PHP_QUERY_RFC3986);
                 $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
