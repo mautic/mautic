@@ -1,0 +1,18 @@
+{
+    "name": "mautic/mauticanalytics-bundle",
+    "description": "Analytics for Mautic",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "analytics"
+    ],
+    "require": {
+        "php": ">=8.1",
+        "mautic/core-lib": "^6.0"
+    },
+    "extra": {
+        "install-directory-name": "MauticAnalyticsBundle"
+    },
+    "minimum-stability": "dev"
+}
