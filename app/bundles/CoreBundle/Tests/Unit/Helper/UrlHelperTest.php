@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -105,6 +106,30 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    #[DataProvider('provideUrlsForSanitizeQueryParameters')]
+    public function testSanitizeQueryParameters(string $url, string $expected): void
+    {
+        self::assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
+    }
+
+    public static function provideUrlsForSanitizeQueryParameters(): \Generator
+    {
+        yield 'With array list parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?par[]=one&par[]=two&ct=parameter',
+            'https://some.test.url/asset/1:examplefilejpg?par%5B%5D=one&par%5B%5D=two&ct=parameter',
+        ];
+
+        yield 'With array hash parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?par[a]=one&par[b]=two&ct=parameter',
+            'https://some.test.url/asset/1:examplefilejpg?par%5Ba%5D=one&par%5Bb%5D=two&ct=parameter',
+        ];
+
+        yield 'With duplicated parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?ct=parameter&ct=dummy_click_through',
+            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+        ];
+    }
+
     public function testGetUrlsFromPlaintextWithHttp(): void
     {
         $this->assertEquals(
@@ -188,7 +213,7 @@ STRING
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurlé'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataDecodeAmpersands')]
+    #[DataProvider('dataDecodeAmpersands')]
     public function testDecodeAmpersands(string $value, string $expected): void
     {
         $this->assertSame($expected, UrlHelper::decodeAmpersands($value));

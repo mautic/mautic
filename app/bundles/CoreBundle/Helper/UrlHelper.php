@@ -229,7 +229,18 @@ class UrlHelper
             $parsedQuery = Query::parse($query);
 
             if ($parsedQuery) {
-                $encodedQuery = Query::build($parsedQuery, PHP_QUERY_RFC3986);
+                $queryItems = [];
+
+                // Remove duplicate query parameters from query.
+                foreach ($parsedQuery as $index => $item) {
+                    if (is_array($item) && !str_ends_with($index, '[]')) {
+                        $item = array_last($item);
+                    }
+
+                    $queryItems[$index] = $item;
+                }
+
+                $encodedQuery = Query::build($queryItems, PHP_QUERY_RFC3986);
                 $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
