@@ -67,8 +67,8 @@ MauticJS.isTrackableDownload = function(url) {
 };
 
 MauticJS.shouldTrackLink = function(link) {
-    // Check for explicit opt-out: data-mautic-notrack
-    if (link.hasAttribute('data-mautic-notrack')) {
+    // Check for explicit opt-out: data-mautic-ignore
+    if (link.hasAttribute('data-mautic-ignore')) {
         return false;
     }
 
