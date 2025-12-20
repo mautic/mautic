@@ -28,10 +28,6 @@ class AutoTrackingJsSubscriber implements EventSubscriberInterface
 
     public function onBuildJs(BuildJsEvent $event): void
     {
-        if (!$this->coreParametersHelper->get('auto_asset_tracking_enabled')) {
-            return;
-        }
-
         $event->appendJs($this->getAutoAssetTrackingJs(), 'Mautic Auto Asset Tracking');
     }
 
@@ -43,14 +39,16 @@ class AutoTrackingJsSubscriber implements EventSubscriberInterface
             $this->router->generate('mautic_asset_auto_track', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
-        $extensions     = $this->coreParametersHelper->get('allowed_extensions');
-        $extensionsJson = json_encode(array_values($extensions));
+        $extensions       = $this->coreParametersHelper->get('allowed_extensions');
+        $extensionsJson   = json_encode(array_values($extensions));
+        $autoTrackEnabled = $this->coreParametersHelper->get('auto_asset_tracking_enabled') ? 'true' : 'false';
 
         return <<<JS
 
 // MauticAssetBundle: Auto-track download file clicks
 MauticJS.downloadTrackUrl = location.protocol + '//{$downloadTrackUrl}';
 MauticJS.trackableExtensions = {$extensionsJson};
+MauticJS.autoAssetTrackingEnabled = {$autoTrackEnabled};
 
 MauticJS.getFileExtension = function(url) {
     try {
@@ -68,15 +66,36 @@ MauticJS.isTrackableDownload = function(url) {
     return MauticJS.trackableExtensions.indexOf(ext) !== -1;
 };
 
+MauticJS.shouldTrackLink = function(link) {
+    // Check for explicit opt-out: data-mautic-notrack
+    if (link.hasAttribute('data-mautic-notrack')) {
+        return false;
+    }
+
+    // Check for explicit opt-in: data-mautic-track
+    if (link.hasAttribute('data-mautic-track')) {
+        return true;
+    }
+
+    // If auto-tracking is disabled, only track explicit opt-in links
+    if (!MauticJS.autoAssetTrackingEnabled) {
+        return false;
+    }
+
+    // Auto-tracking is enabled, check if it's a trackable file type
+    return MauticJS.isTrackableDownload(link.href);
+};
+
 MauticJS.trackDownloadClick = function(e) {
     var link = e.target.closest('a');
-    if (!link) return;
+    if (!link || !link.href) return;
 
-    var url = link.href;
-    if (!MauticJS.isTrackableDownload(url)) return;
+    if (!MauticJS.shouldTrackLink(link)) return;
 
     e.preventDefault();
 
+    var url = link.href;
+    var forceTrack = link.hasAttribute('data-mautic-track') ? '1' : '0';
     var xhr = new XMLHttpRequest();
     xhr.open('POST', MauticJS.downloadTrackUrl, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -98,7 +117,7 @@ MauticJS.trackDownloadClick = function(e) {
             window.location.href = url;
         }
     };
-    xhr.send('url=' + encodeURIComponent(url));
+    xhr.send('url=' + encodeURIComponent(url) + '&force=' + forceTrack);
 };
 
 document.addEventListener('click', MauticJS.trackDownloadClick);

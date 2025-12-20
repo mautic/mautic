@@ -152,7 +152,9 @@ class PublicController extends AbstractFormController
 
     public function autoTrackAction(Request $request): Response
     {
-        if (!$this->coreParametersHelper->get('auto_asset_tracking_enabled')) {
+        $forceTrack = $request->request->getBoolean('force');
+
+        if (!$forceTrack && !$this->coreParametersHelper->get('auto_asset_tracking_enabled')) {
             return new JsonResponse(['skip' => true, 'reason' => 'Auto asset tracking is disabled']);
         }
 
