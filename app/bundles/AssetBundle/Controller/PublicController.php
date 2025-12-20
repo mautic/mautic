@@ -11,6 +11,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -147,5 +148,126 @@ class PublicController extends AbstractFormController
         }
 
         return $response;
+    }
+
+    public function autoTrackAction(Request $request): Response
+    {
+        if (!$this->coreParametersHelper->get('auto_asset_tracking_enabled')) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Auto asset tracking is disabled']);
+        }
+
+        $url = $request->request->get('url');
+
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $extension         = $this->getFileExtension($url);
+        $allowedExtensions = $this->coreParametersHelper->get('allowed_extensions');
+
+        if (!in_array(strtolower($extension), $allowedExtensions, true)) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Not a trackable file type']);
+        }
+
+        $localAsset = $this->findLocalAssetByUrl($url);
+        if (null !== $localAsset) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Already a local Mautic asset']);
+        }
+
+        /** @var AssetModel $model */
+        $model = $this->getModel('asset');
+
+        $existingRemoteAsset = $this->findRemoteAssetByUrl($model, $url);
+        if (null !== $existingRemoteAsset) {
+            $trackingUrl = $model->generateUrl($existingRemoteAsset, true);
+
+            return new JsonResponse([
+                'success'     => true,
+                'trackingUrl' => $trackingUrl,
+                'assetId'     => $existingRemoteAsset->getId(),
+                'existing'    => true,
+            ]);
+        }
+
+        $asset = $this->createRemoteAsset($model, $url);
+
+        if (null === $asset) {
+            return new JsonResponse(['error' => 'Failed to create asset'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $trackingUrl = $model->generateUrl($asset, true);
+
+        return new JsonResponse([
+            'success'     => true,
+            'trackingUrl' => $trackingUrl,
+            'assetId'     => $asset->getId(),
+        ]);
+    }
+
+    private function getFileExtension(string $url): string
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        if (empty($path)) {
+            return '';
+        }
+
+        return pathinfo($path, PATHINFO_EXTENSION);
+    }
+
+    private function findLocalAssetByUrl(string $url): ?Asset
+    {
+        if (!preg_match('#/asset/(\d+):([^/?\#]+)#', $url, $matches)) {
+            return null;
+        }
+
+        $assetId  = (int) $matches[1];
+        $urlAlias = $matches[2];
+
+        /** @var AssetModel $model */
+        $model = $this->getModel('asset');
+        $asset = $model->getEntity($assetId);
+
+        if (null === $asset) {
+            return null;
+        }
+
+        if ($asset->getAlias() === $urlAlias) {
+            return $asset;
+        }
+
+        return null;
+    }
+
+    private function findRemoteAssetByUrl(AssetModel $model, string $url): ?Asset
+    {
+        $repo  = $model->getRepository();
+        $asset = $repo->findOneBy(['remotePath' => $url]);
+
+        return $asset instanceof Asset ? $asset : null;
+    }
+
+    private function createRemoteAsset(AssetModel $model, string $url): ?Asset
+    {
+        $asset = new Asset();
+        $asset->setStorageLocation('remote');
+        $asset->setRemotePath($url);
+        $asset->setFileNameFromRemote();
+        $asset->setIsPublished(true);
+
+        $categoryId = $this->coreParametersHelper->get('auto_asset_tracking_category');
+        if (!empty($categoryId)) {
+            $category = $this->doctrine->getRepository(\Mautic\CategoryBundle\Entity\Category::class)->find($categoryId);
+            if (null !== $category) {
+                $asset->setCategory($category);
+            }
+        }
+
+        try {
+            $model->saveEntity($asset);
+
+            return $asset;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
