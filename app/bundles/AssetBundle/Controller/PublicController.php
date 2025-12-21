@@ -10,6 +10,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -191,7 +192,11 @@ class PublicController extends AbstractFormController
             ]);
         }
 
-        $asset = $this->createRemoteAsset($model, $url);
+        $customTitle = $request->request->get('title');
+        if (!empty($customTitle)) {
+            $customTitle = InputHelper::clean($customTitle);
+        }
+        $asset = $this->createRemoteAsset($model, $url, $customTitle);
 
         if (null === $asset) {
             return new JsonResponse(['error' => 'Failed to create asset'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -248,13 +253,17 @@ class PublicController extends AbstractFormController
         return $asset instanceof Asset ? $asset : null;
     }
 
-    private function createRemoteAsset(AssetModel $model, string $url): ?Asset
+    private function createRemoteAsset(AssetModel $model, string $url, ?string $customTitle = null): ?Asset
     {
         $asset = new Asset();
         $asset->setStorageLocation('remote');
         $asset->setRemotePath($url);
         $asset->setFileNameFromRemote();
         $asset->setIsPublished(true);
+
+        if (!empty($customTitle)) {
+            $asset->setTitle($customTitle);
+        }
 
         $categoryId = $this->coreParametersHelper->get('auto_asset_tracking_category');
         if (!empty($categoryId)) {

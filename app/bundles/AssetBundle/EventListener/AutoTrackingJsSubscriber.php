@@ -96,6 +96,7 @@ MauticJS.trackDownloadClick = function(e) {
 
     var url = link.href;
     var forceTrack = link.hasAttribute('data-mautic-track') ? '1' : '0';
+    var customTitle = link.getAttribute('data-mautic-track-title') || '';
     var xhr = new XMLHttpRequest();
     xhr.open('POST', MauticJS.downloadTrackUrl, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -117,7 +118,11 @@ MauticJS.trackDownloadClick = function(e) {
             window.location.href = url;
         }
     };
-    xhr.send('url=' + encodeURIComponent(url) + '&force=' + forceTrack);
+    var params = 'url=' + encodeURIComponent(url) + '&force=' + forceTrack;
+    if (customTitle) {
+        params += '&title=' + encodeURIComponent(customTitle);
+    }
+    xhr.send(params);
 };
 
 document.addEventListener('click', MauticJS.trackDownloadClick);
