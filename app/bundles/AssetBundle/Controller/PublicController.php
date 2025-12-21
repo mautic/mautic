@@ -11,6 +11,8 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PrivateAddressChecker;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -151,7 +153,7 @@ class PublicController extends AbstractFormController
         return $response;
     }
 
-    public function autoTrackAction(Request $request): Response
+    public function autoTrackAction(Request $request, LoggerInterface $mauticLogger, PrivateAddressChecker $privateAddressChecker): Response
     {
         $forceTrack = $request->request->getBoolean('force');
 
@@ -162,6 +164,14 @@ class PublicController extends AbstractFormController
         $url = $request->request->get('url');
 
         if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            if ($privateAddressChecker->isPrivateUrl($url)) {
+                return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
+            }
+        } catch (\InvalidArgumentException) {
             return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -196,7 +206,7 @@ class PublicController extends AbstractFormController
         if (!empty($customTitle)) {
             $customTitle = InputHelper::clean($customTitle);
         }
-        $asset = $this->createRemoteAsset($model, $url, $customTitle);
+        $asset = $this->createRemoteAsset($model, $url, $customTitle, $mauticLogger);
 
         if (null === $asset) {
             return new JsonResponse(['error' => 'Failed to create asset'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -253,7 +263,7 @@ class PublicController extends AbstractFormController
         return $asset instanceof Asset ? $asset : null;
     }
 
-    private function createRemoteAsset(AssetModel $model, string $url, ?string $customTitle = null): ?Asset
+    private function createRemoteAsset(AssetModel $model, string $url, ?string $customTitle, LoggerInterface $logger): ?Asset
     {
         $asset = new Asset();
         $asset->setStorageLocation('remote');
@@ -278,6 +288,11 @@ class PublicController extends AbstractFormController
 
             return $asset;
         } catch (\Exception $e) {
+            $logger->alert('Failed to create remote asset for auto-tracking: '.$e->getMessage(), [
+                'url'       => $url,
+                'exception' => $e,
+            ]);
+
             return null;
         }
     }
