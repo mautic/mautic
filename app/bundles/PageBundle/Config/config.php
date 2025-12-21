@@ -146,5 +146,7 @@ return [
         'facebook_pixel_landingpage_enabled'    => false,
         'do_not_track_404_anonymous'            => false,
         'append_segment_id_tracking_url'        => false,
+        'auto_asset_tracking_enabled'           => false,
+        'auto_asset_tracking_category'          => null,
     ],
 ];

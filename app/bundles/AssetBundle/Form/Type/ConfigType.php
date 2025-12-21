@@ -2,13 +2,10 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -70,42 +67,6 @@ class ConfigType extends AbstractType
                 ]
             )->addViewTransformer($arrayStringTransformer)
         );
-
-        $builder->add(
-            'auto_asset_tracking_enabled',
-            YesNoButtonGroupType::class,
-            [
-                'label'      => 'mautic.asset.config.form.auto_tracking.enabled',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'tooltip' => 'mautic.asset.config.form.auto_tracking.enabled.tooltip',
-                ],
-                'data'       => (bool) ($options['data']['auto_asset_tracking_enabled'] ?? false),
-            ]
-        );
-
-        $builder->add(
-            'auto_asset_tracking_category',
-            CategoryListType::class,
-            [
-                'label'      => 'mautic.asset.config.form.auto_tracking.category',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.asset.config.form.auto_tracking.category.tooltip',
-                    'data-show-on' => '{"config_assetconfig_auto_asset_tracking_enabled_1":"checked"}',
-                ],
-                'bundle'     => 'asset',
-                'required'   => false,
-            ]
-        );
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data' => [],
-        ]);
     }
 
     public function getBlockPrefix(): string

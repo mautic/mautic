@@ -86,13 +86,11 @@ return [
     ],
 
     'parameters' => [
-        'upload_dir'                   => '%mautic.application_dir%/media/files',
-        'max_size'                     => '6',
-        'allowed_extensions'           => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
-        'streamed_extensions'          => ['gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'pdf', 'png', 'wav'],
-        'auto_asset_tracking_enabled'  => false,
-        'auto_asset_tracking_category' => null,
-        'allowed_mimetypes'            => [
+        'upload_dir'          => '%mautic.application_dir%/media/files',
+        'max_size'            => '6',
+        'allowed_extensions'  => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
+        'streamed_extensions' => ['gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'pdf', 'png', 'wav'],
+        'allowed_mimetypes'   => [
             'csv'  => 'text/csv',
             'doc'  => 'application/msword',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
