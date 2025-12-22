@@ -113,7 +113,11 @@ MauticJS.trackDownloadClick = function(e) {
                         window.location.href = url;
                         return;
                     }
-                } catch (err) {}
+                } catch (err) {
+                    if (typeof console !== 'undefined' && console.warn) {
+                        console.warn('Mautic auto-tracking: Failed to parse response', err);
+                    }
+                }
             }
             window.location.href = url;
         }
