@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
@@ -279,7 +280,7 @@ class PublicController extends AbstractFormController
             $model->saveEntity($asset);
 
             return $asset;
-        } catch (\Exception $e) {
+        } catch (DBALException|ORMException $e) {
             $logger->alert('Failed to create remote asset for auto-tracking: '.$e->getMessage(), [
                 'url'       => $url,
                 'exception' => $e,

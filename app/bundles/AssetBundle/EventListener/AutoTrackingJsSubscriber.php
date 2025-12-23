@@ -100,6 +100,7 @@ MauticJS.trackDownloadClick = function(e) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', MauticJS.downloadTrackUrl, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.timeout = 10000;
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -114,13 +115,17 @@ MauticJS.trackDownloadClick = function(e) {
                         return;
                     }
                 } catch (err) {
-                    if (typeof console !== 'undefined' && console.warn) {
-                        console.warn('Mautic auto-tracking: Failed to parse response', err);
-                    }
+                    // JSON parse failed, fall through to redirect
                 }
             }
             window.location.href = url;
         }
+    };
+    xhr.onerror = function() {
+        window.location.href = url;
+    };
+    xhr.ontimeout = function() {
+        window.location.href = url;
     };
     var params = 'url=' + encodeURIComponent(url) + '&force=' + forceTrack;
     if (customTitle) {
