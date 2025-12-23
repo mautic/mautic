@@ -143,9 +143,6 @@ class ConfigTrackingPageType extends AbstractType
             [
                 'label'      => 'mautic.page.config.form.auto_asset_tracking.enabled',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'tooltip' => 'mautic.page.config.form.auto_asset_tracking.enabled.tooltip',
-                ],
                 'data'       => (bool) ($options['data']['auto_asset_tracking_enabled'] ?? false),
             ]
         );
