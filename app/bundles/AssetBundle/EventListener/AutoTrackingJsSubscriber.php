@@ -86,6 +86,20 @@ MauticJS.shouldTrackLink = function(link) {
     return MauticJS.isTrackableDownload(link.href);
 };
 
+MauticJS.isNewTabClick = function(e, link) {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return true;
+    var target = link.getAttribute('target');
+    return target && target !== '_self';
+};
+
+MauticJS.navigateTo = function(url, openInNewTab) {
+    if (openInNewTab) {
+        window.open(url, '_blank');
+    } else {
+        window.location.href = url;
+    }
+};
+
 MauticJS.trackDownloadClick = function(e) {
     var link = e.target.closest('a');
     if (!link || !link.href) return;
@@ -95,6 +109,7 @@ MauticJS.trackDownloadClick = function(e) {
     e.preventDefault();
 
     var url = link.href;
+    var openInNewTab = MauticJS.isNewTabClick(e, link);
     var forceTrack = link.hasAttribute('data-mautic-track') ? '1' : '0';
     var customTitle = link.getAttribute('data-mautic-track-title') || '';
     var xhr = new XMLHttpRequest();
@@ -107,25 +122,25 @@ MauticJS.trackDownloadClick = function(e) {
                 try {
                     var response = JSON.parse(xhr.responseText);
                     if (response.trackingUrl) {
-                        window.location.href = response.trackingUrl;
+                        MauticJS.navigateTo(response.trackingUrl, openInNewTab);
                         return;
                     }
                     if (response.skip) {
-                        window.location.href = url;
+                        MauticJS.navigateTo(url, openInNewTab);
                         return;
                     }
                 } catch (err) {
                     // JSON parse failed, fall through to redirect
                 }
             }
-            window.location.href = url;
+            MauticJS.navigateTo(url, openInNewTab);
         }
     };
     xhr.onerror = function() {
-        window.location.href = url;
+        MauticJS.navigateTo(url, openInNewTab);
     };
     xhr.ontimeout = function() {
-        window.location.href = url;
+        MauticJS.navigateTo(url, openInNewTab);
     };
     var params = 'url=' + encodeURIComponent(url) + '&force=' + forceTrack;
     if (customTitle) {
