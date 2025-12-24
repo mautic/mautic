@@ -2,67 +2,108 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Monitoring extends FormEntity
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('mauticSocial:monitoring:view')"),
+        new Post(security: "is_granted('mauticSocial:monitoring:create')"),
+        new Get(security: "is_granted('mauticSocial:monitoring:view')"),
+        new Put(security: "is_granted('mauticSocial:monitoring:edit')"),
+        new Patch(security: "is_granted('mauticSocial:monitoring:edit')"),
+        new Delete(security: "is_granted('mauticSocial:monitoring:delete')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['monitoring:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['monitoring:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Monitoring extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
     /**
      * @var int
      */
+    #[Groups(['monitoring:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $title;
 
     /**
      * @var string|null
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $description;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $category;
 
     /**
      * @var array
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $lists = [];
 
     /**
      * @var string|null
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $networkType;
 
     /**
      * @var int
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $revision = 1;
 
     /**
      * @var array
      */
+    #[Groups(['monitoring:read'])]
     private $stats = [];
 
     /**
      * @var array
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $properties = [];
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $publishDown;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['monitoring:read', 'monitoring:write'])]
     private $publishUp;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -89,6 +130,8 @@ class Monitoring extends FormEntity
         $builder->addNullableField('properties', 'array');
 
         $builder->addPublishDates();
+
+        static::addUuidField($builder);
     }
 
     /**
