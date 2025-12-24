@@ -1094,7 +1094,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'viewParameters' => [
                 $itemName     => $entity,
                 'logs'        => $logs,
-                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details',
                 'permissions' => $this->security->isGranted(
                     [
                         $this->getPermissionBase().':view',
