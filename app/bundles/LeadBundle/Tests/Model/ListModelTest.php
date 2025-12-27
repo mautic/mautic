@@ -141,26 +141,26 @@ class ListModelTest extends TestCase
             ],
             [
                 [
-                    0 => ['id' => 1, 'title' => 'Segment Test Category 1', 'bundle' => 'segment'],
-                    1 => ['id' => 2, 'title' => 'Segment Test Category 2', 'bundle' => 'segment'],
+                    0 => ['id' => 1, 'alias' => 'segment-test-category-1', 'title' => 'Segment Test Category 1', 'bundle' => 'segment'],
+                    1 => ['id' => 2, 'alias' => 'segment-test-category-2', 'title' => 'Segment Test Category 2', 'bundle' => 'segment'],
                 ],
                 null,
                 [
                     'categories' => [
-                        1 => 'Segment Test Category 1',
-                        2 => 'Segment Test Category 2',
+                        'segment-test-category-1' => 'Segment Test Category 1',
+                        'segment-test-category-2' => 'Segment Test Category 2',
                     ],
                 ],
             ],
             [
                 [
-                    0 => ['id' => 1, 'title' => 'Segment Test Category 1', 'bundle' => 'segment'],
-                    1 => ['id' => 2, 'title' => 'Segment Test Category 2', 'bundle' => 'segment'],
+                    0 => ['id' => 1, 'alias' => 'segment-test-category-1', 'title' => 'Segment Test Category 1', 'bundle' => 'segment'],
+                    1 => ['id' => 2, 'alias' => 'segment-test-category-2', 'title' => 'Segment Test Category 2', 'bundle' => 'segment'],
                 ],
                 'categories',
                 [
-                    1 => 'Segment Test Category 1',
-                    2 => 'Segment Test Category 2',
+                    'segment-test-category-1' => 'Segment Test Category 1',
+                    'segment-test-category-2' => 'Segment Test Category 2',
                 ],
             ],
             [
