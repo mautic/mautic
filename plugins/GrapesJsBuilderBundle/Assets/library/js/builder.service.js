@@ -88,6 +88,10 @@ export default class BuilderService {
       });
     });
 
+    this.editor.on('asset:upload:error', (error) => {
+      Mautic.setFlashes(Mautic.addErrorFlashMessage(error));
+    });
+
     this.editor.on('asset:open', () => {
       const editor = this.editor;
       const assetsService = this.assetService;
