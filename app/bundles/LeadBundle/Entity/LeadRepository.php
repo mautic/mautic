@@ -786,23 +786,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
-                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-                $sq->select('1')
-                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
-                    ->where(
-                        $q->expr()->and(
-                            $q->expr()->eq('l.id', 'lla.lead_id'),
-                            $q->expr()->eq('lla.manually_removed', 0),
-                            $q->expr()->in('lla.leadlist_id', ":$unique")
-                        )
-                    );
-                $from = $q->getQueryPart('from')[0];
-                $q->resetQueryPart('from');
-                $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
-
-                $filter->strict  = true;
-                $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
-                $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
+                $listIds       = $this->getListIdsByAlias($string) ?: [0];
+                $joinAlias     = $this->generateRandomParameterName();
+                $joinCondition = $q->expr()->and(
+                    $q->expr()->eq('l.id', $joinAlias.'.lead_id'),
+                    $q->expr()->eq($joinAlias.'.manually_removed', 0),
+                    $q->expr()->in($joinAlias.'.leadlist_id', ":$unique")
+                );
+                if ($filter->not) {
+                    $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $joinAlias, $joinCondition);
+                    $expr = $q->expr()->isNull($joinAlias.'.lead_id');
+                } else {
+                    $q->innerJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $joinAlias, $joinCondition);
+                    $expr = null; // No additional where clause needed
+                }
+                $q->setParameter($unique, $listIds, ArrayParameterType::INTEGER);
+                $filter->strict         = true;
+                $this->useDistinctCount = true; // To handle potential duplicates from JOIN
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):

@@ -82,6 +82,11 @@ trait CustomFieldRepositoryTrait
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 
+            if ($this->useDistinctCount) {
+                $select = $dq->getQueryPart('select');
+                $dq->select('DISTINCT '.$select);
+            }
+
             $results = $dq->executeQuery()->fetchAllAssociative();
             if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
                 unset($args['select']); // Our purpose of getting list of ids has already accomplished. We no longer need this.
