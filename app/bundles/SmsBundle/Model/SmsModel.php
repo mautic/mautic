@@ -18,17 +18,18 @@ use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
+use Mautic\SmsBundle\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
-use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\LoggerInterface;
@@ -84,7 +85,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     public function getDoNotContactRepository(): DoNotContactRepository
     {
-        return $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        return $this->em->getRepository(DoNotContact::class);
     }
 
     /**
@@ -354,6 +355,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         if (true !== $recipient->getResult()) {
                             $sendResult['status'] = $recipient->getResult();
                             unset($stats[$recipient->getKey()]);
+                            ++$failedCount;
                         } else {
                             $sendResult['sent'] = true;
                             ++$sentCount;

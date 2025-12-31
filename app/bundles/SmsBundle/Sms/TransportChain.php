@@ -4,11 +4,10 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Collection\RecipientCollection;
-use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\DTO\SmsRecipientDTO;
+use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
-use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 
 class TransportChain
 {

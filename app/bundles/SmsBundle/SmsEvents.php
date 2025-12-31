@@ -87,7 +87,7 @@ final class SmsEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_BATCH_ACTION = 'mautic.sms.on_campaign_trigger_batch_action';
+    public const ON_CAMPAIGN_TRIGGER_BATCH_ACTION = 'mautic.sms.on_campaign_trigger_batch_action';
 
     /**
      * The mautic.sms.on_reply event is dispatched when a SMS service receives a reply.

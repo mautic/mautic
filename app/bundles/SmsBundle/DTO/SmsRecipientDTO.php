@@ -1,21 +1,13 @@
 <?php
 
-namespace Mautic\SmsBundle\Helper\DTO;
+declare(strict_types=1);
+
+namespace Mautic\SmsBundle\DTO;
 
 use Mautic\LeadBundle\Entity\Lead;
 
 class SmsRecipientDTO implements \JsonSerializable
 {
-    /**
-     * @var Lead
-     */
-    private $lead;
-
-    /**
-     * @var array<mixed>
-     */
-    private $substitutionData = [];
-
     /**
      * @var bool
      */
@@ -26,10 +18,8 @@ class SmsRecipientDTO implements \JsonSerializable
      *
      * @param array<mixed> $substitutionData
      */
-    public function __construct(Lead $lead, array $substitutionData = [])
+    public function __construct(private Lead $lead, private array $substitutionData = [])
     {
-        $this->lead             = $lead;
-        $this->substitutionData = $substitutionData;
     }
 
     public function getKey(): int
@@ -61,9 +51,9 @@ class SmsRecipientDTO implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $json = [
             'lead'   => $this->lead,

@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Collection;
 
+use Mautic\SmsBundle\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Exception\RecipientNotFoundException;
-use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 
 class RecipientCollection extends \ArrayIterator
 {

@@ -5,8 +5,7 @@ namespace Mautic\SmsBundle\Tests\Sms;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Collection\RecipientCollection;
-use Mautic\SmsBundle\Entity\Sms;
-use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
+use Mautic\SmsBundle\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Mautic\SmsBundle\Sms\BulkTransportInterface;
 use Mautic\SmsBundle\Sms\TransportChain;
@@ -86,7 +85,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
     public function testSendBatchSms(): void
     {
-        $bulkSmsTransport = new class() implements BulkTransportInterface {
+        $bulkSmsTransport = new class implements BulkTransportInterface {
             public function sendBatchSms(RecipientCollection $collection, string $content): RecipientCollection
             {
                 foreach ($collection as &$recipient) {
@@ -102,7 +101,7 @@ class TransportChainTest extends MauticMysqlTestCase
             }
         };
 
-        $transportChain = new class('mautic.test.bulktwilio.mock', $this->container->get('mautic.helper.integration')) extends TransportChain {
+        $transportChain = new class('mautic.test.bulktwilio.mock', $this->getContainer()->get('mautic.helper.integration')) extends TransportChain {
             public function getEnabledTransports(): array
             {
                 $transports = $this->getTransports();
