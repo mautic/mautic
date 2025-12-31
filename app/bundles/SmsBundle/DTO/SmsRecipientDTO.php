@@ -8,10 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class SmsRecipientDTO implements \JsonSerializable
 {
-    /**
-     * @var bool
-     */
-    private $result = false;
+    private bool $result = false;
 
     /**
      * RecipientDTO constructor.
