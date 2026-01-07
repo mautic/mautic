@@ -637,10 +637,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider createPermissionDataProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('createPermissionDataProvider')]
     public function testPublishPermissionOnCreate(array $permissions, bool $expectDisabled, bool $publishedByDefault, bool $publishAfterSave): void
     {
         // Set user to be able to create emails, but not publish them.
@@ -724,10 +723,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider editPermissionDataProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('editPermissionDataProvider')]
     public function testPublishPermissionOnEdit(string $owner, string $user, array $permissions, bool $expectDisabled, bool $publishAfterSave): void
     {
         $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);

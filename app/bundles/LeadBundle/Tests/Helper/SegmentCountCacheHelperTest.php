@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -15,12 +16,18 @@ class SegmentCountCacheHelperTest extends TestCase
 {
     private MockObject&CacheProviderInterface $cacheProviderMock;
 
+    private MockObject&CoreParametersHelper $coreParametersHelperMock;
+
     private SegmentCountCacheHelper $segmentCountCacheHelper;
 
     protected function setUp(): void
     {
-        $this->cacheProviderMock       = $this->createMock(CacheProviderInterface::class);
-        $this->segmentCountCacheHelper = new SegmentCountCacheHelper($this->cacheProviderMock);
+        $this->cacheProviderMock         = $this->createMock(CacheProviderInterface::class);
+        $this->coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
+        $this->segmentCountCacheHelper   = new SegmentCountCacheHelper(
+            $this->cacheProviderMock,
+            $this->coreParametersHelperMock
+        );
     }
 
     /**
@@ -67,6 +74,11 @@ class SegmentCountCacheHelperTest extends TestCase
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn($cacheItem);
 
+        $this->coreParametersHelperMock
+            ->method('get')
+            ->with('segment_api_count_cache_ttl', 43200)
+            ->willReturn(43200);
+
         $this->cacheProviderMock
             ->method('hasItem')
             ->with('segment.'.$segmentId.'.lead.recount')
@@ -90,6 +102,11 @@ class SegmentCountCacheHelperTest extends TestCase
             ->method('getItem')
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn($cacheItem);
+
+        $this->coreParametersHelperMock
+            ->method('get')
+            ->with('segment_api_count_cache_ttl', 43200)
+            ->willReturn(43200);
 
         $this->cacheProviderMock
             ->expects(self::exactly(1))

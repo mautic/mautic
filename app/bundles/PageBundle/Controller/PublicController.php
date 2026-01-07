@@ -407,11 +407,9 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function trackingImageAction(Request $request)
+    public function trackingImageAction(Request $request): Response
     {
         /** @var PageModel $model */
         $model = $this->getModel('page');

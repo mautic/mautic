@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -80,6 +81,40 @@ class ListApiController extends CommonApiController
         }
 
         return $parameters;
+    }
+
+    /**
+     * Obtains a list of entities.
+     */
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    {
+        $withCounts = $request->query->has('withCounts');
+        $response   = parent::getEntitiesAction($request, $userHelper);
+
+        if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
+            $content = json_decode($response->getContent(), true);
+
+            if (isset($content['lists']) && is_array($content['lists'])) {
+                $segmentIds = array_column($content['lists'], 'id');
+
+                if ($segmentIds) {
+                    /** @var ListModel $model */
+                    $model      = $this->model;
+                    $leadCounts = $model->getSegmentContactCount($segmentIds);
+
+                    foreach ($content['lists'] as &$segment) {
+                        $segment['contactCount'] = $leadCounts[$segment['id']] ?? 0;
+                    }
+
+                    $view = $this->view($content, Response::HTTP_OK);
+                    $this->setSerializationContext($view);
+
+                    return $this->handleView($view);
+                }
+            }
+        }
+
+        return $response;
     }
 
     /**
