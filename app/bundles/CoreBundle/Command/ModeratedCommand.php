@@ -9,7 +9,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -27,11 +26,7 @@ abstract class ModeratedCommand extends Command
      */
     public const MODE_LOCK = 'file_lock';
 
-    protected $checkFile;
-
     protected $moderationKey;
-
-    protected $moderationTable = [];
 
     protected $moderationMode;
 
@@ -135,7 +130,9 @@ abstract class ModeratedCommand extends Command
         }
 
         // Attempt to keep things tidy
-        @unlink($this->lockFile);
+        if ($this->lockFile && file_exists($this->lockFile)) {
+            unlink($this->lockFile);
+        }
     }
 
     private function checkStatus(): bool
