@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field\Helper;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -16,6 +18,13 @@ use Mautic\LeadBundle\Entity\Lead;
 class IndexHelper
 {
     public const MAX_COUNT_ALLOWED = 64;
+
+    /**
+     * In PostgreSQL there is basically no limitation.
+     * But for our purpose we set it to reasonable number which will probably be never reached.
+     */
+    public const POSTGRESQL_MAX_COUNT_ALLOWED = 1024;
+
     /**
      * @var bool|array<string>
      */
@@ -26,8 +35,10 @@ class IndexHelper
      */
     private int $indexCount = 0;
 
-    public function __construct(private EntityManager $entityManager)
-    {
+    public function __construct(
+        private EntityManager $entityManager,
+        private IndexSchemaHelper $indexSchemaHelper
+    ) {
     }
 
     /**
@@ -49,7 +60,8 @@ class IndexHelper
 
     public function getMaxCount(): int
     {
-        return self::MAX_COUNT_ALLOWED;
+        $isPostgreSql = $this->entityManager->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        return $isPostgreSql ? self::POSTGRESQL_MAX_COUNT_ALLOWED : self::MAX_COUNT_ALLOWED;
     }
 
     public function isNewIndexAllowed(): bool
@@ -73,16 +85,23 @@ class IndexHelper
 
         $tableName = $this->entityManager->getClassMetadata(Lead::class)->getTableName();
 
-        $sql = "SHOW INDEXES FROM `$tableName`";
+        // Use get table index implementation which work well with PostgreSQL too
+        // This bypasses the buggy PostgreSQL Doctrine introspection in older DBAL versions (below 4.0)
+        $indexes = $this->indexSchemaHelper->getTableIndexes($tableName);
 
-        $stmt    = $this->entityManager->getConnection()->prepare($sql);
-        $indexes = $stmt->executeQuery()->fetchAllAssociative();
+        $indexedColumns = [];
 
-        $this->indexedColumns = array_map(
-            fn ($index) => $index['Column_name'],
-            $indexes
-        );
+        foreach ($indexes as $index) {
+            $columns = $index->getColumns();
 
-        $this->indexCount = count($indexes);
+            foreach ($columns as $column) {
+                $indexedColumns[] = $column;
+            }
+        }
+
+        $this->indexedColumns = $indexedColumns;
+        // index column count may not be equal indexed column count
+        // (unique search index may include more than 1 column)
+        $this->indexCount     = count($indexes);
     }
 }

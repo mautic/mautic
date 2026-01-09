@@ -151,8 +151,8 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $isSqlite = $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform || $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
+        $noForeignKeyChecks = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform || $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
+        $sql      = $noForeignKeyChecks ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {
@@ -179,8 +179,10 @@ class SchemaHelper
 
     public function validateDatabaseVersion(): void
     {
-        // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
-        $version  = str_replace('PostgreSQL ', '', $this->db->executeQuery('SELECT VERSION()')->fetchOne());
+        // Version strings are in the format:
+        // 10.3.30-MariaDB-1:10.3.30+maria~focal-log
+        // PostgreSQL 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit
+        $version  = $this->extractDatabaseVersion($this->db->executeQuery('SELECT VERSION()')->fetchOne());
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($this->db->getDatabasePlatform()::class);
@@ -338,5 +340,20 @@ class SchemaHelper
         }
 
         return $this->schemaManager = $this->db->createSchemaManager();
+    }
+
+    /**
+     * This will extract the database version
+     *
+     * @param string $version
+     * @return string
+     */
+    private function extractDatabaseVersion(string $version) : string
+    {
+        // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
+        if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
+            return $matches[0];
+        }
+        return '0.0'; // string_compare not accept NULL, prevent NULL errors
     }
 }
