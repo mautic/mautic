@@ -152,7 +152,7 @@ class SchemaHelper
         }
 
         $noForeignKeyChecks = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform || $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
-        $sql      = $noForeignKeyChecks ? [] : ['SET foreign_key_checks = 0;'];
+        $sql                = $noForeignKeyChecks ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {
@@ -343,17 +343,15 @@ class SchemaHelper
     }
 
     /**
-     * This will extract the database version
-     *
-     * @param string $version
-     * @return string
+     * This will extract the database version.
      */
-    private function extractDatabaseVersion(string $version) : string
+    private function extractDatabaseVersion(string $version): string
     {
         // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
         if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
             return $matches[0];
         }
+
         return '0.0'; // string_compare not accept NULL, prevent NULL errors
     }
 }

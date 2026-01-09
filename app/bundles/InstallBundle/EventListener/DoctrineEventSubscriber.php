@@ -155,12 +155,12 @@ class DoctrineEventSubscriber
             'CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT split_part($1, $2, $3);$$',
             'CREATE OR REPLACE FUNCTION concat_ws(sep text, VARIADIC args text[]) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT array_to_string(array_remove(args,NULL),sep);$$',
             "CREATE OR REPLACE FUNCTION group_concat(val text, sep text DEFAULT ',') RETURNS text LANGUAGE sql IMMUTABLE AS \$\$SELECT string_agg(val,sep);\$\$",
-            "CREATE OR REPLACE FUNCTION year(date) RETURNS integer LANGUAGE sql IMMUTABLE AS \$\$SELECT EXTRACT(YEAR FROM \$1)::integer;\$\$",
-            "CREATE OR REPLACE FUNCTION year(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS \$\$SELECT EXTRACT(YEAR FROM \$1)::integer;\$\$",
-            "CREATE OR REPLACE FUNCTION month(date) RETURNS integer LANGUAGE sql IMMUTABLE AS \$\$SELECT EXTRACT(MONTH FROM \$1)::integer;\$\$",
-            "CREATE OR REPLACE FUNCTION month(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS \$\$SELECT EXTRACT(MONTH FROM \$1)::integer;\$\$",
-            "CREATE OR REPLACE FUNCTION day(date) RETURNS integer LANGUAGE sql IMMUTABLE AS \$\$SELECT EXTRACT(DAY FROM \$1)::integer;\$\$",
-            "CREATE OR REPLACE FUNCTION day(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS \$\$SELECT EXTRACT(DAY FROM \$1)::integer;\$\$",
+            'CREATE OR REPLACE FUNCTION year(date) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(YEAR FROM $1)::integer;$$',
+            'CREATE OR REPLACE FUNCTION year(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(YEAR FROM $1)::integer;$$',
+            'CREATE OR REPLACE FUNCTION month(date) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(MONTH FROM $1)::integer;$$',
+            'CREATE OR REPLACE FUNCTION month(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(MONTH FROM $1)::integer;$$',
+            'CREATE OR REPLACE FUNCTION day(date) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(DAY FROM $1)::integer;$$',
+            'CREATE OR REPLACE FUNCTION day(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(DAY FROM $1)::integer;$$',
         ];
 
         foreach ($functions as $sql) {

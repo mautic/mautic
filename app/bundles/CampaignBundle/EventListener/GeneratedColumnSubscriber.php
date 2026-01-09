@@ -64,6 +64,7 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
         $generatedColumn->setOriginalDateColumn('date_added', 'd');
         $generatedColumn->setStored(true);
         $generatedColumn->setFilterDateColumn('generated_date_added_day');
+
         return $generatedColumn;
     }
 
@@ -77,6 +78,7 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
         $generatedColumn->prependIndexColumn('campaign_id');
         $generatedColumn->setOriginalDateColumn('date_added', 'W');
         $generatedColumn->setStored(true);
+
         return $generatedColumn;
     }
 
@@ -90,6 +92,7 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
         $generatedColumn->prependIndexColumn('campaign_id');
         $generatedColumn->setOriginalDateColumn('date_added', 'm');
         $generatedColumn->setStored(true);
+
         return $generatedColumn;
     }
 
@@ -103,6 +106,7 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
         $generatedColumn->prependIndexColumn('campaign_id');
         $generatedColumn->setOriginalDateColumn('date_added', 'Y');
         $generatedColumn->setStored(true);
+
         return $generatedColumn;
     }
 }

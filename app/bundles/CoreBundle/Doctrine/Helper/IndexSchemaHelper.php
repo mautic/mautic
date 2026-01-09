@@ -3,12 +3,12 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
 class IndexSchemaHelper
 {
@@ -69,6 +69,7 @@ class IndexSchemaHelper
         }
 
         $this->table = $this->sm->introspectTable($this->prefix.$name);
+
         return $this;
     }
 
@@ -93,7 +94,7 @@ class IndexSchemaHelper
             return $this;
         }
 
-        $indexName = $this->prefix . $name;
+        $indexName = $this->prefix.$name;
         $index     = new Index($indexName, $textColumns, false, false, $options);
 
         if ($this->_hasIndex($this->table->getName(), $indexName)) {
@@ -122,7 +123,7 @@ class IndexSchemaHelper
             return $this;
         }
 
-        $indexName = $this->prefix . $name;
+        $indexName = $this->prefix.$name;
         $index     = new Index($indexName, $textColumns, false, false, $options);
 
         if ($this->_hasIndex($this->table->getName(), $indexName)) {
@@ -169,20 +170,19 @@ class IndexSchemaHelper
     public function hasIndex(LeadField $leadField): bool
     {
         return $this->_hasIndex(
-            $this->prefix . $leadField->getCustomFieldObject(),
-            $this->prefix . $leadField->getAlias() . '_search'
+            $this->prefix.$leadField->getCustomFieldObject(),
+            $this->prefix.$leadField->getAlias().'_search'
         );
     }
 
     /**
      * @param array<mixed> $uniqueIdentifierColumns
-     *
      */
     public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns): bool
     {
         return $this->_hasIndex(
-            $this->prefix . $leadField->getCustomFieldObject(),
-            $this->prefix . 'unique_identifier_search',
+            $this->prefix.$leadField->getCustomFieldObject(),
+            $this->prefix.'unique_identifier_search',
             $uniqueIdentifierColumns
         );
     }
@@ -193,8 +193,8 @@ class IndexSchemaHelper
     public function hasUniqueIdentifierIndex(LeadField $leadField): bool
     {
         return $this->_hasIndex(
-            $this->prefix . $leadField->getCustomFieldObject(),
-            $this->prefix . 'unique_identifier_search'
+            $this->prefix.$leadField->getCustomFieldObject(),
+            $this->prefix.'unique_identifier_search'
         );
     }
 
@@ -202,8 +202,6 @@ class IndexSchemaHelper
      * Custom reliable index listing for PostgreSQL (fallback to Doctrine for other platforms)
      * This bypasses the buggy Doctrine introspection in older DBAL versions (below 4.0)
      * (the deprecated getListTableIndexesSQL misses indexes due to flawed joins/filters).
-     *
-     * @param string $fullTableName
      *
      * @return Index[]
      */
@@ -264,22 +262,20 @@ class IndexSchemaHelper
                 (bool) $row['is_primary']
             );
         }
+
         return $indexes;
     }
 
     /**
-     * @param string $tableName
-     * @param string $indexName
      * @param array<mixed> $indexColumns
-     *
-     * @return bool
      */
     private function _hasIndex(string $tableName, string $indexName, array $indexColumns = []): bool
     {
         foreach ($this->getTableIndexes($tableName) as $idx) {
             if (strtolower($idx->getName()) === strtolower($indexName)) {
-                if(empty($indexColumns)) return true;
-                else {
+                if (empty($indexColumns)) {
+                    return true;
+                } else {
                     $columns = $idx->getColumns();
                     asort($columns);
                     asort($indexColumns);
@@ -288,6 +284,7 @@ class IndexSchemaHelper
                 }
             }
         }
+
         return false;
     }
 

@@ -37,7 +37,7 @@ class IndexHelper
 
     public function __construct(
         private EntityManager $entityManager,
-        private IndexSchemaHelper $indexSchemaHelper
+        private IndexSchemaHelper $indexSchemaHelper,
     ) {
     }
 
@@ -61,6 +61,7 @@ class IndexHelper
     public function getMaxCount(): int
     {
         $isPostgreSql = $this->entityManager->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+
         return $isPostgreSql ? self::POSTGRESQL_MAX_COUNT_ALLOWED : self::MAX_COUNT_ALLOWED;
     }
 
