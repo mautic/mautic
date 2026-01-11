@@ -334,7 +334,22 @@ final class MauticReportBuilder implements ReportBuilderInterface
         if ($allSelectColumns && ($groupByColumns || $existingGroupBy || $aggregators)) {
             $nonAggregatedColumns = [];
 
-            // Extract base column names from selectColumns
+            // Helper closure to normalize a single column identifier for comparison
+            $normalizeColumn = function (string $col): string {
+                if (preg_match('/^[\"\`a-zA-Z0-9_\.\$]+$/', $col)) {
+                    return preg_replace('/[`"]/', '', $col);
+                }
+
+                return $col; // Keep complex expressions unchanged
+            };
+
+            // 1. Normalize GROUP BY columns
+            $normalizedGroupBy = array_map($normalizeColumn, (array) $groupByColumns);
+
+            // 2. Normalize aggregated columns
+            $normalizedAggregated = array_map($normalizeColumn, $aggregatedColumns);
+
+            // 3. Extract base column names from selectColumns
             foreach ($allSelectColumns as $select) {
                 // Handle cases like "column AS alias" or "CONCAT(..., column, ...) AS alias"
                 if (preg_match('/^CONCAT\(/', $select)) {
@@ -353,13 +368,18 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
                 }
 
-                // Skip if the column is already in groupByColumns or aggregatedColumns
-                if (!in_array($column, $groupByColumns) && !in_array($column, $aggregatedColumns)) {
-                    $nonAggregatedColumns[] = $column;
+                // Normalize for comparison
+                $normalizedColumn = preg_replace('/[`"]/', '', $column);
+
+                // Skip if already in GROUP BY or aggregated (using normalized comparison)
+                if (in_array($normalizedColumn, $normalizedGroupBy) || in_array($normalizedColumn, $normalizedAggregated)) {
+                    continue;
                 }
+
+                $nonAggregatedColumns[] = $column;  // Add the original (usually sanitized) version
             }
 
-            // Add missing non-aggregated columns to groupByColumns
+            // 4. Add missing non-aggregated columns to groupByColumns
             $groupByColumns = array_merge($groupByColumns, $nonAggregatedColumns);
             $queryBuilder->resetQueryPart('groupBy'); // Clear existing GROUP BY
             if ($groupByColumns) {
