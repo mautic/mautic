@@ -334,20 +334,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
         if ($allSelectColumns && ($groupByColumns || $existingGroupBy || $aggregators)) {
             $nonAggregatedColumns = [];
 
-            // Helper closure to normalize a single column identifier for comparison
-            $normalizeColumn = function (string $col): string {
-                if (preg_match('/^[\"\`a-zA-Z0-9_\.\$]+$/', $col)) {
-                    return preg_replace('/[`"]/', '', $col);
-                }
-
-                return $col; // Keep complex expressions unchanged
-            };
-
             // 1. Normalize GROUP BY columns
-            $normalizedGroupBy = array_map($normalizeColumn, (array) $groupByColumns);
+            $normalizedGroupBy = array_map([$this, 'normalizeColumnName'], (array) $groupByColumns);
 
             // 2. Normalize aggregated columns
-            $normalizedAggregated = array_map($normalizeColumn, $aggregatedColumns);
+            $normalizedAggregated = array_map([$this, 'normalizeColumnName'], $aggregatedColumns);
 
             // 3. Extract base column names from selectColumns
             foreach ($allSelectColumns as $select) {
@@ -369,7 +360,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
 
                 // Normalize for comparison
-                $normalizedColumn = preg_replace('/[`"]/', '', $column);
+                $normalizedColumn = $this->normalizeColumnName($column);
 
                 // Skip if already in GROUP BY or aggregated (using normalized comparison)
                 if (in_array($normalizedColumn, $normalizedGroupBy) || in_array($normalizedColumn, $normalizedAggregated)) {
@@ -638,9 +629,27 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private function sanitizeColumnName(string $fullColumnName): string
     {
         [$tableAlias, $columnName] = explode('.', $fullColumnName);
-        $isPostgreSql              = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform;
 
-        return $isPostgreSql ? "\"$tableAlias\".\"$columnName\"" : "`$tableAlias`.`$columnName`";
+        return $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform
+            ? "\"$tableAlias\".\"$columnName\""
+            : "`$tableAlias`.`$columnName`";
+    }
+
+    /**
+     * Normalize a column identifier for comparison by removing platform-specific identifier quotes
+     * if it appears to be a simple (non-complex) column reference.
+     */
+    private function normalizeColumnName(string $fullColumnName): string
+    {
+        if ($this->db->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            return preg_match('/^["a-zA-Z0-9_\.\$]+$/', $fullColumnName)
+                ? str_replace('"', '', $fullColumnName)
+                : $fullColumnName;
+        }
+
+        return preg_match('/^[`a-zA-Z0-9_\.\$]+$/', $fullColumnName)
+            ? str_replace('`', '', $fullColumnName)
+            : $fullColumnName;
     }
 
     /**

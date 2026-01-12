@@ -50,31 +50,6 @@ class DoctrineEventSubscriber
             }
         }
         // Add MySQL missing functions + operators to PostgreSQL
-        // TODO: Move it to migration once migration files validation passed once again
-        /* doctrine:schema:validate
-
-        Mapping
-        -------
-         [FAIL] The entity-class Mautic\ApiBundle\Entity\oAuth2\AccessToken mapping is invalid:
-         * The field 'Mautic\ApiBundle\Entity\oAuth2\AccessToken#expiresAt' has the property type 'int' that differs from the metadata field type 'string' returned by the 'bigint' DBAL type.
-
-         [FAIL] The entity-class Mautic\ApiBundle\Entity\oAuth2\RefreshToken mapping is invalid:
-         * The field 'Mautic\ApiBundle\Entity\oAuth2\RefreshToken#expiresAt' has the property type 'int' that differs from the metadata field type 'string' returned by the 'bigint' DBAL type.
-
-         [FAIL] The entity-class Mautic\ApiBundle\Entity\oAuth2\AuthCode mapping is invalid:
-         * The field 'Mautic\ApiBundle\Entity\oAuth2\AuthCode#expiresAt' has the property type 'int' that differs from the metadata field type 'string' returned by the 'bigint' DBAL type.
-
-         [FAIL] The entity-class Mautic\CampaignBundle\Entity\Event mapping is invalid:
-         * The field Mautic\CampaignBundle\Entity\Event#redirectingEvents is on the inverse side of a bi-directional relationship, but the specified mappedBy association on the target-entity Mautic\CampaignBundle\Entity\Event#redirectEvent does not contain the required 'inversedBy="redirectingEvents"' attribute.
-
-         [FAIL] The entity-class Mautic\DynamicContentBundle\Entity\DynamicContentLeadData mapping is invalid:
-         * The association Mautic\DynamicContentBundle\Entity\DynamicContentLeadData#dynamicContent refers to the inverse side field Mautic\DynamicContentBundle\Entity\DynamicContent#id which is not defined as association.
-         * The association Mautic\DynamicContentBundle\Entity\DynamicContentLeadData#dynamicContent refers to the inverse side field Mautic\DynamicContentBundle\Entity\DynamicContent#id which does not exist.
-
-        Database
-        --------
-         [ERROR] The database schema is not in sync with the current mapping file.
-        */
         $this->postgreSqlMySqlCompact($args);
     }
 
