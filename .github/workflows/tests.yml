@@ -311,3 +311,84 @@ jobs:
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
+
+  phpunit-postgres:
+    if: (github.event_name == 'schedule' && (github.repository == 'wieslawgolec/mautic' || github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ['8.2', '8.3', '8.4', '8.5']
+        postgres-version: ['16']
+
+    name: PHPUnit ${{ matrix.php-versions }} PostgreSQL ${{ matrix.postgres-version }}
+
+    services:
+      database:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_DB: mautictest
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql, pdo_pgsql
+          coverage: pcov
+          ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
+
+      - name: Set SYMFONY_ENV to test
+        run: |
+          echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+          echo "MAUTIC_ENV=test" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        uses: "ramsey/composer-install@v3"
+
+      - name: Run tests - PostgreSQL ${{ matrix.postgres-version }}
+        run: |
+          rm -rf var/cache
+          export DB_PORT="${{ job.services.database.ports['5432'] }}"
+          export SAML_PORT="${{ job.services.saml.ports['8080'] }}"
+  
+          # Modern Doctrine/Symfony way
+          export DATABASE_URL="postgresql://postgres:postgres@localhost:${DB_PORT}/mautictest"
+  
+          # Legacy fallback vars (in case any test bootstrap still uses them)
+          export DB_DRIVER=pdo_pgsql
+          export DB_CHARSET=UTF8
+          export DB_HOST=localhost
+          export DB_PORT=${DB_PORT}
+          export DB_NAME=mautictest
+          export DB_USER=postgres
+          export DB_PASSWD=postgres
+  
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --log-junit=junit.xml
+
+      - name: Store log artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-postgres-${{ matrix.php-versions }}-${{ matrix.postgres-version }}
+          path: ./var/logs/*
