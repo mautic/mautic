@@ -34,7 +34,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
             ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_hour`(campaign_id, generated_date_added_hour)', array_shift($generatedColumns));
         $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_day date AS (DATE_FORMAT(date_added, \"%Y-%m-%d\")) STORED COMMENT '(DC2Type:generated)';
             ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_day`(campaign_id, generated_date_added_day)', array_shift($generatedColumns));
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_week char(7) AS (DATE_FORMAT(date_added, \"%Y %U\")) STORED COMMENT '(DC2Type:generated)';
+        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_week char(8) AS (DATE_FORMAT(date_added, \"%Y %U\")) STORED COMMENT '(DC2Type:generated)';
             ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_week`(campaign_id, generated_date_added_week)', array_shift($generatedColumns));
         $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_month char(7) AS (DATE_FORMAT(date_added, \"%Y-%m\")) STORED COMMENT '(DC2Type:generated)';
             ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_month`(campaign_id, generated_date_added_month)', array_shift($generatedColumns));
