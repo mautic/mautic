@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -17,6 +18,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
+use Doctrine\DBAL\Connection;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -42,6 +44,8 @@ class ReportSubscriberTest extends TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
 
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
+
     private ReportSubscriber $subscriber;
 
     public function setUp(): void
@@ -53,6 +57,7 @@ class ReportSubscriberTest extends TestCase
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->versionProvider     = $this->createMock(VersionProvider::class);
         $this->dncReportService    = $this->createMock(DncReportService::class);
+        $this->connection          = $this->createMock(Connection::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
@@ -60,6 +65,12 @@ class ReportSubscriberTest extends TestCase
             $this->dncReportService,
             $this->versionProvider,
         );
+
+        // Default to MySQL platform for backward compatibility with existing tests
+        $platform = new MySQLPlatform();
+
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($platform);
     }
 
     public function testOnReportBuilderAddsPageAndPageHitReports(): void
@@ -290,8 +301,13 @@ class ReportSubscriberTest extends TestCase
                 'loadAndBuildTimeData',
                 'fetchCount',
                 'fetchCountDateDiff',
+                'getConnection',
             ])
             ->getMock();
+
+
+        $mockChartQuery->method('getConnection')
+            ->willReturn($this->connection);
 
         $mockChartQuery->expects($this->any())
             ->method('loadAndBuildTimeData')

@@ -311,7 +311,7 @@ class LeadListRepository extends CommonRepository
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
     {
-        if (!($qb->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform)) {
+        if (!($this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform)) {
             $fromPart             = $qb->getQueryPart('from');
             $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
             $qb->resetQueryPart('from');

@@ -10,6 +10,9 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\BigIntType;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\TextType;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\InstallBundle\EventListener\DoctrineEventSubscriber;
@@ -24,11 +27,26 @@ class DoctrineEventSubscriberTest extends TestCase
      */
     private MockObject $entityManager;
 
+    /**
+     * @var Connection&MockObject
+     */
+    private MockObject $connection;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->connection    = $this->createMock(Connection::class);
+
+        // Default to MySQL platform for backward compatibility with existing tests
+        $platform = new MySQLPlatform();
+
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($platform);
+
+        $this->entityManager->method('getConnection')
+            ->willReturn($this->connection);
     }
 
     public function testSubscriberWillAddCorrectIndexes(): void
