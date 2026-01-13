@@ -535,7 +535,7 @@ class ChartQuery extends AbstractChart
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
 
-        if ($this->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        if ($this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $query->where('EXTRACT(EPOCH FROM ('.$tablePrefix.'.'.$dateColumn1.' - '.$tablePrefix.'.'.$dateColumn2.')) >= :startSecond');
             $query->andWhere('EXTRACT(EPOCH FROM ('.$tablePrefix.'.'.$dateColumn1.' - '.$tablePrefix.'.'.$dateColumn2.')) < :endSecond');
         } else {
@@ -559,7 +559,7 @@ class ChartQuery extends AbstractChart
         return (int) $data['count'];
     }
 
-    /** Expose connection variable to Unit Test to support mulple database type testing */
+    /** Expose connection variable to Unit Test to support multiple database type testing via mock objects */
     public function getConnection()
     {
         return $this->connection;

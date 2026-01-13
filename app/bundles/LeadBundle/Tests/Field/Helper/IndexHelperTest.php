@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\Helper;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
@@ -19,60 +16,48 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetIndexCountAndColumns(): void
     {
-        $tableName   = 'table_name';
-        $sql         = "SHOW INDEXES FROM `$tableName`";
+        $tableName = 'table_name';
+
         $columnNames = [
             'id', '0', '1', '1', '2', '2',
         ];
-        foreach ($columnNames as $columnName) {
-            $sqlResult[][self::COLUMN_NAME_KEY] = $columnName;
-        }
-        $expectedColumnNames = array_map(
-            function ($column) {
-                return $column[self::COLUMN_NAME_KEY];
-            },
-            $sqlResult
-        );
 
-        $expectedCount = count($expectedColumnNames);
+        // Create individual single-column indexes to match the expected behavior
+        // (6 indexes, each with one "column" – this preserves the original test intent
+        // of having duplicate entries in the flattened list while indexCount == column count)
+        $indexes = [];
+        foreach ($columnNames as $columnName) {
+            $indexMock = $this->createMock(Index::class);
+            $indexMock->method('getColumns')
+                ->willReturn([$columnName]);
+            $indexes[] = $indexMock;
+        }
+
+        $expectedColumnNames = $columnNames;
+        $expectedCount       = count($expectedColumnNames);
 
         $emMock  = $this->createMock(EntityManager::class);
         $ishMock = $this->createMock(IndexSchemaHelper::class);
-        $helper  = new IndexHelper($emMock, $ishMock);
 
         $mdMock = $this->createMock(ClassMetadata::class);
+        $mdMock->expects($this->once())
+            ->method('getTableName')
+            ->willReturn($tableName);
 
         $emMock->expects($this->once())
             ->method('getClassMetadata')
             ->with(Lead::class)
             ->willReturn($mdMock);
 
-        $mdMock->expects($this->once())
-            ->method('getTableName')
-            ->willReturn($tableName);
+        // Mock the platform-agnostic IndexSchemaHelper
+        $ishMock->expects($this->once())
+            ->method('getTableIndexes')
+            ->with($tableName)
+            ->willReturn($indexes);
 
-        $connMock = $this->createMock(Connection::class);
+        $helper = new IndexHelper($emMock, $ishMock);
 
-        $emMock->expects($this->once())
-            ->method('getConnection')
-            ->willReturn($connMock);
-
-        $stmtMock = $this->createMock(Statement::class);
-        $result   = $this->createMock(Result::class);
-        $connMock->expects($this->once())
-            ->method('prepare')
-            ->with($sql)
-            ->willReturn($stmtMock);
-
-        $stmtMock->expects($this->once())
-            ->method('executeQuery')
-            ->willReturn($result);
-
-        $result->expects($this->once())
-            ->method('fetchAllAssociative')
-            ->willReturn($sqlResult);
-
-        $this->assertEquals($expectedColumnNames, $helper->getIndexedColumnNames());
-        $this->assertEquals($expectedCount, $helper->getIndexCount());
+        $this->assertSame($expectedColumnNames, $helper->getIndexedColumnNames());
+        $this->assertSame($expectedCount, $helper->getIndexCount());
     }
 }

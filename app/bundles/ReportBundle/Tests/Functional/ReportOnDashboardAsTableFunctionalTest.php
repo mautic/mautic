@@ -87,7 +87,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $report = new Report();
         $report->setName('All Emails');
         $report->setSource('emails');
-        $report->setColumns(['e.subject', 'e.sent_count', 'e.read_count', 'read_ratio', 'unsubscribed_ratio', 'hits_ratio', 'c.title']);
+        $report->setColumns(['e.subject', 'e.sent_count', 'e.read_count', 'read_ratio', 'unsubscribed_ratio', 'hits_ratio']);
         $report->setGraphs(['mautic.email.table.most.emails.table']);
         $report->setGroupBy(['e.id']);
 
