@@ -182,15 +182,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $prefix = MAUTIC_TABLE_PREFIX;
         if ($this->isMysqlPlatform()) {
-            foreach ($tables as $table) {
-                $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
-                $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
-                $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
-            }
-        } else {
-            foreach ($tables as $table) {
-                $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
-            }
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+        }
+        foreach ($tables as $table) {
+            $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
+        }
+        if ($this->isMysqlPlatform()) {
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         }
     }
 
