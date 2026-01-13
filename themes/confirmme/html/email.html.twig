@@ -12,6 +12,11 @@
     </mj-attributes>
     <!-- CSS-STYLE -->
     <mj-style inline="inline"> p, li {margin:0; padding:0;} </mj-style>
+    <mj-style>
+      @media only screen and (max-width: 600px) {
+      td:has(img) { width: auto !important; }
+      }
+    </mj-style>
   </mj-head>
   <!-- BODY -->
   <mj-body css-class="graylink">
