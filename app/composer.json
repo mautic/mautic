@@ -104,7 +104,7 @@
     "symfony/twig-bundle": "~7.4.0",
     "symfony/validator": "~7.4.0",
     "twilio/sdk": "^5.25",
-    "wikimedia/less.php": "^5.4"
+    "wikimedia/less.php": "^5.5"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"
