@@ -16,6 +16,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -34,6 +35,11 @@ class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
+    /**
+     * @var VersionProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
+
     private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
 
     private ReportSubscriber $subscriber;
@@ -45,12 +51,14 @@ class ReportSubscriberTest extends TestCase
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
+        $this->versionProvider     = $this->createMock(VersionProvider::class);
         $this->dncReportService    = $this->createMock(DncReportService::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
             $this->translator,
-            $this->dncReportService
+            $this->dncReportService,
+            $this->versionProvider,
         );
     }
 

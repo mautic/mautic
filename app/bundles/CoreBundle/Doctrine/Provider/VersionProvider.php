@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
 
-final class VersionProvider implements VersionProviderInterface
+class VersionProvider implements VersionProviderInterface
 {
     private ?string $version = null;
 

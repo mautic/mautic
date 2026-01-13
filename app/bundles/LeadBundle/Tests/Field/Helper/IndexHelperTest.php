@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 
 class IndexHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +37,8 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
         $expectedCount = count($expectedColumnNames);
 
         $emMock = $this->createMock(EntityManager::class);
-        $helper = new IndexHelper($emMock);
+        $ishMock = $this->createMock(IndexSchemaHelper::class);
+        $helper = new IndexHelper($emMock, $ishMock);
 
         $mdMock = $this->createMock(ClassMetadata::class);
 
