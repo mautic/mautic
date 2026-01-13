@@ -8,7 +8,6 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
-use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\DncReportService;
@@ -38,9 +37,6 @@ class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var VersionProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private \PHPUnit\Framework\MockObject\MockObject&VersionProvider $versionProvider;
 
     private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
