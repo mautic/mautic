@@ -55,7 +55,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
             return trim($node->text());
         });
 
-        $expectedHeaders = ['Subject', 'Sent count', 'Read count', 'Read ratio', 'Unsubscribed ratio', 'Clicks ratio', 'Category name'];
+        $expectedHeaders = ['Subject', 'Sent count', 'Read count', 'Category name'];
         $this->assertEquals($expectedHeaders, $headers);
 
         $rows = $crawler->filter('table tbody tr');
@@ -70,9 +70,6 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
             $email->getSubject(),
             (string) $email->getSentCount(),
             (string) $email->getReadCount(),
-            '50.0%',
-            '0.0%',
-            '0.0%',
             '',
         ];
 
@@ -87,8 +84,8 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $report = new Report();
         $report->setName('All Emails');
         $report->setSource('emails');
-        $report->setColumns(['e.subject', 'e.sent_count', 'e.read_count', 'read_ratio', 'unsubscribed_ratio', 'hits_ratio']);
-        $report->setGraphs(['mautic.email.table.most.emails.table']);
+        $report->setColumns(['e.subject', 'e.sent_count', 'e.read_count', 'c.title']);
+        $report->setGraphs(['mautic.email.table.most.emails.read']);
         $report->setGroupBy(['e.id']);
 
         return $report;
@@ -116,7 +113,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $widget->setHeight(330);
         $widget->setCreatedBy($user);
         $widget->setParams([
-            'graph' => sprintf('%s:mautic.email.table.most.emails.table', $report->getId()),
+            'graph' => sprintf('%s:mautic.email.table.most.emails.read', $report->getId()),
         ]);
 
         return $widget;

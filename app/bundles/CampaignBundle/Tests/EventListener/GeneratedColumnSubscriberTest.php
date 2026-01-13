@@ -30,7 +30,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
         Assert::assertCount(5, $generatedColumns);
 
         $generatedColumns = iterator_to_array($generatedColumns);
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_hour DATETIME AS (DATE_FORMAT(date_added, \"%Y-%m-%d %H:00\")) STORED COMMENT '(DC2Type:generated)';
+        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_hour CHAR(16) AS (DATE_FORMAT(date_added, \"%Y-%m-%d %H:00\")) STORED COMMENT '(DC2Type:generated)';
             ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_hour`(campaign_id, generated_date_added_hour)', array_shift($generatedColumns));
         $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_day DATE AS (DATE_FORMAT(date_added, \"%Y-%m-%d\")) STORED COMMENT '(DC2Type:generated)';
             ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_day`(campaign_id, generated_date_added_day)', array_shift($generatedColumns));
