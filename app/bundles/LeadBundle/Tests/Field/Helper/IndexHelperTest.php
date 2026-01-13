@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\Helper;
 
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
+use PHPUnit\Framework\TestCase;
 
-class IndexHelperTest extends \PHPUnit\Framework\TestCase
+class IndexHelperTest extends TestCase
 {
-    public const COLUMN_NAME_KEY = 'Column_name';
-
     public function testGetIndexCountAndColumns(): void
     {
         $tableName = 'table_name';
@@ -22,9 +22,6 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
             'id', '0', '1', '1', '2', '2',
         ];
 
-        // Create individual single-column indexes to match the expected behavior
-        // (6 indexes, each with one "column" – this preserves the original test intent
-        // of having duplicate entries in the flattened list while indexCount == column count)
         $indexes = [];
         foreach ($columnNames as $columnName) {
             $indexMock = $this->createMock(Index::class);
@@ -49,7 +46,6 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
             ->with(Lead::class)
             ->willReturn($mdMock);
 
-        // Mock the platform-agnostic IndexSchemaHelper
         $ishMock->expects($this->once())
             ->method('getTableIndexes')
             ->with($tableName)
