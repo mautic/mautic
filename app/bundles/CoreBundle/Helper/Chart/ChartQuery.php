@@ -560,7 +560,7 @@ class ChartQuery extends AbstractChart
     }
 
     /** Expose connection variable to Unit Test to support multiple database type testing via mock objects */
-    public function getConnection()
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
