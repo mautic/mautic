@@ -249,7 +249,7 @@ class IndexSchemaHelper
             if (is_string($columns)) {
                 $columnsStr = trim($columns, '{}');
                 $columns    = explode(',', $columnsStr);
-                $columns    = array_map(fn($part) => trim($part, '"'), $columns);
+                $columns    = array_map(fn ($part) => trim($part, '"'), $columns);
             }
             // If already array (some drivers return native array), leave as-is
 

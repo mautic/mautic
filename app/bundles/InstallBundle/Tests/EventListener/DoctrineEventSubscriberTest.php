@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\BigIntType;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\TextType;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySQLPlatform;
-
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\InstallBundle\EventListener\DoctrineEventSubscriber;

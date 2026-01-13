@@ -2,10 +2,12 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\DncReportService;
@@ -17,8 +19,6 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
-use Doctrine\DBAL\Connection;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -304,7 +304,6 @@ class ReportSubscriberTest extends TestCase
                 'getConnection',
             ])
             ->getMock();
-
 
         $mockChartQuery->method('getConnection')
             ->willReturn($this->connection);

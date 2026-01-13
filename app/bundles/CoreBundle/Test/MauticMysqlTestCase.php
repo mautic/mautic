@@ -156,7 +156,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $prefix = $this->getTablePrefix();
 
         foreach ($tables as $table) {
-            $fullTable = $prefix . $table;
+            $fullTable = $prefix.$table;
 
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
@@ -225,16 +225,16 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             );
         } elseif ($this->isPostgresqlPlatform()) {
             // Use psql for PostgreSQL
-            $password = $connectionParams['password'] ?? '';
+            $password    = $connectionParams['password'] ?? '';
             $passwordCmd = $password ? "export PGPASSWORD={$password};" : '';
-            $command = $passwordCmd . sprintf(
-                    'psql -h %s -p %s -U %s -d %s -f %s',
-                    escapeshellarg($connectionParams['host']),
-                    escapeshellarg((string) ($connectionParams['port'] ?? 5432)),
-                    escapeshellarg($connectionParams['user']),
-                    escapeshellarg($connectionParams['dbname']),
-                    escapeshellarg($file)
-                );
+            $command     = $passwordCmd.sprintf(
+                'psql -h %s -p %s -U %s -d %s -f %s',
+                escapeshellarg($connectionParams['host']),
+                escapeshellarg((string) ($connectionParams['port'] ?? 5432)),
+                escapeshellarg($connectionParams['user']),
+                escapeshellarg($connectionParams['dbname']),
+                escapeshellarg($file)
+            );
         } else {
             throw new \RuntimeException('Unsupported database platform');
         }
@@ -262,7 +262,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $sqlDumpFile = $this->getSqlFilePath('fresh_db');
 
-        if (!file_exists($sqlDumpFile) ) {
+        if (!file_exists($sqlDumpFile)) {
             $this->installDatabase();
 
             if ($this->databaseInstalled && $this->isMysqlPlatform()) {
@@ -273,6 +273,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 // Generate fast TRUNCATE-based reset SQL for PostgreSQL
                 $this->generateResetDatabaseSql($this->getSqlFilePath('reset_db'));
             }
+
             return;
         }
 
@@ -304,7 +305,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 if (!empty($prefixedTables)) {
                     $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
                     $this->connection->executeStatement(
-                        'TRUNCATE TABLE ' . implode(', ', $quotedTables) . ' RESTART IDENTITY CASCADE'
+                        'TRUNCATE TABLE '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
                     );
                 }
 
@@ -367,9 +368,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function generatePostgresqlResetSql(string $file): void
     {
-        $prefix = $this->getTablePrefix();
+        $prefix        = $this->getTablePrefix();
         $schemaManager = $this->connection->createSchemaManager();
-        $tables = $schemaManager->listTableNames();
+        $tables        = $schemaManager->listTableNames();
 
         $prefixedTables = array_filter($tables, function ($table) use ($prefix) {
             return str_starts_with($table, $prefix);
@@ -378,6 +379,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (empty($prefixedTables)) {
             // Nothing to do
             file_put_contents($file, '-- No tables to truncate');
+
             return;
         }
 
@@ -385,7 +387,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
 
         $content = "-- PostgreSQL reset script for prefixed tables\n";
-        $content .= "TRUNCATE TABLE " . implode(', ', $quotedTables) . " RESTART IDENTITY CASCADE;\n";
+        $content .= 'TRUNCATE TABLE '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
 
         file_put_contents($file, $content);
     }

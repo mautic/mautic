@@ -74,6 +74,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
             {
                 return $this->isMySql;
             }
+
             public function isPostgreSql(): bool
             {
                 return false;

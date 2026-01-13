@@ -41,7 +41,7 @@ class LeadListRepositoryTest extends TestCase
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->expressionMock   = $this->createMock(Expr::class);
         $this->repository       = $this->configureRepository(LeadList::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager    = $this->createMock(EntityManagerInterface::class);
 
         // Default to MySQL platform for backward compatibility with existing tests
         $platform = new MySQLPlatform();
