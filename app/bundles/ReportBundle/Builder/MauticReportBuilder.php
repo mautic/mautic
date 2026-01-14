@@ -342,32 +342,19 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
             // 3. Extract base column names from selectColumns
             foreach ($allSelectColumns as $select) {
-                // Handle cases like "column AS alias" or "CONCAT(..., column, ...) AS alias"
-                if (preg_match('/^CONCAT\(/', $select)) {
-                    // Extract the column from CONCAT
-                    if (preg_match('/CONCAT\(\'.*?\',\s*([^\s,]+)\s*,.*?\)/', $select, $matches)) {
-                        $column = $matches[1];
-                    } else {
-                        continue; // Skip if we can't parse
+                $columns = $this->extractColumnsFromSelect($select);
+
+                foreach ($columns as $column) {
+                    // Normalize for comparison
+                    $normalizedColumn = $this->normalizeColumnName($column);
+
+                    // Skip if already in GROUP BY or aggregated (using normalized comparison)
+                    if (in_array($normalizedColumn, $normalizedGroupBy) || in_array($normalizedColumn, $normalizedAggregated)) {
+                        continue;
                     }
-                } else {
-                    // Handle "column AS alias" or just "column"
-                    $column = preg_replace('/\s+AS\s+.*/i', '', $select);
-                    // Only include simple column names (e.g., ad.date_download, a.title)
-                    if (!preg_match('/^[\"\`a-zA-Z0-9_\.]+$/', $column)) {
-                        continue; // Skip complex expressions like COUNT(*) or CASE
-                    }
+
+                    $nonAggregatedColumns[] = $column;  // Add the original (usually sanitized) version
                 }
-
-                // Normalize for comparison
-                $normalizedColumn = $this->normalizeColumnName($column);
-
-                // Skip if already in GROUP BY or aggregated (using normalized comparison)
-                if (in_array($normalizedColumn, $normalizedGroupBy) || in_array($normalizedColumn, $normalizedAggregated)) {
-                    continue;
-                }
-
-                $nonAggregatedColumns[] = $column;  // Add the original (usually sanitized) version
             }
 
             // 4. Add missing non-aggregated columns to groupByColumns
@@ -619,6 +606,105 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $operator = 'in' === $filter['condition'] ? 'IN' : 'NOT IN';
 
         return sprintf('l.id %s (%s)', $operator, $dncSubQuery->getSQL());
+    }
+
+    /**
+     * Extracts qualified column references (table.column) from a SELECT expression.
+     *
+     * - Preserves original quoting (backticks for MySQL, double quotes for PostgreSQL, or unquoted).
+     * - Handles simple columns: e.subject, `e`.`subject`, "e"."subject"
+     * - Handles columns inside common functions: CONCAT, IFNULL, IF, ROUND, CASE, etc.
+     * - Skips pure aggregates/constants with no real columns: COUNT(*), SUM(1), 'literal', 123
+     * - Completely skips any column references that appear inside subqueries (including correlated references like e.id inside a scalar subquery)
+     * - Handles nested parentheses and multiple subqueries correctly
+     * - Returns array of unique matched column strings (with original quoting preserved), in order of first appearance.
+     *
+     * @param string $selectExpression The raw SELECT part
+     *
+     * @return array<string>
+     */
+    private function extractColumnsFromSelect(string $selectExpression): array
+    {
+        $expr = preg_replace('/\s+AS\s+.*$/i', '', trim($selectExpression));
+
+        // Quick skip for pure constants/literals/simple aggregates with no columns
+        if (preg_match('/^\s*(([\'"].*[\'"])|(\d+\.?\d*)|(COUNT|SUM|AVG|MIN|MAX|SELECT)\s*\(\s*(\*|\d+)\s*\))\s*$/ix', $expr)) {
+            return [];
+        }
+
+        // Find all top-level subquery ranges: (SELECT ... ) – including nested ones inside
+        $ranges = [];
+        $length = strlen($expr);
+        $i      = 0;
+        while ($i < $length) {
+            if ('(' === $expr[$i]) {
+                $j = $i + 1;
+                // Skip whitespace (spaces, tabs, newlines, etc.)
+                while ($j < $length && ctype_space($expr[$j])) {
+                    ++$j;
+                }
+                // Check for "SELECT" (case-insensitive)
+                if ($j + 6 <= $length && 'SELECT' === strtoupper(substr($expr, $j, 6))) {
+                    // This is a subquery – find the matching closing parenthesis
+                    $level = 1;
+                    $k     = $i + 1;
+                    while ($k < $length && $level > 0) {
+                        if ('(' === $expr[$k]) {
+                            ++$level;
+                        } elseif (')' === $expr[$k]) {
+                            --$level;
+                        }
+                        ++$k;
+                    }
+                    if (0 === $level) {
+                        // Valid subquery range: from opening ( to closing )
+                        $ranges[] = [$i, $k - 1];
+                        $i        = $k; // Skip past the closing parenthesis
+                        continue;
+                    }
+                    // Unbalanced – ignore and continue searching
+                }
+            }
+            ++$i;
+        }
+
+        // Extract potential qualified columns with their positions
+        // Improved pattern: identifiers must start with letter or _, to avoid invalid matches
+        $pattern          = '/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i';
+        $potentialMatches = [];
+        if (preg_match_all($pattern, $expr, $matches, PREG_OFFSET_CAPTURE)) {
+            $potentialMatches = $matches[1]; // [[column_string, offset], ...]
+        }
+
+        // Filter out any matches that fall inside a subquery range
+        $columns = [];
+        foreach ($potentialMatches as $match) {
+            $col = $match[0];
+            $pos = $match[1];
+
+            $isInsideSubquery = false;
+            foreach ($ranges as $range) {
+                // If the start of the match is inside any subquery range → skip it
+                if ($pos >= $range[0] && $pos <= $range[1]) {
+                    $isInsideSubquery = true;
+                    break;
+                }
+            }
+
+            if (!$isInsideSubquery) {
+                $columns[] = $col;
+            }
+        }
+
+        // Unique while preserving first-occurrence order
+        $uniqueColumns = [];
+        foreach ($columns as $col) {
+            if (!in_array($col, $uniqueColumns, true)) {
+                $uniqueColumns[] = $col;
+            }
+        }
+
+        return $uniqueColumns;
     }
 
     /**
