@@ -194,7 +194,7 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: mautic
-          DB_PASSWORD: mautic
+          DB_PASSWD: mautic
           DB_NAME: mautictest
           SYMFONY_ENV: test
           MAUTIC_ENV: test

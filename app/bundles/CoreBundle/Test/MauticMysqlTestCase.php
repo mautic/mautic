@@ -34,9 +34,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         // Only default to MySQL if no DB_DRIVER is not set
         if (!isset($this->configParams['db_driver']) || empty($this->configParams['db_driver'])) {
-            $this->configParams += [
-                'db_driver' => 'pdo_mysql',
-            ];
+            $this->configParams['db_driver'] = 'pdo_mysql';
         }
     }
 
