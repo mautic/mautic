@@ -60,6 +60,7 @@ $container->loadFromExtension('web_profiler', [
 ]);
 
 $connectionSettings = [
+    'driver'   => '%env(DB_DRIVER)%' ?: '%mautic.db_driver%',
     'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
     'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
     'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
