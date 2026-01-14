@@ -95,6 +95,7 @@ jobs:
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         rm -rf var/cache
+        export DB_DRIVER="pdo_mysql"
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
@@ -201,6 +202,7 @@ jobs:
         run: |
           rm -rf var/cache
 
+          export DB_DRIVER="pdo_pgsql"
           export DB_PORT="${{ job.services.postgres.ports[5432] }}"
           export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
