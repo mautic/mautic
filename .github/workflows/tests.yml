@@ -96,6 +96,7 @@ jobs:
       run: |
         rm -rf var/cache
         export DB_DRIVER="pdo_mysql"
+        export DB_CHARSET="utf8mb4"
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
@@ -192,6 +193,7 @@ jobs:
       - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
         env:
           DB_DRIVER: pdo_pgsql
+          DB_CHARSET: UTF8
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: mautic
@@ -203,6 +205,7 @@ jobs:
           rm -rf var/cache
 
           export DB_DRIVER="pdo_pgsql"
+          export DB_CHARSET="UTF8"
           export DB_PORT="${{ job.services.postgres.ports[5432] }}"
           export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
