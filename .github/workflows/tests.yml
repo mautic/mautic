@@ -136,6 +136,84 @@ jobs:
         name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
 
+  phpunit-postgres:
+    # Same gating as the main phpunit job
+    if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ['8.3']
+        postgres-versions: ['16']
+
+    name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
+
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres-versions }}
+        env:
+          POSTGRES_DB: mautictest
+          POSTGRES_USER: mautic
+          POSTGRES_PASSWORD: mautic
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
+          coverage: pcov
+          ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
+
+      - name: Install dependencies
+        uses: "ramsey/composer-install@v3"
+
+      - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
+        env:
+          DB_DRIVER: pdo_pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: mautic
+          DB_PASSWORD: mautic
+          DB_NAME: mautictest
+          SYMFONY_ENV: test
+          MAUTIC_ENV: test
+        run: |
+          rm -rf var/cache
+
+          export DB_PORT="${{ job.services.postgres.ports[5432] }}"
+          export SAML_PORT="${{ job.services.saml.ports[8080] }}"
+
+          # Run PHPUnit exactly like the MySQL job (adjust memory limit if needed)
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+
+      - name: Store log artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-postgres-${{ matrix.php-versions }}-postgres_${{ matrix.postgres-versions }}
+          path: ./var/logs/*
+
   e2e-tests:
     runs-on: ubuntu-latest
 
