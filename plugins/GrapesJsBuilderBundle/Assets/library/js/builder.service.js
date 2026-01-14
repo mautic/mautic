@@ -31,10 +31,178 @@ export default class BuilderService {
   assetService;
 
   /**
+   * Cached mj-head content from the theme for injection into component rendering.
+   * This ensures theme tokens (mj-attributes, mj-class) are applied in the editor canvas.
+   */
+  cachedMjHeadContent = '';
+
+  /**
+   * Parsed mj-class definitions from the theme.
+   * Maps class names to their attribute values.
+   */
+  mjClassDefinitions = {};
+
+  /**
    * @param {AssetService} assetService
    */
   constructor(assetService) {
     this.assetService = assetService;
+  }
+
+  /**
+   * Extract mj-head content from MJML for injection into component rendering.
+   * @param {string} mjml - Full MJML content
+   * @returns {string} - The inner content of mj-head (without the tags)
+   */
+  extractMjHeadContent(mjml) {
+    if (!mjml) return '';
+    const mjHeadMatch = mjml.match(/<mj-head[^>]*>([\s\S]*?)<\/mj-head>/i);
+    return mjHeadMatch && mjHeadMatch[1] ? mjHeadMatch[1].trim() : '';
+  }
+
+  /**
+   * Parse mj-class definitions from mj-head content.
+   * Returns a map of class names to their attribute values.
+   * @param {string} mjHeadContent - The inner content of mj-head
+   * @returns {Object} - Map of class name to attributes object
+   */
+  parseMjClassDefinitions(mjHeadContent) {
+    const classes = {};
+    if (!mjHeadContent) return classes;
+
+    // Match all mj-class elements: <mj-class name="t-h1" font-size="32px" ...>
+    const mjClassRegex = /<mj-class\s+([^>]*?)(?:\/>|><\/mj-class>|>)/gi;
+    let match;
+
+    while ((match = mjClassRegex.exec(mjHeadContent)) !== null) {
+      const attrString = match[1];
+
+      // Extract the name attribute
+      const nameMatch = attrString.match(/name\s*=\s*["']([^"']+)["']/i);
+      if (!nameMatch) continue;
+
+      const className = nameMatch[1];
+      const attrs = {};
+
+      // Extract all other attributes
+      const attrRegex = /(\S+)\s*=\s*["']([^"']*)["']/g;
+      let attrMatch;
+      while ((attrMatch = attrRegex.exec(attrString)) !== null) {
+        const [, attrName, attrValue] = attrMatch;
+        if (attrName.toLowerCase() !== 'name') {
+          attrs[attrName] = attrValue;
+        }
+      }
+
+      classes[className] = attrs;
+    }
+
+    return classes;
+  }
+
+  /**
+   * Apply mj-class styles to components that have mj-class attribute.
+   * This ensures theme token styles are reflected in the editor.
+   * @param {Editor} editor - GrapesJS editor instance
+   * @param {Object} mjClassDefinitions - Map of class names to attributes
+   */
+  applyMjClassStylesToComponents(editor, mjClassDefinitions) {
+    if (!mjClassDefinitions || Object.keys(mjClassDefinitions).length === 0) return;
+
+    const processComponent = (component) => {
+      const attrs = component.get('attributes') || {};
+      const mjClassAttr = attrs['mj-class'];
+
+      if (mjClassAttr) {
+        // mj-class can have multiple classes: "t-btn t-btn-primary"
+        const classNames = mjClassAttr.split(/\s+/);
+        const mergedAttrs = { ...attrs };
+
+        // Apply each class's attributes (later classes override earlier ones)
+        classNames.forEach(className => {
+          const classAttrs = mjClassDefinitions[className];
+          if (classAttrs) {
+            Object.assign(mergedAttrs, classAttrs);
+          }
+        });
+
+        // Update component attributes
+        component.set('attributes', mergedAttrs);
+
+        // Also update the style (GrapesJS uses style for visual representation)
+        const currentStyle = component.get('style') || {};
+        component.set('style', { ...currentStyle, ...mergedAttrs });
+      }
+
+      // Process child components
+      const children = component.get('components');
+      if (children) {
+        children.forEach(child => processComponent(child));
+      }
+    };
+
+    // Process all components in the editor
+    const wrapper = editor.getWrapper();
+    if (wrapper) {
+      const components = wrapper.get('components');
+      if (components) {
+        components.forEach(component => processComponent(component));
+      }
+    }
+  }
+
+  /**
+   * Override MJML component views to inject mj-head content into their
+   * MJML compilation wrappers. This ensures theme tokens (mj-attributes, mj-class)
+   * are applied when components render in the editor canvas.
+   *
+   * @param {Editor} editor - GrapesJS editor instance
+   * @param {string} mjHeadContent - The inner content of mj-head from the theme
+   */
+  injectMjHeadIntoComponentViews(editor, mjHeadContent) {
+    if (!mjHeadContent) return;
+
+    const mjHeadWrapper = `<mj-head>${mjHeadContent}</mj-head>`;
+
+    // List of all MJML component types that need the mj-head injection
+    const mjmlComponentTypes = [
+      'mj-text', 'mj-button', 'mj-image', 'mj-divider', 'mj-spacer',
+      'mj-social', 'mj-social-element', 'mj-navbar', 'mj-navbar-link',
+      'mj-section', 'mj-column', 'mj-wrapper', 'mj-group', 'mj-hero',
+      'mj-raw', 'mj-body',
+    ];
+
+    mjmlComponentTypes.forEach((typeName) => {
+      const existingType = editor.DomComponents.getType(typeName);
+      if (!existingType) return;
+
+      // Get the View class (not the config object)
+      const ViewClass = existingType.view;
+
+      // Check if this type has a view with getMjmlTemplate on its prototype
+      if (!ViewClass || !ViewClass.prototype || typeof ViewClass.prototype.getMjmlTemplate !== 'function') {
+        return;
+      }
+
+      // Store reference to original method
+      const originalGetMjmlTemplate = ViewClass.prototype.getMjmlTemplate;
+
+      // Patch getMjmlTemplate to inject mj-head
+      ViewClass.prototype.getMjmlTemplate = function() {
+        const original = originalGetMjmlTemplate.call(this);
+
+        // Inject mj-head after <mjml> tag in the start wrapper
+        const enhancedStart = original.start.replace(
+          '<mjml>',
+          `<mjml>${mjHeadWrapper}`
+        );
+
+        return {
+          start: enhancedStart,
+          end: original.end,
+        };
+      };
+    });
   }
 
   /**
@@ -276,6 +444,9 @@ export default class BuilderService {
     // validate
     MjmlService.mjmlToHtml(components);
 
+    // Extract mj-head content for theme token injection into component rendering
+    this.cachedMjHeadContent = this.extractMjHeadContent(components);
+
     const styles = [
       `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
     ];
@@ -311,6 +482,15 @@ export default class BuilderService {
       },
     });
 
+    // Inject mj-head into component views for proper theme token rendering in canvas
+    // Must be done AFTER grapesjs.init() (so component types are registered) but BEFORE setComponents()
+    if (this.cachedMjHeadContent) {
+      this.injectMjHeadIntoComponentViews(this.editor, this.cachedMjHeadContent);
+    }
+
+    // Parse mj-class definitions for applying to components
+    this.mjClassDefinitions = this.parseMjClassDefinitions(this.cachedMjHeadContent);
+
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 
@@ -319,6 +499,12 @@ export default class BuilderService {
     // See: https://github.com/GrapesJS/mjml/issues/149
     const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
     this.editor.setComponents(parsedContent);
+
+    // Apply mj-class styles to components after they're loaded
+    // This ensures theme token values are set on component attributes
+    if (this.mjClassDefinitions && Object.keys(this.mjClassDefinitions).length > 0) {
+      this.applyMjClassStylesToComponents(this.editor, this.mjClassDefinitions);
+    }
 
     this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
