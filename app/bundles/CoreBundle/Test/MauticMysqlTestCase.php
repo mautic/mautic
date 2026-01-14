@@ -32,8 +32,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         parent::__construct($name);
 
-        // Only default to MySQL if no DATABASE_URL is provided (allows PostgreSQL via env in CI)
-        if (!getenv('DATABASE_URL')) {
+        // Only default to MySQL if no DB_DRIVER is not set
+        if (!isset($this->configParams['db_driver'])) {
             $this->configParams += [
                 'db_driver' => 'pdo_mysql',
             ];
