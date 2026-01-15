@@ -208,7 +208,11 @@ jobs:
           export DB_CHARSET="UTF8"
           export DB_PORT="${{ job.services.postgres.ports[5432] }}"
           export SAML_PORT="${{ job.services.saml.ports[8080] }}"
-          
+
+          # Create database if not exists using psql (bypasses Doctrine limitation on Postgres)
+          psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME'" | grep -q 1 || \
+          psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -c "CREATE DATABASE $DB_NAME"
+
           # Create DB if not exists, schema, and run migrations (including your compatibility functions)
           php bin/console doctrine:database:create --if-not-exists --no-interaction
           php bin/console doctrine:schema:create --no-interaction
