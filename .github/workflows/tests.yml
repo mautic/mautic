@@ -203,7 +203,7 @@ jobs:
         env:
           DB_DRIVER: pdo_pgsql
           DB_CHARSET: UTF8
-          DB_HOST: postgres
+          DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: mautic
           DB_PASSWD: mautic
