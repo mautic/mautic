@@ -282,7 +282,12 @@ export default class BuilderService {
     }
 
     if (type === 'mj-section') {
-      return mjClassNames.has('t-surface-1') ? 't-surface-1' : '';
+      const hasSection = mjClassNames.has('t-section');
+      const hasSurface = mjClassNames.has('t-surface-1');
+      if (hasSection && hasSurface) return 't-section t-surface-1';
+      if (hasSurface) return 't-surface-1';
+      if (hasSection) return 't-section';
+      return '';
     }
 
     return '';
