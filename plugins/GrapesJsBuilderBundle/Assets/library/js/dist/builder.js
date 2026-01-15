@@ -196996,6 +196996,104 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
         wrapper.components?.().forEach((c)=>walk(c));
     }
     /**
+   * Register hidden (non-layerable, non-selectable) component types for MJML theme tokens
+   * inside `<mj-attributes>...</mj-attributes>`.
+   *
+   * Without this, tags like `<mj-text>` inside `<mj-attributes>` get parsed as normal body
+   * components (`mj-text`, `mj-button`, etc) and show up in the builder.
+   *
+   * These types:
+   * - stay in the component tree (so they persist on save/export)
+   * - are hidden in canvas and layers
+   * - are not editable/selectable/draggable
+   *
+   * IMPORTANT: must be called AFTER `grapesjs.init()` (so base mj-* types exist),
+   * but BEFORE `editor.setComponents()` (so parsing uses these parent-aware types).
+   *
+   * @param {Editor} editor
+   */ registerHiddenMjAttributesTypes(editor) {
+        const isTag = (el, tag)=>(el?.tagName || "").toLowerCase() === tag;
+        const parentIs = (el, tag)=>isTag(el?.parentElement, tag);
+        const hiddenDefaults = {
+            selectable: false,
+            hoverable: false,
+            highlightable: false,
+            layerable: false,
+            draggable: false,
+            droppable: false,
+            copyable: false,
+            removable: false,
+            editable: false
+        };
+        const hiddenView = {
+            tagName: "div",
+            attributes: {
+                style: "display:none !important;"
+            },
+            getTemplateFromMjml () {
+                return "";
+            },
+            render () {
+                this.el.innerHTML = "";
+                return this;
+            }
+        };
+        // Container <mj-attributes>
+        editor.DomComponents.addType("mj-attributes", {
+            isComponent: (el)=>isTag(el, "mj-attributes"),
+            model: {
+                defaults: {
+                    tagName: "mj-attributes",
+                    ...hiddenDefaults
+                }
+            },
+            view: hiddenView
+        });
+        // Leaf tags inside <mj-attributes> which are NOT part of the body layout
+        editor.DomComponents.addType("mj-all", {
+            isComponent: (el)=>isTag(el, "mj-all") && parentIs(el, "mj-attributes"),
+            model: {
+                defaults: {
+                    tagName: "mj-all",
+                    // keep non-void to avoid self-closing issues (matches your `<mj-all></mj-all>` usage)
+                    void: false,
+                    ...hiddenDefaults
+                }
+            },
+            view: hiddenView
+        });
+        editor.DomComponents.addType("mj-class", {
+            isComponent: (el)=>isTag(el, "mj-class") && parentIs(el, "mj-attributes"),
+            model: {
+                defaults: {
+                    tagName: "mj-class",
+                    void: false,
+                    ...hiddenDefaults
+                }
+            },
+            view: hiddenView
+        });
+        // Head-default tags like <mj-text ...></mj-text> inside <mj-attributes>
+        // Extend the existing body types but hide them + make them non-layerable.
+        const addHiddenAttrType = (typeName, baseType, tagName)=>{
+            editor.DomComponents.addType(typeName, {
+                extend: baseType,
+                isComponent: (el)=>isTag(el, tagName) && parentIs(el, "mj-attributes"),
+                model: {
+                    defaults: {
+                        tagName: tagName,
+                        ...hiddenDefaults
+                    }
+                },
+                view: hiddenView
+            });
+        };
+        addHiddenAttrType("mj-attr-text", "mj-text", "mj-text");
+        addHiddenAttrType("mj-attr-button", "mj-button", "mj-button");
+        addHiddenAttrType("mj-attr-section", "mj-section", "mj-section");
+        addHiddenAttrType("mj-attr-column", "mj-column", "mj-column");
+    }
+    /**
    * Initialize GrapesJsBuilder
    *
    * @param object
@@ -197253,6 +197351,9 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
                 ...$f60070874070a14a$export$2e2bcd8739ae039.getPluginOptions("email-mjml")
             }
         });
+        // Hide `<mj-attributes>` content in builder while still persisting on save/export
+        // Must run BEFORE setComponents() so parsing uses these parent-aware types.
+        this.registerHiddenMjAttributesTypes(this.editor);
         this.unsetComponentVoidTypes(this.editor);
         this.editor.setComponents(components);
         // Reinitialize the content after parsing MJML.
