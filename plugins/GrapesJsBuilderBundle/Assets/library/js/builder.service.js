@@ -11,6 +11,7 @@ import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsckeditor from './plugins/grapesjs.ckeditor';
+import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs.mjmlThemeTokens';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
@@ -132,234 +133,6 @@ export default class BuilderService {
     };
 
     wrapper.components?.().forEach((c) => walk(c));
-  }
-
-  /**
-   * Register hidden (non-layerable, non-selectable) component types for MJML theme tokens
-   * inside `<mj-attributes>...</mj-attributes>`.
-   *
-   * Without this, tags like `<mj-text>` inside `<mj-attributes>` get parsed as normal body
-   * components (`mj-text`, `mj-button`, etc) and show up in the builder.
-   *
-   * These types:
-   * - stay in the component tree (so they persist on save/export)
-   * - are hidden in canvas and layers
-   * - are not editable/selectable/draggable
-   *
-   * IMPORTANT: must be called AFTER `grapesjs.init()` (so base mj-* types exist),
-   * but BEFORE `editor.setComponents()` (so parsing uses these parent-aware types).
-   *
-   * @param {Editor} editor
-   */
-  registerHiddenMjAttributesTypes(editor) {
-    const isTag = (el, tag) => ((el?.tagName || '').toLowerCase() === tag);
-    const parentIs = (el, tag) => isTag(el?.parentElement, tag);
-
-    const hiddenDefaults = {
-      selectable: false,
-      hoverable: false,
-      highlightable: false,
-      layerable: false,
-      draggable: false,
-      droppable: false,
-      copyable: false,
-      removable: false,
-      editable: false,
-    };
-
-    const hiddenView = {
-      tagName: 'div',
-      attributes: { style: 'display:none !important;' },
-      getTemplateFromMjml() {
-        return '';
-      },
-      render() {
-        this.el.innerHTML = '';
-        return this;
-      },
-    };
-
-    // Container <mj-attributes>
-    editor.DomComponents.addType('mj-attributes', {
-      isComponent: (el) => isTag(el, 'mj-attributes'),
-      model: {
-        defaults: {
-          tagName: 'mj-attributes',
-          ...hiddenDefaults,
-        },
-      },
-      view: hiddenView,
-    });
-
-    // Leaf tags inside <mj-attributes> which are NOT part of the body layout
-    editor.DomComponents.addType('mj-all', {
-      isComponent: (el) => isTag(el, 'mj-all') && parentIs(el, 'mj-attributes'),
-      model: {
-        defaults: {
-          tagName: 'mj-all',
-          // keep non-void to avoid self-closing issues (matches your `<mj-all></mj-all>` usage)
-          void: false,
-          ...hiddenDefaults,
-        },
-      },
-      view: hiddenView,
-    });
-
-    editor.DomComponents.addType('mj-class', {
-      isComponent: (el) => isTag(el, 'mj-class') && parentIs(el, 'mj-attributes'),
-      model: {
-        defaults: {
-          tagName: 'mj-class',
-          void: false,
-          ...hiddenDefaults,
-        },
-      },
-      view: hiddenView,
-    });
-
-    // Head-default tags like <mj-text ...></mj-text> inside <mj-attributes>
-    // Extend the existing body types but hide them + make them non-layerable.
-    const addHiddenAttrType = (typeName, baseType, tagName) => {
-      editor.DomComponents.addType(typeName, {
-        extend: baseType,
-        isComponent: (el) => isTag(el, tagName) && parentIs(el, 'mj-attributes'),
-        model: {
-          defaults: {
-            tagName,
-            ...hiddenDefaults,
-          },
-        },
-        view: hiddenView,
-      });
-    };
-
-    addHiddenAttrType('mj-attr-text', 'mj-text', 'mj-text');
-    addHiddenAttrType('mj-attr-button', 'mj-button', 'mj-button');
-    addHiddenAttrType('mj-attr-section', 'mj-section', 'mj-section');
-    addHiddenAttrType('mj-attr-column', 'mj-column', 'mj-column');
-  }
-
-  /**
-   * Parse mj-class names from mj-head content.
-   * @param {string} mjHeadContent
-   * @returns {Set<string>}
-   */
-  parseMjClassNames(mjHeadContent) {
-    const out = new Set();
-    if (!mjHeadContent) return out;
-
-    const re = /<mj-class\s+[^>]*\bname\s*=\s*["']([^"']+)["'][^>]*>/gi;
-    let m;
-    while ((m = re.exec(mjHeadContent)) !== null) {
-      out.add(m[1]);
-    }
-
-    return out;
-  }
-
-  /**
-   * Get theme default `mj-class` to apply to newly dropped components.
-   * Adjust mapping here if your theme uses different token names.
-   *
-   * @param {string} type - GrapesJS component type (eg. 'mj-text')
-   * @param {Set<string>} mjClassNames
-   * @returns {string} mj-class value or empty string
-   */
-  getDefaultMjClassForType(type, mjClassNames) {
-    if (!mjClassNames || mjClassNames.size === 0) return '';
-
-    if (type === 'mj-text') {
-      return mjClassNames.has('t-body') ? 't-body' : '';
-    }
-
-    if (type === 'mj-button') {
-      const hasBtn = mjClassNames.has('t-btn');
-      const hasPrimary = mjClassNames.has('t-btn-primary');
-      if (hasBtn && hasPrimary) return 't-btn t-btn-primary';
-      if (hasPrimary) return 't-btn-primary';
-      if (hasBtn) return 't-btn';
-      return '';
-    }
-
-    if (type === 'mj-section') {
-      const hasSection = mjClassNames.has('t-section');
-      const hasSurface = mjClassNames.has('t-surface-1');
-      if (hasSection && hasSurface) return 't-section t-surface-1';
-      if (hasSurface) return 't-surface-1';
-      if (hasSection) return 't-section';
-      return '';
-    }
-
-    return '';
-  }
-
-  /**
-   * Strip attributes which match this component's `style-default`.
-   * This prevents grapesjs-mjml defaults from overriding theme `<mj-attributes>`
-   * and/or theme tokens applied via `mj-class`.
-   *
-   * @param {any} component - GrapesJS component model
-   */
-  stripDefaultAttrsForComponent(component) {
-    if (!component) return;
-
-    const attrs = { ...(component.get('attributes') || {}) };
-    const styleDefault = component.get('style-default') || {};
-
-    let changed = false;
-    Object.keys(styleDefault).forEach((key) => {
-      if (key in attrs && attrs[key] === styleDefault[key]) {
-        delete attrs[key];
-        changed = true;
-      }
-    });
-
-    if (changed) {
-      component.set('attributes', attrs);
-    }
-  }
-
-  /**
-   * Ensure newly added blocks/components match the theme:
-   * - Apply default `mj-class` tokens for common components (text/button/section)
-   * - Strip grapesjs-mjml `style-default` attrs so theme `<mj-attributes>` can win
-   *
-   * Call this AFTER initial content is loaded (after `setComponents` calls),
-   * so it only affects newly dropped blocks.
-   *
-   * @param {Editor} editor
-   * @param {Set<string>} mjClassNames
-   */
-  enableThemeDefaultsForNewComponents(editor, mjClassNames) {
-    if (!editor) return;
-
-    // Avoid double-binding if initEmailMjml is called multiple times
-    if (this.__themeDefaultsAddHandler) {
-      editor.off('component:add', this.__themeDefaultsAddHandler);
-    }
-
-    this.__themeDefaultsAddHandler = (component) => {
-      const type = component?.get?.('type');
-      if (!type) return;
-
-      // Only handle MJML components we care about
-      if (!['mj-text', 'mj-button', 'mj-section'].includes(type)) return;
-
-      const attrs = { ...(component.get('attributes') || {}) };
-
-      // If block didn't specify mj-class, apply theme default token (if available)
-      if (!attrs['mj-class']) {
-        const mjClass = this.getDefaultMjClassForType(type, mjClassNames);
-        if (mjClass) {
-          component.set('attributes', { ...attrs, 'mj-class': mjClass });
-        }
-      }
-
-      // After potentially setting mj-class, strip default attrs so tokens/theme apply
-      this.stripDefaultAttrsForComponent(component);
-    };
-
-    editor.on('component:add', this.__themeDefaultsAddHandler);
   }
 
   /**
@@ -579,13 +352,13 @@ export default class BuilderService {
   }
 
   mjmlToHtml(mjml) {
-    const converted = MjmlService.mjmlToHtml(mjml);
+      const converted = MjmlService.mjmlToHtml(mjml);
 
-    if (0 === converted.errors.length) {
-      return converted.html;
-    }
+      if (0 === converted.errors.length) {
+          return converted.html;
+      }
 
-    return '';
+      return '';
   }
 
   initEmailMjml() {
@@ -594,33 +367,44 @@ export default class BuilderService {
     // validate
     MjmlService.mjmlToHtml(components);
 
-    // Cache mj-head inner content BEFORE init, so the parser wrapper can use it
+    // Cache mj-head inner content BEFORE init (used by mjmlParser wrapper)
     this.cachedMjHeadContent = this.extractMjHeadContent(components);
-
-    // Parse available mj-class names (used to apply defaults to newly dropped blocks)
-    const mjClassNames = this.parseMjClassNames(this.cachedMjHeadContent);
 
     const styles = [
       `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
     ];
 
-    // Wrap MJML parser so that all fragment compilations include <mj-head> tokens
+    // IMPORTANT: mjmlParser must be provided directly to grapesjs-mjml via pluginsOpts
     const headInjectingParser = this.createHeadInjectingMjmlParser(() => this.cachedMjHeadContent);
 
     this.editor = grapesjs.init({
-      selectorManager: { componentFirst: true },
-      avoidInlineStyle: false,
-      forceClass: false,
+      selectorManager: {
+        componentFirst: true,
+      },
+      avoidInlineStyle: false, // TEMP: fixes issue with disappearing inline styles
+      forceClass: false, // create new styles if there are some already on the element: https://github.com/GrapesJS/grapesjs/issues/1531
       clearOnRender: true,
       container: '.builder-panel',
       height: '100%',
-      canvas: { styles },
+      canvas: {
+        styles,
+      },
       domComponents: {
-        disableTextInnerChilds: (child) => !child.is('link'),
+        // disable all except link components
+        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, grapesjsckeditor, ...BuilderService.getPluginNames('email-mjml')],
+
+      plugins: [
+        grapesjsmjml,
+        grapesjsMjmlThemeTokens,
+        grapesjspostcss,
+        grapesjsmautic,
+        grapesjsckeditor,
+        ...BuilderService.getPluginNames('email-mjml'),
+      ],
+
       pluginsOpts: {
         [grapesjsmjml]: {
           hideSelector: false,
@@ -628,46 +412,28 @@ export default class BuilderService {
           useCustomTheme: false,
           mjmlParser: headInjectingParser,
         },
+
+        [grapesjsMjmlThemeTokens]: {
+          headContent: this.cachedMjHeadContent
+        },
+
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         [grapesjsckeditor]: BuilderService.getCkeConf('email:getBuilderTokens'),
         ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
 
-    // Hide `<mj-attributes>` content in builder while still persisting on save/export
-    // Must run BEFORE setComponents() so parsing uses these parent-aware types.
-    this.registerHiddenMjAttributesTypes(this.editor);
-
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 
     // Reinitialize the content after parsing MJML.
+    // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
     // See: https://github.com/GrapesJS/mjml/issues/149
     const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
     this.editor.setComponents(parsedContent);
 
-    // Critical: allow mj-class tokens to win over grapesjs-mjml defaults in the canvas
-    this.stripDefaultAttrsForTokenizedComponents(this.editor);
-
-    // Make newly dropped blocks match theme defaults (tokens + mj-attributes)
-    this.enableThemeDefaultsForNewComponents(this.editor, mjClassNames);
-
-    // Override base blocks to include theme tokens by default
-    const bm = this.editor.BlockManager;
-
-    const btnBlock = bm.get('mj-button');
-    if (btnBlock) {
-      btnBlock.set({
-        content: '<mj-button mj-class="t-btn t-btn-primary" href="https://">Button</mj-button>',
-      });
-    }
-
-    const textBlock = bm.get('mj-text');
-    if (textBlock) {
-      textBlock.set({
-        content: '<mj-text mj-class="t-body">Insert text here</mj-text>',
-      });
-    }
+    // Tell plugin initial content is ready: strip defaults for existing tokenized nodes + enable defaults for new drops
+    this.editor.trigger('mjml-theme-tokens:content:ready');
 
     this.removeSelectedElementsEmailMjml();
 
