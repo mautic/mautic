@@ -201,6 +201,7 @@ jobs:
           DB_NAME: mautictest
           SYMFONY_ENV: test
           MAUTIC_ENV: test
+          PGPASSWORD: mautic
         run: |
           rm -rf var/cache
 
