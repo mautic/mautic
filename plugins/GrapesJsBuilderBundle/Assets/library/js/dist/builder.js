@@ -147753,29 +147753,6 @@ var $54c065b375b82db2$export$2e2bcd8739ae039 = (editor, opts = {})=>{
 };
 
 
-const $6e78246edbcb059d$export$93555f331aae1550 = "mautic-mjml-custom-blocks";
-var $6e78246edbcb059d$export$2e2bcd8739ae039 = (editor, opts = {})=>{
-    const options = {
-        category: "Blocks",
-        label: "Secondary Button",
-        id: "mj-button-secondary",
-        content: '<mj-button mj-class="t-btn t-btn-secondary" href="https://">Secondary Button</mj-button>',
-        ...opts
-    };
-    const bm = editor.BlockManager;
-    bm.add(options.id, {
-        label: options.label,
-        category: options.category,
-        content: options.content,
-        // Optional: replace with your own SVG
-        media: `<svg viewBox="0 0 24 24">
-      <path fill="currentColor" d="M7 7h10a4 4 0 0 1 0 8H7a4 4 0 0 1 0-8Zm0 2a2 2 0 0 0 0 4h10a2 2 0 0 0 0-4H7Z"/>
-    </svg>`
-    });
-};
-const $6e78246edbcb059d$export$70054fdf943916cf = $6e78246edbcb059d$export$93555f331aae1550;
-
-
 function $18fb071779ff2293$var$_defineProperty(obj, key, value) {
     if (key in obj) Object.defineProperty(obj, key, {
         value: value,
@@ -197468,7 +197445,6 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
             plugins: [
                 (0, (/*@__PURE__*/$parcel$interopDefault($4d17c3be5d2e5e5c$exports))),
                 (0, $54c065b375b82db2$export$2e2bcd8739ae039),
-                (0, $6e78246edbcb059d$export$2e2bcd8739ae039),
                 (0, (/*@__PURE__*/$parcel$interopDefault($2b976e4a616e21e9$exports))),
                 (0, $6ee6b1623ac749ec$export$2e2bcd8739ae039),
                 (0, $a682266adc6b7aa6$export$2e2bcd8739ae039),
@@ -197483,10 +197459,6 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
                 },
                 [(0, $54c065b375b82db2$export$2e2bcd8739ae039)]: {
                     headContent: this.cachedMjHeadContent
-                },
-                [(0, $6e78246edbcb059d$export$93555f331aae1550)]: {
-                    category: Mautic.translate("grapesjsbuilder.categoryBlockLabel") || "Blocks",
-                    label: "Secondary Button"
                 },
                 grapesjsmautic: $f60070874070a14a$export$2e2bcd8739ae039.getMauticConf("email-mjml"),
                 [(0, $a682266adc6b7aa6$export$2e2bcd8739ae039)]: $f60070874070a14a$export$2e2bcd8739ae039.getCkeConf("email:getBuilderTokens"),
