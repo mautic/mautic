@@ -197094,6 +197094,99 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
         addHiddenAttrType("mj-attr-column", "mj-column", "mj-column");
     }
     /**
+   * Parse mj-class names from mj-head content.
+   * @param {string} mjHeadContent
+   * @returns {Set<string>}
+   */ parseMjClassNames(mjHeadContent) {
+        const out = new Set();
+        if (!mjHeadContent) return out;
+        const re = /<mj-class\s+[^>]*\bname\s*=\s*["']([^"']+)["'][^>]*>/gi;
+        let m;
+        while((m = re.exec(mjHeadContent)) !== null)out.add(m[1]);
+        return out;
+    }
+    /**
+   * Get theme default `mj-class` to apply to newly dropped components.
+   * Adjust mapping here if your theme uses different token names.
+   *
+   * @param {string} type - GrapesJS component type (eg. 'mj-text')
+   * @param {Set<string>} mjClassNames
+   * @returns {string} mj-class value or empty string
+   */ getDefaultMjClassForType(type, mjClassNames) {
+        if (!mjClassNames || mjClassNames.size === 0) return "";
+        if (type === "mj-text") return mjClassNames.has("t-body") ? "t-body" : "";
+        if (type === "mj-button") {
+            const hasBtn = mjClassNames.has("t-btn");
+            const hasPrimary = mjClassNames.has("t-btn-primary");
+            if (hasBtn && hasPrimary) return "t-btn t-btn-primary";
+            if (hasPrimary) return "t-btn-primary";
+            if (hasBtn) return "t-btn";
+            return "";
+        }
+        if (type === "mj-section") return mjClassNames.has("t-surface-1") ? "t-surface-1" : "";
+        return "";
+    }
+    /**
+   * Strip attributes which match this component's `style-default`.
+   * This prevents grapesjs-mjml defaults from overriding theme `<mj-attributes>`
+   * and/or theme tokens applied via `mj-class`.
+   *
+   * @param {any} component - GrapesJS component model
+   */ stripDefaultAttrsForComponent(component) {
+        if (!component) return;
+        const attrs = {
+            ...component.get("attributes") || {}
+        };
+        const styleDefault = component.get("style-default") || {};
+        let changed = false;
+        Object.keys(styleDefault).forEach((key)=>{
+            if (key in attrs && attrs[key] === styleDefault[key]) {
+                delete attrs[key];
+                changed = true;
+            }
+        });
+        if (changed) component.set("attributes", attrs);
+    }
+    /**
+   * Ensure newly added blocks/components match the theme:
+   * - Apply default `mj-class` tokens for common components (text/button/section)
+   * - Strip grapesjs-mjml `style-default` attrs so theme `<mj-attributes>` can win
+   *
+   * Call this AFTER initial content is loaded (after `setComponents` calls),
+   * so it only affects newly dropped blocks.
+   *
+   * @param {Editor} editor
+   * @param {Set<string>} mjClassNames
+   */ enableThemeDefaultsForNewComponents(editor, mjClassNames) {
+        if (!editor) return;
+        // Avoid double-binding if initEmailMjml is called multiple times
+        if (this.__themeDefaultsAddHandler) editor.off("component:add", this.__themeDefaultsAddHandler);
+        this.__themeDefaultsAddHandler = (component)=>{
+            const type = component?.get?.("type");
+            if (!type) return;
+            // Only handle MJML components we care about
+            if (![
+                "mj-text",
+                "mj-button",
+                "mj-section"
+            ].includes(type)) return;
+            const attrs = {
+                ...component.get("attributes") || {}
+            };
+            // If block didn't specify mj-class, apply theme default token (if available)
+            if (!attrs["mj-class"]) {
+                const mjClass = this.getDefaultMjClassForType(type, mjClassNames);
+                if (mjClass) component.set("attributes", {
+                    ...attrs,
+                    "mj-class": mjClass
+                });
+            }
+            // After potentially setting mj-class, strip default attrs so tokens/theme apply
+            this.stripDefaultAttrsForComponent(component);
+        };
+        editor.on("component:add", this.__themeDefaultsAddHandler);
+    }
+    /**
    * Initialize GrapesJsBuilder
    *
    * @param object
@@ -197310,6 +197403,8 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
         (0, $cad057a96dc36b51$export$2e2bcd8739ae039).mjmlToHtml(components);
         // Cache mj-head inner content BEFORE init, so the parser wrapper can use it
         this.cachedMjHeadContent = this.extractMjHeadContent(components);
+        // Parse available mj-class names (used to apply defaults to newly dropped blocks)
+        const mjClassNames = this.parseMjClassNames(this.cachedMjHeadContent);
         const styles = [
             `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
         ];
@@ -197362,8 +197457,17 @@ class $f60070874070a14a$export$2e2bcd8739ae039 {
         this.editor.setComponents(parsedContent);
         // Critical: allow mj-class tokens to win over grapesjs-mjml defaults in the canvas
         this.stripDefaultAttrsForTokenizedComponents(this.editor);
-        this.editor.BlockManager.get("mj-button").set({
-            content: '<mj-button href="https://">Button</mj-button>'
+        // Make newly dropped blocks match theme defaults (tokens + mj-attributes)
+        this.enableThemeDefaultsForNewComponents(this.editor, mjClassNames);
+        // Override base blocks to include theme tokens by default
+        const bm = this.editor.BlockManager;
+        const btnBlock = bm.get("mj-button");
+        if (btnBlock) btnBlock.set({
+            content: '<mj-button mj-class="t-btn t-btn-primary" href="https://">Button</mj-button>'
+        });
+        const textBlock = bm.get("mj-text");
+        if (textBlock) textBlock.set({
+            content: '<mj-text mj-class="t-body">Insert text here</mj-text>'
         });
         this.removeSelectedElementsEmailMjml();
         return this.editor;
