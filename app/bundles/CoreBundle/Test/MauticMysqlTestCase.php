@@ -36,6 +36,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (!isset($this->configParams['db_driver']) || empty($this->configParams['db_driver'])) {
             $this->configParams['db_driver'] = 'pdo_mysql';
         }
+        // Initialize default charset if no DB_CHARSET is set
+        if (!isset($this->configParams['db_charset']) || empty($this->configParams['db_charset'])) {
+            $this->configParams['db_charset'] = 'pdo_pgsql' == $this->configParams['db_driver'] ? 'UTF8' : 'utf8mb4';
+        }
     }
 
     protected function isMysqlPlatform(): bool
@@ -492,7 +496,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
+        $prefix = $this->getTablePrefix();
+        $table  = $prefix.'ip_addresses';
+
+        if ($this->isPostgresqlPlatform()) {
+            $quotedTable = $this->connection->quoteIdentifier($table);
+            $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence($quotedTable, 'id')");
+            $quotedSeq   = $this->connection->quoteIdentifier($sequence);
+            $sql         = "INSERT INTO {$table} (id, ip_address) VALUES (nextval($quotedSeq), '127.0.0.1')";
+        } else {
+            // Existing MySQL behavior (unchanged)
+            $sql = "INSERT INTO {$table} (ip_address) VALUES ('127.0.0.1')";
+        }
+
+        $this->connection->executeStatement($sql);
     }
 
     private function wasRollbackSuccessful(): bool
