@@ -208,9 +208,14 @@ jobs:
           export DB_CHARSET="UTF8"
           export DB_PORT="${{ job.services.postgres.ports[5432] }}"
           export SAML_PORT="${{ job.services.saml.ports[8080] }}"
+          
+          # Create DB if not exists, schema, and run migrations (including your compatibility functions)
+          php bin/console doctrine:database:create --if-not-exists --no-interaction
+          php bin/console doctrine:schema:create --no-interaction
+          php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
           # Run PHPUnit exactly like the MySQL job (adjust memory limit if needed)
-          php -d zend.assertions=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --process-isolation
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
 
       - name: Store log artifacts
         if: ${{ always() }}
