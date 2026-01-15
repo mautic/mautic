@@ -158,9 +158,10 @@ jobs:
           POSTGRES_USER: mautic
           POSTGRES_PASSWORD: mautic
         ports:
-          - 5432:5432
+          - 5432
+        #  - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U mautic -d mautictest"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -193,11 +194,16 @@ jobs:
       - name: Install psql client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
+      - name: Debug ports (for local act troubleshooting)
+        run: |
+          echo "Postgres host port: ${{ job.services.postgres.ports[5432] }}"
+          echo "SAML host port: ${{ job.services.saml.ports[8080] }}"
+
       - name: Setup PostgreSQL schema
         env:
           DB_DRIVER: pdo_pgsql
           DB_CHARSET: UTF8
-          DB_HOST: localhost
+          DB_HOST: postgres
           DB_PORT: 5432
           DB_USER: mautic
           DB_PASSWD: mautic
@@ -206,8 +212,34 @@ jobs:
           MAUTIC_ENV: test
           PGPASSWORD: mautic  # Non-interactive password for psql
         run: |
-          export DB_PORT="${{ job.services.postgres.ports[5432] }}"
+          echo "Env Port: $DB_PORT"
+          echo "Env Host: $DB_HOST"
+          echo "Env DB Name: $DB_NAME"
 
+          # Wait for readiness
+          for i in {1..5}; do
+            if pg_isready -h $DB_HOST -p $DB_PORT -U mautic > /dev/null 2>&1; then
+              echo "PostgreSQL ready!"
+              break
+            fi
+            echo "Waiting... (attempt $i/5)"
+            sleep 5
+          done
+
+          export DB_PORT="${{ job.services.postgres.ports[5432] }}"
+          
+          echo "Export Env Port: $DB_PORT"
+          
+          # Wait for readiness 
+          for i in {1..5}; do
+            if pg_isready -h $DB_HOST -p $DB_PORT -U mautic > /dev/null 2>&1; then
+              echo "PostgreSQL ready!"
+              break
+            fi
+            echo "Waiting... (attempt $i/5)"
+            sleep 5
+          done   
+          
           # Create the test database if it doesn't exist (safe, idempotent)
           psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -w -c "CREATE DATABASE $DB_NAME;" || true
 
@@ -222,7 +254,7 @@ jobs:
         env:
           DB_DRIVER: pdo_pgsql
           DB_CHARSET: UTF8
-          DB_HOST: localhost
+          DB_HOST: postgres
           DB_PORT: 5432
           DB_USER: mautic
           DB_PASSWD: mautic
