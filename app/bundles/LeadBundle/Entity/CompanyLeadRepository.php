@@ -219,12 +219,12 @@ class CompanyLeadRepository extends CommonRepository
 
         $sql = "DELETE FROM {$table_name}
             WHERE is_primary = 0
-            AND id IN (
-                SELECT id FROM (
-                    SELECT id
+            AND (lead_id, company_id) IN (
+                SELECT lead_id, company_id FROM (
+                    SELECT lead_id, company_id
                     FROM {$table_name}
                     WHERE is_primary = 0
-                    ORDER BY id ASC  -- delete oldest associations first (deterministic and efficient)
+                    ORDER BY lead_id ASC, company_id ASC
                     LIMIT ".self::DELETE_BATCH_SIZE.'
                 ) AS subquery
             )';
