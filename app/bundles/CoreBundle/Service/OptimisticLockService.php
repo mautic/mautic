@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
+use Doctrine\DBAL\LockMode;
 
 final class OptimisticLockService implements OptimisticLockServiceInterface
 {
@@ -17,15 +18,58 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
 
     public function incrementVersion(OptimisticLockInterface $entity): void
     {
-        $this->buildUpdateQuery($entity, $versionColumn)
-            ->set($versionColumn, "(@newVersion := {$versionColumn} + 1)")
-            ->executeStatement();
-
-        $newVersion = (int) $this->entityManager->getConnection()
-            ->executeQuery('SELECT @newVersion')
-            ->fetchOne();
-
-        $entity->setVersion($newVersion);
+        $className    = $entity::class;
+        $metadata     = $this->entityManager->getClassMetadata($className);
+        $versionField = $entity->getVersionField();
+        $versionColumn = $metadata->fieldNames[$versionField] ?? null;
+        $tableName    = $metadata->table['name'];
+    
+        if (null === $versionColumn) {
+            throw new \LogicException(sprintf('Field "%s::$%s" is not mapped. Did you forget to do so? See "%s::addVersionField()"', $className, $versionField, OptimisticLockTrait::class));
+        }
+    
+        if (!$identifierValues = $metadata->getIdentifierValues($entity)) {
+            throw new \LogicException('Entity must have ID for incrementing its version field.');
+        }
+    
+        $connection = $this->entityManager->getConnection();
+        $connection->beginTransaction();
+    
+        try {
+            // Build WHERE clause for identifiers
+            $whereConditions = implode(' AND ', array_map(
+                fn (string $name) => "{$name} = :{$name}",
+                $metadata->getIdentifierFieldNames()
+            ));
+    
+            // Select current version with lock (FOR UPDATE)
+            $selectQb = $connection->createQueryBuilder();
+            $selectQb->select($versionColumn)
+                ->from($tableName)
+                ->where($whereConditions)
+                ->setParameters($identifierValues)
+                ->setLockMode(LockMode::PESSIMISTIC_WRITE);
+    
+            $currentVersion = (int) $selectQb->executeQuery()->fetchOne();
+    
+            $newVersion = $currentVersion + 1;
+    
+            // Update to new version
+            $updateQb = $connection->createQueryBuilder();
+            $updateQb->update($tableName)
+                ->set($versionColumn, ':newVersion')
+                ->where($whereConditions)
+                ->setParameter('newVersion', $newVersion)
+                ->setParameters($identifierValues)
+                ->executeStatement();
+    
+            $connection->commit();
+    
+            $entity->setVersion($newVersion);
+        } catch (\Throwable $e) {
+            $connection->rollBack();
+            throw $e;
+        }
     }
 
     public function resetVersion(OptimisticLockInterface $entity): void
