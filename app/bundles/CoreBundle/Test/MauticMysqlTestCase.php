@@ -163,11 +163,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
             } elseif ($this->isPostgresqlPlatform()) {
-                $quotedTable = sprintf("'%'", $fullTable);
+                $quotedTable = sprintf("'%s'", $fullTable);
                 $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence($quotedTable, 'id')");
 
                 if ($sequence) {
-                    $quotedSequence = sprintf("'%'", $sequence); // $this->connection->quoteIdentifier($sequence);
+                    $quotedSequence = sprintf("'%s'", $sequence); // $this->connection->quoteIdentifier($sequence);
                     $this->connection->executeStatement("ALTER SEQUENCE $quotedSequence RESTART WITH 1");
                 }
             }
