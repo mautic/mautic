@@ -113,12 +113,10 @@ class FrequencyRuleRepository extends CommonRepository
 
     /**
      * @param string $channel
-     * @param array  $leadIds
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
      *
-     * @return array
      */
     private function getCustomFrequencyRuleViolations(
         $channel,
@@ -137,7 +135,7 @@ class FrequencyRuleRepository extends CommonRepository
           ->from(MAUTIC_TABLE_PREFIX . $statTable, 'ch')
           ->join('ch', MAUTIC_TABLE_PREFIX . 'lead_frequencyrules', 'fr', "ch.$statContactColumn = fr.lead_id");
     
-        if ($channel) {
+        if ($channel !== null && $channel !== '') {
             $q->andWhere('fr.channel = :channel')
               ->setParameter('channel', $channel);
         }
@@ -150,9 +148,8 @@ class FrequencyRuleRepository extends CommonRepository
             )
         );
     
-        // Portable date range conditions for each possible frequency_time
-        $timeConditions = $q->expr()->or();
-    
+        // Build time-based conditions (only add actual intervals)
+        $timeConditions = [];
         $intervals = [
             'DAY'   => '1 DAY',
             'WEEK'  => '1 WEEK',
@@ -164,15 +161,16 @@ class FrequencyRuleRepository extends CommonRepository
                 ? "NOW() - INTERVAL '$intervalUnit'"
                 : "DATE_SUB(NOW(), INTERVAL 1 $freq)";
     
-            $timeConditions->add(
-                $q->expr()->and(
-                    $q->expr()->eq('fr.frequency_time', $connection->quote($freq)),
-                    $q->expr()->gte("ch.$statSentColumn", "($dateSubExpr)")
-                )
+            $timeConditions[] = $q->expr()->and(
+                $q->expr()->eq('fr.frequency_time', $connection->quote($freq)),
+                $q->expr()->gte("ch.$statSentColumn", "($dateSubExpr)")
             );
         }
     
-        $q->andWhere($timeConditions);
+        // Only add OR if there are conditions (prevents empty or())
+        if ($timeConditions !== []) {
+            $q->andWhere($q->expr()->or(...$timeConditions));
+        }
     
         $q->andWhere(
             $q->expr()->in("ch.$statContactColumn", ':leadIds')
@@ -183,7 +181,7 @@ class FrequencyRuleRepository extends CommonRepository
     
         $q->having(
             $q->expr()->gte(
-                "COUNT(ch.$statContactColumn)",
+                $q->expr()->count("ch.$statContactColumn"),
                 'fr.frequency_number'
             )
         );
