@@ -21,7 +21,7 @@ plugins/CustomBlocksBundle/
 
 ---
 
-## 2) JS: register into `window.MauticGrapesJsPlugins` and add the block
+## 2) JS: register into `window.MauticGrapesJsPlugins` and add blocks
 
 ### File: `plugins/CustomBlocksBundle/Assets/js/grapesjs.customBlocks.js`
 
@@ -37,37 +37,57 @@ plugins/CustomBlocksBundle/
     name: 'customblocks-mjml-blocks',
     context: ['email-mjml'],
     plugin: (editor, opts = {}) => {
-      const options = {
-        id: 'customblocks-section-surface-2',
-        label: 'Section (Surface 2)',
-        category: (window.Mautic && typeof Mautic.translate === 'function')
-          ? Mautic.translate('grapesjsbuilder.categorySectionLabel')
-          : 'Sections',
-        content:
-          '<mj-section mj-class="t-section t-surface-2">' +
-            '<mj-column>' +
-              '<mj-text mj-class="t-body">Section content...</mj-text>' +
-            '</mj-column>' +
-          '</mj-section>',
-        ...opts,
-      };
-
       const bm = editor.BlockManager;
 
-      // Don’t overwrite if it already exists
-      if (bm.get(options.id)) return;
+      // Block: Section (Surface 2)
+      const sectionSurface2Id = 'customblocks-section-surface-2';
+      if (!bm.get(sectionSurface2Id)) {
+        bm.add(sectionSurface2Id, {
+          label: 'Section (Surface 2)',
+          category: 'Custom Blocks',
+          content:
+            '<mj-section mj-class="t-section t-surface-2">' +
+              '<mj-column>' +
+                '<mj-text mj-class="t-body">Section content...</mj-text>' +
+              '</mj-column>' +
+            '</mj-section>',
+          media: `<svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M4 6h16v4H4V6zm0 8h16v4H4v-4z"/>
+          </svg>`,
+        });
+      }
 
-      bm.add(options.id, {
-        label: options.label,
-        category: options.category,
-        content: options.content,
-        media: `<svg viewBox="0 0 24 24">
-          <path fill="currentColor" d="M4 6h16v4H4V6zm0 8h16v4H4v-4z"/>
-        </svg>`,
-      });
+      // Block: Secondary Button
+      const secondaryButtonId = 'customblocks-button-secondary';
+      if (!bm.get(secondaryButtonId)) {
+        bm.add(secondaryButtonId, {
+          label: 'Secondary Button',
+          category: 'Custom Blocks',
+          content: '<mj-button mj-class="t-btn t-btn-secondary" href="https://">Secondary Button</mj-button>',
+          media: `<svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M7 7h10a4 4 0 0 1 0 8H7a4 4 0 0 1 0-8Zm0 2a2 2 0 0 0 0 4h10a2 2 0 0 0 0-4H7Z"/>
+          </svg>`,
+        });
+      }
     },
   });
 })();
+```
+
+### Adding more blocks
+
+To add additional blocks, follow this pattern inside the `plugin` function:
+
+```js
+const myBlockId = 'customblocks-my-block';
+if (!bm.get(myBlockId)) {
+  bm.add(myBlockId, {
+    label: 'My Block Label',
+    category: 'Custom Blocks',
+    content: '<mj-... mj-class="t-...">...</mj-...>',
+    media: `<svg viewBox="0 0 24 24">...</svg>`,
+  });
+}
 ```
 
 ---
@@ -221,6 +241,8 @@ When asked to add a new block as an independent plugin:
 
 1. Add/extend a JS file under `plugins/<PluginName>Bundle/Assets/js/...` that pushes to `window.MauticGrapesJsPlugins`.
 2. Scope with `context: ['email-mjml']` (or other).
-3. Add the block via `editor.BlockManager.add(...)` with MJML `content` using theme tokens (e.g. `mj-class="t-section t-surface-2"`).
-4. Inject the JS on builder pages via `CoreEvents::VIEW_INJECT_CUSTOM_CONTENT` subscriber registered under `Config/services.php`.
-5. All PHP files must include `declare(strict_types=1);` after the opening `<?php` tag.
+3. Add blocks via `editor.BlockManager.add(...)` with MJML `content` using theme tokens (e.g. `mj-class="t-section t-surface-2"`).
+4. Use `'Custom Blocks'` as the category for all custom blocks to group them together.
+5. Always check if block exists before adding: `if (!bm.get(blockId)) { bm.add(...) }`.
+6. Inject the JS on builder pages via `CoreEvents::VIEW_INJECT_CUSTOM_CONTENT` subscriber registered under `Config/services.php`.
+7. All PHP files must include `declare(strict_types=1);` after the opening `<?php` tag.
