@@ -171,7 +171,7 @@ class EventRepository extends CommonRepository
                 $joinCondition
             )
             ->where(
-                $qb->expr()->and(
+                $qb->expr()->andX(
                     $qb->expr()->eq('e.campaign', ':campaignId'),
                     $qb->expr()->eq('e.channel', ':channel'),
                     $qb->expr()->isNull('e.deleted')
