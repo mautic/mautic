@@ -49,8 +49,23 @@ class LogRepository extends CommonRepository
             ->executeQuery()->fetchOne();
 
         if ($id) {
-            $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
-            while ($rows = $conn->executeStatement($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])) {
+            // Cross-compatible batched DELETE using subquery (works on both MySQL and PostgreSQL)
+            $sql = "DELETE FROM {$table_name}
+                WHERE webhook_id = ? AND id <= ?
+                AND id IN (
+                    SELECT id FROM (
+                        SELECT id
+                        FROM {$table_name}
+                        WHERE webhook_id = ? AND id <= ?
+                        ORDER BY id ASC  -- delete oldest first for consistent progress
+                        LIMIT ".self::LOG_DELETE_BATCH_SIZE.'
+                    ) AS subquery
+                )';
+
+            $params = [$webHookId, $id, $webHookId, $id];
+            $types  = [ParameterType::INTEGER, ParameterType::INTEGER, ParameterType::INTEGER, ParameterType::INTEGER];
+
+            while ($rows = $conn->executeStatement($sql, $params, $types)) {
                 $deletedLogs += $rows;
             }
         }

@@ -18,11 +18,28 @@ final class Version20230311195347 extends AbstractMauticMigration
         $value      = 'Pipedrive';
 
         $connection = $this->connection;
-        $rowCount   = self::BATCH_SIZE;
 
-        while ($rowCount) {
-            $sql      = "DELETE FROM $tableName WHERE $columnName = :value LIMIT ".self::BATCH_SIZE;
-            $rowCount = $connection->executeStatement($sql, ['value' => $value]);
+        $sql = "DELETE FROM {$tableName}
+            WHERE {$columnName} = :value
+            AND id IN (
+                SELECT id FROM (
+                    SELECT id
+                    FROM {$tableName}
+                    WHERE {$columnName} = :value_sub
+                    ORDER BY id ASC  -- delete in consistent order (oldest first)
+                    LIMIT ".self::BATCH_SIZE.'
+                ) AS subquery
+            )';
+
+        $params = [
+            'value'     => $value,
+            'value_sub' => $value,
+        ];
+
+        $rowCount = self::BATCH_SIZE;  // initial non-zero value to enter the loop
+
+        while ($rowCount > 0) {
+            $rowCount = $connection->executeStatement($sql, $params);
         }
     }
 }

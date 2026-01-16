@@ -74,7 +74,15 @@ class ListLeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
+
+        // Platform aware drop temporary table
+        $deleteQuery = str_replace(
+            'TABLE ',
+            'TABLE IF EXISTS ',
+            $conn->getDatabasePlatform()->getDropTemporaryTableSQL($tableName)
+        );
+
+        $conn->executeQuery($deleteQuery);
         $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select lll.leadlist_id, lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
         $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
         $deletedRecordCount= 0;

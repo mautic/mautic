@@ -214,11 +214,25 @@ class CompanyLeadRepository extends CommonRepository
 
     public function removeAllSecondaryCompanies(): void
     {
-        $conn = $this->getEntityManager()->getConnection();
-        do {
-            $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
-            $row = $conn->executeStatement($sql);
-        } while ($row);
+        $conn       = $this->getEntityManager()->getConnection();
+        $table_name = MAUTIC_TABLE_PREFIX.'companies_leads';
+
+        $sql = "DELETE FROM {$table_name}
+            WHERE is_primary = 0
+            AND id IN (
+                SELECT id FROM (
+                    SELECT id
+                    FROM {$table_name}
+                    WHERE is_primary = 0
+                    ORDER BY id ASC  -- delete oldest associations first (deterministic and efficient)
+                    LIMIT ".self::DELETE_BATCH_SIZE.'
+                ) AS subquery
+            )';
+
+        $rows = true;
+        while ($rows > 0) {
+            $rows = $conn->executeStatement($sql);
+        }
     }
 
     public function removeContactSecondaryCompanies(int $leadId): void

@@ -623,7 +623,16 @@ SQL;
     public function removeEventLogsByCampaignId(int $campaignId): void
     {
         $table_name    = $this->getTableName();
-        $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        // DELETE ... LIMIT n not work on PostgreSQL
+        $sql = "DELETE FROM {$table_name}
+            WHERE id IN (
+                SELECT id FROM (
+                    SELECT id
+                    FROM {$table_name}
+                    WHERE campaign_id = ?
+                    LIMIT ".self::LOG_DELETE_BATCH_SIZE.'
+                ) AS subquery
+            )';
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
