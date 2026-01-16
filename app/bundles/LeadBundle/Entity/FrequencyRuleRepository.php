@@ -148,7 +148,7 @@ class FrequencyRuleRepository extends CommonRepository
             )
         );
     
-        // Build time-based conditions (only add actual intervals)
+        // Build time-based conditions (always at least one)
         $timeConditions = [];
         $intervals = [
             'DAY'   => '1 DAY',
@@ -167,24 +167,21 @@ class FrequencyRuleRepository extends CommonRepository
             );
         }
     
-        // Only add OR if there are conditions (prevents empty or())
-        if ($timeConditions !== []) {
-            $q->andWhere($q->expr()->or(...$timeConditions));
-        }
+        // Since $timeConditions is never empty, we can safely use or(...)
+        $q->andWhere($q->expr()->or(...$timeConditions));
     
         $q->andWhere(
             $q->expr()->in("ch.$statContactColumn", ':leadIds')
-        )
-          ->setParameter('leadIds', $leadIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+        )->setParameter('leadIds', $leadIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
     
         $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
     
         $q->having(
             $q->expr()->gte(
-                $q->expr()->count("ch.$statContactColumn"),
+                'COUNT(ch.' . $statContactColumn . ')',
                 'fr.frequency_number'
             )
-        );
+        );        
     
         return $q->executeQuery()->fetchAllAssociative();
     }
