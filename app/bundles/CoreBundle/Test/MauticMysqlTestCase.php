@@ -163,11 +163,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
             } elseif ($this->isPostgresqlPlatform()) {
-                $quotedTable = sprintf("'%s'", $fullTable);
+                $quotedTable = $this->connection->quoteIdentifier($fullTable);
                 $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence($quotedTable, 'id')");
 
                 if ($sequence) {
-                    $quotedSequence = sprintf("'%s'", $sequence); // $this->connection->quoteIdentifier($sequence);
+                    $quotedSequence = $this->connection->quoteIdentifier($sequence);
                     $this->connection->executeStatement("ALTER SEQUENCE $quotedSequence RESTART WITH 1");
                 }
             }
@@ -496,12 +496,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $prefix = $this->getTablePrefix();
-        $table  = $prefix.'ip_addresses';
+        if ($this->isPostgresqlPlatform()) {
+            return;
+        }
 
-        $sql = "INSERT INTO {$table} (ip_address) VALUES ('127.0.0.1')";
-
-        $this->connection->executeStatement($sql);
+        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
     }
 
     private function wasRollbackSuccessful(): bool
