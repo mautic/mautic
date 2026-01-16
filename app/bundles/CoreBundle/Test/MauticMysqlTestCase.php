@@ -163,11 +163,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
             } elseif ($this->isPostgresqlPlatform()) {
-                $quotedTable = $this->connection->quoteIdentifier($fullTable);
+                $quotedTable = sprintf("'%'", $fullTable);
                 $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence($quotedTable, 'id')");
 
                 if ($sequence) {
-                    $quotedSequence = $this->connection->quoteIdentifier($sequence);
+                    $quotedSequence = sprintf("'%'", $sequence); // $this->connection->quoteIdentifier($sequence);
                     $this->connection->executeStatement("ALTER SEQUENCE $quotedSequence RESTART WITH 1");
                 }
             }
@@ -499,15 +499,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $prefix = $this->getTablePrefix();
         $table  = $prefix.'ip_addresses';
 
-        if ($this->isPostgresqlPlatform()) {
-            $quotedTable = $this->connection->quoteIdentifier($table);
-            $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence($quotedTable, 'id')");
-            $quotedSeq   = $this->connection->quoteIdentifier($sequence);
-            $sql         = "INSERT INTO {$table} (id, ip_address) VALUES (nextval($quotedSeq), '127.0.0.1')";
-        } else {
-            // Existing MySQL behavior (unchanged)
-            $sql = "INSERT INTO {$table} (ip_address) VALUES ('127.0.0.1')";
-        }
+        $sql = "INSERT INTO {$table} (ip_address) VALUES ('127.0.0.1')";
 
         $this->connection->executeStatement($sql);
     }

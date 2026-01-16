@@ -194,38 +194,11 @@ jobs:
       - name: Install psql client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Debug ports (for local act troubleshooting)
-        run: |
-          echo "Postgres host port: ${{ job.services.postgres.ports[5432] }}"
-          echo "SAML host port: ${{ job.services.saml.ports[8080] }}"
-
-      - name: Setup PostgreSQL schema
-        env:
-          DB_DRIVER: pdo_pgsql
-          DB_CHARSET: UTF8
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: mautic
-          DB_PASSWD: mautic
-          DB_NAME: mautictest
-          SYMFONY_ENV: test
-          MAUTIC_ENV: test
-          PGPASSWORD: mautic  # Non-interactive password for psql
-        run: |
-          export DB_PORT="${{ job.services.postgres.ports[5432] }}"
-
-          # Drop existing schema if any (safe on fresh DB)
-          #php bin/console doctrine:schema:drop --force --no-interaction || true
-
-          # Create schema and run migrations (this will create your compatibility functions/operators)
-          php bin/console doctrine:schema:create --no-interaction
-          php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
-
       - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
         env:
           DB_DRIVER: pdo_pgsql
           DB_CHARSET: UTF8
-          DB_HOST: postgres
+          DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: mautic
           DB_PASSWD: mautic
