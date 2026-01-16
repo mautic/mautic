@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
 /**
  * @extends CommonRepository<FrequencyRule>
@@ -112,43 +113,81 @@ class FrequencyRuleRepository extends CommonRepository
 
     /**
      * @param string $channel
+     * @param array  $leadIds
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
+     *
+     * @return array
      */
-    private function getCustomFrequencyRuleViolations($channel, array $leadIds, $statTable, $statContactColumn, $statSentColumn): array
-    {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
+    private function getCustomFrequencyRuleViolations(
+        $channel,
+        array $leadIds,
+        $statTable,
+        $statContactColumn,
+        $statSentColumn
+    ): array {
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+    
+        $q = $connection->createQueryBuilder();
+    
         $q->select("ch.$statContactColumn, fr.frequency_number, fr.frequency_time")
-            ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
-            ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
-
+          ->from(MAUTIC_TABLE_PREFIX . $statTable, 'ch')
+          ->join('ch', MAUTIC_TABLE_PREFIX . 'lead_frequencyrules', 'fr', "ch.$statContactColumn = fr.lead_id");
+    
         if ($channel) {
             $q->andWhere('fr.channel = :channel')
-                ->setParameter('channel', $channel);
+              ->setParameter('channel', $channel);
         }
-
-        // Preferred channel is stored in this table so they may not have a frequency rule defined but just a preference so exclude them
-        $q->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
-
-        // Calculate the rule timeframe
+    
+        // Exclude rows where frequency is not actually defined (preferred channel only)
         $q->andWhere(
-            '(ch.'.$statSentColumn.' >= case fr.frequency_time
-                 when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
-                 when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY)
-                 when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
-                end)'
+            $q->expr()->and(
+                $q->expr()->isNotNull('fr.frequency_time'),
+                $q->expr()->isNotNull('fr.frequency_number')
+            )
         );
-
+    
+        // Portable date range conditions for each possible frequency_time
+        $timeConditions = $q->expr()->or();
+    
+        $intervals = [
+            'DAY'   => '1 DAY',
+            'WEEK'  => '1 WEEK',
+            'MONTH' => '1 MONTH',
+        ];
+    
+        foreach ($intervals as $freq => $intervalUnit) {
+            $dateSubExpr = $isPg
+                ? "NOW() - INTERVAL '$intervalUnit'"
+                : "DATE_SUB(NOW(), INTERVAL 1 $freq)";
+    
+            $timeConditions->add(
+                $q->expr()->and(
+                    $q->expr()->eq('fr.frequency_time', $connection->quote($freq)),
+                    $q->expr()->gte("ch.$statSentColumn", "($dateSubExpr)")
+                )
+            );
+        }
+    
+        $q->andWhere($timeConditions);
+    
         $q->andWhere(
-            $q->expr()->in("ch.$statContactColumn", $leadIds)
-        );
-
+            $q->expr()->in("ch.$statContactColumn", ':leadIds')
+        )
+          ->setParameter('leadIds', $leadIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+    
         $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
-
-        $q->having("count(ch.$statContactColumn) >= fr.frequency_number");
-
+    
+        $q->having(
+            $q->expr()->gte(
+                "COUNT(ch.$statContactColumn)",
+                'fr.frequency_number'
+            )
+        );
+    
         return $q->executeQuery()->fetchAllAssociative();
     }
 
