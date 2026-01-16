@@ -8,7 +8,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
-use Doctrine\DBAL\LockMode;
 
 final class OptimisticLockService implements OptimisticLockServiceInterface
 {
@@ -47,10 +46,13 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
             $selectQb->select($versionColumn)
                 ->from($tableName)
                 ->where($whereConditions)
-                ->setParameters($identifierValues)
-                ->setLockMode(LockMode::PESSIMISTIC_WRITE);
+                ->setParameters($identifierValues);
     
-            $currentVersion = (int) $selectQb->executeQuery()->fetchOne();
+            $sql = $selectQb->getSQL() . ' FOR UPDATE';
+            $parameters = $selectQb->getParameters();
+            $types = $selectQb->getParameterTypes();
+    
+            $currentVersion = (int) $connection->fetchOne($sql, $parameters, $types);
     
             $newVersion = $currentVersion + 1;
     
@@ -59,8 +61,7 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
             $updateQb->update($tableName)
                 ->set($versionColumn, ':newVersion')
                 ->where($whereConditions)
-                ->setParameter('newVersion', $newVersion)
-                ->setParameters($identifierValues)
+                ->setParameters(['newVersion' => $newVersion] + $identifierValues)
                 ->executeStatement();
     
             $connection->commit();
