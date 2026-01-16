@@ -628,7 +628,7 @@ class LeadRepository extends CommonRepository
         ->groupBy("$leadAlias.country")
         ->orderBy("$leadAlias.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
-        ->setParameter('false', false)
+        ->setParameter('false', false, 'boolean')
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
         ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
