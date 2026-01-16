@@ -100,7 +100,6 @@ class SummaryRepository extends CommonRepository
         $numberOfIntervals            = ceil(($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds);
     
         $connection = $this->getEntityManager()->getConnection();
-        $platformName = $connection->getDatabasePlatform();
     
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
@@ -139,7 +138,7 @@ class SummaryRepository extends CommonRepository
             $insertSql = 'INSERT INTO ' . MAUTIC_TABLE_PREFIX . 'campaign_summary (' . $columns . ') 
                           SELECT ' . $columns . ' FROM (' . $innerSql . ') AS tmp';
     
-            if ($platform instanceof PostgreSQLPlatform) {
+            if ($connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
                 $sql = $insertSql . ' ON CONFLICT (campaign_id, event_id, date_triggered) DO UPDATE SET 
                     scheduled_count = EXCLUDED.scheduled_count, 
                     non_action_path_taken_count = EXCLUDED.non_action_path_taken_count, 
