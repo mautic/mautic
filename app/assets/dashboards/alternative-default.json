@@ -87,16 +87,6 @@
             "template": null
         },
         {
-            "name": "Upcoming Emails",
-            "width": 25,
-            "height": 330,
-            "ordering": 10,
-            "type": "upcoming.emails",
-            "params": [
-            ],
-            "template": null
-        },
-        {
             "name": "Top Contact Creators",
             "width": 100,
             "height": 330,
