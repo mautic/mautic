@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -232,25 +233,28 @@ class LeadFieldRepository extends CommonRepository
      */
     public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $connection = $this->_em->getConnection();
+        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+    
+        $q = $connection->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+    
         if ('tags' === $field) {
             // Special reserved tags field
-            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
-                ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+            $q->join('l', MAUTIC_TABLE_PREFIX . 'lead_tags_xref', 'x', 'l.id = x.lead_id')
+                ->join('x', MAUTIC_TABLE_PREFIX . 'lead_tags', 't', 'x.tag_id = t.id')
                 ->where(
-                    $q->expr()->and(
+                    $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
                         $q->expr()->eq('t.tag', ':value')
                     )
                 )
                 ->setParameter('lead', (int) $lead)
                 ->setParameter('value', $value);
-
+    
             $result = $q->executeQuery()->fetchAssociative();
-
+    
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
             } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
@@ -261,101 +265,104 @@ class LeadFieldRepository extends CommonRepository
         } else {
             $property = $this->getPropertyByField($field, $q);
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
-                $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
-                $compositeExpression              = ('empty' === $operatorExpr) ?
-                    $q->expr()->or(
+                $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
+                $compositeExpression   = ('empty' === $operatorExpr) ?
+                    $q->expr()->orX(
                         $q->expr()->isNull($property),
                         $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
-                    )
-                    :
-                    $q->expr()->and(
+                    ) :
+                    $q->expr()->andX(
                         $q->expr()->isNotNull($property),
                         $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
                     );
                 $q->where(
-                    $q->expr()->and(
+                    $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
                         $compositeExpression
                     )
                 )
                   ->setParameter('lead', (int) $lead);
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-                if ('regexp' === $operatorExpr) {
-                    $where = $property.' REGEXP  :value';
-                } else {
-                    $where = $property.' NOT REGEXP  :value';
-                }
-
+                $regexOp = $isPg ? ($operatorExpr === 'regexp' ? '~*' : '!~*') : ($operatorExpr === 'regexp' ? 'REGEXP' : 'NOT REGEXP');
+    
+                $where = $property . ' ' . $regexOp . ' :value';
+    
                 $q->where(
-                    $q->expr()->and(
+                    $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
-                        $q->expr()->and($where)
+                        $where
                     )
                 )
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $values   = (!is_array($value)) ? [$value] : $value;
-                $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
-                $expr     = $q->expr()->and(
+                $regexOp  = $isPg ? '~*' : 'REGEXP';
+                $notRegexOp = $isPg ? '!~*' : 'NOT REGEXP';
+    
+                $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
                 );
-
+    
                 $innerExpr  = [];
                 $paramCount = 0;
                 foreach ($values as $v) {
                     // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
-                    $paramName   = 'value'.$paramCount++;
+                    $paramName   = 'value' . $paramCount++;
                     $v           = trim((string) $v, "'");
-                    $innerExpr[] = $property." $operator :".$paramName;
-                    $q->setParameter($paramName, "\\|?$v\\|?");
+                    // For PostgreSQL, escape | as \| if needed; pattern is already POSIX-compatible
+                    $pattern     = $isPg ? ('\\|?' . preg_quote($v, '~') . '\\|?') : ("\\|?$v\\|?");
+                    $innerExpr[] = $property . ' ' . ($operatorExpr === 'in' ? $regexOp : $notRegexOp) . ' :' . $paramName;
+                    $q->setParameter($paramName, $pattern);
                 }
-
+    
                 if (str_starts_with($operatorExpr, 'not')) {
-                    $expr = $expr->with($q->expr()->or(
-                        $q->expr()->isNull($property),
-                        $q->expr()->and(...$innerExpr)
-                    ));
+                    $expr = $expr->with(
+                        $q->expr()->orX(
+                            $q->expr()->isNull($property),
+                            $q->expr()->andX(...$innerExpr)
+                        )
+                    );
                 } else {
-                    $expr = $expr->with($q->expr()->or(...$innerExpr));
+                    $expr = $expr->with($q->expr()->orX(...$innerExpr));
                 }
-
+    
                 $q->where($expr)
                     ->setParameter('lead', (int) $lead);
             } else {
-                $expr = $q->expr()->and(
+                $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
                 );
-
+    
                 if ('neq' === $operatorExpr) {
                     // include null
                     $expr = $expr->with(
-                        $q->expr()->or(
-                            $q->expr()->$operatorExpr($property, ':value'),
+                        $q->expr()->orX(
+                            $q->expr()->neq($property, ':value'),
                             $q->expr()->isNull($property)
                         )
                     );
                 } else {
                     switch ($operatorExpr) {
                         case 'startsWith':
-                            $operatorExpr    = 'like';
-                            $value           = $value.'%';
+                            $operatorExpr = 'like';
+                            $value        = $value . '%';
                             break;
                         case 'endsWith':
-                            $operatorExpr   = 'like';
-                            $value          = '%'.$value;
+                            $operatorExpr = 'like';
+                            $value        = '%' . $value;
                             break;
                         case 'contains':
-                            $operatorExpr   = 'like';
-                            $value          = '%'.$value.'%';
+                            $operatorExpr = 'like';
+                            $value        = '%' . $value . '%';
                             break;
                     }
-
+    
                     $expr = $expr->with(
                         $q->expr()->$operatorExpr($property, ':value')
                     );
                 }
-
+    
                 $q->where($expr)
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
@@ -366,7 +373,7 @@ class LeadFieldRepository extends CommonRepository
                 $q->setMaxResults(1);
             }
             $result = $q->executeQuery()->fetchAssociative();
-
+    
             return !empty($result['id']);
         }
     }
