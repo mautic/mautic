@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
 /**
  * @extends CommonRepository<Summary>
@@ -94,51 +95,67 @@ class SummaryRepository extends CommonRepository
         $dateFromTsActual = $dateFrom->getTimestamp();
         $dateToTsActual   = $dateTo->getTimestamp();
         $intervalInSeconds= 3600;
-
+    
         $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % $intervalInSeconds);
         $numberOfIntervals            = ceil(($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds);
-
+    
+        $connection = $this->getEntityManager()->getConnection();
+        $platformName = $connection->getDatabasePlatform();
+    
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
             $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + ($intervalInSeconds - 1));
-
-            $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
-            ' SELECT * FROM (SELECT '.
-            '       mclel.campaign_id AS campaign_id, '.
-            '       mclel.event_id AS event_id, '.
-            '       "'.$dateFromTs.'" AS date_triggered_i, '.
-            '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 1, 0)) AS scheduled_count_i, '.
-            '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 0, mclel.non_action_path_taken)) AS non_action_path_taken_count_i, '.
-            '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken, 0, mclefl.log_id IS NOT NULL)) AS failed_count_i, '.
-            '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken OR mclefl.log_id IS NOT NULL, 0, 1)) AS triggered_count_i, '.
-            '       COUNT((SELECT mcl.campaign_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl 
-                WHERE mcl.campaign_id = mclel.campaign_id 
-                AND mclel.lead_id = mcl.lead_id 
-                AND mclel.is_scheduled = 0 
-                AND mclel.date_triggered IS NOT NULL 
-                AND NOT EXISTS(SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl2 
-                    WHERE mclefl2.log_id = mclel.id AND mclefl2.date_added BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'")
-            )) AS log_counts_processed_i '.
-            ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
-            ' WHERE (mclel.date_triggered BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'") ';
+    
+            $innerSql = 'SELECT 
+                mclel.campaign_id AS campaign_id, 
+                mclel.event_id AS event_id, 
+                ' . $connection->quote($dateFromTs) . ' AS date_triggered,
+                SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 1 ELSE 0 END) AS scheduled_count,
+                SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 0 ELSE mclel.non_action_path_taken END) AS non_action_path_taken_count,
+                SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken THEN 0 
+                         ELSE CASE WHEN mclefl.log_id IS NOT NULL THEN 1 ELSE 0 END END) AS failed_count,
+                SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken OR mclefl.log_id IS NOT NULL THEN 0 ELSE 1 END) AS triggered_count,
+                SUM(CASE WHEN EXISTS (SELECT 1 FROM ' . MAUTIC_TABLE_PREFIX . 'campaign_leads mcl 
+                                      WHERE mcl.campaign_id = mclel.campaign_id AND mcl.lead_id = mclel.lead_id)
+                         AND mclel.is_scheduled = 0 
+                         AND mclel.date_triggered IS NOT NULL 
+                         AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed
+            FROM ' . MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log mclel 
+            LEFT JOIN ' . MAUTIC_TABLE_PREFIX . 'campaign_lead_event_failed_log mclefl 
+                ON mclefl.log_id = mclel.id AND mclefl.date_added BETWEEN ' . $connection->quote($dateFromTs) . ' AND ' . $connection->quote($dateToTs) . '
+            WHERE (mclel.date_triggered BETWEEN ' . $connection->quote($dateFromTs) . ' AND ' . $connection->quote($dateToTs) . ')';
+    
             if ($campaignId) {
-                $sql .= ' AND mclel.campaign_id = '.$campaignId;
+                $innerSql .= ' AND mclel.campaign_id = ' . (int) $campaignId;
             }
-
+    
             if ($eventId) {
-                $sql .= ' AND mclel.event_id = '.$eventId;
+                $innerSql .= ' AND mclel.event_id = ' . (int) $eventId;
             }
-
-            $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id) AS `s` '.
-            ' ON DUPLICATE KEY UPDATE '.
-            ' scheduled_count = s.scheduled_count_i, '.
-            ' non_action_path_taken_count = s.non_action_path_taken_count_i, '.
-            ' failed_count = s.failed_count_i, '.
-            ' triggered_count = s.triggered_count_i, '.
-            ' log_counts_processed = s.log_counts_processed_i;';
-
-            $this->getEntityManager()->getConnection()->executeStatement($sql);
+    
+            $innerSql .= ' GROUP BY mclel.campaign_id, mclel.event_id';
+    
+            $columns = 'campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed';
+            $insertSql = 'INSERT INTO ' . MAUTIC_TABLE_PREFIX . 'campaign_summary (' . $columns . ') 
+                          SELECT ' . $columns . ' FROM (' . $innerSql . ') AS tmp';
+    
+            if ($platform instanceof PostgreSQLPlatform) {
+                $sql = $insertSql . ' ON CONFLICT (campaign_id, event_id, date_triggered) DO UPDATE SET 
+                    scheduled_count = EXCLUDED.scheduled_count, 
+                    non_action_path_taken_count = EXCLUDED.non_action_path_taken_count, 
+                    failed_count = EXCLUDED.failed_count, 
+                    triggered_count = EXCLUDED.triggered_count, 
+                    log_counts_processed = EXCLUDED.log_counts_processed';
+            } else {
+                $sql = $insertSql . ' ON DUPLICATE KEY UPDATE 
+                    scheduled_count = VALUES(scheduled_count), 
+                    non_action_path_taken_count = VALUES(non_action_path_taken_count), 
+                    failed_count = VALUES(failed_count), 
+                    triggered_count = VALUES(triggered_count), 
+                    log_counts_processed = VALUES(log_counts_processed)';
+            }
+    
+            $connection->executeStatement($sql);
         }
     }
 }
