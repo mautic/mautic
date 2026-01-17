@@ -5,9 +5,8 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -235,16 +234,16 @@ class LeadFieldRepository extends CommonRepository
     {
         $connection = $this->_em->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-    
+        $isPg       = $platform instanceof PostgreSQLPlatform;
+
         $q = $connection->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
-    
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
         if ('tags' === $field) {
             // Special reserved tags field
-            $q->join('l', MAUTIC_TABLE_PREFIX . 'lead_tags_xref', 'x', 'l.id = x.lead_id')
-                ->join('x', MAUTIC_TABLE_PREFIX . 'lead_tags', 't', 'x.tag_id = t.id')
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+                ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
                 ->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
@@ -253,9 +252,9 @@ class LeadFieldRepository extends CommonRepository
                 )
                 ->setParameter('lead', (int) $lead)
                 ->setParameter('value', $value);
-    
+
             $result = $q->executeQuery()->fetchAssociative();
-    
+
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
             } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
@@ -265,7 +264,7 @@ class LeadFieldRepository extends CommonRepository
             }
         } else {
             $property = $this->getPropertyByField($field, $q);
-    
+
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
                 $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
                 $compositeExpression   = ('empty' === $operatorExpr) ?
@@ -277,7 +276,7 @@ class LeadFieldRepository extends CommonRepository
                         $q->expr()->isNotNull($property),
                         $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
                     );
-    
+
                 $q->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
@@ -286,10 +285,10 @@ class LeadFieldRepository extends CommonRepository
                 )
                   ->setParameter('lead', (int) $lead);
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-                $regexOp = $isPg ? ($operatorExpr === 'regexp' ? '~*' : '!~*') : ($operatorExpr === 'regexp' ? 'REGEXP' : 'NOT REGEXP');
-    
-                $where = $property . ' ' . $regexOp . ' :value';
-    
+                $regexOp = $isPg ? ('regexp' === $operatorExpr ? '~*' : '!~*') : ('regexp' === $operatorExpr ? 'REGEXP' : 'NOT REGEXP');
+
+                $where = $property.' '.$regexOp.' :value';
+
                 $q->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
@@ -299,24 +298,24 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $values   = (!is_array($value)) ? [$value] : $value;
-                $regexOp  = $isPg ? '~*' : 'REGEXP';
+                $values     = (!is_array($value)) ? [$value] : $value;
+                $regexOp    = $isPg ? '~*' : 'REGEXP';
                 $notRegexOp = $isPg ? '!~*' : 'NOT REGEXP';
-    
+
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
                 );
-    
+
                 $innerExpr  = [];
                 $paramCount = 0;
                 foreach ($values as $v) {
-                    $paramName   = 'value' . $paramCount++;
+                    $paramName   = 'value'.$paramCount++;
                     $v           = trim((string) $v, "'");
-                    $pattern     = $isPg ? ('\\|?' . preg_quote($v, '~') . '\\|?') : ("\\|?$v\\|?");
-                    $innerExpr[] = $property . ' ' . ($operatorExpr === 'in' ? $regexOp : $notRegexOp) . ' :' . $paramName;
+                    $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
+                    $innerExpr[] = $property.' '.('in' === $operatorExpr ? $regexOp : $notRegexOp).' :'.$paramName;
                     $q->setParameter($paramName, $pattern);
                 }
-    
+
                 if (str_starts_with($operatorExpr, 'not')) {
                     $expr = $expr->with(
                         $q->expr()->or(
@@ -327,14 +326,14 @@ class LeadFieldRepository extends CommonRepository
                 } else {
                     $expr = $expr->with($q->expr()->or(...$innerExpr));
                 }
-    
+
                 $q->where($expr)
                     ->setParameter('lead', (int) $lead);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
                 );
-    
+
                 if ('neq' === $operatorExpr) {
                     // include null
                     $expr = $expr->with(
@@ -347,39 +346,40 @@ class LeadFieldRepository extends CommonRepository
                     switch ($operatorExpr) {
                         case 'startsWith':
                             $operatorExpr = 'like';
-                            $value        = $value . '%';
+                            $value        = $value.'%';
                             break;
                         case 'endsWith':
                             $operatorExpr = 'like';
-                            $value        = '%' . $value;
+                            $value        = '%'.$value;
                             break;
                         case 'contains':
                             $operatorExpr = 'like';
-                            $value        = '%' . $value . '%';
+                            $value        = '%'.$value.'%';
                             break;
                     }
-    
+
                     $expr = $expr->with(
                         $q->expr()->$operatorExpr($property, ':value')
                     );
                 }
-    
+
                 $q->where($expr)
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }
-    
+
             if (str_starts_with($property, 'u.')) {
                 // Match only against the latest UTM properties.
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);
             }
-    
+
             $result = $q->executeQuery()->fetchAssociative();
-    
+
             return !empty($result['id']);
         }
     }
+
     /**
      * Compare a form result value with empty value for defined lead.
      */

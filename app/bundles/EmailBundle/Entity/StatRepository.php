@@ -879,7 +879,7 @@ class StatRepository extends CommonRepository
             )
             ->leftJoin(
                 $statsAlias,
-                "(" . $subQueryBuilder->getSQL() . ")",
+                '('.$subQueryBuilder->getSQL().')',
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
             );

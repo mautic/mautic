@@ -72,7 +72,7 @@ class ListLeadRepository extends CommonRepository
     {
         $conn           = $this->getEntityManager()->getConnection();
         $tableName      = $this->getTableName();
-        $leadsTableName = MAUTIC_TABLE_PREFIX . 'leads';
+        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
 
         // Drop any leftover temporary table from previous runs (works on both MySQL and PostgreSQL)
@@ -93,8 +93,8 @@ class ListLeadRepository extends CommonRepository
                       SELECT leadlist_id, lead_id
                       FROM {$tempTableName}
                       ORDER BY leadlist_id ASC, lead_id ASC
-                      LIMIT " . self::DELETE_BATCH_SIZE . "
-                  )";
+                      LIMIT ".self::DELETE_BATCH_SIZE.'
+                  )';
 
         $deletedRecordCount = 0;
         $deletedRows        = true;

@@ -4,11 +4,11 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
 /**
  * @extends CommonRepository<Event>
@@ -155,12 +155,12 @@ class EventRepository extends CommonRepository
     public function getCampaignEmailEvents(int $campaignId): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-    
-        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+
+        $platform      = $this->getEntityManager()->getConnection()->getDatabasePlatform();
         $joinCondition = ($platform instanceof PostgreSQLPlatform)
             ? 'em.id = CAST(e.channelId AS INTEGER)'
             : 'em.id = e.channelId';
-    
+
         return $qb
             ->select('DISTINCT em')
             ->from(Event::class, 'e')

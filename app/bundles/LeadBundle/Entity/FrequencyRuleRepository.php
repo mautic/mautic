@@ -2,8 +2,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<FrequencyRule>
@@ -116,30 +116,29 @@ class FrequencyRuleRepository extends CommonRepository
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
      */
     private function getCustomFrequencyRuleViolations(
         $channel,
         array $leadIds,
         $statTable,
         $statContactColumn,
-        $statSentColumn
+        $statSentColumn,
     ): array {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-    
+        $isPg       = $platform instanceof PostgreSQLPlatform;
+
         $q = $connection->createQueryBuilder();
-    
+
         $q->select("ch.$statContactColumn, fr.frequency_number, fr.frequency_time")
-          ->from(MAUTIC_TABLE_PREFIX . $statTable, 'ch')
-          ->join('ch', MAUTIC_TABLE_PREFIX . 'lead_frequencyrules', 'fr', "ch.$statContactColumn = fr.lead_id");
-    
-        if ($channel !== null && $channel !== '') {
+          ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
+          ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.$statContactColumn = fr.lead_id");
+
+        if (null !== $channel && '' !== $channel) {
             $q->andWhere('fr.channel = :channel')
               ->setParameter('channel', $channel);
         }
-    
+
         // Exclude rows where frequency is not actually defined (preferred channel only)
         $q->andWhere(
             $q->expr()->and(
@@ -147,42 +146,42 @@ class FrequencyRuleRepository extends CommonRepository
                 $q->expr()->isNotNull('fr.frequency_number')
             )
         );
-    
+
         // Build time-based conditions (always at least one)
         $timeConditions = [];
-        $intervals = [
+        $intervals      = [
             'DAY'   => '1 DAY',
             'WEEK'  => '1 WEEK',
             'MONTH' => '1 MONTH',
         ];
-    
+
         foreach ($intervals as $freq => $intervalUnit) {
             $dateSubExpr = $isPg
                 ? "NOW() - INTERVAL '$intervalUnit'"
                 : "DATE_SUB(NOW(), INTERVAL 1 $freq)";
-    
+
             $timeConditions[] = $q->expr()->and(
                 $q->expr()->eq('fr.frequency_time', $connection->quote($freq)),
                 $q->expr()->gte("ch.$statSentColumn", "($dateSubExpr)")
             );
         }
-    
+
         // Since $timeConditions is never empty, we can safely use or(...)
         $q->andWhere($q->expr()->or(...$timeConditions));
-    
+
         $q->andWhere(
             $q->expr()->in("ch.$statContactColumn", ':leadIds')
         )->setParameter('leadIds', $leadIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
-    
+
         $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
-    
+
         $q->having(
             $q->expr()->gte(
-                'COUNT(ch.' . $statContactColumn . ')',
+                'COUNT(ch.'.$statContactColumn.')',
                 'fr.frequency_number'
             )
-        );        
-    
+        );
+
         return $q->executeQuery()->fetchAllAssociative();
     }
 

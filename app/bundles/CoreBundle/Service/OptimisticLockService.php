@@ -17,45 +17,45 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
 
     public function incrementVersion(OptimisticLockInterface $entity): void
     {
-        $className    = $entity::class;
-        $metadata     = $this->entityManager->getClassMetadata($className);
-        $versionField = $entity->getVersionField();
+        $className     = $entity::class;
+        $metadata      = $this->entityManager->getClassMetadata($className);
+        $versionField  = $entity->getVersionField();
         $versionColumn = $metadata->fieldNames[$versionField] ?? null;
-        $tableName    = $metadata->table['name'];
-    
+        $tableName     = $metadata->table['name'];
+
         if (null === $versionColumn) {
             throw new \LogicException(sprintf('Field "%s::$%s" is not mapped. Did you forget to do so? See "%s::addVersionField()"', $className, $versionField, OptimisticLockTrait::class));
         }
-    
+
         if (!$identifierValues = $metadata->getIdentifierValues($entity)) {
             throw new \LogicException('Entity must have ID for incrementing its version field.');
         }
-    
+
         $connection = $this->entityManager->getConnection();
         $connection->beginTransaction();
-    
+
         try {
             // Build WHERE clause for identifiers
             $whereConditions = implode(' AND ', array_map(
                 fn (string $name) => "{$name} = :{$name}",
                 $metadata->getIdentifierFieldNames()
             ));
-    
+
             // Select current version with lock (FOR UPDATE)
             $selectQb = $connection->createQueryBuilder();
             $selectQb->select($versionColumn)
                 ->from($tableName)
                 ->where($whereConditions)
                 ->setParameters($identifierValues);
-    
-            $sql = $selectQb->getSQL() . ' FOR UPDATE';
+
+            $sql        = $selectQb->getSQL().' FOR UPDATE';
             $parameters = $selectQb->getParameters();
-            $types = $selectQb->getParameterTypes();
-    
+            $types      = $selectQb->getParameterTypes();
+
             $currentVersion = (int) $connection->fetchOne($sql, $parameters, $types);
-    
+
             $newVersion = $currentVersion + 1;
-    
+
             // Update to new version
             $updateQb = $connection->createQueryBuilder();
             $updateQb->update($tableName)
@@ -63,9 +63,9 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
                 ->where($whereConditions)
                 ->setParameters(['newVersion' => $newVersion] + $identifierValues)
                 ->executeStatement();
-    
+
             $connection->commit();
-    
+
             $entity->setVersion($newVersion);
         } catch (\Throwable $e) {
             $connection->rollBack();
