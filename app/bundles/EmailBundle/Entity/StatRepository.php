@@ -860,47 +860,52 @@ class StatRepository extends CommonRepository
                 "{$cutAlias}.redirect_id = {$pageHitsAlias}.redirect_id AND {$cutAlias}.channel_id = {$pageHitsAlias}.source_id"
             )
             ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
-            ->andWhere("{$cutAlias}.channel_id in (:emails)")
+            ->andWhere("{$cutAlias}.channel_id IN (:emails)")
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
         // main query
         $queryBuilder->addSelect(
-            "COUNT({$statsAlias}.id) AS `sent_count`",
-            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
-            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
-        )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            "COUNT({$statsAlias}.id) AS sent_count",
+            "SUM(COALESCE({$statsAlias}.is_read, 0)) AS read_count",
+            "SUM(CASE WHEN {$subQueryAlias}.hits IS NOT NULL THEN 1 ELSE 0 END) AS clicked_through_count",
+            "{$leadAlias}.country AS country"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,
                 MAUTIC_TABLE_PREFIX.'leads',
                 $leadAlias,
-                "{$statsAlias}.lead_id=l.id"
-            )->leftJoin(
+                "{$statsAlias}.lead_id = {$leadAlias}.id"
+            )
+            ->leftJoin(
                 $statsAlias,
-                "({$subQueryBuilder->getSQL()})",
+                "(" . $subQueryBuilder->getSQL() . ")",
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
             );
 
         switch ($sourceType) {
             case 'campaign':
-                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
-                    ->andWhere("{$statsAlias}.source_id in (:events)")
+                $queryBuilder
+                    ->andWhere("{$statsAlias}.source_id IN (:events)")
                     ->andWhere("{$statsAlias}.source = :source")
-                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER)
                     ->setParameter('events', $eventsIds, ArrayParameterType::INTEGER)
                     ->setParameter('source', 'campaign.event');
                 break;
             case 'email':
-                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
-                    ->andWhere("{$statsAlias}.email_id in (:emails)")
-                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
+                $queryBuilder->andWhere("{$statsAlias}.email_id IN (:emails)");
+                break;
         }
 
-        $queryBuilder->groupBy("{$leadAlias}.country")
-                    ->orderBy("{$leadAlias}.country", 'ASC');
-        $queryBuilder->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo");
-        $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
-        $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
+        // Always set :emails (used in the inlined subquery)
+        $queryBuilder->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
+
+        $queryBuilder
+            ->groupBy("{$leadAlias}.country")
+            ->orderBy("{$leadAlias}.country", 'ASC')
+            ->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo")
+            ->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB))
+            ->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
     }

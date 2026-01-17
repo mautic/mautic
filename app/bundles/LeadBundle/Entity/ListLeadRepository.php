@@ -72,23 +72,40 @@ class ListLeadRepository extends CommonRepository
     {
         $conn           = $this->getEntityManager()->getConnection();
         $tableName      = $this->getTableName();
-        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
+        $leadsTableName = MAUTIC_TABLE_PREFIX . 'leads';
         $tempTableName  = 'to_delete';
 
-        // Platform aware drop temporary table
-        $deleteQuery = str_replace(
-            'TABLE ',
-            'TABLE IF EXISTS ',
-            $conn->getDatabasePlatform()->getDropTemporaryTableSQL($tableName)
-        );
+        // Drop any leftover temporary table from previous runs (works on both MySQL and PostgreSQL)
+        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
 
-        $conn->executeQuery($deleteQuery);
-        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select lll.leadlist_id, lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
-        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
-        $deletedRecordCount= 0;
-        while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
+        // Create temporary table with the composite keys of rows to delete
+        $createSql = "CREATE TEMPORARY TABLE {$tempTableName} AS
+                  SELECT lll.leadlist_id, lll.lead_id
+                  FROM {$tableName} lll
+                  JOIN {$leadsTableName} l ON l.id = lll.lead_id
+                  WHERE l.date_identified IS NULL";
+
+        $conn->executeQuery($createSql);
+
+        // Batched delete using composite key IN subquery (fully compatible with MySQL and PostgreSQL)
+        $deleteSql = "DELETE FROM {$tableName}
+                  WHERE (leadlist_id, lead_id) IN (
+                      SELECT leadlist_id, lead_id
+                      FROM {$tempTableName}
+                      ORDER BY leadlist_id ASC, lead_id ASC
+                      LIMIT " . self::DELETE_BATCH_SIZE . "
+                  )";
+
+        $deletedRecordCount = 0;
+        $deletedRows        = true;
+
+        while ($deletedRows > 0) {
+            $deletedRows = $conn->executeStatement($deleteSql);
             $deletedRecordCount += $deletedRows;
         }
+
+        // Clean up the temporary table
+        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
 
         return $deletedRecordCount;
     }
