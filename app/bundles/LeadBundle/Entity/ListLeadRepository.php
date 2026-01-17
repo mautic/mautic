@@ -75,10 +75,10 @@ class ListLeadRepository extends CommonRepository
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
 
-        // Drop any leftover temporary table from previous runs (works on both MySQL and PostgreSQL)
+        // Drop any existing temporary table (safe for both MySQL/MariaDB and PostgreSQL)
         $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
 
-        // Create temporary table with the composite keys of rows to delete
+        // Create temporary table with the composite keys of anonymous contacts in lists
         $createSql = "CREATE TEMPORARY TABLE {$tempTableName} AS
                   SELECT lll.leadlist_id, lll.lead_id
                   FROM {$tableName} lll
@@ -87,24 +87,53 @@ class ListLeadRepository extends CommonRepository
 
         $conn->executeQuery($createSql);
 
-        // Batched delete using composite key IN subquery (fully compatible with MySQL and PostgreSQL)
-        $deleteSql = "DELETE FROM {$tableName}
-                  WHERE (leadlist_id, lead_id) IN (
-                      SELECT leadlist_id, lead_id
-                      FROM {$tempTableName}
-                      ORDER BY leadlist_id ASC, lead_id ASC
-                      LIMIT ".self::DELETE_BATCH_SIZE.'
-                  )';
-
         $deletedRecordCount = 0;
-        $deletedRows        = true;
 
-        while ($deletedRows > 0) {
-            $deletedRows = $conn->executeStatement($deleteSql);
-            $deletedRecordCount += $deletedRows;
+        while (true) {
+            // Fetch the next batch of keys (portable via QueryBuilder)
+            $qb = $conn->createQueryBuilder();
+            $qb->select('leadlist_id', 'lead_id')
+                ->from($tempTableName)
+                ->orderBy('leadlist_id', 'ASC')
+                ->addOrderBy('lead_id', 'ASC')
+                ->setMaxResults(self::DELETE_BATCH_SIZE);
+
+            $batch = $qb->executeQuery()->fetchAllAssociative();
+
+            if (empty($batch)) {
+                break;
+            }
+
+            // Build dynamic IN clause with placeholders for the composite keys
+            $placeholders = [];
+            $params       = [];
+            $types        = [];
+
+            foreach ($batch as $row) {
+                $placeholders[] = '(?, ?)';
+                $params[]       = $row['leadlist_id'];
+                $params[]       = $row['lead_id'];
+                $types[]        = \Doctrine\DBAL\ParameterType::INTEGER;
+                $types[]        = \Doctrine\DBAL\ParameterType::INTEGER;
+            }
+
+            $inClause = implode(', ', $placeholders);
+
+            // Delete the batch from the main table
+            $deleteMainSql = "DELETE FROM {$tableName}
+                          WHERE (leadlist_id, lead_id) IN ({$inClause})";
+
+            $deleted = $conn->executeStatement($deleteMainSql, $params, $types);
+            $deletedRecordCount += $deleted;
+
+            // Remove the processed batch from the temp table so the next iteration gets the next batch
+            $deleteTempSql = "DELETE FROM {$tempTableName}
+                          WHERE (leadlist_id, lead_id) IN ({$inClause})";
+
+            $conn->executeStatement($deleteTempSql, $params, $types);
         }
 
-        // Clean up the temporary table
+        // Final cleanup
         $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
 
         return $deletedRecordCount;
