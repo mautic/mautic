@@ -76,45 +76,60 @@ class ListLeadRepository extends CommonRepository
     public function deleteAnonymousContacts(): int
     {
         $conn           = $this->getEntityManager()->getConnection();
-        $tableName      = $this->getTableName(); // lead_lists_leads
+        $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX . 'leads';
-        $tempTableName  = 'tmp_anon_delete';
-    
-        // Clean up any leftover temp table
-        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
-    
-        // Create temp table with rows to delete (leadlist_id + lead_id composite key)
-        $conn->executeQuery("
-            CREATE TEMPORARY TABLE {$tempTableName} (
-                leadlist_id INT UNSIGNED NOT NULL,
-                lead_id     INT UNSIGNED NOT NULL,
-                PRIMARY KEY (leadlist_id, lead_id)
-            ) ENGINE = MEMORY
-            AS
-            SELECT lll.leadlist_id, lll.lead_id
-            FROM {$tableName} lll
-            INNER JOIN {$leadsTableName} l ON l.id = lll.lead_id
-            WHERE l.date_identified IS NULL
-        ");
+        $batchSize      = self::DELETE_BATCH_SIZE; 
     
         $deletedRecordCount = 0;
-    
-        // Batch delete using JOIN (MariaDB + MySQL + PostgreSQL compatible)
-        $deleteSql = "
-            DELETE lll
-            FROM {$tableName} lll
-            INNER JOIN {$tempTableName} tmp
-                ON lll.leadlist_id = tmp.leadlist_id
-               AND lll.lead_id     = tmp.lead_id
-            LIMIT " . self::DELETE_BATCH_SIZE;
+        $offset             = 0;
     
         do {
-            $deletedRows = $conn->executeStatement($deleteSql);
-            $deletedRecordCount += $deletedRows;
-        } while ($deletedRows > 0);
+            // Fetch next batch of composite keys (leadlist_id, lead_id)
+            $selectSql = "
+                SELECT lll.leadlist_id, lll.lead_id
+                FROM {$tableName} lll
+                INNER JOIN {$leadsTableName} l ON l.id = lll.lead_id
+                WHERE l.date_identified IS NULL
+                ORDER BY lll.leadlist_id ASC, lll.lead_id ASC
+                LIMIT {$batchSize} OFFSET {$offset}
+            ";
     
-        // Cleanup
-        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
+            $rows = $conn->executeQuery($selectSql)->fetchAllAssociative();
+    
+            if (empty($rows)) {
+                break;
+            }
+    
+            // Build IN clause with tuple values: (1,100), (1,101), ...
+            $placeholders = [];
+            $params       = [];
+            $types        = [];
+    
+            foreach ($rows as $index => $row) {
+                $placeholders[] = "(?, ?)";
+                $params[]       = (int)$row['leadlist_id'];
+                $params[]       = (int)$row['lead_id'];
+                $types[]        = \PDO::PARAM_INT;
+                $types[]        = \PDO::PARAM_INT;
+            }
+    
+            $tupleList = implode(', ', $placeholders);
+    
+            // Delete this batch
+            $deleteSql = "
+                DELETE FROM {$tableName}
+                WHERE (leadlist_id, lead_id) IN ({$tupleList})
+            ";
+    
+            $deletedRows = $conn->executeStatement($deleteSql, $params, $types);
+            $deletedRecordCount += $deletedRows;
+    
+            $offset += $batchSize;
+    
+            // Small sleep to reduce DB load in very large operations
+            // usleep(100000); // 0.1s - uncomment if needed
+    
+        } while (count($rows) === $batchSize);
     
         return $deletedRecordCount;
     }
