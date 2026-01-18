@@ -68,45 +68,54 @@ class ListLeadRepository extends CommonRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * Deletes anonymous contacts (leads where date_identified IS NULL) from lead list relations.
+     *
+     * @return int Number of deleted rows
+     */
     public function deleteAnonymousContacts(): int
     {
         $conn           = $this->getEntityManager()->getConnection();
-        $tableName      = $this->getTableName();
-        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
-        $tempTableName  = 'to_delete';
-
-        // Drop any leftover temporary table from previous runs (works on both MySQL and PostgreSQL)
-        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
-
-        // Create temporary table with the composite keys of rows to delete
-        $createSql = "CREATE TEMPORARY TABLE {$tempTableName} AS
-                  SELECT lll.leadlist_id, lll.lead_id
-                  FROM {$tableName} lll
-                  JOIN {$leadsTableName} l ON l.id = lll.lead_id
-                  WHERE l.date_identified IS NULL";
-
-        $conn->executeQuery($createSql);
-
-        // Batched delete using composite key IN subquery (fully compatible with MySQL and PostgreSQL)
-        $deleteSql = "DELETE FROM {$tableName}
-                  WHERE (leadlist_id, lead_id) IN (
-                      SELECT leadlist_id, lead_id
-                      FROM {$tempTableName}
-                      ORDER BY leadlist_id ASC, lead_id ASC
-                      LIMIT ".self::DELETE_BATCH_SIZE.'
-                  )';
-
+        $tableName      = $this->getTableName(); // lead_lists_leads
+        $leadsTableName = MAUTIC_TABLE_PREFIX . 'leads';
+        $tempTableName  = 'tmp_anon_delete';
+    
+        // Clean up any leftover temp table
+        $conn->executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
+    
+        // Create temp table with rows to delete (leadlist_id + lead_id composite key)
+        $conn->executeQuery("
+            CREATE TEMPORARY TABLE {$tempTableName} (
+                leadlist_id INT UNSIGNED NOT NULL,
+                lead_id     INT UNSIGNED NOT NULL,
+                PRIMARY KEY (leadlist_id, lead_id)
+            ) ENGINE = MEMORY
+            AS
+            SELECT lll.leadlist_id, lll.lead_id
+            FROM {$tableName} lll
+            INNER JOIN {$leadsTableName} l ON l.id = lll.lead_id
+            WHERE l.date_identified IS NULL
+        ");
+    
         $deletedRecordCount = 0;
-        $deletedRows        = true;
-
-        while ($deletedRows > 0) {
+    
+        // Batch delete using JOIN (MariaDB + MySQL + PostgreSQL compatible)
+        $deleteSql = "
+            DELETE lll
+            FROM {$tableName} lll
+            INNER JOIN {$tempTableName} tmp
+                ON lll.leadlist_id = tmp.leadlist_id
+               AND lll.lead_id     = tmp.lead_id
+            LIMIT " . self::DELETE_BATCH_SIZE;
+    
+        do {
             $deletedRows = $conn->executeStatement($deleteSql);
             $deletedRecordCount += $deletedRows;
-        }
-
-        // Clean up the temporary table
-        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
-
+        } while ($deletedRows > 0);
+    
+        // Cleanup
+        $conn->executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
+    
         return $deletedRecordCount;
     }
 }
