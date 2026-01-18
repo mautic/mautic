@@ -81,7 +81,7 @@ class ListLeadRepository extends CommonRepository
         $tempTableName  = 'tmp_anon_delete';
     
         // Clean up any leftover temp table
-        $conn->executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
+        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
     
         // Create temp table with rows to delete (leadlist_id + lead_id composite key)
         $conn->executeQuery("
@@ -114,7 +114,7 @@ class ListLeadRepository extends CommonRepository
         } while ($deletedRows > 0);
     
         // Cleanup
-        $conn->executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
+        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
     
         return $deletedRecordCount;
     }
