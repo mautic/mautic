@@ -328,6 +328,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
         $this->testSymfonyCommand('doctrine:database:create');
+        if ($this->isPostgresqlPlatform()) {
+            // Database can't be dropped if there is existing connection (drop schema instead)
+            $this->testSymfonyCommand('doctrine:schema:drop', ['--force' => true, '--full-database' => true]);
+        }
         $this->testSymfonyCommand('doctrine:schema:create');
         $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
     }

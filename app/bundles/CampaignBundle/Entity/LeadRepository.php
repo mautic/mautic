@@ -272,6 +272,7 @@ class LeadRepository extends CommonRepository
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
                 ->orderBy('l.lead_id')
+                ->groupBy('l.lead_id') // make pgsql happy
                 ->setParameter('campaignId', (int) $campaignId);
 
             // Contact IDs
