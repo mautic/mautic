@@ -77,7 +77,7 @@ class ListLeadRepository extends CommonRepository
     {
         $conn           = $this->getEntityManager()->getConnection();
         $tableName      = $this->getTableName();
-        $leadsTableName = MAUTIC_TABLE_PREFIX . 'leads';
+        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $batchSize      = self::DELETE_BATCH_SIZE;
 
         $deletedRecordCount = 0;
@@ -106,9 +106,9 @@ class ListLeadRepository extends CommonRepository
             $types        = [];
 
             foreach ($rows as $index => $row) {
-                $placeholders[] = "(?, ?)";
-                $params[]       = (int)$row['leadlist_id'];
-                $params[]       = (int)$row['lead_id'];
+                $placeholders[] = '(?, ?)';
+                $params[]       = (int) $row['leadlist_id'];
+                $params[]       = (int) $row['lead_id'];
                 $types[]        = \PDO::PARAM_INT;
                 $types[]        = \PDO::PARAM_INT;
             }
@@ -128,7 +128,6 @@ class ListLeadRepository extends CommonRepository
 
             // Small sleep to reduce DB load in very large operations
             // usleep(100000); // 0.1s - uncomment if needed
-
         } while (count($rows) === $batchSize);
 
         return $deletedRecordCount;
