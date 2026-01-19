@@ -445,7 +445,7 @@ HTML;
         ];
 
         $connection->insert($table, [
-            'allow_restart'       => false,
+            'allow_restart'       => 0,
             'id'                  => 1,
             'category_id'         => null,
             'is_published'        => true,
