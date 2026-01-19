@@ -105,7 +105,7 @@ class ListLeadRepository extends CommonRepository
             $params       = [];
             $types        = [];
 
-            foreach ($rows as $index => $row) {
+            foreach ($rows as $row) {
                 $placeholders[] = '(?, ?)';
                 $params[]       = (int) $row['leadlist_id'];
                 $params[]       = (int) $row['lead_id'];
