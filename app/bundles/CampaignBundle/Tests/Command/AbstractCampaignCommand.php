@@ -256,47 +256,47 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         ];
 
         $fieldTypes = [
-            'id'                    => Types::INTEGER,
+            // 'id'                    => Types::INTEGER,
             'date_added'            => Types::DATETIME_MUTABLE,
-            'name'                  => Types::STRING,
-            'subject'               => Types::STRING,
-            'custom_html'           => Types::TEXT,
-            'headers'               => Types::JSON,
-            'category_id'           => Types::INTEGER,
-            'translation_parent_id' => Types::INTEGER,
-            'variant_parent_id'     => Types::INTEGER,
-            'unsubscribeform_id'    => Types::INTEGER,
+            // 'name'                  => Types::STRING,
+            // 'subject'               => Types::STRING,
+            // 'custom_html'           => Types::TEXT,
+            // 'headers'               => Types::JSON,
+            // 'category_id'           => Types::INTEGER,
+            // 'translation_parent_id' => Types::INTEGER,
+            // 'variant_parent_id'     => Types::INTEGER,
+            // 'unsubscribeform_id'    => Types::INTEGER,
             'is_published'          => Types::BOOLEAN,
-            'created_by'            => Types::INTEGER,
-            'created_by_user'       => Types::STRING,
+            // 'created_by'            => Types::INTEGER,
+            // 'created_by_user'       => Types::STRING,
             'date_modified'         => Types::DATETIME_MUTABLE,
-            'modified_by'           => Types::INTEGER,
-            'modified_by_user'      => Types::STRING,
+            // 'modified_by'           => Types::INTEGER,
+            // 'modified_by_user'      => Types::STRING,
             'checked_out'           => Types::DATETIME_MUTABLE,
-            'checked_out_by'        => Types::INTEGER,
-            'checked_out_by_user'   => Types::STRING,
-            'description'           => Types::TEXT,
-            'from_address'          => Types::STRING,
-            'from_name'             => Types::STRING,
-            'reply_to_address'      => Types::STRING,
-            'bcc_address'           => Types::STRING,
-            'template'              => Types::STRING,
-            'content'               => Types::ARRAY,
-            'utm_tags'              => Types::ARRAY,
-            'plain_text'            => Types::STRING,
-            'email_type'            => Types::STRING,
+            // 'checked_out_by'        => Types::INTEGER,
+            // 'checked_out_by_user'   => Types::STRING,
+            // 'description'           => Types::TEXT,
+            // 'from_address'          => Types::STRING,
+            // 'from_name'             => Types::STRING,
+            // 'reply_to_address'      => Types::STRING,
+            // 'bcc_address'           => Types::STRING,
+            // 'template'              => Types::STRING,
+            // 'content'               => Types::ARRAY,
+            // 'utm_tags'              => Types::ARRAY,
+            // 'plain_text'            => Types::STRING,
+            // 'email_type'            => Types::STRING,
             'publish_up'            => Types::DATETIME_MUTABLE,
             'publish_down'          => Types::DATETIME_MUTABLE,
-            'read_count'            => Types::INTEGER,
-            'sent_count'            => Types::INTEGER,
-            'revision'              => Types::INTEGER,
-            'lang'                  => Types::STRING,
-            'variant_settings'      => Types::ARRAY,
+            // 'read_count'            => Types::INTEGER,
+            // 'sent_count'            => Types::INTEGER,
+            // 'revision'              => Types::INTEGER,
+            // 'lang'                  => Types::STRING,
+            // 'variant_settings'      => Types::ARRAY,
             'variant_start_date'    => Types::DATETIME_MUTABLE,
-            'dynamic_content'       => Types::ARRAY,
-            'variant_sent_count'    => Types::INTEGER,
-            'variant_read_count'    => Types::INTEGER,
-            'preference_center_id'  => Types::INTEGER,
+            // 'dynamic_content'       => Types::ARRAY,
+            // 'variant_sent_count'    => Types::INTEGER,
+            // 'variant_read_count'    => Types::INTEGER,
+            // 'preference_center_id'  => Types::INTEGER,
         ];
 
         $dateAdded1 = new \DateTime('2018-01-04 21:20:25', new \DateTimeZone(self::DATE_TIME_ZONE));
@@ -510,23 +510,23 @@ HTML;
             'canvas_settings'     => serialize($canvasSettings),
         ], [
             'allow_restart'       => Types::BOOLEAN,
-            'id'                  => Types::INTEGER,
-            'category_id'         => Types::INTEGER,
+            // 'id'                  => Types::INTEGER,
+            // 'category_id'         => Types::INTEGER,
             'is_published'        => Types::BOOLEAN,
             'date_added'          => Types::DATETIME_MUTABLE,
-            'created_by'          => Types::INTEGER,
-            'created_by_user'     => Types::STRING,
-            'date_modified'       => Types::DATETIME_MUTABLE,
-            'modified_by'         => Types::INTEGER,
-            'modified_by_user'    => Types::STRING,
+            // 'created_by'          => Types::INTEGER,
+            // 'created_by_user'     => Types::STRING,
+            // 'date_modified'       => Types::DATETIME_MUTABLE,
+            // 'modified_by'         => Types::INTEGER,
+            // 'modified_by_user'    => Types::STRING,
             'checked_out'         => Types::DATETIME_MUTABLE,
-            'checked_out_by'      => Types::INTEGER,
-            'checked_out_by_user' => Types::STRING,
-            'name'                => Types::STRING,
-            'description'         => Types::TEXT,
+            // 'checked_out_by'      => Types::INTEGER,
+            // 'checked_out_by_user' => Types::STRING,
+            // 'name'                => Types::STRING,
+            // 'description'         => Types::TEXT,
             'publish_up'          => Types::DATETIME_MUTABLE,
             'publish_down'        => Types::DATETIME_MUTABLE,
-            'canvas_settings'     => Types::ARRAY,
+            // 'canvas_settings'     => Types::ARRAY,
         ]);
     }
 
@@ -536,24 +536,24 @@ HTML;
         $table      = $this->prefix.'campaign_events';
 
         $fieldTypes = [
-            'id'                    => Types::INTEGER,
-            'campaign_id'           => Types::INTEGER,
-            'parent_id'             => Types::INTEGER,
-            'name'                  => Types::STRING,
-            'description'           => Types::TEXT,
-            'type'                  => Types::STRING,
-            'event_type'            => Types::STRING,
-            'event_order'           => Types::INTEGER,
-            'properties'            => Types::ARRAY,
+            // 'id'                    => Types::INTEGER,
+            // 'campaign_id'           => Types::INTEGER,
+            // 'parent_id'             => Types::INTEGER,
+            // 'name'                  => Types::STRING,
+            // 'description'           => Types::TEXT,
+            // 'type'                  => Types::STRING,
+            // 'event_type'            => Types::STRING,
+            // 'event_order'           => Types::INTEGER,
+            // 'properties'            => Types::ARRAY,
             'trigger_date'          => Types::DATETIME_MUTABLE,
-            'trigger_interval'      => Types::INTEGER,
-            'trigger_interval_unit' => Types::STRING,
-            'trigger_mode'          => Types::STRING,
-            'decision_path'         => Types::STRING,
-            'temp_id'               => Types::INTEGER,
-            'channel'               => Types::STRING,
-            'channel_id'            => Types::INTEGER,
-            'failed_count'          => Types::INTEGER,
+            // 'trigger_interval'      => Types::INTEGER,
+            // 'trigger_interval_unit' => Types::STRING,
+            // 'trigger_mode'          => Types::STRING,
+            // 'decision_path'         => Types::STRING,
+            // 'temp_id'               => Types::INTEGER,
+            // 'channel'               => Types::STRING,
+            // 'channel_id'            => Types::INTEGER,
+            // 'failed_count'          => Types::INTEGER,
         ];
 
         // Event 1: Tag CampaignTest (source action, adds tag ID 1)
@@ -580,7 +580,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 2: Send email 1
         $properties2 = [
@@ -637,7 +637,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 4: Is UK (condition)
         $properties4 = [
@@ -723,7 +723,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 7: Tag NonUS:NotOpen
         $properties7 = [
@@ -749,7 +749,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 8: Tag UK:NotOpen
         $properties8 = [
@@ -775,7 +775,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 9: Tag NonUK:NotOpen
         $properties9 = [
@@ -801,7 +801,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 10: Send email 2
         $properties10 = [
@@ -832,7 +832,7 @@ HTML;
             'channel'               => 'email',
             'channel_id'            => 2,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 11: Is US (condition off first tag action)
         $properties11 = [
@@ -862,7 +862,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 12: Tag US:Action
         $properties12 = [
@@ -888,7 +888,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 13: Tag NonUS:Action
         $properties13 = [
@@ -914,7 +914,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 14: Tag EmailNotOpen (interval trigger)
         $properties14 = [
@@ -940,7 +940,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 15: Tag EmailNotOpen Again (interval trigger)
         $properties15 = [
@@ -966,7 +966,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
 
         // Event 16: Chained Action (adds tag ID 10)
         $properties16 = [
@@ -992,7 +992,7 @@ HTML;
             'channel'               => null,
             'channel_id'            => null,
             'failed_count'          => 0,
-        ], $fieldTypes);
+        ]);
     }
 
     private function insertLeadLists(): void
@@ -1022,24 +1022,24 @@ HTML;
             'is_global'            => true,
             'public_name'          => 'campaign-test',
         ], [
-            'id'                   => Types::INTEGER,
+            // 'id'                   => Types::INTEGER,
             'is_preference_center' => Types::BOOLEAN,
             'is_published'         => Types::BOOLEAN,
             'date_added'           => Types::DATETIME_MUTABLE,
-            'created_by'           => Types::INTEGER,
-            'created_by_user'      => Types::STRING,
+            // 'created_by'           => Types::INTEGER,
+            // 'created_by_user'      => Types::STRING,
             'date_modified'        => Types::DATETIME_MUTABLE,
-            'modified_by'          => Types::INTEGER,
-            'modified_by_user'     => Types::STRING,
+            // 'modified_by'          => Types::INTEGER,
+            // 'modified_by_user'     => Types::STRING,
             'checked_out'          => Types::DATETIME_MUTABLE,
-            'checked_out_by'       => Types::INTEGER,
-            'checked_out_by_user'  => Types::STRING,
-            'name'                 => Types::STRING,
-            'description'          => Types::TEXT,
-            'alias'                => Types::STRING,
-            'filters'              => Types::ARRAY,
+            // 'checked_out_by'       => Types::INTEGER,
+            // 'checked_out_by_user'  => Types::STRING,
+            // 'name'                 => Types::STRING,
+            // 'description'          => Types::TEXT,
+            // 'alias'                => Types::STRING,
+            // 'filters'              => Types::ARRAY,
             'is_global'            => Types::BOOLEAN,
-            'public_name'          => Types::STRING,
+            // 'public_name'          => Types::STRING,
         ]);
     }
 
@@ -1051,9 +1051,6 @@ HTML;
         $connection->insert($table, [
             'campaign_id' => 1,
             'leadlist_id' => 1,
-        ], [
-            'campaign_id' => Types::INTEGER,
-            'leadlist_id' => Types::INTEGER,
         ]);
     }
 
