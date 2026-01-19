@@ -494,10 +494,49 @@ HTML;
             'trigger_date'          => Types::DATETIME_MUTABLE,
         ];
 
+        // Common buttons for form submission keys
+        $buttons = ['save' => ''];
+
+        // Common settings for tag change actions
+        $tagSettings = [
+            'label'       => "Modify contact's tags",
+            'description' => 'Add tag to or remove tag from contact',
+            'formType'    => 'modify_lead_tags',
+            'eventName'   => 'mautic.lead.on_campaign_trigger_action',
+        ];
+
+        // Common settings for email send actions
+        $emailSettings = [
+            'label'           => 'Send email',
+            'description'     => 'Send the selected email to the contact.',
+            'eventName'       => 'mautic.email.on_campaign_trigger_action',
+            'formType'        => 'emailsend_list',
+            'formTypeOptions' => [
+                'update_select'    => 'campaignevent_properties_email',
+                'with_email_types' => true,
+            ],
+            'formTheme'      => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'channel'        => 'email',
+            'channelIdField' => 'email',
+        ];
+
         // Event 1: Tag CampaignTest (source action, adds tag ID 1)
         $properties1 = [
-            'canvasSettings' => ['droppedX' => '577', 'droppedY' => '155'],
-            'properties'     => ['add_tags' => ['1']],
+            'canvasSettings'      => ['droppedX' => '577', 'droppedY' => '155'],
+            'name'                => '',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'leadsource',
+            'properties'          => ['add_tags' => ['1']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'source',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['Campaign Test'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 1,
@@ -522,13 +561,28 @@ HTML;
 
         // Event 2: Send email 1
         $properties2 = [
-            'canvasSettings' => ['droppedX' => '842', 'droppedY' => '164'],
-            'properties'     => [
+            'canvasSettings'      => ['droppedX' => '337', 'droppedY' => '155'],
+            'name'                => '',
+            'triggerMode'         => 'date',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'leadsource',
+            'properties'          => [
                 'email'      => '1',
                 'email_type' => 'transactional',
-                'priority'   => 2,
-                'attempts'   => 3,
+                'priority'   => '2',
+                'attempts'   => '3',
             ],
+            'type'            => 'email.send',
+            'eventType'       => 'action',
+            'anchorEventType' => 'source',
+            'buttons'         => $buttons,
+            'settings'        => $emailSettings,
+            'email'           => '1',
+            'email_type'      => 'transactional',
+            'priority'        => 2,
+            'attempts'        => 3,
         ];
         $connection->insert($table, [
             'id'                    => 2,
@@ -551,11 +605,8 @@ HTML;
             'failed_count'          => 0,
         ], $fieldTypes);
 
-        // Event 3: Opens email (decision)
-        $properties3 = [
-            'canvasSettings' => ['droppedX' => '842', 'droppedY' => '269'],
-            'properties'     => [],
-        ];
+        // Event 3: Opens email (decision - empty)
+        $properties3 = [];
         $connection->insert($table, [
             'id'                    => 3,
             'campaign_id'           => 1,
@@ -577,14 +628,27 @@ HTML;
             'failed_count'          => 0,
         ]);
 
-        // Event 4: Is UK (condition)
+        // Event 4: Is UK (condition - lead.field_value) - with duplicates
         $properties4 = [
-            'canvasSettings' => ['droppedX' => '1132', 'droppedY' => '373'],
-            'properties'     => [
+            'canvasSettings'      => ['droppedX' => '942', 'droppedY' => '374'],
+            'name'                => 'Is UK',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'no',
+            'properties'          => [
                 'field'    => 'country',
                 'operator' => '=',
                 'value'    => 'United Kingdom',
             ],
+            'type'            => 'lead.field_value',
+            'eventType'       => 'condition',
+            'anchorEventType' => 'decision',
+            'buttons'         => $buttons,
+            'field'           => 'country',
+            'operator'        => '=',
+            'value'           => 'United Kingdom',
         ];
         $connection->insert($table, [
             'id'                    => 4,
@@ -607,15 +671,29 @@ HTML;
             'failed_count'          => 0,
         ], $fieldTypes);
 
-        // Event 5: Is US (condition)
+        // Event 5: Is US (condition - duplicate structure)
         $properties5 = [
-            'canvasSettings' => ['droppedX' => '841', 'droppedY' => '378'],
-            'properties'     => [
+            'canvasSettings'      => ['droppedX' => '942', 'droppedY' => '374'],
+            'name'                => 'Is US',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'no',
+            'properties'          => [
                 'field'    => 'country',
                 'operator' => '=',
                 'value'    => 'United States',
             ],
+            'type'            => 'lead.field_value',
+            'eventType'       => 'condition',
+            'anchorEventType' => 'decision',
+            'buttons'         => $buttons,
+            'field'           => 'country',
+            'operator'        => '=',
+            'value'           => 'United States',
         ];
+
         $connection->insert($table, [
             'id'                    => 5,
             'campaign_id'           => 1,
@@ -639,8 +717,21 @@ HTML;
 
         // Event 6: Tag US:NotOpen
         $properties6 = [
-            'canvasSettings' => ['droppedX' => '649', 'droppedY' => '496'],
-            'properties'     => ['add_tags' => ['2']],
+            'canvasSettings'      => ['droppedX' => '741', 'droppedY' => '483'],
+            'name'                => 'Tag US:NotOpen',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'yes',
+            'properties'          => ['add_tags' => ['2']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'condition',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['US:NotOpen'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 6,
@@ -665,8 +756,21 @@ HTML;
 
         // Event 7: Tag NonUS:NotOpen
         $properties7 = [
-            'canvasSettings' => ['droppedX' => '874', 'droppedY' => '488'],
-            'properties'     => ['add_tags' => ['3']],
+            'canvasSettings'      => ['droppedX' => '981', 'droppedY' => '483'],
+            'name'                => 'Tag NonUS:NotOpen',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'no',
+            'properties'          => ['add_tags' => ['3']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'condition',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['NonUS:NotOpen'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 7,
@@ -691,8 +795,21 @@ HTML;
 
         // Event 8: Tag UK:NotOpen
         $properties8 = [
-            'canvasSettings' => ['droppedX' => '1097', 'droppedY' => '486'],
-            'properties'     => ['add_tags' => ['4']],
+            'canvasSettings'      => ['droppedX' => '501', 'droppedY' => '480'],
+            'name'                => 'Tag UK:NotOpen',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'yes',
+            'properties'          => ['add_tags' => ['4']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'condition',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['UK:NotOpen'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 8,
@@ -717,8 +834,21 @@ HTML;
 
         // Event 9: Tag NonUK:NotOpen
         $properties9 = [
-            'canvasSettings' => ['droppedX' => '1313', 'droppedY' => '491'],
-            'properties'     => ['add_tags' => ['5']],
+            'canvasSettings'      => ['droppedX' => '1221', 'droppedY' => '480'],
+            'name'                => 'Tag NonUK:NotOpen',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'no',
+            'properties'          => ['add_tags' => ['5']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'condition',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['NonUK:NotOpen'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 9,
@@ -743,13 +873,28 @@ HTML;
 
         // Event 10: Send email 2
         $properties10 = [
-            'canvasSettings' => ['droppedX' => '597', 'droppedY' => '378'],
-            'properties'     => [
+            'canvasSettings'      => ['droppedX' => '742', 'droppedY' => '374'],
+            'name'                => 'Send email 2',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'yes',
+            'properties'          => [
                 'email'      => '2',
                 'email_type' => 'transactional',
-                'priority'   => 2,
-                'attempts'   => 3,
+                'priority'   => '2',
+                'attempts'   => '3',
             ],
+            'type'            => 'email.send',
+            'eventType'       => 'action',
+            'anchorEventType' => 'decision',
+            'buttons'         => $buttons,
+            'settings'        => $emailSettings,
+            'email'           => '2',
+            'email_type'      => 'transactional',
+            'priority'        => 2,
+            'attempts'        => 3.0,
         ];
         $connection->insert($table, [
             'id'                    => 10,
@@ -774,12 +919,25 @@ HTML;
 
         // Event 11: Is US (condition off first tag action)
         $properties11 = [
-            'canvasSettings' => ['droppedX' => '389', 'droppedY' => '252'],
-            'properties'     => [
+            'canvasSettings'      => ['droppedX' => '577', 'droppedY' => '260'],
+            'name'                => 'Is US',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'bottom',
+            'properties'          => [
                 'field'    => 'country',
                 'operator' => '=',
                 'value'    => 'United States',
             ],
+            'type'            => 'lead.field_value',
+            'eventType'       => 'condition',
+            'anchorEventType' => 'action',
+            'buttons'         => $buttons,
+            'field'           => 'country',
+            'operator'        => '=',
+            'value'           => 'United States',
         ];
         $connection->insert($table, [
             'id'                    => 11,
@@ -804,8 +962,21 @@ HTML;
 
         // Event 12: Tag US:Action
         $properties12 = [
-            'canvasSettings' => ['droppedX' => '168', 'droppedY' => '334'],
-            'properties'     => ['add_tags' => ['6']],
+            'canvasSettings'      => ['droppedX' => '12', 'droppedY' => '357'],
+            'name'                => 'Tag US:Action',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'yes',
+            'properties'          => ['add_tags' => ['6']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'condition',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['US:Action'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 12,
@@ -830,8 +1001,21 @@ HTML;
 
         // Event 13: Tag NonUS:Action
         $properties13 = [
-            'canvasSettings' => ['droppedX' => '391', 'droppedY' => '335'],
-            'properties'     => ['add_tags' => ['7']],
+            'canvasSettings'      => ['droppedX' => '489', 'droppedY' => '357'],
+            'name'                => 'Tag NonUS:Action',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'no',
+            'properties'          => ['add_tags' => ['7']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'condition',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['NonUS:Action'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 13,
@@ -856,8 +1040,21 @@ HTML;
 
         // Event 14: Tag EmailNotOpen (interval trigger)
         $properties14 = [
-            'canvasSettings' => ['droppedX' => '1372', 'droppedY' => '364'],
-            'properties'     => ['add_tags' => ['9']],
+            'canvasSettings'      => ['droppedX' => '1081', 'droppedY' => '374'],
+            'name'                => 'Tag EmailNotOpen',
+            'triggerMode'         => 'interval',
+            'triggerDate'         => null,
+            'triggerInterval'     => '2',
+            'triggerIntervalUnit' => 'i',
+            'anchor'              => 'no',
+            'properties'          => ['add_tags' => ['9']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'decision',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['EmailNotOpen'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 14,
@@ -882,8 +1079,20 @@ HTML;
 
         // Event 15: Tag EmailNotOpen Again (interval trigger)
         $properties15 = [
-            'canvasSettings' => ['droppedX' => '1563', 'droppedY' => '291'],
-            'properties'     => ['add_tags' => ['9']],
+            'canvasSettings'      => ['droppedX' => '1612', 'droppedY' => '374'],
+            'name'                => 'Tag EmailNotOpen Again',
+            'triggerMode'         => 'interval',
+            'triggerDate'         => null,
+            'triggerInterval'     => '6',
+            'triggerIntervalUnit' => 'i',
+            'anchor'              => 'no',
+            'properties'          => ['add_tags' => ['9']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'decision',
+            'buttons'             => $buttons,
+            'add_tags'            => ['EmailNotOpen'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 15,
@@ -907,9 +1116,23 @@ HTML;
         ]);
 
         // Event 16: Chained Action (adds tag ID 10)
+        // Event 16: Tag ChainedAction (chained off event 12)
         $properties16 = [
-            'canvasSettings' => ['droppedX' => '168', 'droppedY' => '439'],
-            'properties'     => ['add_tags' => ['10']],
+            'canvasSettings'      => ['droppedX' => '168', 'droppedY' => '439'],
+            'name'                => 'Chained Action',
+            'triggerMode'         => 'immediate',
+            'triggerDate'         => null,
+            'triggerInterval'     => '1',
+            'triggerIntervalUnit' => 'd',
+            'anchor'              => 'bottom',
+            'properties'          => ['add_tags' => ['10']],
+            'type'                => 'lead.changetags',
+            'eventType'           => 'action',
+            'anchorEventType'     => 'action',
+            'buttons'             => $buttons,
+            'settings'            => $tagSettings,
+            'add_tags'            => ['ChainedAction'],
+            'remove_tags'         => [],
         ];
         $connection->insert($table, [
             'id'                    => 16,
@@ -960,7 +1183,6 @@ HTML;
             'is_global'            => true,
             'public_name'          => 'campaign-test',
         ], [
-            // 'id'                   => Types::INTEGER,
             'is_preference_center' => Types::BOOLEAN,
             'is_published'         => Types::BOOLEAN,
             'date_added'           => Types::DATETIME_MUTABLE,
