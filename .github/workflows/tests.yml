@@ -145,8 +145,8 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.3']
-        postgres-versions: ['16']
+        php-versions: ['8.4']
+        postgres-versions: ['18']
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
 
@@ -210,7 +210,7 @@ jobs:
           export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
           # Run PHPUnit exactly like the MySQL job (adjust memory limit if needed)
-          php -d zend.assertions=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --cache-result
 
       - name: Store log artifacts
         if: ${{ always() }}
