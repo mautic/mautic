@@ -68,73 +68,68 @@ class ListLeadRepository extends CommonRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * Deletes anonymous contacts (leads where date_identified IS NULL) from lead list relations.
+     *
+     * @return int Number of deleted rows
+     */
     public function deleteAnonymousContacts(): int
     {
         $conn           = $this->getEntityManager()->getConnection();
         $tableName      = $this->getTableName();
-        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
-        $tempTableName  = 'to_delete';
-
-        // Drop any existing temporary table (safe for both MySQL/MariaDB and PostgreSQL)
-        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
-
-        // Create temporary table with the composite keys of anonymous contacts in lists
-        $createSql = "CREATE TEMPORARY TABLE {$tempTableName} AS
-                  SELECT lll.leadlist_id, lll.lead_id
-                  FROM {$tableName} lll
-                  JOIN {$leadsTableName} l ON l.id = lll.lead_id
-                  WHERE l.date_identified IS NULL";
-
-        $conn->executeQuery($createSql);
+        $leadsTableName = MAUTIC_TABLE_PREFIX . 'leads';
+        $batchSize      = self::DELETE_BATCH_SIZE;
 
         $deletedRecordCount = 0;
+        $offset             = 0;
 
-        while (true) {
-            // Fetch the next batch of keys (portable via QueryBuilder)
-            $qb = $conn->createQueryBuilder();
-            $qb->select('leadlist_id', 'lead_id')
-                ->from($tempTableName)
-                ->orderBy('leadlist_id', 'ASC')
-                ->addOrderBy('lead_id', 'ASC')
-                ->setMaxResults(self::DELETE_BATCH_SIZE);
+        do {
+            // Fetch next batch of composite keys (leadlist_id, lead_id)
+            $selectSql = "
+                SELECT lll.leadlist_id, lll.lead_id
+                FROM {$tableName} lll
+                INNER JOIN {$leadsTableName} l ON l.id = lll.lead_id
+                WHERE l.date_identified IS NULL
+                ORDER BY lll.leadlist_id ASC, lll.lead_id ASC
+                LIMIT {$batchSize} OFFSET {$offset}
+            ";
 
-            $batch = $qb->executeQuery()->fetchAllAssociative();
+            $rows = $conn->executeQuery($selectSql)->fetchAllAssociative();
 
-            if (empty($batch)) {
+            if (empty($rows)) {
                 break;
             }
 
-            // Build dynamic IN clause with placeholders for the composite keys
+            // Build IN clause with tuple values: (1,100), (1,101), ...
             $placeholders = [];
             $params       = [];
             $types        = [];
 
-            foreach ($batch as $row) {
-                $placeholders[] = '(?, ?)';
-                $params[]       = $row['leadlist_id'];
-                $params[]       = $row['lead_id'];
-                $types[]        = \Doctrine\DBAL\ParameterType::INTEGER;
-                $types[]        = \Doctrine\DBAL\ParameterType::INTEGER;
+            foreach ($rows as $index => $row) {
+                $placeholders[] = "(?, ?)";
+                $params[]       = (int)$row['leadlist_id'];
+                $params[]       = (int)$row['lead_id'];
+                $types[]        = \PDO::PARAM_INT;
+                $types[]        = \PDO::PARAM_INT;
             }
 
-            $inClause = implode(', ', $placeholders);
+            $tupleList = implode(', ', $placeholders);
 
-            // Delete the batch from the main table
-            $deleteMainSql = "DELETE FROM {$tableName}
-                          WHERE (leadlist_id, lead_id) IN ({$inClause})";
+            // Delete this batch
+            $deleteSql = "
+                DELETE FROM {$tableName}
+                WHERE (leadlist_id, lead_id) IN ({$tupleList})
+            ";
 
-            $deleted = $conn->executeStatement($deleteMainSql, $params, $types);
-            $deletedRecordCount += $deleted;
+            $deletedRows = $conn->executeStatement($deleteSql, $params, $types);
+            $deletedRecordCount += $deletedRows;
 
-            // Remove the processed batch from the temp table so the next iteration gets the next batch
-            $deleteTempSql = "DELETE FROM {$tempTableName}
-                          WHERE (leadlist_id, lead_id) IN ({$inClause})";
+            $offset += $batchSize;
 
-            $conn->executeStatement($deleteTempSql, $params, $types);
-        }
+            // Small sleep to reduce DB load in very large operations
+            // usleep(100000); // 0.1s - uncomment if needed
 
-        // Final cleanup
-        $conn->executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
+        } while (count($rows) === $batchSize);
 
         return $deletedRecordCount;
     }
