@@ -346,3 +346,18 @@ Mautic.getIntegrationCampaigns = function (el, settings) {
         "GET"
     );
 };
+
+Mautic.initPluginEvents = function () {
+    const $integrationModal = mQuery('#IntegrationEditModal');
+
+    $integrationModal.off('mautic:onPageLoad:before');
+    $integrationModal.on('mautic:onPageLoad:before', function(e, container, response) {
+        if (container === '#IntegrationEditModal' && response && response.pluginVersion) {
+            const $modalLabel = mQuery('#IntegrationEditModal-label');
+            if ($modalLabel.find('.plugin-version-badge').length === 0) {
+                const versionHtml = ' <span class="plugin-version-badge label label-default ml-xs">v' + response.pluginVersion + '</span>';
+                $modalLabel.append(versionHtml);
+            }
+        }
+    });
+};
