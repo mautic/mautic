@@ -176,7 +176,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
-        $leadIds = array_column($results[$segment->getId()], 'id');
+        $leadIds = array_map('intval', array_column($results[$segment->getId()], 'id'));
 
         Assert::assertContains($lead->getId(), $leadIds);
 
@@ -199,7 +199,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $primaryResults = $this->contactSegmentService->getNewLeadListLeads($primarySegment, []);
-        $primaryLeadIds = array_column($primaryResults[$primarySegment->getId()], 'id');
+        $primaryLeadIds = array_map('intval', array_column($primaryResults[$primarySegment->getId()], 'id'));
 
         Assert::assertNotContains($lead->getId(), $primaryLeadIds);
     }
