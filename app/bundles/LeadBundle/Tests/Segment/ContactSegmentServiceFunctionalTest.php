@@ -11,6 +11,8 @@ use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
@@ -130,6 +132,48 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'segment-not-having-company'                                         => 4,
             'has-email-and-visited-url'                                          => 4,
         ];
+    }
+
+    public function testSegmentMatchesSecondaryCompanyFields(): void
+    {
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead = $this->getReference('lead-1');
+
+        $company = new Company();
+        $company->setDateAdded(new \DateTime());
+        $company->setName('Secondary Co');
+        $company->setCity('Codexville');
+        $this->em->persist($company);
+
+        $companyLead = new CompanyLead();
+        $companyLead->setLead($lead);
+        $companyLead->setCompany($company);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(false);
+        $this->em->persist($companyLead);
+
+        $segment = new LeadList();
+        $segment->setName('Segment Secondary Company')
+            ->setPublicName('Segment Secondary Company')
+            ->setAlias('segment-secondary-company')
+            ->setFilters([
+                [
+                    'glue'     => 'and',
+                    'type'     => 'text',
+                    'object'   => 'company',
+                    'field'    => 'companycity',
+                    'operator' => '=',
+                    'filter'   => 'Codexville',
+                    'display'  => '',
+                ],
+            ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
+        $leadIds = array_column($results[$segment->getId()], 'id');
+
+        Assert::assertContains($lead->getId(), $leadIds);
     }
 
     public function testSegmentRebuildCommand(): void
