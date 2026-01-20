@@ -51,7 +51,12 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias = $this->generateRandomParameterName();
 
             $relTable = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin($leadsTableAlias, $filter->getRelationJoinTable(), $relTable, $relTable.'.lead_id = '.$leadsTableAlias.'.id');
+            $queryBuilder->leftJoin(
+                $leadsTableAlias,
+                $filter->getRelationJoinTable(),
+                $relTable,
+                $this->getRelationJoinCondition($filter, $relTable, $leadsTableAlias)
+            );
             $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.'
                 .$filter->getRelationJoinTableField());
         }
@@ -127,5 +132,10 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
+    }
+
+    protected function getRelationJoinCondition(ContactSegmentFilter $filter, string $relationAlias, string $leadsTableAlias): string
+    {
+        return $relationAlias.'.lead_id = '.$leadsTableAlias.'.id';
     }
 }

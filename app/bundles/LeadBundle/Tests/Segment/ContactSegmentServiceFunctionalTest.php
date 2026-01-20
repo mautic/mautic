@@ -14,6 +14,8 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
@@ -138,19 +140,22 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $this->getReference('lead-1');
+        $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        \assert($lead instanceof Lead);
 
         $company = new Company();
         $company->setDateAdded(new \DateTime());
         $company->setName('Secondary Co');
-        $company->setCity('Codexville');
+        $company->addUpdatedField('companycity', 'Codexville');
         $this->em->persist($company);
+        $this->em->flush();
 
         $companyLead = new CompanyLead();
         $companyLead->setLead($lead);
         $companyLead->setCompany($company);
         $companyLead->setDateAdded(new \DateTime());
         $companyLead->setPrimary(false);
-        $this->em->persist($companyLead);
+        $this->em->getRepository(CompanyLead::class)->saveEntity($companyLead);
 
         $segment = new LeadList();
         $segment->setName('Segment Secondary Company')
@@ -160,7 +165,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 [
                     'glue'     => 'and',
                     'type'     => 'text',
-                    'object'   => 'company',
+                    'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
                     'field'    => 'companycity',
                     'operator' => '=',
                     'filter'   => 'Codexville',
@@ -174,6 +179,29 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $leadIds = array_column($results[$segment->getId()], 'id');
 
         Assert::assertContains($lead->getId(), $leadIds);
+
+        $primarySegment = new LeadList();
+        $primarySegment->setName('Segment Primary Company')
+            ->setPublicName('Segment Primary Company')
+            ->setAlias('segment-primary-company')
+            ->setFilters([
+                [
+                    'glue'     => 'and',
+                    'type'     => 'text',
+                    'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
+                    'field'    => 'companycity',
+                    'operator' => '=',
+                    'filter'   => 'Codexville',
+                    'display'  => '',
+                ],
+            ]);
+        $this->em->persist($primarySegment);
+        $this->em->flush();
+
+        $primaryResults = $this->contactSegmentService->getNewLeadListLeads($primarySegment, []);
+        $primaryLeadIds = array_column($primaryResults[$primarySegment->getId()], 'id');
+
+        Assert::assertNotContains($lead->getId(), $primaryLeadIds);
     }
 
     public function testSegmentRebuildCommand(): void
@@ -283,9 +311,8 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    private function getReference(string $name): LeadList
+    private function getReference(string $name): object
     {
-        /** @var LeadList $reference */
         $reference = $this->fixtures->getReference($name);
 
         return $reference;

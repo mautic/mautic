@@ -322,6 +322,20 @@ final class FilterOperatorSubscriberTest extends TestCase
                         'iconClass' => 'ri-shapes-line',
                     ],
                 ],
+                'company_all' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company_all',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
             ],
             $event->getChoices()
         );

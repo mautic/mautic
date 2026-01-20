@@ -586,6 +586,8 @@ return [
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
                     'mautic.lead.model.lead_segment_decorator_company',
+                    'mautic.lead.model.lead_segment_decorator_company_primary',
+                    'mautic.lead.model.lead_segment_decorator_company_all',
                     'event_dispatcher',
                 ],
             ],
@@ -605,6 +607,20 @@ return [
             ],
             'mautic.lead.model.lead_segment_decorator_company' => [
                 'class'     => Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_company_primary' => [
+                'class'     => Mautic\LeadBundle\Segment\Decorator\PrimaryCompanyDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_company_all' => [
+                'class'     => Mautic\LeadBundle\Segment\Decorator\CompanyAllDecorator::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
@@ -796,6 +812,14 @@ return [
             ],
             'mautic.lead.query.builder.complex_relation.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+            ],
+            'mautic.lead.query.builder.complex_relation.primary_company' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+            ],
+            'mautic.lead.query.builder.complex_relation.any_company' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.channel_click.value' => [

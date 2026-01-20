@@ -11,6 +11,8 @@ use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Decorator\CompanyAllDecorator;
+use Mautic\LeadBundle\Segment\Decorator\PrimaryCompanyDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -40,6 +42,16 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     private MockObject $companyDecorator;
 
     /**
+     * @var MockObject|PrimaryCompanyDecorator
+     */
+    private MockObject $primaryCompanyDecorator;
+
+    /**
+     * @var MockObject|CompanyAllDecorator
+     */
+    private MockObject $companyAllDecorator;
+
+    /**
      * @var MockObject|DateOptionFactory
      */
     private MockObject $dateOptionFactory;
@@ -55,6 +67,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         $this->baseDecorator                  = $this->createMock(BaseDecorator::class);
         $this->customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
         $this->companyDecorator               = $this->createMock(CompanyDecorator::class);
+        $this->primaryCompanyDecorator        = $this->createMock(PrimaryCompanyDecorator::class);
+        $this->companyAllDecorator            = $this->createMock(CompanyAllDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $this->contactSegmentFilterDictionary,
@@ -62,6 +76,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             $this->customMappedDecorator,
             $this->dateOptionFactory,
             $this->companyDecorator,
+            $this->primaryCompanyDecorator,
+            $this->companyAllDecorator,
             $this->eventDispatcherMock);
     }
 
@@ -87,6 +103,34 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(
             CustomMappedDecorator::class,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testPrimaryCompanyDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->primaryCompanyDecorator,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testCompanyAllDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyAllDecorator,
             $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
         );
     }
