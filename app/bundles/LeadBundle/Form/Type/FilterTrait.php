@@ -318,9 +318,9 @@ trait FilterTrait
                         function ($regex, ExecutionContextInterface $context): void {
                             // Let's test the regex's syntax by making a fake query
                             try {
-                                $qb = $this->connection->createQueryBuilder();
+                                $qb   = $this->connection->createQueryBuilder();
                                 $isPg = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
-                                $op = $isPg ? '~*' : 'REGEXP';
+                                $op   = $isPg ? '~*' : 'REGEXP';
                                 $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                                     ->where('l.id '.$op.' :regex')

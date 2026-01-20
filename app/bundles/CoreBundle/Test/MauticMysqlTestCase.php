@@ -189,10 +189,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
         }
         foreach ($tables as $table) {
-            $fullTable = $prefix.$table;
+            $fullTable    = $prefix.$table;
             $quotedTable  = $this->connection->quoteIdentifier($fullTable);
 
-            $sql = 'TRUNCATE TABLE ' . $quotedTable;
+            $sql = 'TRUNCATE TABLE '.$quotedTable;
 
             if ($this->isPostgresqlPlatform()) {
                 // Reset sequences (equivalent to MySQL AUTO_INCREMENT reset)
@@ -349,7 +349,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->testSymfonyCommand('doctrine:schema:create');
         $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
 
-        if($this->isPostgresqlPlatform()) {
+        if ($this->isPostgresqlPlatform()) {
             // make sure compatibility layer is created
             $args       = new GenerateSchemaEventArgs($this->em, new Schema());
             $subscriber = new DoctrineEventSubscriber();

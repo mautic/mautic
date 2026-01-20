@@ -91,7 +91,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 
     private function getIndexHint(): string
     {
-        if ($this->em->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+        if ($this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             return '';
         }
 

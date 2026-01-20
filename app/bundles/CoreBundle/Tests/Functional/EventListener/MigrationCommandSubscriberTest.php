@@ -76,7 +76,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         Assert::assertTrue($tableFirst->hasColumn('generated_name_one'), 'generated_name_one column missing');
         Assert::assertTrue($tableFirst->hasColumn('generated_name_three'), 'generated_name_three column missing');
 
-        $hasIndexOne = $this->hasSingleColumnIndex($tableFirst, 'generated_name_one');
+        $hasIndexOne   = $this->hasSingleColumnIndex($tableFirst, 'generated_name_one');
         $hasIndexThree = $this->hasSingleColumnIndex($tableFirst, 'generated_name_three');
 
         Assert::assertTrue($hasIndexOne, 'Index on generated_name_one missing');
@@ -96,7 +96,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
     {
         foreach ($table->getIndexes() as $index) {
             $columns = $index->getColumns();
-            if (count($columns) === 1 && $columns[0] === $column) {
+            if (1 === count($columns) && $columns[0] === $column) {
                 return true;
             }
         }
@@ -117,9 +117,9 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
     private function createTables(): void
     {
-        $isPostgreSQL = $this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform;
+        $isPostgreSQL = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
 
-        $idType = $isPostgreSQL ? 'integer' : 'int unsigned';
+        $idType   = $isPostgreSQL ? 'integer' : 'int unsigned';
         $dateType = $isPostgreSQL ? 'timestamp' : 'datetime';
 
         // Generated column syntax differs significantly between MySQL and PostgreSQL

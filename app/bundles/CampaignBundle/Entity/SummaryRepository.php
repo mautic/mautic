@@ -112,9 +112,9 @@ class SummaryRepository extends CommonRepository
             $quotedTo   = $connection->quote($dateToTs);
 
             // Platform-specific expressions to ensure correct type (timestamp/datetime)
-            $dateTriggeredExpr = $isPg ? $quotedFrom . '::timestamp' : $quotedFrom;
-            $dateFromExpr      = $isPg ? $quotedFrom . '::timestamp' : $quotedFrom;
-            $dateToExpr        = $isPg ? $quotedTo . '::timestamp' : $quotedTo;
+            $dateTriggeredExpr = $isPg ? $quotedFrom.'::timestamp' : $quotedFrom;
+            $dateFromExpr      = $isPg ? $quotedFrom.'::timestamp' : $quotedFrom;
+            $dateToExpr        = $isPg ? $quotedTo.'::timestamp' : $quotedTo;
 
             // Build inner aggregation query with consistent integer types in CASE branches
             $innerSql = '

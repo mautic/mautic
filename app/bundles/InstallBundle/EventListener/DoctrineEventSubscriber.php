@@ -3,12 +3,12 @@
 namespace Mautic\InstallBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
-use Doctrine\DBAL\Connection;
 
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
 class DoctrineEventSubscriber

@@ -140,9 +140,9 @@ class SegmentContactsLineChartQuery extends ChartQuery
 
     private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder
     {
-        if(!$this->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
-            $fromPart = $qb->getQueryPart('from');
-            $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX . LeadEventLog::INDEX_SEARCH);
+        if (!$this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $fromPart             = $qb->getQueryPart('from');
+            $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH);
             $qb->resetQueryPart('from');
             $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
         }
