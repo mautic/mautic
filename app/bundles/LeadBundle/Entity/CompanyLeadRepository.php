@@ -188,7 +188,7 @@ class CompanyLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter('companyId', $company->getId())
-            ->andWhere('cl.is_primary = 1');
+            ->andWhere('cl.is_primary = TRUE');
         $leadIds = $q->executeQuery()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -208,7 +208,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 1)
+            $qb->expr()->eq('is_primary', true)
         )->executeStatement();
     }
 
@@ -218,12 +218,12 @@ class CompanyLeadRepository extends CommonRepository
         $table_name = MAUTIC_TABLE_PREFIX.'companies_leads';
 
         $sql = "DELETE FROM {$table_name}
-            WHERE is_primary = 0
+            WHERE is_primary = FALSE
             AND (lead_id, company_id) IN (
                 SELECT lead_id, company_id FROM (
                     SELECT lead_id, company_id
                     FROM {$table_name}
-                    WHERE is_primary = 0
+                    WHERE is_primary = FALSE
                     ORDER BY lead_id ASC, company_id ASC
                     LIMIT ".self::DELETE_BATCH_SIZE.'
                 ) AS subquery
@@ -242,7 +242,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 0)
+            $qb->expr()->eq('is_primary', false)
         )->executeStatement();
     }
 }

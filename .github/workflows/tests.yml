@@ -191,6 +191,9 @@ jobs:
       - name: Install dependencies
         uses: "ramsey/composer-install@v3"
 
+      - name: Install psql client
+        run: apt-get update && apt-get install -y postgresql-client
+
       - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
         env:
           DB_DRIVER: pdo_pgsql

@@ -2,7 +2,9 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Expression;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder as BaseExpressionBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
 class ExpressionBuilder extends BaseExpressionBuilder
@@ -10,6 +12,14 @@ class ExpressionBuilder extends BaseExpressionBuilder
     public const REGEXP  = 'REGEXP';
 
     public const BETWEEN = 'BETWEEN';
+
+    private string $platform;
+
+    public function __construct(Connection $connection)
+    {
+        $this->platform = DatabasePlatform::getDatabasePlatform($connection->getDatabasePlatform());
+        parent::__construct($connection);
+    }
 
     /**
      * Creates a between comparison expression.
@@ -59,7 +69,11 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function regexp($x, $y)
     {
-        return $this->comparison($x, self::REGEXP, $y);
+        if ('postgresql' == $this->platform) {
+            return $this->comparison($x, '~*', $y);
+        } else {
+            return $this->comparison($x, self::REGEXP, $y);
+        }
     }
 
     /**
@@ -77,7 +91,11 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function notRegexp($x, $y): string
     {
-        return 'NOT '.$this->comparison($x, self::REGEXP, $y);
+        if ('postgresql' == $this->platform) {
+            return $this->comparison($x, '!~*', $y);
+        } else {
+            return 'NOT '.$this->comparison($x, self::REGEXP, $y);
+        }
     }
 
     /**

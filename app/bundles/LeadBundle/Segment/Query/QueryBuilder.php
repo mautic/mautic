@@ -23,11 +23,6 @@ class QueryBuilder extends BaseQueryBuilder
         parent::__construct($connection);
     }
 
-    public function getConnection(): Connection
-    {
-        return $this->connection;
-    }
-
     /**
      * @return ExpressionBuilder
      */
