@@ -17,7 +17,7 @@ class CompanyLeadRepository extends CommonRepository
      */
     public function saveEntities($entities, $new = true): void
     {
-        // Get a list of contacts and set primary to 0
+        // Get a list of contacts and set primary to TRUE
         if ($new) {
             $contacts  = [];
             $contactId = null;
@@ -35,7 +35,7 @@ class CompanyLeadRepository extends CommonRepository
                 // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-                    ->set('is_primary', true);
+                    ->set('is_primary', 'TRUE');
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
@@ -67,7 +67,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', true)
+                $q->expr()->eq('cl.is_primary', 'TRUE')
             );
         }
 
@@ -208,7 +208,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', true)
+            $qb->expr()->eq('is_primary', 'TRUE')
         )->executeStatement();
     }
 
@@ -242,7 +242,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', false)
+            $qb->expr()->eq('is_primary', 'FALSE')
         )->executeStatement();
     }
 }

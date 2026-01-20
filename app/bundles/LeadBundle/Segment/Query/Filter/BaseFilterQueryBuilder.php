@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -11,10 +13,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
+    private string $platform;
+
     public function __construct(
         private RandomParameterName $parameterNameGenerator,
         private EventDispatcherInterface $dispatcher,
+        Connection $connection,
     ) {
+        $this->platform = DatabasePlatform::getDatabasePlatform($connection->getDatabasePlatform());
+    }
+
+    public function getPlatform(): string
+    {
+        return $this->platform;
     }
 
     public static function getServiceId(): string

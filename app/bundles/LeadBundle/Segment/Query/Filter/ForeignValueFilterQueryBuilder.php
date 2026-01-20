@@ -114,7 +114,8 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
                 // Detect platform and choose correct operator
-                $isPg = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+                // $isPg = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+                $isPg = 'postgresql' == $this->getPlatform();
 
                 if ($isPg) {
                     $not      = ('notRegexp' === $filterOperator) ? '!' : '';

@@ -53,6 +53,13 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         );
     }
 
+    public function getMockedConnection(): mixed
+    {
+        $connection = $this->createMock(Connection::class);
+
+        return $connection;
+    }
+
     public function testGetServiceId(): void
     {
         $this->assertEquals(

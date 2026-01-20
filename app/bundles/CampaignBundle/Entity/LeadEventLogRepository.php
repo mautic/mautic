@@ -8,6 +8,7 @@ use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -577,19 +578,32 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function unscheduleEvents(Lead $campaignMember, $message): void
     {
+        $connection = $this->getEntityManager()->getConnection();
+        $isPg       = 'postgresql' == DatabasePlatform::getDatabasePlatform($connection->getDatabasePlatform());
+
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();
         $rotation   = $campaignMember->getRotation();
         $dateAdded  = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
         // Insert entries into the failed log so it's known why they were never executed
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql    = <<<SQL
+
+        if ($isPg) {
+            $sql = <<<SQL
+INSERT INTO {$prefix}campaign_lead_event_failed_log (log_id, date_added, reason)
+SELECT id, :dateAdded as date_added, :message as reason
+FROM {$prefix}campaign_lead_event_log
+WHERE is_scheduled = TRUE AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
+ON CONFLICT (log_id) DO UPDATE SET date_added = EXCLUDED.date_added, reason = EXCLUDED.reason
+SQL;
+        } else {
+            $sql    = <<<SQL
 REPLACE INTO {$prefix}campaign_lead_event_failed_log( `log_id`, `date_added`, `reason`)
 SELECT id, :dateAdded as date_added, :message as reason from {$prefix}campaign_lead_event_log
-WHERE is_scheduled = 1 AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
+WHERE is_scheduled = TRUE AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
 SQL;
+        }
 
-        $connection = $this->getEntityManager()->getConnection();
         $stmt       = $connection->prepare($sql);
         $stmt->bindValue('dateAdded', $dateAdded, \PDO::PARAM_STR);
         $stmt->bindValue('message', $message, \PDO::PARAM_STR);
@@ -601,10 +615,10 @@ SQL;
         // Now unschedule them
         $qb = $connection->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
-            ->set('is_scheduled', 0)
+            ->set('is_scheduled', 'false')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('is_scheduled', 1),
+                    $qb->expr()->eq('is_scheduled', 'true'),
                     $qb->expr()->eq('lead_id', ':contactId'),
                     $qb->expr()->eq('campaign_id', ':campaignId'),
                     $qb->expr()->eq('rotation', ':rotation')
