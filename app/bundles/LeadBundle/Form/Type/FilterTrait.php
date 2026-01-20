@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -318,9 +319,11 @@ trait FilterTrait
                             // Let's test the regex's syntax by making a fake query
                             try {
                                 $qb = $this->connection->createQueryBuilder();
+                                $isPg = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+                                $op = $isPg ? '~*' : 'REGEXP';
                                 $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                                    ->where('l.id REGEXP :regex')
+                                    ->where('l.id '.$op.' :regex')
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->executeQuery()->fetchAllAssociative();

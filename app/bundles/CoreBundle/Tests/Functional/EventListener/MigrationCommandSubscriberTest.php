@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
@@ -55,59 +56,100 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
         $output = $this->executeMigrationCommand();
 
-        Assert::assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_first
--> ALTER TABLE {$this->tablePrefix}test_first ADD generated_name_one CHAR(2) AS (SUBSTRING(name, 1, 2)) COMMENT '(DC2Type:generated)', 
-ADD generated_name_three CHAR(2) AS (SUBSTRING(name, 5, 2)) COMMENT '(DC2Type:generated)'
-++ Execution finished", $output);
+        // Relaxed, platform-agnostic checks – we only verify that the expected steps were executed
+        Assert::assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_first", $output);
+        Assert::assertStringContainsString("adding indices for table {$this->tablePrefix}test_first", $output);
+        Assert::assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_second", $output);
+        Assert::assertStringContainsString("adding indices for table {$this->tablePrefix}test_second", $output);
 
-        Assert::assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_first
--> ALTER TABLE {$this->tablePrefix}test_first ADD INDEX `{$this->tablePrefix}generated_name_one`(generated_name_one), 
-ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
-++ Execution finished", $output);
-
-        Assert::assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_second
--> ALTER TABLE {$this->tablePrefix}test_second ADD generated_date_year YEAR AS (YEAR(date_added)) STORED COMMENT '(DC2Type:generated)'
-++ Execution finished", $output);
-
-        Assert::assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_second
--> ALTER TABLE {$this->tablePrefix}test_second ADD INDEX `{$this->tablePrefix}campaign_id_generated_date_year_id`(campaign_id, generated_date_year, id)
-++ Execution finished", $output);
-
-        $this->assertTableHasColumnAndIndex('test_first', 'generated_name_one', 'generated_name_one');
-        $this->assertTableHasColumnAndIndex('test_first', 'generated_name_three', 'generated_name_three');
-        $this->assertTableHasColumnAndIndex('test_second', 'generated_date_year', 'campaign_id_generated_date_year_id');
+        // Platform-agnostic verification of columns and indexes via schema introspection
+        $this->assertGeneratedColumnsAndIndexesExist();
     }
 
-    private function assertTableHasColumnAndIndex(string $table, string $column, string $index): void
+    private function assertGeneratedColumnsAndIndexesExist(): void
     {
-        $result = $this->connection->fetchAssociative("SHOW COLUMNS FROM {$this->tablePrefix}{$table} WHERE Field = '{$column}'");
-        Assert::assertNotEmpty($result, sprintf('Table "%s" is expected to have column "%s".', $table, $column));
+        $schemaManager = $this->connection->createSchemaManager();
 
-        $result = $this->connection->fetchAssociative("SHOW INDEX FROM {$this->tablePrefix}{$table} WHERE Key_name = '{$this->tablePrefix}{$index}'");
-        Assert::assertNotEmpty($result, sprintf('Table "%s" is expected to have index "%s".', $table, $index));
+        // test_first
+        $tableFirst = $schemaManager->introspectTable($this->tablePrefix.'test_first');
+
+        Assert::assertTrue($tableFirst->hasColumn('generated_name_one'), 'generated_name_one column missing');
+        Assert::assertTrue($tableFirst->hasColumn('generated_name_three'), 'generated_name_three column missing');
+
+        $hasIndexOne = $this->hasSingleColumnIndex($tableFirst, 'generated_name_one');
+        $hasIndexThree = $this->hasSingleColumnIndex($tableFirst, 'generated_name_three');
+
+        Assert::assertTrue($hasIndexOne, 'Index on generated_name_one missing');
+        Assert::assertTrue($hasIndexThree, 'Index on generated_name_three missing');
+
+        // test_second
+        $tableSecond = $schemaManager->introspectTable($this->tablePrefix.'test_second');
+
+        Assert::assertTrue($tableSecond->hasColumn('generated_date_year'), 'generated_date_year column missing');
+
+        $hasCompositeIndex = $this->hasCompositeIndex($tableSecond, ['campaign_id', 'generated_date_year', 'id']);
+
+        Assert::assertTrue($hasCompositeIndex, 'Composite index on (campaign_id, generated_date_year, id) missing');
+    }
+
+    private function hasSingleColumnIndex(\Doctrine\DBAL\Schema\Table $table, string $column): bool
+    {
+        foreach ($table->getIndexes() as $index) {
+            $columns = $index->getColumns();
+            if (count($columns) === 1 && $columns[0] === $column) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasCompositeIndex(\Doctrine\DBAL\Schema\Table $table, array $expectedColumns): bool
+    {
+        foreach ($table->getIndexes() as $index) {
+            if ($index->getColumns() === $expectedColumns) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function createTables(): void
     {
-        $this->connection->executeStatement("
-            CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first
-            (
-                id int unsigned not null,
-                name varchar(100) NOT NULL,
-                generated_name_two CHAR(2) AS (SUBSTRING(name, 3, 2)),
-                primary key (id)
-            )
-        ");
+        $isPostgreSQL = $this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform;
 
-        $this->connection->executeStatement("
-            CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_second
-            (
-                id int unsigned not null,
-                campaign_id int not null,
-                date_added datetime NOT NULL,
-                primary key (id)
-            )
-        ");
+        $idType = $isPostgreSQL ? 'integer' : 'int unsigned';
+        $dateType = $isPostgreSQL ? 'timestamp' : 'datetime';
+
+        // Generated column syntax differs significantly between MySQL and PostgreSQL
+        $generatedColumnSql = $isPostgreSQL
+            ? 'generated_name_two CHAR(2) GENERATED ALWAYS AS (substring(name from 3 for 2)) STORED,'
+            : 'generated_name_two CHAR(2) AS (SUBSTRING(name, 3, 2)),';
+
+        // test_first (pre-creates one generated column to test skipping duplicates)
+        $sqlFirst = <<<SQL
+CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first (
+    id $idType NOT NULL,
+    name varchar(100) NOT NULL,
+    $generatedColumnSql
+    PRIMARY KEY (id)
+)
+SQL;
+
+        $this->connection->executeStatement($sqlFirst);
+
+        // test_second (no pre-existing generated column)
+        $sqlSecond = <<<SQL
+CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_second (
+    id $idType NOT NULL,
+    campaign_id integer NOT NULL,
+    date_added $dateType NOT NULL,
+    PRIMARY KEY (id)
+)
+SQL;
+
+        $this->connection->executeStatement($sqlSecond);
     }
 
     private function dropTable(string $table): void

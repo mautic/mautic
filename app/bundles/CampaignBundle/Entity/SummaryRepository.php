@@ -107,12 +107,21 @@ class SummaryRepository extends CommonRepository
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
             $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + ($intervalInSeconds - 1));
 
+            // Quote the date strings once
+            $quotedFrom = $connection->quote($dateFromTs);
+            $quotedTo   = $connection->quote($dateToTs);
+
+            // Platform-specific expressions to ensure correct type (timestamp/datetime)
+            $dateTriggeredExpr = $isPg ? $quotedFrom . '::timestamp' : $quotedFrom;
+            $dateFromExpr      = $isPg ? $quotedFrom . '::timestamp' : $quotedFrom;
+            $dateToExpr        = $isPg ? $quotedTo . '::timestamp' : $quotedTo;
+
             // Build inner aggregation query with consistent integer types in CASE branches
             $innerSql = '
                 SELECT 
                     mclel.campaign_id AS campaign_id, 
                     mclel.event_id AS event_id, 
-                    '.$connection->quote($dateFromTs).' AS date_triggered,
+                    '.$dateTriggeredExpr.' AS date_triggered,
                     SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 1 ELSE 0 END) AS scheduled_count,
                     SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 0 
                              ELSE CASE WHEN mclel.non_action_path_taken = TRUE THEN 1 ELSE 0 END END) AS non_action_path_taken_count,
@@ -129,8 +138,8 @@ class SummaryRepository extends CommonRepository
                 FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel 
                 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl 
                     ON mclefl.log_id = mclel.id 
-                   AND mclefl.date_added BETWEEN '.$connection->quote($dateFromTs).' AND '.$connection->quote($dateToTs).'
-                WHERE mclel.date_triggered BETWEEN '.$connection->quote($dateFromTs).' AND '.$connection->quote($dateToTs).'
+                   AND mclefl.date_added BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
+                WHERE mclel.date_triggered BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
             ';
 
             if (null !== $campaignId) {

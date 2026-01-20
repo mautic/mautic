@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
+use Doctrine\DBAL\Connection;
 
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
 class DoctrineEventSubscriber
@@ -50,13 +51,11 @@ class DoctrineEventSubscriber
             }
         }
         // Add MySQL missing functions + operators to PostgreSQL
-        $this->postgreSqlMySqlCompact($args);
+        $this->postgreSqlMySqlCompact($args->getEntityManager()->getConnection());
     }
 
-    private function postgreSqlMySqlCompact(GenerateSchemaEventArgs $args): void
+    public function postgreSqlMySqlCompact(Connection $conn): void
     {
-        $conn = $args->getEntityManager()->getConnection();
-
         if (!$conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             return;
         }
@@ -105,6 +104,8 @@ class DoctrineEventSubscriber
             END;
             $$',
             'CREATE OR REPLACE FUNCTION ifnull(a anyelement, b anyelement) RETURNS anyelement LANGUAGE sql IMMUTABLE AS $$SELECT coalesce($1,$2);$$',
+            'CREATE OR REPLACE FUNCTION isnull(a anyelement, b anyelement) RETURNS anyelement LANGUAGE sql IMMUTABLE AS $$SELECT coalesce($1,$2);$$',
+            "CREATE OR REPLACE FUNCTION format(n numeric, decimals int DEFAULT 2) RETURNS text LANGUAGE sql IMMUTABLE AS \$\$SELECT to_char(n, 'FM999,999,999,999,999,990D' || repeat('0', decimals));\$\$",
             "CREATE OR REPLACE FUNCTION find_in_set(needle text, haystack text)
              RETURNS integer LANGUAGE plpgsql IMMUTABLE AS \$\$
              DECLARE
@@ -125,6 +126,9 @@ class DoctrineEventSubscriber
                  RETURN 0;
              END;
              \$\$;",
+            'CREATE OR REPLACE FUNCTION from_unixtime(ts bigint) RETURNS timestamp with time zone LANGUAGE sql IMMUTABLE AS $$SELECT to_timestamp(ts);$$',
+            'CREATE OR REPLACE FUNCTION unix_timestamp(ts timestamp with time zone) RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM ts)::bigint;$$',
+            'CREATE OR REPLACE FUNCTION unix_timestamp() RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM now())::bigint;$$',
             "CREATE OR REPLACE FUNCTION sec_to_time(secs integer) RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$SELECT to_char(make_interval(secs => abs(secs)), CASE WHEN secs < 0 THEN '-FMHH24:MI:SS' ELSE 'FMHH24:MI:SS' END);\$\$",
             "CREATE OR REPLACE FUNCTION sec_to_time(secs bigint) RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$SELECT to_char(make_interval(secs => abs(secs)::integer), CASE WHEN secs < 0 THEN '-FMHH24:MI:SS' ELSE 'FMHH24:MI:SS' END);\$\$",
             'CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT split_part($1, $2, $3);$$',
@@ -136,6 +140,10 @@ class DoctrineEventSubscriber
             'CREATE OR REPLACE FUNCTION month(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(MONTH FROM $1)::integer;$$',
             'CREATE OR REPLACE FUNCTION day(date) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(DAY FROM $1)::integer;$$',
             'CREATE OR REPLACE FUNCTION day(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(DAY FROM $1)::integer;$$',
+            'CREATE OR REPLACE FUNCTION if(cond boolean, then_val anyelement, else_val anyelement)
+             RETURNS anyelement LANGUAGE sql IMMUTABLE AS $$
+               SELECT CASE WHEN cond THEN then_val ELSE else_val END;
+             $$',
         ];
 
         foreach ($functions as $sql) {

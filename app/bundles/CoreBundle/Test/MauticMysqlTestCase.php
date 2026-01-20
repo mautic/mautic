@@ -5,6 +5,9 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Mautic\InstallBundle\EventListener\DoctrineEventSubscriber;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -181,12 +184,23 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function truncateTables(string ...$tables): void
     {
-        $prefix = MAUTIC_TABLE_PREFIX;
+        $prefix = $this->getTablePrefix();
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
         }
         foreach ($tables as $table) {
-            $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
+            $fullTable = $prefix.$table;
+            $quotedTable  = $this->connection->quoteIdentifier($fullTable);
+
+            $sql = 'TRUNCATE TABLE ' . $quotedTable;
+
+            if ($this->isPostgresqlPlatform()) {
+                // Reset sequences (equivalent to MySQL AUTO_INCREMENT reset)
+                // and cascade to handle foreign key references (equivalent to disabling checks)
+                $sql .= ' RESTART IDENTITY CASCADE';
+            }
+
+            $this->connection->executeQuery($sql);
         }
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
@@ -334,6 +348,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
         $this->testSymfonyCommand('doctrine:schema:create');
         $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
+
+        if($this->isPostgresqlPlatform()) {
+            // make sure compatibility layer is created
+            $args       = new GenerateSchemaEventArgs($this->em, new Schema());
+            $subscriber = new DoctrineEventSubscriber();
+            $subscriber->postGenerateSchema($args);
+        }
     }
 
     private function generateResetDatabaseSql(string $file): void
