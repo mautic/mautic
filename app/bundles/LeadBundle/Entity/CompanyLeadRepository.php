@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
@@ -17,7 +18,7 @@ class CompanyLeadRepository extends CommonRepository
      */
     public function saveEntities($entities, $new = true): void
     {
-        // Get a list of contacts and set primary to TRUE
+        // Get a list of contacts and set primary to 0
         if ($new) {
             $contacts  = [];
             $contactId = null;
@@ -35,7 +36,7 @@ class CompanyLeadRepository extends CommonRepository
                 // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-                    ->set('is_primary', 1);
+                    ->set('is_primary', 0);
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
@@ -56,8 +57,8 @@ class CompanyLeadRepository extends CommonRepository
         $q->select('cl.company_id, cl.date_added as date_associated, cl.is_primary, comp.*')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
-        ->where('cl.lead_id = :leadId')
-        ->setParameter('leadId', $leadId);
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
 
         if ($companyId) {
             $q->andWhere(
@@ -67,7 +68,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', 1)
+                $q->expr()->eq('cl.is_primary', true)
             );
         }
 
@@ -192,12 +193,12 @@ class CompanyLeadRepository extends CommonRepository
         $leadIds = $q->executeQuery()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX.'leads')
-            ->set('company', ':company')
-            ->setParameter('company', $company->getName())
-            ->where(
-                $q->expr()->in('id', $leadIds)
-            )->executeStatement();
+                ->update(MAUTIC_TABLE_PREFIX.'leads')
+                ->set('company', ':company')
+                ->setParameter('company', $company->getName())
+                ->where(
+                    $q->expr()->in('id', $leadIds)
+                )->executeStatement();
         }
     }
 
@@ -214,23 +215,19 @@ class CompanyLeadRepository extends CommonRepository
 
     public function removeAllSecondaryCompanies(): void
     {
-        $conn       = $this->getEntityManager()->getConnection();
-        $table_name = MAUTIC_TABLE_PREFIX.'companies_leads';
+        $conn = $this->getEntityManager()->getConnection();
 
         do {
-            $sql = "DELETE FROM {$table_name}
-            WHERE is_primary = 0
-            AND (lead_id, company_id) IN (
-                SELECT lead_id, company_id FROM (
-                    SELECT lead_id, company_id
-                    FROM {$table_name}
-                    WHERE is_primary = 0
-                    ORDER BY lead_id ASC, company_id ASC
-                    LIMIT ".self::DELETE_BATCH_SIZE.'
-                ) AS subquery
-            )';
-            $rows = $conn->executeStatement($sql);
-        } while ($rows > 0);
+            if ($conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads 
+                WHERE (company_id, lead_id) IN (SELECT company_id, lead_id 
+                    FROM '.MAUTIC_TABLE_PREFIX.'companies_leads
+                    WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE.')';
+            } else {
+                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
+            }
+            $row = $conn->executeStatement($sql);
+        } while ($row);
     }
 
     public function removeContactSecondaryCompanies(int $leadId): void
