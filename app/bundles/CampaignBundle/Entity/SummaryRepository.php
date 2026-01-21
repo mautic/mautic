@@ -173,7 +173,7 @@ class SummaryRepository extends CommonRepository
             if ($isPg) {
                 $insertSql = '
                 INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary ('.$pgIdColumn.$columns.')
-                SELECT '.$columns.' FROM ('.$innerSql.') AS tmp
+                SELECT '.$pgIdColumn.$columns.' FROM ('.$innerSql.') AS tmp
                 ';
                 $sql = $insertSql.'
                     ON CONFLICT (campaign_id, event_id, date_triggered) 
