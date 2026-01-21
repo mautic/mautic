@@ -81,9 +81,10 @@ class ListLeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
+
         $conn->executeQuery(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
 
-        // PostgreSQL requires "AS SELECT" for table creation
+        // Create temp table with IDs to delete
         $asSelect = $isPg ? 'AS ' : '';
         $conn->executeQuery(sprintf(
             'CREATE TEMPORARY TABLE %s %s SELECT lll.leadlist_id, lll.lead_id FROM %s lll JOIN %s l ON l.id = lll.lead_id WHERE l.date_identified IS NULL',
@@ -100,8 +101,8 @@ class ListLeadRepository extends CommonRepository
                 // PostgreSQL: DELETE FROM ... USING
                 $deleteQuery = sprintf(
                     'DELETE FROM %s lll 
-             USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d 
-             WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
+                 USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d 
+                 WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
                     $tableName,
                     $tempTableName,
                     self::DELETE_BATCH_SIZE
@@ -119,15 +120,20 @@ class ListLeadRepository extends CommonRepository
             $deletedRows = $conn->executeStatement($deleteQuery);
             $deletedRecordCount += $deletedRows;
 
-            // Cleanup the temporary table for the next iteration to prevent infinite loops
-            // or re-deleting the same rows if the temporary table is large
             if ($deletedRows > 0) {
-                $conn->executeStatement(sprintf(
-                    'DELETE FROM %s WHERE (leadlist_id, lead_id) IN (SELECT leadlist_id, lead_id FROM %s LIMIT %d)',
-                    $tempTableName,
-                    $tempTableName,
-                    self::DELETE_BATCH_SIZE
-                ));
+                if ($isPg) {
+                    $conn->executeStatement(sprintf(
+                        'DELETE FROM %s WHERE (leadlist_id, lead_id) IN (SELECT leadlist_id, lead_id FROM %s LIMIT %d)',
+                        $tempTableName, $tempTableName, self::DELETE_BATCH_SIZE
+                    ));
+                } else {
+                    // Direct LIMIT is allowed on DELETE for single tables
+                    $conn->executeStatement(sprintf(
+                        'DELETE FROM %s LIMIT %d',
+                        $tempTableName,
+                        self::DELETE_BATCH_SIZE
+                    ));
+                }
             }
         } while ($deletedRows > 0);
 
