@@ -866,7 +866,7 @@ class StatRepository extends CommonRepository
         // main query
         $queryBuilder->addSelect(
             "COUNT({$statsAlias}.id) AS sent_count",
-            "SUM(COALESCE({$statsAlias}.is_read, 0)) AS read_count",
+            "SUM(CASE WHEN {$statsAlias}.is_read IS NOT NULL THEN 1 ELSE 0 END) AS read_count",
             "SUM(CASE WHEN {$subQueryAlias}.hits IS NOT NULL THEN 1 ELSE 0 END) AS clicked_through_count",
             "{$leadAlias}.country AS country"
         )

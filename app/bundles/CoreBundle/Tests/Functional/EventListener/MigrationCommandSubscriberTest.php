@@ -104,6 +104,9 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         return false;
     }
 
+    /**
+     * @param array<string> $expectedColumns
+     */
     private function hasCompositeIndex(\Doctrine\DBAL\Schema\Table $table, array $expectedColumns): bool
     {
         foreach ($table->getIndexes() as $index) {
