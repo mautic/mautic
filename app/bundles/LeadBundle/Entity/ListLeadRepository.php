@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -76,59 +77,59 @@ class ListLeadRepository extends CommonRepository
     public function deleteAnonymousContacts(): int
     {
         $conn           = $this->getEntityManager()->getConnection();
+        $isPg           = $conn->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
-        $batchSize      = self::DELETE_BATCH_SIZE;
+        $tempTableName  = 'to_delete';
+        $conn->executeQuery(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
+
+        // PostgreSQL requires "AS SELECT" for table creation
+        $asSelect = $isPg ? 'AS ' : '';
+        $conn->executeQuery(sprintf(
+            'CREATE TEMPORARY TABLE %s %s SELECT lll.leadlist_id, lll.lead_id FROM %s lll JOIN %s l ON l.id = lll.lead_id WHERE l.date_identified IS NULL',
+            $tempTableName,
+            $asSelect,
+            $tableName,
+            $leadsTableName
+        ));
 
         $deletedRecordCount = 0;
-        $offset             = 0;
 
         do {
-            // Fetch next batch of composite keys (leadlist_id, lead_id)
-            $selectSql = "
-                SELECT lll.leadlist_id, lll.lead_id
-                FROM {$tableName} lll
-                INNER JOIN {$leadsTableName} l ON l.id = lll.lead_id
-                WHERE l.date_identified IS NULL
-                ORDER BY lll.leadlist_id ASC, lll.lead_id ASC
-                LIMIT {$batchSize} OFFSET {$offset}
-            ";
-
-            $rows = $conn->executeQuery($selectSql)->fetchAllAssociative();
-
-            if (empty($rows)) {
-                break;
+            if ($isPg) {
+                // PostgreSQL: DELETE FROM ... USING
+                $deleteQuery = sprintf(
+                    'DELETE FROM %s lll 
+             USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d 
+             WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
+                    $tableName,
+                    $tempTableName,
+                    self::DELETE_BATCH_SIZE
+                );
+            } else {
+                // MySQL/MariaDB: DELETE lll FROM ... JOIN
+                $deleteQuery = sprintf(
+                    'DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id)',
+                    $tableName,
+                    $tempTableName,
+                    self::DELETE_BATCH_SIZE
+                );
             }
 
-            // Build IN clause with tuple values: (1,100), (1,101), ...
-            $placeholders = [];
-            $params       = [];
-            $types        = [];
-
-            foreach ($rows as $row) {
-                $placeholders[] = '(?, ?)';
-                $params[]       = (int) $row['leadlist_id'];
-                $params[]       = (int) $row['lead_id'];
-                $types[]        = \PDO::PARAM_INT;
-                $types[]        = \PDO::PARAM_INT;
-            }
-
-            $tupleList = implode(', ', $placeholders);
-
-            // Delete this batch
-            $deleteSql = "
-                DELETE FROM {$tableName}
-                WHERE (leadlist_id, lead_id) IN ({$tupleList})
-            ";
-
-            $deletedRows = $conn->executeStatement($deleteSql, $params, $types);
+            $deletedRows = $conn->executeStatement($deleteQuery);
             $deletedRecordCount += $deletedRows;
 
-            $offset += $batchSize;
-
-            // Small sleep to reduce DB load in very large operations
-            // usleep(100000); // 0.1s - uncomment if needed
-        } while (count($rows) === $batchSize);
+            // Cleanup the temporary table for the next iteration to prevent infinite loops
+            // or re-deleting the same rows if the temporary table is large
+            if ($deletedRows > 0) {
+                $conn->executeStatement(sprintf(
+                    'DELETE FROM %s WHERE (leadlist_id, lead_id) IN (SELECT leadlist_id, lead_id FROM %s LIMIT %d)',
+                    $tempTableName,
+                    $tempTableName,
+                    self::DELETE_BATCH_SIZE
+                ));
+            }
+        } while ($deletedRows > 0);
 
         return $deletedRecordCount;
     }
