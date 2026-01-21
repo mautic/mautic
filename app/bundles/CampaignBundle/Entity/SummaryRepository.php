@@ -103,6 +103,21 @@ class SummaryRepository extends CommonRepository
         $platform   = $connection->getDatabasePlatform();
         $isPg       = $platform instanceof PostgreSQLPlatform;
 
+        $pgIdColumn = '';
+        $pgIdSelect = '';
+
+        if ($isPg) { // Because we use direct SQL doctrine do not prepare ID columns
+            // SQLSTATE[23502]:
+            // Not null violation: 7 ERROR:
+            // null value in column "id" of relation "campaign_summary" violates not-null constraint
+            // Detect sequence - use metadata
+            $metadata     = $this->getEntityManager()->getClassMetadata(Summary::class);
+            $sequenceName = $metadata->getSequenceName($platform);
+
+            $pgIdColumn = 'id, ';
+            $pgIdSelect = "nextval('$sequenceName') AS id, ";
+        }
+
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
             $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + ($intervalInSeconds - 1));
@@ -119,6 +134,7 @@ class SummaryRepository extends CommonRepository
             // Build inner aggregation query with consistent integer types in CASE branches
             $innerSql = '
                 SELECT 
+                    '.$pgIdSelect.'
                     mclel.campaign_id AS campaign_id, 
                     mclel.event_id AS event_id, 
                     '.$dateTriggeredExpr.' AS date_triggered,
@@ -154,12 +170,11 @@ class SummaryRepository extends CommonRepository
 
             $columns = 'campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed';
 
-            $insertSql = '
-                INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary ('.$columns.')
-                SELECT '.$columns.' FROM ('.$innerSql.') AS tmp
-            ';
-
             if ($isPg) {
+                $insertSql = '
+                INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary ('.$pgIdColumn.$columns.')
+                SELECT '.$columns.' FROM ('.$innerSql.') AS tmp
+                ';
                 $sql = $insertSql.'
                     ON CONFLICT (campaign_id, event_id, date_triggered) 
                     DO UPDATE SET
@@ -170,6 +185,10 @@ class SummaryRepository extends CommonRepository
                         log_counts_processed = EXCLUDED.log_counts_processed
                 ';
             } else {
+                $insertSql = '
+                INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary ('.$columns.')
+                SELECT '.$columns.' FROM ('.$innerSql.') AS tmp
+                ';
                 $sql = $insertSql.'
                     ON DUPLICATE KEY UPDATE
                         scheduled_count = VALUES(scheduled_count),
