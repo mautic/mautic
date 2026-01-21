@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -77,45 +76,13 @@ class ListLeadRepository extends CommonRepository
     public function deleteAnonymousContacts(): int
     {
         $conn           = $this->getEntityManager()->getConnection();
-        $isPg           = $conn->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-
-        $conn->executeQuery(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
-
-        // Create temp table with IDs to delete
-        $asSelect = $isPg ? 'AS ' : '';
-        $conn->executeQuery(sprintf(
-            'CREATE TEMPORARY TABLE %s %s SELECT lll.leadlist_id, lll.lead_id FROM %s lll JOIN %s l ON l.id = lll.lead_id WHERE l.date_identified IS NULL',
-            $tempTableName,
-            $asSelect,
-            $tableName,
-            $leadsTableName
-        ));
-
-        $deletedRecordCount = 0;
-
-        if ($isPg) {
-            // PostgreSQL: DELETE FROM ... USING
-            $deleteQuery = sprintf(
-                'DELETE FROM %s lll
-             USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d
-             WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
-                $tableName,
-                $tempTableName,
-                self::DELETE_BATCH_SIZE
-            );
-        } else {
-            // MySQL/MariaDB: DELETE lll FROM ... JOIN
-            $deleteQuery = sprintf(
-                'DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id)',
-                $tableName,
-                $tempTableName,
-                self::DELETE_BATCH_SIZE
-            );
-        }
-
+        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
+        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select lll.leadlist_id, lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
+        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
+        $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
         }
