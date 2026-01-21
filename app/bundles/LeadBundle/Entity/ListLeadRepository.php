@@ -96,46 +96,29 @@ class ListLeadRepository extends CommonRepository
 
         $deletedRecordCount = 0;
 
-        do {
-            if ($isPg) {
-                // PostgreSQL: DELETE FROM ... USING
-                $deleteQuery = sprintf(
-                    'DELETE FROM %s lll 
-                 USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d 
-                 WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
-                    $tableName,
-                    $tempTableName,
-                    self::DELETE_BATCH_SIZE
-                );
-            } else {
-                // MySQL/MariaDB: DELETE lll FROM ... JOIN
-                $deleteQuery = sprintf(
-                    'DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id)',
-                    $tableName,
-                    $tempTableName,
-                    self::DELETE_BATCH_SIZE
-                );
-            }
+        if ($isPg) {
+            // PostgreSQL: DELETE FROM ... USING
+            $deleteQuery = sprintf(
+                'DELETE FROM %s lll
+             USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d
+             WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
+                $tableName,
+                $tempTableName,
+                self::DELETE_BATCH_SIZE
+            );
+        } else {
+            // MySQL/MariaDB: DELETE lll FROM ... JOIN
+            $deleteQuery = sprintf(
+                'DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id)',
+                $tableName,
+                $tempTableName,
+                self::DELETE_BATCH_SIZE
+            );
+        }
 
-            $deletedRows = $conn->executeStatement($deleteQuery);
+        while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
-
-            if ($deletedRows > 0) {
-                if ($isPg) {
-                    $conn->executeStatement(sprintf(
-                        'DELETE FROM %s WHERE (leadlist_id, lead_id) IN (SELECT leadlist_id, lead_id FROM %s LIMIT %d)',
-                        $tempTableName, $tempTableName, self::DELETE_BATCH_SIZE
-                    ));
-                } else {
-                    // Direct LIMIT is allowed on DELETE for single tables
-                    $conn->executeStatement(sprintf(
-                        'DELETE FROM %s LIMIT %d',
-                        $tempTableName,
-                        self::DELETE_BATCH_SIZE
-                    ));
-                }
-            }
-        } while ($deletedRows > 0);
+        }
 
         return $deletedRecordCount;
     }

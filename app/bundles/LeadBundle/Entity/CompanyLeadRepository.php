@@ -226,8 +226,8 @@ class CompanyLeadRepository extends CommonRepository
             } else {
                 $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
             }
-            $row = $conn->executeStatement($sql);
-        } while ($row);
+            $rows = $conn->executeStatement($sql);
+        } while ($rows > 0);
     }
 
     public function removeContactSecondaryCompanies(int $leadId): void
