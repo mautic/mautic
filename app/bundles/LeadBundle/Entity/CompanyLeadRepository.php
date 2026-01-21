@@ -35,7 +35,7 @@ class CompanyLeadRepository extends CommonRepository
                 // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-                    ->set('is_primary', 'TRUE');
+                    ->set('is_primary', 1);
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
@@ -67,7 +67,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', 'TRUE')
+                $q->expr()->eq('cl.is_primary', 1)
             );
         }
 
@@ -188,7 +188,7 @@ class CompanyLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter('companyId', $company->getId())
-            ->andWhere('cl.is_primary = TRUE');
+            ->andWhere('cl.is_primary = 1');
         $leadIds = $q->executeQuery()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -208,7 +208,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 'TRUE')
+            $qb->expr()->eq('is_primary', 1)
         )->executeStatement();
     }
 
@@ -217,22 +217,20 @@ class CompanyLeadRepository extends CommonRepository
         $conn       = $this->getEntityManager()->getConnection();
         $table_name = MAUTIC_TABLE_PREFIX.'companies_leads';
 
-        $sql = "DELETE FROM {$table_name}
-            WHERE is_primary = FALSE
+        do {
+            $sql = "DELETE FROM {$table_name}
+            WHERE is_primary = 0
             AND (lead_id, company_id) IN (
                 SELECT lead_id, company_id FROM (
                     SELECT lead_id, company_id
                     FROM {$table_name}
-                    WHERE is_primary = FALSE
+                    WHERE is_primary = 0
                     ORDER BY lead_id ASC, company_id ASC
                     LIMIT ".self::DELETE_BATCH_SIZE.'
                 ) AS subquery
             )';
-
-        $rows = true;
-        while ($rows > 0) {
             $rows = $conn->executeStatement($sql);
-        }
+        } while ($rows > 0);
     }
 
     public function removeContactSecondaryCompanies(int $leadId): void
@@ -242,7 +240,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 'FALSE')
+            $qb->expr()->eq('is_primary', 0)
         )->executeStatement();
     }
 }
