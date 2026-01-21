@@ -285,7 +285,7 @@ class LeadFieldRepository extends CommonRepository
                 )
                   ->setParameter('lead', (int) $lead);
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-                $regexOp = $isPg ? ('regexp' === $operatorExpr ? '~*' : '!~*') : ('regexp' === $operatorExpr ? 'REGEXP' : 'NOT REGEXP');
+                $regexOp = ('regexp' === $operatorExpr ? '~*' : '!~*');
 
                 $where = $property.' '.$regexOp.' :value';
 
@@ -299,8 +299,8 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $values     = (!is_array($value)) ? [$value] : $value;
-                $regexOp    = $isPg ? '~*' : 'REGEXP';
-                $notRegexOp = $isPg ? '!~*' : 'NOT REGEXP';
+                $regexOp    = '~*';
+                $notRegexOp = '!~*';
 
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
 class ExpressionBuilder extends BaseExpressionBuilder
 {
-    public const REGEXP  = 'REGEXP';
+    public const REGEXP  = '~*';
 
     public const BETWEEN = 'BETWEEN';
 
@@ -69,11 +69,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function regexp($x, $y)
     {
-        if ('postgresql' == $this->platform) {
-            return $this->comparison($x, '~*', $y);
-        } else {
-            return $this->comparison($x, self::REGEXP, $y);
-        }
+        return $this->comparison($x, self::REGEXP, $y);
     }
 
     /**
@@ -91,11 +87,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function notRegexp($x, $y): string
     {
-        if ('postgresql' == $this->platform) {
-            return $this->comparison($x, '!~*', $y);
-        } else {
-            return 'NOT '.$this->comparison($x, self::REGEXP, $y);
-        }
+        return $this->comparison($x, '!'.self::REGEXP, $y);
     }
 
     /**
