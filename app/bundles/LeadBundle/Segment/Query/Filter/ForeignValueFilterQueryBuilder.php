@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
@@ -111,9 +112,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->from($filter->getTable(), $tableAlias);
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
-
-                $not      = ('notRegexp' === $filterOperator) ? '!' : '';
-                $operator = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
+                $isPg = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+                if ($isPg) {
+                    $not      = ('notRegexp' === $filterOperator) ? '!' : '';
+                    $operator = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
+                } else {
+                    $not      = ('notRegexp' === $filterOperator) ? ' NOT' : '';
+                    $operator = ' REGEXP';
+                }
 
                 $expression = $tableAlias.'.'.$filter->getField().$not.$operator.' '.$filterParametersHolder;
                 $subQueryBuilder->andWhere($expression);
