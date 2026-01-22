@@ -92,7 +92,16 @@ class CodeEditor {
     try {
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim())
+      
+      // Extract only body content in HTML mode to prevent <head> duplication
+      let contentToSet = code.trim();
+      if (!ContentService.isMjmlMode(this.editor)) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(contentToSet, 'text/html');
+        contentToSet = doc.body.innerHTML;
+      }
+      
+      this.editor.setComponents(contentToSet);
 
       // Reinitialize the content after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
@@ -121,6 +130,11 @@ class CodeEditor {
       content = MjmlService.getEditorMjmlContent(this.editor);
     } else {
       content = ContentService.getEditorHtmlContent(this.editor);
+      // Extract only the body content to prevent <head> duplication
+      // when editing in code mode and saving repeatedly
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, 'text/html');
+      content = doc.body.innerHTML;
     }
     this.codeEditor.setContent(content);
   }

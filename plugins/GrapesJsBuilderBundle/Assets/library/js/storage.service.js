@@ -117,6 +117,10 @@ export default class StorageService {
             content = MjmlService.getEditorMjmlContent(this.editor);
         } else {
             content = ContentService.getEditorHtmlContent(this.editor);
+            // Extract only body content to prevent <head> duplication
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, 'text/html');
+            content = doc.body.innerHTML;
         }
         return content;
     }
