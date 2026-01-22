@@ -36,7 +36,7 @@ class CompanyLeadRepository extends CommonRepository
                 // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-                    ->set('is_primary', 0);
+                    ->set('is_primary', 'TRUE');
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
@@ -68,7 +68,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', true)
+                $q->expr()->eq('cl.is_primary', 'TRUE')
             );
         }
 
@@ -189,7 +189,7 @@ class CompanyLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter('companyId', $company->getId())
-            ->andWhere('cl.is_primary = 1');
+            ->andWhere('cl.is_primary = TRUE');
         $leadIds = $q->executeQuery()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -209,7 +209,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 1)
+            $qb->expr()->eq('is_primary', 'TRUE')
         )->executeStatement();
     }
 
@@ -222,9 +222,9 @@ class CompanyLeadRepository extends CommonRepository
                 $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads 
                 WHERE (company_id, lead_id) IN (SELECT company_id, lead_id 
                     FROM '.MAUTIC_TABLE_PREFIX.'companies_leads
-                    WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE.')';
+                    WHERE is_primary = FALSE LIMIT '.self::DELETE_BATCH_SIZE.')';
             } else {
-                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
+                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = FALSE LIMIT '.self::DELETE_BATCH_SIZE;
             }
             $row = $conn->executeStatement($sql);
         } while ($row);
@@ -237,7 +237,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 0)
+            $qb->expr()->eq('is_primary', 'FALSE')
         )->executeStatement();
     }
 }

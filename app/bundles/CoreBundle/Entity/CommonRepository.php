@@ -832,9 +832,17 @@ class CommonRepository extends ServiceEntityRepository
     public function upsert(object $entity): void
     {
         $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
         $metadata   = $this->getClassMetadata();
         $identifier = $metadata->getSingleIdentifierFieldName();
-        $makeUpdate = fn (string $column) => "{$column} = VALUES({$column})";
+        $idColumn   = $metadata->getColumnName($identifier);
+        // Platform-specific "Update" expression
+        $makeUpdate = $isPg
+            ? fn (string $column) => "{$column} = EXCLUDED.{$column}" // Postgres uses EXCLUDED table
+            : fn (string $column) => "{$column} = VALUES({$column})"; // MySQL uses VALUES() function
+
         $columns    = [];
         $values     = [];
         $types      = [];
@@ -847,12 +855,13 @@ class CommonRepository extends ServiceEntityRepository
             $fieldNames = array_diff($fieldNames, [$entity->getVersionField()]);
         }
 
+        // 1. Process Fields
         foreach ($fieldNames as $fieldName) {
             $value = $metadata->getFieldValue($entity, $fieldName);
             if ($metadata->isIdentifier($fieldName)) {
                 if ($value) {
                     $hasId = true;
-                } elseif ($fieldName === $identifier) {
+                } elseif (!$isPg && $fieldName === $identifier) {
                     // https://bugs.php.net/bug.php?id=76896
                     // mysql_last_insert_id might return 0 if our insert updates a row
                     // Call LAST_INSERT_ID() for the column to ensure the correct value
@@ -870,7 +879,7 @@ class CommonRepository extends ServiceEntityRepository
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
         }
-
+        // 2. Process Associations
         foreach ($metadata->getAssociationNames() as $fieldName) {
             $assocEntity = $metadata->getFieldValue($entity, $fieldName);
             if (!$metadata->isAssociationWithSingleJoinColumn($fieldName) || !is_object($assocEntity)) {
@@ -886,22 +895,39 @@ class CommonRepository extends ServiceEntityRepository
             $update[]  = $makeUpdate($column);
         }
 
-        $numberOfRowsAffected = $connection->executeStatement(
-            'INSERT INTO '.$this->getTableName().' ('.implode(', ', $columns).')'.
-            ' VALUES ('.implode(', ', $set).')'.
-            ' ON DUPLICATE KEY UPDATE '.implode(', ', $update),
-            $values,
-            $types
-        );
+        $columnList = implode(', ', $columns);
+        $setList    = implode(', ', array_fill(0, count($columns), '?'));
+        $updateList = implode(', ', $update);
 
-        if ($entity instanceof UpsertInterface) {
-            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT === $numberOfRowsAffected);
-            $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
+        // 3. Execution & Result Detection
+        if ($isPg) {
+            // Postgres: Use RETURNING (xmax = 0) to distinguish Insert vs Update
+            $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) ".
+                "ON CONFLICT ($idColumn) DO UPDATE SET $updateList RETURNING (xmax = 0) AS inserted";
+
+            // We use fetchOne because Postgres returns a result set with RETURNING
+            $wasInserted = (bool) $connection->fetchOne($sql, $values, $types);
+            $wasUpdated  = !$wasInserted;
+        } else {
+            // MySQL: Use affected rows count (1 = Insert, 2 = Update)
+            $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) ".
+                "ON DUPLICATE KEY UPDATE $updateList";
+
+            $affectedRows = $connection->executeStatement($sql, $values, $types);
+            $wasInserted  = (1 === $affectedRows);
+            $wasUpdated   = (2 === $affectedRows);
         }
+
+        // 4. Update Interface
+        if ($entity instanceof UpsertInterface) {
+            $entity->setHasBeenInserted($wasInserted);
+            $entity->setHasBeenUpdated($wasUpdated);
+        }
+
         if ($hasId) {
             return;
         }
-
+        // 5. ID Recovery
         $id = (int) $connection->lastInsertId();
 
         $metadata->setFieldValue($entity, $identifier, $id);
