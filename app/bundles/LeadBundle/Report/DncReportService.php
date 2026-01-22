@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Report;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Helper\DncFormatterHelper;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -22,7 +21,6 @@ class DncReportService
     public function __construct(
         private DoNotContact $doNotContactModel,
         private DncFormatterHelper $dncFormatterHelper,
-        private CoreParametersHelper $coreParametersHelper,
         private Connection $connection,
     ) {
     }

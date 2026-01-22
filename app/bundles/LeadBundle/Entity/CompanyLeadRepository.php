@@ -36,7 +36,7 @@ class CompanyLeadRepository extends CommonRepository
                 // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-                    ->set('is_primary', 'TRUE');
+                    ->set('is_primary', 'FALSE');
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
