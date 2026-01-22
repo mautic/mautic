@@ -157,7 +157,7 @@ class DBALMocker
 
             $mock->expects($this->testCase->any())
                 ->method('getDatabasePlatform')
-                ->willReturnArgument(new MySQLPlatform());
+                ->willReturn(new MySQLPlatform());
 
             $this->mockConnection = $mock;
         }

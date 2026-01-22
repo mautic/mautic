@@ -88,9 +88,23 @@ class EmailPeriodMetrics
 
     private function createClicksSubQuery(): QueryBuilder
     {
+        $platform   = $this->connection->getDatabasePlatform();
+        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
+        // Handle Timezone Offset and Weekday calculation based on Platform
+        if ($isPostgres) {
+            // PostgreSQL: EXTRACT(DOW) returns 0 (Sun) - 6 (Sat).
+            // To match MySQL's WEEKDAY 0 (Mon) - 6 (Sun), we use a modulo calculation.
+            $dateWithOffset = "ph.date_hit + (:timezoneOffset || ' second')::interval";
+            $hitDay         = "FLOOR(EXTRACT(DOW FROM $dateWithOffset) + 6)::int % 7";
+        } else {
+            // MySQL/MariaDB
+            $hitDay = 'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, ph.date_hit))';
+        }
+
         return $this->connection->createQueryBuilder()
             ->select(
-                'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, ph.date_hit)) AS hit_day',
+                $hitDay.' AS hit_day',
                 'COUNT(DISTINCT ph.id) AS hit_count'
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')

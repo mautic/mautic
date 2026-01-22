@@ -112,12 +112,19 @@ class LogRepository extends CommonRepository
             return null;
         }
 
+        // ERROR:  operator does not exist: character varying >= integer at character 157
+        $statusCodeField = $this->getTableAlias().'.status_code';
+        if ($this->_em->getConnection()->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+            // Shorthand for casting in PostgreSQL
+            $statusCodeField = '('.$statusCodeField.')::int';
+        }
+
         // Count successful responses
         $countSuccessQb = $this->_em->getConnection()->createQueryBuilder();
         $countSuccessQb->select('COUNT('.$this->getTableAlias().'.id) AS thecount')
             ->from(sprintf('(%s)', $selectqb->getSQL()), $this->getTableAlias())
-            ->andWhere($countSuccessQb->expr()->gte($this->getTableAlias().'.status_code', 200))
-            ->andWhere($countSuccessQb->expr()->lt($this->getTableAlias().'.status_code', 300))
+            ->andWhere($countSuccessQb->expr()->gte($statusCodeField, 200))
+            ->andWhere($countSuccessQb->expr()->lt($statusCodeField, 300))
             ->setParameter('webhookId', $webhookId);
 
         $result = $countSuccessQb->executeQuery()->fetchAssociative();

@@ -43,14 +43,16 @@ class SubmissionRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $form = $args['form'];
+        $form       = $args['form'];
+        $connection = $this->_em->getConnection();
 
         // DBAL
         if (!isset($args['viewOnlyFields'])) {
             $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
+        // Correctly quote values for the current database (MySQL or PostgreSQL)
         $viewOnlyFields = array_map(
-            fn ($value): string => '"'.$value.'"',
+            fn ($value): string => $connection->quote($value),
             $args['viewOnlyFields']
         );
 

@@ -14,6 +14,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
+        private Conection $connection,
     ) {
     }
 
@@ -112,6 +113,9 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
      */
     private function generateLeftJoinCondition($alias, $action): string
     {
-        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
+        // Fetch the proper platform-specific quote (e.g., "action" for PostgreSQL, `action` for MySQL)
+        $actionField = $this->connection->getDatabasePlatform()->quoteSingleIdentifier('action');
+
+        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.'.$actionField.' =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }
 }

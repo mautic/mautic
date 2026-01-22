@@ -86,18 +86,18 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'type'    => 'int',
                 'alias'   => 'hit_count',
                 'formula' => 'CASE 
-                    WHEN '.self::PREFIX_STATS.'.type = "view" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'view' THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                         
-                        WHERE fs2.type = "view" 
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2                         
+                        WHERE fs2.type = 'view' 
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                         GROUP BY fs2.focus_id
                     )
-                    WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'submission' THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                          
-                        WHERE fs2.type = "submission" 
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2                          
+                        WHERE fs2.type = 'submission' 
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                         GROUP BY fs2.focus_id
                     )
                     ELSE MAX('.self::PREFIX_TRACKABLES.'.hits)
@@ -109,20 +109,20 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'suffix'  => ' %',
                 'alias'   => 'conversion_rate_submission',
                 'formula' => 'CASE
-                    WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'submission' THEN (
                         SELECT
                             ROUND(
                                 (
                                     SELECT COUNT(fs2.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2
-                                    WHERE fs2.type = "submission"
-                                    AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2
+                                    WHERE fs2.type = 'submission'
+                                    AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                                 ) * 100.0 /
                                 NULLIF((
                                     SELECT COUNT(fs3.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs3
-                                    WHERE fs3.type = "view"
-                                    AND fs3.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM '.MAUTIC_TABLE_PREFIX."focus_stats fs3
+                                    WHERE fs3.type = 'view'
+                                    AND fs3.focus_id = ".self::PREFIX_STATS.'.focus_id
                                 ), 0)
                             , 2)
                     )
@@ -135,20 +135,20 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'suffix'  => ' %',
                 'alias'   => 'conversion_rate_click',
                 'formula' => 'CASE
-                    WHEN '.self::PREFIX_STATS.'.type = "click" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'click' THEN (
                         SELECT
                             ROUND(
                                 (
                                     SELECT COUNT(fs2.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2
-                                    WHERE fs2.type = "click"
-                                    AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2
+                                    WHERE fs2.type = 'click'
+                                    AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                                 ) * 100.0 /
                                 NULLIF((
                                     SELECT COUNT(fs3.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs3
-                                    WHERE fs3.type = "view"
-                                    AND fs3.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM '.MAUTIC_TABLE_PREFIX."focus_stats fs3
+                                    WHERE fs3.type = 'view'
+                                    AND fs3.focus_id = ".self::PREFIX_STATS.'.focus_id
                                 ), 0)
                             , 2)
                     )
@@ -168,17 +168,17 @@ final class ReportSubscriber implements EventSubscriberInterface
             'type'    => 'int',
             'alias'   => 'unique_hit_count',
             'formula' => 'CASE 
-                    WHEN '.self::PREFIX_STATS.'.type = "view" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'view' THEN (
                         SELECT COUNT(DISTINCT fs2.lead_id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        WHERE fs2.type = "view" 
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2 
+                        WHERE fs2.type = 'view' 
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                     )
-                    WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'submission' THEN (
                         SELECT COUNT(DISTINCT fs2.lead_id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        WHERE fs2.type = "submission" 
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2 
+                        WHERE fs2.type = 'submission' 
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                     )
                     ELSE MAX('.self::PREFIX_TRACKABLES.'.unique_hits)
                 END',
@@ -206,27 +206,27 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'type'    => 'int',
                 'alias'   => 'hit_count',
                 'formula' => 'CASE 
-                    WHEN '.self::PREFIX_STATS.'.type = "view" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'view' THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                          
-                        WHERE fs2.type = "view"                         
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2                          
+                        WHERE fs2.type = 'view'                         
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                         AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
                         GROUP BY fs2.focus_id
                     )
-                    WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'submission' THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                         
-                        WHERE fs2.type = "submission" 
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2                         
+                        WHERE fs2.type = 'submission' 
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                         AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
                         GROUP BY fs2.focus_id
                     )
-                    WHEN '.self::PREFIX_STATS.'.type = "click" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'click' THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                         
-                        WHERE fs2.type = "click" 
-                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2                         
+                        WHERE fs2.type = 'click' 
+                        AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                         AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
                         GROUP BY fs2.focus_id
                     )
@@ -238,21 +238,21 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'suffix'  => ' %',
                 'alias'   => 'conversion_rate_click',
                 'formula' => 'CASE
-                    WHEN '.self::PREFIX_STATS.'.type = "click" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'click' THEN (
                         SELECT
                             ROUND(
                                 (
                                     SELECT COUNT(fs2.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2
-                                    WHERE fs2.type = "click"
-                                    AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2
+                                    WHERE fs2.type = 'click'
+                                    AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                                     AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
                                 ) * 100.0 /
                                 NULLIF((
                                     SELECT COUNT(fs3.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs3
-                                    WHERE fs3.type = "view"
-                                    AND fs3.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM '.MAUTIC_TABLE_PREFIX."focus_stats fs3
+                                    WHERE fs3.type = 'view'
+                                    AND fs3.focus_id = ".self::PREFIX_STATS.'.focus_id
                                     AND fs3.lead_id = '.self::PREFIX_LEADS.'.id
                                 ), 0)
                             , 2)
@@ -266,21 +266,21 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'suffix'  => ' %',
                 'alias'   => 'conversion_rate_submission',
                 'formula' => 'CASE
-                    WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
+                    WHEN '.self::PREFIX_STATS.".type = 'submission' THEN (
                         SELECT
                             ROUND(
                                 (
                                     SELECT COUNT(fs2.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2
-                                    WHERE fs2.type = "submission"
-                                    AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM ".MAUTIC_TABLE_PREFIX."focus_stats fs2
+                                    WHERE fs2.type = 'submission'
+                                    AND fs2.focus_id = ".self::PREFIX_STATS.'.focus_id
                                     AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
                                 ) * 100.0 /
                                 NULLIF((
                                     SELECT COUNT(fs3.id)
-                                    FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs3
-                                    WHERE fs3.type = "view"
-                                    AND fs3.focus_id = '.self::PREFIX_STATS.'.focus_id
+                                    FROM '.MAUTIC_TABLE_PREFIX."focus_stats fs3
+                                    WHERE fs3.type = 'view'
+                                    AND fs3.focus_id = ".self::PREFIX_STATS.'.focus_id
                                     AND fs3.lead_id = '.self::PREFIX_LEADS.'.id
                                 ), 0)
                             , 2)
