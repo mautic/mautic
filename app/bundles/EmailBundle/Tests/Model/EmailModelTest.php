@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -1081,7 +1082,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         );
         $mockConnection = $dbalMock->getMockConnection();
 
-        $mockPlatform = $this->createMock(\Doctrine\DBAL\Platforms\MySqlPlatform::class);
+        $mockPlatform = new MySQLPlatform();
         $mockConnection->method('getDatabasePlatform')->willReturn($mockPlatform);
 
         $this->entityManager->method('getConnection')->willReturn($mockConnection);
