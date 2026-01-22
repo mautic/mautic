@@ -18,6 +18,11 @@ class SegmentLogReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Doctrine\DBAL\Connection
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
+
     private SegmentLogReportSubscriber $subscriber;
 
     public function setUp(): void
@@ -25,9 +30,12 @@ class SegmentLogReportSubscriberTest extends TestCase
         parent::setUp();
 
         $this->fieldsBuilder = $this->createMock(FieldsBuilder::class);
+        // Mock the Connection
+        $this->connection = $this->createMock(\Doctrine\DBAL\Connection::class);
 
         $this->subscriber = new SegmentLogReportSubscriber(
-            $this->fieldsBuilder
+            $this->fieldsBuilder,
+            $this->connection
         );
     }
 
