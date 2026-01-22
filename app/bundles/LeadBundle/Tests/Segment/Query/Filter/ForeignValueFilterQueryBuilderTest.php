@@ -48,7 +48,8 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
             $this->randomParameter,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->connectionMock
         );
     }
 
