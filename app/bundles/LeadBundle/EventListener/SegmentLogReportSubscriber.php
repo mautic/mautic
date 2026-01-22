@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -14,7 +15,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
-        private Conection $connection,
+        private Connection $connection,
     ) {
     }
 

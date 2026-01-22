@@ -76,10 +76,28 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 
             // because form table data will be deleted we must have same autoincrement as before the insertion
             // to have the form_results table to match the form id in table name e.g. form_results_69_kaleidosco
+            $connection    = $event->getEntityManager()->getConnection();
+            $platform      = $connection->getDatabasePlatform();
             $formTableName = $this->formModel->getRepository()->getTableName();
-            $event->getEntityManager()->getConnection()->executeStatement(
-                'ALTER TABLE '.$formTableName.' AUTO_INCREMENT='.$firstId
-            );
+
+            if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+                // 1. Get the sequence name for the ID column
+                $sequence = $connection->fetchOne(
+                    "SELECT pg_get_serial_sequence('$formTableName', 'id')"
+                );
+
+                if ($sequence) {
+                    // 2. Restart sequence at $firstId
+                    $connection->executeStatement(
+                        sprintf('ALTER SEQUENCE %s RESTART WITH %d', $connection->quoteIdentifier($sequence), $firstId)
+                    );
+                }
+            } else {
+                // MySQL/MariaDB logic
+                $connection->executeStatement(
+                    'ALTER TABLE '.$formTableName.' AUTO_INCREMENT='.$firstId
+                );
+            }
         });
     }
 
