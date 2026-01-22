@@ -39,16 +39,12 @@ class DecoratorFactory
         if ($contactSegmentFilterCrate->isDateType()) {
             $dateDecorator = $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
 
-            if ($contactSegmentFilterCrate->isCompanyType()) {
             if ($contactSegmentFilterCrate->isPrimaryCompanyType()) {
                 return new DatePrimaryCompanyDecorator($dateDecorator);
             }
 
             if ($contactSegmentFilterCrate->isCompanyAllType()) {
                 return new DateCompanyAllDecorator($dateDecorator);
-            }
-
-            return new DateCompanyDecorator($dateDecorator);
             }
 
             return $dateDecorator;
@@ -67,10 +63,6 @@ class DecoratorFactory
 
             if ($contactSegmentFilterCrate->isCompanyAllType()) {
                 return $this->companyAllDecorator;
-            }
-
-            if ($contactSegmentFilterCrate->isCompanyType()) {
-                return $this->companyDecorator;
             }
 
             return $this->baseDecorator;
