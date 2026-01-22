@@ -776,7 +776,7 @@ return [
             ],
             'mautic.lead.query.builder.foreign.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.default_connection'],
             ],
             'mautic.lead.query.builder.foreign.func' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class,
