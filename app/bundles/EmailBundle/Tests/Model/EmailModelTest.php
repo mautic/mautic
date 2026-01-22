@@ -1081,7 +1081,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         );
         $mockConnection = $dbalMock->getMockConnection();
 
-        $mockPlatform = $this->createMock(\Doctrine\DBAL\Platforms\AbstractPlatform::class);
+        $mockPlatform = $this->createMock(\Doctrine\DBAL\Platforms\MySqlPlatform::class);
         $mockConnection->method('getDatabasePlatform')->willReturn($mockPlatform);
 
         $this->entityManager->method('getConnection')->willReturn($mockConnection);

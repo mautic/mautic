@@ -299,7 +299,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         // SQLSTATE[23505]: Unique violation: 7
         // ERROR:  duplicate key value violates unique constraint "idx_ip_address"
         // DETAIL:  Key (ip_address)=(127.0.0.1) already exists.
-        $ipAddress = $ipRepo->find(['ipAddress' => self::IP_ADDRESS]);
+        $ipAddress = $ipRepo->findOneBy(['ipAddress' => self::IP_ADDRESS]);
         if (!$ipAddress) {
             $ipAddress = new IpAddress();
             $ipAddress->setIpAddress(self::IP_ADDRESS);
