@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -43,7 +44,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 
             // 1. Check if we already handled this IP in this loop or if it exists in DB
             if (!isset($createdIps[$ipStr])) {
-                $ipAddress = $ipRepo->findOneBy(['ip_address' => $ipStr]);
+                $ipAddress = $ipRepo->findOneBy(['ipAddress' => $ipStr]);
 
                 if (!$ipAddress) {
                     $ipAddress = new IpAddress();
