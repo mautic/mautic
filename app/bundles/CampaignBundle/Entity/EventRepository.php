@@ -157,8 +157,14 @@ class EventRepository extends CommonRepository
         $qb = $this->getEntityManager()->createQueryBuilder();
 
         $platform      = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        // PostgreSQL Fix: e.channelId + 0 forces the string to integer conversion
+        // This is valid DQL and valid PostgreSQL SQL.
+        // DQL (Doctrine Query Language) does not natively recognize the CAST function
+        // PostgreSQL will implicitly cast a numeric string to an integer
+        // if you perform a mathematical operation on it (like adding zero).
+        // DQL allows basic math without needing a registered function.
         $joinCondition = ($platform instanceof PostgreSQLPlatform)
-            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId <> '' THEN CAST(e.channelId AS integer) ELSE 0 END)"
+            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId <> '' THEN (e.channelId + 0) ELSE 0 END)"
             : 'em.id = e.channelId';
 
         return $qb

@@ -49,9 +49,6 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
                 if (!$ipAddress) {
                     $ipAddress = new IpAddress();
                     $ipAddress->setIpAddress($ipStr);
-                    // We must persist/save immediately if using a repository that
-                    // doesn't track unit of work, or let the Lead persist handle it.
-                    // However, for testing, it's safer to track it:
                 }
                 $createdIps[$ipStr] = $ipAddress;
                 $this->setReference('ipAddress-'.$key, $ipAddress);

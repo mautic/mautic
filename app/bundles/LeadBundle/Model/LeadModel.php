@@ -2022,16 +2022,27 @@ class LeadModel extends FormModel
      */
     public function getCustomLeadFieldLength(array $aliases): array
     {
+        $connection = $this->em->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
+        // PostgreSQL uses LENGTH(), MySQL uses CHAR_LENGTH()
+        $lengthFunc = $isPg ? 'LENGTH' : 'CHAR_LENGTH';
+
         $columns = [];
         foreach ($aliases as $alias) {
-            $columns[] = sprintf('max(CHAR_LENGTH(`%s`)) `%s`', $alias, $alias);
+            // quoteIdentifier handles backticks for MySQL and double quotes for PostgreSQL
+            $quotedAlias = $platform->quoteIdentifier($alias);
+            $columns[]   = sprintf('MAX(%s(%s)) %s', $lengthFunc, $quotedAlias, $quotedAlias);
         }
 
-        $query = $this->em->getConnection()->createQueryBuilder();
+        $query = $connection->createQueryBuilder();
         $query->select(implode(', ', $columns))
             ->from(MAUTIC_TABLE_PREFIX.'leads');
 
-        return $query->executeQuery()->fetchAssociative();
+        $result = $query->executeQuery()->fetchAssociative();
+
+        return $result ?: [];
     }
 
     /**

@@ -22,7 +22,7 @@ class ObjectMappingRepository extends CommonRepository
     /**
      * @return array<string,mixed>|null
      */
-    public function getInternalObjectWithLock(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, string $lock = 'LOCK IN SHARE MODE'): ?array
+    public function getInternalObjectWithLock(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, bool $lock = true): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, $lock);
     }
@@ -198,7 +198,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return mixed[]|null
      */
-    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, ?string $lock = null): ?array
+    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, bool $lock = false): ?array
     {
         $connection = $this->getEntityManager()->getConnection();
         $qb         = $connection->createQueryBuilder();
@@ -217,8 +217,13 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('integrationObjectId', $integrationObjectId)
             ->setParameter('internalObjectName', $internalObjectName);
 
-        $lock   = $lock ? ' '.$lock : '';
-        $result = $connection->executeQuery($qb->getSQL().$lock, $qb->getParameters(), $qb->getParameterTypes())->fetchAssociative();
+        if ($lock) {
+            $isPg       = $connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+            $lockClause = $isPg ? ' FOR SHARE' : ' LOCK IN SHARE MODE';
+        } else {
+            $lockClause = '';
+        }
+        $result = $connection->executeQuery($qb->getSQL().$lockClause, $qb->getParameters(), $qb->getParameterTypes())->fetchAssociative();
 
         return $result ?: null;
     }

@@ -1806,16 +1806,35 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $format = '%h %p';
         }
 
-        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $connection = $this->em->getConnection();
+        $isPg       = $connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
+        $query                 = new ChartQuery($connection, $dateFrom, $dateTo);
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
         $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
-        $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
-        ->groupBy('hour')
-        ->orderBy('count', 'DESC')
-        ->setMaxResults(24);
+
+        if ($isPg) {
+            // PostgreSQL logic
+            $format = (12 == $timeFormat) ? 'HH12 AM' : 'HH24:00';
+
+            // Convert UTC timestamp to local offset
+            $columnName = "($columnWithTimezone AT TIME ZONE 'UTC' AT TIME ZONE '$defaultTimezoneOffset')";
+
+            // Build the "Hour - Next Hour" string
+            $q->select("TO_CHAR($columnName, '$format') || '-' || TO_CHAR($columnName + INTERVAL '1 hour', '$format') as hour, COUNT(t.id) AS count")
+                ->groupBy('hour');
+        } else {
+            // MySQL logic
+            $format     = (12 == $timeFormat) ? '%h %p' : '%H:00';
+            $columnName = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
+
+            $q->select("CONCAT(TIME_FORMAT($columnName, '$format'), '-', TIME_FORMAT($columnName + INTERVAL 1 HOUR, '$format')) as hour, COUNT(t.id) AS count")
+                ->groupBy('hour');
+        }
+
+        $q->orderBy('count', 'DESC')
+            ->setMaxResults(24);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);

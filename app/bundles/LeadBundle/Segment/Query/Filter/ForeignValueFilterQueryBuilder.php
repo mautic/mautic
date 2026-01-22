@@ -112,16 +112,18 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->from($filter->getTable(), $tableAlias);
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
-                $isPg = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+                $isPg = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
                 if ($isPg) {
-                    $not      = ('notRegexp' === $filterOperator) ? '!' : '';
-                    $operator = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
+                    $not             = ('notRegexp' === $filterOperator) ? '!' : '';
+                    $operator        = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
+                    $fieldExpression = $tableAlias.'.'.$filter->getField().'::text';
                 } else {
-                    $not      = ('notRegexp' === $filterOperator) ? ' NOT' : '';
-                    $operator = ' REGEXP';
+                    $not             = ('notRegexp' === $filterOperator) ? ' NOT' : '';
+                    $operator        = ' REGEXP';
+                    $fieldExpression = $tableAlias.'.'.$filter->getField();
                 }
 
-                $expression = $tableAlias.'.'.$filter->getField().$not.$operator.' '.$filterParametersHolder;
+                $expression = $fieldExpression.$not.$operator.' '.$filterParametersHolder;
                 $subQueryBuilder->andWhere($expression);
 
                 $queryBuilder->addLogic(

@@ -1197,6 +1197,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testGetAllActivityDownload(): void
     {
         $expectedActivites = 0;
+
+        $ipAddress = new IpAddress();
+        $ipAddress->setIpAddress('13.13.13.13');
+        $this->em->persist($ipAddress);
+
         for ($i = 0; $i < 10; ++$i) {
             $contact = new Lead();
             $contact->setEmail('email'.(string) $i.'@acquia.cz');
@@ -1204,9 +1209,6 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             // +30 assets downloads
             $expectedActivites += 3;
             for ($iAsset = 0; $iAsset < 3; ++$iAsset) {
-                $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress('13.13.13.13');
-                $this->em->persist($ipAddress);
                 $assetDownload = new Download();
                 $assetDownload->setLead($contact);
                 $assetDownload->setDateDownload(date_create('2013-03-15'));

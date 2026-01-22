@@ -312,7 +312,11 @@ class LeadFieldRepository extends CommonRepository
                     $paramName   = 'value'.$paramCount++;
                     $v           = trim((string) $v, "'");
                     $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
-                    $innerExpr[] = $property.' '.('in' === $operatorExpr ? $regexOp : $notRegexOp).' :'.$paramName;
+
+                    // PostgreSQL Fix: Append ::text to the property name
+                    $propertyExpr = ($isPg) ? $property.'::text' : $property;
+
+                    $innerExpr[] = $propertyExpr.' '.('in' === $operatorExpr ? $regexOp : $notRegexOp).' :'.$paramName;
                     $q->setParameter($paramName, $pattern);
                 }
 
