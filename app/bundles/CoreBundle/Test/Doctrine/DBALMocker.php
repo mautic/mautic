@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -130,6 +131,7 @@ class DBALMocker
                     'quote',
                     'update',
                     'insert',
+                    'getDatabasePlatform',
                 ])
                 ->getMock();
 
@@ -152,6 +154,10 @@ class DBALMocker
                 ->willReturnCallback(function (): void {
                     $this->connectionInserted[] = func_get_args();
                 });
+
+            $mock->expects($this->testCase->any())
+                ->method('getDatabasePlatform')
+                ->willReturnArgument(new MySQLPlatform());
 
             $this->mockConnection = $mock;
         }
