@@ -204,6 +204,49 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotContains($lead->getId(), $primaryLeadIds);
     }
 
+    public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
+    {
+        /** @var \Mautic\LeadBundle\Entity\Lead $leadWithCompany */
+        $leadWithCompany = $this->getReference('lead-1');
+        $leadWithCompany = $this->em->getRepository(Lead::class)->find($leadWithCompany->getId());
+        \assert($leadWithCompany instanceof Lead);
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $leadWithCompanyMatchingValue */
+        $leadWithCompanyMatchingValue = $this->getReference('lead-0');
+        $leadWithCompanyMatchingValue = $this->em->getRepository(Lead::class)->find($leadWithCompanyMatchingValue->getId());
+        \assert($leadWithCompanyMatchingValue instanceof Lead);
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $leadWithoutCompany */
+        $leadWithoutCompany = $this->getReference('lead-5');
+        $leadWithoutCompany = $this->em->getRepository(Lead::class)->find($leadWithoutCompany->getId());
+        \assert($leadWithoutCompany instanceof Lead);
+
+        $segment = new LeadList();
+        $segment->setName('Segment Company All Not Like')
+            ->setPublicName('Segment Company All Not Like')
+            ->setAlias('segment-company-all-not-like')
+            ->setFilters([
+                [
+                    'glue'     => 'and',
+                    'type'     => 'text',
+                    'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                    'field'    => 'companycity',
+                    'operator' => 'notLike',
+                    'filter'   => 'Boston',
+                    'display'  => '',
+                ],
+            ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
+        $leadIds = array_map('intval', array_column($results[$segment->getId()], 'id'));
+
+        Assert::assertContains($leadWithCompany->getId(), $leadIds);
+        Assert::assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
+        Assert::assertNotContains($leadWithoutCompany->getId(), $leadIds);
+    }
+
     public function testSegmentRebuildCommand(): void
     {
         // exclude the segment

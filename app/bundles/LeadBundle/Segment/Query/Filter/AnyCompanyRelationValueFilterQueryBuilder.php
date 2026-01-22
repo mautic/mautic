@@ -45,7 +45,8 @@ class AnyCompanyRelationValueFilterQueryBuilder extends PrimaryCompanyRelationVa
         $this->applyCompanyFilterExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias);
 
         $existsExpression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
-        $allowMissingCompany = in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true);
+        $allowMissingCompany = in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true)
+            && !$filter->contactSegmentFilterCrate->isCompanyAllType();
 
         if ($allowMissingCompany) {
             $relationExistsAlias = $this->generateRandomParameterName();
