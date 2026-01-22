@@ -257,27 +257,6 @@
             <!--/ lead detail collapseable toggler -->
 
             {% if not isAnonymous %}
-            <div class="pa-lg">
-                <div class="row mt-32 mb-64">
-                    <div class="col-md-3">
-                        <span class="text-helper mb-xs">First interaction</span>
-                        <span class="type-body-02">1 Mar, 2025</span>
-                    </div>
-                    <div class="col-md-3">
-                        <span class="text-helper mb-xs">Last interaction</span>
-                        <span class="type-body-02">1 Mar, 2025</span>
-                    </div>
-                    <div class="col-md-3">
-                        <span class="text-helper mb-xs">Total interactions</span>
-                        <span class="type-body-02">1 Mar, 2025</span>
-                    </div>
-                    <div class="col-md-3">
-                        <span class="text-helper mb-xs">Total interactions</span>
-                        <span class="type-body-02">1 Mar, 2025</span>
-                    </div>
-                </div>
-            </div>
-
                 <div class="pa-md">
                     <div class="row">
                         <div class="col-sm-12">
@@ -361,7 +340,7 @@
             <div class="tab-content pa-md">
                 <!-- #history-container -->
                 <div class="tab-pane fade in active bdr-w-0" id="timeline-container">
-                    {{ include('@MauticLead/Timeline/_timeline.html.twig', {'events': events, 'lead': lead}) }}
+                    {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
                 </div>
                 <!--/ #history-container -->
 
