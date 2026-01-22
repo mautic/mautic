@@ -780,29 +780,30 @@ return [
             ],
             'mautic.lead.query.builder.foreign.func' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.default_connection'],
             ],
             'mautic.lead.query.builder.special.dnc' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.default_connection'],
             ],
             'mautic.lead.query.builder.special.integration' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.default_connection'],
             ],
             'mautic.lead.query.builder.special.sessions' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.default_connection'],
             ],
             'mautic.lead.query.builder.complex_relation.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.default_connection'],
             ],
             'mautic.lead.query.builder.channel_click.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
         ],
