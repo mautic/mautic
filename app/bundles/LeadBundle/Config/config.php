@@ -772,7 +772,7 @@ return [
             //  Segment Filter Query builders
             'mautic.lead.query.builder.basic' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher', 'doctrine.dbal.connection'],
             ],
             'mautic.lead.query.builder.foreign.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class,
