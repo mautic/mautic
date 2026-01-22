@@ -1,0 +1,58 @@
+{# Timeline implementation using timeline.less styling #}
+<div class="timeline timeline-right">
+    <div class="header">
+        {{ 'mautic.lead.timeline.displaying_events'|trans }}
+    </div>
+    
+    <ul class="events">
+        {% for event in events.events %}
+            {% set icon = event.icon is defined ? event.icon : 'ri-history-line' %}
+            {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
+            {% if eventLabel is iterable %}
+                {% set eventLabel %}
+                  <a href="{{ eventLabel.href }}" {% if eventLabel.isExternal is not defined %}data-toggle="ajax"{% else %}target="_new"{% endif %}>
+                    {{- eventLabel.label|purify -}}
+                  </a>
+                {% endset %}
+            {% endif %}
+
+            {% set details = '' %}
+            {% if event.contentTemplate is defined %}
+                {% set details = include(event.contentTemplate, {'event': event, 'lead': lead}, with_context=false, ignore_missing=true)|trim %}
+            {% endif %}
+
+            {% set wrapperClass = loop.index is odd ? 'wrapper' : 'wrapper' %}
+            <li class="{{ wrapperClass }}">
+                <div class="figure">
+                    <i class="{{ icon }}"></i>
+                </div>
+                {% if details is not empty %}
+                <button class="panel" data-toggle="popover" data-content="{{ details|e }}" data-html="true">
+                {% else %}
+                <div class="panel">
+                {% endif %}
+                    <div class="">
+                        <h3 class="type-heading-01 mb-sm">{{ eventLabel }}</h3>
+                        <div class="panel-meta">
+                            <span class="event-type">{% if event.eventType is defined %}{{ event.eventType }}{% endif %}</span>
+                        </div>
+                        <div class="event-timestamp type-label-01 text-secondary mt-xs">
+                            <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp) }}">{{ dateToText(event.timestamp, 'local', true) }}</span>
+                        </div>
+                    </div>
+                {% if details is not empty %}
+                </button>
+                {% else %}
+                </div>
+                {% endif %}
+            </li>
+
+            {% if loop.index % 4 == 0 %}
+                <div class="header">
+                    {{ dateToText(event.timestamp, 'local', 'F Y') }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+
