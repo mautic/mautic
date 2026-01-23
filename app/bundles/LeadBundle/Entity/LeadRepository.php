@@ -799,7 +799,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 // Fix: Only apply MySQL-specific index hints if on a MySQL/MariaDB platform
                 $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-                if (!$platform instanceof \Doctrine\DBAL\Platforms\PostgreSqlPlatform) {
+                if (!$platform instanceof \Doctrine\DBAL\Platforms\PostgrePlatform) {
                     $from = $q->getQueryPart('from')[0];
                     $q->resetQueryPart('from');
                     $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
