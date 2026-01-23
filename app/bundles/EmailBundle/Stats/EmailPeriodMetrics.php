@@ -78,7 +78,7 @@ class EmailPeriodMetrics
             ->setParameter('timezoneOffset', $timezoneOffset)
             ->setParameter('format', '%H')
             ->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB))
-            ->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format(DateTimeHelper::FORMAT_DB))
             ->setParameter('email_source', self::EMAIL_SOURCE)
             ->setParameter('campaign_event_source', self::CAMPAIGN_EVENT_SOURCE)
             ->orderBy('h.hour');
@@ -131,9 +131,20 @@ class EmailPeriodMetrics
 
     private function createClicksHourlySubQuery(): QueryBuilder
     {
-        return $this->connection->createQueryBuilder()
+        $platform   = $this->connection->getDatabasePlatform();
+        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
+        $adjustedDate = $this->getOffsetAdjustedDate('ph.date_hit');
+
+        if ($isPostgres) {
+            $hourExpr = "TO_CHAR($adjustedDate, 'HH24')";
+        } else {
+            $hourExpr = 'TIME_FORMAT('.$adjustedDate.', :format)';
+        }
+
+        $qb = $this->connection->createQueryBuilder()
             ->select(
-                'TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, ph.date_hit), :format) AS hit_hour',
+                "$hourExpr AS hit_hour",
                 'COUNT(DISTINCT ph.id) AS hit_count'
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -146,6 +157,12 @@ class EmailPeriodMetrics
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy('hit_hour')
             ->orderBy('hit_hour', 'ASC');
+
+        if (!$isPostgres) {
+            $qb->setParameter('format', '%H');
+        }
+
+        return $qb;
     }
 
     private function createSentHourlySubQuery(): QueryBuilder
@@ -161,9 +178,23 @@ class EmailPeriodMetrics
 
     private function createBasicStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
+        $platform   = $this->connection->getDatabasePlatform();
+        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
+        $adjustedDate = $this->getOffsetAdjustedDate($dateColumn);
+
+        // Handle Timezone Offset and Weekday calculation based on Platform
+        if ($isPostgres) {
+            // EXTRACT(DOW) → 0=Sun ... 6=Sat
+            // Shift to MySQL WEEKDAY: 0=Mon ... 6=Sun → (dow + 6) % 7
+            $weekdayExpr = "FLOOR(EXTRACT(DOW FROM $adjustedDate) + 6)::int % 7";
+        } else {
+            $weekdayExpr = "WEEKDAY($adjustedDate)";
+        }
+
         return $this->connection->createQueryBuilder()
             ->select(
-                "WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, $dateColumn)) AS $groupByAlias",
+                "$weekdayExpr AS $groupByAlias",
                 "COUNT(id) AS $countAlias"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -177,9 +208,20 @@ class EmailPeriodMetrics
 
     private function createBasicHourlyStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
-        return $this->connection->createQueryBuilder()
+        $platform   = $this->connection->getDatabasePlatform();
+        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
+        $adjustedDate = $this->getOffsetAdjustedDate($dateColumn);
+
+        if ($isPostgres) {
+            $hourExpr = "TO_CHAR($adjustedDate, 'HH24')";
+        } else {
+            $hourExpr = "TIME_FORMAT($adjustedDate, :format)";
+        }
+
+        $qb = $this->connection->createQueryBuilder()
             ->select(
-                "TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, $dateColumn), :format) AS $groupByAlias",
+                "$hourExpr AS $groupByAlias",
                 "COUNT(id) AS $countAlias"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -188,8 +230,25 @@ class EmailPeriodMetrics
             ->andWhere('es.source = :campaign_event_source')
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy($groupByAlias)
-            ->orderBy($groupByAlias, 'ASC')
-            ->setMaxResults(24);
+            ->orderBy($groupByAlias, 'ASC');
+
+        if (!$isPostgres) {
+            $qb->setParameter('format', '%H');
+        }
+
+        return $qb->setMaxResults(24);
+    }
+
+    private function getOffsetAdjustedDate(string $column): string
+    {
+        $platform   = $this->connection->getDatabasePlatform();
+        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
+        if ($isPostgres) {
+            return "$column + (:timezoneOffset || ' second')::interval";
+        }
+
+        return "TIMESTAMPADD(SECOND, :timezoneOffset, $column)";
     }
 
     private function createDaysSubQuery(): QueryBuilder

@@ -836,8 +836,18 @@ class CommonRepository extends ServiceEntityRepository
         $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
         $metadata   = $this->getClassMetadata();
-        $identifier = $metadata->getSingleIdentifierFieldName();
+        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
         $idColumn   = $metadata->getColumnName($identifier);
+
+        if ($isPg) { // PG need special case
+            // Detect best conflict target (prefer non-PK unique constraint)
+            $conflictTarget = $this->getUpsertConflictTarget($metadata, $idColumn);
+            if (null === $conflictTarget) {
+                // Fallback – but log/warn in production that upsert may fail on PG for new entities
+                $conflictTarget = $idColumn;
+            }
+        }
+
         // Platform-specific "Update" expression
         $makeUpdate = $isPg
             ? fn (string $column) => "{$column} = EXCLUDED.{$column}" // Postgres uses EXCLUDED table
@@ -903,7 +913,7 @@ class CommonRepository extends ServiceEntityRepository
         if ($isPg) {
             // Postgres: Use RETURNING (xmax = 0) to distinguish Insert vs Update
             $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) ".
-                "ON CONFLICT ($idColumn) DO UPDATE SET $updateList RETURNING (xmax = 0) AS inserted";
+                "ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList RETURNING (xmax = 0) AS inserted";
 
             // We use fetchOne because Postgres returns a result set with RETURNING
             $wasInserted = (bool) $connection->fetchOne($sql, $values, $types);
@@ -1830,5 +1840,40 @@ class CommonRepository extends ServiceEntityRepository
             ->setMaxResults(1);
 
         return (bool) count($query->executeQuery()->fetchAllAssociative());
+    }
+
+    /**
+     * Tries to find a suitable unique constraint for ON CONFLICT (prefers non-PK).
+     */
+    private function getUpsertConflictTarget(ClassMetadata $metadata, string $pkColumn): ?string
+    {
+        // From mapping attributes/annotations
+        $uniqueConstraints = $metadata->table['uniqueConstraints'] ?? [];
+
+        foreach ($uniqueConstraints as $uc) {
+            $cols = $uc['columns'];
+            // Prefer if it doesn't include PK or has more columns
+            if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
+                return implode(', ', $cols);
+            }
+        }
+
+        $connection = $this->getEntityManager()->getConnection();
+        // Fallback: introspect unique indexes (runtime, requires schema access)
+        try {
+            $indexes = $connection->createSchemaManager()->listTableIndexes($metadata->getTableName());
+            foreach ($indexes as $index) {
+                if ($index->isUnique() && !$index->isPrimary()) {
+                    $cols = $index->getColumns();
+                    if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
+                        return implode(', ', $cols);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silent fallback if introspection fails
+        }
+
+        return null; // Caller decides what to do (e.g. throw or fallback to PK)
     }
 }
