@@ -446,7 +446,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     if ($this->versionProvider->isPostgreSql()) {
                         // PostgreSQL: EXTRACT(epoch FROM (date_left - date_hit))
-                        $queryBuilder->select('EXTRACT(EPOCH FROM (ph.date_left - ph.date_hit))::integer AS data, ph.date_hit AS date');
+                        $queryBuilder->select('CAST(EXTRACT(EPOCH FROM (ph.date_left - ph.date_hit)) AS integer) AS data, ph.date_hit AS date');
                     } else {
                         // MySQL: keep original
                         $queryBuilder->select('TIMESTAMPDIFF(SECOND, ph.date_hit, ph.date_left) as data, ph.date_hit as date');

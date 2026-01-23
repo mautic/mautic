@@ -100,7 +100,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $field = $tableAlias.'.'.$filter->getField();
                 if ($isPg) { // example: datetime cant use LIKE, we need to cast fields into TEXT
-                    $field = "({$field})::text";
+                    $field = "CAST({$field} AS text)";
                 }
 
                 $expression = $subQueryBuilder->expr()->or(
@@ -122,7 +122,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 if ($isPg) {
                     $not             = ('notRegexp' === $filterOperator) ? '!' : '';
                     $operator        = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
-                    $fieldExpression = $tableAlias.'.'.$filter->getField().'::text';
+                    $fieldExpression = 'CAST('.$tableAlias.'.'.$filter->getField().' AS text)';
                 } else {
                     $not             = ('notRegexp' === $filterOperator) ? ' NOT' : '';
                     $operator        = ' REGEXP';
@@ -184,7 +184,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 // Fix: Apply ::text operator for 'like' and 'notLike' on PostgreSQL
                 $field = $tableAlias.'.'.$filter->getField();
                 if ($isPg && in_array($filterOperator, ['like', 'notLike'])) {
-                    $field = "({$field})::text";
+                    $field = "CAST({$field} AS text)";
                 }
 
                 $expression = $subQueryBuilder->expr()->$filterOperator(
