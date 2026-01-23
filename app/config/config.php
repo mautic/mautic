@@ -174,6 +174,7 @@ $container->loadFromExtension('doctrine', [
         'dql'                         => [
             'string_functions' => [
                 'match' => DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+                'cast'  => DoctrineExtensions\Query\Mysql\Cast::class,
             ],
         ],
         'result_cache_driver' => [

@@ -210,7 +210,7 @@ class LeadListRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->in('ll.leadlist_id', ':ids'),
                     $qb->expr()->eq('ll.lead_id', ':leadId'),
-                    $qb->expr()->eq('ll.manually_removed', 1)
+                    $qb->expr()->eq('ll.manually_removed', 0)
                 )
             )
             ->setParameter('leadId', $lead->getId())

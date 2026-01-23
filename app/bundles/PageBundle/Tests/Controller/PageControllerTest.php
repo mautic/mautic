@@ -67,7 +67,12 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testLandingPageTracking(): void
     {
         $this->logoutUser();
-        $this->connection->insert($this->prefix.'pages', [
+
+        $pagesTable     = $this->connection->quoteIdentifier($this->prefix.'pages');
+        $leadsTable     = $this->connection->quoteIdentifier($this->prefix.'leads');
+        $eventLogsTable = $this->connection->quoteIdentifier($this->prefix.'lead_event_log');
+
+        $this->connection->insert($pagesTable, [
             'is_published' => true,
             'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTracking',
@@ -80,24 +85,36 @@ class PageControllerTest extends MauticMysqlTestCase
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAllAssociative("SELECT id FROM $leadsTable");
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
 
-        $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
+        $sql = "SELECT id FROM $leadsTable";
         if (!empty($leadIdsBeforeTest)) {
-            $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
+            $sanitizedIds = array_map('intval', $leadIdsBeforeTest);
+            $sql .= ' WHERE id NOT IN ('.implode(',', $sanitizedIds).');';
         }
         $newLeads = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
-        $leadEventLogs = $this->connection->fetchAllAssociative('
-          SELECT `id`, `action`
-          FROM `'.$this->prefix.'lead_event_log`
-          WHERE `lead_id` = :leadId
-          AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
+
+        // Use single quotes for string values to satisfy PostgreSQL strict typing
+        // quoteSingleIdentifier ensures "action" is escaped if it's a reserved word
+        $actionCol = $this->connection->quoteIdentifier('action');
+        $bundleCol = $this->connection->quoteIdentifier('bundle');
+        $objectCol = $this->connection->quoteIdentifier('object');
+        $leadIdCol = $this->connection->quoteIdentifier('lead_id');
+
+        $leadEventLogs = $this->connection->fetchAllAssociative("
+            SELECT id, $actionCol
+            FROM $eventLogsTable
+            WHERE $leadIdCol = :leadId
+            AND $bundleCol = 'page' 
+            AND $objectCol = 'page'",
+            ['leadId' => $leadId]
         );
+
         $this->assertCount(1, $leadEventLogs);
         $this->assertSame('created_contact', reset($leadEventLogs)['action']);
     }
@@ -107,7 +124,11 @@ class PageControllerTest extends MauticMysqlTestCase
      */
     public function LandingPageTrackingSecondVisit(): void
     {
-        $this->connection->insert($this->prefix.'pages', [
+        $pagesTable     = $this->connection->quoteIdentifier($this->prefix.'pages');
+        $leadsTable     = $this->connection->quoteIdentifier($this->prefix.'leads');
+        $eventLogsTable = $this->connection->quoteIdentifier($this->prefix.'lead_event_log');
+
+        $this->connection->insert($pagesTable, [
             'is_published' => true,
             'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTrackingSecondVisit',
@@ -119,32 +140,41 @@ class PageControllerTest extends MauticMysqlTestCase
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAllAssociative("SELECT id FROM $leadsTable");
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
+        $sql = "SELECT id FROM $leadsTable";
         if (!empty($leadIdsBeforeTest)) {
-            $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
+            $sanitizedIds = array_map('intval', $leadIdsBeforeTest);
+            $sql .= ' WHERE id NOT IN ('.implode(',', $sanitizedIds).');';
         }
         $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeadsAfterFirstVisit);
         $leadId                   = reset($newLeadsAfterFirstVisit)['id'];
-        $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative('
-          SELECT `id`, `action`
-          FROM `'.$this->prefix.'lead_event_log`
-          WHERE `lead_id` = :leadId
-          AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
+
+        // Use single quotes for string values to satisfy PostgreSQL strict typing
+        // quoteSingleIdentifier ensures "action" is escaped if it's a reserved word
+        $actionCol = $this->connection->quoteIdentifier('action');
+        $bundleCol = $this->connection->quoteIdentifier('bundle');
+        $objectCol = $this->connection->quoteIdentifier('object');
+        $leadIdCol = $this->connection->quoteIdentifier('lead_id');
+
+        $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative("
+          SELECT $leadIdCol, $actionCol
+          FROM $eventLogsTable
+          WHERE $leadIdCol = :leadId
+          AND $bundleCol = 'page' AND $objectCol = 'page';", ['leadId' => $leadId]
         );
         $this->assertCount(1, $eventLogsAfterFirstVisit);
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
-          SELECT `id`, `action`
-          FROM `'.$this->prefix.'lead_event_log`
-          WHERE `lead_id` = :leadId
-          AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
+        $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative("
+          SELECT $leadIdCol, $actionCol
+          FROM $eventLogsTable
+          WHERE $leadIdCol = :leadId
+          AND $bundleCol = 'page' AND $objectCol = 'page';", ['leadId' => $leadId]
         );
         $this->assertCount(1, $eventLogsAfterSecondVisit);
         $this->assertSame(reset($eventLogsAfterFirstVisit)['id'], reset($eventLogsAfterSecondVisit)['id']);
