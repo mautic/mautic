@@ -210,7 +210,7 @@ class LeadListRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->in('ll.leadlist_id', ':ids'),
                     $qb->expr()->eq('ll.lead_id', ':leadId'),
-                    $qb->expr()->eq('ll.manually_removed', 'FALSE')
+                    $qb->expr()->eq('ll.manually_removed', 1)
                 )
             )
             ->setParameter('leadId', $lead->getId())
@@ -289,7 +289,7 @@ class LeadListRepository extends CommonRepository
             $expression,
             $q->expr()->eq('l.manually_removed', ':false')
         )
-            ->setParameter('false', 'FALSE', 'boolean')
+            ->setParameter('false', false, 'boolean')
             ->groupBy('l.leadlist_id');
 
         $result = $q->executeQuery()->fetchAllAssociative();
@@ -565,7 +565,7 @@ class LeadListRepository extends CommonRepository
             SELECT leadlist_id 
             FROM $tableName
             WHERE lead_id = ?
-                AND manually_removed = FALSE
+                AND manually_removed = 0
             LIMIT 1
 SQL;
 
@@ -649,7 +649,7 @@ SQL;
             FROM $tableName
             WHERE lead_id = ?
                 AND leadlist_id IN (?)
-                AND manually_removed = FALSE
+                AND manually_removed = 0
 SQL;
 
         return $this->getEntityManager()->getConnection()
@@ -884,8 +884,8 @@ SQL;
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->innerJoin('ll', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'll.leadlist_id = l.id')
             ->where('ll.lead_id = :contactId')
-            ->andWhere('ll.manually_removed = FALSE')
-            ->andWhere('l.is_published = TRUE')
+            ->andWhere('ll.manually_removed = 0')
+            ->andWhere('l.is_published = 1')
             ->setParameter('contactId', $contactId)
             ->orderBy('ll.leadlist_id', 'ASC')
             ->executeQuery()

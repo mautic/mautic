@@ -792,7 +792,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->where(
                         $q->expr()->and(
                             $q->expr()->eq('l.id', 'lla.lead_id'),
-                            $q->expr()->eq('lla.manually_removed', 'FALSE'),
+                            $q->expr()->eq('lla.manually_removed', 0),
                             $q->expr()->in('lla.leadlist_id', ":$unique")
                         )
                     );
@@ -872,7 +872,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->where(
                         $q->expr()->and(
                             $q->expr()->in('duplicate.leadlist_id', $imploder),
-                            $q->expr()->eq('duplicate.manually_removed', 'FALSE')
+                            $q->expr()->eq('duplicate.manually_removed', 0)
                         )
                     )
                     ->groupBy('duplicate.lead_id')

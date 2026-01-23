@@ -139,7 +139,7 @@ class StatRepository extends CommonRepository
                     $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 'FALSE')
+                        $sb->expr()->eq('lll.manually_removed', 0)
                     )
                 );
 

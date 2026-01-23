@@ -364,7 +364,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', 'FALSE', 'boolean');
+            ->setParameter('false', false, 'boolean');
 
         $this->updateQueryFromContactLimiter('cl', $q, $limiter, true);
 
@@ -410,7 +410,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', 'FALSE', 'boolean')
+            ->setParameter('false', false, 'boolean')
             ->orderBy('cl.lead_id', 'ASC');
 
         $this->updateQueryFromContactLimiter('cl', $q, $limiter);
@@ -473,7 +473,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', 'FALSE', Types::BOOLEAN);
+            ->setParameter('false', false, Types::BOOLEAN);
 
         if ($leadId) {
             $q->andWhere(
@@ -535,7 +535,7 @@ class CampaignRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('cl.campaign_id', ':campaignId'),
-                    $q->expr()->eq('cl.manually_removed', 'FALSE')
+                    $q->expr()->eq('cl.manually_removed', '0')
                 )
             )
             ->setParameter('campaignId', $campaignId)
@@ -576,7 +576,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', 'FALSE', 'boolean')
+            ->setParameter('false', false, 'boolean')
             ->orderBy('cl.lead_id', 'ASC');
 
         if (!empty($limit)) {
@@ -596,7 +596,7 @@ class CampaignRepository extends CommonRepository
 
         return $q->select('ll.id, ll.name')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
-            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = ll.id and lll.lead_id = :contactId and lll.manually_removed = FALSE')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = ll.id and lll.lead_id = :contactId and lll.manually_removed = 0')
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx', 'clx.leadlist_id = ll.id and clx.campaign_id = :campaignId')
             ->setParameter('contactId', (int) $contactId)
             ->setParameter('campaignId', (int) $campaignId)
@@ -617,7 +617,7 @@ class CampaignRepository extends CommonRepository
             ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = FALSE')
             ->leftJoin('cl',
                 '(SELECT lll.lead_id AS ll, lll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
-                .' AND lll.manually_removed = FALSE)',
+                .' AND lll.manually_removed = 0)',
                 't',
                 't.lead_id = cl.lead_id'
             );

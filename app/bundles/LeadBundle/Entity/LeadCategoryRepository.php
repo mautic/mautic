@@ -24,7 +24,7 @@ class LeadCategoryRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->join('lc', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = lc.category_id')
             ->where('lc.lead_id = :lead')
-            ->andWhere('lc.manually_removed = FALSE')
+            ->andWhere('lc.manually_removed = 0')
             ->setParameter('lead', $lead->getId());
 
         $results = $q->executeQuery()
@@ -48,7 +48,7 @@ class LeadCategoryRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->join('lc', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = lc.category_id')
             ->where('lc.lead_id = :lead')
-            ->andWhere('lc.manually_removed = TRUE')
+            ->andWhere('lc.manually_removed = 1')
             ->setParameter('lead', $lead->getId());
 
         $results = $q->executeQuery()->fetchAllAssociative();

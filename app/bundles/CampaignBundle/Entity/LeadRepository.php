@@ -173,7 +173,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.campaign_id', ':campaignId'),
-                    $q->expr()->eq('l.manually_removed', 'FALSE')
+                    $q->expr()->eq('l.manually_removed', 0)
                 )
             )
             // Order by ID so we can query by greater than X contact ID when batching
@@ -268,7 +268,7 @@ class LeadRepository extends CommonRepository
                 ->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.campaign_id', ':campaignId'),
-                        $q->expr()->eq('l.manually_removed', 'FALSE')
+                        $q->expr()->eq('l.manually_removed', 0)
                     )
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
@@ -364,7 +364,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', 'FALSE'),
+                    $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
             );
@@ -403,7 +403,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', 'FALSE'),
+                    $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
             )->orderBy('ll.lead_id');
@@ -438,8 +438,8 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $qb->expr()->eq('cl.manually_removed', 'FALSE'),
-                    $qb->expr()->eq('cl.manually_added', 'FALSE')
+                    $qb->expr()->eq('cl.manually_removed', 0),
+                    $qb->expr()->eq('cl.manually_added', 0)
                 )
             );
 
@@ -461,8 +461,8 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $qb->expr()->eq('cl.manually_removed', 'FALSE'),
-                    $qb->expr()->eq('cl.manually_added', 'FALSE')
+                    $qb->expr()->eq('cl.manually_removed', 0),
+                    $qb->expr()->eq('cl.manually_added', 0)
                 )
             );
 
@@ -535,9 +535,9 @@ class LeadRepository extends CommonRepository
         );
 
         if ($campaignCanBeRestarted) {
-            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', 'FALSE');
+            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', 0);
             $removedFromCampaignManually = $qb->expr()->and(
-                $qb->expr()->eq('cl.manually_removed', 'TRUE'),
+                $qb->expr()->eq('cl.manually_removed', 1),
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
@@ -572,7 +572,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
-                    $qb->expr()->eq('ll.manually_removed', 'FALSE'),
+                    $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
             );
@@ -630,7 +630,7 @@ class LeadRepository extends CommonRepository
         ->groupBy("$leadAlias.country")
         ->orderBy("$leadAlias.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
-        ->setParameter('false', 'FALSE', 'boolean')
+        ->setParameter('false', false, 'boolean')
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
         ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 

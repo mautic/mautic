@@ -826,7 +826,7 @@ class EmailRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
             ->where($qb->expr()->eq('e.id', $emailId))
-            ->andWhere('lc.manually_removed = TRUE');
+            ->andWhere('lc.manually_removed = 1');
     }
 
     private function getExcludedListQuery(int $emailId): ?QueryBuilder

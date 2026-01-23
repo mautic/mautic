@@ -221,7 +221,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($event->hasFilter('s.leadlist_id')) {
-                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = FALSE');
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                     $event->applyDateFilters($qb, 'date_added', 's');
                 } else {
                     $event->applyDateFilters($qb, 'date_added', 'l');
@@ -243,7 +243,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($event->usesColumn('s.leadlist_id')) {
-                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = FALSE');
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
                 if ($event->usesColumn(['pl.id', 'pl.name'])) {
@@ -265,7 +265,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($event->usesColumn('s.leadlist_id')) {
-                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = FALSE');
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
                 break;
@@ -303,7 +303,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($event->usesColumn('s.leadlist_id')) {
-                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = FALSE');
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
                 $subQ = clone $qb;
