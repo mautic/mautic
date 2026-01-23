@@ -94,7 +94,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 ->leftJoin(self::GROUP_SCORE_PREFIX, MAUTIC_TABLE_PREFIX.'leads', 'l', self::GROUP_SCORE_PREFIX.'.contact_id = l.id');
 
             if ($event->hasFilter('s.leadlist_id')) {
-                $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+                $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = FALSE');
             }
         }
 

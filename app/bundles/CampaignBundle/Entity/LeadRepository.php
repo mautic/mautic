@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -172,7 +173,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.campaign_id', ':campaignId'),
-                    $q->expr()->eq('l.manually_removed', 0)
+                    $q->expr()->eq('l.manually_removed', 'FALSE')
                 )
             )
             // Order by ID so we can query by greater than X contact ID when batching
@@ -267,7 +268,7 @@ class LeadRepository extends CommonRepository
                 ->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.campaign_id', ':campaignId'),
-                        $q->expr()->eq('l.manually_removed', 0)
+                        $q->expr()->eq('l.manually_removed', 'FALSE')
                     )
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
@@ -363,7 +364,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->eq('ll.manually_removed', 'FALSE'),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
             );
@@ -402,7 +403,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->eq('ll.manually_removed', 'FALSE'),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
             )->orderBy('ll.lead_id');
@@ -437,8 +438,8 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $qb->expr()->eq('cl.manually_removed', 0),
-                    $qb->expr()->eq('cl.manually_added', 0)
+                    $qb->expr()->eq('cl.manually_removed', 'FALSE'),
+                    $qb->expr()->eq('cl.manually_added', 'FALSE')
                 )
             );
 
@@ -460,8 +461,8 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $qb->expr()->eq('cl.manually_removed', 0),
-                    $qb->expr()->eq('cl.manually_added', 0)
+                    $qb->expr()->eq('cl.manually_removed', 'FALSE'),
+                    $qb->expr()->eq('cl.manually_added', 'FALSE')
                 )
             );
 
@@ -534,9 +535,9 @@ class LeadRepository extends CommonRepository
         );
 
         if ($campaignCanBeRestarted) {
-            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', 0);
+            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', 'FALSE');
             $removedFromCampaignManually = $qb->expr()->and(
-                $qb->expr()->eq('cl.manually_removed', 1),
+                $qb->expr()->eq('cl.manually_removed', 'TRUE'),
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
@@ -571,7 +572,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
-                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->eq('ll.manually_removed', 'FALSE'),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
             );
@@ -629,7 +630,7 @@ class LeadRepository extends CommonRepository
         ->groupBy("$leadAlias.country")
         ->orderBy("$leadAlias.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
-        ->setParameter('false', false, 'boolean')
+        ->setParameter('false', 'FALSE', 'boolean')
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
         ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
@@ -642,9 +643,39 @@ class LeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select DISTINCT lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
-        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
+
+        if ($conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            // 1. PostgreSQL uses standard DROP TABLE for temporary tables
+            $conn->executeStatement(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
+
+            // 2. PostgreSQL requires the "AS" keyword and specific JOIN syntax for table creation
+            $conn->executeStatement(sprintf(
+                'CREATE TEMPORARY TABLE %s AS 
+         SELECT DISTINCT lll.lead_id 
+         FROM %s lll 
+         JOIN %s l ON l.id = lll.lead_id 
+         WHERE l.date_identified IS NULL',
+                $tempTableName,
+                $tableName,
+                $leadsTableName
+            ));
+
+            // 3. PostgreSQL DELETE syntax uses "USING" and explicit join in WHERE
+            // Note: executeStatement() is used to get the count of affected rows directly
+            $deleteQuery = sprintf(
+                'DELETE FROM %s lll 
+         USING (SELECT lead_id FROM %s LIMIT %d) d 
+         WHERE lll.lead_id = d.lead_id',
+                $tableName,
+                $tempTableName,
+                self::DELETE_BATCH_SIZE
+            );
+        } else {
+            $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
+            $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select DISTINCT lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
+            $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
+        }
+
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;

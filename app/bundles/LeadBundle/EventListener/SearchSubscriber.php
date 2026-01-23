@@ -489,7 +489,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 'from_alias' => 'l',
                 'table'      => 'campaign_leads',
                 'alias'      => 'lc',
-                'condition'  => 'l.id = lc.lead_id and lc.manually_removed = 0',
+                'condition'  => 'l.id = lc.lead_id and lc.manually_removed = FALSE',
             ],
         ];
 

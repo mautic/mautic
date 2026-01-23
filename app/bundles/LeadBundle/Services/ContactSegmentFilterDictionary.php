@@ -139,7 +139,7 @@ class ContactSegmentFilterDictionary
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_lists_leads',
             'field'         => 'leadlist_id',
-            'where'         => 'lead_lists_leads.manually_removed = 0',
+            'where'         => 'lead_lists_leads.manually_removed = FALSE',
         ];
         $this->filters['globalcategory']                = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
@@ -260,7 +260,7 @@ class ContactSegmentFilterDictionary
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'campaign_leads',
             'field'         => 'campaign_id',
-            'where'         => 'campaign_leads.manually_removed = 0',
+            'where'         => 'campaign_leads.manually_removed = FALSE',
         ];
         $this->filters['lead_asset_download']   = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),

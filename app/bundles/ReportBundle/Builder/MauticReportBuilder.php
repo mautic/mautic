@@ -183,28 +183,35 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
+        $orderByColumns = [];
         // Build ORDER BY clause
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
                 if (isset($options['order']['column'])) {
                     $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
+                    $orderByColumns[] = $options['order']['column'];
                 } elseif (!empty($options['order'][0][1])) {
                     [$column, $dir] = $options['order'];
                     $queryBuilder->orderBy($column, $dir);
+                    $orderByColumns[] = $column;
                 } else {
                     foreach ($options['order'] as $order) {
                         $queryBuilder->orderBy($order);
+                        $orderByColumns[] = $order;
                     }
                 }
             } else {
                 $queryBuilder->orderBy($options['order']);
+                $orderByColumns[] = $options['order'];
             }
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
                 if (!empty($options['columns'][$o['column']]['formula'])) {
                     $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
+                    $orderByColumns[] = $o['column'];
                 } elseif (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
+                    $orderByColumns[] = $o['column'];
                 }
             }
         }
@@ -329,8 +336,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $queryBuilder->addSelect($aggregatorSelect);
         }
 
-        // Ensure all non-aggregated SELECT columns are in GROUP BY
-        $allSelectColumns = array_merge($selectColumns, $event->getSelectColumns() ?: []);
+        // Ensure all non-aggregated SELECT/ORDER columns are in GROUP BY
+        $allSelectColumns = array_merge(array_merge($selectColumns, $event->getSelectColumns() ?: []), $orderByColumns);
         if ($allSelectColumns && ($groupByColumns || $existingGroupBy || $aggregators)) {
             $nonAggregatedColumns = [];
 

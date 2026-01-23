@@ -190,7 +190,7 @@ class LeadListRepositoryTest extends TestCase
             SELECT leadlist_id 
             FROM {$prefix}lead_lists_leads
             WHERE lead_id = ?
-                AND manually_removed = 0
+                AND manually_removed = FALSE
             LIMIT 1
 SQL;
         $this->connection->expects(self::once())
@@ -214,7 +214,7 @@ SQL;
             FROM {$prefix}lead_lists_leads
             WHERE lead_id = ?
                 AND leadlist_id IN (?)
-                AND manually_removed = 0
+                AND manually_removed = FALSE
 SQL;
         $this->connection->expects(self::once())
             ->method('executeQuery')
@@ -268,7 +268,7 @@ SQL;
 
         $this->queryBuilderMock->expects(self::once())
             ->method('setParameter')
-            ->with('false', false, 'boolean')
+            ->with('false', 'FALSE', 'boolean')
             ->willReturnSelf();
 
         self::assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));

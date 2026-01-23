@@ -30,8 +30,17 @@ class SegmentLogReportSubscriberTest extends TestCase
         parent::setUp();
 
         $this->fieldsBuilder = $this->createMock(FieldsBuilder::class);
-        // Mock the Connection
+
+        // 1. Create the Connection mock
         $this->connection = $this->createMock(\Doctrine\DBAL\Connection::class);
+
+        // 2. Create and configure the Platform mock
+        // Use MySQLPlatform or PostgreSQLPlatform depending on what you are testing
+        $mockPlatform = $this->createMock(\Doctrine\DBAL\Platforms\MySQLPlatform::class);
+
+        // 3. Ensure the connection returns the platform
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($mockPlatform);
 
         $this->subscriber = new SegmentLogReportSubscriber(
             $this->fieldsBuilder,

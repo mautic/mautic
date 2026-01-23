@@ -167,8 +167,8 @@ class ContactSegmentQueryBuilder
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
             ->andWhere(
                 $queryBuilder->expr()->or(
-                    $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1),
-                    $queryBuilder->expr()->eq($tableAlias.'.manually_removed', $queryBuilder->expr()->literal(''))
+                    $queryBuilder->expr()->eq($tableAlias.'.manually_added', 'TRUE'),
+                    $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 'FALSE')
                 )
             );
 
@@ -196,7 +196,7 @@ class ContactSegmentQueryBuilder
             $tableAlias,
             $leadsTableAlias.'.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
         );
-        $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 1));
+        $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 'TRUE'));
         $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));
 
         return $queryBuilder;

@@ -19,6 +19,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+        $isPg             = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();
         $batchLimiters    = $filter->getBatchLimiters();
@@ -97,9 +98,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
 
+                $field = $tableAlias.'.'.$filter->getField();
+                if ($isPg) { // example: datetime cant use LIKE, we need to cast fields into TEXT
+                    $field = "({$field})::text";
+                }
+
                 $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                    $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
+                    $subQueryBuilder->expr()->like($field, $filterParametersHolder)
                 );
 
                 $subQueryBuilder->andWhere($expression);
@@ -112,7 +118,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->from($filter->getTable(), $tableAlias);
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
-                $isPg = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+
                 if ($isPg) {
                     $not             = ('notRegexp' === $filterOperator) ? '!' : '';
                     $operator        = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
@@ -175,8 +181,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
+                // Fix: Apply ::text operator for 'like' and 'notLike' on PostgreSQL
+                $field = $tableAlias.'.'.$filter->getField();
+                if ($isPg && in_array($filterOperator, ['like', 'notLike'])) {
+                    $field = "({$field})::text";
+                }
+
                 $expression = $subQueryBuilder->expr()->$filterOperator(
-                    $tableAlias.'.'.$filter->getField(),
+                    $field,
                     $filterParametersHolder
                 );
                 $subQueryBuilder->andWhere($expression);

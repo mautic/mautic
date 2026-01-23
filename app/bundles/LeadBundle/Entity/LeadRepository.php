@@ -792,13 +792,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->where(
                         $q->expr()->and(
                             $q->expr()->eq('l.id', 'lla.lead_id'),
-                            $q->expr()->eq('lla.manually_removed', 0),
+                            $q->expr()->eq('lla.manually_removed', 'FALSE'),
                             $q->expr()->in('lla.leadlist_id', ":$unique")
                         )
                     );
-                $from = $q->getQueryPart('from')[0];
-                $q->resetQueryPart('from');
-                $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
+
+                // Fix: Only apply MySQL-specific index hints if on a MySQL/MariaDB platform
+                $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+                if (!$platform instanceof \Doctrine\DBAL\Platforms\PostgreSqlPlatform) {
+                    $from = $q->getQueryPart('from')[0];
+                    $q->resetQueryPart('from');
+                    $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
+                }
 
                 $filter->strict  = true;
                 $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
@@ -867,7 +872,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->where(
                         $q->expr()->and(
                             $q->expr()->in('duplicate.leadlist_id', $imploder),
-                            $q->expr()->eq('duplicate.manually_removed', 0)
+                            $q->expr()->eq('duplicate.manually_removed', 'FALSE')
                         )
                     )
                     ->groupBy('duplicate.lead_id')

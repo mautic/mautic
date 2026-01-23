@@ -115,7 +115,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     private function generateLeftJoinCondition($alias, $action): string
     {
         // Fetch the proper platform-specific quote (e.g., "action" for PostgreSQL, `action` for MySQL)
-        $actionField = $this->connection->getDatabasePlatform()->quoteSingleIdentifier('action');
+        $actionField = $this->connection->quoteIdentifier('action');
 
         return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.'.$actionField.' =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }
