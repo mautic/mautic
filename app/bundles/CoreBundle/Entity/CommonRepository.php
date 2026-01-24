@@ -1871,7 +1871,7 @@ class CommonRepository extends ServiceEntityRepository
                     }
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             // Silent fallback if introspection fails
         }
 

@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Stats;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -31,13 +32,26 @@ class EmailPeriodMetrics
         $queryBuilder = $this->connection->createQueryBuilder();
         $daysSubQuery = $this->createDaysSubQuery();
 
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof PostgreSQLPlatform) {
+            $queryBuilder
+                ->select(
+                    'd.day',
+                    'COALESCE(s.sent_count, 0) AS sent_count',
+                    'COALESCE(r.read_count, 0) AS read_count',
+                    'COALESCE(c.hit_count, 0) AS hit_count'
+                );
+        } else {
+            $queryBuilder
+                ->select(
+                    'd.day',
+                    'IFNULL(s.sent_count, 0) AS sent_count',
+                    'IFNULL(r.read_count, 0) AS read_count',
+                    'IFNULL(c.hit_count, 0) AS hit_count'
+                );
+        }
+
         $queryBuilder
-            ->select(
-                'd.day',
-                'IFNULL(s.sent_count, 0) AS sent_count',
-                'IFNULL(r.read_count, 0) AS read_count',
-                'IFNULL(c.hit_count, 0) AS hit_count'
-            )
             ->from("({$daysSubQuery->getSQL()})", 'd')
             ->leftJoin('d', "({$this->createClicksSubQuery()->getSQL()})", 'c', 'c.hit_day = d.day')
             ->leftJoin('d', "({$this->createSentSubQuery()->getSQL()})", 's', 's.sent_day = d.day')
@@ -89,7 +103,7 @@ class EmailPeriodMetrics
     private function createClicksSubQuery(): QueryBuilder
     {
         $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
         // Handle Timezone Offset and Weekday calculation based on Platform
         if ($isPostgres) {
@@ -132,7 +146,7 @@ class EmailPeriodMetrics
     private function createClicksHourlySubQuery(): QueryBuilder
     {
         $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
         $adjustedDate = $this->getOffsetAdjustedDate('ph.date_hit');
 
@@ -179,7 +193,7 @@ class EmailPeriodMetrics
     private function createBasicStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
         $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
         $adjustedDate = $this->getOffsetAdjustedDate($dateColumn);
 
@@ -209,7 +223,7 @@ class EmailPeriodMetrics
     private function createBasicHourlyStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
         $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
         $adjustedDate = $this->getOffsetAdjustedDate($dateColumn);
 
@@ -242,7 +256,7 @@ class EmailPeriodMetrics
     private function getOffsetAdjustedDate(string $column): string
     {
         $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
         if ($isPostgres) {
             return "$column + (:timezoneOffset || ' second')::interval";

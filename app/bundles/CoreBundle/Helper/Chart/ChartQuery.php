@@ -56,6 +56,25 @@ class ChartQuery extends AbstractChart
     ];
 
     /**
+     * Match date/time unit to a PostgreSql datetime format
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * {@link www.postgresql.org/docs/current/functions-formatting.html}.
+     *
+     * @var array
+     */
+    protected $postgresqlTimeUnits = [
+        's' => 'YYYY-MM-DD HH24:MI:SS',
+        'i' => 'YYYY-MM-DD HH24:MI',
+        'H' => 'YYYY-MM-DD HH24":00"',
+        'd' => 'YYYY-MM-DD',
+        'D' => 'YYYY-MM-DD', // ('D' is BC. Can be removed when all charts use this class)
+        'W' => 'IYYY IW',
+        'm' => 'YYYY-MM',
+        'M' => 'YYYY-MM', // ('M' is BC. Can be removed when all charts use this class)
+        'Y' => 'YYYY',
+    ];
+
+    /**
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
      *
      * @see \Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait::getTimeUnitFromDateRange()
@@ -194,11 +213,21 @@ class ChartQuery extends AbstractChart
             $unit = $this->unit;
         }
 
-        if (!isset($this->mysqlTimeUnits[$unit])) {
-            throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for MySql.');
-        }
+        $platform = $this->connection->getDatabasePlatform();
 
-        return $this->mysqlTimeUnits[$unit];
+        if ($platform instanceof PostgreSQLPlatform) {
+            if (!isset($this->postgresqlTimeUnits[$unit])) {
+                throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for PostgreSql.');
+            }
+
+            return $this->postgresqlTimeUnits[$unit];
+        } else {
+            if (!isset($this->mysqlTimeUnits[$unit])) {
+                throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for MySql.');
+            }
+
+            return $this->mysqlTimeUnits[$unit];
+        }
     }
 
     /**
@@ -595,10 +624,28 @@ class ChartQuery extends AbstractChart
 
         $dbUnit                = $this->translateTimeUnit($this->unit);
         $columnName            = $tablePrefix.'.'.$column;
-        $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
+        $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset(); // e.g. '+08:00' or '-05:00'
 
-        return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof PostgreSQLPlatform) {
+            // Shift the UTC-stored timestamp to the user's local offset
+            // Works whether the column is timestamp or timestamptz
+            // ::timestamp strips any timezone info to avoid session TimeZone influence
+            $tzAdjusted = "({$columnName} + '{$defaultTimezoneOffset}'::interval)::timestamp";
+            // Special handling for weekly grouping ('W' unit → '%Y %U')
+            // MySQL %U = Sunday-based week 00–53
+            // We approximate with ISO week (Monday-based, 01–53) – common compromise in ports
+            // Padded with space like "2026 03" for identical grouping/label behavior
+            if ('IYYY IW' === $dbUnit) {
+                return "TO_CHAR({$tzAdjusted}, 'YYYY') || ' ' || LPAD(TO_CHAR({$tzAdjusted}, 'IW')::text, 2, '0')";
+            }
+
+            return "TO_CHAR({$tzAdjusted}, '{$dbUnit}')";
+        } else {
+            $columnName = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
+
+            return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
+        }
     }
 
     private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix): ?GeneratedColumn

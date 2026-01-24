@@ -313,7 +313,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                 self::PREFIX_FOCUS.'.id = '.self::PREFIX_STATS.'.focus_id')
             ->leftJoin(self::PREFIX_STATS, MAUTIC_TABLE_PREFIX.'channel_url_trackables', self::PREFIX_TRACKABLES,
                 self::PREFIX_TRACKABLES.'.channel_id = '.self::PREFIX_STATS.'.focus_id AND '.
-                self::PREFIX_TRACKABLES.'.channel = "focus"')
+                self::PREFIX_TRACKABLES.".channel = 'focus'")
             ->leftJoin(self::PREFIX_STATS, MAUTIC_TABLE_PREFIX.'page_redirects', self::PREFIX_REDIRECTS,
                 self::PREFIX_REDIRECTS.'.id = '.self::PREFIX_TRACKABLES.'.redirect_id')
             ->orderBy(self::PREFIX_FOCUS.'.name', 'ASC')
