@@ -349,12 +349,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->testSymfonyCommand('doctrine:schema:create');
         $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
 
+        /*
         if ($this->isPostgresqlPlatform()) {
             // make sure compatibility layer is created
             $args       = new GenerateSchemaEventArgs($this->em, new Schema());
             $subscriber = new DoctrineEventSubscriber();
             $subscriber->postGenerateSchema($args);
         }
+        */
     }
 
     private function generateResetDatabaseSql(string $file): void

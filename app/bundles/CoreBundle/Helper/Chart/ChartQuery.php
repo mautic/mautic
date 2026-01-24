@@ -22,7 +22,7 @@ class ChartQuery extends AbstractChart
      * Match date/time unit to a SQL datetime format
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $sqlFormats = [
         's' => 'Y-m-d H:i:s',
@@ -41,7 +41,7 @@ class ChartQuery extends AbstractChart
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $mysqlTimeUnits = [
         's' => '%Y-%m-%d %H:%i:%s',
@@ -60,7 +60,7 @@ class ChartQuery extends AbstractChart
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * {@link www.postgresql.org/docs/current/functions-formatting.html}.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $postgresqlTimeUnits = [
         's' => 'YYYY-MM-DD HH24:MI:SS',
