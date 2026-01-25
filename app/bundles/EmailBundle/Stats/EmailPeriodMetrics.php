@@ -166,7 +166,7 @@ class EmailPeriodMetrics
         if ($isPostgres) {
             $hourExpr = "TO_CHAR($adjustedDate, 'HH24')";
         } else {
-            $hourExpr = 'TIME_FORMAT('.$adjustedDate.', :format)';
+            $hourExpr = 'DATE_FORMAT('.$adjustedDate.', :format)';
         }
 
         $qb = $this->connection->createQueryBuilder()
@@ -243,7 +243,7 @@ class EmailPeriodMetrics
         if ($isPostgres) {
             $hourExpr = "TO_CHAR($adjustedDate, 'HH24')";
         } else {
-            $hourExpr = "TIME_FORMAT($adjustedDate, :format)";
+            $hourExpr = "DATE_FORMAT($adjustedDate, :format)";
         }
 
         $qb = $this->connection->createQueryBuilder()
