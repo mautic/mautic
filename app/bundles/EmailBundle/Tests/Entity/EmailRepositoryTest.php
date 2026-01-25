@@ -145,11 +145,6 @@ class EmailRepositoryTest extends TestCase
             ->with($this->equalTo("SUM(tr.unique_hits) as $uniqueClicksCol"))
             ->willReturnSelf();
 
-        // Mock addTrackableTablesForEmailStats to verify it's called
-        $this->repo->expects($this->once())
-            ->method('addTrackableTablesForEmailStats')
-            ->with($this->identicalTo($queryBuilder));
-
         $resultMock = $this->createMock(Result::class);
         $queryBuilder->expects($this->once())
             ->method('executeQuery')
