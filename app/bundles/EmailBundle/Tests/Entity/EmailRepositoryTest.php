@@ -127,9 +127,11 @@ class EmailRepositoryTest extends TestCase
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
+        $uniqueClicksCol = $this->connection->quoteIdentifier('unique_clicks');
+
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with('SUM( tr.unique_hits) as `unique_clicks`')
+            ->with("SUM(tr.unique_hits) as $uniqueClicksCol")
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);

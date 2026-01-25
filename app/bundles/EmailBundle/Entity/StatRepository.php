@@ -676,8 +676,9 @@ class StatRepository extends CommonRepository
      */
     public function getStatsSummaryForContacts(array $contacts): array
     {
-        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection         = $this->getEntityManager()->getConnection();
+        $queryBuilder       = $connection->createQueryBuilder();
+        $subQueryBuilder    = $connection->createQueryBuilder();
 
         $leadAlias     = 'l'; // leads
         $statsAlias    = 'es'; // email_stats
@@ -704,12 +705,17 @@ class StatRepository extends CommonRepository
             ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
+        $leadIdCol    = $connection->quoteIdentifier('lead_id');
+        $sentCountCol = $connection->quoteIdentifier('sent_count');
+        $readCountCol = $connection->quoteIdentifier('read_count');
+        $readCountCol = $connection->quoteIdentifier('clicked_through_count');
+
         // main query
         $queryBuilder->select(
-            "{$leadAlias}.id AS `lead_id`",
-            "COUNT({$statsAlias}.id) AS `sent_count`",
-            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
-            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
+            "{$leadAlias}.id AS $leadIdCol",
+            "COUNT({$statsAlias}.id) AS $sentCountCol",
+            "SUM(COALESCE({$statsAlias}.is_read, 0)) AS $readCountCol",
+            "SUM(COALESCE({$subQueryAlias}.hits, 0)) AS $readCountCol",
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,
@@ -760,8 +766,9 @@ class StatRepository extends CommonRepository
      */
     public function getStatsSummaryForCampaignEvents(array $eventIds): array
     {
-        $queryBuilder    = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection      = $this->getEntityManager()->getConnection();
+        $queryBuilder    = $connection->createQueryBuilder();
+        $subQueryBuilder = $connection->createQueryBuilder();
 
         $eventAlias     = 'e';  // campaign events
         $statsAlias     = 'es'; // email_stats
@@ -785,12 +792,17 @@ class StatRepository extends CommonRepository
             ->setParameter('events', $eventIds, ArrayParameterType::INTEGER)
             ->groupBy("{$statsAlias}.id");
 
+        $eventIdCol             = $connection->quoteIdentifier('event_id');
+        $sentCountCol           = $connection->quoteIdentifier('sent_count');
+        $readCountCol           = $connection->quoteIdentifier('read_count');
+        $clickedThroughCountCol = $connection->quoteIdentifier('clicked_through_count');
+
         // main query
         $queryBuilder->select(
-            "{$eventAlias}.id AS `event_id`",
-            "COUNT({$statsAlias}.id) AS `sent_count`",
-            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
-            "COUNT(DISTINCT CASE WHEN {$subQueryAlias}.hits > 0 THEN {$statsAlias}.id END) AS `clicked_through_count`"
+            "{$eventAlias}.id AS $eventIdCol",
+            "COUNT({$statsAlias}.id) AS $sentCountCol",
+            "SUM(COALESCE({$statsAlias}.is_read, 0)) AS $readCountCol",
+            "COUNT(DISTINCT CASE WHEN {$subQueryAlias}.hits > 0 THEN {$statsAlias}.id END) AS $clickedThroughCountCol"
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,

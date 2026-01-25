@@ -489,7 +489,11 @@ class EmailRepository extends CommonRepository
     public function getUniqueClicks(QueryBuilder $queryBuilder): int
     {
         $this->addTrackableTablesForEmailStats($queryBuilder);
-        $queryBuilder->select('SUM( tr.unique_hits) as `unique_clicks`');
+
+        $connection      = $this->getEntityManager()->getConnection();
+        $uniqueClicksCol = $connection->quoteIdentifier('unique_clicks');
+
+        $queryBuilder->select("SUM(tr.unique_hits) as $uniqueClicksCol");
 
         return (int) $queryBuilder->executeQuery()->fetchOne();
     }

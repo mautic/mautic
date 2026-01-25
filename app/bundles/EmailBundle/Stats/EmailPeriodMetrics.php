@@ -77,13 +77,26 @@ class EmailPeriodMetrics
         $queryBuilder  = $this->connection->createQueryBuilder();
         $hoursSubQuery = $this->createHoursSubQuery();
 
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof PostgreSQLPlatform) {
+            $queryBuilder
+                ->select(
+                    'd.hour',
+                    'COALESCE(s.sent_count, 0) AS sent_count',
+                    'COALESCE(r.read_count, 0) AS read_count',
+                    'COALESCE(c.hit_count, 0) AS hit_count'
+                );
+        } else {
+            $queryBuilder
+                ->select(
+                    'd.hour',
+                    'IFNULL(s.sent_count, 0) AS sent_count',
+                    'IFNULL(r.read_count, 0) AS read_count',
+                    'IFNULL(c.hit_count, 0) AS hit_count'
+                );
+        }
+
         $queryBuilder
-            ->select(
-                'h.hour',
-                'IFNULL(s.sent_count, 0) AS sent_count',
-                'IFNULL(r.read_count, 0) AS read_count',
-                'IFNULL(c.hit_count, 0) AS hit_count'
-            )
             ->from("({$hoursSubQuery->getSQL()})", 'h')
             ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', 'c.hit_hour = h.hour')
             ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', 's.sent_hour = h.hour')

@@ -736,7 +736,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $this->joinEmailsTableIfMissing($queryBuilder, $event);
                     $this->addDNCTableForEmailStats($queryBuilder);
                     $queryBuilder->select(
-                        'e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                        'e.id, e.subject as title, count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     )
                         ->having(
                             'count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) > 0'
@@ -772,9 +772,18 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.email.table.most.emails.clicks':
                     $this->addTrackableTablesForEmailStats($queryBuilder);
-                    $queryBuilder->select('e.id, e.subject as `title`, tr.hits as `clicks`, tr.unique_hits as `unique clicks`, pr.url as `URL`')
+
+                    // 1. Use quoteSingleIdentifier for aliases to handle MySQL backticks vs PostgreSQL double quotes
+                    $titleAlias   = $this->db->quoteIdentifier('title');
+                    $clicksAlias  = $this->db->quoteIdentifier('clicks');
+                    $uClicksAlias = $this->db->quoteIdentifier('unique clicks');
+                    $urlAlias     = $this->db->quoteIdentifier('URL');
+
+                    $queryBuilder->select("e.id, e.subject as $titleAlias, tr.hits as $clicksAlias, tr.unique_hits as $uClicksAlias, pr.url as $urlAlias")
                         ->andWhere('pr.url IS NOT NULL')
-                        ->groupBy('e.id, tr.redirect_id, tr.hits')
+                        // 2. PostgreSQL requires ALL non-aggregated columns in the GROUP BY.
+                        // MySQL/MariaDB accept this strict syntax as well.
+                        ->groupBy('e.id, e.subject, tr.hits, tr.unique_hits, pr.url, tr.redirect_id')
                         ->orderBy('tr.hits', 'DESC')
                         ->setMaxResults(10);
 
