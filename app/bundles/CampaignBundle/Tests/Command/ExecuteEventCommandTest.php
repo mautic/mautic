@@ -11,6 +11,13 @@ use PHPUnit\Framework\Assert;
 
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
+    protected function setUp(): void
+    {
+        echo "\n[DUMPDUMPDEBUG] ---------------------\n";
+        parent::setUp();
+        echo "\n[DUMPDUMPDEBUG] ---------------------\n";
+    }
+
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');

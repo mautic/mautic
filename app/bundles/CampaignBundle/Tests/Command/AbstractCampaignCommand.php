@@ -57,8 +57,56 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->db     = $this->em->getConnection();
         $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
+        // ────────────────────────────────────────────────
+        //          DEBUG: Before fixtures
+        // ────────────────────────────────────────────────
+        echo '[DEBUG] Before fixtures - current DB platform: '.get_class($this->db->getDatabasePlatform())."\n";
+        echo '[DEBUG] Table prefix: '.$this->prefix."\n";
+        echo '[DEBUG] leads table exists? '.($this->db->createSchemaManager()->tablesExist($this->prefix.'leads') ? 'YES' : 'NO')."\n";
+
+        // Try to count rows in leads (safe even if table missing)
+        try {
+            $count = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}leads");
+            echo "[DEBUG] leads row count before fixtures: $count\n";
+        } catch (\Exception $e) {
+            echo '[DEBUG] Cannot count leads before fixtures: '.$e->getMessage()."\n";
+        }
+
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
+
+        // ────────────────────────────────────────────────
+        //          DEBUG: After fixtures
+        // ────────────────────────────────────────────────
+        echo '[DEBUG] After fixtures - leads table exists? '.($this->db->createSchemaManager()->tablesExist($this->prefix.'leads') ? 'YES' : 'NO')."\n";
+
+        try {
+            $count = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}leads");
+            echo "[DEBUG] leads row count AFTER fixtures: $count\n";
+        } catch (\Exception $e) {
+            echo '[DEBUG] Cannot count leads after fixtures: '.$e->getMessage()."\n";
+        }
+
+        // Also check a few other important tables
+        foreach (['leads', 'lead_fields', 'lead_points_change_log', 'lead_categories_xref'] as $tbl) {
+            try {
+                $cnt = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}{$tbl}");
+                echo "[DEBUG] $tbl count: $cnt\n";
+            } catch (\Exception $e) {
+                echo "[DEBUG] Table $tbl error: ".$e->getMessage()."\n";
+            }
+        }
+
+        // Optional: dump first few leads
+        try {
+            $leads = $this->db->fetchAllAssociative("SELECT id, email, date_added FROM {$this->prefix}leads LIMIT 5");
+            echo "[DEBUG] Sample leads:\n".print_r($leads, true)."\n";
+        } catch (\Exception $e) {
+            echo '[DEBUG] Cannot fetch sample leads: '.$e->getMessage()."\n";
+        }
+
+        // If you have a logger available
+        $this->getContainer()->get('logger')->debug('Fixtures loaded in AbstractCampaignCommand test setup');
 
         date_default_timezone_set(self::DATE_TIME_ZONE);
         $this->eventDate  = new \DateTime('now', new \DateTimeZone(self::DATE_TIME_ZONE));
