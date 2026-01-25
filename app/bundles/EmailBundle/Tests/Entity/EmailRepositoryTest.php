@@ -127,7 +127,28 @@ class EmailRepositoryTest extends TestCase
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $uniqueClicksCol = $this->connection->quoteIdentifier('unique_clicks');
+        // 1. Mock the Connection and its quoting behavior
+        $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $connection->method('quoteIdentifier')
+            ->willReturnCallback(function ($identifier) {
+                // This simulates platform-agnostic quoting (e.g., `ident` or "ident")
+                return sprintf('`%s`', $identifier);
+            });
+
+        // 2. Mock the EntityManager to return our connection
+        $entityManager = $this->createMock(\Doctrine\ORM\EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($connection);
+
+        // 3. Setup the Repository with mocked EntityManager access
+        $repository = $this->getMockBuilder(EmailRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['addTrackableTablesForEmailStats', 'getEntityManager'])
+            ->getMock();
+
+        $repository->method('getEntityManager')->willReturn($entityManager);
+
+        // 4. Dynamically determine the expected identifier quoting
+        $uniqueClicksCol = $connection->quoteIdentifier('unique_clicks');
 
         $queryBuilder->expects($this->once())
             ->method('select')
