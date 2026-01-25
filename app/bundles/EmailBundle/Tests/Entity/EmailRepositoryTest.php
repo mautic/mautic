@@ -123,37 +123,32 @@ class EmailRepositoryTest extends TestCase
         yield [[96, 98, 103], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM test_leads l WHERE (l.id IN (SELECT ll.lead_id FROM test_lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM test_lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (l.id NOT IN (SELECT stat.lead_id FROM test_email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM test_message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id NOT IN (SELECT lc.lead_id FROM test_lead_categories lc INNER JOIN test_emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
     }
 
-    public function testGetUniqueCliks(): void
+    public function testGetUniqueClicks(): void
     {
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->repo = $this->configureRepository(Email::class);
 
-        // 1. Mock the Connection and its quoting behavior
-        $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
-        $connection->method('quoteIdentifier')
-            ->willReturnCallback(function ($identifier) {
-                // This simulates platform-agnostic quoting (e.g., `ident` or "ident")
-                return sprintf('`%s`', $identifier);
+        // Make quoteIdentifier behave realistically
+        $this->connection->method('quoteIdentifier')
+            ->willReturnCallback(function (string $identifier): string {
+                // For MySQL/MariaDB simulation (most common in CI)
+                return '`'.$identifier.'`';
+                // If testing PostgreSQL quoting:
+                // return '"' . $identifier . '"';
             });
 
-        // 2. Mock the EntityManager to return our connection
-        $entityManager = $this->createMock(\Doctrine\ORM\EntityManagerInterface::class);
-        $entityManager->method('getConnection')->willReturn($connection);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        // 3. Setup the Repository with mocked EntityManager access
-        $repository = $this->getMockBuilder(EmailRepository::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addTrackableTablesForEmailStats', 'getEntityManager'])
-            ->getMock();
-
-        $repository->method('getEntityManager')->willReturn($entityManager);
-
-        // 4. Dynamically determine the expected identifier quoting
-        $uniqueClicksCol = $connection->quoteIdentifier('unique_clicks');
+        $uniqueClicksCol = $this->connection->quoteIdentifier('unique_clicks');
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with("SUM(tr.unique_hits) as $uniqueClicksCol")
+            ->with($this->equalTo("SUM(tr.unique_hits) as $uniqueClicksCol"))
             ->willReturnSelf();
+
+        // Mock addTrackableTablesForEmailStats to verify it's called
+        $this->repo->expects($this->once())
+            ->method('addTrackableTablesForEmailStats')
+            ->with($this->identicalTo($queryBuilder));
 
         $resultMock = $this->createMock(Result::class);
         $queryBuilder->expects($this->once())
@@ -162,16 +157,11 @@ class EmailRepositoryTest extends TestCase
 
         $resultMock->expects($this->once())
             ->method('fetchOne')
-            ->willReturn(10);
+            ->willReturn('10');
 
-        $repository = $this->getMockBuilder(EmailRepository::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addTrackableTablesForEmailStats'])
-            ->getMock();
+        $result = $this->repo->getUniqueClicks($queryBuilder);
 
-        $result = $repository->getUniqueClicks($queryBuilder);
-
-        $this->assertEquals(10, $result);
+        $this->assertSame(10, $result);
     }
 
     public function testGetUnsubscribedCount(): void
