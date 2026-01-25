@@ -103,6 +103,15 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $testData['campaign'];
 
         $this->client->request(Request::METHOD_GET, "/s/campaign/metrics/email-hours/{$campaign->getId()}/2024-12-01/2024-12-12");
+
+        // Temporary debug helpers – remove after finding the issue
+        if (!$this->client->getResponse()->isOk()) {
+            echo 'HTTP Status: '.$this->client->getResponse()->getStatusCode()."\n";
+            echo "Response headers:\n";
+            print_r($this->client->getResponse()->headers->all());
+            echo "Response content:\n".$this->client->getResponse()->getContent()."\n";
+        }
+
         Assert::assertTrue($this->client->getResponse()->isOk());
         $content   = $this->client->getResponse()->getContent();
         $crawler   = new Crawler($content);

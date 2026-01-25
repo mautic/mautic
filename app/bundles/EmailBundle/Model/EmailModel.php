@@ -1801,11 +1801,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
 
-        $format = '%H:00';
-        if (12 == $timeFormat) {
-            $format = '%h %p';
-        }
-
         $connection = $this->em->getConnection();
         $isPg       = $connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 
