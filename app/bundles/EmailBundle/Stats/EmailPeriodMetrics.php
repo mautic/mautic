@@ -81,7 +81,7 @@ class EmailPeriodMetrics
         if ($platform instanceof PostgreSQLPlatform) {
             $queryBuilder
                 ->select(
-                    'd.hour',
+                    'h.hour',
                     'COALESCE(s.sent_count, 0) AS sent_count',
                     'COALESCE(r.read_count, 0) AS read_count',
                     'COALESCE(c.hit_count, 0) AS hit_count'
@@ -89,7 +89,7 @@ class EmailPeriodMetrics
         } else {
             $queryBuilder
                 ->select(
-                    'd.hour',
+                    'h.hour',
                     'IFNULL(s.sent_count, 0) AS sent_count',
                     'IFNULL(r.read_count, 0) AS read_count',
                     'IFNULL(c.hit_count, 0) AS hit_count'
