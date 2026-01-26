@@ -9,12 +9,12 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Form;
@@ -200,9 +200,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 $data[$key] = $values;
             } else {
                 $existingIds = array_column($data[$key], 'id');
-                $data[$key]  = array_merge($data[$key], array_filter($values, function ($value) use ($existingIds) {
-                    return !in_array($value['id'], $existingIds);
-                }));
+                $data[$key]  = array_merge($data[$key], array_filter($values, fn ($value) => !in_array($value['id'], $existingIds)));
             }
         }
     }
@@ -298,7 +296,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         ];
 
         foreach ($event->getEntityData() as $element) {
-            if (!empty($element['uuid']) && !UuidTrait::isValidUuid($element['uuid'])) {
+            if (!empty($element['uuid']) && !UuidHelper::isValidUuid($element['uuid'])) {
                 $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
                 break;
             }

@@ -49,12 +49,13 @@ class CampaignDeleteEventLogsCommand extends Command
         $campaignId = (int) $input->getOption('campaign-id');
 
         if (!empty($campaignId)) {
+            // For entire campaign deletion, remove both events and logs
             $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
             $this->eventModel->deleteEventsByCampaignId($campaignId);
             $campaign = $this->campaignModel->getEntity($campaignId);
             $this->campaignModel->deleteCampaign($campaign);
         } elseif (!empty($eventIds)) {
-            $this->leadEventLogRepository->removeEventLogs($eventIds);
+            // For individual event deletion, just soft-delete the event but keep logs
             $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 

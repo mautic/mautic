@@ -104,13 +104,13 @@ class PageModelTest extends PageTestAbstract
         $res = $cleanQueryMethod->invokeArgs($pageModel, [
             [
                 'page_title'    => 'Mautic & PHP',
-                'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum',
+                'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
                 'page_language' => 'en',
             ],
         ]);
         $this->assertEquals($res, [
             'page_title'    => 'Mautic &#38; PHP',
-            'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum',
+            'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
             'page_language' => 'en',
         ]);
     }
@@ -145,6 +145,33 @@ class PageModelTest extends PageTestAbstract
             $query = $pageModel->getHitQuery($request, $redirect);
             $this->assertUtmQuery($query);
         }
+    }
+
+    /**
+     * This test is somewhat synthetic to test the missing $query['ct'].
+     */
+    public function testNoClickThroughInQuery(): void
+    {
+        $redirectUrl = '/somewhat';
+        $pageModel   = $this->getPageModel();
+
+        $ipAddress = $this->createMock(IpAddress::class);
+        $ipAddress->method('isTrackable')->willReturn(true);
+
+        $this->security->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('getIpAddress')->willReturn($ipAddress);
+        $this->companyModel->method('fetchCompanyFields')->willReturn([]);
+
+        $redirect = $this->createMock(Redirect::class);
+        $redirect->method('getUrl')->willReturn($redirectUrl);
+
+        $this->contactRequestHelper->expects($this->once())
+            ->method('getContactFromQuery')
+            ->with(['page_url' => $redirectUrl])
+            ->willReturn(null);
+
+        $result = $pageModel->hitPage($redirect, new Request());
+        self::assertFalse($result);
     }
 
     private function assertUtmQuery(array $query): void

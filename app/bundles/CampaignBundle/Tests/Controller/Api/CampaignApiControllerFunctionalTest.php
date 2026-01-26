@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -252,10 +253,11 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(2);
 
         $email1 = $this->getMailerMessagesByToAddress('contact@one.email')[0];
+        \assert($email1 instanceof MauticMessage);
 
         // The email is has mailer is owner ON but this contact doesn't have any owner. So it uses default FROM and Reply-To.
         Assert::assertSame('Ahoy contact@one.email', $email1->getSubject());
-        Assert::assertMatchesRegularExpression('#Your email is <b>contact@one\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email1->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@one\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email1->getHtmlBody());
         Assert::assertSame('Your email is contact@one.email', $email1->getTextBody());
         Assert::assertCount(1, $email1->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email1->getFrom()[0]->getName());
@@ -268,10 +270,11 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($this->configParams['mailer_from_email'], $email1->getReplyTo()[0]->getAddress());
 
         $email2 = $this->getMailerMessagesByToAddress('contact@two.email')[0];
+        \assert($email2 instanceof MauticMessage);
 
         // This contact does have an owner so it uses FROM and Rply-to from the owner.
         Assert::assertSame('Ahoy contact@two.email', $email2->getSubject());
-        Assert::assertMatchesRegularExpression('#Your email is <b>contact@two\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email2->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@two\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]*" alt="" \/>#', $email2->getHtmlBody());
         Assert::assertSame('Your email is contact@two.email', $email2->getTextBody());
         Assert::assertCount(1, $email2->getFrom());
         Assert::assertSame($user->getName(), $email2->getFrom()[0]->getName());
@@ -297,11 +300,6 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testExportCampaignAction(): void
     {
         $entities = $this->createTestEntities();
-        $user     = $entities['user'];
-        $segment  = $entities['segment'];
-        $email    = $entities['email'];
-        $dwc      = $entities['dwc'];
-        $company  = $entities['company'];
 
         // Create the campaign
         $campaign = new Campaign();

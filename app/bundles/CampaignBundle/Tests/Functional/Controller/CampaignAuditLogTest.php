@@ -20,124 +20,33 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         // Create a Segment.
         $segment = $this->createSegment('seg1', []);
 
+        $campaign = $this->createCampaign('Audit Log Campaign');
+        $campaign->addList($segment);
+        $campaign->setIsPublished(true);
+
+        $event = new Event();
+        $event->setName('Change points event');
+        $event->setType('lead.changepoints');
+        $event->setEventType('action');
+        $event->setOrder(1);
+        $event->setProperties(['points' => 21]);
+        $event->setTriggerMode('date');
+        $event->setTriggerDate(new \DateTime('2023-09-27 21:37'));
+        $event->setCampaign($campaign);
+
+        $this->em->persist($event);
         $this->em->flush();
         $this->em->clear();
 
-        // 1. Start creating a campaign.
-        $uri = '/s/campaigns/new';
-        $this->client->xmlHttpRequest('GET', $uri);
-        $response = $this->client->getResponse();
+        $campaignId     = $campaign->getId();
+        $eventId        = $event->getId();
+        $modifiedEvents = []; // Initialize empty for consistency with API approach
 
-        $responseData = json_decode($response->getContent(), true);
-        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
-        $campaignForm = $crawler->filterXPath('//form[@name="campaign"]')->form();
-
-        // This is new campaign id to be used for later operations.
-        $campaignId = $campaignForm->getValues()['campaign[sessionId]'];
-
-        // 1.a Add segment source to campaign.
-        $uri = sprintf('/s/campaigns/sources/new/%s?sourceType=lists', $campaignId);
-        $this->client->xmlHttpRequest('GET', $uri);
-        $response     = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
-
-        $crawler = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
-        $form    = $crawler->filterXPath('//form[@name="campaign_leadsource"]')->form();
-        $form->setValues(
-            [
-                'campaign_leadsource[lists]'      => [$segment->getId()],
-                'campaign_leadsource[sourceType]' => 'lists',
-            ]
-        );
-
-        $this->setCsrfHeader();
-        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
-
-        // 1.b Add a new event
-        $uri = sprintf('/s/campaigns/events/new?type=lead.changepoints&eventType=action&campaignId=%s&anchor=no&anchorEventType=condition', $campaignId);
-        $this->client->xmlHttpRequest('GET', $uri);
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-
-        // Get the form HTML element out of the response, fill it in and submit.
-        $responseData = json_decode($response->getContent(), true);
-        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
-        $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
-        $form->setValues(
-            [
-                'campaignevent[canvasSettings][droppedX]'   => '863',
-                'campaignevent[canvasSettings][droppedY]'   => '363',
-                'campaignevent[name]'                       => '',
-                'campaignevent[triggerMode]'                => 'date',
-                'campaignevent[triggerDate]'                => '2023-09-27 21:37',
-                'campaignevent[triggerInterval]'            => '1',
-                'campaignevent[triggerIntervalUnit]'        => 'd',
-                'campaignevent[triggerHour]'                => '',
-                'campaignevent[triggerRestrictedStartHour]' => '',
-                'campaignevent[triggerRestrictedStopHour]'  => '',
-                'campaignevent[anchor]'                     => 'no',
-                'campaignevent[properties][points]'         => '21',
-                'campaignevent[properties][group]'          => '',
-                'campaignevent[type]'                       => 'lead.changepoints',
-                'campaignevent[eventType]'                  => 'action',
-                'campaignevent[anchorEventType]'            => 'condition',
-                'campaignevent[campaignId]'                 => $campaignId,
-            ]
-        );
-
-        $this->setCsrfHeader();
-        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
-
-        $eventId = $responseData['event']['id'];
-
-        // 1.c Submit the campaign form.
-        $campaignForm->setValues(
-            [
-                'campaign[name]'         => 'Audit Log Campaign',
-                'campaign[description]'  => 'Test campaign to see the logs',
-                'campaign[category]'     => '',
-                'campaign[isPublished]'  => '1',
-                'campaign[allowRestart]' => '0',
-                'campaign[publishUp]'    => '',
-                'campaign[publishDown]'  => '',
-                'campaign[sessionId]'    => $campaignId,
-            ]
-        );
-        $this->setCsrfHeader();
-        $this->client->xmlHttpRequest($campaignForm->getMethod(), $campaignForm->getUri(), $campaignForm->getPhpValues());
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-        $campaignResponseData = json_decode($response->getContent(), true);
-
-        preg_match('/(\d+)$/', $campaignResponseData['route'], $matches);
-        $campaignId = $matches[1] ?? null;
-
-        // 2. Update the campaign to create change log.
-
-        // 2.a Edit campaign.
-        $uri = '/s/campaigns/edit/'.$campaignId;
-        $this->client->xmlHttpRequest('GET', $uri);
-        $response = $this->client->getResponse();
-
-        $responseData = json_decode($response->getContent(), true);
-        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
-        $campaignForm = $crawler->filterXPath('//form[@name="campaign"]')->form();
-
-        // 2.a.a Get event id.
-        $pointsEvent = $this->em->getRepository(Event::class)->findOneBy(['tempId' => $eventId]);
-        $eventId     = $pointsEvent->getId();
+        // 2. Update the event through API to test EventController and create audit log.
 
         // 2.b Get the event edit form.
         $uri = "/s/campaigns/events/edit/{$eventId}?campaignId={$campaignId}&anchor=leadsource";
-        $this->client->xmlHttpRequest('GET', $uri);
+        $this->client->xmlHttpRequest('GET', $uri, ['modifiedEvents' => json_encode($modifiedEvents)]);
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
@@ -167,7 +76,10 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
+        $this->setCsrfHeader();
+        $formData                   = $form->getPhpValues();
+        $formData['modifiedEvents'] = json_encode($modifiedEvents);
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $formData);
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -175,15 +87,18 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         $this->assertTrue($responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
-        // 2.c Submit the campaign form
-        $this->setCsrfHeader();
-        $this->client->xmlHttpRequest($campaignForm->getMethod(), $campaignForm->getUri(), $campaignForm->getPhpValues());
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-        $campaignResponseData = json_decode($response->getContent(), true);
+        // 2.c Save campaign through CampaignModel to trigger audit log creation
+        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
+        $campaign      = $campaignModel->getEntity($campaignId);
+        $event         = $this->em->find(Event::class, $eventId);
+        $event->setName('2 contact points after 1 day');
+        $campaign->addEvent($eventId, $event);
+        $campaignModel->saveEntity($campaign);
+        $this->em->clear();
 
         // 3. View the campaign.
-        $this->client->request(Request::METHOD_GET, $campaignResponseData['route']);
+        $campaignViewUrl = '/s/campaigns/view/'.$campaignId;
+        $this->client->request(Request::METHOD_GET, $campaignViewUrl);
         $this->assertResponseIsSuccessful();
 
         $translator = static::getContainer()->get('translator');

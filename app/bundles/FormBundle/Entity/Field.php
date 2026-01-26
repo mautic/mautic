@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -228,11 +228,8 @@ class Field implements UuidInterface
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $mappedField;
 
-    public ?int $deletedId;
+    public ?int $deletedId = null;
 
-    /**
-     * Reset properties on clone.
-     */
     public function __clone()
     {
         $this->id   = null;
@@ -352,8 +349,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -362,8 +357,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set label.
-     *
      * @param string $label
      *
      * @return Field
@@ -377,8 +370,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get label.
-     *
      * @return string
      */
     public function getLabel()
@@ -387,8 +378,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set alias.
-     *
      * @param string $alias
      *
      * @return Field
@@ -402,8 +391,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get alias.
-     *
      * @return string
      */
     public function getAlias()
@@ -412,8 +399,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      *
      * @return Field
@@ -427,8 +412,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -437,8 +420,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set defaultValue.
-     *
      * @param string $defaultValue
      *
      * @return Field
@@ -452,8 +433,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get defaultValue.
-     *
      * @return string
      */
     public function getDefaultValue()
@@ -462,8 +441,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set isRequired.
-     *
      * @param bool $isRequired
      *
      * @return Field
@@ -477,8 +454,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get isRequired.
-     *
      * @return bool
      */
     public function getIsRequired()
@@ -497,8 +472,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
      *
      * @return Field
@@ -512,8 +485,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get order.
-     *
      * @return int
      */
     public function getOrder()
@@ -522,8 +493,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
      *
      * @return Field
@@ -537,8 +506,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -547,8 +514,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set validation.
-     *
      * @param array $validation
      *
      * @return Field
@@ -562,8 +527,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get validation.
-     *
      * @return array
      */
     public function getValidation()
@@ -572,8 +535,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set validationMessage.
-     *
      * @param string $validationMessage
      *
      * @return Field
@@ -587,8 +548,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get validationMessage.
-     *
      * @return string
      */
     public function getValidationMessage()
@@ -607,8 +566,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get form.
-     *
      * @return Form|null
      */
     public function getForm()

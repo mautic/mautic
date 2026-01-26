@@ -2,7 +2,9 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * @extends CommonRepository<WebhookQueue>
@@ -26,6 +28,27 @@ class WebhookQueueRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $idList)
             )
+            ->executeStatement();
+    }
+
+    /**
+     * @param array<int> $idList
+     */
+    public function incrementRetryCount(array $idList): void
+    {
+        if (!count($idList)) {
+            return;
+        }
+
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.'webhook_queue')
+            ->where(
+                $qb->expr()->in('id', ':ids')
+            )
+            ->set('retries', 'retries + 1')
+            ->set('date_modified', ':date_modified')
+            ->setParameter('ids', $idList, ArrayParameterType::INTEGER)
+            ->setParameter('date_modified', (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB))
             ->executeStatement();
     }
 

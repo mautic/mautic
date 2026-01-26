@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CampaignBundle\Validator\Constraints\NoOrphanEvents;
@@ -21,14 +22,13 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
-use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -51,7 +51,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface, UuidInterface
+class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
 
@@ -69,7 +69,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     private $name;
@@ -94,6 +94,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     #[Groups(['campaign:read', 'campaign:write'])]
     public ?\DateTimeInterface $deleted = null;
+
+    // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
+    #[Groups(['campaign:read', 'campaign:write'])]
+    private ?string $republishBehavior = null;
 
     /**
      * @var Category|null
@@ -161,6 +165,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder->addIdColumns();
 
         $builder->addPublishDates();
+
+        $builder->createField('republishBehavior', Types::STRING)
+            ->columnName('republish_behavior')
+            ->nullable()
+            ->length(32)
+            ->build();
 
         $builder->addCategory();
 
@@ -237,6 +247,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'allowRestart',
                     'publishUp',
                     'publishDown',
+                    'republishBehavior',
                     'events',
                     'forms',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
@@ -291,8 +302,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return Campaign
@@ -306,8 +315,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -316,8 +323,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set name.
-     *
      * @return Campaign
      */
     public function setName(string $name)
@@ -329,8 +334,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -353,8 +356,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add events.
-     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)
@@ -367,9 +368,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove events.
-     */
     public function removeEvent(Event $event): void
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
@@ -378,8 +376,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get events.
-     *
      * @return ArrayCollection<int, Event>
      */
     public function getEvents()
@@ -449,8 +445,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set publishUp.
-     *
      * @param ?\DateTime $publishUp
      *
      * @return Campaign
@@ -464,8 +458,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -474,8 +466,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set publishDown.
-     *
      * @param ?\DateTime $publishDown
      *
      * @return Campaign
@@ -488,9 +478,20 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
+    public function getRepublishBehavior(): ?string
+    {
+        return $this->republishBehavior;
+    }
+
+    public function setRepublishBehavior(?string $republishBehavior): self
+    {
+        $this->isChanged('republishBehavior', $republishBehavior);
+        $this->republishBehavior = $republishBehavior;
+
+        return $this;
+    }
+
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishDown()
@@ -516,8 +517,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add lead.
-     *
      * @return Campaign
      */
     public function addLead($key, Lead $lead)
@@ -531,9 +530,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove lead.
-     */
     public function removeLead(Lead $lead): void
     {
         $leadEntity                                              = $lead->getLead();
@@ -542,8 +538,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get leads.
-     *
      * @return Lead[]|Collection
      */
     public function getLeads()
@@ -560,8 +554,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add list.
-     *
      * @return Campaign
      */
     public function addList(LeadList $list)
@@ -573,9 +565,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
@@ -591,8 +580,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Add form.
-     *
      * @return Campaign
      */
     public function addForm(Form $form)
@@ -604,9 +591,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove form.
-     */
     public function removeForm(Form $form): void
     {
         $this->changes['forms']['removed'][$form->getId()] = $form->getName();
@@ -637,10 +621,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             return false;
         }
 
-        // Extract event IDs from canvas nodes (excludes 'lists' and other non-event nodes)
+        // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
         $eventIds = array_filter(
             array_column($canvasSettings['nodes'], 'id'),
-            fn ($id) => 'lists' !== $id
+            fn ($id) => !in_array($id, ['lists', 'forms'])
         );
 
         if (empty($eventIds)) {
@@ -704,11 +688,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         );
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     */
     public function getOnclickMethod(): string
     {
         return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     *
+     * @return array<string, string>
+     */
     public function getDataAttributes(): array
     {
         return [
@@ -718,6 +710,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         ];
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     *
+     * @return array<string, string>
+     */
     public function getTranslationKeysDataAttributes(): array
     {
         return [

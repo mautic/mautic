@@ -67,6 +67,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
             ],
+            'l.generated_email_domain' => [
+                'label' => 'mautic.lead.report.generated_email_domain',
+                'type'  => 'string',
+            ],
             'x.title' => [
                 'label' => 'Title',
                 'type'  => 'string',
@@ -203,6 +207,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ],
             'u.last_name' => [
                 'label' => 'mautic.lead.report.owner_lastname',
+                'type'  => 'string',
+            ],
+            'l.generated_email_domain' => [
+                'label' => 'mautic.lead.report.generated_email_domain',
                 'type'  => 'string',
             ],
             'x.title' => [

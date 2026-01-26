@@ -170,4 +170,17 @@ class LeadDeviceRepository extends CommonRepository
             ->where('lead_id = '.(int) $fromLeadId)
             ->executeStatement();
     }
+
+    public function findExistingDevice(LeadDevice $device): ?LeadDevice
+    {
+        return $this->findOneBy(
+            [
+                'lead'         => $device->getLead(),
+                'device'       => $device->getDevice(),
+                'deviceBrand'  => $device->getDeviceBrand(),
+                'deviceModel'  => $device->getDeviceModel(),
+                'deviceOsName' => $device->getDeviceOsName(),
+            ]
+        );
+    }
 }

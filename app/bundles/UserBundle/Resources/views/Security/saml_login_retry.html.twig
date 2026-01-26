@@ -1,0 +1,6 @@
+{% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
+{% block content %}
+<a class="btn btn-lg btn-primary btn-block" href="{{ loginRoute }}">
+    {{ 'mautic.user.auth.form.loginbtn'|trans }}
+</a>
+{% endblock %}

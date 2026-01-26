@@ -165,9 +165,7 @@ class ContactSegmentFilterFactory
 
         $filter                         = $stack[0];
         $filter['operator']             = 'in';
-        $filter['properties']['filter'] = $filter['filter'] = array_map(function ($ele) {
-            return $ele['filter'];
-        }, $stack);
+        $filter['properties']['filter'] = $filter['filter'] = array_map(fn ($ele) => $ele['filter'], $stack);
 
         return $filter;
     }

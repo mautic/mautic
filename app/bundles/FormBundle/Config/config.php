@@ -36,6 +36,10 @@ return [
                     'format' => 'csv',
                 ],
             ],
+            'mautic_form_results_add_segment' => [
+                'path'       => '/forms/results/{objectId}/add-to-segment',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::addToSegmentAction',
+            ],
             'mautic_form_results_action' => [
                 'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
                 'controller' => 'Mautic\FormBundle\Controller\ResultController::executeAction',

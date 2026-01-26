@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -57,51 +57,44 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * @var int|null
-     *
-     * @Groups({"asset:read", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'download:read', 'email:read'])]
     private $id;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $title;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $description;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $storageLocation = 'local';
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $path;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $remotePath;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $originalFileName;
 
     /**
@@ -140,91 +133,80 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * @var string
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $alias;
 
     /**
      * @var string
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $language = 'en';
 
     /**
      * @var \DateTimeInterface|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $publishDown;
 
     /**
      * @var int
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $downloadCount = 0;
 
     /**
      * @var int
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $uniqueDownloadCount = 0;
 
     /**
      * @var int
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $revision = 1;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      **/
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $category;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $extension;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $mime;
 
     /**
      * @var int|null
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $size;
 
     /**
      * @var string|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $downloadUrl;
 
     /**
      * @var bool|null
-     *
-     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
+    #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $disallow = true;
 
     public function __construct()
@@ -350,7 +332,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -1182,11 +1164,14 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Load content of the file from it's path.
+     * Load the content of the file from its path.
      */
     public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
+        if (!file_exists($path)) {
+            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', $path));
+        }
 
         return file_get_contents($path);
     }

@@ -1,5 +1,5 @@
 <li class="dropdown dropdown-custom" id="notificationsDropdown">
-    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown">
+    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown" aria-label={{ 'mautic.core.notifications'|trans }}>
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
         <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="ri-asterisk"></i></span>
         <span class="ri-notification-3-line ri-xl"></span>

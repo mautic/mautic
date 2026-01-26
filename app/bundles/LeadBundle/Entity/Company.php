@@ -2,6 +2,13 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -10,8 +17,29 @@ use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'Companies',
+    operations: [
+        new GetCollection(uriTemplate: '/companies', security: "is_granted('lead:leads:viewown')"),
+        new Post(uriTemplate: '/companies', security: "is_granted('lead:leads:create')"),
+        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown')"),
+        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown')"),
+        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother')"),
+        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['company:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['company:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -23,42 +51,94 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @var int
      */
+    #[Groups(['company:read'])]
     private $id;
 
     /**
      * @var int|null
      */
+    #[Groups(['company:read', 'company:write'])]
     private $score = 0;
 
+    #[Groups(['company:read', 'company:write'])]
     private ?User $owner = null;
 
     /**
      * @var mixed[]
      */
+    #[Groups(['company:read', 'company:write'])]
     private $socialCache = [];
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $email;
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $address1;
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $address2;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $phone;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $city;
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $state;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $zipcode;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $country;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $name;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $website;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $industry;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $description;
 
     public function __construct()
@@ -176,6 +256,10 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
+        $metadata->addPropertyConstraint('score', new Assert\Range([
+            'min' => 0,
+            'max' => 2147483647,
+        ]));
     }
 
     public static function getDefaultIdentifierFields(): array

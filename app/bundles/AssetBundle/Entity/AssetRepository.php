@@ -3,6 +3,7 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -91,6 +92,22 @@ class AssetRepository extends CommonRepository
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         switch ($command) {
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired', [], null, 'en_US'):
+                $expr = sprintf(
+                    "(a.isPublished = :%1\$s AND a.publishDown IS NOT NULL AND a.publishDown <> '' AND a.publishDown < CURRENT_TIMESTAMP())",
+                    $unique
+                );
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.ispending'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.ispending', [], null, 'en_US'):
+                $expr = sprintf(
+                    "(a.isPublished = :%1\$s AND a.publishUp IS NOT NULL AND a.publishUp <> '' AND a.publishUp > CURRENT_TIMESTAMP())",
+                    $unique
+                );
+                $forceParameters = [$unique => true];
+                break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
@@ -98,10 +115,7 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('a.language', ":$unique"),
-                    $q->expr()->like('a.language', ":$langUnique")
-                );
+                $expr            = '('.$q->expr()->eq('a.language', ":$unique").' OR '.$q->expr()->like('a.language', ":$langUnique").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -142,6 +156,8 @@ class AssetRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
+            'mautic.asset.asset.searchcommand.isexpired',
+            'mautic.asset.asset.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
             'mautic.project.searchcommand.name',
@@ -218,5 +234,52 @@ class AssetRepository extends CommonRepository
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();
+    }
+
+    /**
+     * Finds a single Asset entity based on a slug in the format "id:alias-or-uuid".
+     *
+     * The slug is expected to be a string with two parts separated by a colon (`:`):
+     *  - The first part is the asset's numeric ID.
+     *  - The second part is either the asset's alias or UUID.
+     *
+     * Example:
+     *    - "1:example-file"
+     *    - "42:1234a567-124-1a2b-123b-ab1c2345de6f7"
+     *
+     * @throws NonUniqueResultException
+     * @throws EntityNotFoundException
+     */
+    public function findByIdAndAlias(string $slug): Asset
+    {
+        // Split the slug into ID and alias/UUID parts. Alias is to BC check.
+        [$id, $alias] = array_pad(explode(':', $slug, 2), 2, null);
+
+        // Validate input: both parts must be present.
+        if (!$id || !$alias) {
+            throw new \InvalidArgumentException('Invalid slug format. Expected "id:alias-or-uuid".');
+        }
+
+        $qb = $this->createQueryBuilder('a');
+
+        // Build query: match the asset by ID and either alias or UUID.
+        $asset = $qb
+            ->where('a.id = :id')
+            ->andWhere(
+                $qb->expr()->eq('a.alias', ':val')
+            )
+            ->setParameters([
+                'id'  => (int) $id,
+                'val' => $alias,
+            ])
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        // If not found, throw a standardized Doctrine exception.
+        if (!$asset) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(Asset::class, ['id' => $id, 'alias/uuid' => $alias]);
+        }
+
+        return $asset;
     }
 }

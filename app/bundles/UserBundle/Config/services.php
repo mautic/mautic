@@ -31,6 +31,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
+    $services->set(Mautic\UserBundle\ApiPlatform\UserProcessor::class)
+        ->args([
+            service('api_platform.doctrine.orm.state.persist_processor'),
+            service('security.user_password_hasher'),
+        ])
+        ->tag('api_platform.state_processor');
+
     $services->set('security.authenticator.mautic_sso', SsoAuthenticator::class)
         ->abstract()
         ->args([
@@ -47,6 +54,7 @@ return function (ContainerConfigurator $configurator): void {
             '$oAuth2' => service('fos_oauth_server.server'),
         ]);
 
+    $services->set(Mautic\UserBundle\Security\SAML\Helper::class);
     $services->set('security.token.permissions', TokenPermissions::class);
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
@@ -73,4 +81,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
     $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
         ->tag('controller.service_arguments');
+    // Decorate the form_login class to ensure no user enumeration can
+    // happen via timing attacks.
+    $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)
+        ->decorate('security.authenticator.form_login.main')
+        ->args([
+            service('.inner'),
+            service('mautic.user.provider'),
+            service('security.password_hasher_factory'),
+            [], // This will be replaced by the compiler pass
+        ]);
 };

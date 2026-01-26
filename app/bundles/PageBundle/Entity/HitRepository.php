@@ -220,13 +220,19 @@ class HitRepository extends CommonRepository
     /**
      * Get the latest hit.
      *
-     * @param array $options
+     * @param array{
+     *     leadId?: int,
+     *     urls?: string[]|string|null,
+     *     second_to_last?: int|null
+     * } $options
      */
     public function getLatestHit($options): ?\DateTime
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('h.date_hit latest_hit')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
+        $sq->select('h.date_hit')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->orderBy('h.date_hit', 'DESC')
+            ->setMaxResults(1);
 
         if (isset($options['leadId'])) {
             $sq->andWhere(
@@ -242,12 +248,15 @@ class HitRepository extends CommonRepository
         }
         if (isset($options['second_to_last'])) {
             $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
-        } else {
-            $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
-        $result = $sq->executeQuery()->fetchAssociative();
 
-        return $result ? new \DateTime($result['latest_hit'], new \DateTimeZone('UTC')) : null;
+        $latestHit = $sq->executeQuery()->fetchOne();
+
+        if (!$latestHit) {
+            return null;
+        }
+
+        return new \DateTime($latestHit, new \DateTimeZone('UTC'));
     }
 
     /**

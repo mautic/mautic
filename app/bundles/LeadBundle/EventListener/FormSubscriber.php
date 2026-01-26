@@ -19,8 +19,12 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
@@ -35,6 +39,7 @@ class FormSubscriber implements EventSubscriberInterface
         protected LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
+        private FieldModel $leadFieldModel,
     ) {
     }
 
@@ -52,6 +57,7 @@ class FormSubscriber implements EventSubscriberInterface
                 ['onFormSubmitActionAddUtmTags', 3],
                 ['onFormSubmitActionScoreContactsCompanies', 4],
                 ['onFormSubmitActionRemoveFromDoNotContact', 5],
+                ['onFormSubmitActionUpdateLead', 5],
             ],
         ];
     }
@@ -117,6 +123,15 @@ class FormSubscriber implements EventSubscriberInterface
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'template'    => '@MauticLead/Action/points.html.twig',
         ]);
+
+        $event->addSubmitAction('lead.updatelead', [
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.updatelead',
+            'description' => 'mautic.lead.lead.events.updatelead_descr',
+            'formType'    => UpdateLeadActionType::class,
+            'formTheme'   => '@MauticLead/FormTheme/FormActionUpdateLead/_formaction_properties_row.html.twig',
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        ]);
     }
 
     public function onObjectCollect(ObjectCollectEvent $event): void
@@ -139,6 +154,13 @@ class FormSubscriber implements EventSubscriberInterface
                     $field->getProperties()
                 )
             );
+        }
+
+        // Add the owner and stage fields to the form
+        if ('lead' === $object) {
+            $event->appendField(new FieldCrate('ownerbyemail', 'mautic.lead.field.ownerbyemail', 'email', []));
+            $event->appendField(new FieldCrate('ownerbyid', 'mautic.lead.field.ownerbyid', 'text', []));
+            $event->appendField(new FieldCrate('stagebyname', 'mautic.lead.field.stagebyname', 'text', []));
         }
     }
 
@@ -309,5 +331,47 @@ class FormSubscriber implements EventSubscriberInterface
         if (!empty($removeFrom)) {
             $this->leadModel->removeFromLists($lead, $removeFrom);
         }
+    }
+
+    public function onFormSubmitActionUpdateLead(SubmissionEvent $event): void
+    {
+        if (false === $event->checkContext('lead.updatelead')) {
+            return;
+        }
+
+        if (!$lead = $this->contactTracker->getContact()) {
+            return;
+        }
+
+        $actionValues         = $event->getActionConfig();
+        $contactFieldMatches  = $event->getContactFieldMatches();
+        $fields               = $lead->getFields(true);
+
+        $mergedValues = array_merge($actionValues, array_filter(
+            $contactFieldMatches,
+            static fn ($value) => '' !== $value && null !== $value
+        ));
+
+        $processedValues = [];
+        foreach ($mergedValues as $alias => $value) {
+            if (isset($fields[$alias]) && 'boolean' === $fields[$alias]['type'] && 0 === $value) {
+                // 0 is interpreted as 'don't change the bool field' instead of setting it to false, so we change the field manually in this step
+                $lead->addUpdatedField($alias, 0);
+            }
+            if (is_string($value)) {
+                $processedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                $fieldEntity    = $this->leadFieldModel->getEntityByAlias($alias);
+
+                if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($processedValue) > $charLimit) {
+                    $processedValue = mb_substr($processedValue, 0, $charLimit);
+                }
+                $processedValues[$alias] = $processedValue;
+            } else {
+                $processedValues[$alias] = $value;
+            }
+        }
+
+        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $processedValues), false);
+        $this->leadModel->saveEntity($lead);
     }
 }
