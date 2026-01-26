@@ -72,6 +72,12 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             echo '[DEBUG] Cannot count leads before fixtures: '.$e->getMessage()."\n";
         }
 
+        // ────────────────────────────────────────────────
+        //  BEFORE fixtures – read current sequence / auto-increment
+        // ────────────────────────────────────────────────
+        $beforeValue = $this->getCurrentIdSequenceValue($this->prefix.'leads');
+        echo '[SEQUENCE DEBUG] Before fixtures - current next ID for leads: '.($beforeValue ?? 'N/A')."\n";
+
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
 
@@ -86,6 +92,12 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         } catch (\Exception $e) {
             echo '[DEBUG] Cannot count leads after fixtures: '.$e->getMessage()."\n";
         }
+
+        // ────────────────────────────────────────────────
+        //  BEFORE fixtures – read current sequence / auto-increment
+        // ────────────────────────────────────────────────
+        $beforeValue = $this->getCurrentIdSequenceValue($this->prefix.'leads');
+        echo '[SEQUENCE DEBUG] AFTER fixtures - current next ID for leads: '.($beforeValue ?? 'N/A')."\n";
 
         // Optional: dump first few leads
         try {
@@ -161,6 +173,49 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
                 echo "[END DEBUG] Table $tbl error: ".$e->getMessage()."\n";
             }
         }
+    }
+
+    /**
+     * Returns the **next available ID** that would be used for a new row.
+     * Works on both MySQL (AUTO_INCREMENT) and PostgreSQL (sequence).
+     *
+     * @return int|null Next ID, or null if table/sequence not found
+     */
+    private function getCurrentIdSequenceValue(string $table): ?int
+    {
+        $platform = $this->db->getDatabasePlatform();
+
+        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+            // PostgreSQL: get the next value from the sequence
+            $sequence = $this->db->fetchOne(
+                "SELECT pg_get_serial_sequence(?, 'id')",
+                [$table]
+            );
+
+            if (!$sequence) {
+                return null; // no identity column or sequence not found
+            }
+
+            // Get current next value (what the next insert would get)
+            return (int) $this->db->fetchOne('SELECT nextval(?)', [$sequence]);
+        }
+
+        if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
+            // MySQL / MariaDB: AUTO_INCREMENT value is the next ID
+            $row = $this->db->fetchAssociative(
+                'SHOW TABLE STATUS WHERE Name = ?',
+                [$table]
+            );
+
+            if (!$row || !isset($row['Auto_increment'])) {
+                return null;
+            }
+
+            return (int) $row['Auto_increment'];
+        }
+
+        // Other platforms → not supported
+        return null;
     }
 
     public function beforeTearDown(): void
