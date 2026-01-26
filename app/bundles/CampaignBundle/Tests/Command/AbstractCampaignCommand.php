@@ -87,22 +87,35 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             echo '[DEBUG] Cannot count leads after fixtures: '.$e->getMessage()."\n";
         }
 
-        // Also check a few other important tables
-        foreach (['leads', 'lead_fields', 'lead_points_change_log', 'lead_categories_xref'] as $tbl) {
-            try {
-                $cnt = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}{$tbl}");
-                echo "[DEBUG] $tbl count: $cnt\n";
-            } catch (\Exception $e) {
-                echo "[DEBUG] Table $tbl error: ".$e->getMessage()."\n";
-            }
-        }
-
         // Optional: dump first few leads
         try {
             $leads = $this->db->fetchAllAssociative("SELECT id, email, date_added FROM {$this->prefix}leads LIMIT 5");
             echo "[DEBUG] Sample leads:\n".print_r($leads, true)."\n";
         } catch (\Exception $e) {
             echo '[DEBUG] Cannot fetch sample leads: '.$e->getMessage()."\n";
+        }
+
+        // Also check a few other important tables
+        $checkTables = [
+            'leads',
+            'lead_fields',
+            'emails',
+            'lead_tags',
+            'campaigns',
+            'campaign_events',
+            'lead_lists',
+            'lead_points_change_log',
+            'campaign_leadlist_xref',
+            'lead_lists_leads',
+            'campaign_leads',
+        ];
+        foreach ($checkTables as $tbl) {
+            try {
+                $cnt = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}{$tbl}");
+                echo "[POST installDatabaseFixtures DEBUG] $tbl count: $cnt\n";
+            } catch (\Exception $e) {
+                echo "[POST installDatabaseFixtures DEBUG] Table $tbl error: ".$e->getMessage()."\n";
+            }
         }
 
         // If you have a logger available
@@ -125,6 +138,29 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->insertCampaignLeadlistXref();
         $this->insertLeadListsLeads();
         $this->insertCampaignLeads();
+
+        // Also check a few other important tables
+        $checkTables = [
+            'leads',
+            'lead_fields',
+            'emails',
+            'lead_tags',
+            'campaigns',
+            'campaign_events',
+            'lead_lists',
+            'lead_points_change_log',
+            'campaign_leadlist_xref',
+            'lead_lists_leads',
+            'campaign_leads',
+        ];
+        foreach ($checkTables as $tbl) {
+            try {
+                $cnt = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}{$tbl}");
+                echo "[END DEBUG] $tbl count: $cnt\n";
+            } catch (\Exception $e) {
+                echo "[END DEBUG] Table $tbl error: ".$e->getMessage()."\n";
+            }
+        }
     }
 
     public function beforeTearDown(): void
