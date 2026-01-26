@@ -76,7 +76,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         //  BEFORE fixtures – read current sequence / auto-increment
         // ────────────────────────────────────────────────
         $beforeValue = $this->getCurrentIdSequenceValue($this->prefix.'leads');
-        echo '[SEQUENCE DEBUG] Before fixtures - current next ID for leads: '.($beforeValue ?? 'N/A')."\n";
+        echo "[SEQUENCE DEBUG] Before fixtures - current next ID for {$this->prefix}leads: ".($beforeValue ?? 'N/A')."\n";
 
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
@@ -97,6 +97,8 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         //  BEFORE fixtures – read current sequence / auto-increment
         // ────────────────────────────────────────────────
         $beforeValue = $this->getCurrentIdSequenceValue($this->prefix.'leads');
+        echo "[SEQUENCE DEBUG] AFTER fixtures - current next ID for {$this->prefix}leads: ".($beforeValue ?? 'N/A')."\n";
+        $beforeValue = $this->getCurrentIdSequenceValue('leads');
         echo '[SEQUENCE DEBUG] AFTER fixtures - current next ID for leads: '.($beforeValue ?? 'N/A')."\n";
 
         // Optional: dump first few leads
@@ -192,12 +194,37 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
                 [$table]
             );
 
+            echo '[SEQUENCE] Sequence name: '.$sequence."\n";
+
             if (!$sequence) {
+                // Try 2: Manual search for sequences owned by the table's id column
+                $sequence = $this->db->fetchOne(
+                    "SELECT pg_get_serial_sequence(?, 'id') 
+             FROM pg_class c 
+             JOIN pg_attribute a ON a.attrelid = c.oid 
+             WHERE c.relname = ? AND a.attname = 'id'",
+                    [$table, $table]
+                );
+
+                echo '[SEQUENCE] Try 2 Sequence name: '.$sequence."\n";
+
+                // Try 3: Look for any sequence with name like '%leads_id_seq%'
+                $sequenceLike = '%'.str_replace($this->prefix, '', $table).'_id_seq';
+                $sequence     = $this->db->fetchOne(
+                    "SELECT relname 
+             FROM pg_class 
+             WHERE relkind = 'S' AND relname LIKE ? 
+             LIMIT 1",
+                    [$sequenceLike]
+                );
+
+                echo '[SEQUENCE] Try 3 Sequence name: '.$sequence."\n";
+
                 return null; // no identity column or sequence not found
             }
 
             // Get current next value (what the next insert would get)
-            return (int) $this->db->fetchOne('SELECT nextval(?)', [$sequence]);
+            return (int) $this->db->fetchOne('SELECT last_value + 1', [$sequence]);
         }
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
