@@ -60,27 +60,23 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
 
-        try {
-            date_default_timezone_set(self::DATE_TIME_ZONE);
-            $this->eventDate = new \DateTime('now', new \DateTimeZone(self::DATE_TIME_ZONE));
+        date_default_timezone_set(self::DATE_TIME_ZONE);
+        $this->eventDate = new \DateTime('now', new \DateTimeZone(self::DATE_TIME_ZONE));
 
-            $sendEmailTimestamp = clone $this->eventDate;
-            $sendEmailTimestamp->modify('+'.self::SEND_EMAIL_SECONDS.' seconds');
+        $sendEmailTimestamp = clone $this->eventDate;
+        $sendEmailTimestamp->modify('+'.self::SEND_EMAIL_SECONDS.' seconds');
 
-            $conditionTimestamp = clone $this->eventDate;
-            $conditionTimestamp->modify('+'.self::CONDITION_SECONDS.' seconds');
+        $conditionTimestamp = clone $this->eventDate;
+        $conditionTimestamp->modify('+'.self::CONDITION_SECONDS.' seconds');
 
-            $this->insertLeadTags();
-            $this->insertEmails();
-            $this->insertCampaigns();
-            $this->insertCampaignEvents($sendEmailTimestamp, $conditionTimestamp);
-            $this->insertLeadLists();
-            $this->insertCampaignLeadlistXref();
-            $this->insertLeadListsLeads();
-            $this->insertCampaignLeads();
-        } catch (\Exception $e) {
-            echo PHP_EOL.'[TRACE DEBUG] '.$e->getTraceAsString().PHP_EOL;
-        }
+        $this->insertLeadTags();
+        $this->insertEmails();
+        $this->insertCampaigns();
+        $this->insertCampaignEvents($sendEmailTimestamp, $conditionTimestamp);
+        $this->insertLeadLists();
+        $this->insertCampaignLeadlistXref();
+        $this->insertLeadListsLeads();
+        $this->insertCampaignLeads();
     }
 
     public function beforeTearDown(): void
@@ -1215,25 +1211,17 @@ HTML;
         $dateAdded = new \DateTime('2018-01-04 22:47:00', new \DateTimeZone(self::DATE_TIME_ZONE));
 
         for ($leadId = 1; $leadId <= 50; ++$leadId) {
-            try {
-                $connection->insert($table, [
-                    'leadlist_id'      => 1,
-                    'lead_id'          => $leadId,
-                    'date_added'       => $dateAdded->format('Y-m-d H:i:s'),
-                    'manually_removed' => false,
-                    'manually_added'   => true,
-                ], [
-                    'date_added'       => Types::DATETIME_MUTABLE,
-                    'manually_removed' => Types::BOOLEAN,
-                    'manually_added'   => Types::BOOLEAN,
-                ]);
-                echo "[DEBUG insert] Successfully inserted lead_id $leadId into lead_lists_leads\n";
-            } catch (\Throwable $e) {
-                echo "[DEBUG insert FAILED on lead_id $leadId] ".get_class($e).': '.$e->getMessage()."\n";
-                echo $e->getTraceAsString()."\n\n";
-
-                throw $e;
-            }
+            $connection->insert($table, [
+                'leadlist_id'      => 1,
+                'lead_id'          => $leadId,
+                'date_added'       => $dateAdded->format('Y-m-d H:i:s'),
+                'manually_removed' => false,
+                'manually_added'   => true,
+            ], [
+                'date_added'       => Types::DATETIME_MUTABLE,
+                'manually_removed' => Types::BOOLEAN,
+                'manually_added'   => Types::BOOLEAN,
+            ]);
         }
     }
 
