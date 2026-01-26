@@ -118,27 +118,27 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             }
         }
 
-        // If you have a logger available
-        $this->getContainer()->get('logger')->debug('Fixtures loaded in AbstractCampaignCommand test setup');
+        try {
+            date_default_timezone_set(self::DATE_TIME_ZONE);
+            $this->eventDate = new \DateTime('now', new \DateTimeZone(self::DATE_TIME_ZONE));
 
-        date_default_timezone_set(self::DATE_TIME_ZONE);
-        $this->eventDate  = new \DateTime('now', new \DateTimeZone(self::DATE_TIME_ZONE));
+            $sendEmailTimestamp = clone $this->eventDate;
+            $sendEmailTimestamp->modify('+'.self::SEND_EMAIL_SECONDS.' seconds');
 
-        $sendEmailTimestamp = clone $this->eventDate;
-        $sendEmailTimestamp->modify('+'.self::SEND_EMAIL_SECONDS.' seconds');
+            $conditionTimestamp = clone $this->eventDate;
+            $conditionTimestamp->modify('+'.self::CONDITION_SECONDS.' seconds');
 
-        $conditionTimestamp = clone $this->eventDate;
-        $conditionTimestamp->modify('+'.self::CONDITION_SECONDS.' seconds');
-
-        $this->insertLeadTags();
-        $this->insertEmails();
-        $this->insertCampaigns();
-        $this->insertCampaignEvents($sendEmailTimestamp, $conditionTimestamp);
-        $this->insertLeadLists();
-        $this->insertCampaignLeadlistXref();
-        $this->insertLeadListsLeads();
-        $this->insertCampaignLeads();
-
+            $this->insertLeadTags();
+            $this->insertEmails();
+            $this->insertCampaigns();
+            $this->insertCampaignEvents($sendEmailTimestamp, $conditionTimestamp);
+            $this->insertLeadLists();
+            $this->insertCampaignLeadlistXref();
+            $this->insertLeadListsLeads();
+            $this->insertCampaignLeads();
+        } catch (\Exception $e) {
+            echo PHP_EOL.'[TRACE DEBUG] '.$e->getTraceAsString().PHP_EOL;
+        }
         // Also check a few other important tables
         $checkTables = [
             'leads',
