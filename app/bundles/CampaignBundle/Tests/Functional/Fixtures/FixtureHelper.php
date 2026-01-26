@@ -95,7 +95,8 @@ final class FixtureHelper
         );
 
         $this->em->persist($event);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         $campaign->addEvent(0, $event);
         $campaign->setCanvasSettings(
@@ -149,7 +150,8 @@ final class FixtureHelper
         $campaign->setName('Test send email');
 
         $this->em->persist($campaign);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         $event1 = new Event();
         $event1->setCampaign($campaign);
@@ -196,7 +198,8 @@ final class FixtureHelper
             ]
         );
         $this->em->persist($event1);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         $campaign->setCanvasSettings(
             [
@@ -226,7 +229,8 @@ final class FixtureHelper
         );
         $campaign->addEvent($event1->getId(), $event1);
         $this->em->persist($campaign);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         return $campaign;
     }
@@ -257,7 +261,8 @@ final class FixtureHelper
         $campaign->setAllowRestart($allowRestart);
 
         $this->em->persist($campaign);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         // Create point condition event
         $eventCondition = new Event();
@@ -294,7 +299,8 @@ final class FixtureHelper
         ]);
 
         $this->em->persist($eventCondition);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         // Create email send event
         $eventEmail = new Event();
@@ -337,7 +343,8 @@ final class FixtureHelper
             'attempts'        => 3.0,
         ]);
         $this->em->persist($eventEmail);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         // Set up canvas with connections
         $campaign->setCanvasSettings([
@@ -383,7 +390,8 @@ final class FixtureHelper
         $campaign->setIsPublished(true);
 
         $this->em->persist($campaign);
-        $this->em->flush();
+        // Do NOT flush here — let the caller/test do it
+        // $this->em->flush();  ← remove this line
 
         return $campaign;
     }
