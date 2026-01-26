@@ -1247,33 +1247,41 @@ HTML;
 
         $dateAdded = new \DateTime('2018-01-04 23:41:20', new \DateTimeZone(self::DATE_TIME_ZONE));
 
-        $connection->insert($table, [
-            'id'                   => 1,
-            'is_preference_center' => false,
-            'is_published'         => true,
-            'date_added'           => $dateAdded,
-            'created_by'           => 1,
-            'created_by_user'      => 'Admin User',
-            'date_modified'        => null,
-            'modified_by'          => null,
-            'modified_by_user'     => null,
-            'checked_out'          => null,
-            'checked_out_by'       => null,
-            'checked_out_by_user'  => null,
-            'name'                 => 'Campaign Test',
-            'description'          => null,
-            'alias'                => 'campaign-test',
-            'filters'              => serialize([]), // a:0:{}
-            'is_global'            => true,
-            'public_name'          => 'campaign-test',
-        ], [
-            'is_preference_center' => Types::BOOLEAN,
-            'is_published'         => Types::BOOLEAN,
-            'date_added'           => Types::DATETIME_MUTABLE,
-            // 'date_modified'        => Types::DATETIME_MUTABLE,
-            // 'checked_out'          => Types::DATETIME_MUTABLE,
-            'is_global'            => Types::BOOLEAN,
-        ]);
+        try {
+            $connection->insert($table, [
+                'id'                   => 1,
+                'is_preference_center' => false,
+                'is_published'         => true,
+                'date_added'           => $dateAdded,
+                'created_by'           => 1,
+                'created_by_user'      => 'Admin User',
+                'date_modified'        => null,
+                'modified_by'          => null,
+                'modified_by_user'     => null,
+                'checked_out'          => null,
+                'checked_out_by'       => null,
+                'checked_out_by_user'  => null,
+                'name'                 => 'Campaign Test',
+                'description'          => null,
+                'alias'                => 'campaign-test',
+                'filters'              => serialize([]), // a:0:{}
+                'is_global'            => true,
+                'public_name'          => 'campaign-test',
+            ], [
+                'is_preference_center' => Types::BOOLEAN,
+                'is_published'         => Types::BOOLEAN,
+                'date_added'           => Types::DATETIME_MUTABLE,
+                // 'date_modified'        => Types::DATETIME_MUTABLE,
+                // 'checked_out'          => Types::DATETIME_MUTABLE,
+                'is_global' => Types::BOOLEAN,
+            ]);
+            echo "[DEBUG insert] Successfully inserted lead 1 into lead_lists\n";
+        } catch (\Throwable $e) {
+            echo '[DEBUG insert FAILED on lead 1] '.get_class($e).': '.$e->getMessage()."\n";
+            echo $e->getTraceAsString()."\n\n";
+
+            throw $e;
+        }
     }
 
     private function insertCampaignLeadlistXref(): void
@@ -1295,17 +1303,25 @@ HTML;
         $dateAdded = new \DateTime('2018-01-04 22:47:00', new \DateTimeZone(self::DATE_TIME_ZONE));
 
         for ($leadId = 1; $leadId <= 50; ++$leadId) {
-            $connection->insert($table, [
-                'leadlist_id'      => 1,
-                'lead_id'          => $leadId,
-                'date_added'       => $dateAdded->format('Y-m-d H:i:s'),
-                'manually_removed' => false,
-                'manually_added'   => true,
-            ], [
-                'date_added'        => Types::DATETIME_MUTABLE,
-                'manually_removed'  => Types::BOOLEAN,
-                'manually_added'    => Types::BOOLEAN,
-            ]);
+            try {
+                $connection->insert($table, [
+                    'leadlist_id'      => 1,
+                    'lead_id'          => $leadId,
+                    'date_added'       => $dateAdded->format('Y-m-d H:i:s'),
+                    'manually_removed' => false,
+                    'manually_added'   => true,
+                ], [
+                    'date_added'       => Types::DATETIME_MUTABLE,
+                    'manually_removed' => Types::BOOLEAN,
+                    'manually_added'   => Types::BOOLEAN,
+                ]);
+                echo "[DEBUG insert] Successfully inserted lead_id $leadId into lead_lists_leads\n";
+            } catch (\Throwable $e) {
+                echo "[DEBUG insert FAILED on lead_id $leadId] ".get_class($e).': '.$e->getMessage()."\n";
+                echo $e->getTraceAsString()."\n\n";
+
+                throw $e;
+            }
         }
     }
 
