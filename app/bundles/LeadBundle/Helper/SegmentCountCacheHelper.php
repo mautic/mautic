@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Cache\InvalidArgumentException;
 
 class SegmentCountCacheHelper
 {
     public function __construct(
         private CacheProviderInterface $cacheProvider,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -29,6 +31,12 @@ class SegmentCountCacheHelper
     {
         $item = $this->cacheProvider->getItem($this->generateCacheKey($segmentId));
         $item->set($count);
+
+        $ttl = $this->coreParametersHelper->get('segment_api_count_cache_ttl', 43200);
+        if ($ttl) {
+            $item->expiresAfter($ttl);
+        }
+
         $this->cacheProvider->save($item);
 
         if ($this->hasSegmentIdForReCount($segmentId)) {

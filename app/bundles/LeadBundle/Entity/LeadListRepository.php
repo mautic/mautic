@@ -864,4 +864,30 @@ SQL;
 
         return array_column($result, 'id');
     }
+
+    /**
+     * Get segment IDs for a contact.
+     *
+     * @param string $contactId Contact ID (supports BIGINT UNSIGNED)
+     *
+     * @return int[]
+     */
+    public function getContactSegmentIds(string $contactId): array
+    {
+        $result = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('ll.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->innerJoin('ll', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'll.leadlist_id = l.id')
+            ->where('ll.lead_id = :contactId')
+            ->andWhere('ll.manually_removed = 0')
+            ->andWhere('l.is_published = 1')
+            ->setParameter('contactId', $contactId)
+            ->orderBy('ll.leadlist_id', 'ASC')
+            ->executeQuery()
+            ->fetchAllNumeric();
+
+        return array_map(fn ($row) => (int) $row[0], $result);
+    }
 }

@@ -939,35 +939,36 @@ Mautic.ajaxifyLink = function (el, event, extraData = {}) {
  */
 Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
-    if (mQuery(el).parents('.no-chosen').length && !ignoreGlobal) {
+    const $select = mQuery(el);
+    if ($select.parents('.no-chosen').length && !ignoreGlobal) {
         // Globally ignored chosens because they are handled manually due to hidden elements, etc
         return;
     }
 
-    var noResultsText = mQuery(el).data('no-results-text');
+    var noResultsText = $select.data('no-results-text');
     if (!noResultsText) {
         noResultsText = mauticLang['chosenNoResults'];
     }
 
-    var isLookup = mQuery(el).attr('data-chosen-lookup');
+    var isLookup = $select.attr('data-chosen-lookup');
 
     if (isLookup) {
-        if (mQuery(el).attr('data-new-route')) {
+        if ($select.attr('data-new-route')) {
             // Register method to initiate new
-            mQuery(el).on('change', function () {
-                var url = mQuery(el).attr('data-new-route');
+            $select.on('change', function () {
+                var url = $select.attr('data-new-route');
                 // If the element is already in a modal then use a popup
-                if (mQuery(el).val() == 'new' && (mQuery(el).attr('data-popup') == "true" || mQuery(el).closest('.modal').length > 0)) {
+                if ($select.val() == 'new' && ($select.attr('data-popup') == "true" || $select.closest('.modal').length > 0)) {
                     var queryGlue = url.indexOf('?') >= 0 ? '&' : '?';
                     // De-select the new select option
-                    mQuery(el).find('option[value="new"]').prop('selected', false);
-                    mQuery(el).trigger('chosen:updated');
+                    $select.find('option[value="new"]').prop('selected', false);
+                    $select.trigger('chosen:updated');
 
                     Mautic.loadNewWindow({
-                        "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + mQuery(el).attr('id')
+                        "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + $select.attr('id')
                     });
                 } else {
-                    Mautic.loadAjaxModalBySelectValue(this, 'new', url, mQuery(el).attr('data-header'));
+                    Mautic.loadAjaxModalBySelectValue(this, 'new', url, $select.attr('data-header'));
                 }
             });
         }
@@ -979,33 +980,45 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
             singlePlaceholder = mauticLang['chosenChooseOne'];
     }
 
-    if (typeof mQuery(el).data('chosen-placeholder') !== 'undefined') {
-        multiPlaceholder = singlePlaceholder = mQuery(el).data('chosen-placeholder');
+    if (typeof $select.data('chosen-placeholder') !== 'undefined') {
+        multiPlaceholder = singlePlaceholder = $select.data('chosen-placeholder');
     }
 
-    mQuery(el).chosen({
+    const hideResultsOnSelect = !$select.attr('data-chosen-keep-results-on-select');
+
+    $select.chosen({
         placeholder_text_multiple: multiPlaceholder,
         placeholder_text_single: singlePlaceholder,
         no_results_text: noResultsText,
         width: "100%",
         allow_single_deselect: true,
         include_group_label_in_selected: true,
-        search_contains: true
+        search_contains: true,
+        hide_results_on_select: hideResultsOnSelect,
     });
 
     if (isLookup) {
-        var searchTerm = mQuery(el).attr('data-model');
+        const searchTerm = $select.attr('data-model');
+        const minTermLength = $select.attr('data-chosen-min-term-length');
 
         if (searchTerm) {
-            mQuery(el).ajaxChosen({
+            $select.ajaxChosen({
                 type: 'GET',
-                url: mauticAjaxUrl + '?action=' + mQuery(el).attr('data-chosen-lookup'),
+                url: mauticAjaxUrl + '?action=' + $select.attr('data-chosen-lookup'),
                 dataType: 'json',
                 afterTypeDelay: 2,
-                minTermLength: 2,
+                minTermLength: minTermLength ? minTermLength : 2,
                 jsonTermKey: searchTerm,
                 keepTypingMsg: "Keep typing...",
                 lookingForMsg: "Looking for"
+            }, function (data) {
+                const results = [];
+
+                mQuery.each(data, function (i, value) {
+                    results.push(typeof value === 'object' ? value : {value: value, text: value});
+                });
+
+                return results;
             });
         }
     }

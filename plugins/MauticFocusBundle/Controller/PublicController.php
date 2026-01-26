@@ -38,10 +38,7 @@ class PublicController extends CommonController
         }
     }
 
-    /**
-     * @return Response
-     */
-    public function viewPixelAction(Request $request, ContactTracker $contactTracker)
+    public function viewPixelAction(Request $request, ContactTracker $contactTracker): Response
     {
         $id = $request->get('id', false);
         if ($id) {
