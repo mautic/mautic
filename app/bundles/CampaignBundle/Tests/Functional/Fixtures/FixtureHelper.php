@@ -53,9 +53,10 @@ final class FixtureHelper
 
     public function createCampaignWithScheduledEvent(Campaign $campaign, int $interval = 1, string $intervalUnit = 'd', ?\DateTimeInterface $hour = null): Event
     {
-        if (!$campaign->getId()) {
-            $this->em->flush();
-        }
+        // No need to flush here — Doctrine will assign ID when flushed later
+        // if (!$campaign->getId()) {
+        //     $this->em->flush();
+        // }
 
         $event = new Event();
         $event->setCampaign($campaign);
