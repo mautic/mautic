@@ -164,7 +164,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
             } elseif ($this->isPostgresqlPlatform()) {
+                // Step 1: Try standard pg_get_serial_sequence (may return NULL)
                 $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', 'id')");
+
+                // Step 2: Fallback - set common sequence name as doctrine do
+                if (!$sequence) {
+                    // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
+                    // without linking a named sequence in a way visible to pg_get_serial_sequence()
+                    // Test DB uses a different config that doesn't register the sequence properly
+                    if ($this->connection->fetchOne(
+                        "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
+                        [$fullTable.'_id_seq'])) {
+                        $sequence = $fullTable.'_id_seq';
+                    }
+                }
 
                 if ($sequence) {
                     $quotedSequence = $this->connection->quoteIdentifier($sequence);
