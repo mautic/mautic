@@ -80,7 +80,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $fixtureHelper->addContactToCampaign($contact, $campaign);
         $fixtureHelper->createCampaignWithScheduledEvent($campaign);
 
-        $this->em->flush();
+        // $this->em->flush();
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
@@ -88,8 +88,8 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $campaign->setIsPublished(false);
         $this->em->persist($campaign);
-        $this->em->flush();
-        $this->em->clear();
+        // $this->em->flush();
+        // $this->em->clear();
 
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
         \assert($leadEventLogRepository instanceof LeadEventLogRepository);
