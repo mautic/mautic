@@ -57,78 +57,8 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->db     = $this->em->getConnection();
         $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        // ────────────────────────────────────────────────
-        //          DEBUG: Before fixtures
-        // ────────────────────────────────────────────────
-        echo '[DEBUG] Before fixtures - current DB platform: '.get_class($this->db->getDatabasePlatform())."\n";
-        echo '[DEBUG] Table prefix: '.$this->prefix."\n";
-        echo '[DEBUG] leads table exists? '.($this->db->createSchemaManager()->tablesExist($this->prefix.'leads') ? 'YES' : 'NO')."\n";
-
-        // Try to count rows in leads (safe even if table missing)
-        try {
-            $count = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}leads");
-            echo "[DEBUG] leads row count before fixtures: $count\n";
-        } catch (\Exception $e) {
-            echo '[DEBUG] Cannot count leads before fixtures: '.$e->getMessage()."\n";
-        }
-
-        // ────────────────────────────────────────────────
-        //  BEFORE fixtures – read current sequence / auto-increment
-        // ────────────────────────────────────────────────
-        $beforeValue = $this->getCurrentIdSequenceValue($this->prefix.'leads');
-        echo "[SEQUENCE DEBUG] Before fixtures - current next ID for {$this->prefix}leads: ".($beforeValue ?? 'N/A')."\n";
-
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
-
-        // ────────────────────────────────────────────────
-        //          DEBUG: After fixtures
-        // ────────────────────────────────────────────────
-        echo '[DEBUG] After fixtures - leads table exists? '.($this->db->createSchemaManager()->tablesExist($this->prefix.'leads') ? 'YES' : 'NO')."\n";
-
-        try {
-            $count = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}leads");
-            echo "[DEBUG] leads row count AFTER fixtures: $count\n";
-        } catch (\Exception $e) {
-            echo '[DEBUG] Cannot count leads after fixtures: '.$e->getMessage()."\n";
-        }
-
-        // ────────────────────────────────────────────────
-        //  BEFORE fixtures – read current sequence / auto-increment
-        // ────────────────────────────────────────────────
-        $beforeValue = $this->getCurrentIdSequenceValue($this->prefix.'leads');
-        echo "[SEQUENCE DEBUG] AFTER fixtures - current next ID for {$this->prefix}leads: ".($beforeValue ?? 'N/A')."\n";
-
-        // Optional: dump first few leads
-        try {
-            $leads = $this->db->fetchAllAssociative("SELECT id, email, date_added FROM {$this->prefix}leads ORDER BY id ASC LIMIT 5");
-            echo "[DEBUG] Sample leads:\n".print_r($leads, true)."\n";
-        } catch (\Exception $e) {
-            echo '[DEBUG] Cannot fetch sample leads: '.$e->getMessage()."\n";
-        }
-
-        // Also check a few other important tables
-        $checkTables = [
-            'leads',
-            'lead_fields',
-            'emails',
-            'lead_tags',
-            'campaigns',
-            'campaign_events',
-            'lead_lists',
-            'lead_points_change_log',
-            'campaign_leadlist_xref',
-            'lead_lists_leads',
-            'campaign_leads',
-        ];
-        foreach ($checkTables as $tbl) {
-            try {
-                $cnt = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}{$tbl}");
-                echo "[POST installDatabaseFixtures DEBUG] $tbl count: $cnt\n";
-            } catch (\Exception $e) {
-                echo "[POST installDatabaseFixtures DEBUG] Table $tbl error: ".$e->getMessage()."\n";
-            }
-        }
 
         try {
             date_default_timezone_set(self::DATE_TIME_ZONE);
@@ -151,79 +81,6 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         } catch (\Exception $e) {
             echo PHP_EOL.'[TRACE DEBUG] '.$e->getTraceAsString().PHP_EOL;
         }
-        // Also check a few other important tables
-        $checkTables = [
-            'leads',
-            'lead_fields',
-            'emails',
-            'lead_tags',
-            'campaigns',
-            'campaign_events',
-            'lead_lists',
-            'lead_points_change_log',
-            'campaign_leadlist_xref',
-            'lead_lists_leads',
-            'campaign_leads',
-        ];
-        foreach ($checkTables as $tbl) {
-            try {
-                $cnt = $this->db->fetchOne("SELECT COUNT(*) FROM {$this->prefix}{$tbl}");
-                echo "[END DEBUG] $tbl count: $cnt\n";
-            } catch (\Exception $e) {
-                echo "[END DEBUG] Table $tbl error: ".$e->getMessage()."\n";
-            }
-        }
-    }
-
-    /**
-     * Returns the **next available ID** that would be used for a new row.
-     * Works on both MySQL (AUTO_INCREMENT) and PostgreSQL (sequence).
-     *
-     * @return int|null Next ID, or null if table/sequence not found
-     */
-    private function getCurrentIdSequenceValue(string $table): ?int
-    {
-        $platform = $this->db->getDatabasePlatform();
-
-        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-            // PostgreSQL: get the next value from the sequence
-            $sequence = $this->db->fetchOne(
-                "SELECT pg_get_serial_sequence(?, 'id')",
-                [$table]
-            );
-
-            // Step 2: Fallback - set common sequence name as doctrine do
-            if (!$sequence) {
-                // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-                // without linking a named sequence in a way visible to pg_get_serial_sequence()
-                // Test DB uses a different config that doesn't register the sequence properly
-                if ($this->db->fetchOne(
-                    "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                    [$table.'_id_seq'])) {
-                    $sequence = $table.'_id_seq';
-                }
-            }
-
-            // Get current next value (what the next insert would get)
-            return (int) $this->db->fetchOne('SELECT last_value + 1', [$sequence]);
-        }
-
-        if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
-            // MySQL / MariaDB: AUTO_INCREMENT value is the next ID
-            $row = $this->db->fetchAssociative(
-                'SHOW TABLE STATUS WHERE Name = ?',
-                [$table]
-            );
-
-            if (!$row || !isset($row['Auto_increment'])) {
-                return null;
-            }
-
-            return (int) $row['Auto_increment'];
-        }
-
-        // Other platforms → not supported
-        return null;
     }
 
     public function beforeTearDown(): void
