@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -56,6 +57,8 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 .$filter->getRelationJoinTableField());
         }
 
+        $isPg = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+
         switch ($filterOperator) {
             case 'empty':
                 $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
@@ -88,7 +91,6 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'gt':
             case 'eq':
             case 'gte':
-            case 'like':
             case 'lt':
             case 'lte':
             case 'in':
@@ -100,7 +102,18 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $filterParametersHolder
                 );
                 break;
+            case 'like':
+                $expression = $queryBuilder->expr()->$filterOperator(
+                    $isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+                break;
             case 'notLike':
+                $expression = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->$filterOperator($isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(), $filterParametersHolder),
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
+                );
+                break;
             case 'notBetween': // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             case 'notIn':
                 $expression = $queryBuilder->expr()->or(

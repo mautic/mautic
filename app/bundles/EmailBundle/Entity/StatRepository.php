@@ -436,7 +436,7 @@ class StatRepository extends CommonRepository
 
         // Added double quotes around all aliases in the select (e.g., as "dateRead")
         // to preserve case on PostgreSQL (unquoted identifiers are lowercased).
-        // to match the Twig template's camelCase access (e.g., item.isFailed now finds "isFailed" key).
+        // Match the Twig template's camelCase access (e.g., item.isFailed now finds "isFailed" key).
         if (!empty($options['basic_select'])) {
             $query->select(
                 's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').', e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', ec.subject as storedSubject'
