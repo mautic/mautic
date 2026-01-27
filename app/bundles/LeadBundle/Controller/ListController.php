@@ -864,14 +864,16 @@ class ListController extends FormController
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
 
-        $sourceLists = $this->getListModel()->getSourceLists();
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories     = $categoryModel->getLookupResults('segment', '', 0);
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
                 'multiple'    => true,
                 'groups'      => [
                     'mautic.lead.list.source.segment.category' => [
-                        'options' => $sourceLists['categories'],
+                        'options' => $categories,
                         'prefix'  => 'category',
                     ],
                 ],
@@ -901,20 +903,29 @@ class ListController extends FormController
 
         $joinCategories = false;
         if (!empty($currentFilters)) {
+            $categoryIdsByAlias = [];
+            foreach ($categories as $category) {
+                if (!empty($category['alias'])) {
+                    $categoryIdsByAlias[$category['alias']] = (int) $category['id'];
+                }
+            }
+
             $catIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
-                    if ('category' == $type) {
+                    if ('category' == $type && is_numeric($fltr)) {
                         $catIds[] = (int) $fltr;
+                    } elseif ('category' == $type && isset($categoryIdsByAlias[$fltr])) {
+                        $catIds[] = $categoryIdsByAlias[$fltr];
                     } // else for other group filters
                 }
             }
 
             if (!empty($catIds)) {
                 $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => array_values(array_unique($catIds))];
             }
         }
 
