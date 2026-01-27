@@ -102,9 +102,16 @@ class BuilderTokenHelper
         }
 
         if (!empty($filter)) {
-            $expr = $expr->with(
-                $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
-            );
+            if ($this->connection instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+                // ILIKE is PostgreSQL's built-in case-insensitive LIKE — much faster and cleaner than LOWER()
+                $expr = $expr->with(
+                    $exprBuilder->comparison('CAST('.$labelColumn.' AS TEXT)', 'ILIKE', ':label')
+                );
+            } else {
+                $expr = $expr->with(
+                    $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
+                );
+            }
 
             $parameters = [
                 'label' => strtolower($filter).'%',

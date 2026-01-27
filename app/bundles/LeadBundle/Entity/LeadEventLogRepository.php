@@ -100,8 +100,9 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getEvents(?Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = [])
     {
-        $alias = $this->getTableAlias();
-        $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $alias      = $this->getTableAlias();
+        $connection = $this->getEntityManager()->getConnection();
+        $qb         = $connection->createQueryBuilder()
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias);
 
@@ -133,7 +134,13 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (!empty($options['search'])) {
-            $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
+            if ($connection instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+                // ILIKE is PostgreSQL's built-in case-insensitive LIKE — much faster and cleaner than LOWER()
+                $qb->andWhere($qb->expr()->comparison('CAST('.$alias.'.properties as text)', 'ILIKE', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
+            // $qb->andWhere($qb->expr()->like('LOWER(' . $alias . '.properties::text)', $qb->expr()->literal('%' . strtolower($options['search']) . '%')));
+            } else {
+                $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
+            }
         }
 
         return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added'], null, $alias.'.id');

@@ -365,11 +365,27 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns(string $table, string $column): array
     {
-        $stmt = $this->connection->executeQuery(
-            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '"
-            .MAUTIC_TABLE_PREFIX
-            ."$table' AND COLUMN_NAME = '$column'"
-        );
+        $platform = $this->connection->getDatabasePlatform();
+        $dbName   = $this->connection->getDatabase();
+
+        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+            $sql = "SELECT * FROM information_schema.columns 
+                WHERE table_catalog = :db 
+                  AND table_schema = 'public' 
+                  AND table_name = :table 
+                  AND column_name = :column";
+            $params = ['db' => $dbName, 'table' => $this->prefix.$table, 'column' => $column];
+            $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
+        } else {
+            $sql = 'SELECT * FROM information_schema.COLUMNS 
+                WHERE TABLE_SCHEMA = :db 
+                  AND TABLE_NAME = :table 
+                  AND COLUMN_NAME = :column';
+            $params = ['db' => $dbName, 'table' => $this->prefix.$table, 'column' => $column];
+            $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
+        }
+
+        $stmt = $this->connection->executeQuery($sql, $params, $types);
 
         return $stmt->fetchAllAssociative();
     }
@@ -379,15 +395,49 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getUniqueIdentifierIndexColumns(string $table): array
     {
-        $stmt       = $this->connection->executeQuery(
-            sprintf(
-                "SELECT * FROM information_schema.statistics where table_schema = '%s' and table_name = '%s' and index_name = '%sunique_identifier_search'",
-                $this->connection->getDatabase(),
-                MAUTIC_TABLE_PREFIX.$table,
-                MAUTIC_TABLE_PREFIX
-            )
-        );
+        $platform  = $this->connection->getDatabasePlatform();
+        $fullTable = $this->prefix.$table;
+        $indexName = $this->prefix.'unique_identifier_search';
 
-        return $stmt->fetchAllAssociative();
+        if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
+            $sql = sprintf(
+                "SELECT * FROM information_schema.statistics 
+             WHERE table_schema = '%s' 
+               AND table_name = '%s' 
+               AND index_name = '%s'",
+                $this->connection->getDatabase(),
+                $fullTable,
+                $indexName
+            );
+
+            return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        }
+
+        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+            $sql = 'SELECT 
+                    t.relname AS table_name,
+                    i.relname AS index_name,
+                    a.attname AS column_name,
+                    ix.indisunique AS is_unique
+                FROM 
+                    pg_index ix
+                JOIN 
+                    pg_class t ON t.oid = ix.indrelid
+                JOIN 
+                    pg_class i ON i.oid = ix.indexrelid
+                JOIN 
+                    pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
+                WHERE 
+                    t.relname = :table 
+                    AND i.relname = :index
+                ORDER BY a.attnum';
+
+            return $this->connection->executeQuery($sql, [
+                'table' => $fullTable,
+                'index' => $indexName,
+            ])->fetchAllAssociative();
+        }
+
+        return [];
     }
 }

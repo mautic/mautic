@@ -734,7 +734,7 @@ SQL;
         $qb->select([
             'COUNT(log.id) as total_logs',
             'COUNT(DISTINCT log.lead_id) as unique_executions',
-            'SUM(log.is_scheduled) as pending_executions',
+            'SUM(CASE WHEN log.is_scheduled THEN 1 ELSE 0 END) as pending_executions',
             'SUM(CASE WHEN log.non_action_path_taken = 1 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as negative_path_count',
             'SUM(CASE WHEN log.non_action_path_taken = 0 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as positive_path_count',
             'MIN(log.date_triggered) as first_execution_date',

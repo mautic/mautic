@@ -107,7 +107,25 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $response = $this->client->getResponse()->getContent();
         self::assertStringContainsString($errorMessage, (string) $response);
 
-        $pointDetail = $this->em->getRepository(Point::class)->findOneBy(['delta' => $delta]);
-        '' == $errorMessage ? self::assertNotNull($pointDetail) : self::assertNull($pointDetail);
+        // Try to fetch the entity, but gracefully handle DB range errors
+        try {
+            $pointDetail = $this->em->getRepository(Point::class)->findOneBy(['delta' => $delta]);
+        } catch (\Doctrine\DBAL\Exception\DriverException $e) {
+            // On PostgreSQL: 22003 = numeric value out of range
+            // On MySQL: similar numeric overflow errors
+            if (false !== stripos($e->getMessage(), 'out of range') || '22003' === $e->getCode()) {
+                // Treat as "not found" for invalid delta
+                $pointDetail = null;
+            } else {
+                // Other unexpected DB errors → let test fail
+                throw $e;
+            }
+        }
+
+        if ('' === $errorMessage) {
+            self::assertNotNull($pointDetail, "Point with delta $delta should have been created");
+        } else {
+            self::assertNull($pointDetail, "Point with invalid delta $delta should NOT have been created");
+        }
     }
 }
