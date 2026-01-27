@@ -632,7 +632,8 @@ class ChartQuery extends AbstractChart
             // Works whether the column is timestamp or timestamptz
             // ::timestamp strips any timezone info to avoid session TimeZone influence
             // PostgreSQL can cast UUID to TEXT, but not UUID to TIMESTAMP directly
-            $tzAdjusted = "(({$columnName}::text) + '{$defaultTimezoneOffset}'::interval)::timestamp";
+            $safeColumn = "({$columnName}::text)::timestamp";
+            $tzAdjusted = "({$safeColumn} + '{$defaultTimezoneOffset}'::interval)::timestamp";
             // Special handling for weekly grouping ('W' unit → '%Y %U')
             // MySQL %U = Sunday-based week 00–53
             // We approximate with ISO week (Monday-based, 01–53) – common compromise in ports
