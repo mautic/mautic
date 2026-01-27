@@ -422,7 +422,9 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+
+        $query = $connection->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id');
@@ -432,13 +434,16 @@ class StatRepository extends CommonRepository
                 ->setParameter('leadId', $leadId);
         }
 
+        // Added double quotes around all aliases in the select (e.g., as "dateRead")
+        // to preserve case on PostgreSQL (unquoted identifiers are lowercased).
+        // to match the Twig template's camelCase access (e.g., item.isFailed now finds "isFailed" key).
         if (!empty($options['basic_select'])) {
             $query->select(
-                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent, e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, ec.subject as storedSubject'
+                's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').', e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', ec.subject as storedSubject'
             );
         } else {
             $query->select(
-                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent,e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, s.viewed_in_browser as viewedInBrowser, s.retry_count as retryCount, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.open_details as openDetails, ec.subject as storedSubject, s.lead_id'
+                's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').',e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', s.viewed_in_browser as '.$connection->quoteIdentifier('viewedInBrowser').', s.retry_count as '.$connection->quoteIdentifier('retryCount').', s.list_id, l.name as list_name, s.tracking_hash as '.$connection->quoteIdentifier('idHash').', s.open_details as '.$connection->quoteIdentifier('openDetails').', ec.subject as '.$connection->quoteIdentifier('storedSubject').', s.lead_id'
             )
                 ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
         }
