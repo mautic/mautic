@@ -27,6 +27,11 @@ use Symfony\Component\HttpFoundation\Response;
 class FocusController extends AbstractStandardFormController
 {
     /**
+     * @var array<string, mixed>
+     */
+    protected array $listFilters = [];
+
+    /**
      * @phpstan-ignore-next-line
      */
     public function __construct(
@@ -54,6 +59,93 @@ class FocusController extends AbstractStandardFormController
     protected function getModelName(): string
     {
         return 'focus';
+    }
+
+    /**
+     * @param mixed $start
+     * @param mixed $limit
+     * @param mixed $filter
+     * @param mixed $orderBy
+     * @param mixed $orderByDir
+     * @param mixed[] $args
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    {
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories     = $categoryModel->getLookupResults('plugin:focus', '', 0);
+
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [
+                    'mautic.core.filter.categories' => [
+                        'options' => $categories,
+                        'prefix'  => 'category',
+                    ],
+                ],
+            ],
+        ];
+
+        $request        = $this->getCurrentRequest();
+        $session        = $request->getSession();
+        $currentFilters = $session->get('mautic.'.$this->getSessionBase().'.list_filters', []);
+        $updatedFilters = $request->get('filters', false);
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    $newFilters[$clmn][] = $fltr;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $session->set('mautic.'.$this->getSessionBase().'.list_filters', $currentFilters);
+
+        if (!empty($currentFilters)) {
+            $categoryIdsByAlias = [];
+            foreach ($categories as $category) {
+                if (!empty($category['alias'])) {
+                    $categoryIdsByAlias[$category['alias']] = (int) $category['id'];
+                }
+            }
+
+            $catIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                if ('category' !== $type) {
+                    continue;
+                }
+
+                $listFilters['filters']['groups']['mautic.core.filter.categories']['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if (is_numeric($fltr)) {
+                        $catIds[] = (int) $fltr;
+                        continue;
+                    }
+
+                    if (isset($categoryIdsByAlias[$fltr])) {
+                        $catIds[] = $categoryIdsByAlias[$fltr];
+                    }
+                }
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => array_values(array_unique($catIds))];
+            }
+        }
+
+        $this->listFilters = $listFilters;
+
+        return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
     }
 
     /**
@@ -136,6 +228,10 @@ class FocusController extends AbstractStandardFormController
      */
     public function getViewArguments(array $args, $action): array
     {
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
+        }
+
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 
         if ('view' == $action) {

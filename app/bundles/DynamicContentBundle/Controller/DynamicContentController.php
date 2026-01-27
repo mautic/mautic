@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,6 +62,77 @@ class DynamicContentController extends FormController
             ],
         ];
 
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $categories     = $categoryModel->getLookupResults('dynamicContent', '', 0);
+
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [
+                    'mautic.core.filter.categories' => [
+                        'options' => $categories,
+                        'prefix'  => 'category',
+                    ],
+                ],
+            ],
+        ];
+
+        $session        = $request->getSession();
+        $currentFilters = $session->get('mautic.dynamicContent.list_filters', []);
+        $updatedFilters = $request->get('filters', false);
+
+        if ($updatedFilters) {
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    $newFilters[$clmn][] = $fltr;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $session->set('mautic.dynamicContent.list_filters', $currentFilters);
+
+        if (!empty($currentFilters)) {
+            $categoryIdsByAlias = [];
+            foreach ($categories as $category) {
+                if (!empty($category['alias'])) {
+                    $categoryIdsByAlias[$category['alias']] = (int) $category['id'];
+                }
+            }
+
+            $catIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                if ('category' !== $type) {
+                    continue;
+                }
+
+                $listFilters['filters']['groups']['mautic.core.filter.categories']['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if (is_numeric($fltr)) {
+                        $catIds[] = (int) $fltr;
+                        continue;
+                    }
+
+                    if (isset($categoryIdsByAlias[$fltr])) {
+                        $catIds[] = $categoryIdsByAlias[$fltr];
+                    }
+                }
+            }
+
+            if (!empty($catIds)) {
+                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => array_values(array_unique($catIds))];
+            }
+        }
+
         $orderBy    = $request->getSession()->get('mautic.dynamicContent.orderby', 'e.name');
         $orderByDir = $request->getSession()->get('mautic.dynamicContent.orderbydir', 'DESC');
 
@@ -81,11 +151,6 @@ class DynamicContentController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        // retrieve a list of categories
-        $pageModel  = $this->getModel('page');
-        \assert($pageModel instanceof PageModel);
-        $categories = $pageModel->getLookupResults('category', '', 0);
-
         return $this->delegateView(
             [
                 'contentTemplate' => '@MauticDynamicContent/DynamicContent/list.html.twig',
@@ -96,6 +161,7 @@ class DynamicContentController extends FormController
                 ],
                 'viewParameters' => [
                     'searchValue' => $search,
+                    'filters'     => $listFilters,
                     'items'       => $entities,
                     'categories'  => $categories,
                     'page'        => $page,
