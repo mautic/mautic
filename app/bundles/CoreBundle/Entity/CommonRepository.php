@@ -1414,9 +1414,13 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param QueryBuilder|DbalQueryBuilder $q
      */
+    /**
+     * @param QueryBuilder|DbalQueryBuilder $q
+     */
     protected function buildSelectClause($q, array $args)
     {
         $isOrm = $q instanceof QueryBuilder;
+
         if (isset($args['select'])) {
             // Build a custom select
             if (is_string($args['select'])) {
@@ -1425,6 +1429,7 @@ class CommonRepository extends ServiceEntityRepository
 
             $selects = [];
             foreach ($args['select'] as $select) {
+                $select = trim($select);
                 if (str_contains($select, '.')) {
                     [$alias, $select] = explode('.', $select);
                 } else {
@@ -1441,16 +1446,44 @@ class CommonRepository extends ServiceEntityRepository
             $partials    = [];
             $ormColumns  = $this->getBaseColumns($this->getClassName());
             $dbalColumns = $this->getTableColumns();
-            foreach ($selects as $alias => $columns) {
-                if ($isOrm) {
+
+            if ($isOrm) {
+                // ORM handling (unchanged - custom fields are not selected via ORM partials)
+                foreach ($selects as $alias => $columns) {
                     if ($columns = array_intersect($columns, $ormColumns)) {
                         $columns    = array_map([$this, 'sanitize'], $columns);
                         $partials[] = 'partial '.$alias.'.{'.implode(',', $columns).'}';
                     }
-                } else {
-                    if ($columns = array_intersect($columns, $dbalColumns)) {
-                        foreach ($columns as $column) {
+                }
+            } else {
+                // DBAL handling - enhanced for custom fields
+                [$customFields, $fixedFields] = $this->getCustomFieldList('lead'); // 'lead' or make dynamic if needed
+
+                foreach ($selects as $alias => $columns) {
+                    foreach ($columns as $column) {
+                        // Base column
+                        if (in_array($column, $dbalColumns, true)) {
                             $partials[] = $alias.'.'.$this->sanitize($column);
+                            continue;
+                        }
+
+                        // Custom field alias
+                        if (isset($customFields[$column])) {
+                            $field     = $customFields[$column];
+                            $fieldId   = (int) $field['id'];
+                            $joinAlias = 'cfv_'.$column;
+
+                            // Add LEFT JOIN with correct integer field_id binding
+                            $q->leftJoin(
+                                $this->getTableAlias(),
+                                MAUTIC_TABLE_PREFIX.'lead_fields_value',
+                                $joinAlias,
+                                $joinAlias.'.lead_id = '.$this->getTableAlias().'.id AND '.$joinAlias.'.field_id = :cf_field_id_'.$column
+                            );
+                            $q->setParameter('cf_field_id_'.$column, $fieldId, Types::INTEGER);
+
+                            // Select the value with the requested alias
+                            $partials[] = $joinAlias.'.value AS '.$column;
                         }
                     }
                 }
@@ -1458,21 +1491,25 @@ class CommonRepository extends ServiceEntityRepository
 
             if ($partials) {
                 $newSelect = implode(', ', $partials);
-                $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
+
                 if ($isOrm) {
                     $q->select($newSelect);
                 } else {
+                    $select = $q->getQueryPart('select');
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
                     } elseif (is_string($select) && str_contains($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
                     } elseif (is_string($select) && str_contains($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
+                    } else {
+                        $q->select($newSelect);
                     }
                 }
             }
         }
 
+        // Default select if nothing was set
         if ($isOrm) {
             if (!$q->getDQLPart('select')) {
                 $q->select($this->getTableAlias());

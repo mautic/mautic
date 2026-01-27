@@ -714,7 +714,7 @@ class StatRepository extends CommonRepository
         $queryBuilder->select(
             "{$leadAlias}.id AS $leadIdCol",
             "COUNT({$statsAlias}.id) AS $sentCountCol",
-            "SUM(COALESCE({$statsAlias}.is_read, 0)) AS $readCountCol",
+            "SUM(CASE WHEN {$statsAlias}.is_read = TRUE THEN 1 ELSE 0 END) AS $readCountCol",
             "SUM(COALESCE({$subQueryAlias}.hits, 0)) AS $readCountCol",
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
@@ -801,7 +801,7 @@ class StatRepository extends CommonRepository
         $queryBuilder->select(
             "{$eventAlias}.id AS $eventIdCol",
             "COUNT({$statsAlias}.id) AS $sentCountCol",
-            "SUM(COALESCE({$statsAlias}.is_read, 0)) AS $readCountCol",
+            "SUM(CASE WHEN {$statsAlias}.is_read = TRUE THEN 1 ELSE 0 END) AS $readCountCol",
             "COUNT(DISTINCT CASE WHEN {$subQueryAlias}.hits > 0 THEN {$statsAlias}.id END) AS $clickedThroughCountCol"
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
