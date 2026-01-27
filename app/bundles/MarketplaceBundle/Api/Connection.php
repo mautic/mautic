@@ -23,7 +23,14 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = '', string $type = 'mautic-plugin'): array
     {
-        return $this->makeRequest("https://packagist.org/search.json?page={$page}&per_page={$limit}&type={$type}&q={$query}");
+        $params = http_build_query([
+            'page'     => $page,
+            'per_page' => $limit,
+            'type'     => $type,
+            'q'        => $query,
+        ]);
+
+        return $this->makeRequest("https://packagist.org/search.json?{$params}");
     }
 
     /**

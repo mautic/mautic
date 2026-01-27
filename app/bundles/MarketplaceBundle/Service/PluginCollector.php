@@ -142,7 +142,7 @@ class PluginCollector
                 continue;
             }
 
-            $payload = $this->connection->getPlugins(1, 1, $entry->package);
+            $payload = $this->connection->getPlugins(1, 1, $entry->package, $entry->type);
 
             if (isset($payload['results'][0])) {
                 $results[] = $payload['results'][0] + $entry->toArray();
