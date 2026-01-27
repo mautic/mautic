@@ -25,9 +25,9 @@ final class DbRegexValidator extends ConstraintValidator
 
         try {
             if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-                $this->connection->executeQuery('SELECT 1 ~* ? AS is_valid', [$regex]);
+                $this->connection->executeQuery("SELECT '1' ~* ? AS is_valid", [$regex]);
             } else {
-                $this->connection->executeQuery('SELECT 1 REGEXP ? AS is_valid', [$regex]);
+                $this->connection->executeQuery("SELECT '1' REGEXP ? AS is_valid", [$regex]);
             }
         } catch (Exception $e) {
             $this->context->buildViolation(

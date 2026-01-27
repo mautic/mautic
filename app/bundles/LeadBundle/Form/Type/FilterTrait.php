@@ -317,11 +317,13 @@ trait FilterTrait
                         function ($regex, ExecutionContextInterface $context): void {
                             // Let's test the regex's syntax by making a fake query
                             try {
-                                $qb   = $this->connection->createQueryBuilder();
-                                $op   = '~*';
+                                $qb             = $this->connection->createQueryBuilder();
+                                $isPg           = $this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+                                $op             = $isPg ? '~*' : 'REGEX';
+                                $whereCondition = $isPg ? 'CAST(l.id AS TEXT) '.$op.' :regex' : 'l.id '.$op.' :regex';
                                 $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                                    ->where('l.id '.$op.' :regex')
+                                    ->where($whereCondition)
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->executeQuery()->fetchAllAssociative();
