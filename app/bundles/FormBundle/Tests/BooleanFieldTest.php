@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class BooleanFieldTest extends MauticMysqlTestCase
 {
+    private const FORM_SELECTOR          = 'form[data-mautic-form]';
+    private const FORM_SELECTOR_BY_ALIAS = 'form[data-mautic-form="%s"]';
+    private const VALUE_ZERO             = 'value="0"';
+
     protected $useCleanupRollback   = false;
     protected bool $authenticateApi = true;
 
@@ -69,17 +73,16 @@ final class BooleanFieldTest extends MauticMysqlTestCase
             'yes' => 'Custom Yes',
             'no'  => 'Custom No',
         ]);
-        $formId    = $created['formId'];
-        $formAlias = $created['formAlias'];
+        $formId = $created['formId'];
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $html      = $crawler->html();
-        $pageAlias = (string) $crawler->filter('form[data-mautic-form]')->attr('data-mautic-form');
+        $pageAlias = (string) $crawler->filter(self::FORM_SELECTOR)->attr('data-mautic-form');
 
         $this->assertStringContainsString('Custom Yes', $html);
         $this->assertStringContainsString('Custom No', $html);
-        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringContainsString(self::VALUE_ZERO, $html);
         $this->assertStringContainsString('value="1"', $html);
         $this->assertStringContainsString('mauticform-boolean', $html);
         $this->assertStringContainsString('mauticform-boolean-positive', $html);
@@ -87,7 +90,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
         $this->assertStringContainsString('mauticform-radiogrp-radio', $html);
         $this->assertStringNotContainsString('checked="checked"', $html);
 
-        $formCrawler = $crawler->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $formCrawler = $crawler->filter(sprintf(self::FORM_SELECTOR_BY_ALIAS, $pageAlias));
         $this->assertCount(1, $formCrawler, $html);
         $form = $formCrawler->form();
         $form->setValues([
@@ -111,13 +114,12 @@ final class BooleanFieldTest extends MauticMysqlTestCase
             'yes' => 'I wanna receive comm',
             'no'  => '',
         ]);
-        $formId    = $created['formId'];
-        $formAlias = $created['formAlias'];
+        $formId = $created['formId'];
 
         // Load public form page
         $crawler   = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $html      = $crawler->html();
-        $pageAlias = (string) $crawler->filter('form[data-mautic-form]')->attr('data-mautic-form');
+        $pageAlias = (string) $crawler->filter(self::FORM_SELECTOR)->attr('data-mautic-form');
 
         // Assert checkbox rendering with positive option only
         $this->assertStringContainsString('type="checkbox"', $html);
@@ -126,10 +128,10 @@ final class BooleanFieldTest extends MauticMysqlTestCase
         $this->assertStringContainsString('name="mauticform[test_boolean][]"', $html);
         $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
         $this->assertStringContainsString('mauticform-boolean-positive', $html);
-        $this->assertStringNotContainsString('value="0"', $html);
+        $this->assertStringNotContainsString(self::VALUE_ZERO, $html);
 
         // Submit unchecked (no value sent)
-        $formCrawler = $crawler->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $formCrawler = $crawler->filter(sprintf(self::FORM_SELECTOR_BY_ALIAS, $pageAlias));
         $form        = $formCrawler->form();
         $this->client->submit($form);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -142,7 +144,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
 
         // Submit checked (send value "1")
         $crawler2     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
-        $formCrawler2 = $crawler2->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $formCrawler2 = $crawler2->filter(sprintf(self::FORM_SELECTOR_BY_ALIAS, $pageAlias));
         $form2        = $formCrawler2->form();
         $form2->setValues([
             'mauticform[test_boolean]' => ['1'],
@@ -165,22 +167,21 @@ final class BooleanFieldTest extends MauticMysqlTestCase
             'yes' => '',
             'no'  => 'I do not want to receive comm',
         ]);
-        $formId    = $created['formId'];
-        $formAlias = $created['formAlias'];
+        $formId = $created['formId'];
 
         $crawler   = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $html      = $crawler->html();
-        $pageAlias = (string) $crawler->filter('form[data-mautic-form]')->attr('data-mautic-form');
+        $pageAlias = (string) $crawler->filter(self::FORM_SELECTOR)->attr('data-mautic-form');
 
         $this->assertStringContainsString('type="checkbox"', $html);
         $this->assertStringContainsString('I do not want to receive comm', $html);
-        $this->assertStringContainsString('value="0"', $html);
+        $this->assertStringContainsString(self::VALUE_ZERO, $html);
         $this->assertStringContainsString('name="mauticform[test_boolean][]"', $html);
         $this->assertStringContainsString('mauticform-checkboxgrp-checkbox', $html);
         $this->assertStringContainsString('mauticform-boolean-negative', $html);
 
         // Submit with the checkbox checked (send value "0")
-        $formCrawler = $crawler->filter(sprintf('form[data-mautic-form="%s"]', $pageAlias));
+        $formCrawler = $crawler->filter(sprintf(self::FORM_SELECTOR_BY_ALIAS, $pageAlias));
         $form        = $formCrawler->form();
         $form->setValues([
             'mauticform[test_boolean]' => ['0'],
