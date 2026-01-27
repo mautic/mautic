@@ -867,6 +867,7 @@ class ListController extends FormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories     = $categoryModel->getLookupResults('segment', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
@@ -874,7 +875,7 @@ class ListController extends FormController
                 'groups'      => [
                     'mautic.lead.list.source.segment.category' => [
                         'options' => $categories,
-                        'prefix'  => 'category',
+                        'prefix'  => $categoryFilterPrefix,
                     ],
                 ],
             ],
@@ -912,6 +913,10 @@ class ListController extends FormController
 
             $catIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
+                if ($type === $categoryFilterPrefix) {
+                    $type = 'category';
+                }
+
                 $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {

@@ -46,6 +46,7 @@ class TriggerController extends FormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories     = $categoryModel->getLookupResults('point', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
             'filters' => [
@@ -54,7 +55,7 @@ class TriggerController extends FormController
                 'groups'      => [
                     'mautic.core.filter.categories' => [
                         'options' => $categories,
-                        'prefix'  => 'category',
+                        'prefix'  => $categoryFilterPrefix,
                     ],
                 ],
             ],
@@ -91,6 +92,10 @@ class TriggerController extends FormController
 
             $catIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
+                if ($type === $categoryFilterPrefix) {
+                    $type = 'category';
+                }
+
                 if ('category' !== $type) {
                     continue;
                 }

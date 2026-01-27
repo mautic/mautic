@@ -123,9 +123,10 @@ class EmailController extends FormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories = $categoryModel->getLookupResults('email', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
             'options' => $categories,
-            'prefix'  => 'category',
+            'prefix'  => $categoryFilterPrefix,
         ];
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
@@ -152,6 +153,10 @@ class EmailController extends FormController
         if (!empty($currentFilters)) {
             $listIds = $catIds = $templates = [];
             foreach ($currentFilters as $type => $typeFilters) {
+                if ($type === $categoryFilterPrefix) {
+                    $type = 'category';
+                }
+
                 switch ($type) {
                     case 'list':
                         $key = 'lists';

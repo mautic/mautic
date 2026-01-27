@@ -64,6 +64,7 @@ class AssetController extends FormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories     = $categoryModel->getLookupResults('asset', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
             'filters' => [
@@ -72,7 +73,7 @@ class AssetController extends FormController
                 'groups'      => [
                     'mautic.core.filter.categories' => [
                         'options' => $categories,
-                        'prefix'  => 'category',
+                        'prefix'  => $categoryFilterPrefix,
                     ],
                 ],
             ],

@@ -74,6 +74,7 @@ class FocusController extends AbstractStandardFormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories     = $categoryModel->getLookupResults('plugin:focus', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
             'filters' => [
@@ -82,7 +83,7 @@ class FocusController extends AbstractStandardFormController
                 'groups'      => [
                     'mautic.core.filter.categories' => [
                         'options' => $categories,
-                        'prefix'  => 'category',
+                        'prefix'  => $categoryFilterPrefix,
                     ],
                 ],
             ],
@@ -120,6 +121,10 @@ class FocusController extends AbstractStandardFormController
 
             $catIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
+                if ($type === $categoryFilterPrefix) {
+                    $type = 'category';
+                }
+
                 if ('category' !== $type) {
                     continue;
                 }

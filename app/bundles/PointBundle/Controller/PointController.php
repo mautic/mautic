@@ -44,6 +44,7 @@ class PointController extends AbstractFormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories     = $categoryModel->getLookupResults('point', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
             'filters' => [
@@ -52,7 +53,7 @@ class PointController extends AbstractFormController
                 'groups'      => [
                     'mautic.core.filter.categories' => [
                         'options' => $categories,
-                        'prefix'  => 'category',
+                        'prefix'  => $categoryFilterPrefix,
                     ],
                 ],
             ],

@@ -953,6 +953,7 @@ class CampaignController extends AbstractStandardFormController
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories  = $categoryModel->getLookupResults('campaign', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.campaign.filter.placeholder'),
@@ -968,7 +969,7 @@ class CampaignController extends AbstractStandardFormController
                     ],
                     'mautic.core.filter.categories'     => [
                         'options' => $categories,
-                        'prefix'  => 'category',
+                        'prefix'  => $categoryFilterPrefix,
                     ],
                 ],
             ],
@@ -999,6 +1000,10 @@ class CampaignController extends AbstractStandardFormController
         if (!empty($currentFilters)) {
             $listIds = $catIds = $formIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
+                if ($type === $categoryFilterPrefix) {
+                    $type = 'category';
+                }
+
                 switch ($type) {
                     case 'list':
                         $key = 'mautic.campaign.leadsource.list';
