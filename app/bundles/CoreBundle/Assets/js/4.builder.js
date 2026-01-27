@@ -625,6 +625,7 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     htmlContent.find('[data-source="mautic"]').remove();
     htmlContent.find('.atwho-container').remove();
     htmlContent.find('.fr-image-overlay, .fr-quick-insert, .fr-tooltip, .fr-toolbar, .fr-popup, .fr-image-resizer').remove();
+    htmlContent.find('style[data-cke]').remove();
 
     // Remove the slot focus highlight
     htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
