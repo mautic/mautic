@@ -66,10 +66,8 @@ class PluginCollector
     {
         $query = strtolower($query);
 
-        return array_values(array_filter($entries, function (AllowlistEntry $entry) use ($query): bool {
-            return str_contains(strtolower($entry->package), $query)
-                || str_contains(strtolower($entry->displayName), $query);
-        }));
+        return array_values(array_filter($entries, fn (AllowlistEntry $entry): bool => str_contains(strtolower($entry->package), $query)
+            || str_contains(strtolower($entry->displayName), $query)));
     }
 
     /**
