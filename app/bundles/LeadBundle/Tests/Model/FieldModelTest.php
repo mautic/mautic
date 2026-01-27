@@ -374,14 +374,14 @@ class FieldModelTest extends MauticMysqlTestCase
                   AND table_schema = 'public' 
                   AND table_name = :table 
                   AND column_name = :column";
-            $params = ['db' => $dbName, 'table' => $this->prefix.$table, 'column' => $column];
+            $params = ['db' => $dbName, 'table' => MAUTIC_TABLE_PREFIX.$table, 'column' => $column];
             $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
         } else {
             $sql = 'SELECT * FROM information_schema.COLUMNS 
                 WHERE TABLE_SCHEMA = :db 
                   AND TABLE_NAME = :table 
                   AND COLUMN_NAME = :column';
-            $params = ['db' => $dbName, 'table' => $this->prefix.$table, 'column' => $column];
+            $params = ['db' => $dbName, 'table' => MAUTIC_TABLE_PREFIX.$table, 'column' => $column];
             $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
         }
 
@@ -396,8 +396,8 @@ class FieldModelTest extends MauticMysqlTestCase
     private function getUniqueIdentifierIndexColumns(string $table): array
     {
         $platform  = $this->connection->getDatabasePlatform();
-        $fullTable = $this->prefix.$table;
-        $indexName = $this->prefix.'unique_identifier_search';
+        $fullTable = MAUTIC_TABLE_PREFIX.$table;
+        $indexName = MAUTIC_TABLE_PREFIX.'unique_identifier_search';
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
             $sql = sprintf(
