@@ -117,9 +117,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
     }
 
-    /**
-     * @dataProvider typeFilterProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('typeFilterProvider')]
     public function testMarketplaceListFilterByType(string $searchCommand, string $expectedPackage): void
     {
         $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
