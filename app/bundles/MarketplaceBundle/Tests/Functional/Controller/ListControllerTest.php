@@ -116,4 +116,47 @@ final class ListControllerTest extends MauticMysqlTestCase
             )
         );
     }
+
+    /**
+     * @dataProvider typeFilterProvider
+     */
+    public function testMarketplaceListFilterByType(string $searchCommand, string $expectedPackage): void
+    {
+        $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
+
+        /** @var MockHandler $handlerStack */
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist_with_types.json')),
+            new Response(SymfonyResponse::HTTP_OK, [], json_encode(['results' => [$mockResults[1]]])),
+        );
+
+        /** @var Allowlist $allowlist */
+        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist->clearCache();
+
+        $crawler = $this->client->request('GET', 's/marketplace?search='.$searchCommand);
+
+        $this->assertResponseIsSuccessful();
+
+        Assert::assertSame(
+            [$expectedPackage],
+            array_map(
+                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+            )
+        );
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function typeFilterProvider(): array
+    {
+        return [
+            'plugin'   => ['is:plugin', 'KocoCaptcha'],
+            'theme'    => ['is:theme', 'Mautic Referrals Bundle'],
+            'campaign' => ['is:campaign', 'Welcome Campaign'],
+        ];
+    }
 }
