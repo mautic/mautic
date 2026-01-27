@@ -159,7 +159,7 @@ class EventRepository extends CommonRepository
         $platform      = $this->getEntityManager()->getConnection()->getDatabasePlatform();
 
         $joinCondition = ($platform instanceof PostgreSQLPlatform)
-            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId != '' AND e.channelId ~ '^[0-9]+$' THEN TO_NUMBER(e.channelId, '9999999999') ELSE 0 END)"
+            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId != '' AND e.channelId ~* '^[0-9]+$' THEN TO_NUMBER(e.channelId, '9999999999') ELSE 0 END)"
             : 'em.id = e.channelId';
 
         return $qb
