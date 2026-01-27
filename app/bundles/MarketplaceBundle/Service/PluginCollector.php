@@ -24,20 +24,62 @@ class PluginCollector
     ) {
     }
 
-    public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
+    public function collectPackages(int $page, int $limit, string $query = '', ?string $type = null): PackageCollection
     {
         $allowlist = $this->allowlist->getAllowList();
 
+        // Remove type commands from query for text search
+        $searchQuery = $this->removeTypeCommandsFromQuery($query);
+
         if (!empty($allowlist)) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
-            $payload                   = $this->getAllowlistedPackages($page, $limit);
+
+            if (null !== $type) {
+                $this->allowlistedPackages = $this->filterAllowlistedPackagesByType($this->allowlistedPackages, $type);
+            }
+
+            if (!empty($searchQuery)) {
+                $this->allowlistedPackages = $this->filterAllowlistedPackagesByName($this->allowlistedPackages, $searchQuery);
+            }
+
+            $payload = $this->getAllowlistedPackages($page, $limit);
         } else {
-            $payload = $this->connection->getPlugins($page, $limit, $query);
+            $payload = $this->connection->getPlugins($page, $limit, $searchQuery, $type ?? AllowlistEntry::TYPE_PLUGIN);
         }
 
         $this->total = (int) $payload['total'];
 
         return PackageCollection::fromArray($payload['results']);
+    }
+
+    private function removeTypeCommandsFromQuery(string $query): string
+    {
+        return trim(preg_replace('/is:(plugin|theme|campaign)/i', '', $query));
+    }
+
+    /**
+     * @param AllowlistEntry[] $entries
+     *
+     * @return AllowlistEntry[]
+     */
+    private function filterAllowlistedPackagesByName(array $entries, string $query): array
+    {
+        $query = strtolower($query);
+
+        return array_values(array_filter($entries, function (AllowlistEntry $entry) use ($query): bool {
+            return str_contains(strtolower($entry->package), $query)
+                || str_contains(strtolower($entry->displayName), $query);
+        }));
+    }
+
+    /**
+     * @param AllowlistEntry[] $entries
+     *
+     * @return AllowlistEntry[]
+     */
+    private function filterAllowlistedPackagesByType(array $entries, string $type): array
+    {
+        return array_values(array_filter($entries, fn (AllowlistEntry $entry): bool => $entry->type === $type));
     }
 
     public function getTotal(): int

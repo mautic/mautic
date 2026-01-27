@@ -88,4 +88,32 @@ final class ListControllerTest extends MauticMysqlTestCase
             )
         );
     }
+
+    public function testMarketplaceListFilterBySearchName(): void
+    {
+        $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
+
+        /** @var MockHandler $handlerStack */
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')),
+            new Response(SymfonyResponse::HTTP_OK, [], json_encode(['results' => [$mockResults[1]]])), // koco matches
+        );
+
+        /** @var Allowlist $allowlist */
+        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist->clearCache();
+
+        $crawler = $this->client->request('GET', 's/marketplace?search=koco');
+
+        $this->assertResponseIsSuccessful();
+
+        Assert::assertSame(
+            ['KocoCaptcha'],
+            array_map(
+                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+            )
+        );
+    }
 }
