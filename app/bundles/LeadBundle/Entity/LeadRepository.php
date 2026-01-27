@@ -1413,6 +1413,65 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * Override parent to handle custom field selects in DBAL mode for leads.
+     *
+     * @param QueryBuilder|DbalQueryBuilder $q
+     */
+    protected function buildSelectClause($q, array $args)
+    {
+        parent::buildSelectClause($q, $args);  // Let parent handle base columns first
+
+        $isOrm = $q instanceof QueryBuilder;
+        if ($isOrm || !isset($args['select'])) {
+            return;  // ORM doesn't need custom field joins; only DBAL for listing
+        }
+
+        // Load custom fields map (alias => field data)
+        [$customFields, $fixedFields] = $this->getCustomFieldList('lead');
+
+        // Get current select parts to append to
+        $selectParts   = $q->getQueryPart('select');
+        $currentSelect = is_array($selectParts) ? implode(', ', $selectParts) : ($selectParts ?: $this->getTableAlias().'.*');
+
+        $additionalSelects = [];
+        $hasCustomFields   = false;
+
+        foreach ($args['select'] as $selectItem) {
+            $select = trim($selectItem);
+
+            // Skip if already qualified (e.g., 'l.id') or not a simple alias
+            if (str_contains($select, '.') || str_contains($select, '(') || str_contains($select, ' ')) {
+                continue;
+            }
+
+            // Check if this is a custom field alias
+            if (isset($customFields[$select])) {
+                $hasCustomFields = true;
+                $field           = $customFields[$select];
+                $fieldId         = (int) $field['id'];
+                $joinAlias       = 'cfv_'.$select;
+
+                // Add LEFT JOIN with integer field_id binding
+                $q->leftJoin(
+                    $this->getTableAlias(),
+                    MAUTIC_TABLE_PREFIX.'lead_fields_value',
+                    $joinAlias,
+                    $joinAlias.'.lead_id = '.$this->getTableAlias().'.id AND '.$joinAlias.'.field_id = :cf_field_id_'.$select
+                );
+                $q->setParameter('cf_field_id_'.$select, $fieldId, \Doctrine\DBAL\Types\Types::INTEGER);
+
+                // Select value with requested alias
+                $additionalSelects[] = $joinAlias.'.value AS '.$select;
+            }
+        }
+
+        if ($hasCustomFields) {
+            $newSelect = $currentSelect.', '.implode(', ', $additionalSelects);
+            $q->select($newSelect);
+        }
+    }
+
+    /**
      * @param string[] $uniqueFields
      */
     private function buildDuplicateValuesQuery(array $uniqueFields): string
