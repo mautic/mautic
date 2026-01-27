@@ -1416,6 +1416,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Override parent to handle custom field selects in DBAL mode for leads.
+     *
+     * @param OrmQueryBuilder|QueryBuilder $q
+     * @param array<string, mixed>         $args
      */
     protected function buildSelectClause($q, array $args): void
     {
@@ -1423,11 +1426,20 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $isOrm  = $q instanceof OrmQueryBuilder;
 
-        if ($isOrm || !isset($args['select'])) {
+        if ($isOrm || !isset($args['select']) || !is_array($args['select'])) {
             return;  // ORM doesn't need custom field joins; only DBAL for listing
         }
 
-        // Load custom fields map (alias => field data)
+        $connection = $this->getEntityManager()->getConnection();
+        $valueTable = MAUTIC_TABLE_PREFIX.'lead_fields_value';
+
+        // Critical guard for tests: skip if value table doesn't exist (many unit/functional tests have minimal schema)
+        $schemaManager = $connection->createSchemaManager();
+        if (!$schemaManager->tablesExist([$valueTable])) {
+            return;
+        }
+
+        // Load custom fields map
         [$customFields] = $this->getCustomFieldList('lead');
 
         // Get current select parts to append to

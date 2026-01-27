@@ -1413,6 +1413,7 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param QueryBuilder|DbalQueryBuilder $q
+     * @param array<string, mixed>          $args
      */
     protected function buildSelectClause($q, array $args)
     {
