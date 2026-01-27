@@ -37,7 +37,7 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $email = $this->emailFixturesHelper->createEmail('Test Email');
-        // $this->em->flush();
+        $this->em->flush();
 
         $campaign      = $this->campaignFixturesHelper->createCampaignWithEmailSent($email->getId());
         $this->campaignFixturesHelper->addContactToCampaign($contacts[0], $campaign);
@@ -52,14 +52,14 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $this->emailFixturesHelper->emulateEmailRead($emailStats[0], $email, '2024-12-10 12:09:00');
         $this->emailFixturesHelper->emulateEmailRead($emailStats[1], $email, '2024-12-11 21:35:00');
 
-        // $this->em->flush();
+        $this->em->flush();
         $this->em->persist($email);
 
         $emailLinks = [
             $this->emailFixturesHelper->createEmailLink('https://example.com/1', $email->getId()),
             $this->emailFixturesHelper->createEmailLink('https://example.com/2', $email->getId()),
         ];
-        // $this->em->flush();
+        $this->em->flush();
 
         $this->emailFixturesHelper->emulateLinkClick($email, $emailLinks[0], $contacts[0], '2024-12-10 12:10:00', 3);
         $this->emailFixturesHelper->emulateLinkClick($email, $emailLinks[1], $contacts[0], '2024-12-10 13:20:00');

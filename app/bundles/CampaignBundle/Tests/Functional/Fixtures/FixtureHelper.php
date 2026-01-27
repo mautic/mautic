@@ -53,10 +53,9 @@ final class FixtureHelper
 
     public function createCampaignWithScheduledEvent(Campaign $campaign, int $interval = 1, string $intervalUnit = 'd', ?\DateTimeInterface $hour = null): Event
     {
-        // No need to flush here — Doctrine will assign ID when flushed later
-        // if (!$campaign->getId()) {
-        //     $this->em->flush();
-        // }
+        if (!$campaign->getId()) {
+            $this->em->flush();
+        }
 
         $event = new Event();
         $event->setCampaign($campaign);
@@ -95,8 +94,7 @@ final class FixtureHelper
         );
 
         $this->em->persist($event);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         $campaign->addEvent(0, $event);
         $campaign->setCanvasSettings(
@@ -150,8 +148,7 @@ final class FixtureHelper
         $campaign->setName('Test send email');
 
         $this->em->persist($campaign);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         $event1 = new Event();
         $event1->setCampaign($campaign);
@@ -198,8 +195,7 @@ final class FixtureHelper
             ]
         );
         $this->em->persist($event1);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         $campaign->setCanvasSettings(
             [
@@ -229,8 +225,7 @@ final class FixtureHelper
         );
         $campaign->addEvent($event1->getId(), $event1);
         $this->em->persist($campaign);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         return $campaign;
     }
@@ -261,8 +256,7 @@ final class FixtureHelper
         $campaign->setAllowRestart($allowRestart);
 
         $this->em->persist($campaign);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         // Create point condition event
         $eventCondition = new Event();
@@ -299,8 +293,7 @@ final class FixtureHelper
         ]);
 
         $this->em->persist($eventCondition);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         // Create email send event
         $eventEmail = new Event();
@@ -343,8 +336,7 @@ final class FixtureHelper
             'attempts'        => 3.0,
         ]);
         $this->em->persist($eventEmail);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         // Set up canvas with connections
         $campaign->setCanvasSettings([
@@ -390,8 +382,7 @@ final class FixtureHelper
         $campaign->setIsPublished(true);
 
         $this->em->persist($campaign);
-        // Do NOT flush here — let the caller/test do it
-        // $this->em->flush();  ← remove this line
+        $this->em->flush();
 
         return $campaign;
     }
