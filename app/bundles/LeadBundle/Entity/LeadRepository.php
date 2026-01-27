@@ -8,6 +8,8 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -570,7 +572,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param mixed[] $args
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return OrmQueryBuilder
      */
     public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
@@ -689,7 +691,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     * @param OrmQueryBuilder|QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -1414,20 +1416,19 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Override parent to handle custom field selects in DBAL mode for leads.
-     *
-     * @param QueryBuilder|DbalQueryBuilder $q
      */
-    protected function buildSelectClause($q, array $args)
+    protected function buildSelectClause($q, array $args): void
     {
         parent::buildSelectClause($q, $args);  // Let parent handle base columns first
 
-        $isOrm = $q instanceof QueryBuilder;
+        $isOrm  = $q instanceof OrmQueryBuilder;
+
         if ($isOrm || !isset($args['select'])) {
             return;  // ORM doesn't need custom field joins; only DBAL for listing
         }
 
         // Load custom fields map (alias => field data)
-        [$customFields, $fixedFields] = $this->getCustomFieldList('lead');
+        [$customFields] = $this->getCustomFieldList('lead');
 
         // Get current select parts to append to
         $selectParts   = $q->getQueryPart('select');
@@ -1439,7 +1440,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         foreach ($args['select'] as $selectItem) {
             $select = trim($selectItem);
 
-            // Skip if already qualified (e.g., 'l.id') or not a simple alias
+            // Skip if already qualified (e.g., 'l.id'), contains functions/spaces, or is not a simple alias
             if (str_contains($select, '.') || str_contains($select, '(') || str_contains($select, ' ')) {
                 continue;
             }
@@ -1458,7 +1459,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $joinAlias,
                     $joinAlias.'.lead_id = '.$this->getTableAlias().'.id AND '.$joinAlias.'.field_id = :cf_field_id_'.$select
                 );
-                $q->setParameter('cf_field_id_'.$select, $fieldId, \Doctrine\DBAL\Types\Types::INTEGER);
+                $q->setParameter('cf_field_id_'.$select, $fieldId, Types::INTEGER);
 
                 // Select value with requested alias
                 $additionalSelects[] = $joinAlias.'.value AS '.$select;
