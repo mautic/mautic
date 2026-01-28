@@ -126,6 +126,27 @@ Mautic.ajaxifyForm = function (formName) {
         e.preventDefault();
         var form = mQuery(this);
 
+        // Sync Froala editors in code view mode before AJAX submission
+        // This triggers the same event that would fire on native form submit
+        if (typeof mauticFroalaEnabled !== 'undefined' && mauticFroalaEnabled) {
+            form.find('textarea.editor').each(function() {
+                var froalaInstance = mQuery(this).data('froala.editor');
+                if (froalaInstance && froalaInstance.events) {
+                    froalaInstance.events.trigger('form.submit');
+                }
+            });
+        }
+
+        // Sync CKEditor content (including source mode) before AJAX submission
+        if (typeof ckEditors !== 'undefined' && ckEditors.size > 0) {
+            form.find('textarea.editor').each(function() {
+                var editor = ckEditors.get(this);
+                if (editor && typeof editor.updateSourceElement === 'function') {
+                    editor.updateSourceElement();
+                }
+            });
+        }
+
         if (MauticVars.formSubmitInProgress) {
             return false;
         } else {
