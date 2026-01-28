@@ -287,7 +287,10 @@ class LeadFieldRepository extends CommonRepository
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
                 $regexOp = $isPg ? ('regexp' === $operatorExpr ? '~*' : '!~*') : ('regexp' === $operatorExpr ? 'REGEXP' : 'NOT REGEXP');
 
-                $where = $property.' '.$regexOp.' :value';
+                // PostgreSQL Fix: Append ::text to the property name
+                $propertyExpr = ($isPg) ? 'CAST('.$property.' AS text)' : $property;
+
+                $where = $propertyExpr.' '.$regexOp.' :value';
 
                 $q->where(
                     $q->expr()->and(
