@@ -365,8 +365,11 @@ class LeadFieldRepository extends CommonRepository
                             break;
                     }
 
+                    // PostgreSQL Fix: Append ::text to the property name
+                    $propertyExpr = ($isPg) ? 'CAST('.$property.' AS text)' : $property;
+
                     $expr = $expr->with(
-                        $q->expr()->$operatorExpr($property, ':value')
+                        $q->expr()->$operatorExpr($propertyExpr, ':value')
                     );
                 }
 
