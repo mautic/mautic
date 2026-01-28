@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
@@ -79,11 +80,19 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
+        $connection = $event->getQueryBuilder()->getConnection();
+        $isPg = $connection->getDatabasePlatform() instanceof PostgreSqlPlatform;
+        $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
+
+        if($isPg && in_array($event->getFilter()->getOperator(), ['notLike'])) {
+            $fieldExpr .= '::text';
+        }
+
         $event->addExpression(
             $event->getQueryBuilder()->expr()->or(
                 $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
                 $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
-                    $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                    $fieldExpr,
                     $event->getParameterHolder()
                 )
             )
@@ -127,8 +136,15 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $filterGlue = 'or';
         }
 
+        $isPg = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
+        $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
+
+        if($isPg) {
+            $fieldExpr .= '::text';
+        }
+
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $queryBuilder->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
+            $expressions[] = $queryBuilder->expr()->$operator($fieldExpr, $parameter);
         }
 
         if ($applyIsNull) {
@@ -170,9 +186,17 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
+        $qb       = $event->getQueryBuilder();
+        $isPg     = $qb->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
+        $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
+
+        if($isPg && in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+            $fieldExpr .= '::text';
+        }
+
         $event->addExpression(
             $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
-                $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                $fieldExpr,
                 $event->getParameterHolder()
             )
         );

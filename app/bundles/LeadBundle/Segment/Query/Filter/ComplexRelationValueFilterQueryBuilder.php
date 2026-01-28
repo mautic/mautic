@@ -86,8 +86,6 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     )
                 );
                 break;
-            case 'startsWith':
-            case 'endsWith':
             case 'gt':
             case 'eq':
             case 'gte':
@@ -95,13 +93,15 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'lte':
             case 'in':
             case 'between':   // Used only for date with week combination (EQUAL [this week, next week, last week])
-            case 'regexp':
-            case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
                 $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
                 break;
+            case 'startsWith':
+            case 'endsWith':
+            case 'regexp':
+            case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
             case 'like':
                 $expression = $queryBuilder->expr()->$filterOperator(
                     $isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(),
@@ -126,7 +126,9 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $operator    = 'multiselect' === $filterOperator ? 'regexp' : 'notRegexp';
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
-                    $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
+                    $expressions[] = $queryBuilder->expr()->$operator(
+                        $isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(), $parameter
+                    );
                 }
 
                 $expression = $queryBuilder->expr()->and(...$expressions);
