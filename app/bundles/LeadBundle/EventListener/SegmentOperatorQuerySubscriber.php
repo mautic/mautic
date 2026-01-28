@@ -81,10 +81,10 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         $leadsTableAlias = $event->getLeadsTableAlias();
 
         $connection = $event->getQueryBuilder()->getConnection();
-        $isPg = $connection->getDatabasePlatform() instanceof PostgreSqlPlatform;
-        $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
+        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
-        if($isPg && in_array($event->getFilter()->getOperator(), ['notLike'])) {
+        if ($isPg && in_array($event->getFilter()->getOperator(), ['notLike'])) {
             $fieldExpr .= '::text';
         }
 
@@ -136,10 +136,10 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $filterGlue = 'or';
         }
 
-        $isPg = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
+        $isPg      = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
-        if($isPg) {
+        if ($isPg) {
             $fieldExpr .= '::text';
         }
 
@@ -186,11 +186,11 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
-        $qb       = $event->getQueryBuilder();
-        $isPg     = $qb->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
+        $qb        = $event->getQueryBuilder();
+        $isPg      = $qb->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
-        if($isPg && in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+        if ($isPg && in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
             $fieldExpr .= '::text';
         }
 
