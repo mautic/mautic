@@ -104,6 +104,7 @@ abstract class AbstractHelper implements StatHelperInterface
      */
     protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection)
     {
+        echo PHP_EOL.$q->getSQL().PHP_EOL;
         $results = $q->executeQuery()->fetchAllAssociative();
         foreach ($results as $result) {
             $statCollection->addStatByDateTimeStringInUTC($result['date'], $result['count']);
