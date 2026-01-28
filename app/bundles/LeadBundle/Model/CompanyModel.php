@@ -48,11 +48,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     use RequestTrait;
 
     /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
      * @var array
      */
     protected $companyFields;
@@ -65,7 +60,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private bool $repoSetup = false;
 
     public function __construct(
-        FieldModel $leadFieldModel,
+        protected FieldModel $leadFieldModel,
         protected EmailValidator $emailValidator,
         protected CompanyDeduper $companyDeduper,
         EntityManager $em,
@@ -78,8 +73,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         CoreParametersHelper $coreParametersHelper,
         private FieldList $fieldList,
     ) {
-        $this->leadFieldModel = $leadFieldModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

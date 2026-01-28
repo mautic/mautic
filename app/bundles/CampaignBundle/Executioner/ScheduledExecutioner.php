@@ -109,7 +109,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null)
     {
-        $now           = $now ?? $this->now ?? new \DateTime();
+        $now ??= $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
@@ -225,7 +225,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $this->counter->advanceEventCount();
 
             // Loop over contacts until the entire campaign is executed
-            $this->executeScheduled($eventId, $now);
+            $this->executeOrRescheduleScheduledEvents($eventId, $now);
         }
     }
 
@@ -239,7 +239,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws NotSchedulableException
      * @throws QueryException|SignalCaughtException
      */
-    private function executeScheduled(int $eventId, \DateTime $now): void
+    private function executeOrRescheduleScheduledEvents(int $eventId, \DateTime $now): void
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
@@ -283,11 +283,26 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     private function validateSchedule(ArrayCollection $logs, \DateTime $now, bool $scheduleTogether = false): void
     {
         $toBeRescheduled     = new ArrayCollection();
+        $toReschedule        = [];
         $latestExecutionDate = $now;
 
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
+            $triggerDateExtended = $this->scheduler->extendTriggerDateWhenCampaignUnpublished($log);
+            if ($triggerDateExtended) {
+                // If the extended trigger date is in the past, execute/validate it anyway,
+                // If it is in the future then remove from the collection to be processed later.
+                if ($log->getTriggerDate() > $now) {
+                    $logs->remove($key);
+                    $toReschedule = $this->addForReschedule($toReschedule, $log, $log->getTriggerDate());
+
+                    continue;
+                } else {
+                    $this->repo->saveEntity($log);
+                }
+            }
+
             $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);
             $this->logger->debug(
                 'CAMPAIGN: Log ID #'.$log->getID().
@@ -305,7 +320,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                         $latestExecutionDate = $executionDate;
                     }
                 } else {
-                    $this->scheduler->reschedule($log, $executionDate);
+                    $toReschedule = $this->addForReschedule($toReschedule, $log, $latestExecutionDate);
                 }
 
                 $logs->remove($key);
@@ -316,7 +331,29 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
         if ($toBeRescheduled->count()) {
             $this->scheduler->rescheduleLogs($toBeRescheduled, $latestExecutionDate);
+            $this->counter->advanceRescheduled($toBeRescheduled->count());
         }
+
+        foreach ($toReschedule as $eventLogTimeGroups) {
+            foreach ($eventLogTimeGroups as $timestamp => $eventLogs) {
+                $this->scheduler->rescheduleLogs($eventLogs, \DateTime::createFromFormat('U', $timestamp));
+                $this->counter->advanceRescheduled($eventLogs->count());
+            }
+        }
+    }
+
+    /**
+     * @param array<int,array<ArrayCollection<int,LeadEventLog>>> $toReschedule
+     *
+     * @return array<int,array<ArrayCollection<int,LeadEventLog>>>
+     */
+    private function addForReschedule(array $toReschedule, LeadEventLog $log, \DateTimeInterface $newTriggerDate): array
+    {
+        $toReschedule[$log->getEvent()->getId()] ??= [];
+        $toReschedule[$log->getEvent()->getId()][$newTriggerDate->getTimestamp()] ??= new ArrayCollection();
+        $toReschedule[$log->getEvent()->getId()][$newTriggerDate->getTimestamp()]->set($log->getId(), $log);
+
+        return $toReschedule;
     }
 
     /**

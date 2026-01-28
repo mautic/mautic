@@ -267,6 +267,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ]
         ));
 
+        $metadata->addPropertyConstraint('position', new Assert\Length(
+            [
+                'max'        => 191,
+                'maxMessage' => 'mautic.user.user.position.toolong',
+            ]
+        ));
+
         $metadata->addPropertyConstraint('role', new Assert\NotBlank(
             ['message' => 'mautic.user.user.role.notblank']
         ));

@@ -332,7 +332,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -1164,11 +1164,14 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Load content of the file from it's path.
+     * Load the content of the file from its path.
      */
     public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
+        if (!file_exists($path)) {
+            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', $path));
+        }
 
         return file_get_contents($path);
     }

@@ -29,6 +29,7 @@ class Client
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $this->coreParametersHelper->get('site_url'),
             'Webhook-Signature' => $signature,
+            'User-Agent'        => 'Webhook',
         ];
 
         $allowedPrivateAddresses = $this->coreParametersHelper->get('webhook_allowed_private_addresses');

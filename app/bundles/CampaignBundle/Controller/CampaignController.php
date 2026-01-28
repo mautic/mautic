@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -110,6 +111,7 @@ class CampaignController extends AbstractStandardFormController
         private RequestStack $requestStack,
         CorePermissions $security,
         private EntityManager $em,
+        private PublishStateService $publishStateService,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -1119,6 +1121,7 @@ class CampaignController extends AbstractStandardFormController
                         'showEmailStats'   => $showEmailStats,
                         'dateRangeForm'    => $dateRangeForm->createView(),
                         'campaignElements' => $this->campaignElements,
+                        'lastPublishDate'  => $this->publishStateService->getLastPublishDate($entity),
                     ]
                 );
                 break;

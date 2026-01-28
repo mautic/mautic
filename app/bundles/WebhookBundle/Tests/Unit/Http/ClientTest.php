@@ -50,6 +50,7 @@ final class ClientTest extends TestCase
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $siteUrl,
             'Webhook-Signature' => $expectedSignature,
+            'User-Agent'        => 'Webhook',
         ];
 
         $response = new Response();

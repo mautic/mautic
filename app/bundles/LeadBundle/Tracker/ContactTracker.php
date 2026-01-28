@@ -28,8 +28,6 @@ class ContactTracker
 
     private ?Lead $trackedContact = null;
 
-    private FieldModel $leadFieldModel;
-
     private ?bool $useSystemContact = null;
 
     private bool $contactLastActiveLogged = false;
@@ -44,9 +42,8 @@ class ContactTracker
         private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private EventDispatcherInterface $dispatcher,
-        FieldModel $leadFieldModel,
+        private FieldModel $leadFieldModel,
     ) {
-        $this->leadFieldModel         = $leadFieldModel;
     }
 
     /**

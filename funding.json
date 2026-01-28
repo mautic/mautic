@@ -1,7 +1,6 @@
 {
   "id": 0,
   "guid": "",
-  "version": "",
   "url": "",
   "meta": {},
   "status": "",
@@ -9,8 +8,8 @@
   "crawl_errors": 0,
   "crawl_message": null,
   "created_at": "0001-01-01T00:00:00Z",
-  "updated_at": "0001-01-01T00:00:00Z",
-  "version": "v1.0.0",
+  "updated_at": "2025-08-12T00:00:00Z",
+  "version": "v1.0.1",
   "entity": {
     "type": "organisation",
     "role": "steward",
@@ -47,91 +46,103 @@
       ]
     },
     {
-      "guid": "mautic-api-library",
-      "name": "Mautic's API library",
-      "description": "The Mautic API library provides developers with a comprehensive tool to interact programmatically with Mautic's marketing automation platform. Hosted on GitHub, this official PHP library supports REST API operations. \n\nIt facilitates a wide range of actions from managing contacts to controlling campaigns and accessing analytical data, enabling developers to seamlessly integrate and automate marketing workflows. The API library requires authentication via OAuth 2 or Basic Auth, depending on the Mautic installation settings.\n\nExtensive documentation accompanying the API library can be found directly within the GitHub repository or via Mautic's official developer docs at https://devdocs.mautic.org (legacy docs at https://developer.mautic.org), ensuring developers have guidance on setting up and utilizing the library effectively. \n\nThere is not currently 100% API coverage however it's a long term goal to work towards this, such that the front-end of Mautic could be entirely decoupled, enabling it to run headless if desired.",
+      "guid": "mautic-privacy-project",
+      "name": "Mautic project: The Mautic Privacy Project",
+      "description": "Mautic's product vision is to be the most privacy-focused, accessible and extendable marketing automation product on the market, giving everyone the power to understand, manage and grow their business or organization while respecting and safeguarding the privacy of their end users. When it comes to truly respecting privacy, there are very few marketing tools that can afford true digital sovereignty, guaranteeing ownership of data to avoid vendor lock-in, and offering granular controls over the level and types of tracking used. Mautic stands at the intersection of these needs, offering a powerful solution which can be self-hosted, with features that align with our commitment to being the most privacy-focused marketing automation solution on the market. The vision for this project is to address some issues in our product, enabling better compliance with GDPR and related legislation, and to enable the marketer to easily turn on the tracking features that they wish to use through a central, clear user interface. This will allow Mautic to ship in no-tracking mode, and also educate marketers further on the impact of each form of tracking at the point they turn it on.",
       "webpageUrl": {
-        "url": "https://github.com/mautic/api-library",
-        "wellKnown": "https://github.com/mautic/api-library/blob/main/.well-known/funding-manifest-urls"
+        "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/16",
+        "wellKnown": "https://community.mautic.org/.well-known/funding-manifest-urls"
       },
       "repositoryUrl": {
-        "url": "https://github.com/mautic/api-library",
-        "wellKnown": "https://github.com/mautic/api-library/blob/main/.well-known/funding-manifest-urls"
+        "url": "https://github.com/mautic/mautic",
+        "wellKnown": "https://github.com/mautic/mautic/blob/7.x/funding.json"
       },
       "licenses": [
-        "spdx:MIT"
+        "spdx:GPL-3.0"
       ],
       "tags": [
         "programming",
         "core-development",
         "core",
-        "api"
+        "privacy",
+        "gdpr",
+        "compliance",
+        "tracking",
+        "digital-sovereignty"
       ]
     },
     {
-      "guid": "user-docs",
-      "name": "Mautic's User Documentation",
-      "description": "The Mautic user documentation at https://docs.mautic.org provides a thorough guide specifically designed to assist end users in navigating and maximizing the capabilities of Mautic. \n\nThe End User Documentation is rich with detailed explanations on how to set up and manage campaigns, create and utilize marketing channels like emails and SMS, and analyze results through reports and dashboards. \n\nIt is regularly updated to reflect the latest functionalities introduced in new releases of Mautic, ensuring users have up-to-date information to operate the software proficiently.",
+      "guid": "sovereign-ai-marketing",
+      "name": "Mautic project: Developing a digitally sovereign AI-supported marketing assistant and agentic workflows for Mautic",
+      "description": "This project will implement a marketing assistant and agentic workflows in Mautic - the open source marketing automation platform - focusing on locally hosted AI models that preserve data sovereignty. Building on Symfony's AI initiative, we'll develop a comprehensive system enabling marketers to automate complex tasks while keeping sensitive data on-premises. The implementation will include: 1) A pluggable AI interface supporting multiple open source models; 2) Workflow automation agents for campaign optimization, content generation, and segment creation; 3) Transparent operations with human oversight capabilities; and 4)A data privacy layer ensuring no sensitive information leaves the user's infrastructure. This approach democratizes AI capabilities for organizations of all sizes while respecting European values of privacy, transparency, and digital sovereignty. The outcome will be a production-ready, community-maintained framework that transforms Mautic into the first enterprise-grade marketing platform with ethics-first, locally controlled AI capabilities. It will also establish the foundation for future AI-driven features in the open source marketing technology ecosystem, allowing developers to plug in new models and capabilities as they emerge.",
       "webpageUrl": {
-        "url": "https://github.com/mautic/user-documentation",
-        "wellKnown": "https://github.com/mautic/user-documentation/blob/5.x/.well-known/funding-manifest-urls"
+        "url": "https://community.mautic.org/assemblies/ai-working-group",
+        "wellKnown": "https://community.mautic.org/.well-known/funding-manifest-urls"
       },
       "repositoryUrl": {
-        "url": "https://github.com/mautic/user-documentation",
-        "wellKnown": "https://github.com/mautic/user-documentation/blob/5.x/.well-known/funding-manifest-urls"
+        "url": "https://github.com/mautic/mautic",
+        "wellKnown": "https://github.com/mautic/mautic/blob/7.x/funding.json"
       },
       "licenses": [
-        "spdx:CC-BY-SA-4.0"
+        "spdx:GPL-3.0"
       ],
       "tags": [
-        "docs",
-        "documentation"
+        "ml",
+        "ai",
+        "marketing",
+        "martech",
+        "sovereignty",
+        "privacy",
+        "gdpr",
+        "core",
+        "agentic"
       ]
     },
     {
-      "guid": "developer-documentation",
-      "name": "Developer Documentation",
-      "description": "The Mautic Developer Documentation, accessible at https://devdocs.mautic.org, is a comprehensive resource designed to aid developers in understanding and using the Mautic platform effectively. \n\nIt covers various aspects of Mautic’s open-source marketing automation system, offering detailed guides on APIs, plugin development, and core contributions. \n\nThis documentation is crucial for developers looking to integrate or extend Mautic’s functionalities. It includes a structured overview of Mautic's architecture, API endpoints, webhook implementations, and practical examples of how to create and customize plugins.\n\nAdditionally, the documentation provides insights into the development environment setup, covering system requirements and installation steps to ensure a smooth start for new developers. \n\nNote: The old dev docs are at https://developer.mautic.org as some sections are yet to be migrated.",
+      "guid": "archive-old-resources",
+      "name": "Mautic project: Archive old resources",
+      "description": "There is currently no way to remove older resources in Mautic which are no longer in use without deleting them completely. This project involves implementing a state - archived - which would enable the marketer to effectively 'hide' resources which are no longer being used. This project is one part of the Resource Management Strategic Initiative, the first part has already been completed (implementing project-based collections - project outline: https://community.mautic.org/processes/roadmap/f/4/proposals/8, project accountability: https://community.mautic.org/processes/roadmap/f/43/results/1.",
       "webpageUrl": {
-        "url": "https://github.com/mautic/developer-documentation-new",
-        "wellKnown": "https://github.com/mautic/developer-documentation-new/blob/5.x/.well-known/funding-manifest-urls"
+        "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/7",
+        "wellKnown": "https://community.mautic.org/.well-known/funding-manifest-urls"
       },
       "repositoryUrl": {
-        "url": "https://github.com/mautic/developer-documentation-new",
-        "wellKnown": "https://github.com/mautic/developer-documentation-new/blob/5.x/.well-known/funding-manifest-urls"
+        "url": "https://github.com/mautic/mautic",
+        "wellKnown": "https://github.com/mautic/mautic/blob/7.x/funding.json"
       },
       "licenses": [
-        "spdx:CC-BY-SA-4.0"
+        "spdx:GPL-3.0"
       ],
       "tags": [
-        "docs",
-        "documentation",
-        "developer-relations",
-        "devrel",
-        "developer-documentation"
+        "programming",
+        "core-development",
+        "core",
+        "resource-management",
+        "archive"
       ]
     },
     {
-      "guid": "grapesjs-preset",
-      "name": "GrapesJS Builder Preset",
-      "description": "At the heart of Mautic is the email and landing page builder, used by every marketer to create stunning resources using a drag-and-drop builder powered by the open source framework, GrapesJS.\n\nMautic's implementation of GrapesJS is made through a preset, which allows us to add our own custom blocks.\n\nThis is an area of Mautic that needs a lot of attention because we have several shortcomings and people are asking for a lot more functionality.",
+      "guid": "mautic-bounce-management",
+      "name": "Mautic project: Enhance bounce management capabilities",
+      "description": "Mautic processing of email webhooks from Omnivery, Mailgun and similar Email Service Providers is a bit limited due to insufficient underlying model where we store information coming from webhooks. This proposal aims to add ability to the Mautic core in a way so that transport plugins can leverage them and map it more precisely to the Mautic core model. This will allow better handling of bounces, complaints and other email events, leading to improved deliverability and sender reputation for Mautic users. For the problem described above we're suggesting that we add a complaint flag into the DNC entity so transport plugins can use it when the Email Service Provider suggests so. We would also like to introduce soft bounces into Mautic core in a way so that we still send to contacts that soft bounces, but if the soft bounce happens multiple times that translates to the DNC entity for that lead with a hard bounced flag. How many times contact soft bounces consecutively before it translates to hard bounced will be configurable with the setting in Configuration -> Email Settings. We introduce soft bounce categories so that transport plugins can categorize and we can display that data to the end user. We would add the following filters on segments: filter for DNC complaint reason, soft bounce filter and soft bounce of specific category. We would like to show some more statistics about bounced, soft bounced and complaint contacts on the email list page and to show the count of soft bounces & complaints on the contact page in addition to showing how many soft bounces are left until the hard bounce is set for the given contact. We'll show the count of soft bounces & complaints on email list view.  This will allow marketers to have better insights into their email campaigns and take necessary actions to improve deliverability.",
       "webpageUrl": {
-        "url": "https://github.com/mautic/grapesjs-preset-mautic",
-        "wellKnown": "https://github.com/mautic/grapesjs-preset-mautic/blob/5.x/.well-known/funding-manifest-urls"
+        "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/47",
+        "wellKnown": "https://community.mautic.org/.well-known/funding-manifest-urls"
       },
       "repositoryUrl": {
-        "url": "https://github.com/mautic/grapesjs-preset-mautic",
-        "wellKnown": "https://github.com/mautic/grapesjs-preset-mautic/blob/5.x/.well-known/funding-manifest-urls"
+        "url": "https://github.com/mautic/mautic",
+        "wellKnown": "https://github.com/mautic/mautic/blob/7.x/funding.json"
       },
       "licenses": [
         "spdx:MIT"
       ],
       "tags": [
-        "grapesjs",
-        "email-builder",
-        "landing-page-builder",
-        "mautic",
-        "builder"
+        "email-deliverability",
+        "bounce-management",
+        "programming",
+        "core-development",
+        "core",
+        "email"
       ]
     }
   ],
@@ -161,8 +172,20 @@
         "guid": "community-tier",
         "status": "active",
         "name": "Community Tier membership",
-        "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future.",
+        "description": "$1200 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
         "amount": 1200,
+        "currency": "USD",
+        "frequency": "yearly",
+        "channels": [
+          "open-collective"
+        ]
+      },
+      {
+        "guid": "growth-tier",
+        "status": "active",
+        "name": "Growth Tier membership",
+        "description": "$3000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
+        "amount": 3000,
         "currency": "USD",
         "frequency": "yearly",
         "channels": [
@@ -173,7 +196,7 @@
         "guid": "bronze-tier",
         "status": "active",
         "name": "Bronze Tier membership",
-        "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future.",
+        "description": "$5000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
         "amount": 5000,
         "currency": "USD",
         "frequency": "yearly",
@@ -185,7 +208,7 @@
         "guid": "silver-tier",
         "status": "active",
         "name": "Silver Tier membership",
-        "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future.",
+        "description": "$10000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
         "amount": 10000,
         "currency": "USD",
         "frequency": "yearly",
@@ -197,7 +220,7 @@
         "guid": "gold-tier",
         "status": "active",
         "name": "Gold Tier membership",
-        "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future.",
+        "description": "$15000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
         "amount": 15000,
         "currency": "USD",
         "frequency": "yearly",
@@ -209,7 +232,7 @@
         "guid": "platinum-tier",
         "status": "active",
         "name": "Platinum Tier membership",
-        "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future.",
+        "description": "$20000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
         "amount": 20000,
         "currency": "USD",
         "frequency": "yearly",
@@ -221,10 +244,22 @@
         "guid": "diamond-tier",
         "status": "active",
         "name": "Diamond Tier membership",
-        "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future.",
+        "description": "$30000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. See tiers and pricing details at https://mau.tc/membership.",
         "amount": 30000,
         "currency": "USD",
         "frequency": "yearly",
+        "channels": [
+          "open-collective"
+        ]
+      },
+      {
+        "guid": "elts-4-1-year",
+        "status": "active",
+        "name": "Extended Long Term Support - Mautic 4 - 1 year",
+        "description": "$2000 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac. A year's security support after the official community support has closed. Purchased in blocks of one year from 1 January to 31 December, for a maximum of two years. See tiers and pricing details at https://mau.tc/elts.",
+        "amount": 2000,
+        "currency": "USD",
+        "frequency": "one-time",
         "channels": [
           "open-collective"
         ]

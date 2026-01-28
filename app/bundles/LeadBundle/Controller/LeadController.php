@@ -1475,17 +1475,17 @@ class LeadController extends FormController
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity ??= new Email();
                             $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
                         }
 
                         if (!empty($email['from'])) {
-                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity ??= new Email();
                             $emailEntity->setFromAddress($email['from']);
                         }
 
                         if (!empty($email['fromname'])) {
-                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity ??= new Email();
                             $emailEntity->setFromName($email['fromname']);
                         }
 

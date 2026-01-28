@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -57,7 +57,7 @@ class Download
     private $ipAddress;
 
     #[Groups(['download:read', 'download:write'])]
-    private ?Lead $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var int

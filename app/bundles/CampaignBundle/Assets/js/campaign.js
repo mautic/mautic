@@ -274,6 +274,7 @@ Mautic.lazyLoadEventStatsOnCampaignDetail = function()  {
             mQuery('#preview-container').html(response.preview);
             Mautic.prepareCampaignCanvas();
             Mautic.previewCampaignLabels();
+            Mautic.previewCampaignEventDetails()
         }
         else
         {
@@ -2542,7 +2543,9 @@ Mautic.highlightJumpTarget = function(event, el) {
 Mautic.showCampaignConfirmation = function (el) {
     let element = mQuery(el);
     if (element.prop('checked') && element.val() !== "1") {
-        Mautic.showConfirmation(element);
+        Mautic.showConfirmation(element, element.data('message-unpublish'));
+    } else {
+        Mautic.showConfirmation(element, element.data('message-publish'));
     }
 };
 
@@ -2569,13 +2572,10 @@ Mautic.setPublishedButtonToYes = function (el) {
 Mautic.confirmationCampaignPublishStatus = function (el) {
     let element = mQuery(el);
 
-    // Add the confirmation modal, if current status is published
     if (element.data('status') === 'published') {
-        Mautic.showConfirmation(element);
-    }
-    else {
-        // Otherwise just change the status.
-        Mautic.confirmCallbackCampaignPublishStatus('', el);
+        Mautic.showConfirmation(element, element.data('message-unpublish'));
+    } else {
+        Mautic.showConfirmation(element, element.data('message-publish'));
     }
 }
 
@@ -2627,10 +2627,14 @@ Mautic.hideCampaignEventPanel = function() {
     mQuery('#CampaignEventPanel').addClass('hide');
 }
 
+Mautic.getCampaignBuilderHtmlElements = function() {
+    const managedElements = Mautic.campaignBuilderInstance.getManagedElements();
+    return Object.values(managedElements).map(el => el.el);
+}
+
 Mautic.previewCampaignLabels = function() {
     const campaignBuilder = Mautic.campaignBuilderInstance;
-    const managedElements = Mautic.campaignBuilderInstance.getManagedElements();
-    const allElements = Object.values(managedElements).map(el => el.el);
+    const allElements = Mautic.getCampaignBuilderHtmlElements();
 
     allElements.forEach(function(element) {
         const id = element.id;
@@ -2656,6 +2660,80 @@ Mautic.previewCampaignLabels = function() {
             }
         });
     });
+}
+
+Mautic.previewCampaignEventDetails = function() {
+    const $allElements = mQuery(Mautic.getCampaignBuilderHtmlElements());
+
+    $allElements.click(function (event) {
+        const $el = mQuery(event.currentTarget);
+        const eventId = $el.data('eventId');
+
+        if (!eventId) return;
+
+        if ($el.hasClass('event-details-visible')) {
+            $el.removeClass('event-details-visible');
+            return;
+        } else {
+            $allElements.removeClass('event-details-visible');
+            $el.addClass('event-details-visible');
+        }
+
+
+        if ($el.data('event-details-loaded')) return;
+
+        mQuery.ajax({
+            url: '/s/campaign/metrics/event-details/' + eventId,
+            success: function (response) {
+                if (response.hasOwnProperty('first_execution_date')) {
+                    renderEventDetails($el, response);
+                } else {
+                    renderEventDetailsInfo($el, Mautic.translate('mautic.campaign.event.not_executed'));
+                }
+
+            },
+            error: function (response) {
+                if (response.responseJSON.message) {
+                    renderEventDetailsError($el, response.responseJSON.message);
+                } else {
+                    renderEventDetailsError($el, Mautic.translate('mautic.core.request.error'));
+                }
+            }
+        });
+        
+        event.preventDefault();
+    });
+
+    const renderEventDetails = function($el, data) {
+        const $dl = mQuery('<dl class="dl-horizontal campaign-event-details-dl"/>');
+
+        Object.entries(data).forEach(([key, stat]) => {
+            const translationKey = 'mautic.campaign.event.' + key;
+
+            const $dt = mQuery('<dt>')
+                .attr('data-event-details-key', key)
+                .text(Mautic.translate(translationKey));
+
+            const $dd = mQuery('<dd>')
+                .attr('data-event-details-key', key)
+                .text(stat.value);
+
+            if (stat.tooltip) {
+                $dd.attr('title', stat.tooltip);
+            }
+
+            $dl.append($dt).append($dd);
+        });
+        $el.find('.campaign-event-details').html($dl);
+        $el.data('event-details-loaded', true);
+    }
+
+    const renderEventDetailsError = function($el, message) {
+       $el.find('.campaign-event-details').html('<div class="alert alert-danger mb-0" role="alert">' + message + '</div>');
+    }
+    const renderEventDetailsInfo = function($el, message) {
+       $el.find('.campaign-event-details').html('<div class="alert alert-info mb-0" role="alert">' + message + '</div>');
+    }
 }
 
 Mautic.campaignAuditlogOnLoad = function (container, response) {
