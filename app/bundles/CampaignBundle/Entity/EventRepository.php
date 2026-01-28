@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -156,26 +155,43 @@ class EventRepository extends CommonRepository
     public function getCampaignEmailEvents(int $campaignId): array
     {
         /*
-         * Switching to DBAL's QueryBuilder for raw SQL
-         * to bypass DQL parser limitations and handle platform-specific join conditions.
+         * Switching to DBAL's QueryBuilder to bypass DQL parser limitations
+         * and handle platform-specific join conditions.
+         *
+         * SQLSTATE[42883]: Undefined function: 7
+         * ERROR:  could not identify an equality operator for type json
+         *
+         * Email entity has Types::ARRAY for the content field,
+         * which in Doctrine versions maps to json type in PostgreSQL.
+         * This cause issue with DISTINCT em.* when PostgreSQL tries to
+         * compare JSON values for uniqueness.
+         *
+         * But we actually don't need DISTINCT if we use EXISTS with subqueries.
+         * It's much more efficient.
          */
         $entityManager = $this->getEntityManager();
         $connection    = $entityManager->getConnection();
         $platform      = $connection->getDatabasePlatform();
 
-        // Build query with DBAL QueryBuilder
-        $dbalQb = $connection->createQueryBuilder();
+        // Build subquery using DBAL QueryBuilder
+        $subQb = $connection->createQueryBuilder();
 
-        $joinCondition = $platform instanceof PostgreSQLPlatform
-            ? "em.id = CASE  WHEN e.channel_id IS NOT NULL  AND e.channel_id != ''  AND e.channel_id ~ '^[0-9]+$' THEN CAST(e.channel_id AS INTEGER) ELSE 0 END"
-            : 'em.id = e.channel_id';
+        $channelIdWhere = $platform instanceof PostgreSQLPlatform
+            ? "CASE WHEN e.channel_id IS NOT NULL AND e.channel_id != '' AND e.channel_id ~ '^[0-9]+$' THEN CAST(e.channel_id AS INTEGER) ELSE 0 END = em.id"
+            : 'e.channel_id = em.id';
 
-        $dbalQb->select('DISTINCT em.*')
+        $subQb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')
-            ->innerJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'em', $joinCondition)
             ->where('e.campaign_id = :campaignId')
             ->andWhere('e.channel = :channel')
             ->andWhere('e.deleted IS NULL')
+            ->andWhere($channelIdWhere);
+
+        // Build main query using DBAL QueryBuilder
+        $mainQb = $connection->createQueryBuilder();
+        $mainQb->select('em.*')
+            ->from(MAUTIC_TABLE_PREFIX.'emails', 'em')
+            ->where('EXISTS ('.$subQb->getSQL().')')
             ->setParameter('campaignId', $campaignId)
             ->setParameter('channel', Event::CHANNEL_EMAIL);
 
@@ -183,44 +199,14 @@ class EventRepository extends CommonRepository
         $rsm = new ResultSetMappingBuilder($entityManager);
         $rsm->addRootEntityFromClassMetadata(Email::class, 'em');
 
-        $query = $entityManager->createNativeQuery($dbalQb->getSQL(), $rsm);
+        $query = $entityManager->createNativeQuery($mainQb->getSQL(), $rsm);
 
         // Transfer parameters
-        foreach ($dbalQb->getParameters() as $key => $value) {
+        foreach ($mainQb->getParameters() as $key => $value) {
             $query->setParameter($key, $value);
         }
 
         return $query->getResult();
-        /*
-        $qb = $this->getEntityManager()->createQueryBuilder();
-
-        $platform      = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-
-        $joinCondition = ($platform instanceof PostgreSQLPlatform) // DQL convert e.channelId LIKE '%[^0-9]%' to proper format
-            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId != '' AND e.channelId LIKE '%[^0-9]%' THEN CAST(e.channelId as INTEGER) ELSE 0 END)"
-            : 'em.id = e.channelId';
-
-        return $qb
-            ->select('DISTINCT em')
-            ->from(Event::class, 'e')
-            ->innerJoin(
-                Email::class,
-                'em',
-                Expr\Join::WITH,
-                $joinCondition
-            )
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('e.campaign', ':campaignId'),
-                    $qb->expr()->eq('e.channel', ':channel'),
-                    $qb->expr()->isNull('e.deleted')
-                )
-            )
-            ->setParameter('campaignId', $campaignId)
-            ->setParameter('channel', Event::CHANNEL_EMAIL)
-            ->getQuery()
-            ->getResult();
-        */
     }
 
     /**
