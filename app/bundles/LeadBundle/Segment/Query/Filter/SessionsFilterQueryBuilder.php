@@ -25,6 +25,9 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 
+        $isPg         = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $intervalExpr = $isPg ? "INTERVAL '30 MINUTES'" : 'INTERVAL 30 MINUTE';
+
         $exclusionQueryBuilder = $queryBuilder->createQueryBuilder();
         $exclusionQueryBuilder
             ->select($exclusionAlias.'.id')
@@ -34,7 +37,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
                     $queryBuilder->expr()->eq($leadsTableAlias.'.id', $exclusionAlias.'.lead_id'),
                     $queryBuilder->expr()->gt(
                         $exclusionAlias.'.date_hit',
-                        $pageHitsAlias.'.date_hit - INTERVAL 30 MINUTE'
+                        $pageHitsAlias.'.date_hit - '.$intervalExpr
                     ),
                     $queryBuilder->expr()->lt($exclusionAlias.'.date_hit', $pageHitsAlias.'.date_hit')
                 )
