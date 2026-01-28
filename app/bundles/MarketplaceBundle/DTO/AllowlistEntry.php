@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\DTO;
 
+use Mautic\MarketplaceBundle\Enum\PackageType;
+
 final class AllowlistEntry
 {
-    public const TYPE_PLUGIN   = 'mautic-plugin';
-    public const TYPE_THEME    = 'mautic-theme';
-    public const TYPE_CAMPAIGN = 'mautic-campaign';
-
     public function __construct(
         /**
          * Packagist package in the format vendor/package.
@@ -30,7 +28,7 @@ final class AllowlistEntry
         /**
          * Package type: mautic-plugin, mautic-theme, or mautic-campaign.
          */
-        public string $type = self::TYPE_PLUGIN,
+        public string $type = PackageType::PLUGIN->value,
     ) {
     }
 
@@ -44,7 +42,7 @@ final class AllowlistEntry
             $array['display_name'] ?? '',
             $array['minimum_mautic_version'],
             $array['maximum_mautic_version'],
-            $array['type'] ?? self::TYPE_PLUGIN
+            $array['type'] ?? PackageType::PLUGIN->value
         );
     }
 

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
 use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
+use Mautic\MarketplaceBundle\Enum\PackageType;
 
 class PluginCollector
 {
@@ -28,9 +29,6 @@ class PluginCollector
     {
         $allowlist = $this->allowlist->getAllowList();
 
-        // Remove type commands from query for text search
-        $searchQuery = $this->removeTypeCommandsFromQuery($query);
-
         if (!empty($allowlist)) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
 
@@ -38,23 +36,18 @@ class PluginCollector
                 $this->allowlistedPackages = $this->filterAllowlistedPackagesByType($this->allowlistedPackages, $type);
             }
 
-            if (!empty($searchQuery)) {
-                $this->allowlistedPackages = $this->filterAllowlistedPackagesByName($this->allowlistedPackages, $searchQuery);
+            if (!empty($query)) {
+                $this->allowlistedPackages = $this->filterAllowlistedPackagesByName($this->allowlistedPackages, $query);
             }
 
             $payload = $this->getAllowlistedPackages($page, $limit);
         } else {
-            $payload = $this->connection->getPlugins($page, $limit, $searchQuery, $type ?? AllowlistEntry::TYPE_PLUGIN);
+            $payload = $this->connection->getPlugins($page, $limit, $query, $type ?? PackageType::PLUGIN->value);
         }
 
         $this->total = (int) $payload['total'];
 
         return PackageCollection::fromArray($payload['results']);
-    }
-
-    private function removeTypeCommandsFromQuery(string $query): string
-    {
-        return trim(preg_replace('/is:(plugin|theme|campaign)/i', '', $query));
     }
 
     /**

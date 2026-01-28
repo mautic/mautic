@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
+use Mautic\MarketplaceBundle\Enum\PackageType;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
@@ -63,8 +63,9 @@ class ListController extends CommonController
             $page = $session->get('mautic.marketplace.package.page', 1);
         }
 
-        // Parse type filter from search string
-        $type = $this->parseTypeFromSearch($search);
+        // Parse type filter and remove it from search string
+        $type        = $this->parseTypeFromSearch($search);
+        $searchQuery = $this->removeTypeCommandFromSearch($search);
 
         // set limits
         $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
@@ -75,7 +76,7 @@ class ListController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'       => $search,
-                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $search, $type),
+                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $searchQuery, $type),
                     'count'             => $this->pluginCollector->getTotal(),
                     'page'              => $page,
                     'limit'             => $limit,
@@ -94,18 +95,17 @@ class ListController extends CommonController
 
     private function parseTypeFromSearch(string $search): ?string
     {
-        $typeMap = [
-            'is:plugin'   => AllowlistEntry::TYPE_PLUGIN,
-            'is:theme'    => AllowlistEntry::TYPE_THEME,
-            'is:campaign' => AllowlistEntry::TYPE_CAMPAIGN,
-        ];
-
-        foreach ($typeMap as $searchCommand => $packageType) {
+        foreach (PackageType::getSearchCommandMap() as $searchCommand => $packageType) {
             if (str_contains(strtolower($search), $searchCommand)) {
                 return $packageType;
             }
         }
 
         return null;
+    }
+
+    private function removeTypeCommandFromSearch(string $search): string
+    {
+        return trim(preg_replace(PackageType::getTypeCommandPattern(), '', $search));
     }
 }
