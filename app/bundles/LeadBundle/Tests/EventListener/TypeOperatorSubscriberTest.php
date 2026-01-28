@@ -118,16 +118,19 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         // Test for random operators:
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['text']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['text']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['boolean']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['boolean']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['date']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['boolean']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['date']['include']);
         $this->assertContains(OperatorOptions::DATE, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['number']['include']);
-        $this->assertNotContains(OperatorOptions::IN, $operators['number']['include']);
+        $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['number']['include']);
         $this->assertContains(OperatorOptions::EMPTY, $operators['country']['include']);
-        $this->assertContains(OperatorOptions::IN, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::INCLUDING_ANY, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::INCLUDING_ALL, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::EXCLUDING_ANY, $operators['multiselect']['include']);
+        $this->assertContains(OperatorOptions::EXCLUDING_ALL, $operators['multiselect']['include']);
         $this->assertNotContains(OperatorOptions::STARTS_WITH, $operators['country']['include']);
     }
 
@@ -277,44 +280,40 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'lookup_id']];
         $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+        $matcher  = $this->exactly(2);
 
-        $this->form->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'display',
-                    TextType::class,
-                    $this->callback(
-                        function (array $options) {
-                            $this->assertSame('', $options['data']);
-                            $this->assertSame(
-                                [
-                                    'class'                 => 'form-control',
-                                    'data-field-callback'   => 'activateSegmentFilterTypeahead',
-                                    'data-target'           => 'owner',
-                                    'placeholder'           => 'mautic.lead.list.form.startTyping',
-                                    'data-no-record-message'=> 'mautic.core.form.nomatches',
-                                ],
-                                $options['attr']
-                            );
+        $this->form->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('display', $parameters[0]);
+                    $this->assertSame(TextType::class, $parameters[1]);
+                    $callback = function (array $options) {
+                        $this->assertSame('', $options['data']);
+                        $this->assertSame(
+                            [
+                                'class'                 => 'form-control',
+                                'data-field-callback'   => 'activateSegmentFilterTypeahead',
+                                'data-target'           => 'owner',
+                                'placeholder'           => 'mautic.lead.list.form.startTyping',
+                                'data-no-record-message'=> 'mautic.core.form.nomatches',
+                            ],
+                            $options['attr']
+                        );
+                    };
+                    $callback($parameters[2]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('filter', $parameters[0]);
+                    $this->assertSame(HiddenType::class, $parameters[1]);
+                    $callback = function (array $options) {
+                        $this->assertSame('', $options['data']);
+                        $this->assertSame(['class' => 'form-control'], $options['attr']);
+                    };
+                    $callback($parameters[2]);
+                }
 
-                            return true;
-                        }
-                    ),
-                ],
-                [
-                    'filter',
-                    HiddenType::class,
-                    $this->callback(
-                        function (array $options) {
-                            $this->assertSame('', $options['data']);
-                            $this->assertSame(['class' => 'form-control'], $options['attr']);
-
-                            return true;
-                        }
-                    ),
-                ]
-            );
+                return $this->form;
+            });
 
         $this->subscriber->onSegmentFilterFormHandleLookupId($event);
     }
@@ -333,45 +332,41 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+        $matcher  = $this->exactly(2);
 
-        $this->form->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'display',
-                    TextType::class,
-                    $this->callback(
-                        function (array $options) {
-                            $this->assertSame('', $options['data']);
-                            $this->assertSame(
-                                [
-                                    'class'                  => 'form-control',
-                                    'data-field-callback'    => 'fooBarCallback',
-                                    'data-target'            => 'custom',
-                                    'placeholder'            => 'mautic.lead.list.form.startTyping',
-                                    'data-no-record-message' => 'mautic.core.form.nomatches',
-                                    'data-action'            => 'foo.bar',
-                                ],
-                                $options['attr']
-                            );
+        $this->form->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('display', $parameters[0]);
+                    $this->assertSame(TextType::class, $parameters[1]);
+                    $callback = function (array $options) {
+                        $this->assertSame('', $options['data']);
+                        $this->assertSame(
+                            [
+                                'class'                  => 'form-control',
+                                'data-field-callback'    => 'fooBarCallback',
+                                'data-target'            => 'custom',
+                                'placeholder'            => 'mautic.lead.list.form.startTyping',
+                                'data-no-record-message' => 'mautic.core.form.nomatches',
+                                'data-action'            => 'foo.bar',
+                            ],
+                            $options['attr']
+                        );
+                    };
+                    $callback($parameters[2]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('filter', $parameters[0]);
+                    $this->assertSame(HiddenType::class, $parameters[1]);
+                    $callback = function (array $options) {
+                        $this->assertSame('', $options['data']);
+                        $this->assertSame(['class' => 'form-control'], $options['attr']);
+                    };
+                    $callback($parameters[2]);
+                }
 
-                            return true;
-                        }
-                    ),
-                ],
-                [
-                    'filter',
-                    HiddenType::class,
-                    $this->callback(
-                        function (array $options) {
-                            $this->assertSame('', $options['data']);
-                            $this->assertSame(['class' => 'form-control'], $options['attr']);
-
-                            return true;
-                        }
-                    ),
-                ]
-            );
+                return $this->form;
+            });
 
         $this->subscriber->onSegmentFilterFormHandleLookupId($event);
     }
@@ -430,7 +425,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'select_a';
         $object   = 'lead';
-        $operator = OperatorOptions::IN;
+        $operator = OperatorOptions::INCLUDING_ANY;
         $details  = ['properties' => ['type' => 'unicorn']];
         $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
@@ -463,7 +458,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'select_a';
         $object   = 'lead';
-        $operator = OperatorOptions::IN;
+        $operator = OperatorOptions::INCLUDING_ANY;
         $details  = [
             'properties' => [
                 'type' => 'select',

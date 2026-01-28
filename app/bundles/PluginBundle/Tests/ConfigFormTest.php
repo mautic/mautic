@@ -117,35 +117,23 @@ class ConfigFormTest extends KernelTestCase
     public function getIntegrationObject()
     {
         // create an integration object
-        $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
-        $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
-        $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
+        $pathsHelper          = $this->createMock(PathsHelper::class);
+        $bundleHelper         = $this->createMock(BundleHelper::class);
+        $pluginModel          = $this->createMock(PluginModel::class);
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
-        $twig                 = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $entityManager        = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $twig                 = $this->createMock(Environment::class);
+        $entityManager        = $this->createMock(EntityManager::class);
 
-        $pluginRepository = $this
-            ->getMockBuilder(PluginRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pluginRepository = $this->createMock(PluginRepository::class);
 
         $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
         $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->method('getPluginBundles')->willReturn($registeredPluginBundles);
 
         $bundleHelper->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
-        $integrationEntityRepository = $this
-            ->getMockBuilder(IntegrationEntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
 
-        $integrationRepository = $this
-            ->getMockBuilder(IntegrationRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integrationRepository = $this->createMock(IntegrationRepository::class);
 
         $entityManager
                 ->method('getRepository')

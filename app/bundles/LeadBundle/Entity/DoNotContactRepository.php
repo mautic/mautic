@@ -34,7 +34,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -142,7 +142,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getChannelList($channel, array $contacts = null): array
+    public function getChannelList($channel, ?array $contacts = null): array
     {
         // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
         if (is_array($contacts) && empty($contacts)) {
@@ -185,5 +185,20 @@ class DoNotContactRepository extends CommonRepository
         unset($results);
 
         return $dnc;
+    }
+
+    /**
+     * Get all unique combinations of reason and channel.
+     *
+     * @return array<int, array{reason: mixed, channel: mixed}> Array of arrays containing 'reason' and 'channel'
+     */
+    public function getReasonChannelCombinations(): array
+    {
+        $qb = $this->createQueryBuilder('dnc')
+            ->select('DISTINCT dnc.reason, dnc.channel')
+            ->orderBy('dnc.reason', 'ASC')
+            ->addOrderBy('dnc.channel', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 }

@@ -2,6 +2,14 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -14,136 +22,165 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('page:pages:viewown')"),
+        new Post(security: "is_granted('page:pages:create')"),
+        new Get(security: "is_granted('page:pages:viewown')"),
+        new Put(security: "is_granted('page:pages:editown')"),
+        new Patch(security: "is_granted('page:pages:editother')"),
+        new Delete(security: "is_granted('page:pages:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['page:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'translationChildren'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['page:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 /**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "page:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "translationChildren"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "page:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
+ * @use TranslationEntityTrait<Page>
+ * @use VariantEntityTrait<Page>
  */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use UuidTrait;
+    use ProjectTrait;
+    public const ENTITY_NAME = 'page';
+
+    public const TABLE_NAME = 'pages';
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'download:read', 'email:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $title;
 
     /**
      * @var string
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $alias;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $template;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $customHtml;
 
     /**
      * @var array
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $content = [];
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $publishUp;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $publishDown;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $hits = 0;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $uniqueHits = 0;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $variantHits = 0;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $revision = 1;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $metaDescription;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $headScript;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $footerScript;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $redirectType;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $redirectUrl;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $category;
 
     /**
      * @var bool|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $isPreferenceCenter;
 
     /**
      * @var bool|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $noIndex;
 
     /**
@@ -151,11 +188,26 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
+    private ?PageDraft $draft = null;
+
+    private bool $isCloned = false;
+
+    private ?int $cloneObjectId = null;
+
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    private ?bool $publicPreview = true;
+
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    private bool $isDuplicate = false;
+
     public function __clone()
     {
-        $this->id = null;
+        $this->cloneObjectId = (int) $this->id;
+        $this->isCloned      = true;
+        $this->id            = null;
         $this->clearTranslations();
         $this->clearVariants();
+        $this->setDraft(null);
 
         parent::__clone();
     }
@@ -164,13 +216,14 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('pages')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(PageRepository::class)
             ->addIndex(['alias'], 'page_alias_search');
 
@@ -244,9 +297,18 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
             ->nullable()
             ->build();
 
+        $builder->createOneToOne('draft', PageDraft::class)
+            ->mappedBy('page')
+            ->fetchExtraLazy()
+            ->cascadeAll()
+            ->build();
+
+        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
+
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'page_projects_xref', 'page_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -255,8 +317,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
             'message' => 'mautic.core.title.required',
         ]));
 
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Page $page, ExecutionContextInterface $context): void {
+        $metadata->addConstraint(new Callback(
+            function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
                 if (!is_null($type)) {
                     $validator  = $context->getValidator();
@@ -293,7 +355,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     }
                 }
             },
-        ]));
+        ));
 
         $metadata->addConstraint(new EntityEvent());
     }
@@ -341,6 +403,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
             ->setMaxDepth(1, 'translationParent')
             ->setMaxDepth(1, 'translationChildren')
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'page');
     }
 
     /**
@@ -652,7 +716,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      *
      * @return Page
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(?Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -831,5 +895,63 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function setCustomHtml($customHtml): void
     {
         $this->customHtml = $customHtml;
+    }
+
+    public function hasDraft(): bool
+    {
+        return !is_null($this->getDraft());
+    }
+
+    public function getDraftContent(): ?string
+    {
+        return $this->hasDraft() ? $this->getDraft()->getHtml() : null;
+    }
+
+    public function getDraft(): ?PageDraft
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?PageDraft $draft): void
+    {
+        $this->draft = $draft;
+    }
+
+    public function getIsClone(): bool
+    {
+        return $this->isCloned;
+    }
+
+    public function getCloneObjectId(): int
+    {
+        return $this->cloneObjectId;
+    }
+
+    public function getPublicPreview(): bool
+    {
+        return $this->publicPreview;
+    }
+
+    public function isPublicPreview(): bool
+    {
+        return $this->publicPreview;
+    }
+
+    public function setPublicPreview(bool $publicPreview): self
+    {
+        $this->isChanged('publicPreview', $publicPreview);
+        $this->publicPreview = $publicPreview;
+
+        return $this;
+    }
+
+    public function isDuplicate(): bool
+    {
+        return $this->isDuplicate;
+    }
+
+    public function setIsDuplicate(bool $isDuplicate): void
+    {
+        $this->isDuplicate = $isDuplicate;
     }
 }

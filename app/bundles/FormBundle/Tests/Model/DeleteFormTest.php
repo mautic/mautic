@@ -73,11 +73,19 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
+        $matcher = $this->exactly(2);
 
-        $dispatcher->expects($this->exactly(2))
-            ->method('hasListeners')
-            ->withConsecutive(['mautic.form_pre_delete'], ['mautic.form_post_delete'])
-            ->willReturn(false);
+        $dispatcher->expects($matcher)
+            ->method('hasListeners')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.form_pre_delete', $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.form_post_delete', $parameters[0]);
+                }
+
+                return false;
+            });
 
         $entityManager->expects($this->once())
             ->method('getRepository')

@@ -15,7 +15,7 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : notification,
@@ -26,6 +26,7 @@
         'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
     }
 ) -}}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -41,13 +42,38 @@
 
 {% block publishStatus %}
     {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': notification}, with_context=false) }}
+
+    {% set tags = [] %}
+
+    {# Translation tags #}
+    {% set tags = tags
+        |merge(notification.isTranslation and not notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+        : [])
+        |merge(notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
+        : [])
+    %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
+
+
+{% set translationContent = include('@MauticCore/Translation/index.html.twig',
+    {
+        'activeEntity'      : notification,
+        'translations'      : translations,
+        'model'             : 'notifications',
+        'actionRoute'       : 'mautic_mobile_notification_action',
+    }
+) %}
+{% set showTranslations = translationContent|trim is not empty %}
 
 {% block content %}
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 height-auto">
+      <div class="col-lg-8 col-md-7 height-auto">
           <div>
               <!-- notification detail collapseable -->
               <div class="collapse pr-md pl-md" id="notification-details">
@@ -75,6 +101,18 @@
               <div class="pa-md">
                   <div class="row">
                       <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.mobile_sent',
+                                'value': notification.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
+                                }),
+                                'icon': 'ri-smartphone-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 va-m">
@@ -87,7 +125,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -108,6 +146,14 @@
                           {{ 'mautic.lead.leads'|trans }}
                       </a>
                   </li>
+
+                  {% if showTranslations %}
+                      <li>
+                          <a href="#translation-container" role="tab" data-toggle="tab">
+                              {{ 'mautic.core.translations'|trans }}
+                          </a>
+                      </li>
+                  {% endif %}
               </ul>
               <!--/ tabs controls -->
           </div>
@@ -125,12 +171,23 @@
               <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
                   {{ contacts|raw }}
               </div>
+
+              {% if showTranslations %}
+                  <div class="tab-pane bdr-w-0" id="translation-container">
+                      {{ translationContent|raw }}
+                  </div>
+              {% endif %}
           </div>
+          <!--/ tab-content -->
+
       </div>
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bdr-l height-auto">
+      <div class="col-lg-4 col-md-5 height-auto">
+        <div class="pa-md mb-32 animation--slide-in-down">
+            {{ include('@MauticNotification/MobileNotification/preview.html.twig') }}
+        </div>
           <!-- activity feed -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}, with_context=false) }}
       </div>

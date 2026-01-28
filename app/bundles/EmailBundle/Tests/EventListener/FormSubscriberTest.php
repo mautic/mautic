@@ -84,10 +84,10 @@ class FormSubscriberTest extends TestCase
 
         $event->expects($this->exactly(2))
             ->method('checkContext')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['email.send.user', false],
                 ['email.send.lead', false],
-            ]));
+            ]);
 
         $event->expects($this->exactly(0))
             ->method('getAction');
@@ -142,10 +142,10 @@ class FormSubscriberTest extends TestCase
 
         $event->expects($this->exactly(2))
             ->method('checkContext')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['email.send.user', false],
                 ['email.send.lead', true],
-            ]));
+            ]);
 
         $event->expects($this->once())
             ->method('getTokens')

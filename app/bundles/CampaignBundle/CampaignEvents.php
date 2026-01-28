@@ -226,4 +226,22 @@ final class CampaignEvents
      * @var string
      */
     public const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
+
+    /**
+     * The mautic.campaign_failure_notify event is dispatched after campaign event is failed for a contact.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfFailureEvent
+     *
+     * @var string
+     */
+    public const ON_CAMPAIGN_FAILURE_NOTIFY = 'mautic.campaign_failure_notify';
+
+    /**
+     * The mautic.campaign_unpublish_notify event is dispatched after campaign event is auto unpublished after failures.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent
+     *
+     * @var string
+     */
+    public const ON_CAMPAIGN_UNPUBLISH_NOTIFY = 'mautic.campaign_unpublish_notify';
 }

@@ -15,7 +15,7 @@
 
 {% block headerTitle %}{{ company.name }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : company,
@@ -28,6 +28,7 @@
         'targetLabel'     : 'mautic.lead.lead.companies'|trans
     }
 ) -}}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': company}) }}
 {% endblock %}
 
 {% block actions %}
@@ -159,11 +160,13 @@
                                 <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                             </div>
                         </div>
+                        <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                         {{ include('@MauticCore/Helper/chart.html.twig', {
                             'chartData': engagementData,
                             'chartType': 'line',
                             'chartHeight': 250,
                         }) }}
+                        </div>
                     </div>
                 </div>
             </div>

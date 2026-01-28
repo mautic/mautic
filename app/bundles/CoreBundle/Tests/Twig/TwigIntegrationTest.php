@@ -15,10 +15,12 @@ use Symfony\Component\Asset\Packages;
 use Twig\Extension\ExtensionInterface;
 
 /**
- * @see https://twig.symfony.com/doc/2.x/advanced.html#functional-tests
+ * @see https://twig.symfony.com/doc/3.x/advanced.html#functional-tests
  */
-class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
+final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
+    use TwigIntegrationTestTrait;
+
     /**
      * @return ExtensionInterface[]
      */
@@ -31,12 +33,12 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         $pathHelperMock = $this->createMock(PathsHelper::class);
 
         $packagesMock->method('getUrl')
-            ->will($this->returnCallback(function (string $path) {
+            ->willReturnCallback(function (string $path) {
                 $packageName = $version = null;
                 $absolute    = $ignorePrefix = false;
 
                 return "{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
-            }));
+            });
 
         $assetsHelper = new AssetsHelper($packagesMock);
         $pathHelperMock->method('getSystemPath')->willReturn('https://example.com/');
@@ -48,10 +50,5 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             new ClassExtension(),
             new FormExtension(),
         ];
-    }
-
-    public function getFixturesDir()
-    {
-        return __DIR__.'/Fixtures/';
     }
 }

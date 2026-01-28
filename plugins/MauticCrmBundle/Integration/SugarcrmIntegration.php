@@ -381,7 +381,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
                         }
                     } else {
-                        throw new ApiErrorException($this->authorizationError);
+                        throw new ApiErrorException($this->authorizationError ?? '');
                     }
                 }
             }
@@ -1329,7 +1329,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function fetchDncToMautic(Lead $lead = null, array $data): void
+    private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
         if (is_null($lead)) {
             return;

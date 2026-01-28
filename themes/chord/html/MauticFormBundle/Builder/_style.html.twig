@@ -181,7 +181,7 @@
         background-color: var(--form-field);
         appearance: none;
         border: 1px solid var(--form-border-strong);
-        border-radius: 0px;
+        border-radius: {{ getRoundedCorners('sm') }}px;
         margin: 0;
         align-items: center;
         display: inline-flex;
@@ -245,7 +245,7 @@
         padding: 16px 30px;
         font-size: 13px;
         line-height: 1.3856;
-        border-radius: 0px;
+        border-radius: {{ getRoundedCorners('lg') }}px;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
@@ -273,6 +273,32 @@
 
     .mauticform-pagebreak-wrapper .mauticform-button-wrapper {
         display: inline;
+    }
+
+    /* Make fields display inline when using width classes */
+    .mauticform-page-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        margin: 0 -10px;
+    }
+
+    /* Ensure field containers respect width classes */
+    .mauticform-row {
+        box-sizing: border-box;
+        padding: 0 10px;
+        margin-bottom: 15px;
+    }
+
+    /* Responsive adjustment for mobile */
+    @media (max-width: 767px) {
+        .mauticform-three-quarters-width,
+        .mauticform-two-thirds-width,
+        .mauticform-half-width,
+        .mauticform-one-third-width,
+        .mauticform-one-quarter-width {
+            width: 100%;
+        }
     }
 
     /**

@@ -11,10 +11,11 @@
         'entity': entity,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {% set tags = [
         {
-            color: 'warm-gray',
+            color: 'high-contrast',
             label: entity.isCampaignBased
                 ? 'mautic.dwc.form.is.campaign'
                 : 'mautic.dwc.form.is.standalone'
@@ -23,17 +24,25 @@
 
     {% set tags = tags
         |merge(entity.isTranslation and not entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+            ? [{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon_only: true, icon: 'ri-translate' }]
             : [])
         |merge(entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
+            ? [{ 
+                color: 'warm-gray', 
+                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+                icon: 'ri-translate',
+                attributes: {
+                    'href': path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
+                    'data-toggle': 'ajax'
+                }
+            }]
             : [])
     %}
 
     {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : entity,
@@ -44,6 +53,7 @@
         'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
     }
 ) -}}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': entity.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -96,7 +106,7 @@
                     {% endif %}
                 {% endset %}
 
-                {% include '@MauticCore/Helper/description.html.twig' with { 'description': description } %}
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with { 'description': description } %}
               <!--/ page detail header -->
               <!-- page detail collapseable -->
               <div class="collapse pr-md pl-md" id="page-details">
@@ -150,7 +160,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>

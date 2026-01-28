@@ -34,9 +34,7 @@ class SchedulerMonthBuilderTest extends \PHPUnit\Framework\TestCase
 
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
-        $rule = $this->getMockBuilder(Rule::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rule = $this->createMock(Rule::class);
 
         $rule->expects($this->once())
             ->method('setFreq')

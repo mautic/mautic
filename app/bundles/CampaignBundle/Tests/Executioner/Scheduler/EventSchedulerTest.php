@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ScheduledBatchEvent;
-use Mautic\CampaignBundle\Event\ScheduledEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
@@ -16,7 +15,9 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized;
+use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use PHPUnit\Framework\Assert;
@@ -61,14 +62,17 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
     private EventScheduler $scheduler;
 
+    /**
+     * @var MockObject&PublishStateService
+     */
+    private MockObject $publishStateService;
+
     protected function setUp(): void
     {
         $this->logger              = new NullLogger();
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParamtersHelper->method('get')
-            ->willReturnCallback(
-                fn () => 'America/New_York'
-            );
+        $this->coreParamtersHelper->method('getDefaultTimezone')
+            ->willReturn('America/New_York');
         $this->eventLogger                = $this->createMock(EventLogger::class);
         $this->peakInteractionTimer       = $this->createMock(PeakInteractionTimer::class);
         $this->intervalScheduler          = new Interval($this->logger, $this->coreParamtersHelper);
@@ -76,6 +80,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->optimizedScheduler         = new Optimized($this->peakInteractionTimer);
         $this->eventCollector             = $this->createMock(EventCollector::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $this->publishStateService        = $this->createMock(PublishStateService::class);
         $this->scheduler                  = new EventScheduler(
             $this->logger,
             $this->eventLogger,
@@ -84,7 +89,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
-            $this->coreParamtersHelper
+            $this->coreParamtersHelper,
+            $this->createMock(OptimisticLockServiceInterface::class),
+            $this->publishStateService
         );
     }
 
@@ -344,45 +351,40 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with('campaign_time_wait_on_event_false')
             ->willReturn('PT1H');
+        $matcher = $this->exactly(3);
 
-        $this->dispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                [
-                    $this->callback(
-                        function (ScheduledEvent $event) use ($now) {
-                            // The first log was scheduled to 10 minutes.
-                            Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getLog()->getTriggerDate());
-                            Assert::assertLessThan($now->modify('+11 minutes'), $event->getLog()->getTriggerDate());
+        $this->dispatcher->expects($matcher)
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $callback = function (ScheduledBatchEvent $event) use ($now) {
+                        // The first log was scheduled to 10 minutes.
+                        Assert::assertCount(1, $event->getScheduled());
+                        Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                        Assert::assertLessThan($now->modify('+11 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $callback = function (ScheduledBatchEvent $event) use ($now) {
+                        // The second log was not scheduled so the default interval is used.
+                        Assert::assertCount(1, $event->getScheduled());
+                        Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                        Assert::assertLessThan($now->modify('+61 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $callback = function (ScheduledBatchEvent $event) {
+                        Assert::assertCount(2, $event->getScheduled());
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
+                }
 
-                            return true;
-                        }
-                    ),
-                    CampaignEvents::ON_EVENT_SCHEDULED,
-                ],
-                [
-                    $this->callback(
-                        function (ScheduledEvent $event) use ($now) {
-                            // The second log was not scheduled so the default interval is used.
-                            Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getLog()->getTriggerDate());
-                            Assert::assertLessThan($now->modify('+61 minutes'), $event->getLog()->getTriggerDate());
-
-                            return true;
-                        }
-                    ),
-                    CampaignEvents::ON_EVENT_SCHEDULED,
-                ],
-                [
-                    $this->callback(
-                        function (ScheduledBatchEvent $event) {
-                            Assert::assertCount(2, $event->getScheduled());
-
-                            return true;
-                        }
-                    ),
-                    CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
-                ]
-            );
+                return $parameters[0];
+            });
 
         $scheduler         = new EventScheduler(
             $this->logger,
@@ -392,7 +394,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
-            $coreParamtersHelper
+            $coreParamtersHelper,
+            $this->createMock(OptimisticLockServiceInterface::class),
+            $this->publishStateService
         );
 
         $scheduler->rescheduleFailures(new ArrayCollection([$logWithRescheduleInterval, $logWithNoRescheduleInterval]));

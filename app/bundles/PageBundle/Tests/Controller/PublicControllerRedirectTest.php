@@ -6,15 +6,15 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerRedirectTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider redirectTypeOptions
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('redirectTypeOptions')]
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/new');
@@ -33,7 +33,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, string}>
      */
-    public function redirectTypeOptions(): iterable
+    public static function redirectTypeOptions(): iterable
     {
         yield 'redirect set, empty redirect URL' => ['', 'A value is required.'];
         yield 'redirect set, invalid redirect URL' => ['invalid.url', 'This value is not a valid URL.'];
@@ -55,5 +55,37 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/page-a');
 
         Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('redirectUrlProvider')]
+    public function testRedirectWithSpecialCharsInQuery(string $url): void
+    {
+        $redirect = new Redirect();
+        $redirect->setUrl($url);
+        $redirect->setRedirectId('57cf5a66a9f9414f301082cf0');
+        $this->em->persist($redirect);
+        $this->em->flush();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, sprintf('/r/%s', $redirect->getRedirectId()));
+
+        $response = $this->client->getResponse();
+        \assert($response instanceof RedirectResponse);
+        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        Assert::assertSame($url, $response->getTargetUrl());
+    }
+
+    /**
+     * @return iterable<string, array<string, string>>
+     */
+    public static function redirectUrlProvider(): iterable
+    {
+        yield 'The spaces in the query part must not be encoded with plus signs.' => [
+            'url' => 'https://google.com?q=this%20has%20spaces',
+        ];
+
+        yield 'The dot in the query part must not be replaced with underscore.' => [
+            'url' => 'https://google.com?registrants.source=email',
+        ];
     }
 }

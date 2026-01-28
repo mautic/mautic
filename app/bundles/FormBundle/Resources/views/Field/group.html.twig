@@ -81,6 +81,7 @@
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
         ]),
+        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
@@ -255,5 +256,5 @@
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}
 
-  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
+  <span class="mauticform-errormsg" aria-live="polite" aria-atomic="true" aria-hidden="true" style="display:none;">{{ validationMessage }}</span>
 </div>

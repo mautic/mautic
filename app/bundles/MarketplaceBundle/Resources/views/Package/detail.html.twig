@@ -7,7 +7,7 @@
     {% set latestVersion = packageDetail.versions.findLatestVersionPackage() %}
 {% endif %}
 
-{% block indexButton %}
+{% block preHeader %}
     {% include '@MauticCore/Helper/button.html.twig' with {
         buttons: [
             {

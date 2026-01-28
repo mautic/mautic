@@ -14,7 +14,6 @@ parameters:
 		- app/migrations
 		- plugins
 	excludePaths:
-		- *.html.php
 		- *.js.php
 		- *.less.php
 		- *.inc.php
@@ -31,6 +30,8 @@ parameters:
 		# not all IDEs are as smart as PHPSTAN and need the type hint
 		- identifier: function.alreadyNarrowedType
 		- identifier: instanceof.alwaysTrue
+		# Symfony 7.4 deprecation - Request->get() to be fixed before Symfony 8.0
+		- '#Call to deprecated method get\(\) of class Symfony\\Component\\HttpFoundation\\Request#'
 		- '/Variable \$\w+ might not be defined\./'
 		# resolve later with translator interface generics
 		- '#Method (.*?)::getTranslatedEntity\(\) return type has no value type specified in iterable type array#'
@@ -50,6 +51,19 @@ parameters:
 		-
 			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
 			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+		# Doctrine expects concrete types but traits use interfaces with generics
+		-
+			message: '#Property .+::\$translationParent type mapping mismatch: property can contain .+TranslationEntityInterface\|null but database expects#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+			identifier: doctrine.associationType
+		-
+			message: '#Property .+::\$translationChildren type mapping mismatch: property can contain .+but database expects#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+			identifier: doctrine.associationType
+		-
+			message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
+			path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
+			identifier: doctrine.associationType
 		# mocks
 		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'

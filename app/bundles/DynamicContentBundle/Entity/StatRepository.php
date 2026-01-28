@@ -66,7 +66,7 @@ class StatRepository extends CommonRepository
      *
      * @param array $dynamicContentIds
      */
-    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($dynamicContentIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')

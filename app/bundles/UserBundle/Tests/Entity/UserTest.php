@@ -9,9 +9,14 @@ class UserTest extends \PHPUnit\Framework\TestCase
     public function testEraseCredentials(): void
     {
         $user = new User();
-        $user->setPlainPassword('test');
-        $user->setCurrentPassword('test');
-        $user->eraseCredentials();
+        $user->setUsername('testUser');
+        $user->setPlainPassword('plainPass');
+        $user->setCurrentPassword('currentPass');
+
+        $user = unserialize(serialize($user));
+        \assert($user instanceof User);
+
+        $this->assertSame('testUser', $user->getUsername());
         $this->assertNull($user->getPlainPassword());
         $this->assertNull($user->getCurrentPassword());
     }

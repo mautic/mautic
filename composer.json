@@ -21,18 +21,18 @@
         "source": "https://github.com/mautic/mautic"
     },
   "require": {
-    "composer/installers": "^1.11",
-    "mautic/core-lib": "^6.0"
+    "composer/installers": "^2.3",
+    "mautic/core-lib": "^7.0"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",
     "codeception/module-asserts": "^3.0",
     "codeception/module-db": "^3.1",
-    "codeception/module-webdriver": "^3.2",
+    "codeception/module-webdriver": "^4.0",
     "friendsofphp/php-cs-fixer": "^3.14",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
-    "liip/test-fixtures-bundle": "^2.6",
+    "liip/test-fixtures-bundle": "^3.5",
     "mautic/transifex": "^5.0",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.0",
@@ -40,14 +40,14 @@
     "phpstan/phpstan-doctrine": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
-    "phpunit/phpunit": "^9.5",
-    "rector/rector": "2.0",
-    "symfony/browser-kit": "~6.4.0",
-    "symfony/dom-crawler": "~6.4.0",
-    "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~6.4.0",
-    "symfony/var-dumper": "~6.4.0",
-    "symfony/web-profiler-bundle": "~6.4.0",
+    "phpunit/phpunit": "^10.5.62",
+    "rector/rector": "2.2",
+    "symfony/browser-kit": "~7.4.0",
+    "symfony/dom-crawler": "~7.4.0",
+    "symfony/maker-bundle": "^1.64",
+    "symfony/phpunit-bridge": "~7.4.0",
+    "symfony/var-dumper": "~7.4.0",
+    "symfony/web-profiler-bundle": "~7.4.0",
     "symplify/easy-coding-standard": "^12.0.13"
   },
   "replace": {
@@ -101,7 +101,8 @@
     "mautic/theme-capture": "self.version",
     "mautic/theme-chord": "self.version",
     "mautic/theme-formscape": "self.version",
-    "mautic/theme-reachout": "self.version"
+    "mautic/theme-reachout": "self.version",
+    "mautic/theme-multi-step": "self.version"
   },
   "autoload": {
     "psr-4": {
@@ -114,7 +115,7 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "6.0.0-dev"
+            "mautic/core-lib": "7.0.0-dev"
         }
       }
     },
@@ -154,14 +155,19 @@
     "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=5G bin/phpstan analyse --ansi",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
-    "rector": "bin/rector process --ansi",
+    "rector-code": "bin/rector process --ansi",
+    "rector-tests": "bin/rector process --config=rector-tests.php --ansi",
+    "rector": [
+      "@rector-code",
+      "@rector-tests"
+    ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate"
+    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
   },
   "config": {
     "platform": {
-      "php": "8.1.0"
+      "php": "8.2.0"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",

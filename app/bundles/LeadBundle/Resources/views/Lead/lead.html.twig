@@ -19,11 +19,12 @@
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
-  {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ leadName|purify }}</span><span class="span-block small ml-sm">
+    {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ leadName|purify }}</span><span class="span-block small ml-sm">
     {{ lead.secondaryIdentifier|purify }}</span></div>
+    {{ customContent('lead.name.after', _context) }}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : lead,
@@ -206,7 +207,7 @@
                                                             {% elseif 'url' == field.type %}
                                                                 <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
                                                             {% elseif 'html' == field.type %}
-                                                                <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
+                                                                <div style="resize: vertical; overflow: auto">{{ field.value|raw }}</div>
                                                             {% elseif 'datetime' == field.type %}
                                                                 {{ dateToFullConcat(field.value, 'UTC') }}
                                                             {% else %}
@@ -268,7 +269,9 @@
                                         <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
-                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
+                                <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                                    {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -532,53 +535,220 @@
             </div>
 
         <div class="pa-sm">
-            {% for tag in lead.tags %}
-                <div id="tagLabel{{ tag.id }}">
-                    <h5 class="pull-left mt-xs mr-xs">
-                        <span class="label label-blue">
-                            <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax">
-                                {{ tag.tag|purify }}
-                            </a>
-                            <i class="ri-close-line" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
-                        </span>
-                    </h5>
+            {% if lead.tags|length <= 8 %}
+                {# Use tile--base for 8 or fewer tags #}
+                {% set tagContent %}
+                <div class="d-flex jc-space-between">
+                    <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
+                    <i class="ri-hashtag" aria-hidden="true"></i>
                 </div>
-            {% endfor %}
-            <div class="clearfix"></div>
-        </div>
-        <div class="pa-sm panel-companies">
-            <div class="panel-title">
-                {{ 'mautic.lead.lead.companies'|trans }}
-            </div>
-            {% for key, company in companies %}
-            <h5 class="pull-left mt-xs mr-xs">
-                <span class="label label-success">
-                    <i id="company-{{ company.id }}" class="ri-check-line {% if 1 == company.is_primary %}primary{% endif %}" onclick="Mautic.setAsPrimaryCompany({{ company.id }}, {{ lead.id }});" title="{{ 'mautic.lead.company.set.primary'|trans }}"></i>
-                    <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax" style="color: white;">
-                        {{ company.companyname|purify }}
-                    </a>
-                </span>
-            </h5>
-            {% endfor %}
-            <div class="clearfix"></div>
-        </div>
-        {% if lists[lead.id] is defined %}
-            <div class="pa-sm panel-segments">
-                <div class="panel-title">
-                    {{ 'mautic.lead.lead.lists'|trans }}
+                <div class="d-flex fw-wrap gap-xs mt-xs">
+                    {% if lead.tags|length > 0 %}
+                        {% for tag in lead.tags %}
+                            <div id="tagLabel{{ tag.id }}">
+                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+                                    'label': tag.tag|purify,
+                                    'attributes': {
+                                        'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
+                                        'data-toggle': 'ajax',
+                                    },
+                                    'color': 'blue',
+                                    'type': 'dismissible',
+                                    'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
+                                }]} %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-helper">{{ 'mautic.lead.tags.no_results'|trans }}</p>
+                    {% endif %}
+                    </div>
+                {% endset %}
+                
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'base',
+                    'content': tagContent
+                } %}
+            {% else %}
+                {# Use tile--expandable-interactive for more than 8 tags #}
+                {% set firstEightTags = lead.tags|slice(0, 8) %}
+                {% set remainingTags = lead.tags|slice(8) %}
+                
+                {% set aboveContent %}
+                <div class="d-flex jc-space-between">
+                    <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
+                    <i class="ri-hashtag" aria-hidden="true"></i>
                 </div>
-                {% set classes = ['label-gray', 'label-red', 'label-magenta', 'label-purple', 'label-blue', 'label-cyan', 'label-teal', 'label-green'] %}
-                {% for key, list in lists[lead.id] %}
-                    <h5 class="mt-xs mr-xs">
-                        <span class="label {{ cycle(classes, key) }} has-click-event">
-                            <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">
-                                {{ list.name|purify }}
-                            </a>
-                        </span>
-                    </h5>
+                    <div class="d-flex fw-wrap gap-xs">
+                    {% for tag in firstEightTags %}
+                        <div id="tagLabel{{ tag.id }}">
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+                                'label': tag.tag|purify,
+                                'attributes': {
+                                    'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
+                                    'data-toggle': 'ajax',
+                                },
+                                'color': 'blue',
+                                'type': 'dismissible',
+                                'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
+                            }]} %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endset %}
+                
+                {% set belowContent %}
+                <div class="d-flex fw-wrap gap-xs mt-xs">
+                    {% for tag in remainingTags %}
+                        <div id="tagLabel{{ tag.id }}">
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+                                'label': tag.tag|purify,
+                                'attributes': {
+                                    'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
+                                    'data-toggle': 'ajax',
+                                },
+                                'color': 'blue',
+                                'type': 'dismissible',
+                                'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
+                            }]} %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endset %}
+                
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'expandable-interactive',
+                    'aboveFoldContent': aboveContent,
+                    'belowFoldContent': belowContent
+                } %}
+            {% endif %}
+        </div>
+        <div class="pa-sm panel-companies layout--size-0">
+            {% if companies is defined and companies|length > 0 %}
+                {% set companiesList = [] %}
+                {% for key, company in companies %}
+                    {% set companiesList = companiesList|merge([{
+                        'label': company.companyname|purify,
+                        'link': path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}),
+                        'icon': (company.is_primary == 1 ? 'ri-user-star-fill' : ''),
+                        'button': {
+                            'onclick': 'Mautic.setAsPrimaryCompany(' ~ company.id ~ ', ' ~ lead.id ~ ');',
+                            'icon': 'ri-check-line',
+                            'size': 'lg',
+                            'label': 'mautic.lead.company.set.primary'|trans
+                        }
+                    }]) %}
                 {% endfor %}
-            </div>
-        {% endif %}
+
+                {% set tileContent %}
+                <div class="ma-neg-local">
+                    {{ include('@MauticCore/Components/contained-list.html.twig', {
+                        'title': 'mautic.lead.lead.companies'|trans,
+                        'items': companiesList,
+                        'variant': 'interactive-actions'
+                    }) }}
+                </div>
+                {% endset %}
+
+                {{ include('@MauticCore/Components/tile.html.twig', {
+                    'type': 'base',
+                    'content': tileContent
+                }) }}
+            {% else %}
+                {% set content %}
+                <div class="d-flex jc-space-between">
+                    <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.companies'|trans }}</span>
+                    <i class="ri-building-line" aria-hidden="true"></i>
+                </div>
+                <p class="text-helper">{{ 'mautic.lead.lead.companies.no_results'|trans }}</p>
+                <div class="clearfix"></div>
+                {% endset %}
+                
+                {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
+            {% endif %}
+        </div>
+        <div class="pa-sm">
+            {% if lists[lead.id] is defined and lists[lead.id]|length > 0 %}
+                {% set segments = lists[lead.id] %}
+                {% set classes = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
+                
+                {% if segments|length <= 8 %}
+                    {% set content %}
+                        <div class="d-flex jc-space-between">
+                            <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                            <i class="ri-pie-chart-line" aria-hidden="true"></i>
+                        </div>
+                        <div class="d-flex fw-wrap gap-xs">
+                            {% for key, list in segments %}
+                                {% set tag = {
+                                    'label': list.name|purify,
+                                    'attributes': {
+                                        'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}),
+                                        'data-toggle': 'ajax'
+                                    },
+                                    'color': cycle(classes, key)
+                                } %}
+                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tag]} %}
+                            {% endfor %}
+                        </div>
+                    {% endset %}
+                    
+                    {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
+                {% else %}
+                    {% set aboveContent %}
+                        <div class="d-flex jc-space-between">
+                            <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                            <i class="ri-pie-chart-line" aria-hidden="true"></i>
+                        </div>
+                        <div class="d-flex fw-wrap gap-xs">
+                            {% for key, list in segments|slice(0, 8) %}
+                                {% set tag = {
+                                    'label': list.name|purify,
+                                    'attributes': {
+                                        'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}),
+                                    'data-toggle': 'ajax'
+                                },
+                                'color': cycle(classes, key)
+                            } %}
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tag]} %}
+                        {% endfor %}
+                        </div>
+                    {% endset %}
+                    
+                    {% set belowContent %}
+                        <div class="d-flex fw-wrap gap-xs mt-xs">
+                        {% for key, list in segments|slice(8) %}
+                            {% set tag = {
+                                'label': list.name|purify,
+                                'attributes': {
+                                    'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}),
+                                    'data-toggle': 'ajax'
+                                },
+                                'color': cycle(classes, key + 8)
+                            } %}
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tag]} %}
+                        {% endfor %}
+                        </div>
+                    {% endset %}
+                    
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        'type': 'expandable-interactive',
+                        'aboveFoldContent': aboveContent,
+                        'belowFoldContent': belowContent
+                    } %}
+                {% endif %}
+            {% else %}
+                {% set content %}
+                <div class="d-flex jc-space-between">
+                    <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                    <i class="ri-pie-chart-line" aria-hidden="true"></i>
+                </div>
+                <p class="text-helper">{{ 'mautic.lead.lead.lists.no_results'|trans }}</p>
+                <div class="clearfix"></div>
+                {% endset %}
+                
+                {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
+            {% endif %}
+        </div>
 
           <div class="clearfix"></div>
         </div>

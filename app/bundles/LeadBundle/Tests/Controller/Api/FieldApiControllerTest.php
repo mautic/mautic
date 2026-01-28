@@ -64,9 +64,6 @@ class FieldApiControllerTest extends TestCase
         $fieldModel->method('getRepository')
             ->willReturn($fieldRepository);
         $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')
-            ->with('lead.field')
-            ->willReturn($fieldModel);
         $controller   = new FieldApiController(
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
@@ -79,6 +76,7 @@ class FieldApiControllerTest extends TestCase
             $modelFactory,
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(CoreParametersHelper::class),
+            $fieldModel,
         );
 
         $controllerReflection = new \ReflectionClass(FieldApiController::class);

@@ -14,11 +14,14 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
+    use SegmentFilterIconTrait;
+
     public function __construct(
         private OperatorOptions $operatorOptions,
         private LeadFieldRepository $leadFieldRepository,
@@ -36,6 +39,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ['onGenerateSegmentFiltersAddStaticFields', 0],
                 ['onGenerateSegmentFiltersAddCustomFields', 0],
                 ['onGenerateSegmentFiltersAddBehaviors', 0],
+                ['onGenerateSegmentFiltersNormalizeOperatorLabels', -1000],
             ],
         ];
     }
@@ -77,6 +81,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'properties' => $properties,
                     'object'     => $field->getObject(),
                     'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
+                    'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
                 ]
             );
         });
@@ -95,6 +100,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
+                'iconClass'  => $this->getSegmentFilterIcon('leadlist'),
             ]
         );
 
@@ -107,13 +113,13 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
@@ -272,8 +278,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'globalcategory',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'globalcategory'),
+                    'type'     => 'globalcategory',
                 ],
             ],
             'utm_campaign' => [
@@ -309,6 +314,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($staticFields as $alias => $fieldOptions) {
+            $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
             $event->addChoice('lead', $alias, $fieldOptions);
         }
     }
@@ -339,8 +345,10 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::IN,
-                    OperatorOptions::NOT_IN,
+                    OperatorOptions::INCLUDING_ANY,
+                    OperatorOptions::EXCLUDING_ANY,
+                    OperatorOptions::INCLUDING_ALL,
+                    OperatorOptions::EXCLUDING_ALL,
                 ]),
             ],
             'lead_email_sent' => [
@@ -351,8 +359,10 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_sent'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::IN,
-                    OperatorOptions::NOT_IN,
+                    OperatorOptions::INCLUDING_ANY,
+                    OperatorOptions::EXCLUDING_ANY,
+                    OperatorOptions::INCLUDING_ALL,
+                    OperatorOptions::EXCLUDING_ALL,
                 ]),
             ],
             'lead_email_sent_date' => [
@@ -578,6 +588,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($choices as $alias => $fieldOptions) {
+            $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
             $event->addChoice('behaviors', $alias, $fieldOptions);
         }
     }
@@ -599,8 +610,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                         OperatorOptions::NOT_LIKE,
                         OperatorOptions::REGEXP,
                         OperatorOptions::NOT_REGEXP,
-                        OperatorOptions::IN,
-                        OperatorOptions::NOT_IN,
+                        OperatorOptions::INCLUDING_ANY,
+                        OperatorOptions::EXCLUDING_ANY,
                         OperatorOptions::STARTS_WITH,
                         OperatorOptions::ENDS_WITH,
                         OperatorOptions::CONTAINS,
@@ -610,5 +621,45 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         $event->setChoices($choices);
+    }
+
+    public function onGenerateSegmentFiltersNormalizeOperatorLabels(LeadListFiltersChoicesEvent $event): void
+    {
+        $choices = $event->getChoices();
+
+        foreach ($choices as $groupKey => $group) {
+            foreach ($group as $fieldKey => $field) {
+                if (in_array($field['properties']['type'] ?? '', ['date', 'datetime'])) {
+                    $operators                                  = array_flip($field['operators'] ?? []);
+                    $operators                                  = $this->translateOperators($operators);
+                    $choices[$groupKey][$fieldKey]['operators'] = array_flip($operators);
+                }
+            }
+        }
+
+        $event->setChoices($choices);
+    }
+
+    /**
+     * @param array<string, string> $operators
+     *
+     * @return array<string, string>
+     */
+    private function translateOperators(array $operators): array
+    {
+        $translationKeys = [
+            'gt'  => 'mautic.lead.list.form.operator.greaterthan.date',
+            'gte' => 'mautic.lead.list.form.operator.greaterthanequals.date',
+            'lt'  => 'mautic.lead.list.form.operator.lessthan.date',
+            'lte' => 'mautic.lead.list.form.operator.lessthanequals.date',
+        ];
+
+        foreach ($operators as $operator => $string) {
+            if (isset($translationKeys[$operator])) {
+                $operators[$operator] = $this->translator->trans($translationKeys[$operator]);
+            }
+        }
+
+        return $operators;
     }
 }

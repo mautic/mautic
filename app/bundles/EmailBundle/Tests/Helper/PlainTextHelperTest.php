@@ -9,9 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class PlainTextHelperTest extends TestCase
 {
-    /**
-     * @dataProvider emailContentProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emailContentProvider')]
     public function testGetText(string $htmlContent, string $expectedPlainText): void
     {
         $plainTextHelper = new PlainTextHelper();
@@ -24,7 +22,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function emailContentProvider(): array
+    public static function emailContentProvider(): array
     {
         return [
             // Test case 1: Simple paragraph
@@ -63,12 +61,51 @@ class PlainTextHelperTest extends TestCase
 </html>',
                 "WELCOME TO OUR NEWSLETTER\n\nThis is an example paragraph in our email content.",
             ],
+            [
+                <<<HTML
+<a href="https://example.com">text</a>
+HTML
+                ,
+                <<<HTML
+text [https://example.com]
+HTML,
+            ],
+            [
+                <<<HTML
+<a href="https://example.com">link 1</a>
+<a href="https://examples.com">link 2</a>
+HTML
+                ,
+                <<<HTML
+link 1 [https://example.com] link 2 [https://examples.com]
+HTML,
+            ],
+            [
+                <<<HTML
+<a href="https://example.com">text<br></a>
+HTML
+                ,
+                <<<HTML
+text
+[https://example.com]
+HTML,
+            ],
+            [
+                <<<HTML
+<h1>something</h1>
+<h2>another something</h2>
+HTML
+                ,
+                <<<HTML
+SOMETHING
+
+ANOTHER SOMETHING
+HTML,
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getPreviewProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getPreviewProvider')]
     public function testGetPreview(?int $previewLength, string $htmlContent, string $expectedPlainText): void
     {
         $options = [];
@@ -85,7 +122,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @return array<int, array<int, string|int|null>>
      */
-    public function getPreviewProvider(): array
+    public static function getPreviewProvider(): array
     {
         return [
             // Test case 1: Simple paragraph, with default options

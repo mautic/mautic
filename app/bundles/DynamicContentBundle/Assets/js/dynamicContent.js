@@ -138,6 +138,21 @@ Mautic.dwcGenerator = (function() {
     return { init };
 })();
 
+Mautic.toggleContentEditor = function () {
+    const typeField = mQuery('#dwc_type').val();
+    const contentField = mQuery('#dwc_content');
+    if (typeField === 'html') {
+        Mautic.ConvertFieldToCkeditor(contentField, MauticVars.maxButtons);
+    } else if (typeField === 'text') {
+        if (ckEditors.size > 0) {
+            ckEditors.forEach(function(value, key, map){
+                map.get(key).destroy()
+            })
+            ckEditors.clear();
+        }
+    }
+};
+
 Mautic.dynamicContentOnLoad = function (container, response) {
     if (typeof container !== 'object') {
         if (mQuery(container + ' #list-search').length) {

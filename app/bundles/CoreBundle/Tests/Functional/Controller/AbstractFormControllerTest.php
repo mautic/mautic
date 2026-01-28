@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\Controller;
+namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class AbstractFormControllerFunctionalTest extends MauticMysqlTestCase
+class AbstractFormControllerTest extends MauticMysqlTestCase
 {
     public function testUnlockActionWithValidReturnUrl(): void
     {
@@ -58,7 +58,7 @@ class AbstractFormControllerFunctionalTest extends MauticMysqlTestCase
     {
         $objectId    = 1;
         $objectModel = 'form.form';
-        $returnUrl   = 'http://malicious.com/s/forms';
+        $returnUrl   = 'https://malicious.com/s/forms';
 
         $this->client->request(
             'GET',

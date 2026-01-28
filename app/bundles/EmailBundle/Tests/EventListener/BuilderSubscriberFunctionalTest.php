@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -17,31 +18,28 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['disable_trackable_urls'] = false;
-        if (str_contains($this->getDataSetAsString(false), 'Invalid unsubscribe_text configured')) {
+        if (str_contains($this->dataSetAsString(), 'Invalid unsubscribe_text configured')) {
             $this->configParams['unsubscribe_text']  = '<a href="|some|">Unsubscribe</a> with invalid token within the href attribute.';
         }
 
-        if (str_contains($this->getDataSetAsString(false), 'No unsubscribe_text configured')) {
+        if (str_contains($this->dataName(), 'No unsubscribe_text configured')) {
             $this->configParams['unsubscribe_text']  = '';
         }
 
-        $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
     }
 
     /**
      * @return iterable<string, array{string}>
      */
-    public function dataOneTrackingLinkIsNotUsedForDifferentContacts(): iterable
+    public static function dataOneTrackingLinkIsNotUsedForDifferentContacts(): iterable
     {
         yield 'Invalid unsubscribe_text configured' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a></body></html>'];
         yield 'No unsubscribe_text configured' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a></body></html>'];
         yield 'Invalid tag attribute for unsubscribe_url' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a><a id="{unsubscribe_url}">unsubscribe</a></body></html>'];
     }
 
-    /**
-     * @dataProvider dataOneTrackingLinkIsNotUsedForDifferentContacts
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataOneTrackingLinkIsNotUsedForDifferentContacts')]
     public function testOneTrackingLinkIsNotUsedForDifferentContacts(string $content): void
     {
         $numContacts = 3;
@@ -55,6 +53,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(3);
 
         foreach ($this->getMailerMessages() as $message) {
+            \assert($message instanceof MauticMessage);
             $clickThrough = $this->parseClickThrough($message->getHtmlBody());
             $email        = $message->getTo()[0]->getAddress();
             Assert::assertSame((string) $leads[$email]->getId(), $clickThrough['lead'], '"lead" parameter within the click through should match the contact\'s ID.');

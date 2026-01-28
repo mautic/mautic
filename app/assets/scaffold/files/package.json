@@ -6,10 +6,11 @@
     "grunt": "^1.6.1",
     "grunt-contrib-less": "^3.0.0",
     "grunt-contrib-watch": "^1.1.0",
-    "patch-package": "^7.0.0",
+    "patch-package": "^8.0.1",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@carbon/pictograms": "^12.50.0",
     "@ckeditor/ckeditor5-adapter-ckfinder": "^43.1.1",
     "@ckeditor/ckeditor5-alignment": "^43.1.1",
     "@ckeditor/ckeditor5-autoformat": "^43.1.1",

@@ -283,10 +283,10 @@
       ]
     },
     {
-      "login": "ts-navghane",
+      "login": "tejasync",
       "name": "Tejas Navghane",
       "avatar_url": "https://avatars.githubusercontent.com/u/54406786?v=4",
-      "profile": "https://github.com/ts-navghane",
+      "profile": "https://github.com/tejasync",
       "contributions": [
         "test",
         "code",
@@ -1531,6 +1531,142 @@
       "name": "Jun",
       "avatar_url": "https://avatars.githubusercontent.com/u/105675530?v=4",
       "profile": "https://github.com/1792826181",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "goma101",
+      "name": "Guilherme Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104629384?v=4",
+      "profile": "https://github.com/goma101",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "pedroasgomes",
+      "name": "Pedro Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99080726?v=4",
+      "profile": "https://github.com/pedroasgomes",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ElPollero",
+      "name": "ElPollero",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130322184?v=4",
+      "profile": "https://github.com/ElPollero",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "pelbox",
+      "name": "Gagandeep Singh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6670191?v=4",
+      "profile": "http://pelbox.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "PedroLoureiro1",
+      "name": "PedroLoureiro1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116733776?v=4",
+      "profile": "https://github.com/PedroLoureiro1",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "OlgaMarchuk",
+      "name": "OlgaMarchuk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/219189660?v=4",
+      "profile": "https://github.com/OlgaMarchuk",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "stone-creator",
+      "name": "Stone-creator",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1327019?v=4",
+      "profile": "https://github.com/stone-creator",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "lolaslade",
+      "name": "lolcode",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2320484?v=4",
+      "profile": "https://github.com/lolaslade",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rodrigoaguilera",
+      "name": "Rodrigo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/655187?v=4",
+      "profile": "https://www.rodrigoaguilera.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "DarshBhavnani",
+      "name": "Darsh Bhavnani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/131427031?v=4",
+      "profile": "https://github.com/DarshBhavnani",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "kou",
+      "name": "Sutou Kouhei",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27350?v=4",
+      "profile": "https://www.clear-code.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "naoya-kawakatsu",
+      "name": "naoya-kawakatsu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49386563?v=4",
+      "profile": "https://github.com/naoya-kawakatsu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "BeniShoga1",
+      "name": "Benisyoga",
+      "avatar_url": "https://avatars.githubusercontent.com/u/197698659?v=4",
+      "profile": "https://github.com/BeniShoga1",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "kniziol",
+      "name": "Krzysztof Nizioł",
+      "avatar_url": "https://avatars.githubusercontent.com/u/947620?v=4",
+      "profile": "https://niziol.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lexxxel",
+      "name": "Alexander Petermann",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5159138?v=4",
+      "profile": "http://extrahourdevs.com",
       "contributions": [
         "code"
       ]

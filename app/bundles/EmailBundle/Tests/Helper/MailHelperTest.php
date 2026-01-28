@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
@@ -100,6 +101,10 @@ class MailHelperTest extends TestCase
 
     private EntityManagerInterface&MockObject $entityManager;
 
+    private ModelFactory&MockObject $mockFactory;
+
+    private SMimeHelper&MockObject $sMimeHelper;
+
     /**
      * @var array<array<string,string|int>>
      */
@@ -149,6 +154,12 @@ class MailHelperTest extends TestCase
         $this->entityManager        = $this->createMock(EntityManagerInterface::class);
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->requestStack         = new RequestStack();
+        $this->mockFactory          = $this->createMock(ModelFactory::class);
+        $this->sMimeHelper          = $this->createMock(SMimeHelper::class);
+
+        // Configure SMimeHelper to return false for signing by default
+        $this->sMimeHelper->method('sMimeSigningEnabled')->willReturn(false);
+        $this->sMimeHelper->method('signContent')->willReturnArgument(0);
 
         $this->entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
@@ -162,7 +173,6 @@ class MailHelperTest extends TestCase
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
-                    ['mailer_spool_type', false, 'memory'],
                     ['mailer_address_length_limit', false, 320],
                 ]
             );
@@ -185,6 +195,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $batchMailHelper->enableQueue();
         $batchMailHelper->addTo('somebody@somewhere.com');
@@ -200,7 +211,6 @@ class MailHelperTest extends TestCase
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
-                    ['mailer_spool_type', false, 'memory'],
                 ]
             );
 
@@ -224,6 +234,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         try {
@@ -256,6 +267,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $singleMailHelper->enableQueue();
 
@@ -312,6 +324,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $singleMailHelper->enableQueue();
 
@@ -366,6 +379,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $email = new Email();
@@ -457,6 +471,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email  = new Email();
         $email->setUseOwnerAsMailer(true);
@@ -510,6 +525,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -569,6 +585,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $mailer->enableQueue();
         $mailer->setSubject('Hello');
@@ -609,6 +626,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -653,6 +671,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -694,6 +713,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -737,6 +757,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -784,6 +805,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $email = new Email();
@@ -812,9 +834,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideEmails
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmails')]
     public function testValidateEmails(string $email, bool $isValid): void
     {
         $helper = $this->mockEmptyMailHelper();
@@ -844,7 +864,7 @@ class MailHelperTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function provideEmails(): array
+    public static function provideEmails(): array
     {
         return [
             ['john@doe.com', true],
@@ -947,6 +967,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $mailer->setBody('{signature}');
         $mailer->addTo($this->contacts[0]['email']);
@@ -994,6 +1015,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $mailer->addTo($this->contacts[0]['email']);
 
@@ -1044,6 +1066,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $mailer->addTo($this->contacts[0]['email']);
         $mailer->setTokens([
@@ -1121,6 +1144,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $mailer->setIdHash('hash');
 
@@ -1187,6 +1211,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $mailer->setIdHash('hash');
 
@@ -1229,6 +1254,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
     }
 
@@ -1264,9 +1290,7 @@ class MailHelperTest extends TestCase
 
         $coreParametersHelper->method('get')->willReturnMap($parameterMap);
 
-        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockMailboxHelper = $this->createMock(Mailbox::class);
         $mockMailboxHelper->method('isConfigured')
             ->willReturn(false);
 
@@ -1302,6 +1326,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $mailer->setTo(['sombody@somewhere.com', 'sombodyelse@somewhere.com'], 'test');
@@ -1320,9 +1345,7 @@ class MailHelperTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider minifyHtmlDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('minifyHtmlDataProvider')]
     public function testMinifyHtml(bool $minifyHtml, string $html, string $expectedHtml): void
     {
         $params = [
@@ -1351,6 +1374,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $mailer->addTo($this->contacts[0]['email']);
@@ -1403,6 +1427,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $smtpMailHelper->addTo($this->contacts[0]['email']);
 
@@ -1426,6 +1451,7 @@ class MailHelperTest extends TestCase
             [
                 'To'                    => 'contact1@somewhere.com',
                 'From'                  => 'No Body <nobody@nowhere.com>',
+                'Sender'                => 'No Body <nobody@nowhere.com>',
                 'Reply-To'              => 'nobody@nowhere.com',
                 'Subject'               => 'Test',
                 'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
@@ -1471,6 +1497,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -1496,7 +1523,7 @@ class MailHelperTest extends TestCase
 
         $metadata = $transport->getMessage()->getMetadata();
         foreach ($this->contacts as $contact) {
-            Assert::assertSame($metadata[$contact['email']]['tokens']['{tracking_pixel}'], 'http://tracking.url');
+            Assert::assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
         }
     }
 
@@ -1535,6 +1562,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
         $email = new Email();
 
@@ -1563,7 +1591,7 @@ class MailHelperTest extends TestCase
             ['mailer_from_name', null, 'No Body'],
             ['mailer_address_length_limit', null, 30], // Set a small address length limit for testing
         ];
-        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+        $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -1585,6 +1613,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $longName = 'This is a very long name that exceeds the length limit';
@@ -1626,6 +1655,59 @@ class MailHelperTest extends TestCase
         $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
     }
 
+    public function testClearMetadataAfterSend(): void
+    {
+        $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
+
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->mockFactory,
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
+        );
+
+        $email = new Email();
+        $email->setSubject('Test Subject');
+        $email->setCustomHtml('Test content');
+        $mailer->setEmail($email);
+
+        // Add metadata to the message by setting lead and body
+        $contact = $this->contacts[0];
+        $mailer->addTo($contact['email']);
+        $mailer->setLead($contact);
+        $mailer->setBody('Test email body with {firstname} token');
+
+        // Manually add metadata to verify clearing functionality
+        $mailer->message->addMetadata($contact['email'], ['test' => 'metadata']);
+
+        // Verify metadata exists before sending
+        $metadataBeforeSend = $mailer->message->getMetadata();
+        $this->assertCount(1, $metadataBeforeSend, 'Metadata should exist before sending');
+
+        // Send the email
+        $mailer->send();
+
+        // Verify metadata is cleared after sending
+        $metadataAfterSend = $mailer->message->getMetadata();
+        $this->assertCount(0, $metadataAfterSend, 'Metadata should be cleared after sending to prevent memory leaks');
+    }
+
     public function testSetCcWithIndexedArray(): void
     {
         $symfonyMailer = new Mailer(new SmtpTransport());
@@ -1647,6 +1729,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $addresses = ['cc1@example.com', 'cc2@example.com'];
@@ -1683,6 +1766,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $addresses = [
@@ -1722,6 +1806,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $addresses = ['bcc1@example.com', 'bcc2@example.com'];
@@ -1758,6 +1843,7 @@ class MailHelperTest extends TestCase
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
         );
 
         $addresses = [

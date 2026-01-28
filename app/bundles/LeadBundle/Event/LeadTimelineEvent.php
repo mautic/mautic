@@ -29,9 +29,9 @@ class LeadTimelineEvent extends Event
      *  includeEvents => (array) event types to include
      *  excludeEvents => (array) event types to exclude.
      *
-     * @var array
+     * @var mixed[]
      */
-    protected $filters = [];
+    protected array $filters;
 
     /**
      * @var array<string, int>
@@ -479,7 +479,7 @@ class LeadTimelineEvent extends Event
     /**
      * Calculate engagement counts only.
      */
-    public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null): void
+    public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ?ChartQuery $chartQuery = null): void
     {
         $this->countOnly  = true;
         $this->dateFrom   = $dateFrom;

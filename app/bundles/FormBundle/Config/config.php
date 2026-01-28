@@ -36,6 +36,10 @@ return [
                     'format' => 'csv',
                 ],
             ],
+            'mautic_form_results_add_segment' => [
+                'path'       => '/forms/results/{objectId}/add-to-segment',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::addToSegmentAction',
+            ],
             'mautic_form_results_action' => [
                 'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
                 'controller' => 'Mautic\FormBundle\Controller\ResultController::executeAction',
@@ -190,7 +194,7 @@ return [
             ],
             'mautic.form.collector.already.mapped.field' => [
                 'class'     => Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
-                'arguments' => ['mautic.cache.provider'],
+                'arguments' => ['mautic.cache.provider_tag_aware'],
             ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,

@@ -15,7 +15,7 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : notification,
@@ -26,6 +26,7 @@
         'targetLabel'     : 'mautic.notification.notifications'|trans
     }
 ) -}}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -47,7 +48,7 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 height-auto">
+    <div class="col-md-7 col-lg-8 height-auto">
         <div>
             <!-- notification detail collapseable -->
             <div class="collapse pr-md pl-md" id="notification-details">
@@ -78,6 +79,18 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.web_sent',
+                                'value': notification.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.web_sent'|trans) ~ ':' ~ notification.id
+                                }),
+                                'icon': 'ri-notification-3-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
@@ -90,7 +103,7 @@
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}, with_context=false) }}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}, with_context=false) }}
                             </div>
                         </div>
@@ -135,7 +148,10 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-5 col-lg-4 height-auto">
+        <div class="pa-md mb-32 animation--slide-in-right">
+            {{ include('@MauticNotification/Notification/preview.html.twig') }}
+        </div>
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
     </div>

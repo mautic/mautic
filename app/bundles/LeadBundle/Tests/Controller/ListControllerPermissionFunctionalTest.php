@@ -138,9 +138,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Edit Segment - Segment Test', $crawler->html());
     }
 
-    /**
-     * @dataProvider dataSegmentCloneUserPermissions
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSegmentCloneUserPermissions')]
     public function testSegmentCloningOwnedSegmentWithDifferentPermissions(string $name, int $perm, int $expected): void
     {
         $user = $this->createUser(
@@ -167,7 +165,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, mixed[]>
      */
-    public function dataSegmentCloneUserPermissions(): iterable
+    public static function dataSegmentCloneUserPermissions(): iterable
     {
         yield 'Only create' => ['user-clone-1', 32, Response::HTTP_FORBIDDEN];
         yield 'Create and View own' => ['user-clone-2', 34, Response::HTTP_OK];
@@ -598,6 +596,78 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $this->assertStringContainsString("{$lead->getPrimaryIdentifier()} is currently checked out by", $crawler->html());
+    }
+
+    public function testUserCanPublishOwnSegmentWithPermission(): void
+    {
+        $userDetails = [
+            'user-name'  => 'testuser_publish',
+            'first-name' => 'Test',
+            'last-name'  => 'Publisher',
+            'email'      => 'testuser_publish@example.com',
+            'role'       => [
+                'name'     => 'Can Publish Own Segments',
+                'perm'     => 'lead:lists',
+                'bitwise'  => 382,  // View own&other, Edit own&other, Create, Delete One, Publish Own
+            ],
+        ];
+
+        $user = $this->createUser($userDetails);
+        $this->loginOtherUser($user->getUserIdentifier());
+
+        $segment = $this->createSegment('My Segment to Publish', $user);
+
+        $this->assertTrue($segment->isPublished());
+
+        $this->client->request(
+            'POST',
+            '/s/ajax',
+            [
+                'action' => 'togglePublishStatus',
+                'model'  => 'lead.list',
+                'id'     => $segment->getId(),
+            ]
+        );
+
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+
+        $this->em->refresh($segment);
+        $this->assertFalse($segment->isPublished());
+    }
+
+    public function testUserCannotPublishOwnSegmentWithoutPermission(): void
+    {
+        $userDetails = [
+            'user-name'  => 'testuser_nopublish',
+            'first-name' => 'Test',
+            'last-name'  => 'NoPublisher',
+            'email'      => 'testuser_nopublish@example.com',
+            'role'       => [
+                'name'     => 'No Publish Permission',
+                'perm'     => 'lead:lists',
+                'bitwise'  => 126,  // View own&other, Edit own&other, Create, Delete One
+            ],
+        ];
+
+        $user = $this->createUser($userDetails);
+        $this->loginOtherUser($user->getUserIdentifier());
+
+        $segment = $this->createSegment('Segment Without Publish', $user);
+
+        $this->client->request(
+            'POST',
+            '/s/ajax',
+            [
+                'action' => 'togglePublishStatus',
+                'model'  => 'lead.list',
+                'id'     => $segment->getId(),
+            ]
+        );
+
+        $this->assertEquals(403, $this->client->getResponse()->getStatusCode());
+
+        $this->em->refresh($segment);
+        $this->assertTrue($segment->isPublished());
     }
 
     private function loginOtherUser(string $name): void

@@ -135,7 +135,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
-    private function createEmail(string $name, string $subject, string $emailType, int $segmentId = null): int
+    private function createEmail(string $name, string $subject, string $emailType, ?int $segmentId = null): int
     {
         $payload = [
             'name'       => $name,

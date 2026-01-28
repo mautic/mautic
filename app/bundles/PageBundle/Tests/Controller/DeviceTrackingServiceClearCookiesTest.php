@@ -14,7 +14,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
     /**
      * @return array<string, array{bool}>
      */
-    public function blockedTrackingCookieDataProvider(): array
+    public static function blockedTrackingCookieDataProvider(): array
     {
         return [
             'with blocked tracking cookie'    => [true],
@@ -22,9 +22,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
         ];
     }
 
-    /**
-     * @dataProvider blockedTrackingCookieDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('blockedTrackingCookieDataProvider')]
     public function testClearTrackingCookiesBehavior(bool $shouldClearCookies): void
     {
         $this->logoutUser();

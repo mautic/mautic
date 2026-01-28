@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
@@ -35,6 +36,7 @@ use Mautic\LeadBundle\Form\Type\UpdateCompanyActionType;
 use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -339,8 +341,22 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $lead   = $log->getLead();
         $fields = $lead->getFields(true);
+
         try {
-            $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $values), false);
+            $tokenizedValues = [];
+            foreach ($values as $field => $value) {
+                if (is_string($value)) {
+                    $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                    $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
+                    if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($tokenizedValue) > $charLimit) {
+                        $tokenizedValue = mb_substr($tokenizedValue, 0, $charLimit);
+                    }
+                    $tokenizedValues[$field] = $tokenizedValue;
+                } else {
+                    $tokenizedValues[$field] = $value;
+                }
+            }
+            $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
         } catch (ImportFailedException $e) {
             $event->fail($log, $e->getMessage());
         }
@@ -352,9 +368,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
         }
 
-        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $values), false);
+        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
         $this->leadModel->saveEntity($lead);
-
         $event->pass($log);
     }
 
@@ -475,33 +490,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext('lead.device')) {
-            $deviceRepo = $this->leadModel->getDeviceRepository();
-            $result     = false;
-
-            $deviceType   = $event->getConfig()['device_type'];
-            $deviceBrands = $event->getConfig()['device_brand'];
-            $deviceOs     = $event->getConfig()['device_os'];
-
-            if (!empty($deviceType)) {
-                $result = false;
-                if (!empty($deviceRepo->getDevice($lead, $deviceType))) {
-                    $result = true;
-                }
-            }
-
-            if (!empty($deviceBrands)) {
-                $result = false;
-                if (!empty($deviceRepo->getDevice($lead, null, $deviceBrands))) {
-                    $result = true;
-                }
-            }
-
-            if (!empty($deviceOs)) {
-                $result = false;
-                if (!empty($deviceRepo->getDevice($lead, null, null, null, $deviceOs))) {
-                    $result = true;
-                }
-            }
+            $result = $this->validateContactDevice($event, $lead, $this->leadModel->getDeviceRepository());
         } elseif ($event->checkContext('lead.tags')) {
             $tagRepo = $this->leadModel->getTagRepository();
             $result  = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
@@ -517,7 +506,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
-                $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
+                $triggerDate = new \DateTime('now',
+                    new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (str_contains($event->getConfig()['value'], '+P')) { // add date
@@ -537,17 +527,32 @@ class CampaignSubscriber implements EventSubscriberInterface
             } else {
                 $operators = OperatorOptions::getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
-                $value     = $event->getConfig()['value'];
+                $value     = $event->getConfig()['value'] ?? '';
+                $operator  = $event->getConfig()['operator'];
                 $fields    = $this->getFields($lead);
 
-                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
-                $result     = $this->leadFieldModel->getRepository()->compareValue(
-                    $lead->getId(),
-                    $field,
-                    $fieldValue,
-                    $operators[$event->getConfig()['operator']]['expr'],
-                    $fields[$field]['type'] ?? null
-                );
+                $fieldType  = '';
+                $fieldValue = $value;
+                if (isset($fields[$field])) {
+                    $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value);
+                    $fieldType  = $fields[$field]['type'];
+                }
+
+                // Preventing date/datetime fields to fail on empty/notEmpty
+                if (in_array($fieldType, ['date', 'datetime']) && in_array($operator, ['empty', '!empty'])) {
+                    $result     = $this->leadFieldModel->getRepository()->compareEmptyDateValue(
+                        $lead->getId(),
+                        $field,
+                        $operators[$operator]['expr']
+                    );
+                } else {
+                    $result     = $this->leadFieldModel->getRepository()->compareValue(
+                        $lead->getId(),
+                        $field,
+                        $fieldValue,
+                        $operators[$operator]['expr']
+                    );
+                }
             }
         } elseif ($event->checkContext('lead.dnc')) {
             $channels  = $event->getConfig()['channels'];
@@ -700,5 +705,20 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         return $this->fields;
+    }
+
+    /**
+     * It returns true if contact device matches
+     * device specified in the
+     * CampaignExecutionEvent's settings.
+     */
+    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact, LeadDeviceRepository $leadDeviceRepository): bool // @phpstan-ignore parameter.deprecatedClass
+    {
+        $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
+        $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];
+        $deviceBrands                 = empty($campaignExecutionEventConfig['device_brand']) ? null : $campaignExecutionEventConfig['device_brand'];
+        $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];
+
+        return !empty($leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
     }
 }

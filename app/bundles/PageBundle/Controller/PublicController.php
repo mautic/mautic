@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -22,14 +23,18 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
+use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
+use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -43,7 +48,7 @@ class PublicController extends AbstractFormController
      * @return Response
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function indexAction(
         Request $request,
@@ -55,17 +60,15 @@ class PublicController extends AbstractFormController
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
+        PageModel $model,
         $slug)
     {
-        /** @var PageModel $model */
-        $model    = $this->getModel('page');
-        $security = $this->security;
         /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         // Do not hit preference center pages
         if (!empty($entity) && !$entity->getIsPreferenceCenter()) {
-            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
+            $userAccess = $this->security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
             $published  = $entity->isPublished();
 
             // Make sure the page is published or deny access if not
@@ -313,53 +316,48 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return mixed[]|JsonResponse|RedirectResponse|Response
      *
-     * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id)
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null)
     {
-        $contactId = (int) $request->query->get('contactId');
-
-        if ($contactId) {
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead.lead');
-            /** @var Lead $contact */
-            $contact = $leadModel->getEntity($contactId);
-        }
-
-        /** @var PageModel $model */
-        $model = $this->getModel('page');
-        /** @var Page $page */
         $page = $model->getEntity($id);
 
-        if (!$page->getId()) {
+        if (!$page || !$page->getId()) {
             return $this->notFound();
         }
 
-        $analytics = $analyticsHelper->getCode();
+        $contactId = (int) $request->query->get('contactId');
+        if ($contactId) {
+            $contact = $leadModel->getEntity($contactId);
+        }
+        $draftEnabled = $pageConfig->isDraftEnabled();
+        $analytics    = $analyticsHelper->getCode();
 
-        $BCcontent = $page->getContent();
-        $content   = $page->getCustomHtml();
+        $BCcontent     = $page->getContent();
+        $content       = $page->getCustomHtml();
+        $publicPreview = $page->isPublicPreview();
 
-        if (!$security->isAdmin()
-            && (
-                (!$page->isPublished())
-                || (!$security->hasEntityAccess(
-                    'page:pages:viewown',
-                    'page:pages:viewother',
-                    $page->getCreatedBy()
-                )))
-        ) {
+        if ('draft' === $objectType && $draftEnabled && $page->hasDraft()) {
+            $content       = $page->getDraftContent();
+            $publicPreview = $page->getDraft()->isPublicPreview();
+        }
+
+        if (($security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$security->isAnonymous(
+        ) && !$security->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $page->getCreatedBy()
+        ))) {
             return $this->accessDenied();
         }
 
-        if ($contactId && (
-            !$security->isAdmin()
-            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-        )
-        ) {
+        if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother'
+        ))) {
+            // disallow displaying contact information
             return $this->accessDenied();
         }
 
@@ -402,15 +400,8 @@ class PublicController extends AbstractFormController
         return new Response($content);
     }
 
-    /**
-     * @return Response
-     *
-     * @throws \Exception
-     */
-    public function trackingImageAction(Request $request)
+    public function trackingImageAction(Request $request, PageModel $model): Response
     {
-        /** @var PageModel $model */
-        $model = $this->getModel('page');
         $model->hitPage(null, $request);
 
         return TrackingPixelHelper::getResponse($request);
@@ -418,14 +409,13 @@ class PublicController extends AbstractFormController
 
     /**
      * @return JsonResponse
-     *
-     * @throws \Exception
      */
     public function trackingAction(
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
         ContactTracker $contactTracker,
+        PageModel $model,
     ) {
         $notSuccessResponse = new JsonResponse(
             [
@@ -435,9 +425,6 @@ class PublicController extends AbstractFormController
         if (!$this->security->isAnonymous()) {
             return $notSuccessResponse;
         }
-
-        /** @var PageModel $model */
-        $model = $this->getModel('page');
 
         try {
             $model->hitPage(null, $request);
@@ -475,13 +462,13 @@ class PublicController extends AbstractFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
+        RedirectModel $redirectModel,
+        PageModel $pageModel,
         $redirectId,
-    ): \Symfony\Component\HttpFoundation\RedirectResponse {
+    ): RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->getModel('page.redirect');
-        $redirect      = $redirectModel->getRedirectById($redirectId);
+        $redirect = $redirectModel->getRedirectById($redirectId);
 
         $logger->debug('Executing Redirect: '.$redirect);
 
@@ -499,7 +486,12 @@ class PublicController extends AbstractFormController
         // Get query string
         $query = $request->query->all();
 
-        $ct = $query['ct'] ?? null;
+        $ct = null;
+        // Remove click-trough parameter, so it won't be duplicated later.
+        if (isset($query['ct'])) {
+            $ct = $query['ct'];
+            unset($query['ct']);
+        }
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -511,15 +503,9 @@ class PublicController extends AbstractFormController
         $ipAddress = $ipLookupHelper->getIpAddress();
 
         $isHitTrackable = false;
-        if ($ct) {
+        if (null !== $ct && '' !== $ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
-                /** @var LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
-
-                /** @var PageModel $pageModel */
-                $pageModel = $this->getModel('page');
-
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
@@ -529,19 +515,25 @@ class PublicController extends AbstractFormController
 
                     $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
-                    $request->request->set('ct', '');
-                    $request->query->set('ct', '');
+                    $request->request->remove('ct');
+                    $request->query->remove('ct');
                     $lead           = $contactRequestHelper->getContactFromQuery();
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
 
-                $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+                if ($lead) {
+                    $leadArray = $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+                    $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
 
-                $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+                    // Dispatch URL token replace event to allow modifications
+                    $urlEvent = new UrlTokenReplaceEvent($url, $lead, null);
+                    $this->dispatcher->dispatch($urlEvent);
+                    $url = $urlEvent->getContent();
+                }
             }
 
             if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
-                if (strpos($url, '&')) {
+                if (str_contains($url, '?')) {
                     $url .= '&ct='.$ct;
                 } else {
                     $url .= '?ct='.$ct;
@@ -564,13 +556,10 @@ class PublicController extends AbstractFormController
     /**
      * Track video views.
      */
-    public function hitVideoAction(Request $request): JsonResponse|Response
+    public function hitVideoAction(Request $request, VideoModel $model): JsonResponse|Response
     {
         // Only track XMLHttpRequests, because the hit should only come from there
         if ($request->isXmlHttpRequest()) {
-            /** @var VideoModel $model */
-            $model = $this->getModel('page.video');
-
             try {
                 $model->hitVideo($request);
             } catch (\Exception) {

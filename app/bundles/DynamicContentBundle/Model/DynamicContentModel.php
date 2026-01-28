@@ -49,6 +49,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $repo = $this->em->getRepository(DynamicContent::class);
 
         $repo->setTranslator($this->translator);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
     }
@@ -79,6 +80,34 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         }
 
         return parent::getEntity($id);
+    }
+
+    public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '=',
+        ?int $skipId = null): bool
+    {
+        $qb = $this->em->getConnection()->createQueryBuilder();
+
+        $qb->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content')
+            ->where($qb->expr()->eq('slot_name', ':slot_name'))
+            ->setParameter('slot_name', $slotName)
+            ->setMaxResults(1);
+
+        if (!empty($type)) {
+            if (!in_array($typeCondition, ['=', '<>', '!='], true)) {
+                throw new \InvalidArgumentException("Invalid operator '$typeCondition'");
+            }
+
+            $qb->andWhere("type {$typeCondition} :type");
+            $qb->setParameter('type', $type);
+        }
+
+        if (null !== $skipId) {
+            $qb->andWhere('id != :id');
+            $qb->setParameter('id', $skipId);
+        }
+
+        return (bool) $qb->executeQuery()->fetchOne();
     }
 
     /**
@@ -183,7 +212,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);

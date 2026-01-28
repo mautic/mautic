@@ -28,7 +28,7 @@
   &:after {
     display: flex;
     content: "";
-    width: 5px;
+    width: 3px;
     height: 100%;
     position: absolute;
     left: 0;
@@ -153,23 +153,34 @@
   }
 
   &--warning {
-    border-left-color: @brand-warning;
+    border-left-color: var(--support-warning);
 
     a {
-      color: @brand-warning;
+      color: var(--support-warning);
       &:hover {
-        color: lighten(@brand-warning, 20%);
+        color: var(--support-warning-inverse);
       }
     }
   }
 
   &--error {
-    border-left-color: @brand-danger;
+    border-left-color: var(--support-error);
 
     a {
-      color: @brand-danger;
+      color: var(--support-error);
       &:hover {
-        color: lighten(@brand-danger, 20%);
+        color: var(--support-error-inverse);
+      }
+    }
+  }
+
+  &--success {
+    border-left-color: var(--support-success);
+
+    a {
+      color: var(--support-success);
+      &:hover {
+        color: var(--support-success-inverse);
       }
     }
   }

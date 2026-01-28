@@ -18,6 +18,8 @@ class FlashBag
 
     public const LEVEL_NOTICE    = 'notice';
 
+    public const LEVEL_SUCCESS   = 'success';
+
     public function __construct(
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
@@ -53,7 +55,8 @@ class FlashBag
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             $iconClass = match ($level) {
                 self::LEVEL_WARNING => 'text-warning ri-alert-line',
-                self::LEVEL_ERROR   => 'text-danger ri-error-warning-line-circle',
+                self::LEVEL_ERROR   => 'text-danger ri-error-warning-line',
+                self::LEVEL_SUCCESS => 'text-success ri-check-line',
                 default             => 'ri-information-2-line',
             };
 

@@ -51,7 +51,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $reason
      */
-    public function fail(LeadEventLog $log, $reason, \DateInterval $rescheduleInterval = null): void
+    public function fail(LeadEventLog $log, $reason, ?\DateInterval $rescheduleInterval = null): void
     {
         if (!$failedLog = $log->getFailedLog()) {
             $failedLog = new FailedLeadEventLog();

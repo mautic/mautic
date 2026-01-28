@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\AbstractFormFieldHelper::class)]
 class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -40,11 +41,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $this->companyDeduper = $this->createMock(CompanyDeduper::class);
     }
 
-    /**
-     * @testdox Ensure that an array value is flattened before saving
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Ensure that an array value is flattened before saving')]
     public function testArrayValueIsFlattenedBeforeSave(): void
     {
         /** @var CompanyModel $companyModel */
@@ -100,7 +97,46 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
-        $duplicatedCompany->expects($this->exactly(1))->method('addUpdatedField');
+        $duplicatedCompany->expects($this->once())->method('addUpdatedField');
+        $companyModel->importCompany([], [], null, false, false);
+    }
+
+    public function testImportHtmlFieldsForCompany(): void
+    {
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['fetchCompanyFields', 'getFieldData'])
+            ->getMock();
+
+        $companyModel->method('fetchCompanyFields')->willReturn(
+            [
+                [
+                    'alias'        => 'companyfield',
+                    'defaultValue' => '',
+                    'type'         => 'text',
+                ],
+                [
+                    'alias'        => 'custom_html_field',
+                    'defaultValue' => '',
+                    'type'         => 'html',
+                ],
+            ]
+        );
+
+        $data = ['companyfield' => 'test', 'custom_html_field' => '<p>html content</p>'];
+        $companyModel->method('getFieldData')
+            ->willReturn($data);
+        $this->setSecurity($companyModel);
+
+        $companyModel->method('getFieldData')->willReturn($data);
+
+        $duplicatedCompany = $this->createMock(Company::class);
+        $duplicatedCompany->method('getProfileFields')->willReturn($data);
+
+        $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
+        $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
+
+        $duplicatedCompany->expects($this->exactly(2))->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
     }
 
@@ -159,11 +195,11 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $companyModel->method('fetchCompanyFields')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['alias' => 'companyname'],
                 ['alias' => 'companyemail'],
                 ['alias' => 'companyindustry'],
-            ]));
+            ]);
 
         $fields = [
             'email'           => 'i_contact_email',

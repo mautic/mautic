@@ -155,7 +155,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -357,7 +357,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * Set user preference.
      */
-    public function setPreference($key, $value = null, User $user = null): void
+    public function setPreference($key, $value = null, ?User $user = null): void
     {
         if (null == $user) {
             $user = $this->userHelper->getUser();
@@ -374,7 +374,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * Get user preference.
      */
-    public function getPreference($key, $default = null, User $user = null)
+    public function getPreference($key, $default = null, ?User $user = null)
     {
         if (null == $user) {
             $user = $this->userHelper->getUser();

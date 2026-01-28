@@ -411,6 +411,10 @@
 
 .pi-16, .pi-md { padding-inline: var(--spacing-05) !important; }
 .mi-16, .mi-md { margin-inline: var(--spacing-05) !important; }
+.pi-neg-local { padding-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.mi-neg-local { margin-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.ma-neg-local { margin: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+
 
 //fixed widths
 .w-44 {width: 44px;}
@@ -441,6 +445,33 @@
 .h-448 { height: 448px; }
 .h-512 { height: 512px; }
 .h-640 { height: 640px; }
+
+// Fixed min-heights
+.min-h-4 { min-height: 4px; }
+.min-h-8 { min-height: 8px; }
+.min-h-12 { min-height: 12px; }
+.min-h-16 { min-height: 16px; }
+.min-h-24 { min-height: 24px; }
+.min-h-32 { min-height: 32px; }
+.min-h-40 { min-height: 40px; }
+.min-h-48 { min-height: 48px; }
+.min-h-56 { min-height: 56px; }
+.min-h-64 { min-height: 64px; }
+.min-h-80 { min-height: 80px; }
+.min-h-96 { min-height: 96px; }
+.min-h-112 { min-height: 112px; }
+.min-h-128 { min-height: 128px; }
+.min-h-144 { min-height: 144px; }
+.min-h-160 { min-height: 160px; }
+.min-h-192 { min-height: 192px; }
+.min-h-224 { min-height: 224px; }
+.min-h-256 { min-height: 256px; }
+.min-h-288 { min-height: 288px; }
+.min-h-320 { min-height: 320px; }
+.min-h-384 { min-height: 384px; }
+.min-h-448 { min-height: 448px; }
+.min-h-512 { min-height: 512px; }
+.min-h-640 { min-height: 640px; }
 
 // disable focus ring
 // ---------------------------------------------
@@ -534,6 +565,16 @@
 .gap-2 { gap: 2px !important; }
 .gap-1 { gap: 1px !important; }
 .gap-0 { gap: 0px !important; }
+
+.row-gap-20, .row-gap-lg { row-gap: 20px !important; }
+.row-gap-15, .row-gap-md { row-gap: 15px !important; }
+.row-gap-10, .row-gap-sm { row-gap: 10px !important; }
+.row-gap-5, .row-gap-xs { row-gap: 5px !important; }
+
+.column-gap-20, .column-gap-lg { column-gap: 20px !important; }
+.column-gap-15, .column-gap-md { column-gap: 15px !important; }
+.column-gap-10, .column-gap-sm { column-gap: 10px !important; }
+.column-gap-5, .column-gap-xs { column-gap: 5px !important; }
 
 @media (min-width: @screen-sm-min) {
   .fd-row-sm { flex-direction: row; }
@@ -669,3 +710,88 @@
   .fo-4-lg { order: 4; }
   .fo-5-lg { order: 5; }
 }
+
+// Aspect ratio
+.ar-16-9 { aspect-ratio: 16 / 9; }
+.ar-2-1 { aspect-ratio: 2 / 1; }
+.ar-1-1 { aspect-ratio: 1 / 1; }
+
+// Animations
+// Slide in
+
+.animation--slide-in-up { animation: animationSlideInUp var(--duration-expressive) forwards; }
+.animation--slide-in-down { animation: animationSlideInDown var(--duration-expressive) forwards; }
+.animation--slide-in-left { animation: animationSlideInLeft var(--duration-expressive) forwards; }
+.animation--slide-in-right { animation: animationSlideInRight var(--duration-expressive) forwards; }
+
+.animation--slide-scale-in-up { animation: animationSlideScaleInUp var(--duration-expressive) forwards; }
+.animation--slide-scale-in-down { animation: animationSlideScaleInDown var(--duration-expressive) forwards; } 
+.animation--slide-scale-in-left { animation: animationSlideScaleInLeft var(--duration-expressive) forwards; }
+.animation--slide-scale-in-right { animation: animationSlideScaleInRight var(--duration-expressive) forwards; }
+
+// Scale animations
+.animation--grow { 
+  transition: transform var(--duration-expressive);
+  &:hover { transform: scale(1.02); }
+}
+.animation--shrink { 
+  transition: transform var(--duration-expressive);
+  &:hover { transform: scale(0.9); }
+}
+.animation--grow-in { 
+  transform: scale(0);
+  transition: transform var(--duration-expressive);
+  &.active { transform: scale(1); }
+}
+.animation--shrink-out { 
+  transform: scale(1);
+  transition: transform var(--duration-expressive);
+  &.active { transform: scale(0); }
+}
+
+@keyframes animationSlideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes animationSlideInDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes animationSlideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes animationSlideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInUp {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInDown {
+  from { transform: translateY(-20px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInLeft {
+  from { transform: translateX(-20px) scale(0.95); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInRight {
+  from { transform: translateX(20px) scale(0.95); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+/// Aspect ratio
+.as-1-1 { aspect-ratio: 1 / 1; }
+.as-2-1 { aspect-ratio: 2 / 1; }
+.as-3-2 { aspect-ratio: 3 / 2; }
+.as-4-3 { aspect-ratio: 4 / 3; }
+.as-16-9 { aspect-ratio: 16 / 9; }

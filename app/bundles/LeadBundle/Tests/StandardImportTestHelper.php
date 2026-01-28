@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
@@ -73,7 +74,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         $file    = fopen($tmpFile, 'w');
 
         foreach (self::$initialList as $line) {
-            fputcsv($file, $line);
+            CsvHelper::putCsv($file, $line);
         }
 
         fclose($file);
@@ -84,10 +85,10 @@ abstract class StandardImportTestHelper extends CommonMocks
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_large_test_');
         $file    = fopen($tmpFile, 'w');
-        fputcsv($file, ['email', 'firstname', 'lastname']);
+        CsvHelper::putCsv($file, ['email', 'firstname', 'lastname']);
         $counter = 510;
         while ($counter) {
-            fputcsv($file, [uniqid().'@gmail.com', uniqid(), uniqid()]);
+            CsvHelper::putCsv($file, [uniqid().'@gmail.com', uniqid(), uniqid()]);
 
             --$counter;
         }
@@ -106,7 +107,7 @@ abstract class StandardImportTestHelper extends CommonMocks
     /**
      * @return Import&MockObject
      */
-    protected function initImportEntity(array $methods = null)
+    protected function initImportEntity(?array $methods = null)
     {
         /** @var Import&MockObject $entity */
         $entity = $this->getMockBuilder(Import::class)
@@ -154,13 +155,11 @@ abstract class StandardImportTestHelper extends CommonMocks
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
-                        [Import::class, $importRepository],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
+                    [Import::class, $importRepository],
+                ]
             );
 
         $this->entityManager->expects($this->any())

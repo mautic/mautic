@@ -67,7 +67,7 @@ abstract class AbstractFormController extends CommonController
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);
-        $returnUrl              = $postActionVars['returnUrl'];
+        $returnUrl              = $postActionVars['returnUrl'] ?? null;
         $override               = '';
 
         $modelClass             = $this->getModel($model);
@@ -268,5 +268,24 @@ abstract class AbstractFormController extends CommonController
         \assert($form instanceof ClickableInterface);
 
         return $form;
+    }
+
+    protected function isButtonClicked(FormInterface $form, string $name): bool
+    {
+        return $form->get('buttons')->has($name) && $this->getFormButton($form, ['buttons', $name])->isClicked();
+    }
+
+    /**
+     * @param string[] $names
+     */
+    protected function isAnyOfButtonsClicked(FormInterface $form, array $names): bool
+    {
+        foreach ($names as $name) {
+            if ($this->isButtonClicked($form, $name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

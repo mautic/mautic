@@ -78,10 +78,6 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
 
     // Handle popover shown event
     mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
-        // Initialize code blocks after popover is fully shown
-        Mautic.initializeCodeBlocks();
-
-        // Initialize other elements inside popover
         mQuery('.popover-content select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
@@ -96,7 +92,6 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    Mautic.initializeCodeBlocks();
 });
 
 mQuery( document ).ready(function() {
@@ -125,15 +120,6 @@ mQuery( document ).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    // Copy code blocks when clicked
-    mQuery(document).on('click', 'code', function(e) {
-        e.preventDefault();
-        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
-            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
-            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
-        });
-    });
-    Mautic.initializeCodeBlocks();
     Mautic.attachDismissHandlers();
 });
 
@@ -370,19 +356,6 @@ var Mautic = {
             modalWindow.modal();
         });
 
-    },
-
-    /**
-     * Copy code blocks when clicked
-     *
-     */
-    initializeCodeBlocks: function () {
-        mQuery('code').each(function() {
-            var $codeBlock = mQuery(this);
-            if (!$codeBlock.find('.copy-icon').length) {
-                $codeBlock.append('<i class="ri-clipboard-fill copy-icon"></i>');
-            }
-        });
     },
 
     /**
@@ -795,7 +768,7 @@ var Mautic = {
      * @param textStatus
      * @param errorThrown
      */
-    processAjaxError: function (request, textStatus, errorThrown, mainContent) {
+    processAjaxError: function (request, textStatus, errorThrown, mainContent, target) {
         if (textStatus == 'abort') {
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
@@ -850,6 +823,11 @@ var Mautic = {
                 mQuery('.modal.in .modal-body-content').removeClass('hide');
                 if (mQuery('.modal.in  .loading-placeholder').length) {
                     mQuery('.modal.in  .loading-placeholder').addClass('hide');
+                }
+            } else if (response.closeModal) {
+                if (typeof target !== "undefined") {
+                    mQuery('body').removeClass('noscroll');
+                    mQuery(target).modal('hide');
                 }
             } else if (inDevMode) {
                 console.log(response);

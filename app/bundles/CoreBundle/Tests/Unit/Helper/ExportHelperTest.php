@@ -8,25 +8,21 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translatorInterfaceMock;
+    private MockObject&TranslatorInterface $translatorInterfaceMock;
 
-    /**
-     * @var MockObject|CoreParametersHelper
-     */
-    private MockObject $coreParametersHelperMock;
+    private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
     private ExportHelper $exportHelper;
 
@@ -53,20 +49,22 @@ class ExportHelperTest extends TestCase
      */
     private array $filePaths = [];
 
-    /**
-     * @var FilePathResolver|MockObject
-     */
-    private MockObject $filePathResolver;
+    private MockObject&FilePathResolver $filePathResolver;
+    private MockObject&ProcessSignalService $processSignalService;
 
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
+        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
+
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
-            $this->filePathResolver
+            $this->filePathResolver,
+            $this->processSignalService,
+            $this->createMock(EventDispatcherInterface::class),
         );
     }
 
@@ -78,6 +76,101 @@ class ExportHelperTest extends TestCase
             }
         }
         parent::tearDown();
+    }
+
+    public function testDownloadAsZip(): void
+    {
+        $tempDir     = sys_get_temp_dir();
+        $zipFilePath = $tempDir.'/test-download.zip';
+        $zip         = new \ZipArchive();
+        $zip->open($zipFilePath, \ZipArchive::CREATE);
+        $zip->addFromString('test.txt', 'This is test content');
+        $zip->close();
+
+        $this->filePaths[] = $zipFilePath;
+
+        $response = $this->exportHelper->downloadAsZip($zipFilePath, 'exported.zip');
+
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testWriteToZipFileIncludesAssets(): void
+    {
+        $tempDir = sys_get_temp_dir();
+
+        // Create temporary asset files
+        $assetFilePath1 = tempnam($tempDir, 'asset_test1');
+        file_put_contents($assetFilePath1, 'Asset content 1');
+
+        $assetFilePath2 = tempnam($tempDir, 'asset_test2');
+        file_put_contents($assetFilePath2, 'Asset content 2');
+
+        $assetList  = [$assetFilePath1, $assetFilePath2];
+        $jsonOutput = json_encode(['key' => 'value']);
+
+        // Call the method
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+
+        // Open the ZIP file and verify contents
+        $zip = new \ZipArchive();
+        $zip->open($zipFilePath);
+
+        $this->assertTrue(false !== $zip->locateName('entity_data.json'));
+        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath2)));
+
+        $zip->close();
+
+        // Clean up
+        unlink($assetFilePath1);
+        unlink($assetFilePath2);
+        unlink($zipFilePath);
+    }
+
+    public function testWriteToZipFileIncludesAssetsWithCustomPath(): void
+    {
+        $filesystem = new \Symfony\Component\Filesystem\Filesystem();
+        $tempDir    = sys_get_temp_dir();
+        $customDir  = $tempDir.'/export_test_'.uniqid();
+        $filesystem->mkdir($customDir);
+
+        // Create temporary asset files
+        $assetFilePath1 = tempnam($tempDir, 'asset_test1');
+        file_put_contents($assetFilePath1, 'Asset content 1');
+
+        $assetFilePath2 = tempnam($tempDir, 'asset_test2');
+        file_put_contents($assetFilePath2, 'Asset content 2');
+
+        $assetList  = [$assetFilePath1, $assetFilePath2];
+        $jsonOutput = json_encode(['key' => 'value']);
+
+        // Pre-create entity_data.json to trigger unlink in method
+        $jsonFilePath = sprintf('%s/entity_data.json', $customDir);
+        file_put_contents($jsonFilePath, 'Old content');
+        $this->assertFileExists($jsonFilePath);
+
+        // Call the method with custom path
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, $customDir);
+
+        $this->assertFileExists($zipFilePath);
+        $this->assertStringStartsWith($customDir, $zipFilePath);
+
+        // Open the ZIP file and verify contents
+        $zip = new \ZipArchive();
+        $zip->open($zipFilePath);
+
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath2)));
+
+        $zip->close();
+        $this->assertFileDoesNotExist($jsonFilePath);
+
+        // Clean up using Symfony Filesystem
+        $filesystem->remove([$assetFilePath1, $assetFilePath2, $zipFilePath, $customDir]);
     }
 
     /**

@@ -14,13 +14,14 @@ import grapesjsckeditor from './plugins/grapesjs.ckeditor';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
-import StorageService from "./storage.service";
+import StorageService from './storage.service';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
 // import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 
 import CodeModeButton from './codeMode/codeMode.button';
+import CompCopyPaste from './commands/compCopyPaste';
 import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 
 export default class BuilderService {
@@ -86,6 +87,10 @@ export default class BuilderService {
         url: this.assetService.getDeletePath(),
         data: { filename: response.getFilename() },
       });
+    });
+
+    this.editor.on('asset:upload:error', (error) => {
+      Mautic.setFlashes(Mautic.addErrorFlashMessage(error));
     });
 
     this.editor.on('asset:open', () => {
@@ -192,6 +197,12 @@ export default class BuilderService {
     const codeModeButton = new CodeModeButton(this.editor);
     codeModeButton.addCommand();
     codeModeButton.addButton();
+
+    /**
+     * Add command that will allow users
+     * to copy paste component across tabs
+     */
+    new CompCopyPaste(this.editor).addCommand();
 
     this.storageService = new StorageService(this.editor, object);
     this.setListeners();

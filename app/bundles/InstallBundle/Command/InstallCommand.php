@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,6 +20,10 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * CLI Command to install Mautic.
  */
+#[AsCommand(
+    name: InstallCommand::COMMAND,
+    description: 'Installs Mautic'
+)]
 class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
@@ -450,6 +455,4 @@ class InstallCommand extends Command
             $output->writeln("  - [$type] $message");
         }
     }
-
-    protected static $defaultDescription = 'Installs Mautic';
 }

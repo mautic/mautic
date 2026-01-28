@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\FieldList;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -30,9 +30,8 @@ class FieldModelTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, mixed[]> $filters
-     *
-     * @dataProvider dataForGetFieldsProperties
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
@@ -56,7 +55,7 @@ class FieldModelTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, mixed[]>
      */
-    public function dataForGetFieldsProperties(): iterable
+    public static function dataForGetFieldsProperties(): iterable
     {
         // When mautic is installed the total number of fields are 42.
         yield 'All fields' => [
@@ -170,6 +169,50 @@ class FieldModelTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getColumns('companies', $companyField2->getAlias()));
     }
 
+    public function testGenerateUniqueFieldAlias(): void
+    {
+        $repoMock = $this->getMockBuilder(LeadFieldRepository::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['__call']) // only __call can intercept dynamic methods
+        ->getMock();
+
+        $repoMock->method('__call')
+            ->with('findOneByAlias', $this->anything())
+            ->willReturnCallback(function ($method, $args) {
+                $alias = $args[0];
+
+                // Simulate alias and alias_1 are taken, alias_2 is available
+                if (in_array($alias, ['alias', 'alias_1'], true)) {
+                    return new LeadField();
+                }
+
+                return null;
+            });
+
+        // Anonymous subclass that overrides getRepository
+        $fieldModel = new FieldModel(
+            $this->createMock(ColumnSchemaHelper::class),
+            $this->createMock(ListModel::class),
+            $this->createMock(CustomFieldColumn::class),
+            $this->createMock(FieldSaveDispatcher::class),
+            $repoMock,
+            $this->createMock(FieldList::class),
+            $this->createMock(LeadFieldSaver::class),
+            $this->createMock(LeadFieldDeleter::class),
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
+        );
+
+        $result = $fieldModel->generateUniqueFieldAlias('alias');
+        $this->assertEquals('alias_2', $result);
+    }
+
     public function testIsUsedField(): void
     {
         $leadField = new LeadField();
@@ -179,9 +222,9 @@ class FieldModelTest extends MauticMysqlTestCase
         $customFieldColumn          = $this->createMock(CustomFieldColumn::class);
         $fieldSaveDispatcher        = $this->createMock(FieldSaveDispatcher::class);
         $leadFieldRepository        = $this->createMock(LeadFieldRepository::class);
-        $fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
         $fieldList                  = $this->createMock(FieldList::class);
         $leadFieldSaver             = $this->createMock(LeadFieldSaver::class);
+        $leadFieldDeleter           = $this->createMock(LeadFieldDeleter::class);
         $leadListModel->expects($this->once())
             ->method('isFieldUsed')
             ->with($leadField)
@@ -195,6 +238,7 @@ class FieldModelTest extends MauticMysqlTestCase
             $leadFieldRepository,
             $fieldList,
             $leadFieldSaver,
+            $leadFieldDeleter,
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(CorePermissions::class),
             $this->createMock(EventDispatcherInterface::class),
@@ -202,7 +246,7 @@ class FieldModelTest extends MauticMysqlTestCase
             $this->createMock(Translator::class),
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
         );
         $this->assertTrue($model->isUsedField($leadField));
     }

@@ -5,11 +5,16 @@ namespace Mautic\MarketplaceBundle\Command;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: InstallCommand::NAME,
+    description: 'Installs a plugin that is available at Packagist.org'
+)]
 class InstallCommand extends Command
 {
     public const NAME = 'mautic:marketplace:install';
@@ -23,7 +28,6 @@ class InstallCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME);
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
         $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
 
@@ -73,6 +77,4 @@ class InstallCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Installs a plugin that is available at Packagist.org';
 }

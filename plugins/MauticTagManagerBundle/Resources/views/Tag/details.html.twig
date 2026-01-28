@@ -5,7 +5,7 @@
 
 {% set customButtons = {} %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         item            : tag,
@@ -39,7 +39,7 @@
             <div>
                 <!-- page detail header -->
                 <!-- sms detail collapseable toggler -->
-                {% include '@MauticCore/Helper/description.html.twig' with {'description': tag.description} %}
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': tag.description} %}
                 <div class="collapse pr-md pl-md" id="sms-details">
                     <div class="pr-md pl-md pb-md">
                         <div class="panel shd-none mb-0">
@@ -75,6 +75,24 @@
                 'stats': usageStats,
                 'noUsages': 'mautic.tagmanager.tag.no_usages'|trans,
             }) }}
+
+            <div class="mt-lg mb-lg">
+                {% if security.isGranted('lead:leads:viewown') %}
+                {% include '@MauticCore/Components/contained-list.html.twig' with {
+                    title: 'mautic.core.useful_links',
+                    items: [
+                        {
+                            label: 'mautic.lead.segments.contacts.tag'|trans,
+                            link: path('mautic_contact_index', {
+                                'search': ('mautic.lead.lead.searchcommand.tag'|trans) ~ ':' ~ ('"' ~ tag.tag ~ '"')
+                            }),
+                            icon: 'ri-user-6-line'
+                        }
+                    ],
+                    variant: 'interactive'
+                } %}
+                {% endif %}
+            </div>
         </div>
         <!--/ right section -->
 

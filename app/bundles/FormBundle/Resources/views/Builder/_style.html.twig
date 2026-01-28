@@ -7,7 +7,7 @@
     .mauticform-error { margin-bottom: 10px; color: red; }
     .mauticform-message { margin-bottom: 10px; color: green; }
     .mauticform-row { display: block; margin-bottom: 20px; }
-    .mauticform-label { font-size: 1.1em; display: block; font-weight: bold; margin-bottom: 5px; }
+    .mauticform-label { font-size: 1.1em; display: inline-block; font-weight: bold; margin-bottom: 5px; }
     .mauticform-row.mauticform-required .mauticform-label:after { color: #e32; content: " *"; display: inline; }
     .mauticform-helpmessage { display: block; font-size: 0.9em; margin-bottom: 3px; }
     .mauticform-errormsg { display: block; color: red; margin-top: 2px; }
@@ -22,6 +22,34 @@
     .mauticform-button-wrapper .mauticform-button, .mauticform-pagebreak-wrapper .mauticform-pagebreak { display: inline-block;margin-bottom: 0;font-weight: 600;text-align: center;vertical-align: middle;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;padding: 6px 12px;font-size: 13px;line-height: 1.3856;border-radius: 3px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}
     .mauticform-button-wrapper .mauticform-button.btn-ghost[disabled], .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost[disabled] { background-color: #ffffff; border-color: #dddddd; opacity: 0.75; cursor: not-allowed; }
     .mauticform-pagebreak-wrapper .mauticform-button-wrapper {  display: inline; }
+    .mauticform-slider { margin: 0; padding: 0; }
+    .mauticform-slider-value { float: right; font-size: 0.875em; min-block-size: 1.145em; margin-top: .25em; }
+
+    /* Make fields display inline when using width classes */
+    .mauticform-page-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        margin: 0 -10px;
+    }
+
+    /* Ensure field containers respect width classes */
+    .mauticform-row {
+        box-sizing: border-box;
+        padding: 0 10px;
+        margin-bottom: 15px;
+    }
+
+    /* Responsive adjustment for mobile */
+    @media (max-width: 767px) {
+        .mauticform-three-quarters-width,
+        .mauticform-two-thirds-width,
+        .mauticform-half-width,
+        .mauticform-one-third-width,
+        .mauticform-one-quarter-width {
+            width: 100%;
+        }
+    }
 
     /**
     * @see https://github.com/TarekRaafat/autoComplete.js/blob/master/dist/css/autoComplete.02.css.

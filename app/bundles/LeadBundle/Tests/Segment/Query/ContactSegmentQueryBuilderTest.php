@@ -34,7 +34,7 @@ class ContactSegmentQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataAddNewContactsRestrictionsWithBatchLimiters(): iterable
+    public static function dataAddNewContactsRestrictionsWithBatchLimiters(): iterable
     {
         yield [['minId' => 1,  'maxId' => 2], 'par0.lead_id BETWEEN 1 and 2'];
         yield [['minId' => 1], 'par0.lead_id >= 1'];
@@ -43,10 +43,9 @@ class ContactSegmentQueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider dataAddNewContactsRestrictionsWithBatchLimiters
-     *
      * @param array<string, mixed> $batchLimiters
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataAddNewContactsRestrictionsWithBatchLimiters')]
     public function testAddNewContactsRestrictionsWithBatchLimiters(array $batchLimiters, string $expectedWhereClause): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());

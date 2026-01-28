@@ -4,137 +4,53 @@
     - campaignId
 #}
 {% set route = route|default('mautic_campaignevent_action') %}
+{% set decisionTileContent %}
+<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.decision.header'|trans }}</h3>
+<div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.decision.descr'|trans }}</div>
+{% endset %}
+
+{% set actionTileContent %}
+<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.action.header'|trans }}</h3>
+<div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.action.descr'|trans }}</div>
+{% endset %}
+
+{% set conditionTileContent %}
+<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.condition.header'|trans }}</h3>
+<div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
+{% endset %}
+
 <div class="hide" id="CampaignEventPanel">
     <div id="CampaignEventPanelGroups">
         <div class="row">
             <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-4" id="DecisionGroupSelector">
-                <div class="panel panel-info mb-0">
-                    <div class="panel-heading">
-                        <div class="col-xs-8 col-sm-10 np">
-                            <h3 class="panel-title">{{ 'mautic.campaign.event.decision.header'|trans }}</h3>
-                        </div>
-                        <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
-                            <i class="hidden-xs ri-shuffle-line ri-lg"></i>
-                            {% include '@MauticCore/Helper/button.html.twig' with {
-                                buttons: [
-                                    {
-                                        label: 'mautic.core.select',
-                                        variant: 'ghost',
-                                        size: 'sm',
-                                        attributes: {
-                                            class: 'visible-xs pull-right text-success',
-                                            'data-type': 'Decision'
-                                        }
-                                    }
-                                ]
-                            } %}
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        {{ 'mautic.campaign.event.decision.descr'|trans }}
-                    </div>
-                    <div class="hidden-xs panel-footer text-center">
-                        {% include '@MauticCore/Helper/button.html.twig' with {
-                            buttons: [
-                                {
-                                    label: 'mautic.core.select',
-                                    variant: 'ghost',
-                                    size: 'md',
-                                    attributes: {
-                                        'data-type': 'Decision',
-                                        type: 'button'
-                                    }
-                                }
-                            ]
-                        } %}
-                    </div>
-                </div>
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'clickable',
+                    'content': decisionTileContent,
+                    'icon': 'ri-node-tree',
+                    'attributes': {
+                        'data-type': 'Decision'
+                    }
+                } %}
             </div>
-            <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-4 " id="ActionGroupSelector">
-                <div class="panel panel-primary mb-0">
-                    <div class="panel-heading">
-                        <div class="col-xs-8 col-sm-10 np">
-                            <h3 class="panel-title">{{ 'mautic.campaign.event.action.header'|trans }}</h3>
-                        </div>
-                        <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
-                            <i class="hidden-xs ri-focus-2-line ri-lg"></i>
-                            {% include '@MauticCore/Helper/button.html.twig' with {
-                                buttons: [
-                                    {
-                                        label: 'mautic.core.select',
-                                        size: 'sm',
-                                        attributes: {
-                                            'class': 'visible-xs pull-right',
-                                            'data-type': 'Action',
-                                            type: 'button'
-                                        },
-                                        variant: 'ghost',
-                                    }
-                                ]
-                            } %}
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        {{ 'mautic.campaign.event.action.descr'|trans }}
-                    </div>
-                    <div class="hidden-xs panel-footer text-center">
-                        {% include '@MauticCore/Helper/button.html.twig' with {
-                            buttons: [
-                                {
-                                    label: 'mautic.core.select',
-                                    variant: 'ghost',
-                                    size: 'md',
-                                    attributes: {
-                                        'data-type': 'Action',
-                                        type: 'button'
-                                    }
-                                }
-                            ]
-                        } %}
-                    </div>
-                </div>
+            <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-4" id="ActionGroupSelector">
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'clickable',
+                    'content': actionTileContent,
+                    'icon': 'ri-function-add-line',
+                    'attributes': {
+                        'data-type': 'Action'
+                    }
+                } %}
             </div>
             <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-4" id="ConditionGroupSelector">
-                <div class="panel panel-warning mb-0">
-                    <div class="panel-heading">
-                        <div class="col-xs-8 col-sm-10 np">
-                            <h3 class="panel-title">{{ 'mautic.campaign.event.condition.header'|trans }}</h3>
-                        </div>
-                        <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
-                            <i class="hidden-xs ri-filter-2-fill ri-lg"></i>
-                            {% include '@MauticCore/Helper/button.html.twig' with {
-                                buttons: [
-                                    {
-                                        label: 'mautic.core.select',
-                                        size: 'sm',
-                                        attributes: {
-                                            'class': 'visible-xs pull-right',
-                                            'data-type': 'Condition',
-                                            type: 'button'
-                                        },
-                                        variant: 'ghost',
-                                    }
-                                ]
-                            } %}
-                        </div>
-                    </div>
-                    <div class="panel-body">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
-                    <div class="hidden-xs panel-footer text-center">
-                        {% include '@MauticCore/Helper/button.html.twig' with {
-                            buttons: [
-                                {
-                                    label: 'mautic.core.select',
-                                    variant: 'ghost',
-                                    size: 'md',
-                                    attributes: {
-                                        'data-type': 'Condition',
-                                        type: 'button'
-                                    }
-                                }
-                            ]
-                        } %}
-                    </div>
-                </div>
+                {% include '@MauticCore/Components/tile.html.twig' with {
+                    'type': 'clickable',
+                    'content': conditionTileContent,
+                    'icon': 'ri-filter-3-line',
+                    'attributes': {
+                        'data-type': 'Condition'
+                    }
+                } %}
             </div>
         </div>
         <div class="row">

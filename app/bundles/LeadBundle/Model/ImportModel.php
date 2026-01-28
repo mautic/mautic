@@ -7,6 +7,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -102,12 +103,14 @@ class ImportModel extends FormModel
     /**
      * Generates a HTML link to the import detail.
      */
-    public function generateLink(Import $import): string
+    public function generateLink(Import $import, ?string $text = null): string
     {
+        $linkText = $text ?? $import->getOriginalFile().' ('.$import->getId().')';
+
         return '<a href="'.$this->router->generate(
             'mautic_import_action',
             ['objectAction' => 'view', 'object' => 'lead', 'objectId' => $import->getId()]
-        ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>';
+        ).'" data-toggle="ajax">'.$linkText.'</a>';
     }
 
     /**
@@ -151,13 +154,18 @@ class ImportModel extends FormModel
      * Start import. This is meant for the CLI command since it will import
      * the whole file at once.
      *
-     * @param int $limit Number of records to import before delaying the import. 0 will import all
+     * @param int   $limit Number of records to import before delaying the import. 0 will import all
+     * @param float $start Start time for timing calculation
      *
      * @throws ImportFailedException
      * @throws ImportDelayedException
      */
-    public function beginImport(Import $import, Progress $progress, $limit = 0): void
+    public function beginImport(Import $import, Progress $progress, $limit = 0, ?float $start = null): void
     {
+        if (null === $start) {
+            $start = microtime(true);
+        }
+
         $this->setGhostImportsAsFailed();
 
         if (!$import) {
@@ -228,12 +236,18 @@ class ImportModel extends FormModel
         if ($import->getCreatedBy()) {
             $this->notificationModel->addNotification(
                 $this->translator->trans(
-                    'mautic.lead.import.result.info',
-                    ['%import%' => $this->generateLink($import)]
+                    'mautic.lead.import.result',
+                    [
+                        '%lines%'   => $import->getProcessedRows(),
+                        '%created%' => $import->getInsertedCount(),
+                        '%updated%' => $import->getUpdatedCount(),
+                        '%ignored%' => $import->getIgnoredCount(),
+                        '%time%'    => round(microtime(true) - $start, 2),
+                    ]
                 ),
                 'info',
                 false,
-                $this->translator->trans('mautic.lead.import.completed'),
+                $this->generateLink($import, $this->translator->trans('mautic.lead.import.completed')),
                 'ri-download-line',
                 null,
                 $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
@@ -279,7 +293,7 @@ class ImportModel extends FormModel
         while ($batchSize && !$file->eof()) {
             $string = $file->current();
             $file->next();
-            $data = str_getcsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
+            $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
@@ -310,11 +324,9 @@ class ImportModel extends FormModel
                     continue;
                 }
 
-                $data = array_combine($headers, $data);
-
+                $data  = array_combine($headers, $data);
+                $event = new ImportProcessEvent($import, $eventLog, $data);
                 try {
-                    $event = new ImportProcessEvent($import, $eventLog, $data);
-
                     $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_PROCESS);
 
                     if ($event->wasMerged()) {
@@ -342,6 +354,11 @@ class ImportModel extends FormModel
                 // This should be called only if the entity manager is open
                 $this->logImportRowError($eventLog, $errorMessage);
             } else {
+                // adding warning logs for partial imports.
+                if ($event->getWarnings()) {
+                    $eventLog->addProperty('error', implode('\n', $event->getWarnings()))
+                        ->setAction('failed');
+                }
                 $this->leadEventLogRepo->saveEntity($eventLog);
             }
 
@@ -392,7 +409,8 @@ class ImportModel extends FormModel
             }
         }
 
-        if ($import->getLastLineImported() < $import->getLineCount()) {
+        $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
+        if ($isPublished && $import->getLastLineImported() < $import->getLineCount()) {
             $import->setStatus($import::DELAYED);
             $this->saveEntity($import);
         }
@@ -589,7 +607,7 @@ class ImportModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);
@@ -634,7 +652,7 @@ class ImportModel extends FormModel
      *
      * @param string $msg
      */
-    protected function logDebug($msg, Import $import = null)
+    protected function logDebug($msg, ?Import $import = null)
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

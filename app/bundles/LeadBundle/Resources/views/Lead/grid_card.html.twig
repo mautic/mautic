@@ -23,7 +23,7 @@
                     {% endif %}
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
-                            <span>{{ contact.primaryIdentifier }}</span>
+                            <span>{{ contact.primaryIdentifier | trans }}</span>
                         </a>
                     </h4>
                     <div class="text-secondary mb-1 ellipsis">
@@ -52,6 +52,7 @@
                         </div>
                     {% endif %}
                     {{ customContent('lead.grid', _context) }}
+                    {{ customContent('lead.name.after', _context) }}
                 </div>
             </div>
         </div>

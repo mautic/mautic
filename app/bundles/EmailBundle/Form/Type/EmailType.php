@@ -17,12 +17,14 @@ use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -52,6 +54,7 @@ class EmailType extends AbstractType
         private StageModel $stageModel,
         private CoreParametersHelper $coreParametersHelper,
         private ThemeHelperInterface $themeHelper,
+        private CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
@@ -61,6 +64,9 @@ class EmailType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
+
+        $emailEntity =  $options['data'];
+        \assert($emailEntity instanceof Email);
 
         $builder->add(
             'name',
@@ -151,7 +157,7 @@ class EmailType extends AbstractType
             [
                 'label'      => 'mautic.email.use.owner.as.mailer',
                 'label_attr' => ['class' => 'control-label'],
-                'data'       => $this->getUseOwnerAsMailerOrDefaultValue($options['data']),
+                'data'       => $this->getUseOwnerAsMailerOrDefaultValue($emailEntity),
                 'required'   => false,
                 'attr'       => [
                     'data-global-mailer-is-onwer' => (string) $this->getGlobalMailerIsOwner(),
@@ -194,9 +200,9 @@ class EmailType extends AbstractType
             ]
         );
 
-        $template = $options['data']->getTemplate() ?? 'blank';
-        if (true === $this->isDraftEnabled && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getTemplate())) {
-            $template = $options['data']->getDraft()->getTemplate();
+        $template = $emailEntity->getTemplate() ?? 'blank';
+        if (true === $this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getTemplate())) {
+            $template = $emailEntity->getDraft()->getTemplate();
         }
         // If theme does not exist, set empty
         $template = $this->themeHelper->getCurrentTheme($template, 'email');
@@ -214,11 +220,20 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'label' => 'mautic.core.form.available',
-        ]);
-        $builder->add('publishUp', PublishUpDateType::class);
-        $builder->add('publishDown', PublishDownDateType::class);
+        $canPublish = $this->corePermissions->hasPublishAccessForEntity($emailEntity, 'email:emails:publishown', 'email:emails:publishother');
+
+        $isPublishOptions = [
+            'data' => $emailEntity->isNew() ? $canPublish : $emailEntity->getIsPublished(),
+        ];
+
+        if (!$canPublish) {
+            $isPublishOptions['disabled'] = true; // Duplicated here for Symfony validations
+            $isPublishOptions['attr']     = ['disabled' => true]; // Duplicated here for the JS switch library
+        }
+
+        $builder->add('isPublished', YesNoButtonGroupType::class, $isPublishOptions);
+        $builder->add('publishUp', PublishUpDateType::class, ['disabled' => !$canPublish]);
+        $builder->add('publishDown', PublishDownDateType::class, ['disabled' => !$canPublish]);
 
         $builder->add(
             'plainText',
@@ -238,9 +253,9 @@ class EmailType extends AbstractType
             ]
         );
 
-        $html = $options['data']->getCustomHtml();
-        if (true === $this->isDraftEnabled && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getHtml())) {
-            $html = $options['data']->getDraft()->getHtml();
+        $html = $emailEntity->getCustomHtml();
+        if (true === $this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getHtml())) {
+            $html = $emailEntity->getDraft()->getHtml();
         }
         $builder->add(
             'customHtml',
@@ -317,8 +332,8 @@ class EmailType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $variantParent     = $options['data']->getVariantParent();
-        $translationParent = $options['data']->getTranslationParent();
+        $variantParent     = $emailEntity->getVariantParent();
+        $translationParent = $emailEntity->getTranslationParent();
         $builder->add(
             'segmentTranslationParent',
             EmailListType::class,
@@ -334,10 +349,10 @@ class EmailType extends AbstractType
                 'email_type'     => 'list',
                 'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
-                'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
-                'ignore_ids'     => [(int) $options['data']->getId()],
+                'variant_parent' => $variantParent ? $variantParent->getId() : null,
+                'ignore_ids'     => [(int) $emailEntity->getId()],
                 'mapped'         => false,
-                'data'           => ($translationParent) ? $translationParent->getId() : null,
+                'data'           => $translationParent ? $translationParent->getId() : null,
             ]
         );
 
@@ -355,11 +370,11 @@ class EmailType extends AbstractType
                 'multiple'       => false,
                 'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
-                'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
+                'variant_parent' => $variantParent ? $variantParent->getId() : null,
                 'email_type'     => 'template',
-                'ignore_ids'     => [(int) $options['data']->getId()],
+                'ignore_ids'     => [(int) $emailEntity->getId()],
                 'mapped'         => false,
-                'data'           => ($translationParent) ? $translationParent->getId() : null,
+                'data'           => $translationParent ? $translationParent->getId() : null,
             ]
         );
 
@@ -396,10 +411,12 @@ class EmailType extends AbstractType
                     !empty($data['variantParent'])
                 );
 
-                if (isset($data['emailType']) && 'list' == $data['emailType']) {
-                    $data['translationParent'] = $data['segmentTranslationParent'] ?? null;
-                } else {
-                    $data['translationParent'] = $data['templateTranslationParent'] ?? null;
+                $emailType = $data['emailType'] ?? null;
+
+                if ('list' === $emailType && isset($data['segmentTranslationParent'])) {
+                    $data['translationParent'] = $data['segmentTranslationParent'];
+                } elseif (isset($data['templateTranslationParent'])) {
+                    $data['translationParent'] = $data['templateTranslationParent'];
                 }
 
                 $event->setData($data);
@@ -464,6 +481,8 @@ class EmailType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $transformer = new IdToEntityModelTransformer(
             $this->em,
             \Mautic\AssetBundle\Entity\Asset::class,
@@ -498,14 +517,14 @@ class EmailType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin text-interactive btn-builder',
                     'icon'    => 'ri-layout-line',
                     'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                 ],
             ],
         ];
 
-        $draftActionButtons = $this->getDraftActionButtons($options['data']);
+        $draftActionButtons = $this->getDraftActionButtons($emailEntity);
         if (!empty($draftActionButtons)) {
             $extraButtons['post_extra_buttons'] = $draftActionButtons;
         }

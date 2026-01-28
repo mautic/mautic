@@ -10,11 +10,10 @@ use PHPUnit\Framework\TestCase;
 class SortableListTransformerTest extends TestCase
 {
     /**
-     * @dataProvider standardListProvider
-     *
      * @param array<string, array<int|string, string>>    $input
      * @param array<string, array<array<string, string>>> $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('standardListProvider')]
     public function testTransformStandardListWithLabels(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: false);
@@ -24,11 +23,10 @@ class SortableListTransformerTest extends TestCase
     }
 
     /**
-     * @dataProvider keyValuePairProvider
-     *
      * @param array<string, string>                       $input
      * @param array<string, array<array<string, string>>> $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('keyValuePairProvider')]
     public function testTransformKeyValuePairs(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: true);
@@ -38,11 +36,10 @@ class SortableListTransformerTest extends TestCase
     }
 
     /**
-     * @dataProvider standardListWithoutLabelsProvider
-     *
      * @param array<string, array<int|string, string>> $input
      * @param array<string, array<string>>             $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('standardListWithoutLabelsProvider')]
     public function testTransformListWithoutLabels(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: false, useKeyValuePairs: false);
@@ -68,11 +65,10 @@ class SortableListTransformerTest extends TestCase
     }
 
     /**
-     * @dataProvider reverseKeyValuePairProvider
-     *
      * @param array<string, array<array<string, string>>> $input
      * @param array<string, string>                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('reverseKeyValuePairProvider')]
     public function testReverseTransformKeyValuePairs(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: true);
@@ -100,7 +96,7 @@ class SortableListTransformerTest extends TestCase
     /**
      * @return array<string, array{input: array<string, array<int|string, string>>, expected: array<string, array<array<string, string>>>}>
      */
-    public function standardListProvider(): array
+    public static function standardListProvider(): array
     {
         return [
             'simple list' => [
@@ -139,7 +135,7 @@ class SortableListTransformerTest extends TestCase
     /**
      * @return array<string, array{input: array<string, array<int|string, string>>, expected: array<string, array<string>>}>
      */
-    public function standardListWithoutLabelsProvider(): array
+    public static function standardListWithoutLabelsProvider(): array
     {
         return [
             'simple list without labels' => [
@@ -172,7 +168,7 @@ class SortableListTransformerTest extends TestCase
     /**
      * @return array<string, array{input: array<string, string>, expected: array<string, array<array<string, string>>>}>
      */
-    public function keyValuePairProvider(): array
+    public static function keyValuePairProvider(): array
     {
         return [
             'key value pairs' => [
@@ -197,7 +193,7 @@ class SortableListTransformerTest extends TestCase
     /**
      * @return array<string, array{input: array<string, array<array<string, string>>>, expected: array<string, string>}>
      */
-    public function reverseKeyValuePairProvider(): array
+    public static function reverseKeyValuePairProvider(): array
     {
         return [
             'standard key-value pairs' => [

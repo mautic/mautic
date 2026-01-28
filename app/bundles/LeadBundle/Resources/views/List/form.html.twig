@@ -72,17 +72,20 @@
                                 <select class="chosen form-control" id="available_segment_filters">
                                     <option value=""></option>
                                     {% for object, field in form.vars.fields %}
-                                      {% set icon = 'company' == object ? 'building' : 'user' %}
                                       {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
                                       <optgroup label="{{ header }}">
                                           {% for value, params in field %}
                                               {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                                              {% set objectLabel = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
+                                              {% set label =  'mautic.lead_list.filter.field.label'|trans({'%object%': objectLabel, '%field%': params.label|capitalize|trans }) %}
                                               <option value="{{ value|e }}"
                                                       id="available_{{ object }}_{{ value }}"
+                                                      data-field-label="{{ label }}"
                                                       data-field-object="{{ object }}"
                                                       data-field-type="{{ params.properties.type }}"
                                                       data-field-operators="{{ operators|e }}"
-                                                      class="segment-filter {{ icon }}">
+                                                      data-field-icon="{{ params.iconClass|default('') }}"
+                                                      class="segment-filter {{ params.iconClass|default('') }}">
                                                       {{ params.label|trans }}
                                               </option>
                                           {% endfor %}
@@ -108,6 +111,7 @@
     <div class="col-md-3 height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
+            {{ form_row(form.projects) }}
             {{ form_row(form.isGlobal) }}
             {{ form_row(form.isPreferenceCenter) }}
             {{ form_row(form.isPublished) }}

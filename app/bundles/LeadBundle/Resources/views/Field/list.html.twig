@@ -56,13 +56,43 @@
                     'checkall': 'true',
                     'target': '#leadFieldTable',
                 }) }}
-                  <th class="col-leadfield-label">{{ 'mautic.lead.field.label'|trans }}</th>
-                  <th class="visible-md visible-lg col-leadfield-alias">{{ 'mautic.core.alias'|trans }}</th>
-                  <th class="visible-md visible-lg col-leadfield-group">{{ 'mautic.lead.field.object'|trans }}</th>
-                  <th class="visible-md visible-lg col-leadfield-group">{{ 'mautic.lead.field.group'|trans }}</th>
-                  <th class="col-leadfield-type">{{ 'mautic.lead.field.type'|trans }}</th>
-                  <th class="visible-md visible-lg col-leadfield-id">{{ 'mautic.core.id'|trans }}</th>
-                  <th class="visible-sm visible-md visible-lg col-leadfield-statusicons"></th>
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'leadfield',
+                    'orderBy': 'f.label',
+                    'text': 'mautic.lead.field.label',
+                    'class': 'col-leadfield-label'
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'leadfield',
+                    'orderBy': 'f.alias',
+                    'text': 'mautic.core.alias',
+                    'class': 'visible-md visible-lg col-leadfield-alias'
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'leadfield',
+                    'orderBy': 'f.object',
+                    'text': 'mautic.lead.field.object',
+                    'class': 'visible-md visible-lg col-leadfield-group'
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'leadfield',
+                    'orderBy': 'f.group',
+                    'text': 'mautic.lead.field.group',
+                    'class': 'visible-md visible-lg col-leadfield-group'
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'leadfield',
+                    'orderBy': 'f.type',
+                    'text': 'mautic.lead.field.type',
+                    'class': 'col-leadfield-type'
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'leadfield',
+                    'orderBy': 'f.id',
+                    'text': 'mautic.core.id',
+                    'class': 'visible-md visible-lg col-leadfield-id'
+                  }) }}
+                   <th class="visible-sm visible-md visible-lg col-leadfield-statusicons"></th>
               </tr>
               </thead>
               <tbody>
@@ -73,9 +103,9 @@
                           {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                   'item': item,
                                   'templateButtons': {
-                                      'edit': permissions['lead:fields:full'],
-                                      'clone': permissions['lead:fields:full'],
-                                      'delete': item.isFixed ? false : permissions['lead:fields:full'],
+                                      'edit': item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
+                                      'clone': item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
+                                      'delete': item.isFixed or item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
                                   },
                                   'routeBase': 'contactfield',
                                   'langVar': 'lead.field',
@@ -88,13 +118,21 @@
                                       'item': item,
                                       'model': 'lead.field',
                                       'disableToggle': item.disablePublishChange,
-                                      'aditionalLabel': item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : null,
+                                      'aditionalLabel': (item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : '') ~ (item.getColumnIsNotRemoved() ? 'mautic.lead.field.being_removed_in_background'|trans : ''),
                           }) }}
-                          <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}">{{ item.label }}</a>
+                          <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">{{ item.label }}</a>
                           {{ customContent('lead.field.name', _context) }}
                       </span>
                       </td>
-                      <td class="visible-md visible-lg">{{ item.alias }}</td>
+                      <td class="visible-md visible-lg">
+                          {% set tokenText = item.object == 'user' ? '{ownerfield=' ~ item.alias ~ '}' : '{contactfield=' ~ item.alias ~ '}' %}
+                          {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                              variant: 'inline',
+                              innerText: tokenText,
+                              copyText: tokenText,
+                              copyButtonDescription: 'mautic.lead.field.copy_token'
+                          } %}
+                      </td>
                       <td class="visible-md visible-lg">{{ ('mautic.'~item.object~'.'~item.object)|trans }}</td>
                       <td class="visible-md visible-lg">{{ ('mautic.lead.field.group.'~item.group)|trans }}</td>
                       <td>{{ translatorConditional('mautic.core.type.'~item.type, 'mautic.lead.field.type.'~item.type) }}</td>
@@ -119,7 +157,7 @@
                               <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
                           {% endif %}
                           {% if item.isIsIndex %}
-                              <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
+                              <i class="ri-menu-search-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
                           {% endif %}
                       </td>
                   </tr>

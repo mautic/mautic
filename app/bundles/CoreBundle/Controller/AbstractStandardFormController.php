@@ -1094,7 +1094,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'viewParameters' => [
                 $itemName     => $entity,
                 'logs'        => $logs,
-                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details',
                 'permissions' => $this->security->isGranted(
                     [
                         $this->getPermissionBase().':view',
@@ -1115,6 +1115,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     null,
                     true
                 ),
+                'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted($entity::ENTITY_NAME.':export:enable', 'MATCH_ONE'),
             ],
             'contentTemplate' => $this->getTemplateName('details.html.twig'),
             'passthroughVars' => [
@@ -1130,7 +1131,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         );
     }
 
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
     {
         return parent::getDataForExport($model, $args, $resultsCallback, $start);
     }

@@ -24,7 +24,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      *
      * @return array<mixed>|int|string
      */
-    public function transform($entity)
+    public function transform(mixed $entity): mixed
     {
         $func = 'get'.ucfirst($this->id);
 
@@ -53,7 +53,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      *
      * @return array<mixed>|object|null
      */
-    public function reverseTransform($id)
+    public function reverseTransform(mixed $id): mixed
     {
         if (!$this->isArray) {
             if (!$id) {

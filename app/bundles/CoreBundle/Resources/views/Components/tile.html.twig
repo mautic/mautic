@@ -1,0 +1,115 @@
+{% if type is not defined %}
+    {% set type = 'base' %}
+{% endif %}
+
+{# === BASE TYPE === #}
+{% if type == 'base' %}
+    <div class="tile {{ className|default('') }}" id="tile-{{ random() }}">
+        {{ content|raw }}
+
+        {% if button is defined %}
+        <div class="tile__button-wrapper mt-md">
+            {% set button = button %}
+            {% if button.variant is not defined or button.variant != 'link' %}
+                {% set button = button|merge({'variant': 'tertiary', 'wide': true}) %}
+            {% endif %}
+            {% include '@MauticCore/Helper/button.html.twig' with {'buttons': [button]} %}
+        </div>
+        {% endif %}
+    </div>
+
+{# === CLICKABLE TYPE === #}
+{% elseif type == 'clickable' %}
+    {% if href is defined and href is not empty %}
+        <a class="tile tile--clickable {{ className|default('') }}" id="clickable-tile-{{ random() }}" href="{{ href }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+            {{ content|raw }}
+            {% if icon is defined %}
+                <div class="tile-icon">
+                    <i class="{{ icon }}" aria-hidden="true"></i>
+                </div>
+            {% endif %}
+        </a>
+    {% else %}
+        <button type="button" class="tile tile--clickable" id="clickable-tile-{{ random() }}" {% if onclick is defined %}onclick="{{ onclick }}"{% endif %} {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+            {{ content|raw }}
+            {% if icon is defined %}
+                <div class="tile-icon">
+                    <i class="{{ icon }}" aria-hidden="true"></i>
+                </div>
+            {% endif %}
+        </button>
+    {% endif %}
+
+{# === EXPANDABLE TYPE === #}
+{% elseif type == 'expandable' %}
+    {% set randomId = random() %}
+    <button type="button"
+            class="tile tile--expandable collapsed {{ className|default('') }}"
+            data-toggle="collapse"
+            data-target="#collapse-{{ randomId }}"
+            aria-expanded="false"
+            aria-controls="collapse-{{ randomId }}"
+            title="{{ 'mautic.core.interact_to_expand_tile'|trans }}"
+            id="expandable-tile-{{ randomId }}"
+            tabindex="0">
+        <div>
+            <div class="tile-content">
+                <div class="tile-content__above-the-fold">
+                    {{ aboveFoldContent|raw }}
+                </div>
+            </div>
+            <div class="tile__chevron">
+                <i class="ri-arrow-down-s-line"></i>
+            </div>
+            <div class="collapse" id="collapse-{{ randomId }}">
+                <div class="tile-content">
+                    <div class="tile-content__below-the-fold">
+                        {{ belowFoldContent|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </button>
+
+{# === EXPANDABLE-INTERACTIVE TYPE === #}
+{% elseif type == 'expandable-interactive' %}
+    {% set randomId = random() %}
+    <div class="tile tile--expandable tile--expandable--interactive" id="expandable-tile-{{ randomId }}">
+        <div>
+            <div class="tile-content">
+                <div class="tile-content__above-the-fold">
+                    {{ aboveFoldContent|raw }}
+                </div>
+            </div>
+            <button type="button"
+                    data-toggle="collapse"
+                    data-target="#collapse-{{ randomId }}"
+                    aria-expanded="false"
+                    aria-controls="expandable-tile-interactive-{{ randomId }}"
+                    aria-label="{{ 'mautic.core.interact_to_expand_tile'|trans }}"
+                    class="tile__chevron tile__chevron--interactive collapsed">
+                <i class="ri-arrow-down-s-line"></i>
+            </button>
+            <div class="collapse" id="collapse-{{ randomId }}">
+                <div class="tile-content" id="expandable-tile-interactive-{{ randomId }}">
+                    <div class="tile-content__below-the-fold">
+                        {{ belowFoldContent|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{# === MINI TYPE === #}
+{% elseif type == 'mini' %}
+    <a href="{{ href|default('#') }}" class="tile tile--clickable {{ className|default('') }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+        <div class="d-flex jc-space-between ai-center">
+            <div class="tile-title">{{ title|trans }}</div>
+            {% if icon is defined %}
+                <div class="tile-icon">
+                    <i class="{{ icon }} text-interactive"></i>
+                </div>
+            {% endif %}
+        </div>
+    </a>
+{% endif %} 

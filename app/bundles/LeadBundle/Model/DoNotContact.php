@@ -4,6 +4,8 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
+use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -14,20 +16,28 @@ class DoNotContact implements MauticModelInterface
     public function __construct(
         protected LeadModel $leadModel,
         protected DoNotContactRepository $dncRepo,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected CacheProvider $cacheProvider,
     ) {
     }
 
     /**
      * Remove a Lead's DNC entry based on channel.
      *
-     * @param int       $contactId
+     * @param int|Lead  $contact
      * @param string    $channel
      * @param bool|true $persist
      * @param int|null  $reason
      */
-    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null): bool
+    public function removeDncForContact($contact, $channel, $persist = true, $reason = null): bool
     {
-        $contact = $this->leadModel->getEntity($contactId);
+        if (is_numeric($contact)) {
+            $contact = $this->leadModel->getEntity($contact);
+        }
+
+        if (null === $contact) {
+            return false;
+        }
 
         /** @var DNC $dnc */
         foreach ($contact->getDoNotContact() as $dnc) {
@@ -53,7 +63,7 @@ class DoNotContact implements MauticModelInterface
     /**
      * Create a DNC entry for a lead.
      *
-     * @param Lead|int|null  $contactId
+     * @param Lead|int|null  $contact
      * @param string|mixed[] $channel                  If an array with an ID, use the structure ['email' => 123]
      * @param string         $comments
      * @param int            $reason                   Must be a class constant from the DoNotContact class
@@ -65,7 +75,7 @@ class DoNotContact implements MauticModelInterface
      *                  and has the specified reason, nothing is done and this returns false
      */
     public function addDncForContact(
-        $contactId,
+        $contact,
         $channel,
         $reason = DNC::BOUNCED,
         $comments = '',
@@ -73,8 +83,10 @@ class DoNotContact implements MauticModelInterface
         $checkCurrentStatus = true,
         $allowUnsubscribeOverride = false,
     ) {
-        $dnc     = null;
-        $contact = $this->leadModel->getEntity($contactId);
+        $dnc     = false;
+        if (is_numeric($contact)) {
+            $contact = $this->leadModel->getEntity($contact);
+        }
 
         if (null === $contact) {
             // Contact not found, nothing to do
@@ -188,6 +200,27 @@ class DoNotContact implements MauticModelInterface
 
         // Re-add the entry to the lead
         $contact->addDoNotContactEntry($dnc);
+    }
+
+    /**
+     * Get all available reason-channel combinations.
+     *
+     * @return array<array{reason: int, channel: string}>
+     */
+    public function getReasonChannelCombinations(bool $useCache = true): array
+    {
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $this->cacheProvider->getItem('dnc.reason_channel_combinations');
+        if ($useCache && $cacheItem->isHit()) {
+            return $cacheItem->get();
+        } else {
+            $reasonChannelCombinations = $this->dncRepo->getReasonChannelCombinations();
+            $cacheItem->set($reasonChannelCombinations);
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $this->cacheProvider->save($cacheItem);
+
+            return $reasonChannelCombinations;
+        }
     }
 
     /**

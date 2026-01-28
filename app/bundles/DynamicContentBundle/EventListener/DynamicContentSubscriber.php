@@ -11,7 +11,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
@@ -28,8 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    use MatchFilterForLeadTrait;
-
     public function __construct(
         private TrackableModel $trackableModel,
         private PageTokenHelper $pageTokenHelper,
@@ -153,20 +150,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = [];
-        if ($lead instanceof Lead) {
-            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        }
-
-        $result = [];
-        foreach ($tokens as $token => $dwc) {
-            $result[$token] = '';
-            if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
-                $result[$token] = $dwc['content'];
-            }
-        }
-        $content = str_replace(array_keys($result), array_values($result), $content);
+        $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
@@ -177,6 +161,9 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         for ($i = 0; $i < $contentSlots->length; ++$i) {
             $slot = $contentSlots->item($i);
+            if (!$slot instanceof \DOMElement) {
+                continue;
+            }
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
                 continue;
             }
@@ -187,10 +174,20 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
             $newnode = $dom->createDocumentFragment();
             $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
-            $slot->parentNode->replaceChild($newnode, $slot);
+            if ($slot->parentNode instanceof \DOMNode) {
+                $slot->parentNode->replaceChild($newnode, $slot);
+            }
         }
 
         $content = $dom->saveHTML();
+
+        // These tokens need to be replaced after the content, because otherwise the replaced tokens will have encoded
+        // HTML entities, which do not conform the tests.
+        $result = [];
+        foreach ($tokens as $token => $dwc) {
+            $result[$token] = $dwc['content'];
+        }
+        $content = str_replace(array_keys($result), array_values($result), $content);
 
         $event->setContent($content);
     }

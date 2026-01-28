@@ -18,7 +18,7 @@ final class Version20221128145933 extends AbstractMauticMigration
     public function preUp(Schema $schema): void
     {
         /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+        $integrationHelper = $this->container->get(IntegrationHelper::class);
         $integration       = $integrationHelper->getIntegrationObject('Twilio');
         $settings          = $integration->getIntegrationSettings()->getFeatureSettings();
         if (empty($settings['disable_trackable_urls'])) {

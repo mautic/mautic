@@ -49,7 +49,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, array<string, array<int, string>|bool|int|null>>
      */
-    public function provideFormDNC(): array
+    public static function provideFormDNC(): array
     {
         return [
             [
@@ -161,8 +161,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createMock(TranslatorInterface::class)
         );
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
+        $mockCoreParametersHelper->method('getDefaultTimezone')
             ->willReturn('UTC');
 
         $this->subscriber = new CampaignSubscriber(
@@ -247,10 +246,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider provideFormDNC
-     *
      * @param array<string> $channels
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormDNC')]
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -438,10 +436,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockLeadModel->expects($this->exactly(2))
             ->method('setFieldValues')
-            ->withConsecutive(
-                [$lead, $properties, false, true, false],
-                [$lead, $properties, false, true, false]
-            );
+            ->with($lead, $properties, false, true, false);
 
         $this->mockLeadModel->expects($this->once())
             ->method('saveEntity')

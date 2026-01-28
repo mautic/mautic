@@ -55,7 +55,7 @@ class FileApiController extends CommonApiController
         }
 
         $response = [$this->entityNameOne => []];
-        if ($request->files) {
+        if ($request->files->count() > 0) {
             foreach ($request->files as $file) {
                 $extension = $file->guessExtension() ?: $file->getClientOriginalExtension();
                 if (in_array($extension, $this->allowedExtensions)) {

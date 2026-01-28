@@ -30,7 +30,8 @@ Mautic.inBuilderSubmissionOff = function(form) {
 Mautic.processBuilderErrors = function(response) {
     if (response.validationError) {
         mQuery('.btn-apply-builder').attr('disabled', true);
-        mQuery('#builder-errors').show('fast').text(response.validationError);
+        mQuery('#builder-errors span').text(response.validationError);
+        mQuery('#builder-errors').show('fast');
     }
 };
 

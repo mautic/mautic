@@ -211,29 +211,29 @@ class ObjectChangeGeneratorTest extends TestCase
                     return $internalInformationChangeRequest;
                 }
             );
+        $matcher = $this->exactly(2);
 
-        $this->bulkNotification->expects($this->exactly(2))
-            ->method('addNotification')
-            ->withConsecutive(
-                [
-                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email',
-                    $exceptionMessage,
-                    $integrationName,
-                    $objectName,
-                    Contact::NAME,
-                    0,
-                    "Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'",
-                ],
-                [
-                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-first_name',
-                    $exceptionMessage,
-                    $integrationName,
-                    $objectName,
-                    Contact::NAME,
-                    0,
-                    "Field 'first_name' for object ID '2' mapped to internal 'first_name' with value 'Robert'",
-                ]
-            );
+        $this->bulkNotification->expects($matcher)
+            ->method('addNotification')->willReturnCallback(function (...$parameters) use ($matcher, $exceptionMessage, $integrationName, $objectName) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email', $parameters[0]);
+                    $this->assertSame($exceptionMessage, $parameters[1]);
+                    $this->assertSame($integrationName, $parameters[2]);
+                    $this->assertSame($objectName, $parameters[3]);
+                    $this->assertSame(Contact::NAME, $parameters[4]);
+                    $this->assertSame(0, $parameters[5]);
+                    $this->assertSame("Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'", $parameters[6]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-first_name', $parameters[0]);
+                    $this->assertSame($exceptionMessage, $parameters[1]);
+                    $this->assertSame($integrationName, $parameters[2]);
+                    $this->assertSame($objectName, $parameters[3]);
+                    $this->assertSame(Contact::NAME, $parameters[4]);
+                    $this->assertSame(0, $parameters[5]);
+                    $this->assertSame("Field 'first_name' for object ID '2' mapped to internal 'first_name' with value 'Robert'", $parameters[6]);
+                }
+            });
 
         $this->createObjectGenerator()->getSyncObjectChange(
             $syncReport,
@@ -278,29 +278,29 @@ class ObjectChangeGeneratorTest extends TestCase
                     return $internalInformationChangeRequest;
                 }
             );
+        $matcher = $this->exactly(2);
 
-        $this->bulkNotification->expects($this->exactly(2))
-            ->method('addNotification')
-            ->withConsecutive(
-                [
-                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email',
-                    $exceptionMessage,
-                    $integrationName,
-                    $objectName,
-                    Contact::NAME,
-                    0,
-                    "Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'",
-                ],
-                [
-                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-first_name',
-                    $exceptionMessage,
-                    $integrationName,
-                    $objectName,
-                    Contact::NAME,
-                    0,
-                    "Field 'first_name' for object ID '2' mapped to internal 'first_name' with value 'Robert'",
-                ]
-            );
+        $this->bulkNotification->expects($matcher)
+            ->method('addNotification')->willReturnCallback(function (...$parameters) use ($matcher, $exceptionMessage, $integrationName, $objectName) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email', $parameters[0]);
+                    $this->assertSame($exceptionMessage, $parameters[1]);
+                    $this->assertSame($integrationName, $parameters[2]);
+                    $this->assertSame($objectName, $parameters[3]);
+                    $this->assertSame(Contact::NAME, $parameters[4]);
+                    $this->assertSame(0, $parameters[5]);
+                    $this->assertSame("Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'", $parameters[6]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-first_name', $parameters[0]);
+                    $this->assertSame($exceptionMessage, $parameters[1]);
+                    $this->assertSame($integrationName, $parameters[2]);
+                    $this->assertSame($objectName, $parameters[3]);
+                    $this->assertSame(Contact::NAME, $parameters[4]);
+                    $this->assertSame(0, $parameters[5]);
+                    $this->assertSame("Field 'first_name' for object ID '2' mapped to internal 'first_name' with value 'Robert'", $parameters[6]);
+                }
+            });
 
         $this->createObjectGenerator()->getSyncObjectChange(
             $syncReport,

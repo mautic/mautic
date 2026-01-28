@@ -34,7 +34,7 @@ class SyncCommandTest extends TestCase
         $this->syncService = $this->createMock(SyncServiceInterface::class);
         $application       = new Application();
 
-        $application->add(new SyncCommand($this->syncService));
+        $application->addCommand(new SyncCommand($this->syncService));
 
         // env is global option. Must be defined.
         $application->getDefinition()->addOption(
@@ -57,11 +57,8 @@ class SyncCommandTest extends TestCase
         $this->assertSame(1, $this->commandTester->execute([]));
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
         $this->syncService->expects($this->once())
@@ -85,11 +82,8 @@ class SyncCommandTest extends TestCase
         $this->assertSame(0, $code);
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testExecuteWhenSyncThrowsException(): void
     {
         $this->syncService->expects($this->once())

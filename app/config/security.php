@@ -48,8 +48,17 @@ $firewalls = [
         ],
         'lazy' => true,
     ],
+    'v2api' => [
+        'pattern'            => '^/api/v2',
+        'fos_oauth'          => true,
+        'mautic_plugin_auth' => true,
+        'http_basic'         => true,
+        'context'            => 'mautic',
+        'provider'           => 'user_provider',
+        'entry_point'        => 'fos_oauth_server.security.entry_point',
+    ],
     'api' => [
-        'pattern'            => '^/api',
+        'pattern'            => '^/api/',
         'fos_oauth'          => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
@@ -89,10 +98,14 @@ $firewalls = [
             'domain'   => '%mautic.rememberme_domain%',
             'samesite' => 'lax',
         ],
-        'entry_point' => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
-        'mautic_sso'  => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
-        'fos_oauth'   => true,
-        'context'     => 'mautic',
+        'entry_point'      => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
+        'mautic_sso'       => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
+        'fos_oauth'        => true,
+        'context'          => 'mautic',
+        'login_throttling' => [
+            'max_attempts' => 3,
+            'interval'     => '30 minutes',
+        ],
     ],
     'public' => [
         'pattern' => '^/',
@@ -108,8 +121,7 @@ if (!$container->getParameter('mautic.famework.csrf_protection')) {
 $container->loadFromExtension(
     'security',
     [
-        'enable_authenticator_manager' => true,
-        'providers'                    => [
+        'providers' => [
             'user_provider' => [
                 'id' => 'mautic.user.provider',
             ],
@@ -152,6 +164,9 @@ $container->loadFromExtension(
     'light_saml_symfony_bridge',
     [
         'own' => [
+            'entity_descriptor_provider' => [
+                'id' => 'mautic.security.saml.entity_descriptor_provider',
+            ],
             'entity_id' => '%mautic.saml_idp_entity_id%',
         ],
         'store' => [
@@ -161,7 +176,7 @@ $container->loadFromExtension(
     ]
 );
 
-$this->import('security_api.php');
+$loader->import('security_api.php');
 
 // List config keys we do not want the user to change via the config UI
 $restrictedConfigFields = [

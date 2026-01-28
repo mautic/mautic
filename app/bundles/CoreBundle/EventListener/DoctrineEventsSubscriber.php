@@ -2,12 +2,17 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class DoctrineEventsSubscriber implements EventSubscriber
+#[AsDoctrineListener(Events::loadClassMetadata)]
+#[AsDoctrineListener(ToolEvents::postGenerateSchema)]
+class DoctrineEventsSubscriber
 {
     private array $deprecatedEntityTables = [];
 
@@ -15,16 +20,9 @@ class DoctrineEventsSubscriber implements EventSubscriber
      * @param string $tablePrefix
      */
     public function __construct(
+        #[Autowire('%mautic.db_table_prefix%')]
         private $tablePrefix,
     ) {
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            'loadClassMetadata',
-            'postGenerateSchema',
-        ];
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
@@ -120,7 +118,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             // Check tables for obsolete indexes.
             // Single column indexes that are the leftmost column of another index are obsolete.
             // That leftmost column is available to look up rows.
-            // @see https://dev.mysql.com/doc/refman/5.7/en/multiple-column-indexes.html
+            // @see https://dev.mysql.com/doc/refman/8.4/en/multiple-column-indexes.html
             $pk              = $table->getPrimaryKey();
             $pk_first_column = $this->trimQuotes(strtolower($pk->getColumns()[0]));
 

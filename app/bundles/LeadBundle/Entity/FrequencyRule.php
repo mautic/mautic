@@ -283,7 +283,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @return FrequencyRule
      */
-    public function setPauseFromDate(\DateTime $pauseFromDate = null)
+    public function setPauseFromDate(?\DateTime $pauseFromDate = null)
     {
         $this->isChanged('pauseFromDate', $pauseFromDate);
 
@@ -303,7 +303,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @return FrequencyRule
      */
-    public function setPauseToDate(\DateTime $pauseToDate = null)
+    public function setPauseToDate(?\DateTime $pauseToDate = null)
     {
         $this->isChanged('pauseToDate', $pauseToDate);
 

@@ -1,42 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface /** @phpstan-ignore-line ContainerAwareInterface is deprecated. This will need bigger refactoring. See https://github.com/doctrine/DoctrineMigrationsBundle/issues/521 */
+abstract class AbstractMauticMigration extends AbstractMigration
 {
     protected const TABLE_NAME = null;
 
     /**
-     * @var ContainerInterface
+     * @var string
      */
-    protected $container;
+    public const COLUMN_TYPE_SIGNED = 'SIGNED';
+
+    /**
+     * @var string
+     */
+    public const COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
+
+    protected ContainerInterface $container;
 
     /**
      * Supported platforms.
      *
-     * @var array
+     * @var string[]
      */
-    protected $supported = ['mysql'];
+    protected array $supported = ['mysql'];
 
     /**
      * Database prefix.
-     *
-     * @var string
      */
-    protected $prefix;
-
-    /**
-     * Database platform.
-     *
-     * @var string
-     */
-    protected $platform;
+    protected string $prefix;
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -46,12 +46,12 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public function up(Schema $schema): void
     {
-        $platform = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
+        $platform = DatabasePlatform::getDatabasePlatform($this->platform);
 
         // Abort the migration if the platform is unsupported
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
 
-        $function = $this->platform.'Up';
+        $function = $platform.'Up';
 
         if (method_exists($this, $function)) {
             $this->$function($schema);
@@ -63,14 +63,10 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         // Not supported
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function setContainer(ContainerInterface $container = null): void
+    public function setContainer(?ContainerInterface $container = null): void
     {
-        $this->container     = $container;
-        $this->prefix        = $container->getParameter('mautic.db_table_prefix');
-        $this->platform      = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
+        $this->container = $container;
+        $this->prefix    = (string) $container->get(CoreParametersHelper::class)->get('db_table_prefix', '');
     }
 
     /**
@@ -191,12 +187,25 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      * This method will remove the burden of getting prefixed table name in individual migration file.
      * Individual migration files just need to keep a protected constant TABLE_NAME.
      */
-    protected function getPrefixedTableName(string $tableName = null): string
+    protected function getPrefixedTableName(?string $tableName = null): string
     {
         if (null === $tableName) {
             $tableName = static::TABLE_NAME;
         }
 
         return $this->prefix.$tableName;
+    }
+
+    protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string
+    {
+        $pagesTable  = $schema->getTable($this->getPrefixedTableName($tableName));
+        $idColumn    = $pagesTable->getColumn($columnName);
+        $idDataType  = self::COLUMN_TYPE_SIGNED;
+
+        if (true === $idColumn->getUnsigned()) {
+            $idDataType = self::COLUMN_TYPE_UNSIGNED;
+        }
+
+        return $idDataType;
     }
 }

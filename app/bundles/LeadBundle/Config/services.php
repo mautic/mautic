@@ -35,7 +35,8 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%'])
-        ->call('setListLeadRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.list_lead')]);
+        ->call('setListLeadRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.list_lead')])
+        ->call('setLeadFieldRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.field')]);
 
     $services->alias('mautic.lead.model.field', Mautic\LeadBundle\Model\FieldModel::class);
     $services->alias('mautic.lead.model.list', Mautic\LeadBundle\Model\ListModel::class);
@@ -64,6 +65,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.repository.field', Mautic\LeadBundle\Entity\LeadFieldRepository::class);
     $services->alias('mautic.company.deduper', Mautic\LeadBundle\Deduplicate\CompanyDeduper::class);
     $services->alias('mautic.lead.helper.contact_request_helper', Mautic\LeadBundle\Helper\ContactRequestHelper::class);
+    $services->alias('mautic.lead.helper.dnc_formatter_helper', Mautic\LeadBundle\Helper\DncFormatterHelper::class);
     $services->alias('mautic.tracker.contact', Mautic\LeadBundle\Tracker\ContactTracker::class);
+    $services->alias('mautic.lead.field.settings.background_service', Mautic\LeadBundle\Field\BackgroundService::class);
+    $services->alias('mautic.lead.report.dnc_report_service', Mautic\LeadBundle\Report\DncReportService::class);
+    $services->alias('mautic.helper.segment.count.cache', Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class);
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };

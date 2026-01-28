@@ -43,16 +43,18 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
      * @param string $operator   empty, !empty, in, !in
      * @param ?int[] $segmentIds
      */
-    private function isContactSegmentRelationshipValid(Lead $contact, string $operator, array $segmentIds = null): bool
+    private function isContactSegmentRelationshipValid(Lead $contact, string $operator, ?array $segmentIds = null): bool
     {
         $contactId = (int) $contact->getId();
 
         return match ($operator) {
-            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
-            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
-            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
-            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
-            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+            OperatorOptions::EMPTY         => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY     => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::INCLUDING_ANY => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ANY => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
+            OperatorOptions::INCLUDING_ALL => $this->segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ALL => $this->segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }
 }

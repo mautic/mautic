@@ -1,0 +1,28 @@
+{% set listTag = type == 'ordered' ? 'ol' : 'ul' %}
+{% set listClass = [
+    'list',
+    type == 'ordered' ? 'list--ordered' : 'list--unordered',
+    style == 'alphabet' ? 'list--alphabet' :
+    style == 'numbers' ? 'list--numbers' :
+    style == 'checkmark' ? 'list--check' :
+    style == 'none' ? 'list--none' : ''
+]|join(' ') %}
+
+<{{ listTag }} class="{{ listClass }}">
+    {% for item in items %}
+        <li class="list__item">
+            {% if style in ['alphabet', 'numbers', 'checkmark'] %}
+                <span class="list__item__marker list__item__marker--{{ color|default('neutral') }}" aria-hidden="true">
+                    {% if style == 'alphabet' %}
+                        {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'|slice(loop.index0 % 26, 1) }}
+                    {% elseif style == 'numbers' %}
+                        {{ loop.index0 + 1 }}
+                    {% elseif style == 'checkmark' %}
+                        <i class="ri-check-line"></i>
+                    {% endif %}
+                </span>
+            {% endif %}
+            <span class="list__item__label">{{ item|trans }}</span>
+        </li>
+    {% endfor %}
+</{{ listTag }}>

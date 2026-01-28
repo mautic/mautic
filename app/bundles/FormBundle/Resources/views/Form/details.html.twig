@@ -17,7 +17,7 @@
 
 {% block mauticContent %}form{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': activeForm,
     'templateButtons': {
@@ -27,6 +27,8 @@
     'langVar': 'form',
     'targetLabel': 'mautic.form.forms'|trans
 }) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activeForm.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': activeForm}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activeForm.name }}{% endblock %}
@@ -69,11 +71,15 @@
     'entity': activeForm,
     'status': 'available'
 }) -}}
+<div class="label__divider"></div>
 {% include '@MauticCore/Helper/_tag.html.twig' with {
     tags: [
         {
             type: 'read-only',
-            color: 'warm-gray',
+            icon: activeForm.formType == 'campaign'
+            ? 'ri-megaphone-line'
+            : 'ri-survey-line',
+            color: 'high-contrast',
             label: activeForm.formType == 'campaign'
                 ? 'mautic.form.type.campaign.header'
                 : 'mautic.form.type.standalone.header'
@@ -81,17 +87,55 @@
     ]
 } %}
 
+{% if activeForm.noIndex is defined and activeForm.noIndex == 1 %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.core.tag.search_index.disabled'|trans,
+            icon: 'ri-eye-off-fill',
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{% if activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.form.tag.kioskmode.label'|trans,
+            icon: 'ri-spy-fill',
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{# Language #}
+{% if activeForm.language is defined and activeForm.language is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: activeForm.language()|language_name,
+            icon: 'ri-translate-2',
+            color: 'warm-gray',
+            attributes: {
+                'data-toggle': 'tooltip',
+                'data-placement': 'top',
+                'title': 'mautic.core.language'|trans
+            }
+        }]
+    } %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
 {% set showActions = activeFormActions|length %}
+{% set previewUrl = url('mautic_form_action', {'objectAction': 'preview', 'objectId': activeForm.id}) %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
     <div class="col-md-9 height-auto">
         <div>
             <!-- form detail header -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeForm.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': activeForm.description} %}
             <!--/ form detail header -->
 
             <!-- form detail collapseable -->
@@ -101,14 +145,6 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
-                            <tr>
-                                <td width="20%">
-                                    <span class="fw-b">{{ 'mautic.form.stats.submission_counts'|trans }}</span>
-                                </td>
-                                <td>
-                                    {{ submissionCounts['unique'] }} / {{ submissionCounts['total'] }}
-                                </td>
-                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -132,6 +168,20 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.form.stats.submission_counts.total',
+                                'value': submissionCounts['total'],
+                                'tooltip': 'mautic.form.stats.submission_counts.total.desc',
+                                'link': path('mautic_form_action', {'objectAction': 'results', 'objectId': activeForm.id}),
+                            },
+                            {
+                                'title': 'mautic.form.stats.submission_counts.unique',
+                                'value': submissionCounts['unique'],
+                                'tooltip': 'mautic.form.stats.submission_counts.unique.desc',
+                                'icon': 'ri-user-6-line'
+                            }
+                        ]}) }}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 va-m">
@@ -144,7 +194,7 @@
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
                             </div>
                         </div>
@@ -240,39 +290,91 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
         <div class="pa-md">
-            <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
-                <div class="panel-body">
-                    <h5 class="fw-sb mb-sm">{{ 'mautic.form.form.header.copy'|trans }}</h5>
-                    <p class="mb-sm">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
-                    {% include '@MauticCore/Helper/button.html.twig' with {
-                        buttons: [
-                            {
-                                label: 'mautic.form.form.header.embedded',
-                                variant: 'info',
-                                size: 'sm',
-                                href: '#',
-                                attributes: {
-                                    'data-toggle': 'modal',
-                                    'data-target': '#modal-automatic-copy'
-                                }
-                            },
-                            {
-                                label: 'mautic.form.form.header.selfhosted',
-                                variant: 'info',
-                                size: 'sm',
-                                href: '#',
-                                attributes: {
-                                    'data-toggle': 'modal',
-                                    'data-target': '#modal-manual-copy'
-                                }
-                            }
-                        ]
-                    } %}
+            {% set aboveFoldContent %}
+                <h4 class="fw-b mb-lg">{{ 'mautic.form.form.header.copy'|trans }}</h4>
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
+                    pictogram: 'embed',
+                    size: 64,
+                    color: 'var(--icon-interactive)'
+                } %}
+            {% endset %}
 
+            {% set belowFoldContent %}
+                <h5 class="mt-lg fw-b">{{ 'mautic.form.form.header.landingpages'|trans }}</h5>
+                <p class="mt-xs mb-lg">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
+                <h5 class="mt-lg mb-sm fw-b">{{ 'mautic.form.form.header.external_cms'|trans }}</h5>
+                {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: [
+                        {
+                            label: 'mautic.form.form.header.embedded',
+                            variant: 'tertiary',
+                            size: 'sm',
+                            wide: true,
+                            attributes: {
+                                'data-toggle': 'modal',
+                                'data-target': '#modal-automatic-copy'
+                            }
+                        },
+                        {
+                            label: 'mautic.form.form.header.selfhosted',
+                            variant: 'tertiary',
+                            size: 'sm',
+                            wide: true,
+                            attributes: {
+                                'data-toggle': 'modal',
+                                'data-target': '#modal-manual-copy',
+                                'class': 'ml-0'
+                            }
+                        }
+                    ]
+                } %}
+            {% endset %}
+
+            {{ include('@MauticCore/Components/tile.html.twig', {
+                'type': 'expandable-interactive',
+                'aboveFoldContent': aboveFoldContent,
+                'belowFoldContent': belowFoldContent
+            }) }}
+        </div>
+        <!--/ form HTML -->
+
+        <!-- preview URL -->
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <div class="panel-title">{{ 'mautic.form.form.preview'|trans }}</div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="row">
+                    <div class="form-group col-xs-12">
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly 
+                                   aria-label="{{ 'mautic.page.preview.url'|trans }}"
+                                   value="{{ previewUrl|escape }}"
+                                   onclick="this.setSelectionRange(0, this.value.length);"
+                                   onfocus="this.setSelectionRange(0, this.value.length);"/>
+                            <span class="input-group-btn">
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.open_link',
+                                            variant: 'ghost',
+                                            size: 'md',
+                                            icon_only: true,
+                                            icon: 'ri-external-link-line',
+                                            attributes: {
+                                                'type': 'button'
+                                            },
+                                            onclick: 'window.open("' ~ previewUrl|e('js') ~ '", "_blank");'
+                                        }
+                                    ]
+                                } %}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!--/ form HTML -->
+        <!--/ preview URL -->
 
         <hr class="hr-w-2" style="width:50%">
 
@@ -284,54 +386,68 @@
     </div>
     <!--/ right section -->
 
-    <!-- #modal-automatic-copy -->
-    <div class="modal fade" id="modal-automatic-copy">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.embedded'|trans }}</h5>
-                </div>
-                <div class="modal-body">
-                    <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
-                    <h3>{{ 'mautic.form.form.help.automaticcopy.js'|trans }}</h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="{{ url('mautic_form_generateform', {'id': activeForm.id}, true) }}"&gt;&lt;/script&gt;</textarea>
-                    <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="{{ url('mautic_form_preview', {'id': activeForm.id}, true) }}" width="300" height="300"&gt;&lt;p&gt;Your browser does not support iframes.&lt;/p&gt;&lt;/iframe&gt;</textarea>
-                    <i>{{ 'mautic.form.form.help.automaticcopy.iframe.note'|trans }}</i>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-ghost" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--/ #modal-automatic-copy -->
+    {% set automaticCopyModalContent %}
+        <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
+        <h3>{{ 'mautic.form.form.help.automaticcopy.js'|trans }}</h3>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'single',
+            'innerText': ('<script type="text/javascript" src="' ~ absolute_url(path('mautic_form_generateform', {'id': activeForm.id})) ~ '"></script>')
+        }) }}
+        <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'single',
+            'innerText': ('<iframe src="' ~ absolute_url(path('mautic_form_preview', {'id': activeForm.id})) ~ '" width="300" height="300" title="' ~ ('mautic.form.form.iframe.title'|trans) ~ '"><p>Your browser does not support iframes.</p></iframe>')
+        }) }}
+        <i>{{ 'mautic.form.form.help.automaticcopy.iframe.note'|trans }}</i>
+    {% endset %}
 
-    <!-- #modal-manual-copy -->
-    <div class="modal fade" id="modal-manual-copy">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.selfhosted'|trans }}</h5>
-                </div>
-                <div class="panel-body">
-                    <p>{{ 'mautic.form.form.help.selfhosted'|trans }}</p>
+    {{ include('@MauticCore/Components/modal.html.twig', {
+        id: 'modal-automatic-copy',
+        modalLabel: 'mautic.form.form.header.copy',
+        modalHeading: 'mautic.form.form.header.embedded',
+        modalContent: automaticCopyModalContent,
+        buttons: [
+            {
+                label: 'mautic.core.close'|trans,
+                variant: 'primary',
+                attributes: {
+                    'data-dismiss': 'modal'
+                }
+            }
+        ]
+    }) }}
 
-                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
-                    <textarea class="form-html form-control" readonly
-                              onclick="this.setSelectionRange(0, this.value.length);">{{ formScript|purify }}</textarea>
+    {% set manualCopyModalContent %}
+        <p>{{ 'mautic.form.form.help.selfhosted'|trans }}</p>
 
-                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
-                    <textarea class="form-html form-control" readonly
-                              onclick="this.setSelectionRange(0, this.value.length);">{{ formContent|raw }}</textarea>
-                </div>
-                <div class="panel-footer text-right">
-                    <button type="button" class="btn btn-ghost" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--/ #modal-manual-copy -->
+        <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'multi',
+            'innerText': formScript
+        }) }}
+
+        <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
+        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+            'variant': 'multi',
+            'innerText': formContent
+        }) }}
+    {% endset %}
+
+    {{ include('@MauticCore/Components/modal.html.twig', {
+        id: 'modal-manual-copy',
+        modalLabel: 'mautic.form.form.header.copy',
+        modalHeading: 'mautic.form.form.header.selfhosted',
+        modalContent: manualCopyModalContent,
+        buttons: [
+            {
+                label: 'mautic.core.close'|trans,
+                variant: 'primary',
+                attributes: {
+                    'data-dismiss': 'modal'
+                }
+            }
+        ]
+    }) }}
 </div>
 <!--/ end: box layout -->
 

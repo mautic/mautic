@@ -78,7 +78,7 @@ class ReportGeneratorEventTest extends TestCase
 
     public function testAddLeadLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->exactly(5))
+        $this->report->expects($this->exactly(6))
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'h.name']);
 
@@ -248,23 +248,23 @@ class ReportGeneratorEventTest extends TestCase
         $this->report->expects($this->once())
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'e.title', 'comp.name']);
+        $matcher = $this->exactly(2);
 
-        $this->queryBuilder->expects($this->exactly(2))
-            ->method('leftJoin')
-            ->withConsecutive(
-                [
-                    'l',
-                    MAUTIC_TABLE_PREFIX.'companies_leads',
-                    'companies_lead',
-                    ReportGeneratorEvent::CONTACT_PREFIX.'.id =companies_lead.lead_id',
-                ],
-                [
-                    'companies_lead',
-                    MAUTIC_TABLE_PREFIX.'companies',
-                    ReportGeneratorEvent::COMPANY_PREFIX,
-                    'companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id',
-                ]
-            );
+        $this->queryBuilder->expects($matcher)
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('l', $parameters[0]);
+                    $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);
+                    $this->assertSame('companies_lead', $parameters[2]);
+                    $this->assertSame(ReportGeneratorEvent::CONTACT_PREFIX.'.id =companies_lead.lead_id', $parameters[3]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('companies_lead', $parameters[0]);
+                    $this->assertSame(MAUTIC_TABLE_PREFIX.'companies', $parameters[1]);
+                    $this->assertSame(ReportGeneratorEvent::COMPANY_PREFIX, $parameters[2]);
+                    $this->assertSame('companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id', $parameters[3]);
+                }
+            });
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
 
@@ -287,9 +287,7 @@ class ReportGeneratorEventTest extends TestCase
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
 
-    /**
-     * @dataProvider applyFilterProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('applyFilterProvider')]
     public function testApplyFilters(bool $dateOnly, string $condition, string $dateFormat): void
     {
         $tablePrefix = 't';
@@ -308,16 +306,25 @@ class ReportGeneratorEventTest extends TestCase
             ->method('andWhere')
             ->with($condition)
             ->willReturn($this->queryBuilder);
+        $matcher = $this->any();
 
         $this
             ->queryBuilder
-            ->expects($this->any())
-            ->method('setParameter')
-            ->withConsecutive(
-                ['dateFrom', $this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat)],
-                ['dateTo', $this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat)]
-            )
-            ->willReturnOnConsecutiveCalls($this->queryBuilder, $this->queryBuilder);
+            ->expects($matcher)
+            ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $dateFormat) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('dateFrom', $parameters[0]);
+                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat), $parameters[1]);
+
+                    return $this->queryBuilder;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('dateTo', $parameters[0]);
+                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat), $parameters[1]);
+
+                    return $this->queryBuilder;
+                }
+            });
 
         $this->reportGeneratorEvent->applyDateFilters($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
     }
@@ -325,7 +332,7 @@ class ReportGeneratorEventTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function applyFilterProvider(): array
+    public static function applyFilterProvider(): array
     {
         return [
             [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s'],
@@ -333,9 +340,7 @@ class ReportGeneratorEventTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider applyFilterWithoutNullValuesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('applyFilterWithoutNullValuesProvider')]
     public function testApplyFiltersWithoutNullValues(bool $dateOnly, string $condition, string $dateFormat): void
     {
         $tablePrefix = 't';
@@ -353,16 +358,25 @@ class ReportGeneratorEventTest extends TestCase
             ->method('andWhere')
             ->with($condition)
             ->willReturn($this->queryBuilder);
+        $matcher = $this->any();
 
         $this
             ->queryBuilder
-            ->expects($this->any())
-            ->method('setParameter')
-            ->withConsecutive(
-                ['dateFrom', $this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat)],
-                ['dateTo', $this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat)]
-            )
-            ->willReturnOnConsecutiveCalls($this->queryBuilder, $this->queryBuilder);
+            ->expects($matcher)
+            ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $dateFormat) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('dateFrom', $parameters[0]);
+                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat), $parameters[1]);
+
+                    return $this->queryBuilder;
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('dateTo', $parameters[0]);
+                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat), $parameters[1]);
+
+                    return $this->queryBuilder;
+                }
+            });
 
         $this->reportGeneratorEvent->applyDateFiltersWithoutNullValues($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
     }
@@ -370,7 +384,7 @@ class ReportGeneratorEventTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function applyFilterWithoutNullValuesProvider(): array
+    public static function applyFilterWithoutNullValuesProvider(): array
     {
         return [
             [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s'],

@@ -152,9 +152,8 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Verify a constraint message.
-     *
-     * @dataProvider validateDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
     public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)

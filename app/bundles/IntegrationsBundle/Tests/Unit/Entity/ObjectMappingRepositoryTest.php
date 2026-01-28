@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -33,10 +34,9 @@ final class ObjectMappingRepositoryTest extends TestCase
         $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->entityManager));
 
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
-        $this->query = $this->getMockBuilder(AbstractQuery::class)
+        $this->query = $this->getMockBuilder(Query::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['setParameters', 'getSingleResult', 'getSQL', '_doExecute'])
-            ->addMethods(['setFirstResult', 'setMaxResults'])
+            ->onlyMethods(['setParameters', 'getSingleResult', 'getSQL', '_doExecute', 'setFirstResult', 'setMaxResults'])
             ->getMock();
 
         $this->query->expects($this->once())

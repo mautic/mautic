@@ -15,14 +15,6 @@ $projectRoot = $container->getParameter('kernel.project_dir');
 
 include __DIR__.'/paths_helper.php';
 
-// Load extra annotations
-$container->loadFromExtension('sensio_framework_extra', [
-    'router'  => ['annotations' => false],
-    'request' => ['converters' => false],
-    'view'    => ['annotations' => true],
-    'cache'   => ['annotations' => false],
-]);
-
 // Build and store Mautic bundle metadata
 $symfonyBundles        = $container->getParameter('kernel.bundles');
 $bundleMetadataBuilder = new Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths);
@@ -52,6 +44,9 @@ if (defined('MAUTIC_INSTALLER')) {
 }
 
 $container->loadFromExtension('framework', [
+    'assets' => [
+        'base_path' => './',
+    ],
     'secret' => '%mautic.secret_key%',
     'router' => [
         'resource'            => '%mautic.application_dir%/app/config/routing.php',
@@ -60,7 +55,7 @@ $container->loadFromExtension('framework', [
     'form'            => null,
     'csrf_protection' => true,
     'validation'      => [
-        'enable_annotations' => false,
+        'enable_attributes' => false,
     ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [
@@ -76,7 +71,9 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        'transports' => [
+            'main' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        ],
     ],
     'messenger'            => [
         'failure_transport'  => 'failed',
@@ -123,7 +120,6 @@ $connectionSettings = [
     'charset'               => 'utf8mb4',
     'default_table_options' => [
         'charset'    => 'utf8mb4',
-        'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
@@ -269,34 +265,11 @@ $container->loadFromExtension('jms_serializer', [
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
-            'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
             'doctrine_result_cache'  => [
                 'adapter' => 'cache.adapter.array',
             ],
         ],
     ],
-]);
-
-// Twig Configuration
-$container->loadFromExtension('twig', [
-    'exception_controller' => null,
-]);
-
-$rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
-$container->loadFromExtension('noxlogic_rate_limit', [
-    'enabled'        => 0 === $rateLimit ? false : true,
-    'storage_engine' => 'cache',
-    'cache_service'  => 'api_rate_limiter_cache',
-    'path_limits'    => [
-        [
-            'path'   => '/api',
-            'limit'  => $rateLimit,
-            'period' => 3600,
-        ],
-    ],
-    'fos_oauth_key_listener' => true,
-    'display_headers'        => true,
-    'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
@@ -391,5 +364,77 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
             ],
         ],
+    ],
+]);
+
+// API Platform Configuration
+$container->loadFromExtension('api_platform', [
+    'title'             => 'Mautic API',
+    'description'       => 'API endpoints for Mautic',
+    'version'           => '1.0.0',
+    'show_webby'        => false,
+    'enable_swagger'    => true,
+    'enable_swagger_ui' => true,
+    'swagger'           => [
+        'versions' => [3],
+    ],
+    'enable_re_doc'     => true,
+    'enable_entrypoint' => true,
+    'enable_docs'       => true,
+    'enable_profiler'   => false,
+    'collection'        => [
+        'pagination'    => [
+            'enabled'        => true,
+        ],
+    ],
+    'patch_formats'     => [
+        'json'    => ['application/merge-patch+json'],
+        'jsonapi' => ['application/vnd.api+json'],
+    ],
+    'formats' => [
+        'jsonld'  => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+        'json'    => [
+            'mime_types' => [
+                'application/json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
+            ],
+        ],
+        'html' => [
+            'mime_types' => [
+                'text/html',
+            ],
+        ],
+    ],
+    'error_formats' => [
+        'jsonproblem' => [
+            'mime_types' => [
+                'application/problem+json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
+            ],
+        ],
+        'jsonld' => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+    ],
+    'exception_to_status' => [
+        'Symfony\Component\Serializer\Exception\ExceptionInterface'       => 400,
+        'ApiPlatform\Exception\InvalidArgumentException'                  => Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST,
+        'ApiPlatform\Validator\Exception\ValidationException'             => 400,
+        'Doctrine\ORM\OptimisticLockException'                            => 409,
+        'Symfony\Component\Security\Core\Exception\AccessDeniedException' => 403,
     ],
 ]);
