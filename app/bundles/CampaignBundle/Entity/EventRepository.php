@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -154,6 +155,43 @@ class EventRepository extends CommonRepository
      */
     public function getCampaignEmailEvents(int $campaignId): array
     {
+        /*
+         * Switching to DBAL's QueryBuilder for raw SQL
+         * to bypass DQL parser limitations and handle platform-specific join conditions.
+         */
+        $entityManager = $this->getEntityManager();
+        $connection    = $entityManager->getConnection();
+        $platform      = $connection->getDatabasePlatform();
+
+        // Build query with DBAL QueryBuilder
+        $dbalQb = $connection->createQueryBuilder();
+
+        $joinCondition = $platform instanceof PostgreSQLPlatform
+            ? "em.id = CASE  WHEN e.channel_id IS NOT NULL  AND e.channel_id != ''  AND e.channel_id ~ '^[0-9]+$' THEN CAST(e.channel_id AS INTEGER) ELSE 0 END"
+            : 'em.id = e.channel_id';
+
+        $dbalQb->select('DISTINCT em.*')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')
+            ->innerJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'em', $joinCondition)
+            ->where('e.campaign_id = :campaignId')
+            ->andWhere('e.channel = :channel')
+            ->andWhere('e.deleted IS NULL')
+            ->setParameter('campaignId', $campaignId)
+            ->setParameter('channel', Event::CHANNEL_EMAIL);
+
+        // Map to entities in a single step
+        $rsm = new ResultSetMappingBuilder($entityManager);
+        $rsm->addRootEntityFromClassMetadata(Email::class, 'em');
+
+        $query = $entityManager->createNativeQuery($dbalQb->getSQL(), $rsm);
+
+        // Transfer parameters
+        foreach ($dbalQb->getParameters() as $key => $value) {
+            $query->setParameter($key, $value);
+        }
+
+        return $query->getResult();
+        /*
         $qb = $this->getEntityManager()->createQueryBuilder();
 
         $platform      = $this->getEntityManager()->getConnection()->getDatabasePlatform();
@@ -182,6 +220,7 @@ class EventRepository extends CommonRepository
             ->setParameter('channel', Event::CHANNEL_EMAIL)
             ->getQuery()
             ->getResult();
+        */
     }
 
     /**
