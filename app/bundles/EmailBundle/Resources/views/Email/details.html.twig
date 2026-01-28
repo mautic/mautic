@@ -315,6 +315,18 @@
                                   </td>
                                   <td>{{ email.readCount }}</td>
                               </tr>
+                              {% if emailType == 'list' and email.lists|length > 0 %}
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                                  </td>
+                                  <td>
+                                      {% for list in email.lists %}
+                                          <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">{{ list.name|purify }}</a>{% if not loop.last %}, {% endif %}
+                                      {% endfor %}
+                                  </td>
+                              </tr>
+                              {% endif %}
                               </tbody>
                           </table>
                       </div>
