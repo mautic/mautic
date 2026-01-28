@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 

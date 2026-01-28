@@ -159,7 +159,7 @@ class EventRepository extends CommonRepository
         $platform      = $this->getEntityManager()->getConnection()->getDatabasePlatform();
 
         $joinCondition = ($platform instanceof PostgreSQLPlatform) // DQL convert e.channelId LIKE '%[^0-9]%' to proper format
-            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId != '' AND e.channelId LIKE '%[^0-9]%' THEN e.channelId::integer ELSE 0 END)"
+            ? "em.id = (CASE WHEN e.channelId IS NOT NULL AND e.channelId != '' AND e.channelId LIKE '%[^0-9]%' THEN CAST(e.channelId as INTEGER) ELSE 0 END)"
             : 'em.id = e.channelId';
 
         return $qb
