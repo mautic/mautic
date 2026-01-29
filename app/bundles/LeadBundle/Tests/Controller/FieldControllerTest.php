@@ -14,7 +14,7 @@ class FieldControllerTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['create_custom_field_in_background'] = 'testAbortColumnCreateExceptionIsHandledOnEditAction' === $this->getName();
+        $this->configParams['create_custom_field_in_background'] = 'testAbortColumnCreateExceptionIsHandledOnEditAction' === $this->name();
 
         parent::setUp();
     }
