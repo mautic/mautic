@@ -172,7 +172,7 @@ jobs:
         run: |
           echo "DB_DRIVER=pdo_pgsql" > .env.test
           echo "DB_HOST=localhost" >> .env.test
-          echo "DB_PORT=5432" >> .env.test
+          echo "DB_PORT=${{ job.services.postgres.ports[5432] }}" >> .env.test
           echo "DB_NAME=mautictest" >> .env.test
           echo "DB_USER=mautic" >> .env.test
           echo "DB_PASSWD=mautic" >> .env.test
@@ -183,7 +183,7 @@ jobs:
           echo "MAUTIC_ADMIN_USERNAME=admin" >> .env.test
           echo "MAUTIC_ADMIN_PASSWORD=mautic" >> .env.test
           echo "SAML_HOST=localhost" >> .env.test
-          echo "SAML_PORT=8080" >> .env.test
+          echo "SAML_PORT=${{ job.services.saml.ports[8080] }}" >> .env.test
 
       - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
         env:
