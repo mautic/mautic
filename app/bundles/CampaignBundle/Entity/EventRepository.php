@@ -177,7 +177,7 @@ class EventRepository extends CommonRepository
         $subQb = $connection->createQueryBuilder();
 
         $channelIdWhere = $platform instanceof PostgreSQLPlatform
-            ? "CASE WHEN e.channel_id IS NOT NULL AND e.channel_id != '' AND e.channel_id ~ '^[0-9]+$' THEN CAST(e.channel_id AS INTEGER) ELSE 0 END = em.id"
+            ? 'e.channel_id = CAST(em.id as TEXT)' // "CASE WHEN e.channel_id IS NOT NULL AND e.channel_id != '' AND e.channel_id ~ '^[0-9]+$' THEN CAST(e.channel_id AS INTEGER) ELSE 0 END = em.id"
             : 'e.channel_id = em.id';
 
         $subQb->select('1')

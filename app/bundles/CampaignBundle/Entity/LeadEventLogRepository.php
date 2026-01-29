@@ -382,8 +382,8 @@ class LeadEventLogRepository extends CommonRepository
             $query->andWhere('e.channel = '.$query->expr()->literal($options['channel']));
         }
 
-        if (isset($options['channelId'])) {
-            $query->andWhere('e.channel_id = '.(int) $options['channelId']);
+        if (isset($options['channelId'])) { // match as text to make PostgreSQL happy
+            $query->andWhere('e.channel_id = '.$query->expr()->literal($options['channelId']));
         }
 
         if (isset($options['type'])) {
