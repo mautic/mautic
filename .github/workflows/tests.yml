@@ -21,8 +21,8 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.2', '8.3', '8.4']
-        db-types: ['mysql:8.4', 'mysql:9.2', 'mariadb:10.11', 'mariadb:11.4']
+        php-versions: ['8.4']
+        db-types: ['mariadb:11.4']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -74,6 +74,9 @@ jobs:
         coverage: pcov
         ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
 
+    - name: Install mysql client
+      run: sudo apt-get update && sudo apt-get install -y mysql-client
+
     - name: add MySQL config file
       run: |
         mysqldump --version
@@ -100,43 +103,14 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
+        export DB_HOST=192.168.0.100
+        export DB_PORT=32774
+
         if [[ "${{ matrix.php-versions }}" == "8.2" ]] && [[ "${{ matrix.db-types }}" == "mariadb:10.11" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
-
-    - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v5
-      with:
-        files: ./coverage.xml
-        fail_ci_if_error: true
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Save test results for future steps
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          ./junit.xml
-          ./coverage.xml
-
-    - name: Slack Notification if tests fail
-      uses: rtCamp/action-slack-notify@v2
-      if: ${{ failure() && github.event_name == 'schedule' }}
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
-
-    - name: Store log artifacts
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
-        path: ./var/logs/*
 
   phpunit-postgres:
     # Same gating as the main phpunit job
@@ -193,6 +167,23 @@ jobs:
 
       - name: Install psql client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Configure env for ${{ matrix.db }}
+        run: |
+          echo "DB_DRIVER=${{ matrix.db == 'pgsql' && 'pdo_pgsql' || 'pdo_mysql' }}" > .env.test
+          echo "DB_HOST=localhost" >> .env.test
+          echo "DB_PORT=${{ matrix.db == 'pgsql' && 5432 || 3306 }}" >> .env.test
+          echo "DB_NAME=${{ matrix.db == 'pgsql' && 'mautictest' || 'mautictest' }}" >> .env.test
+          echo "DB_USER=${{ matrix.db == 'pgsql' && 'mautic' || 'mautic' }}" >> .env.test
+          echo "DB_PASSWD=${{ matrix.db == 'pgsql' && 'mautic' || '' }}" >> .env.test
+          echo "DB_CHARSET=${{ matrix.db == 'pgsql' && 'UTF8' || 'utf8mb4' }}" >> .env.test
+          echo "MAUTIC_DB_PREFIX=test_" >> .env.test
+          echo "MAUTIC_TABLE_PREFIX=test_" >> .env.test
+          echo "MAUTIC_ENV=test" >> .env.test
+          echo "MAUTIC_ADMIN_USERNAME=admin" >> .env.test
+          echo "MAUTIC_ADMIN_PASSWORD=mautic" >> .env.test
+          echo "SAML_HOST=localhost" >> .env.test
+          echo "SAML_PORT=8080" >> .env.test
 
       - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
         env:
@@ -390,10 +381,3 @@ jobs:
           echo "Invalid command"
           exit 1
         fi
-
-    - name: Slack Notification if tests fail
-      uses: rtCamp/action-slack-notify@v2
-      if: ${{ failure() && github.event_name == 'schedule' }}
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'

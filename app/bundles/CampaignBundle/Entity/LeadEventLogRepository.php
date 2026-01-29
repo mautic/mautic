@@ -65,13 +65,14 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getLeadLogs($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()
-                      ->getConnection()
-                      ->createQueryBuilder()
-                      ->select('ll.id as log_id,
+        $connection = $this->getEntityManager()->getConnection();
+
+        $query = $connection
+            ->createQueryBuilder()
+            ->select('ll.id as log_id,
                     ll.event_id,
                     ll.campaign_id,
-                    ll.date_triggered as dateTriggered,
+                    ll.date_triggered as '.$connection->quoteIdentifier('dateTriggered').',
                     e.name AS event_name,
                     e.description AS event_description,
                     e.parent_id AS parent_id,
@@ -80,25 +81,32 @@ class LeadEventLogRepository extends CommonRepository
                     c.description AS campaign_description,
                     ll.metadata,
                     e.type,
-                    ll.is_scheduled as isScheduled,
-                    ll.trigger_date as triggerDate,
+                    ll.is_scheduled as '.$connection->quoteIdentifier('isScheduled').',
+                    ll.trigger_date as '.$connection->quoteIdentifier('triggerDate').',
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
                     fl.reason as fail_reason,
                     e.deleted AS event_deleted_timestamp,
                     e.redirect_event_id,
-                    ll.metadata')
-                        ->add('from', [
-                            'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
-                            'alias' => 'll',
-                            'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
-                        ], true)
-                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
-                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-                        ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
-                        ->andWhere('e.event_type != :eventType')
-                        ->setParameter('eventType', 'decision');
+                    ll.metadata');
+
+        if ($connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll');
+        } else {
+            $query->add('from', [
+                'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'alias' => 'll',
+                'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
+            ], true);
+        }
+
+        $query
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
+            ->andWhere('e.event_type != :eventType')
+            ->setParameter('eventType', 'decision');
 
         if ($leadId) {
             $query->where('ll.lead_id = :leadId')

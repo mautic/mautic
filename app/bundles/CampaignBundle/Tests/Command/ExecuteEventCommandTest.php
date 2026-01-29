@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
 
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
