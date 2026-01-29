@@ -168,15 +168,15 @@ jobs:
       - name: Install psql client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Configure env for ${{ matrix.db }}
+      - name: Configure env for postgres
         run: |
-          echo "DB_DRIVER=${{ matrix.db == 'pgsql' && 'pdo_pgsql' || 'pdo_mysql' }}" > .env.test
+          echo "DB_DRIVER=pdo_pgsql" > .env.test
           echo "DB_HOST=localhost" >> .env.test
-          echo "DB_PORT=${{ matrix.db == 'pgsql' && 5432 || 3306 }}" >> .env.test
-          echo "DB_NAME=${{ matrix.db == 'pgsql' && 'mautictest' || 'mautictest' }}" >> .env.test
-          echo "DB_USER=${{ matrix.db == 'pgsql' && 'mautic' || 'mautic' }}" >> .env.test
-          echo "DB_PASSWD=${{ matrix.db == 'pgsql' && 'mautic' || '' }}" >> .env.test
-          echo "DB_CHARSET=${{ matrix.db == 'pgsql' && 'UTF8' || 'utf8mb4' }}" >> .env.test
+          echo "DB_PORT=5432" >> .env.test
+          echo "DB_NAME=mautictest" >> .env.test
+          echo "DB_USER=mautic" >> .env.test
+          echo "DB_PASSWD=mautic" >> .env.test
+          echo "DB_CHARSET=UTF8" >> .env.test
           echo "MAUTIC_DB_PREFIX=test_" >> .env.test
           echo "MAUTIC_TABLE_PREFIX=test_" >> .env.test
           echo "MAUTIC_ENV=test" >> .env.test
