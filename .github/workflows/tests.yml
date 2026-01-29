@@ -103,9 +103,6 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
-        export DB_HOST=192.168.0.100
-        export DB_PORT=32774
-
         if [[ "${{ matrix.php-versions }}" == "8.2" ]] && [[ "${{ matrix.db-types }}" == "mariadb:10.11" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else

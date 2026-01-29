@@ -278,13 +278,6 @@ class MessageController extends AbstractStandardFormController
             ];
         }
 
-        $platform   = $this->doctrine->getConnection()->getDatabasePlatform();
-        $isPostgres = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-
-        $channelIdCondition = $isPostgres
-            ? 'event.channel_id::integer = '.(int) $objectId
-            : 'event.channel_id = '.(int) $objectId;
-
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,
@@ -302,7 +295,7 @@ class MessageController extends AbstractStandardFormController
                     'from_alias' => 'entity',
                     'table'      => 'campaign_events',
                     'alias'      => 'event', // make postgresql happy, compare as text
-                    'condition'  => "entity.event_id = event.id and event.channel = 'channel.message' and ".$channelIdCondition,
+                    'condition'  => "entity.event_id = event.id and event.channel = 'channel.message' and event.channel_id = '".(int) $objectId."'",
                 ],
             ],
             null,
