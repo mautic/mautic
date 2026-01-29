@@ -59,8 +59,12 @@ trait CustomFieldRepositoryTrait
             if (!empty($args['totalCountTtl'])) {
                 $statement = ResultCacheHelper::executeCachedDbalQuery($this->getEntityManager()->getConnection(), $dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
             } else {
-                echo PHP_EOL.$dq->getSQL().PHP_EOL;
-                $statement = $dq->executeQuery();
+                try {
+                    $statement = $dq->executeQuery();
+                } catch (Exception $e) {
+                    echo PHP_EOL.$dq->getSQL().PHP_EOL;
+                    echo $e->getTraceAsString().PHP_EOL;
+                }
             }
 
             $result = $statement->fetchAllAssociative();
