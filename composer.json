@@ -40,7 +40,7 @@
     "phpstan/phpstan-doctrine": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
-    "phpunit/phpunit": "^10.0",
+    "phpunit/phpunit": "^10.5.62",
     "rector/rector": "2.2",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
