@@ -63,6 +63,7 @@ trait CustomFieldRepositoryTrait
                     $statement = $dq->executeQuery();
                 } catch (Exception $e) {
                     echo PHP_EOL.$dq->getSQL().PHP_EOL;
+                    echo $e->getMessage().PHP_EOL;
                     echo $e->getTraceAsString().PHP_EOL;
                 }
             }
