@@ -6,6 +6,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
@@ -181,7 +182,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             foreach ($limitToUrls as $url) {
                 $url              = html_entity_decode(trim($url));
-                $urlMatches[$url] = fnmatch($url, $pageUrl);
+                // @aivie Campaigns: All URL filters use the same logic / regex
+                $urlMatches[$url] = UrlMatcher::hasMatch([$url], $pageUrl);
             }
         }
 
@@ -194,7 +196,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             foreach ($limitToReferers as $referer) {
                 $referer                  = html_entity_decode(trim($referer));
-                $refererMatches[$referer] = fnmatch($referer, $refererUrl);
+                // @aivie Campaigns: All URL filters use the same logic / regex
+                $refererMatches[$referer] = UrlMatcher::hasMatch([$referer], $refererUrl);
             }
         }
 

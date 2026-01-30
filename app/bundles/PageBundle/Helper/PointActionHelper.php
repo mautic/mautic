@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
@@ -43,7 +44,7 @@ class PointActionHelper
         $url          = $eventDetails->getUrl();
         $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
 
-        if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
+        if (!$limitToUrl || !UrlMatcher::hasMatch([$limitToUrl], $url)) {
             // no points change
             return false;
         }
