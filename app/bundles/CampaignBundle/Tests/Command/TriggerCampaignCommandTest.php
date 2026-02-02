@@ -24,12 +24,14 @@ use PHPUnit\Framework\Assert;
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;
-
-    protected $useCleanupRollback                             = false;
     private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
 
     protected function setUp(): void
     {
+        if ($this->isPostgresqlPlatform()) {
+            $this->useCleanupRollback = false;
+        }
+
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCacheCountInBackground' === $this->name();
         parent::setUp();
 
