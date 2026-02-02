@@ -16,19 +16,9 @@ class Scheduler
     private $id;
 
     /**
-     * @var Report
-     */
-    private $report;
-
-    /**
      * @var array<mixed>
      */
     private array $data = [];
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $scheduleDate;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
