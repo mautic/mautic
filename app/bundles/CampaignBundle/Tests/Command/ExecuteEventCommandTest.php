@@ -9,19 +9,8 @@ use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
 
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
-    protected function setUp(): void
-    {
-        if ($this->isPostgresqlPlatform()) {
-            $this->useCleanupRollback = false;
-        }
-
-        parent::setUp();
-    }
-
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         if ($this->isPostgresqlPlatform()) {
