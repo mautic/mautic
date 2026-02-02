@@ -44,9 +44,9 @@
     "gaufrette/extras": "^0.1.0",
     "geoip2/geoip2": "~2.0",
     "giggsey/libphonenumber-for-php": "^8.12",
-    "guzzlehttp/guzzle": "^7.6",
+    "guzzlehttp/guzzle": "~7.10.0",
     "guzzlehttp/oauth-subscriber": "^0.8.1",
-    "helios-ag/fm-elfinder-bundle": "^12.3",
+    "helios-ag/fm-elfinder-bundle": "^13.0",
     "illuminate/collections": "^10.48",
     "ip2location/ip2location-php": "^7.2",
     "javer/sp-bundle": "^2.0",
@@ -104,7 +104,7 @@
     "symfony/twig-bundle": "~7.4.0",
     "symfony/validator": "~7.4.0",
     "twilio/sdk": "^5.25",
-    "wikimedia/less.php": "^5.4"
+    "wikimedia/less.php": "^5.5"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"

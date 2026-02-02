@@ -228,7 +228,7 @@ class Field implements UuidInterface
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $mappedField;
 
-    public ?int $deletedId;
+    public ?int $deletedId = null;
 
     public function __clone()
     {

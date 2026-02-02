@@ -142,10 +142,8 @@ class MailHelper
 
     /**
      * Tells the helper that the transport supports tokenized emails (likely HTTP API).
-     *
-     * @var bool
      */
-    protected $tokenizationEnabled = false;
+    protected bool $tokenizationEnabled;
 
     /**
      * Use queue mode when sending email through this mailer; this requires a transport that supports tokenization and the use of queue/flushQueue.
@@ -252,6 +250,7 @@ class MailHelper
         private AssetModel $assetModel,
         private TrackableModel $trackableModel,
         private RedirectModel $redirectModel,
+        private SMimeHelper $sMimeHelper,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -265,12 +264,18 @@ class MailHelper
         $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
-        // Check if batching is supported by the transport
-        if ($this->transport instanceof TokenTransportInterface) {
-            $this->tokenizationEnabled = true;
+        $this->message = $this->getMessageInstance();
+
+        $this->tokenizationEnabled = $this->isTokenizationSupported();
+    }
+
+    private function isTokenizationSupported(): bool
+    {
+        if ($this->sMimeHelper->sMimeSigningEnabled()) {
+            return false;
         }
 
-        $this->message = $this->getMessageInstance();
+        return $this->transport instanceof TokenTransportInterface;
     }
 
     /**
@@ -387,9 +392,12 @@ class MailHelper
                 }
             }
 
+            // Sign the message with S/MIME if enabled
+            $messageToSend = $this->sMimeHelper->signContent($this->message);
+
             try {
                 if (!$this->skip) {
-                    $this->mailer->send($this->message);
+                    $this->mailer->send($messageToSend);
                     $this->message->clearMetadata();
                 }
                 $this->skip = false;
@@ -1119,6 +1127,7 @@ class MailHelper
     {
         try {
             $this->message->from($from->toMailerAddress());
+            $this->message->sender($from->toMailerAddress());
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }

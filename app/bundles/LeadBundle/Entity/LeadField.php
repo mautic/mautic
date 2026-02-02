@@ -691,7 +691,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function setIsShortVisible(?bool $isShortVisible): self
     {
-        $isShortVisible = $isShortVisible ?? false;
+        $isShortVisible ??= false;
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
 
