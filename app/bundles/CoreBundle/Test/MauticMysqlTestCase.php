@@ -41,6 +41,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (!isset($this->configParams['db_charset']) || empty($this->configParams['db_charset'])) {
             $this->configParams['db_charset'] = 'pdo_pgsql' == $this->configParams['db_driver'] ? 'UTF8' : 'utf8mb4';
         }
+
+        $this->useCleanupRollback = 'pdo_pgsql' != $this->configParams['db_driver'];
     }
 
     protected function isMysqlPlatform(): bool
@@ -77,7 +79,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
         $this->loginUser($user); // also creates session
 
-        if ($this->useCleanupRollback && !$this->isPostgresqlPlatform()) {
+        if ($this->useCleanupRollback) {
             $this->beforeBeginTransaction();
             $this->connection->beginTransaction();
         }
