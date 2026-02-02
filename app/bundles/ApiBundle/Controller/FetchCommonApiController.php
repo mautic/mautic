@@ -483,7 +483,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         // It must be associative because the order of entities has changed
         $idHelper->setIsAssociative(true);
 
-        [$entities, $total] = $prepareForSerialization
+        [$entities] = $prepareForSerialization
             ? $this->prepareEntitiesForView($entities)
             : $this->prepareEntityResultsToArray($entities);
 
@@ -491,14 +491,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $foundIds = [];
         foreach ($entities as $entity) {
             $foundIds[$entity->getId()] = true;
-        }
-
-        foreach ($requestedIds as $originalKey => $id) {
-            if (!isset($validIds[$originalKey])) {
-                $this->setBatchError($originalKey, "Invalid ID: {$id}", Response::HTTP_BAD_REQUEST, $errors);
-            } elseif (!isset($foundIds[(int) $id])) {
-                $this->setBatchError($originalKey, "ID not found: {$id}", Response::HTTP_NOT_FOUND, $errors);
-            }
         }
 
         // Return the response with matching keys from the request
