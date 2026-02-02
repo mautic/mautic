@@ -263,7 +263,25 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            $property = $this->getPropertyByField($field, $q);
+            $property     = $this->getPropertyByField($field, $q);
+            $coercedValue = $value;
+
+            if ($isPg) {
+                // Coerce value to safe type based on expected column semantics
+                // This mimics MySQL loose typing without breaking PG strictness
+                if (is_string($value)) {
+                    $trimmed = trim($value);
+
+                    // For numeric-ish operators, try to cast safely or fallback to 0
+                    if (in_array($operatorExpr, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
+                        if (is_numeric($trimmed)) {
+                            $coercedValue = (float) $trimmed; // use float to handle decimals
+                        } else {
+                            $coercedValue = 0; // invalid → 0, like MySQL
+                        }
+                    }
+                }
+            }
 
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
                 $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
@@ -353,15 +371,15 @@ class LeadFieldRepository extends CommonRepository
                     switch ($operatorExpr) {
                         case 'startsWith':
                             $operatorExpr = 'like';
-                            $value        = $value.'%';
+                            $value        = $coercedValue.'%';
                             break;
                         case 'endsWith':
                             $operatorExpr = 'like';
-                            $value        = '%'.$value;
+                            $value        = '%'.$coercedValue;
                             break;
                         case 'contains':
                             $operatorExpr = 'like';
-                            $value        = '%'.$value.'%';
+                            $value        = '%'.$coercedValue.'%';
                             break;
                     }
 
@@ -375,7 +393,7 @@ class LeadFieldRepository extends CommonRepository
 
                 $q->where($expr)
                   ->setParameter('lead', (int) $lead)
-                  ->setParameter('value', $value);
+                  ->setParameter('value', $coercedValue);
             }
 
             if (str_starts_with($property, 'u.')) {
