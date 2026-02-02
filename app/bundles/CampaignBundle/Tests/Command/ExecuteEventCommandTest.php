@@ -13,6 +13,8 @@ use PHPUnit\Framework\Assert;
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
+    protected $useCleanupRollback = false;
+
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         if ($this->isPostgresqlPlatform()) {
