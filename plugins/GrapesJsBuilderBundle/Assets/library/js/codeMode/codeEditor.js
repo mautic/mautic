@@ -90,15 +90,49 @@ class CodeEditor {
     }
 
     try {
+      // For HTML mode (non-MJML), we need to extract only the body content
+      // to prevent head content from being duplicated into the body.
+      // See: https://github.com/mautic/mautic/issues/14409
+      let bodyContent = code.trim();
+
+      if (!ContentService.isMjmlMode(this.editor)) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(code, 'text/html');
+
+        // Extract only the body innerHTML to set as components
+        if (doc.body) {
+          bodyContent = doc.body.innerHTML;
+        }
+
+        // Update the original content's head with any changes from the code editor
+        // This preserves head changes without injecting them into the body
+        if (doc.head && doc.head.innerHTML) {
+          const textareaHtml = mQuery('textarea.builder-html');
+          if (textareaHtml.length) {
+            const originalDoc = parser.parseFromString(textareaHtml.val(), 'text/html');
+            originalDoc.head.innerHTML = doc.head.innerHTML;
+            // Serialize back to the textarea to preserve head changes
+            const doctype = originalDoc.doctype
+              ? new XMLSerializer().serializeToString(originalDoc.doctype)
+              : '<!DOCTYPE html>';
+            textareaHtml.val(
+              `${doctype}<html>${originalDoc.head.outerHTML}${originalDoc.body.outerHTML}</html>`
+            );
+          }
+        }
+      }
+
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim())
+      this.editor.setComponents(bodyContent);
 
       // Reinitialize the content after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
       // See: https://github.com/GrapesJS/mjml/issues/149
-      const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
-      this.editor.setComponents(parsedContent);
+      if (ContentService.isMjmlMode(this.editor)) {
+        const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+        this.editor.setComponents(parsedContent);
+      }
 
       this.editor.Modal.close();
     } catch (e) {
