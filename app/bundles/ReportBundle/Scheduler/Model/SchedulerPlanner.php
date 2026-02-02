@@ -23,7 +23,7 @@ class SchedulerPlanner
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
-    public function computeScheduler(Report $report, bool $scheduleNextDownloadJob = true)
+    public function computeScheduler(Report $report, bool $scheduleNextDownloadJob = true): void
     {
         $this->removeSchedulerOfReport($report);
         if ($scheduleNextDownloadJob) {

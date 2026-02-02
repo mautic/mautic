@@ -10,6 +10,7 @@ use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ScheduleController extends CommonAjaxController
 {
@@ -50,19 +51,19 @@ class ScheduleController extends CommonAjaxController
         if (empty($report)) {
             $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
-            return $this->flushFlash();
+            return $this->flushFlash(Response::HTTP_NOT_FOUND);
         }
 
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->addFlashMessage('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
-            return $this->flushFlash();
+            return $this->flushFlash(Response::HTTP_FORBIDDEN);
         }
 
         if ($report->isScheduled()) {
             $this->addFlashMessage('mautic.report.scheduled.already', ['%id%' => $reportId], FlashBag::LEVEL_ERROR);
 
-            return $this->flushFlash();
+            return $this->flushFlash(Response::HTTP_CONFLICT);
         }
 
         $report->setAsScheduledNow($this->user->getEmail());
@@ -73,7 +74,7 @@ class ScheduleController extends CommonAjaxController
             ['%id%' => $reportId, '%email%' => $this->user->getEmail()]
         );
 
-        return $this->flushFlash();
+        return $this->flushFlash(Response::HTTP_OK);
     }
 
     public function exportAction(int $reportId): JsonResponse
@@ -83,18 +84,18 @@ class ScheduleController extends CommonAjaxController
         $security = $this->container->get('mautic.security');
 
         if (empty($report)) {
-            $this->addFlash('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
+            $this->addFlash('mautic.report.notfound', ['%id%' => $reportId]);
 
             return $this->flushFlash(Response::HTTP_NOT_FOUND);
         }
 
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
-            $this->addFlash('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
+            $this->addFlash('mautic.core.error.accessdenied', []);
 
             return $this->flushFlash(Response::HTTP_FORBIDDEN);
         }
 
-        $session  = $this->get('session');
+        $session  = $this->getCurrentRequest()->getSession();
         $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
         $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
@@ -111,7 +112,7 @@ class ScheduleController extends CommonAjaxController
 
         if ($this->dispatcher->hasListeners(ReportEvents::REPORT_SCHEDULE_EXPORT)) {
             $event = new ReportEvent($report);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_EXPORT, $event);
+            $this->dispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_EXPORT);
         }
 
         $this->addFlash(

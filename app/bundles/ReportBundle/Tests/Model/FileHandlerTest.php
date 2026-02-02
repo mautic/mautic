@@ -13,22 +13,16 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
     public function testFileCanBeAttached(): void
     {
         $this->expectException(FileTooBigException::class);
-        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
-        $filePropertyMock = $this->getMockBuilder(FileProperties::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePropertyMock = $this->createMock(FileProperties::class);
 
         $coreParametersHelperMock->expects($this->any())
             ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn(0);
 
-        $filePathResolver = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolver = $this->createMock(FilePathResolver::class);
 
         $filePropertyMock->expects($this->once())
             ->method('getFileSize')
