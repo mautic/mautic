@@ -9,13 +9,14 @@ use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
 
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
@@ -80,7 +81,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
     public function testRepublishScheduledCampaignEventActionWhenEventFailedBecauseCampaignWasUnpublished(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         $fixtureHelper = new FixtureHelper($this->em);
@@ -181,7 +182,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
     public function testScheduledCampaignEventActionIfScheduledAtDefined(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         $interval      = 5;

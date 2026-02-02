@@ -373,7 +373,7 @@ class LeadFieldRepository extends CommonRepository
                                     'in', 'notIn',   // especially when used as delimited-string match
                                 ]);
 
-                                $fieldType = $fieldType ?? $this->getFieldType($field); // your helper method
+                                $fieldType ??= $this->getFieldType($field);
 
                                 if ($fieldType && !$isStringPatternOperator) {
                                     $numericTypes        = ['number', 'int', 'integer', 'float'];
@@ -387,7 +387,7 @@ class LeadFieldRepository extends CommonRepository
                                         // Safe numeric coercion only when comparison is truly numeric
                                         if (is_numeric($trimmed)) {
                                             // Preserve decimals when present
-                                            $value = false !== strpos($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
+                                            $value = str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
                                         } else {
                                             $value = 0; // MySQL-style fallback
                                         }

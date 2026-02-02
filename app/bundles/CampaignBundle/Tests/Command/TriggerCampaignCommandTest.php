@@ -19,6 +19,8 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;
@@ -562,7 +564,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignActionChangeMembership(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
         $campaign1 = $this->createCampaign('Campaign 1');
         $campaign2 = $this->createCampaign('Campaign 2');
@@ -588,7 +590,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignActionChangeMembershipRestartRotation(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         $campaign1 = $this->createCampaign('Campaign 1');
@@ -625,7 +627,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignActionAfterChangeMembership(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
         $campaign  = $this->createCampaign('Campaign 1');
         $lead      = $this->createLead('Lead');
@@ -654,7 +656,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignActionBeforeChangeMembership(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         $campaign  = $this->createCampaign('Campaign 1');
@@ -686,7 +688,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignExclusion(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         $campaign1 = $this->createCampaign('Campaign 1');
@@ -760,7 +762,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignExecuteOrderByDateCreatedDesc(): void
     {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         $oldCampaign = $this->createCampaign('Some old campaign');
@@ -847,7 +849,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         array $expectedTriggerDateLog,
     ): void {
         if ($this->isPostgresqlPlatform()) {
-            $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
+            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
         }
 
         // Create an unpublished campaign with specified republish behavior
