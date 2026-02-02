@@ -264,24 +264,6 @@ class LeadFieldRepository extends CommonRepository
             }
         } else {
             $property     = $this->getPropertyByField($field, $q);
-            $coercedValue = $value;
-
-            if ($isPg) {
-                // Coerce value to safe type based on expected column semantics
-                // This mimics MySQL loose typing without breaking PG strictness
-                if (is_string($value)) {
-                    $trimmed = trim($value);
-
-                    // For numeric-ish operators, try to cast safely or fallback to 0
-                    if (in_array($operatorExpr, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
-                        if (is_numeric($trimmed)) {
-                            $coercedValue = (float) $trimmed; // use float to handle decimals
-                        } else {
-                            $coercedValue = 0; // invalid → 0, like MySQL
-                        }
-                    }
-                }
-            }
 
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
                 $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
@@ -316,7 +298,7 @@ class LeadFieldRepository extends CommonRepository
                         $where
                     )
                 )
-                  ->setParameter('lead', (int) $lead)
+                  ->setParameter('lead', (int) $lead, ParameterType::INTEGER)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $values     = (!is_array($value)) ? [$value] : $value;
@@ -353,7 +335,7 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $q->where($expr)
-                    ->setParameter('lead', (int) $lead);
+                    ->setParameter('lead', (int) $lead, ParameterType::INTEGER);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
@@ -371,16 +353,51 @@ class LeadFieldRepository extends CommonRepository
                     switch ($operatorExpr) {
                         case 'startsWith':
                             $operatorExpr = 'like';
-                            $value        = $coercedValue.'%';
+                            $value        = $value.'%';
                             break;
                         case 'endsWith':
                             $operatorExpr = 'like';
-                            $value        = '%'.$coercedValue;
+                            $value        = '%'.$value;
                             break;
                         case 'contains':
                             $operatorExpr = 'like';
-                            $value        = '%'.$coercedValue.'%';
+                            $value        = '%'.$value.'%';
                             break;
+                        default:
+                            if ($isPg) {
+                                // Determine if we should treat the comparison as numeric
+                                $isNumericComparison     = false;
+                                $isStringPatternOperator = in_array($operatorExpr, [
+                                    'like', 'notLike', 'regexp', 'notRegexp',
+                                    'startsWith', 'endsWith', 'contains',
+                                    'in', 'notIn',   // especially when used as delimited-string match
+                                ]);
+
+                                $fieldType = $fieldType ?? $this->getFieldType($field); // your helper method
+
+                                if ($fieldType && !$isStringPatternOperator) {
+                                    $numericTypes        = ['number', 'int', 'integer', 'float'];
+                                    $isNumericComparison = in_array($fieldType, $numericTypes, true);
+                                }
+
+                                if (is_string($value)) {
+                                    $trimmed = trim($value);
+
+                                    if ($isNumericComparison) {
+                                        // Safe numeric coercion only when comparison is truly numeric
+                                        if (is_numeric($trimmed)) {
+                                            // Preserve decimals when present
+                                            $value = false !== strpos($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
+                                        } else {
+                                            $value = 0; // MySQL-style fallback
+                                        }
+                                    } elseif ('boolean' === $fieldType && !$isStringPatternOperator) {
+                                        // Convert common truthy/falsy strings → 1/0
+                                        $value = filter_var($trimmed, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                                    }
+                                    // else → keep as string (text fields, pattern operators, dates, etc.)
+                                }
+                            }
                     }
 
                     // PostgreSQL Fix: Append ::text to the property name
@@ -392,8 +409,8 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $q->where($expr)
-                  ->setParameter('lead', (int) $lead)
-                  ->setParameter('value', $coercedValue);
+                  ->setParameter('lead', (int) $lead, ParameterType::INTEGER)
+                  ->setParameter('value', $value);
             }
 
             if (str_starts_with($property, 'u.')) {
@@ -595,5 +612,15 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return [$expr, $parameters];
+    }
+
+    private function getFieldType(string $alias, string $object = 'lead'): ?string
+    {
+        $fields = $this->getFields();  // cached array by alias
+        if (isset($fields[$alias]) && $fields[$alias]['object'] === $object) {
+            return $fields[$alias]['type'];
+        }
+
+        return null;
     }
 }

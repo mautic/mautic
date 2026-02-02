@@ -550,7 +550,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                         $lead->getId(),
                         $field,
                         $fieldValue,
-                        $operators[$operator]['expr']
+                        $operators[$operator]['expr'],
+                        $fieldType
                     );
                 }
             }
@@ -655,7 +656,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 );
             } else {
                 $result = $this->leadFieldModel->getRepository()->compareValue(
-                    $lead->getId(), 'points', $score, $operatorExpr
+                    $lead->getId(), 'points', $score, $operatorExpr,
                 );
             }
         }
