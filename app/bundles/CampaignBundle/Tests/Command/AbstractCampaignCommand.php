@@ -381,6 +381,8 @@ HTML;
             'subject'     => 'Campaign Test Email 2',
             'custom_html' => $customHtml2,
         ]), $fieldTypes);
+
+        $this->syncSerialSequence($table);
     }
 
     private function insertLeadTags(): void
@@ -407,6 +409,8 @@ HTML;
                 'tag' => $tag,
             ]);
         }
+
+        $this->syncSerialSequence($table);
     }
 
     private function insertCampaigns(): void
@@ -483,6 +487,8 @@ HTML;
             // 'publish_up'          => Types::DATETIME_MUTABLE,
             // 'publish_down'        => Types::DATETIME_MUTABLE,
         ]);
+
+        $this->syncSerialSequence($table);
     }
 
     private function insertCampaignEvents(\DateTime $sendEmailTimestamp, \DateTime $conditionTimestamp): void
@@ -1154,6 +1160,8 @@ HTML;
             'channel_id'            => null,
             'failed_count'          => 0,
         ]);
+
+        $this->syncSerialSequence($table);
     }
 
     private function insertLeadLists(): void
@@ -1190,6 +1198,8 @@ HTML;
             // 'checked_out'          => Types::DATETIME_MUTABLE,
             'is_global'            => Types::BOOLEAN,
         ]);
+
+        $this->syncSerialSequence($table);
     }
 
     private function insertCampaignLeadlistXref(): void
@@ -1223,6 +1233,8 @@ HTML;
                 'manually_added'   => Types::BOOLEAN,
             ]);
         }
+
+        $this->syncSerialSequence($table);
     }
 
     private function insertCampaignLeads(): void
@@ -1248,5 +1260,25 @@ HTML;
                 // 'date_last_exited'  => Types::DATETIME_MUTABLE,
             ]);
         }
+
+        $this->syncSerialSequence($table);
+    }
+
+    private function syncSerialSequence(string $table, string $field = 'id'): bool
+    {
+        if ($this->isPostgresqlPlatform()) {
+            $sequence = $this->getSerialSequence($table, $field);
+
+            if ($sequence) {
+                $maxId = $this->em->getConnection()->fetchOne("SELECT MAX($field) FROM $table");
+                $next  = $maxId ? (int) $maxId + 1 : 1;
+
+                return !$this->em->getConnection()->executeStatement('SELECT setval(?, ?, false)', [$sequence, $next]);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

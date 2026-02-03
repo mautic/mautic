@@ -13,10 +13,6 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
@@ -78,10 +74,6 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
     public function testRepublishScheduledCampaignEventActionWhenEventFailedBecauseCampaignWasUnpublished(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         $fixtureHelper = new FixtureHelper($this->em);
         $contact       = $fixtureHelper->createContact('some@contact.email');
         $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
@@ -179,10 +171,6 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
     public function testScheduledCampaignEventActionIfScheduledAtDefined(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         $interval      = 5;
         $unit          = 'i';
         $fixtureHelper = new FixtureHelper($this->em);

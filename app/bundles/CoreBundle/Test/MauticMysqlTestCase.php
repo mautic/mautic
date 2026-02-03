@@ -41,8 +41,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (!isset($this->configParams['db_charset']) || empty($this->configParams['db_charset'])) {
             $this->configParams['db_charset'] = 'pdo_pgsql' == $this->configParams['db_driver'] ? 'UTF8' : 'utf8mb4';
         }
-
-        $this->useCleanupRollback = 'pdo_pgsql' != $this->configParams['db_driver'];
     }
 
     protected function isMysqlPlatform(): bool
@@ -166,20 +164,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
             } elseif ($this->isPostgresqlPlatform()) {
-                // Step 1: Try standard pg_get_serial_sequence (may return NULL)
-                $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', 'id')");
-
-                // Step 2: Fallback - set common sequence name as doctrine do
-                if (!$sequence) {
-                    // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-                    // without linking a named sequence in a way visible to pg_get_serial_sequence()
-                    // Test DB uses a different config that doesn't register the sequence properly
-                    if ($this->connection->fetchOne(
-                        "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                        [$fullTable.'_id_seq'])) {
-                        $sequence = $fullTable.'_id_seq';
-                    }
-                }
+                $sequence = $this->getSerialSequence($fullTable);
 
                 if ($sequence) {
                     $quotedSequence = $this->connection->quoteIdentifier($sequence);
@@ -478,7 +463,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $prefix = $this->getTablePrefix();
         $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
-
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
@@ -526,11 +510,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
+        $fullTable = $this->getTablePrefix().'ip_addresses';
         if ($this->isPostgresqlPlatform()) {
-            return;
+            $sequence = $this->getSerialSequence($fullTable);
+            $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '127.0.0.1')");
+        } else {
+            $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('127.0.0.1')");
         }
-
-        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
     }
 
     private function wasRollbackSuccessful(): bool
@@ -558,6 +544,26 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $cacheProvider = static::getContainer()->get('mautic.cache.provider');
         \assert($cacheProvider instanceof CacheItemPoolInterface);
         $cacheProvider->clear();
+    }
+
+    protected function getSerialSequence(string $fullTable, $field = 'id'): string
+    {
+        // Step 1: Try standard pg_get_serial_sequence (may return NULL)
+        $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
+
+        // Step 2: Fallback - set common sequence name as doctrine do
+        if (!$sequence) {
+            // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
+            // without linking a named sequence in a way visible to pg_get_serial_sequence()
+            // Test DB uses a different config that doesn't register the sequence properly
+            if ($this->connection->fetchOne(
+                "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
+                [$fullTable.'_'.$field.'_seq'])) {
+                $sequence = $fullTable.'_'.$field.'_seq';
+            }
+        }
+
+        return $sequence;
     }
 
     /**
