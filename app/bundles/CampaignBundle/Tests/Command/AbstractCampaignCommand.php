@@ -1233,8 +1233,6 @@ HTML;
                 'manually_added'   => Types::BOOLEAN,
             ]);
         }
-
-        $this->syncSerialSequence($table);
     }
 
     private function insertCampaignLeads(): void
@@ -1260,8 +1258,6 @@ HTML;
                 // 'date_last_exited'  => Types::DATETIME_MUTABLE,
             ]);
         }
-
-        $this->syncSerialSequence($table);
     }
 
     private function syncSerialSequence(string $table, string $field = 'id'): bool
