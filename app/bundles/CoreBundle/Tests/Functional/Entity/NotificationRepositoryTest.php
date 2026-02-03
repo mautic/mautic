@@ -12,17 +12,35 @@ use PHPUnit\Framework\Assert;
 
 class NotificationRepositoryTest extends MauticMysqlTestCase
 {
+    private int $userId1;
+    private int $userId2;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Fetch the two users created by LoadUserData / essential fixtures
+        $users = $this->em->getRepository(User::class)->findBy([], ['id' => 'ASC'], 2);
+
+        if (count($users) < 2) {
+            $this->fail('Essential fixtures did not load at least 2 users (admin + sales expected)');
+        }
+
+        $this->userId1 = $users[0]->getId();  // usually admin
+        $this->userId2 = $users[1]->getId();  // usually sales
+    }
+
     public function testIsDuplicate(): void
     {
-        $this->createNotification(2, 'dup1', new \DateTime('-1 day +5 seconds'));
-        $this->createNotification(1, 'dup2', new \DateTime('-1 day +5 seconds'));
+        $this->createNotification($this->userId2, 'dup1', new \DateTime('-1 day +5 seconds'));
+        $this->createNotification($this->userId1, 'dup2', new \DateTime('-1 day +5 seconds'));
         $this->em->flush();
 
-        $this->assertDuplicate(true, 2, 'dup1', new \DateTime('-1 day'));
-        $this->assertDuplicate(true, 2, 'dup1', new \DateTime('-25 hour'));
-        $this->assertDuplicate(false, 2, 'dup1', new \DateTime('-12 hour'));
-        $this->assertDuplicate(true, 1, 'dup2', new \DateTime('-1 day'));
-        $this->assertDuplicate(false, 1, 'dup1', new \DateTime('-1 day'));
+        $this->assertDuplicate(true, $this->userId2, 'dup1', new \DateTime('-1 day'));
+        $this->assertDuplicate(true, $this->userId2, 'dup1', new \DateTime('-25 hour'));
+        $this->assertDuplicate(false, $this->userId2, 'dup1', new \DateTime('-12 hour'));
+        $this->assertDuplicate(true, $this->userId1, 'dup2', new \DateTime('-1 day'));
+        $this->assertDuplicate(false, $this->userId1, 'dup1', new \DateTime('-1 day'));
     }
 
     private function assertDuplicate(bool $expectedIsDuplicate, int $userId, string $deduplicate, \DateTime $from): void
