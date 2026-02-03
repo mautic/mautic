@@ -18,6 +18,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
@@ -868,25 +869,34 @@ class CommonRepository extends ServiceEntityRepository
 
         // 1. Process Fields
         foreach ($fieldNames as $fieldName) {
-            $value = $metadata->getFieldValue($entity, $fieldName);
+            $value  = $metadata->getFieldValue($entity, $fieldName);
+            $column = $metadata->getColumnName($fieldName);
+            $type   = $metadata->getTypeOfField($fieldName);
             if ($metadata->isIdentifier($fieldName)) {
                 if ($value) {
-                    $hasId = true;
-                } elseif (!$isPg && $fieldName === $identifier) {
-                    // https://bugs.php.net/bug.php?id=76896
-                    // mysql_last_insert_id might return 0 if our insert updates a row
-                    // Call LAST_INSERT_ID() for the column to ensure the correct value
-                    $column   = $metadata->getColumnName($fieldName);
-                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
+                    // Existing entity: include id in INSERT (needed for conflict matching)
+                    $hasId     = true;
+                    $columns[] = $column;
+                    $values[]  = $value;
+                    $types[]   = $type;
+                    $set[]     = '?';
+                    $update[]  = $makeUpdate($column);  // usually not updated, but harmless
+                } elseif ($isPg) {
+                    // New entity on PG: use nextval in VALUES (no bound param)
+                    $sequence  = $this->getSerialSequence($metadata->getTableName(), $column);
+                    $columns[] = $column;
+                    $set[]     = "NEXTVAL('{$sequence}')";
+                    // Do NOT add to $values/$types - it's not bound
                     continue;
                 } else {
+                    // New entity on MySQL: omit id for AUTO_INCREMENT + your special handling
+                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
                     continue;
                 }
             }
-            $column    = $metadata->getColumnName($fieldName);
             $columns[] = $column;
             $values[]  = $value;
-            $types[]   = $metadata->getTypeOfField($fieldName);
+            $types[]   = $type;
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
         }
@@ -905,20 +915,30 @@ class CommonRepository extends ServiceEntityRepository
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
         }
-
         $columnList = implode(', ', $columns);
-        $setList    = implode(', ', array_fill(0, count($columns), '?'));
+        $setList    = $setList = implode(', ', $set);
         $updateList = implode(', ', $update);
 
         // 3. Execution & Result Detection
         if ($isPg) {
-            // Postgres: Use RETURNING (xmax = 0) to distinguish Insert vs Update
-            $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) ".
-                "ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList RETURNING (xmax = 0) AS inserted";
+            // Always RETURNING to get both the (generated or existing) id and insert detection
+            $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) "
+                ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
+                .'RETURNING id, (xmax = 0) AS is_new';
 
-            // We use fetchOne because Postgres returns a result set with RETURNING
-            $wasInserted = (bool) $connection->fetchOne($sql, $values, $types);
-            $wasUpdated  = !$wasInserted;
+            $result = $connection->fetchAssociative($sql, $values, $types);
+
+            if (false === $result) {
+                // Should never happen in upsert
+                throw new \RuntimeException('Upsert failed - no row returned');
+            }
+
+            $generatedOrExistingId = (int) $result['id'];
+            $wasInserted           = (bool) $result['is_new'];
+            $wasUpdated            = !$wasInserted;
+
+            // Always set the ID back (important for new entities)
+            $metadata->setFieldValue($entity, $identifier, $generatedOrExistingId);
         } else {
             // MySQL: Use affected rows count (1 = Insert, 2 = Update)
             $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) ".
@@ -927,6 +947,12 @@ class CommonRepository extends ServiceEntityRepository
             $affectedRows = $connection->executeStatement($sql, $values, $types);
             $wasInserted  = (1 === $affectedRows);
             $wasUpdated   = (2 === $affectedRows);
+
+            // MySQL: recover ID only if inserted
+            if ($wasInserted && !$hasId) {
+                $id = (int) $connection->lastInsertId();
+                $metadata->setFieldValue($entity, $identifier, $id);
+            }
         }
 
         // 4. Update Interface
@@ -934,14 +960,6 @@ class CommonRepository extends ServiceEntityRepository
             $entity->setHasBeenInserted($wasInserted);
             $entity->setHasBeenUpdated($wasUpdated);
         }
-
-        if ($hasId) {
-            return;
-        }
-        // 5. ID Recovery
-        $id = (int) $connection->lastInsertId();
-
-        $metadata->setFieldValue($entity, $identifier, $id);
     }
 
     /**
@@ -1844,6 +1862,27 @@ class CommonRepository extends ServiceEntityRepository
         return (bool) count($query->executeQuery()->fetchAllAssociative());
     }
 
+    private function getSerialSequence(string $fullTable, $field = 'id'): string
+    {
+        // Step 1: Try standard pg_get_serial_sequence (may return NULL)
+        $sequence    = $this->getEntityManager()->getConnection()->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
+
+        // Step 2: Fallback - set common sequence name as doctrine do
+        if (!$sequence) {
+            // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
+            // without linking a named sequence in a way visible to pg_get_serial_sequence()
+            // Test DB uses a different config that doesn't register the sequence properly
+            $doctrineSequence = $fullTable.'_'.$field.'_seq';
+            if ($this->getEntityManager()->getConnection()->fetchOne(
+                "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
+                [$doctrineSequence])) {
+                $sequence = $doctrineSequence;
+            }
+        }
+
+        return $sequence;
+    }
+
     /**
      * Tries to find a suitable unique constraint for ON CONFLICT (prefers non-PK).
      */
@@ -1860,10 +1899,14 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $connection = $this->getEntityManager()->getConnection();
         // Fallback: introspect unique indexes (runtime, requires schema access)
         try {
-            $indexes = $connection->createSchemaManager()->listTableIndexes($metadata->getTableName());
+            $helper = new IndexSchemaHelper(
+                $this->getEntityManager()->getConnection(),
+                MAUTIC_TABLE_PREFIX
+            );
+
+            $indexes = $helper->getTableIndexes($metadata->getTableName());
             foreach ($indexes as $index) {
                 if ($index->isUnique() && !$index->isPrimary()) {
                     $cols = $index->getColumns();

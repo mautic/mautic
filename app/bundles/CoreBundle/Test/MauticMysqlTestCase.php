@@ -512,10 +512,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $fullTable = $this->getTablePrefix().'ip_addresses';
         if ($this->isPostgresqlPlatform()) {
-            $sequence = $this->getSerialSequence($fullTable);
-            $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '127.0.0.1')");
-        } else {
-            $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('127.0.0.1')");
+            $sequence = $this->getSerialSequence($fullTable); // postgreql is stric, fail on conflict
+            $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '127.0.0.1') ON CONFLICT (ip_address) DO NOTHING");
+        } else { // if we enable strict mode, this would fail too
+            $this->connection->executeStatement("INSERT IGNORE INTO $fullTable (ip_address) VALUES ('127.0.0.1')");
         }
     }
 
@@ -556,10 +556,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
             // without linking a named sequence in a way visible to pg_get_serial_sequence()
             // Test DB uses a different config that doesn't register the sequence properly
+            $doctrineSequence = $fullTable.'_'.$field.'_seq';
             if ($this->connection->fetchOne(
                 "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                [$fullTable.'_'.$field.'_seq'])) {
-                $sequence = $fullTable.'_'.$field.'_seq';
+                [$doctrineSequence])) {
+                $sequence = $doctrineSequence;
             }
         }
 

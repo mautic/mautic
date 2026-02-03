@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -23,41 +22,17 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
         /** @var CompanyLeadRepository $companyLeadRepo */
         $companyLeadRepo = $manager->getRepository(CompanyLead::class);
 
-        /** @var IpAddressRepository $ipRepo */
-        $ipRepo = $manager->getRepository(IpAddress::class);
-
         $today = new \DateTime();
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
-
-        // Track IPs created during this loop to avoid duplicates
-        // Doctrine\DBAL\Driver\PDO\Exception: SQLSTATE[23505]:
-        // Unique violation: 7 ERROR:
-        // duplicate key value violates unique constraint "idx_ip_address"
-        $createdIps = [];
 
         foreach ($leads as $count => $l) {
             $key  = $count + 1;
             $lead = new Lead();
             $lead->setDateAdded($today);
-
-            $ipStr = $l['ip'];
-
-            // 1. Check if we already handled this IP in this loop or if it exists in DB
-            if (!isset($createdIps[$ipStr])) {
-                $ipAddress = $ipRepo->findOneBy(['ipAddress' => $ipStr]);
-
-                if (!$ipAddress) {
-                    $ipAddress = new IpAddress();
-                    $ipAddress->setIpAddress($ipStr);
-                }
-                $createdIps[$ipStr] = $ipAddress;
-                $this->setReference('ipAddress-'.$key, $ipAddress);
-            } else {
-                $ipAddress = $createdIps[$ipStr];
-            }
-
+            $ipAddress = new IpAddress();
+            $ipAddress->setIpAddress($l['ip']);
+            $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
-
             $lead->addIpAddress($ipAddress);
 
             if ($this->hasReference('sales-user')) {
