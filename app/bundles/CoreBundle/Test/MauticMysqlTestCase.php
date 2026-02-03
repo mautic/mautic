@@ -512,10 +512,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $fullTable = $this->getTablePrefix().'ip_addresses';
         if ($this->isPostgresqlPlatform()) {
-            $sequence = $this->getSerialSequence($fullTable); // postgreql is stric, fail on conflict
-            $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '127.0.0.1') ON CONFLICT (ip_address) DO NOTHING");
-        } else { // if we enable strict mode, this would fail too
-            $this->connection->executeStatement("INSERT IGNORE INTO $fullTable (ip_address) VALUES ('127.0.0.1')");
+            $sequence = $this->getSerialSequence($fullTable);
+            $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '0.0.0.0')");
+        } else {
+            $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('0.0.0.0')");
         }
     }
 
