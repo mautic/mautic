@@ -28,6 +28,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -778,6 +779,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $value = $leadArray[$field->getMappedField()] ?? '';
             // just skip string empty field
             if ('' !== $value) {
+                $mappedFieldAlias = $field->getMappedField();
+                $mappedField      = $this->leadFieldModel->getEntityByAlias($mappedFieldAlias);
+                if ($mappedField && 'boolean' === $mappedField->getType()) {
+                    $properties = $mappedField->getProperties();
+                    $value      = CustomFieldValueHelper::normalize($value, 'boolean', $properties);
+                }
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
