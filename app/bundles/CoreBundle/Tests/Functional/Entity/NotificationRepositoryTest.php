@@ -26,8 +26,8 @@ class NotificationRepositoryTest extends MauticMysqlTestCase
             $this->fail('Essential fixtures did not load at least 2 users (admin + sales expected)');
         }
 
-        $this->userId1 = $users[0]->getId();  // usually admin
-        $this->userId2 = $users[1]->getId();  // usually sales
+        $this->userId1 = $users[0]->getId();  // admin
+        $this->userId2 = $users[1]->getId();  // sales
     }
 
     public function testIsDuplicate(): void

@@ -920,7 +920,7 @@ class CommonRepository extends ServiceEntityRepository
             $update[]  = $makeUpdate($column);
         }
         $columnList = implode(', ', $columns);
-        $setList    = $setList = implode(', ', $set);
+        $setList    = implode(', ', $set);
         $updateList = implode(', ', $update);
 
         // 3. Execution & Result Detection
