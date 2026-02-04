@@ -38,7 +38,7 @@ class DoctrineEventsSubscriber
         $classMetadata = $args->getClassMetadata();
 
         // Do not re-apply the prefix in an inheritance hierarchy or embedded tables.
-        if (($classMetadata->isEmbeddedClass || $classMetadata->isInheritanceTypeSingleTable()) && !$classMetadata->isRootEntity()) {
+        if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
             return;
         }
 
@@ -80,11 +80,12 @@ class DoctrineEventsSubscriber
 
             // Prefix sequences if supported by the DB platform
             if ($classMetadata->isIdGeneratorSequence()) {
-                $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
-
-                $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
-
-                $classMetadata->setSequenceGeneratorDefinition($newDefinition);
+                // sequencer for embedded class already have prefix
+                if (!$classMetadata->isEmbeddedClass) {
+                    $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
+                    $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
+                    $classMetadata->setSequenceGeneratorDefinition($newDefinition);
+                }
                 $em = $args->getEntityManager();
                 if (isset($classMetadata->idGenerator)) {
                     $sequenceGenerator = new \Doctrine\ORM\Id\SequenceGenerator(
