@@ -15,11 +15,6 @@ use PHPUnit\Framework\Assert;
 class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     /**
-     * @var string
-     */
-    private $prefix;
-
-    /**
      * @var IntegrationEntityRepository
      */
     private $integrationEntityRepository;
@@ -27,7 +22,6 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
         $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
     }
 
@@ -41,7 +35,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
         $integrationEntity->setDateAdded($now);
         $integrationEntity->setIntegration('someIntegration');
         $integrationEntity->setIntegrationEntity('someIntegrationEntity');
-        $integrationEntity->setIntegrationEntityId($integrationEntityId);
+        $integrationEntity->setIntegrationEntityId((string) $integrationEntityId);
         $integrationEntity->setInternalEntity('someInternalEntity');
         $integrationEntity->setInternalEntityId($internalEntityId);
         $integrationEntity->setInternal(['someInternalValue']);

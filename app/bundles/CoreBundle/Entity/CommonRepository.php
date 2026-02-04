@@ -1865,7 +1865,7 @@ class CommonRepository extends ServiceEntityRepository
         return (bool) count($query->executeQuery()->fetchAllAssociative());
     }
 
-    private function getSerialSequence(string $fullTable, $field = 'id'): string
+    protected function getSerialSequence(string $fullTable, string $field = 'id'): string
     {
         // Step 1: Try standard pg_get_serial_sequence (may return NULL)
         $sequence    = $this->getEntityManager()->getConnection()->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");

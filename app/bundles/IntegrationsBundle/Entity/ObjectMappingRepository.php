@@ -102,21 +102,33 @@ class ObjectMappingRepository extends CommonRepository
      */
     public function insert(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, int $internalObjectId, ?\DateTimeInterface $createdAt = null): int
     {
-        $createdAt = $createdAt ?: new \DateTimeImmutable();
-        $qb        = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $table      = MAUTIC_TABLE_PREFIX.'sync_object_mapping';
 
-        $qb->insert(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
-            ->values([
-                'integration'             => ':integration',
-                'integration_object_name' => ':integrationObjectName',
-                'integration_object_id'   => ':integrationObjectId',
-                'internal_object_name'    => ':internalObjectName',
-                'internal_object_id'      => ':internalObjectId',
-                'date_created'            => ':date',
-                'last_sync_date'          => ':date',
-                'is_deleted'              => ':isDeleted',
-                'internal_storage'        => ':internalStorage',
-            ])
+        $createdAt = $createdAt ?: new \DateTimeImmutable();
+        $qb        = $connection->createQueryBuilder();
+
+        $values = [
+            'integration'             => ':integration',
+            'integration_object_name' => ':integrationObjectName',
+            'integration_object_id'   => ':integrationObjectId',
+            'internal_object_name'    => ':internalObjectName',
+            'internal_object_id'      => ':internalObjectId',
+            'date_created'            => ':date',
+            'last_sync_date'          => ':date',
+            'is_deleted'              => ':isDeleted',
+            'internal_storage'        => ':internalStorage',
+        ];
+
+        if ($isPg) {
+            $sequence = $this->getSerialSequence($table);
+            $values   = ['id' => "NEXTVAL('{$sequence}')"] + $values;
+        }
+
+        $qb->insert($table)
+            ->values($values)
             ->setParameter('integration', $integration)
             ->setParameter('integrationObjectName', $integrationObjectName)
             ->setParameter('integrationObjectId', $integrationObjectId)

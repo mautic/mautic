@@ -42,6 +42,11 @@ class DoctrineEventsSubscriber
             return;
         }
 
+        // We should also skip embedded one
+        if ($classMetadata->isEmbeddedClass || ($classMetadata->isInheritanceTypeJoined() && !$classMetadata->isRootEntity())) {
+            return;
+        }
+
         if (str_contains($classMetadata->namespace, 'Mautic')) {
             // if in the installer, use the prefix set by it rather than what is cached
 
@@ -81,6 +86,7 @@ class DoctrineEventsSubscriber
             // Prefix sequences if supported by the DB platform
             if ($classMetadata->isIdGeneratorSequence()) {
                 $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
+
                 $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
 
                 $classMetadata->setSequenceGeneratorDefinition($newDefinition);
