@@ -80,9 +80,9 @@ class DoctrineEventsSubscriber
 
             // Prefix sequences if supported by the DB platform
             if ($classMetadata->isIdGeneratorSequence()) {
+                $newDefinition = $classMetadata->sequenceGeneratorDefinition;
                 // sequencer for embedded class already have prefix
                 if (!$classMetadata->isEmbeddedClass) {
-                    $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
                     $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
                     $classMetadata->setSequenceGeneratorDefinition($newDefinition);
                 }
