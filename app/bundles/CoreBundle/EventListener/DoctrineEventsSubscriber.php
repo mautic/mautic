@@ -37,13 +37,8 @@ class DoctrineEventsSubscriber
         /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata */
         $classMetadata = $args->getClassMetadata();
 
-        // Do not re-apply the prefix in an inheritance hierarchy.
-        if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
-            return;
-        }
-
-        // We should also skip embedded one
-        if ($classMetadata->isEmbeddedClass || ($classMetadata->isInheritanceTypeJoined() && !$classMetadata->isRootEntity())) {
+        // Do not re-apply the prefix in an inheritance hierarchy or embedded tables.
+        if (($classMetadata->isEmbeddedClass || $classMetadata->isInheritanceTypeSingleTable()) && !$classMetadata->isRootEntity()) {
             return;
         }
 
