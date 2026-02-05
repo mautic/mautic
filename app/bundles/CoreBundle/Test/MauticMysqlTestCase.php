@@ -64,7 +64,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->backupLocalConfig();
 
         if (!$this->isDatabasePrepared()) {
-            echo 'prepare dabase now'.PHP_EOL;
             $this->prepareDatabase();
 
             if ($this->databaseInstalled) {
