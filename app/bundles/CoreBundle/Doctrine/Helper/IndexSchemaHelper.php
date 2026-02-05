@@ -97,9 +97,18 @@ class IndexSchemaHelper
         $indexName = $this->prefix.$name;
         $index     = new Index($indexName, $textColumns, false, false, $options);
 
+        // Check if index already exists with the same columns
+        if ($this->_hasIndex($this->table->getName(), $indexName, $textColumns)) {
+            // Exact match → nothing to do
+            return $this;
+        }
+
+        // Index either doesn't exist, or exists but has different columns
         if ($this->_hasIndex($this->table->getName(), $indexName)) {
+            // Index exists but has different columns
             $this->changedIndexes[] = $index;
         } else {
+            // Index doesn't exist
             $this->addedIndexes[] = $index;
         }
 
