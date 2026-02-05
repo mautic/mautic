@@ -22,21 +22,21 @@ final class Version20230321133733 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
-        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $tableName     = $this->getPrefixedTableName(self::TABLE_NAME);
         $schemaManager = $this->connection->createSchemaManager();
-        $columns = $schemaManager->listTableColumns($tableName);
+        $columns       = $schemaManager->listTableColumns($tableName);
 
         foreach (array_keys(self::COLUMNS) as $column) {
             $this->skipAssertion(
                 fn () => isset($columns[$column]),
-                sprintf("Column %s.%s already exists", $tableName, $column)
+                sprintf('Column %s.%s already exists', $tableName, $column)
             );
         }
     }
 
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         $alterStatements = [];
@@ -80,7 +80,7 @@ final class Version20230321133733 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         $columns = array_keys(self::COLUMNS);

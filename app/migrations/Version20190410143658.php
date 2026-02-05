@@ -44,7 +44,7 @@ class Version20190410143658 extends AbstractMauticMigration
     }
 
     /**
-     * Check if an index exists (platform-aware, case-insensitive lookup)
+     * Check if an index exists (platform-aware, case-insensitive lookup).
      */
     private function indexExists(string $tableName, string $indexName): bool
     {
@@ -61,16 +61,18 @@ class Version20190410143658 extends AbstractMauticMigration
                   AND schemaname = current_schema()
 SQL;
             $stmt = $this->connection->executeQuery($sql, [$tableName, $indexName]);
+
             return (bool) $stmt->fetchOne();
         }
 
         // MySQL fallback (original hasIndex would work, but for consistency)
         $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
+
         return isset($indexes[$indexName]);
     }
 
     /**
-     * Find any single-column indexes on lead_id (to safely drop old ones)
+     * Find any single-column indexes on lead_id (to safely drop old ones).
      */
     private function findSingleLeadIdIndexes(string $tableName): array
     {
@@ -79,7 +81,7 @@ SQL;
         $toDrop = [];
         foreach ($indexes as $index) {
             $columns = $index->getColumns();
-            if (count($columns) === 1 && $columns[0] === 'lead_id') {
+            if (1 === count($columns) && 'lead_id' === $columns[0]) {
                 $toDrop[] = $index->getName();
             }
         }

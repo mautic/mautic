@@ -44,7 +44,7 @@ final class Version20211020114811 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $platform = $this->connection->getDatabasePlatform();
-        $isPg = $platform instanceof PostgreSQLPlatform;
+        $isPg     = $platform instanceof PostgreSQLPlatform;
 
         // PostgreSQL does not have FOREIGN_KEY_CHECKS – skip that part
         if (!$isPg) {
@@ -109,7 +109,7 @@ final class Version20211020114811 extends PreUpAssertionMigration
     private function dropIndexIfExists(string $tableName, string $indexName): void
     {
         $platform = $this->connection->getDatabasePlatform();
-        $isPg = $platform instanceof PostgreSQLPlatform;
+        $isPg     = $platform instanceof PostgreSQLPlatform;
 
         if ($isPg) {
             $this->addSql(sprintf('DROP INDEX IF EXISTS %s;', $indexName));
@@ -130,16 +130,18 @@ final class Version20211020114811 extends PreUpAssertionMigration
                   AND tablename = ?
                   AND indexname = ?
             ';
+
             return (bool) $this->connection->executeQuery($sql, [$tableName, $indexName])->fetchOne();
         }
 
         $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
+
         return isset($indexes[$indexName]);
     }
 
     /**
      * Returns tables that still need conversion (not utf8mb4_unicode_ci)
-     * On PostgreSQL we return an empty array or implement different logic if needed
+     * On PostgreSQL we return an empty array or implement different logic if needed.
      */
     private function getTablesToConvert(): array
     {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20231110103625 extends AbstractMauticMigration
@@ -20,14 +20,14 @@ final class Version20231110103625 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $rolesTable       = $this->prefix . self::TABLE_NAME;
-        $permissionsTable = $this->prefix . 'permissions';
+        $rolesTable       = $this->prefix.self::TABLE_NAME;
+        $permissionsTable = $this->prefix.'permissions';
 
         $platform   = $this->connection->getDatabasePlatform();
         $isPostgres = $platform instanceof PostgreSQLPlatform;
 
         if ($isPostgres) {
-            $sequenceName = $permissionsTable . '_id_seq';
+            $sequenceName = $permissionsTable.'_id_seq';
             $nextval      = "nextval('{$sequenceName}')";
 
             $insertColumns = '(id, role_id, bundle, name, bitwise)';
@@ -62,7 +62,7 @@ final class Version20231110103625 extends AbstractMauticMigration
             foreach (self::PERMISSIONS_TO_ADD as $permission => $bitwise) {
                 if (!array_key_exists($permission, $permissionsArray)) {
                     $permissionsArray[$permission] = ['enable'];
-                    $changed = true;
+                    $changed                       = true;
 
                     [$bundle, $name] = explode(':', $permission);
 

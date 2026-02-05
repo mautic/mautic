@@ -17,15 +17,13 @@ final class Version20210112162046 extends AbstractMauticMigration
     public function preUp(Schema $schema): void
     {
         if ($this->indexExists()) {
-            throw new SkipMigration(
-                sprintf('Index `%s` already exists. Skipping the migration', self::INDEX_NAME)
-            );
+            throw new SkipMigration(sprintf('Index `%s` already exists. Skipping the migration', self::INDEX_NAME));
         }
     }
 
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -46,15 +44,13 @@ final class Version20210112162046 extends AbstractMauticMigration
     public function preDown(Schema $schema): void
     {
         if (!$this->indexExists()) {
-            throw new SkipMigration(
-                sprintf('Index `%s` doesn\'t exist. Skipping reverting the migration', self::INDEX_NAME)
-            );
+            throw new SkipMigration(sprintf('Index `%s` doesn\'t exist. Skipping reverting the migration', self::INDEX_NAME));
         }
     }
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -73,17 +69,17 @@ final class Version20210112162046 extends AbstractMauticMigration
 
     private function indexExists(): bool
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         if ($platform instanceof PostgreSQLPlatform) {
-            $sql = "
+            $sql = '
                 SELECT 1
                 FROM pg_indexes
                 WHERE schemaname = current_schema()
                   AND tablename = ?
                   AND indexname = ?
-            ";
+            ';
 
             $result = $this->connection->executeQuery($sql, [$tableName, self::INDEX_NAME])->fetchOne();
 
@@ -95,5 +91,4 @@ final class Version20210112162046 extends AbstractMauticMigration
 
         return isset($indexes[self::INDEX_NAME]);
     }
-
 }

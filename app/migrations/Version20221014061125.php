@@ -12,14 +12,12 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20221014061125 extends AbstractMauticMigration
 {
     protected const TABLE_NAME = 'webhook_logs';
-    private const INDEX_NAME = 'webhook_id_date_added';
+    private const INDEX_NAME   = 'webhook_id_date_added';
 
     public function preUp(Schema $schema): void
     {
         if ($this->indexExists()) {
-            throw new SkipMigration(
-                sprintf('Index %s already exists', self::INDEX_NAME)
-            );
+            throw new SkipMigration(sprintf('Index %s already exists', self::INDEX_NAME));
         }
     }
 
@@ -38,7 +36,7 @@ final class Version20221014061125 extends AbstractMauticMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $indexName = $this->getPrefixedIndexName();
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -54,7 +52,7 @@ final class Version20221014061125 extends AbstractMauticMigration
 
     private function indexExists(): bool
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();
 
@@ -80,6 +78,6 @@ final class Version20221014061125 extends AbstractMauticMigration
 
     private function getPrefixedIndexName(): string
     {
-        return $this->prefix . self::INDEX_NAME;
+        return $this->prefix.self::INDEX_NAME;
     }
 }

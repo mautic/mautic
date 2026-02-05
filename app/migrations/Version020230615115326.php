@@ -25,39 +25,39 @@ final class Version020230615115326 extends AbstractMauticMigration
         $isPostgreSQL = $platform instanceof PostgreSQLPlatform;
 
         $tables = [
-            'message_channels' => ['properties'],
-            'emails'           => ['headers'],
-            'form_fields'      => ['conditions', 'validation'],
-            'dynamic_content'  => ['utm_tags'],
-            'sms_message_stats'=> ['details'],
+            'message_channels'    => ['properties'],
+            'emails'              => ['headers'],
+            'form_fields'         => ['conditions', 'validation'],
+            'dynamic_content'     => ['utm_tags'],
+            'sms_message_stats'   => ['details'],
             'sync_object_mapping' => ['internal_storage'],
-            'imports'          => ['properties'],
-            'lead_event_log'   => ['properties'],
-            'reports'          => ['settings'],
-            'tweet_stats'      => ['response_details'],
+            'imports'             => ['properties'],
+            'lead_event_log'      => ['properties'],
+            'reports'             => ['settings'],
+            'tweet_stats'         => ['response_details'],
         ];
 
         foreach ($tables as $table => $columns) {
-            $prefixedTable = $this->prefix . $table;
+            $prefixedTable = $this->prefix.$table;
 
             foreach ($columns as $column) {
                 if ($isPostgreSQL) {
                     // PostgreSQL needs explicit USING for safe cast (TEXT -> jsonb)
                     // Assumes existing data is valid JSON or NULL – if not, add custom validation/cleanup first
                     $this->addSql(
-                        "ALTER TABLE {$prefixedTable} " .
-                        "ALTER COLUMN {$column} TYPE jsonb " .
+                        "ALTER TABLE {$prefixedTable} ".
+                        "ALTER COLUMN {$column} TYPE jsonb ".
                         "USING {$column}::jsonb"
                     );
 
-                    // Optional: Set default if needed (e.g. '{}' for non-nullable)
-                    // $this->addSql("ALTER TABLE {$prefixedTable} ALTER COLUMN {$column} SET DEFAULT '{}'::jsonb");
+                // Optional: Set default if needed (e.g. '{}' for non-nullable)
+                // $this->addSql("ALTER TABLE {$prefixedTable} ALTER COLUMN {$column} SET DEFAULT '{}'::jsonb");
                 } else {
                     // MySQL/MariaDB – keep original or similar
                     $this->addSql(
-                        "ALTER TABLE `{$prefixedTable}` " .
-                        "CHANGE `{$column}` `{$column}` JSON " .
-                        ($column === 'properties' || $column === 'headers' || $column === 'details' || $column === 'internal_storage' ? 'NOT NULL' : 'DEFAULT NULL') .
+                        "ALTER TABLE `{$prefixedTable}` ".
+                        "CHANGE `{$column}` `{$column}` JSON ".
+                        ('properties' === $column || 'headers' === $column || 'details' === $column || 'internal_storage' === $column ? 'NOT NULL' : 'DEFAULT NULL').
                         " COMMENT '(DC2Type:json)'"
                     );
                 }

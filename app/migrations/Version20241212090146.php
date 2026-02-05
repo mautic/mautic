@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20241212090146 extends PreUpAssertionMigration
@@ -14,12 +14,12 @@ final class Version20241212090146 extends PreUpAssertionMigration
 
     private function getTableName(): string
     {
-        return $this->prefix . self::TABLE_NAME;
+        return $this->prefix.self::TABLE_NAME;
     }
 
     private function getIndexName(): string
     {
-        return $this->prefix . 'internal_object_id_idx';
+        return $this->prefix.'internal_object_id_idx';
     }
 
     private function indexExists(): bool
@@ -49,7 +49,7 @@ final class Version20241212090146 extends PreUpAssertionMigration
         }
 
         // MySQL/MariaDB fallback
-        $indexes = $schemaManager->listTableIndexes($tableName);
+        $indexes        = $schemaManager->listTableIndexes($tableName);
         $lowerIndexName = strtolower($indexName);
 
         foreach ($indexes as $index) {

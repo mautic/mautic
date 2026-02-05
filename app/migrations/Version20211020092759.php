@@ -29,7 +29,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
                 return $this->indexExists($tableName);
             },
             sprintf(
-                "Index %s cannot be created because the %s table has hit the table index limit or the index already exists",
+                'Index %s cannot be created because the %s table has hit the table index limit or the index already exists',
                 $this->getIndexName(),
                 $this->getPrefixedTableName(self::TABLE)
             )
@@ -38,7 +38,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE);
         $indexName = $this->getIndexName();
 
@@ -60,7 +60,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE);
         $indexName = $this->getIndexName();
 
@@ -80,7 +80,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
 
     private function getIndexName(): string
     {
-        return $this->prefix . 'lead_date_modified';
+        return $this->prefix.'lead_date_modified';
     }
 
     private function indexExists(string $tableName): bool
@@ -88,13 +88,13 @@ final class Version20211020092759 extends PreUpAssertionMigration
         $platform = $this->connection->getDatabasePlatform();
 
         if ($platform instanceof PostgreSQLPlatform) {
-            $sql = "
+            $sql = '
                 SELECT 1
                 FROM pg_indexes
                 WHERE schemaname = current_schema()
                   AND tablename = ?
                   AND indexname = ?
-            ";
+            ';
 
             $result = $this->connection->executeQuery($sql, [$tableName, $this->getIndexName()])->fetchOne();
 

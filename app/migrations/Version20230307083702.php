@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -15,7 +14,7 @@ final class Version20230307083702 extends AbstractMauticMigration
         $oldCountry = $this->connection->quote('Swaziland');
         $newCountry = $this->connection->quote('Eswatini');
 
-        $leadsTable = $this->getPrefixedTableName('leads');
+        $leadsTable     = $this->getPrefixedTableName('leads');
         $companiesTable = $this->getPrefixedTableName('companies');
 
         // Update country in leads
@@ -59,7 +58,7 @@ final class Version20230307083702 extends AbstractMauticMigration
                 $oldSerialized,
                 $newSerialized,
                 $this->connection->quoteIdentifier($column),
-                $this->connection->quote('%' . $oldSerialized . '%')
+                $this->connection->quote('%'.$oldSerialized.'%')
             ));
         }
     }

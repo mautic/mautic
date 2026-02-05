@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20230424083829 extends AbstractMauticMigration
 {
     protected const TABLE_NAME = 'focus';
-    private const INDEX_NAME = 'focus_name';
+    private const INDEX_NAME   = 'focus_name';
 
     /**
      * @throws SkipMigration
@@ -20,9 +20,7 @@ final class Version20230424083829 extends AbstractMauticMigration
     public function preUp(Schema $schema): void
     {
         if ($this->indexExists()) {
-            throw new SkipMigration(
-                sprintf('Index %s already exists', $this->getPrefixedIndexName())
-            );
+            throw new SkipMigration(sprintf('Index %s already exists', $this->getPrefixedIndexName()));
         }
     }
 
@@ -41,7 +39,7 @@ final class Version20230424083829 extends AbstractMauticMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $indexName = $this->getPrefixedIndexName();
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -57,7 +55,7 @@ final class Version20230424083829 extends AbstractMauticMigration
 
     private function indexExists(): bool
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();
 
@@ -83,6 +81,6 @@ final class Version20230424083829 extends AbstractMauticMigration
 
     private function getPrefixedIndexName(): string
     {
-        return $this->prefix . self::INDEX_NAME;
+        return $this->prefix.self::INDEX_NAME;
     }
 }

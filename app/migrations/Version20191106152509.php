@@ -17,7 +17,7 @@ class Version20191106152509 extends AbstractMauticMigration
             throw new SkipMigration('Migration already applied — no rows to update');
         }
 
-        $tableName = $this->prefix . 'lead_fields';
+        $tableName = $this->prefix.'lead_fields';
 
         // PostgreSQL: use double quotes if needed, but here identifiers are lowercase → no quotes required
         // MySQL: no backticks needed in this case either (but safe to keep quotes if mixed case)
@@ -32,7 +32,7 @@ class Version20191106152509 extends AbstractMauticMigration
     }
 
     /**
-     * Check if migration is already applied
+     * Check if migration is already applied.
      */
     private function isAlreadyApplied(): bool
     {
@@ -43,7 +43,7 @@ class Version20191106152509 extends AbstractMauticMigration
               AND char_length_limit IS NOT NULL
         ";
 
-        return (int) $this->connection->executeQuery($sql)->fetchOne() === 0;
+        return 0 === (int) $this->connection->executeQuery($sql)->fetchOne();
     }
 
     public function down(Schema $schema): void

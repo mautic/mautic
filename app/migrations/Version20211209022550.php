@@ -35,6 +35,7 @@ final class Version20211209022550 extends AbstractMauticMigration
 
         if (empty($roles)) {
             echo "[INFO] No non-admin roles found – skipping permission migration.\n";
+
             return;
         }
 
@@ -75,7 +76,7 @@ final class Version20211209022550 extends AbstractMauticMigration
 
             $this->updateRolePermissions($role, $bitwise, $newPermissions, $em);
 
-            $updatedCount++;
+            ++$updatedCount;
         }
 
         $em->flush();
@@ -116,7 +117,7 @@ final class Version20211209022550 extends AbstractMauticMigration
         $updated = false;
 
         foreach ($role->getPermissions() as $permission) {
-            if ($permission->getName() === 'lists') {
+            if ('lists' === $permission->getName()) {
                 $permission->setBitwise($bitwise);
                 $em->persist($permission);
                 $updated = true;
@@ -133,7 +134,7 @@ final class Version20211209022550 extends AbstractMauticMigration
             $role->addPermission($permission);
         }
 
-        $raw = $role->getRawPermissions();
+        $raw               = $role->getRawPermissions();
         $raw['lead:lists'] = $newPermissions;
         $role->setRawPermissions($raw);
 

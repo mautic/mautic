@@ -16,13 +16,13 @@ final class Version20240725105507 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $this->connection->update(
-            $this->prefix . 'leads',
+            $this->prefix.'leads',
             ['country' => 'Türkiye'],
             ['country' => 'Turkey']
         );
 
         $this->connection->update(
-            $this->prefix . 'companies',
+            $this->prefix.'companies',
             ['companycountry' => 'Türkiye'],
             ['companycountry' => 'Turkey']
         );
@@ -31,13 +31,13 @@ final class Version20240725105507 extends PreUpAssertionMigration
     public function down(Schema $schema): void
     {
         $this->connection->update(
-            $this->prefix . 'leads',
+            $this->prefix.'leads',
             ['country' => 'Turkey'],
             ['country' => 'Türkiye']
         );
 
         $this->connection->update(
-            $this->prefix . 'companies',
+            $this->prefix.'companies',
             ['companycountry' => 'Turkey'],
             ['companycountry' => 'Türkiye']
         );

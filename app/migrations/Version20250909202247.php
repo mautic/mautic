@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\ProjectBundle\Entity\Project;
@@ -16,17 +16,17 @@ final class Version20250909202247 extends PreUpAssertionMigration
 
     private function getTableName(): string
     {
-        return $this->prefix . self::TABLE_NAME;
+        return $this->prefix.self::TABLE_NAME;
     }
 
     private function getNewIndexName(): string
     {
-        return $this->prefix . 'unique_project_name';
+        return $this->prefix.'unique_project_name';
     }
 
     private function getOldIndexName(): string
     {
-        return $this->prefix . 'project_name';
+        return $this->prefix.'project_name';
     }
 
     private function indexExists(string $indexName): bool

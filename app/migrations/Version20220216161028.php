@@ -70,7 +70,7 @@ final class Version20220216161028 extends AbstractMauticMigration
                     $oldQuoted,
                     $newQuoted,
                     $this->connection->quoteIdentifier($column),
-                    $this->connection->quote('%' . $oldSerialized . '%')
+                    $this->connection->quote('%'.$oldSerialized.'%')
                 ));
             }
         }

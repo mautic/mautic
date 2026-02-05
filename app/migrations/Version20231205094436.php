@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\LeadBundle\Entity\ListLead;
 
@@ -13,7 +13,7 @@ final class Version20231205094436 extends PreUpAssertionMigration
 {
     private function getTableName(): string
     {
-        return $this->prefix . ListLead::TABLE_NAME;
+        return $this->prefix.ListLead::TABLE_NAME;
     }
 
     private function getIndexName(): string

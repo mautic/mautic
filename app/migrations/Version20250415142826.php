@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250415142826 extends PreUpAssertionMigration
@@ -14,7 +14,7 @@ final class Version20250415142826 extends PreUpAssertionMigration
 
     private function getTableName(): string
     {
-        return $this->prefix . self::TABLE_NAME;
+        return $this->prefix.self::TABLE_NAME;
     }
 
     private function getIndexName(): string

@@ -17,13 +17,13 @@ final class Version20210420113309 extends PreUpAssertionMigration
     {
         $this->skipAssertion(
             fn (Schema $schema) => $this->indexExists(),
-            sprintf("Index %s already exists", self::INDEX_NAME)
+            sprintf('Index %s already exists', self::INDEX_NAME)
         );
     }
 
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -43,7 +43,7 @@ final class Version20210420113309 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -62,17 +62,17 @@ final class Version20210420113309 extends PreUpAssertionMigration
 
     private function indexExists(): bool
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         if ($platform instanceof PostgreSQLPlatform) {
-            $sql = "
+            $sql = '
                 SELECT 1
                 FROM pg_indexes
                 WHERE schemaname = current_schema()
                   AND tablename = ?
                   AND indexname = ?
-            ";
+            ';
 
             $result = $this->connection->executeQuery($sql, [$tableName, self::INDEX_NAME])->fetchOne();
 

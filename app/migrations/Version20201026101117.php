@@ -26,7 +26,7 @@ final class Version20201026101117 extends AbstractMauticMigration
     {
         $platform = $this->connection->getDatabasePlatform();
 
-        $table = $schema->getTable($this->prefix . $this->tableEmails);
+        $table = $schema->getTable($this->prefix.$this->tableEmails);
 
         $subjectColumn = $table->getColumn('subject');
 
@@ -39,14 +39,14 @@ final class Version20201026101117 extends AbstractMauticMigration
 
             // If no collation set → assume default is sufficient for emoji support
             // You can also skip if no collation key exists (common case)
-            if ($collation === null) {
+            if (null === $collation) {
                 // For most PG installs default is utf8-compatible → can skip
                 throw new SkipMigration('No specific collation → already compatible');
             }
         } else {
             // MySQL/MariaDB: original charset check
             $charset = $subjectColumn->getPlatformOption('charset') ?? null;
-            if ($charset === 'utf8mb4') {
+            if ('utf8mb4' === $charset) {
                 throw new SkipMigration('Migration already applied (utf8mb4 charset detected)');
             }
         }
@@ -62,7 +62,7 @@ final class Version20201026101117 extends AbstractMauticMigration
         ];
 
         foreach ($tables as $table => $columns) {
-            $fullTable = $this->prefix . $table;
+            $fullTable = $this->prefix.$table;
 
             foreach ($columns as $column) {
                 if ($platform instanceof PostgreSQLPlatform) {
@@ -133,9 +133,9 @@ final class Version20201026101117 extends AbstractMauticMigration
         \assert($entityManager instanceof EntityManagerInterface);
 
         $batchSize = 50;
-        $i = 1;
+        $i         = 1;
 
-        $q = $entityManager->createQuery("SELECT t FROM {$entityClass} t");
+        $q              = $entityManager->createQuery("SELECT t FROM {$entityClass} t");
         $iterableResult = $q->toIterable();
 
         foreach ($iterableResult as $row) {

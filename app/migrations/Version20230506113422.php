@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 final class Version20230506113422 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'dynamic_content_stats';
-    private const INDEX_NAME = 'stat_dynamic_content_date_sent';
+    private const INDEX_NAME   = 'stat_dynamic_content_date_sent';
 
     protected function preUpAssertions(): void
     {
@@ -40,7 +40,7 @@ final class Version20230506113422 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $indexName = $this->getPrefixedIndexName();
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -56,7 +56,7 @@ final class Version20230506113422 extends PreUpAssertionMigration
 
     private function indexExists(): bool
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();
 
@@ -82,6 +82,6 @@ final class Version20230506113422 extends PreUpAssertionMigration
 
     private function getPrefixedIndexName(): string
     {
-        return $this->prefix . self::INDEX_NAME;
+        return $this->prefix.self::INDEX_NAME;
     }
 }

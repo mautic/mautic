@@ -17,13 +17,13 @@ final class Version20211026153057 extends PreUpAssertionMigration
     {
         $this->skipAssertion(
             fn () => $this->indexExists(),
-            sprintf("Index %s already exists", self::INDEX_NAME)
+            sprintf('Index %s already exists', self::INDEX_NAME)
         );
     }
 
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();
 
@@ -37,7 +37,7 @@ final class Version20211026153057 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $indexName = $this->getPrefixedIndexName();
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -53,7 +53,7 @@ final class Version20211026153057 extends PreUpAssertionMigration
 
     private function indexExists(): bool
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();
 
@@ -79,6 +79,6 @@ final class Version20211026153057 extends PreUpAssertionMigration
 
     private function getPrefixedIndexName(): string
     {
-        return $this->prefix . self::INDEX_NAME;
+        return $this->prefix.self::INDEX_NAME;
     }
 }

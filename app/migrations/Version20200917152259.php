@@ -6,9 +6,9 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\TextType;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Types\TextType;
 
 final class Version20200917152259 extends AbstractMauticMigration
 {
@@ -34,7 +34,7 @@ final class Version20200917152259 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getTableName();
 
         if ($platform instanceof PostgreSQLPlatform) {
@@ -52,13 +52,13 @@ final class Version20200917152259 extends AbstractMauticMigration
 
     public function down(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform();
+        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getTableName();
 
         if ($platform instanceof PostgreSQLPlatform) {
             // Revert to varchar(191) – may truncate data if longer text exists!
             $this->addSql("ALTER TABLE {$tableName} ALTER COLUMN default_value TYPE varchar(191)");
-            // Optional: add back constraints if originally present
+        // Optional: add back constraints if originally present
         } else {
             $this->addSql("ALTER TABLE {$tableName} MODIFY default_value VARCHAR(191) NULL DEFAULT NULL");
         }
@@ -66,6 +66,6 @@ final class Version20200917152259 extends AbstractMauticMigration
 
     private function getTableName(): string
     {
-        return $this->prefix . $this->table;
+        return $this->prefix.$this->table;
     }
 }

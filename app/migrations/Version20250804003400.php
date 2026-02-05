@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
@@ -15,7 +15,7 @@ final class Version20250804003400 extends AbstractMauticMigration
 
     private function getLeadListsTable(): string
     {
-        return $this->prefix . 'lead_lists';
+        return $this->prefix.'lead_lists';
     }
 
     private function getMultiselectLists(): array
@@ -51,10 +51,10 @@ final class Version20250804003400 extends AbstractMauticMigration
 
                 if (($filter['operator'] ?? '') === OperatorOptions::INCLUDING_ANY) {
                     $filter['operator'] = OperatorOptions::INCLUDING_ALL;
-                    $changed = true;
+                    $changed            = true;
                 } elseif (($filter['operator'] ?? '') === OperatorOptions::EXCLUDING_ANY) {
                     $filter['operator'] = OperatorOptions::EXCLUDING_ALL;
-                    $changed = true;
+                    $changed            = true;
                 }
             }
             unset($filter);
@@ -63,7 +63,7 @@ final class Version20250804003400 extends AbstractMauticMigration
                 $this->connection->update(
                     $table,
                     ['filters' => serialize($filters)],
-                    ['id' => (int) $listData['id']]
+                    ['id'      => (int) $listData['id']]
                 );
             }
         }
@@ -88,10 +88,10 @@ final class Version20250804003400 extends AbstractMauticMigration
 
                 if (($filter['operator'] ?? '') === OperatorOptions::INCLUDING_ALL) {
                     $filter['operator'] = OperatorOptions::INCLUDING_ANY;
-                    $changed = true;
+                    $changed            = true;
                 } elseif (($filter['operator'] ?? '') === OperatorOptions::EXCLUDING_ALL) {
                     $filter['operator'] = OperatorOptions::EXCLUDING_ANY;
-                    $changed = true;
+                    $changed            = true;
                 }
             }
             unset($filter);
@@ -100,7 +100,7 @@ final class Version20250804003400 extends AbstractMauticMigration
                 $this->connection->update(
                     $table,
                     ['filters' => serialize($filters)],
-                    ['id' => (int) $listData['id']]
+                    ['id'      => (int) $listData['id']]
                 );
             }
         }

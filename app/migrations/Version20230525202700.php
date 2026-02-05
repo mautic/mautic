@@ -11,7 +11,7 @@ final class Version20230525202700 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
-        $tableName = $this->getPrefixedTableName('leads');
+        $tableName  = $this->getPrefixedTableName('leads');
         $columnName = $this->connection->quoteIdentifier('state');
 
         $stateUpdates = [
