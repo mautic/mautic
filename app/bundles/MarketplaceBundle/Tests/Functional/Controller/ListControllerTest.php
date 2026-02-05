@@ -25,7 +25,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         Assert::assertSame(
             [
@@ -52,7 +52,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Verify no packages are displayed when API returns no results
         Assert::assertSame(

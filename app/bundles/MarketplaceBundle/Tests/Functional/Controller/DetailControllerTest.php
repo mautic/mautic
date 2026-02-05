@@ -70,9 +70,9 @@ final class DetailControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', 's/marketplace/detail/koco/mautic-recaptcha-bundle');
 
-        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
 
-        Assert::assertSame(SymfonyResponse::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $responseContent = $this->client->getResponse()->getContent();
 
         // Verify reviews from object format (keyed by username) are displayed correctly
         Assert::assertStringContainsString('john_doe', $responseContent);
