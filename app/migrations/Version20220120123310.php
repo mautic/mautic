@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20220120123310 extends PreUpAssertionMigration
@@ -14,12 +14,12 @@ final class Version20220120123310 extends PreUpAssertionMigration
 
     private function getTableName(): string
     {
-        return $this->prefix . self::TABLE;
+        return $this->prefix.self::TABLE;
     }
 
     private function getIndexName(): string
     {
-        return $this->prefix . 'segment_deleted';
+        return $this->prefix.'segment_deleted';
     }
 
     private function indexExists(): bool
