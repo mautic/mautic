@@ -577,20 +577,22 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             }
         } elseif ('utmtags' == $prop) {
             if ($val instanceof UtmTag) {
-                if ($val->getUtmContent()) {
-                    $this->changes['utmtags'] = ['utm_content', $val->getUtmContent()];
-                }
-                if ($val->getUtmMedium()) {
-                    $this->changes['utmtags'] = ['utm_medium', $val->getUtmMedium()];
-                }
-                if ($val->getUtmCampaign()) {
-                    $this->changes['utmtags'] = ['utm_campaign', $val->getUtmCampaign()];
-                }
-                if ($val->getUtmTerm()) {
-                    $this->changes['utmtags'] = ['utm_term', $val->getUtmTerm()];
-                }
-                if ($val->getUtmSource()) {
-                    $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
+                $fields = [
+                    'utm_content'  => 'getUtmContent',
+                    'utm_medium'   => 'getUtmMedium',
+                    'utm_campaign' => 'getUtmCampaign',
+                    'utm_term'     => 'getUtmTerm',
+                    'utm_source'   => 'getUtmSource',
+                ];
+                foreach ($fields as $field => $getterMethod) {
+                    $newValue = $val->$getterMethod();
+                    $oldValue = null;
+                    if ($current instanceof UtmTag) {
+                        $oldValue = $current->$getterMethod();
+                    }
+                    if ($newValue !== $oldValue) {
+                        $this->changes['utmtags'][$field] = [$oldValue, $newValue];
+                    }
                 }
             }
         } elseif ('frequencyRules' == $prop) {
