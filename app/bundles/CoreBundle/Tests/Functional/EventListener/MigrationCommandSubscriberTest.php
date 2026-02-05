@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = true;
+    protected $useCleanupRollback = false;
     private string $tablePrefix;
     private EventDispatcherInterface $eventDispatcher;
 
@@ -162,7 +162,6 @@ SQL;
 
     private function executeMigrationCommand(): string
     {
-        // intentionally not using AbstractMauticTestCase::testSymfonyCommand() as it does not dispatch 'console.terminate' event
         if ($this->isPostgresqlPlatform()) {
             // Doctrine Migrations' TableMetadataStorage::ensureInitialized() is not idempotent on PostgreSQL
             // — it always tries to add the PK via alterTable(), without first verifying if the constraint is already present.
@@ -170,7 +169,7 @@ SQL;
             // and it's well-known when using PostgreSQL (MySQL forgives duplicate attempts).
             $this->connection->executeStatement('DROP TABLE IF EXISTS migrations CASCADE');
         }
-
+        // intentionally not using AbstractMauticTestCase::testSymfonyCommand() as it does not dispatch 'console.terminate' event
         $params      = ['command' => 'doctrine:migration:migrate', '--allow-no-migration' => true, '--no-interaction' => true];
         $application = new Application(static::getContainer()->get('kernel'));
         $application->setAutoExit(false);
