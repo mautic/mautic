@@ -379,10 +379,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $readDateTime = new DateTimeHelper($hitDateTime);
         $userAgent    = $request->server->get('HTTP_USER_AGENT');
