@@ -29,6 +29,9 @@ class ReviewCollection implements \Iterator, \Countable, \ArrayAccess
      */
     public static function fromArray(array $array): self
     {
+        // Convert object format to indexed array
+        $array = array_values($array);
+
         return new self(
             array_map(
                 fn (array $record) => Review::fromArray($record),

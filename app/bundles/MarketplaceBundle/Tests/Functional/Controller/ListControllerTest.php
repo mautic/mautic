@@ -41,4 +41,23 @@ final class ListControllerTest extends MauticMysqlTestCase
             )
         );
     }
+
+    public function testMarketplaceListHandlesEmptyResults(): void
+    {
+        /** @var MockHandler $handlerStack */
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list_empty.json'))
+        );
+
+        $crawler = $this->client->request('GET', 's/marketplace');
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        // Verify no packages are displayed when API returns no results
+        Assert::assertSame(
+            [],
+            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+        );
+    }
 }

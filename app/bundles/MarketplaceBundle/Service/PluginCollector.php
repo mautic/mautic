@@ -22,7 +22,7 @@ class PluginCollector
 
         $this->total = (int) $payload['total'];
 
-        return PackageCollection::fromArray($payload['results']);
+        return PackageCollection::fromArray($payload['results'] ?? []);
     }
 
     public function getTotal(): int

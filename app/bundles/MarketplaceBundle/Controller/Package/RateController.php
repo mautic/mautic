@@ -24,8 +24,11 @@ class RateController extends CommonController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'vendor'  => $vendor,
-                    'package' => $package,
+                    'vendor'          => $vendor,
+                    'package'         => $package,
+                    'auth0Domain'     => $config->getAuth0Domain(),
+                    'auth0ClientId'   => $config->getAuth0ClientId(),
+                    'reviewsApiUrl'   => $config->getReviewsApiUrl(),
                 ],
                 'contentTemplate' => '@Marketplace/Package/rating.html.twig',
             ]

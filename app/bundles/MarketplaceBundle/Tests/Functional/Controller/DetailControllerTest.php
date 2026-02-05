@@ -59,4 +59,25 @@ final class DetailControllerTest extends MauticMysqlTestCase
             '<a href="https://github.com/KonstantinCodes/mautic-recaptcha/releases/tag/3.0.1" id="latest-version" target="_blank" rel="noopener noreferrer">',
         ];
     }
+
+    public function testMarketplaceDetailPageDisplaysReviewsFromObjectFormat(): void
+    {
+        /** @var MockHandler $handlerStack */
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json'))
+        );
+
+        $this->client->request('GET', 's/marketplace/detail/koco/mautic-recaptcha-bundle');
+
+        $responseContent = $this->client->getResponse()->getContent();
+
+        Assert::assertSame(SymfonyResponse::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // Verify reviews from object format (keyed by username) are displayed correctly
+        Assert::assertStringContainsString('john_doe', $responseContent);
+        Assert::assertStringContainsString('Excellent reCAPTCHA integration!', $responseContent);
+        Assert::assertStringContainsString('jane_smith', $responseContent);
+        Assert::assertStringContainsString('Works great with Mautic forms', $responseContent);
+    }
 }

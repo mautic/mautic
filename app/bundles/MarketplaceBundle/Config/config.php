@@ -81,6 +81,9 @@ return [
     ],
     // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
-        Config::MARKETPLACE_ENABLED => true,
+        Config::MARKETPLACE_ENABLED                => true,
+        Config::MARKETPLACE_AUTH0_DOMAIN           => 'mautic-dev.us.auth0.com',
+        Config::MARKETPLACE_AUTH0_CLIENT_ID        => 'oJZKD8pJJM5UFAhadKDivh3pffWZdkdz',
+        Config::MARKETPLACE_REVIEWS_API_URL        => 'https://marketplace.mautic.org/functions/v1/api-marketplace-reviews',
     ],
 ];
