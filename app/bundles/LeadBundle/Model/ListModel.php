@@ -299,9 +299,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of preference center lead lists.
      *
-     * @return mixed
+     * @return array<int, array{
+     *      id: int,
+     *      name: string,
+     *      publicName: string,
+     *      alias: string
+     *   }>
      */
-    public function getPreferenceCenterLists()
+    public function getPreferenceCenterLists(): array
     {
         return $this->em->getRepository(LeadList::class)->getPreferenceCenterList();
     }
