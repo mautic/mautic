@@ -80,21 +80,24 @@ class DoctrineEventsSubscriber
 
             // Prefix sequences if supported by the DB platform
             if ($classMetadata->isIdGeneratorSequence()) {
-                $newDefinition = $classMetadata->sequenceGeneratorDefinition;
-                // sequencer for embedded class already have prefix
-                if (!$classMetadata->isEmbeddedClass) {
-                    $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
-                    $classMetadata->setSequenceGeneratorDefinition($newDefinition);
+                $definition      = $classMetadata->sequenceGeneratorDefinition;
+                $newSequenceName = $this->generateSequenceName($definition['sequenceName']);
+
+                // only redefine if it changed
+                if ($definition['sequenceName'] != $newSequenceName) {
+                    $definition['sequenceName'] = $newSequenceName;
+                    $classMetadata->setSequenceGeneratorDefinition($definition);
                 }
+
                 $em = $args->getEntityManager();
                 if (isset($classMetadata->idGenerator)) {
                     $sequenceGenerator = new \Doctrine\ORM\Id\SequenceGenerator(
                         $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
-                            $newDefinition,
+                            $definition,
                             $classMetadata,
                             $em->getConnection()->getDatabasePlatform()
                         ),
-                        $newDefinition['allocationSize']
+                        $definition['allocationSize']
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
@@ -140,5 +143,15 @@ class DoctrineEventsSubscriber
     private function trimQuotes(string $identifier): string
     {
         return str_replace(['`', '"', '[', ']'], '', $identifier);
+    }
+
+    private function generateSequenceName(string $sequenceName): string
+    {
+        // Remove prefix if present (test_, mautic_, etc.)
+        if (str_starts_with($sequenceName, $this->tablePrefix)) {
+            $sequenceName = substr($sequenceName, strlen($this->tablePrefix));
+        }
+
+        return $this->tablePrefix.$sequenceName;
     }
 }

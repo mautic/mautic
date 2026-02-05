@@ -344,7 +344,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         // Ensure the same list is used each batch <- would love to know how
-        $batchLimiters['maxId'] = (int) $newLeadsCount[$segmentId]['maxId'];
+        $batchLimiters['maxId'] = isset($newLeadsCount[$segmentId]['maxId']) ? (int) $newLeadsCount[$segmentId]['maxId'] : 0;
 
         // Number of total leads to process
         $leadCount = (int) $newLeadsCount[$segmentId]['count'];
