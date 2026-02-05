@@ -4,33 +4,85 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20230424083829 extends AbstractMauticMigration
 {
+    protected const TABLE_NAME = 'focus';
+    private const INDEX_NAME = 'focus_name';
+
     /**
      * @throws SkipMigration
-     * @throws SchemaException
      */
     public function preUp(Schema $schema): void
     {
-        $table = $schema->getTable($this->prefix.'focus');
-
-        if ($table->hasIndex($this->prefix.'focus_name')) {
-            throw new SkipMigration('Schema includes this migration');
+        if ($this->indexExists()) {
+            throw new SkipMigration(
+                sprintf('Index %s already exists', $this->getPrefixedIndexName())
+            );
         }
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE INDEX '.$this->prefix.'focus_name ON '.$this->prefix.'focus (name)');
+        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $indexName = $this->getPrefixedIndexName();
+
+        // CREATE INDEX syntax is identical on MySQL and PostgreSQL in this case
+        $this->addSql(sprintf(
+            'CREATE INDEX %s ON %s (name)',
+            $indexName,
+            $tableName
+        ));
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP INDEX '.$this->prefix.'focus_name ON '.$this->prefix.'focus');
+        $platform = $this->connection->getDatabasePlatform();
+        $indexName = $this->getPrefixedIndexName();
+
+        if ($platform instanceof PostgreSQLPlatform) {
+            $this->addSql(sprintf('DROP INDEX IF EXISTS %s', $indexName));
+        } else {
+            $this->addSql(sprintf(
+                'DROP INDEX %s ON %s',
+                $indexName,
+                $this->getPrefixedTableName(self::TABLE_NAME)
+            ));
+        }
+    }
+
+    private function indexExists(): bool
+    {
+        $platform = $this->connection->getDatabasePlatform();
+        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $indexName = $this->getPrefixedIndexName();
+
+        if ($platform instanceof PostgreSQLPlatform) {
+            $sql = '
+                SELECT 1
+                FROM pg_indexes
+                WHERE schemaname = current_schema()
+                  AND tablename  = ?
+                  AND indexname  = ?
+            ';
+
+            $result = $this->connection->executeQuery($sql, [$tableName, $indexName])->fetchOne();
+
+            return (bool) $result;
+        }
+
+        // MySQL fallback
+        $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
+
+        return isset($indexes[$indexName]);
+    }
+
+    private function getPrefixedIndexName(): string
+    {
+        return $this->prefix . self::INDEX_NAME;
     }
 }

@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\UserBundle\Entity\Permission;
@@ -16,71 +17,82 @@ final class Version20211209022550 extends AbstractMauticMigration
 {
     public function postUp(Schema $schema): void
     {
-        /** @var RoleModel $model */
-        $model = $this->container->get(ModelFactory::class)->getModel('user.role');
+        /** @var RoleModel $roleModel */
+        $roleModel = $this->container->get(ModelFactory::class)->getModel('user.role');
 
-        // Get all non admin roles.
-        $roles = $model->getEntities([
-            'orderBy'       => 'r.id',
-            'orderByDir'    => 'ASC',
-            'filter'        => [
-                'where' => [
-                    [
-                        'col'  => 'r.isAdmin',
-                        'expr' => 'eq',
-                        'val'  => 0,
-                    ],
-                ],
-            ],
-        ]);
+        // Build custom query to force OBJECT hydration
+        $qb = $roleModel->getRepository()->createQueryBuilder('r');
+
+        $qb->where($qb->expr()->eq('r.isAdmin', ':isAdmin'))
+            ->setParameter('isAdmin', 0)
+            ->orderBy('r.id', 'ASC');
+
+        $query = $qb->getQuery();
+        $query->setHint(Query::HINT_REFRESH, true);          // Force refresh / full hydration
+        $query->setHydrationMode(Query::HYDRATE_OBJECT);     // Explicitly force objects
+
+        $roles = $query->getResult();
+
+        if (empty($roles)) {
+            echo "[INFO] No non-admin roles found – skipping permission migration.\n";
+            return;
+        }
+
+        /** @var EntityManagerInterface $em */
+        $em = $this->container->get('doctrine.orm.entity_manager');
+
+        $updatedCount = 0;
 
         /** @var Role $role */
         foreach ($roles as $role) {
+            // Now $role is always Role object – no array fallback needed
             $rawPermissions = $role->getRawPermissions();
+
             if (empty($rawPermissions)) {
                 continue;
             }
 
-            $leadPermission = $rawPermissions['lead:leads'] ?? [];
-            $listPermission = $rawPermissions['lead:lists'] ?? [];
+            $leadPermissions = $rawPermissions['lead:leads'] ?? [];
+            $listPermissions = $rawPermissions['lead:lists'] ?? [];
 
-            if (empty($leadPermission) && empty($listPermission)) {
+            if (empty($leadPermissions) && empty($listPermissions)) {
                 continue;
             }
 
-            // Map all leads permission to list.
-            $newPermissions = $leadPermission;
+            // Map leads → lists
+            $newPermissions = $leadPermissions;
 
-            if (!in_array('full', $newPermissions)) {
-                // If lead has viewown permission, then add create permission for list.
-                if (in_array('viewown', $leadPermission)) {
+            if (!in_array('full', $newPermissions, true)) {
+                if (in_array('viewown', $leadPermissions, true)) {
                     $newPermissions[] = 'create';
                 }
-
-                // Add the list related permission.
-                foreach ($listPermission as $perm) {
-                    $newPermissions[] = $perm;
-                }
+                $newPermissions = array_merge($newPermissions, $listPermissions);
             }
 
-            $perms = array_unique($newPermissions);
+            $newPermissions = array_unique($newPermissions);
 
-            $rawPermissions['lead:lists'] = $perms;
+            $bitwise = $this->calculateBitwise($newPermissions);
 
-            $bit = $this->getPermissionBitwise($perms);
+            $this->updateRolePermissions($role, $bitwise, $newPermissions, $em);
 
-            // We have to get the segment permission to update the bitwise value.
-            // The rest of the permission will stay as-is.
-            $this->setBitwise($role, $bit, $rawPermissions);
+            $updatedCount++;
+        }
+
+        $em->flush();
+
+        if ($updatedCount > 0) {
+            echo "[INFO] Updated permissions for $updatedCount non-admin role(s).\n";
+        } else {
+            echo "[INFO] No roles required permission updates.\n";
         }
     }
 
     /**
-     * @param string[] $perms
+     * @param string[] $permissions
      */
-    private function getPermissionBitwise(array $perms): int
+    private function calculateBitwise(array $permissions): int
     {
-        $permBitwise = [
+        $bitwiseMap = [
             'viewown'     => 2,
             'viewother'   => 4,
             'editown'     => 8,
@@ -92,46 +104,39 @@ final class Version20211209022550 extends AbstractMauticMigration
         ];
 
         $bit = 0;
-        foreach ($perms as $perm) {
-            $bit += $permBitwise[$perm];
+        foreach ($permissions as $perm) {
+            $bit += $bitwiseMap[$perm] ?? 0;
         }
 
         return $bit;
     }
 
-    /**
-     * @param mixed[] $rawPermissions
-     */
-    private function setBitwise(Role $role, int $bit, array $rawPermissions): void
+    private function updateRolePermissions(Role $role, int $bitwise, array $newPermissions, EntityManagerInterface $em): void
     {
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
-        \assert($entityManager instanceof EntityManagerInterface);
+        $updated = false;
 
-        $isPresent = false;
-        /** @var Permission $permission */
-        foreach ($role->getPermissions()->getIterator() as $permission) {
-            if ('lists' !== $permission->getName()) {
-                continue;
+        foreach ($role->getPermissions() as $permission) {
+            if ($permission->getName() === 'lists') {
+                $permission->setBitwise($bitwise);
+                $em->persist($permission);
+                $updated = true;
+                break;
             }
-            $isPresent = true;
-
-            $permission->setBitwise($bit);
-            $entityManager->persist($permission);
-            break;
         }
 
-        if (!$isPresent) {
+        if (!$updated) {
             $permission = new Permission();
             $permission->setBundle('lead');
             $permission->setName('lists');
-            $permission->setBitwise($bit);
-            $entityManager->persist($permission);
-
+            $permission->setBitwise($bitwise);
+            $em->persist($permission);
             $role->addPermission($permission);
         }
 
-        $role->setRawPermissions($rawPermissions);
-        $entityManager->persist($role);
-        $entityManager->flush();
+        $raw = $role->getRawPermissions();
+        $raw['lead:lists'] = $newPermissions;
+        $role->setRawPermissions($raw);
+
+        $em->persist($role);
     }
 }

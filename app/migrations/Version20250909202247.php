@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\ProjectBundle\Entity\Project;
@@ -13,25 +14,81 @@ final class Version20250909202247 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = Project::TABLE_NAME;
 
-    protected function preUpAssertions(): void
+    private function getTableName(): string
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex($this->getIndexName());
-        }, sprintf('Index %s already exists', $this->getIndexName()));
+        return $this->prefix . self::TABLE_NAME;
     }
 
-    public function up(Schema $schema): void
+    private function getNewIndexName(): string
     {
-        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
-        $table     = $schema->getTable($tableName);
+        return $this->prefix . 'unique_project_name';
+    }
 
-        $oldIndexName = $this->prefix.'project_name';
+    private function getOldIndexName(): string
+    {
+        return $this->prefix . 'project_name';
+    }
 
-        if ($table->hasIndex($oldIndexName)) {
-            $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
+    private function indexExists(string $indexName): bool
+    {
+        $tableName = $this->getTableName();
+
+        $platform = $this->connection->getDatabasePlatform();
+
+        if ($platform instanceof PostgreSQLPlatform) {
+            $sql = '
+                SELECT 1
+                FROM pg_indexes
+                WHERE schemaname = current_schema()
+                  AND tablename = ?
+                  AND lower(indexname) = lower(?)
+            ';
+
+            return (bool) $this->connection->fetchOne($sql, [$tableName, $indexName]);
         }
 
-        $table->addUniqueIndex(['name'], $this->getIndexName());
+        // MySQL/MariaDB fallback
+        $schemaManager = $this->connection->createSchemaManager();
+        $indexes       = $schemaManager->listTableIndexes($tableName);
+
+        $lowerIndexName = strtolower($indexName);
+        foreach ($indexes as $index) {
+            if (strtolower($index->getName()) === $lowerIndexName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function preUpAssertions(): void
+    {
+        $this->skipAssertion(
+            fn (Schema $schema) => $this->indexExists($this->getNewIndexName()),
+            sprintf('Index %s already exists', $this->getNewIndexName())
+        );
+    }
+
+    /**
+     * @throws SchemaException
+     */
+    public function up(Schema $schema): void
+    {
+        $tableName = $this->getTableName();
+        $table     = $schema->getTable($tableName);
+
+        $oldIndexName = $this->getOldIndexName();
+        $newIndexName = $this->getNewIndexName();
+
+        // Drop old non-unique index if it exists
+        if ($this->indexExists($oldIndexName)) {
+            $table->dropIndex($oldIndexName);
+        }
+
+        // Add new unique index (idempotent)
+        if (!$this->indexExists($newIndexName)) {
+            $table->addUniqueIndex(['name'], $newIndexName);
+        }
     }
 
     /**
@@ -39,14 +96,20 @@ final class Version20250909202247 extends PreUpAssertionMigration
      */
     public function down(Schema $schema): void
     {
-        $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
+        $tableName = $this->getTableName();
+        $table     = $schema->getTable($tableName);
 
-        $table->dropIndex($this->getIndexName());
-        $table->addIndex(['name'], $this->prefix.'project_name');
-    }
+        $oldIndexName = $this->getOldIndexName();
+        $newIndexName = $this->getNewIndexName();
 
-    private function getIndexName(): string
-    {
-        return $this->prefix.'unique_project_name';
+        // Drop new unique index if it exists
+        if ($this->indexExists($newIndexName)) {
+            $table->dropIndex($newIndexName);
+        }
+
+        // Add back old non-unique index (idempotent)
+        if (!$this->indexExists($oldIndexName)) {
+            $table->addIndex(['name'], $oldIndexName);
+        }
     }
 }

@@ -5,27 +5,85 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250415142826 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'campaign_lead_event_log';
 
+    private function getTableName(): string
+    {
+        return $this->prefix . self::TABLE_NAME;
+    }
+
+    private function getIndexName(): string
+    {
+        return "{$this->prefix}idx_scheduled_events";
+    }
+
+    private function indexExists(): bool
+    {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        $platform = $this->connection->getDatabasePlatform();
+
+        if ($platform instanceof PostgreSQLPlatform) {
+            $sql = '
+                SELECT 1
+                FROM pg_indexes
+                WHERE schemaname = current_schema()
+                  AND tablename = ?
+                  AND lower(indexname) = lower(?)
+            ';
+
+            return (bool) $this->connection->fetchOne($sql, [$tableName, $indexName]);
+        }
+
+        // MySQL/MariaDB fallback
+        $schemaManager = $this->connection->createSchemaManager();
+        $indexes       = $schemaManager->listTableIndexes($tableName);
+
+        $lowerIndexName = strtolower($indexName);
+        foreach ($indexes as $index) {
+            if (strtolower($index->getName()) === $lowerIndexName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex("{$this->prefix}idx_scheduled_events"),
+            fn (Schema $schema) => $this->indexExists(),
             'Index idx_scheduled_events already exists'
         );
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql("CREATE INDEX {$this->prefix}idx_scheduled_events ON {$this->getPrefixedTableName(self::TABLE_NAME)} (is_scheduled, event_id, trigger_date);");
+        $tableName = $this->getTableName();
+
+        if (!$schema->hasTable($tableName) || $this->indexExists()) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->addIndex(['is_scheduled', 'event_id', 'trigger_date'], $this->getIndexName());
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DROP INDEX {$this->prefix}idx_scheduled_events ON {$this->getPrefixedTableName(self::TABLE_NAME)};");
+        $tableName = $this->getTableName();
+
+        if (!$schema->hasTable($tableName) || !$this->indexExists()) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->dropIndex($this->getIndexName());
     }
 }

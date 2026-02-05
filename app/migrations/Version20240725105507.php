@@ -15,13 +15,31 @@ final class Version20240725105507 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("UPDATE {$this->prefix}leads SET `country` = 'Türkiye' WHERE `country` = 'Turkey'");
-        $this->addSql("UPDATE {$this->prefix}companies SET `companycountry` = 'Türkiye' WHERE `companycountry` = 'Turkey'");
+        $this->connection->update(
+            $this->prefix . 'leads',
+            ['country' => 'Türkiye'],
+            ['country' => 'Turkey']
+        );
+
+        $this->connection->update(
+            $this->prefix . 'companies',
+            ['companycountry' => 'Türkiye'],
+            ['companycountry' => 'Turkey']
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("UPDATE {$this->prefix}leads SET `country` = 'Turkey' WHERE `country` = 'Türkiye'");
-        $this->addSql("UPDATE {$this->prefix}companies SET `companycountry` = 'Turkey' WHERE `companycountry` = 'Türkiye'");
+        $this->connection->update(
+            $this->prefix . 'leads',
+            ['country' => 'Turkey'],
+            ['country' => 'Türkiye']
+        );
+
+        $this->connection->update(
+            $this->prefix . 'companies',
+            ['companycountry' => 'Turkey'],
+            ['companycountry' => 'Türkiye']
+        );
     }
 }
