@@ -372,14 +372,12 @@ class SubmissionModel extends CommonFormModel
             $this->leadModel->saveEntity($lead, false);
         }
 
-        if (!$form->isStandalone()) {
-            // Find and add the lead to the associated campaigns
-            $campaigns = $this->campaignModel->getCampaignsByForm($form);
-            /** @var Campaign $campaign */
-            foreach ($campaigns as $campaign) {
-                if ($campaign->isPublished()) {
-                    $this->membershipManager->addContact($lead, $campaign);
-                }
+        // Find and add the lead to the associated campaigns
+        $campaigns = $this->campaignModel->getCampaignsByForm($form);
+        /** @var Campaign $campaign */
+        foreach ($campaigns ?? [] as $campaign) {
+            if ($campaign->isPublished()) {
+                $this->membershipManager->addContact($lead, $campaign);
             }
         }
 

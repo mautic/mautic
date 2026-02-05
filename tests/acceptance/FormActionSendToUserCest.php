@@ -18,9 +18,6 @@ class FormActionSendToUserCest
         // Go to create new form
         $I->amOnPage(FormPage::$URL);
 
-        // Select standalone form
-        $form->selectAStandAloneType();
-
         // Fill basic form info
         $form->addFormMetaData();
 

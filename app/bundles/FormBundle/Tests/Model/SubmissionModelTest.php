@@ -283,6 +283,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->companyModel->method('fetchCompanyFields')->willReturn([]);
 
+        $this->campaignModel->method('getCampaignsByForm')->willReturn([]);
+
         $userMock = $this->createMock(UserRepository::class);
 
         $this->entityManager->expects($this->any())

@@ -126,6 +126,9 @@ class LeadList extends FormEntity implements UuidInterface
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltTime;
 
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    private ?\DateTimeInterface $deleted = null;
+
     public function __construct()
     {
         $this->leads = new ArrayCollection();
@@ -138,7 +141,8 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addIndex(['alias'], 'lead_list_alias');
+            ->addIndex(['alias'], 'lead_list_alias')
+            ->addIndex(['deleted'], 'segment_deleted');
 
         $builder->addIdColumns();
 
@@ -176,6 +180,8 @@ class LeadList extends FormEntity implements UuidInterface
             ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
+        $builder->addNullableField('deleted', 'datetime');
+
         static::addUuidField($builder);
     }
 
@@ -228,6 +234,11 @@ class LeadList extends FormEntity implements UuidInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -505,6 +516,11 @@ class LeadList extends FormEntity implements UuidInterface
         $this->lastBuiltTime = $lastBuiltTime;
     }
 
+    public function setDeleted(?\DateTimeInterface $deletedDate): void
+    {
+        $this->deleted = $deletedDate;
+    }
+
     /**
      * @param mixed[] $filters
      *
@@ -518,5 +534,10 @@ class LeadList extends FormEntity implements UuidInterface
         }
 
         return $filters;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 }
