@@ -123,11 +123,38 @@ class ListLeadRepository extends CommonRepository
 
     public function removeLeadsByListId(int $listId): void
     {
-        $table_name = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+        $tableName  = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
         $conn       = $this->getEntityManager()->getConnection();
+        $platform   = $conn->getDatabasePlatform();
+        $isPostgres = $platform instanceof PostgreSQLPlatform;
+
+        if ($isPostgres) {
+            $deleteQuery = sprintf(
+                'DELETE FROM %s
+             WHERE leadlist_id = :listId
+               AND ctid IN (
+                   SELECT ctid
+                   FROM %s
+                   WHERE leadlist_id = :listId
+                   LIMIT %d
+               )',
+                $tableName,
+                $tableName,
+                self::DELETE_BATCH_SIZE
+            );
+        } else {
+            $deleteQuery = sprintf(
+                'DELETE FROM %s
+             WHERE leadlist_id = :listId
+             LIMIT %d',
+                $tableName,
+                self::DELETE_BATCH_SIZE
+            );
+        }
+
         do {
             $deletedRows = $conn->executeStatement(
-                "DELETE FROM {$table_name} WHERE leadlist_id = :listId LIMIT ".self::DELETE_BATCH_SIZE,
+                $deleteQuery,
                 ['listId' => $listId]
             );
         } while ($deletedRows > 0);

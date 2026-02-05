@@ -34,7 +34,7 @@ final class Version20211209022550 extends AbstractMauticMigration
         $roles = $query->getResult();
 
         if (empty($roles)) {
-            echo "[INFO] No non-admin roles found – skipping permission migration.\n";
+            $this->debugMessage('[INFO] No non-admin roles found – skipping permission migration.');
 
             return;
         }
@@ -82,9 +82,9 @@ final class Version20211209022550 extends AbstractMauticMigration
         $em->flush();
 
         if ($updatedCount > 0) {
-            echo "[INFO] Updated permissions for $updatedCount non-admin role(s).\n";
+            $this->debugMessage("[INFO] Updated permissions for $updatedCount non-admin role(s).");
         } else {
-            echo "[INFO] No roles required permission updates.\n";
+            $this->debugMessage('[INFO] No roles required permission updates.');
         }
     }
 
@@ -110,6 +110,12 @@ final class Version20211209022550 extends AbstractMauticMigration
         }
 
         return $bit;
+    }
+
+    private function debugMessage(string $string): void
+    {
+        // uncomment me for debug
+        // echo $string.PHP_EOL;
     }
 
     private function updateRolePermissions(Role $role, int $bitwise, array $newPermissions, EntityManagerInterface $em): void
