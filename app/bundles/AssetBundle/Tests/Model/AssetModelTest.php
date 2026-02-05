@@ -161,6 +161,8 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('isAnonymous')
             ->willReturn(true);
 
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+
         $request = $this->createMock(Request::class);
 
         $serverBag = $this->createMock(ServerBag::class);
@@ -240,7 +242,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $ipAddress = new IpAddress('127.0.0.1');
 
-        $this->ipLookupHelper->expects($this->once())
+        $this->ipLookupHelper->expects($this->exactly(2))
             ->method('getIpAddress')
             ->willReturn($ipAddress);
 

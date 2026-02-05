@@ -867,6 +867,99 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Test that email validation is triggered for invalid values like 0, "0".
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emailValidationDuringImportProvider')]
+    public function testEmailValidationDuringImport(
+        mixed $emailValue,
+        bool $shouldValidate,
+        bool $shouldThrowException,
+    ): void {
+        $this->mockGetLeadRepository();
+
+        $emailField = new LeadField();
+        $emailField->setAlias('email');
+        $emailField->setLabel('Email');
+        $emailField->setType('email');
+        $emailField->setGroup('core');
+        $emailField->setObject('lead');
+
+        $fields = ['email' => 'email'];
+        $data   = ['email' => $emailValue];
+
+        $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
+            ->willReturn(['email' => 'Email']);
+        $this->fieldModelMock->method('getFieldListWithProperties')
+            ->willReturn([]);
+
+        $this->userHelperMock->method('getUser')
+            ->willReturn(new User());
+
+        $this->fieldModelMock->method('getFieldList')
+            ->willReturn([]);
+
+        $this->fieldModelMock->expects($this->atLeastOnce())
+            ->method('getEntities')
+            ->willReturn($this->getFieldPaginatorFake());
+
+        $this->companyModelMock->method('extractCompanyDataFromImport')
+            ->willReturn([[], []]);
+
+        if ($shouldValidate) {
+            $this->emailValidatorMock->expects($this->once())
+                ->method('validate')
+                ->with($emailValue, false)
+                ->willThrowException(new \Exception('Invalid email address'));
+        } else {
+            $this->emailValidatorMock->expects($this->never())
+                ->method('validate');
+        }
+
+        if ($shouldThrowException) {
+            $this->expectException(\Exception::class);
+            $this->expectExceptionMessage('email: Invalid email address');
+        }
+
+        $this->leadModel->import($fields, $data);
+    }
+
+    /**
+     * Data provider for email validation during import test.
+     *
+     * @return array<string, array{emailValue: mixed, shouldValidate: bool, shouldThrowException: bool}>
+     */
+    public static function emailValidationDuringImportProvider(): array
+    {
+        return [
+            'integer zero should be validated and rejected' => [
+                'emailValue'           => 0,
+                'shouldValidate'       => true,
+                'shouldThrowException' => true,
+            ],
+            'boolean false filtered by getCleanedFieldData before validation' => [
+                'emailValue'           => false,
+                'shouldValidate'       => false,
+                'shouldThrowException' => false,
+            ],
+            'string zero should be validated and rejected' => [
+                'emailValue'           => '0',
+                'shouldValidate'       => true,
+                'shouldThrowException' => true,
+            ],
+            'empty string should skip validation' => [
+                'emailValue'           => '',
+                'shouldValidate'       => false,
+                'shouldThrowException' => false,
+            ],
+            'null should skip validation' => [
+                'emailValue'           => null,
+                'shouldValidate'       => false,
+                'shouldThrowException' => false,
+            ],
+        ];
+    }
+
+    /**
      * Sets up common field model mocks for IP lookup tests.
      */
     private function setupFieldModelForIpLookupTest(): void
