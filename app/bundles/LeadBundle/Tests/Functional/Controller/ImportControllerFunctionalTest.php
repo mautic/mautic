@@ -246,11 +246,14 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(): Import
     {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        Assert::assertInstanceOf(User::class, $user, 'Admin user not found in test database');
+
         $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now);
-        $import->setCreatedBy(1);
+        $import->setCreatedBy($user->getId()); // do not hardcode ID!
         $import->setDir('/tmp');
         $import->setFile(basename($this->csvFile));
         $import->setOriginalFile(basename($this->csvFile));

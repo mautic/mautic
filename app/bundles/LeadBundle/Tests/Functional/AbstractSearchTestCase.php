@@ -47,7 +47,6 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
         $field->setDateModified(new \DateTime());
         $field->setIsIndex(true);
         $field->setType('text');
-
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
     }
