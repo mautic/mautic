@@ -1427,7 +1427,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             // Reset active index for global search
             if (mQuery(el).attr('id') === 'globalSearchInput') {
                 activeIndex = -1;
-                mQuery('#globalSearchResults .gsearch--results-item').removeClass('active');
+                mQuery('.gsearch--results-item', el).removeClass('active');
             }
 
             Mautic.filterList(
@@ -1477,7 +1477,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
      * Supports: ArrowUp, ArrowDown, Tab, Enter, Escape
      */
     if (mQuery(el).attr('id') === 'globalSearchInput') {
-        mQuery(el).off('keydown.globalSearchNav').on('keydown.globalSearchNav', function (e) {
+        mQuery(el).off('keydown.globalSearchNav');
+
+        mQuery(el).on('keydown.globalSearchNav', function (e) {
             const items = mQuery('#globalSearchResults .gsearch--results-item');
             if (!items.length) return;
 
@@ -1491,7 +1493,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
                 activeIndex = (activeIndex - 1 + items.length) % items.length;
             } else if (key === 'Enter' || key === 13) {
                 const link = items.eq(activeIndex).find('a').get(0);
-                if (link) link.click();
+
+                if (link) {
+                    link.click();
+                }
                 return;
             } else if (key === 'Escape' || key === 'Esc' || key === 27) {
                 mQuery('#gsearchModal').modal('hide');
@@ -1509,7 +1514,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         });
 
         // Reset index on input change
-        mQuery(el).off('input.globalSearchNav').on('input.globalSearchNav', function () {
+        mQuery(el).off('input.globalSearchNav');
+
+        mQuery(el).on('input.globalSearchNav', function () {
             activeIndex = -1;
             mQuery('#globalSearchResults .gsearch--results-item').removeClass('active');
         });
