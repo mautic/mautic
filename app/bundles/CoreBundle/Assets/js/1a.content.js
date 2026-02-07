@@ -1336,6 +1336,46 @@ Mautic.activateSearchAutocomplete = function (elId, modelName) {
     }
 };
 
+Mautic.isEnterKey = function (key) {
+    return key === 'Enter' || key === 13;
+};
+
+Mautic.isEscapeKey = function (key) {
+    return key === 'Escape' || key === 'Esc' || key === 27;
+};
+
+Mautic.isArrowDownKey = function (key) {
+    return key === 'ArrowDown' || key === 40;
+};
+
+Mautic.isArrowUpKey = function (key) {
+    return key === 'ArrowUp' || key === 38;
+};
+
+Mautic.isTabKey = function (key) {
+    return key === 'Tab' || key === 9;
+};
+
+
+/**
+ * Check whether the key event is a navigation key
+ * that should not trigger live search.
+ *
+ * @param {KeyboardEvent} event
+ * @returns {boolean}
+ */
+Mautic.isLiveSearchNavigationKey = function (event) {
+    const key = event.key || event.keyCode;
+
+    return (
+        Mautic.isArrowDownKey(key) ||
+        Mautic.isArrowUpKey(key)   ||
+        Mautic.isTabKey(key)       ||
+        Mautic.isEscapeKey(key)
+    );
+};
+
+
 /**
  * Activate live search feature
  *
@@ -1359,14 +1399,8 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
     mQuery(el).on('change keyup paste', {}, function (event) {
         // Prevent LiveSearch from re-triggering on navigation keys
-        const key = event.key || event.keyCode;
-        if (
-            key === 'ArrowDown' || key === 40 ||
-            key === 'ArrowUp'   || key === 38 ||
-            key === 'Tab'       || key === 9  ||
-            key === 'Escape'    || key === 27
-        ) {
-            return; // Do NOT trigger filtering
+        if (Mautic.isLiveSearchNavigationKey(event)) {
+            return;
         }
 
         var searchStr = mQuery(el).val().trim();
@@ -1403,8 +1437,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             });
         }
 
+        let overlay = null;
         if (!deleteKeyPressed && overlayEnabled) {
-            var overlay = mQuery('<div />', {"class": "content-overlay"})
+            overlay = mQuery('<div />', {"class": "content-overlay"})
                 .html(mQuery(el).attr('data-overlay-text'));
 
             if (mQuery(el).attr('data-overlay-background')) {
@@ -1415,7 +1450,6 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             }
         }
 
-        //searchStr in MauticVars[liveCacheVar] ||
         if ((!searchStr && MauticVars[searchStrVar].length)
             || diff >= 3
             || spaceKeyPressed
@@ -1439,7 +1473,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
                 overlayEnabled,
                 overlayTarget
             );
-        } else if (overlayEnabled) {
+        } else if (overlayEnabled && overlay) {
             if (!mQuery(overlayTarget + ' .content-overlay').length) {
                 mQuery(overlayTarget).prepend(overlay);
             }
@@ -1484,26 +1518,34 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             if (!items.length) return;
 
             const key = e.key || e.keyCode;
+            switch (true) {
+                case Mautic.isArrowDownKey(key):
+                case Mautic.isTabKey(key):
+                    e.preventDefault();
+                    activeIndex = (activeIndex + 1) % items.length;
+                    break;
 
-            if (key === 'ArrowDown' || key === 40 || key === 'Tab') {
-                e.preventDefault();
-                activeIndex = (activeIndex + 1) % items.length;
-            } else if (key === 'ArrowUp' || key === 38) {
-                e.preventDefault();
-                activeIndex = (activeIndex - 1 + items.length) % items.length;
-            } else if (key === 'Enter' || key === 13) {
-                const link = items.eq(activeIndex).find('a').get(0);
+                case Mautic.isArrowUpKey(key):
+                    e.preventDefault();
+                    activeIndex = (activeIndex - 1 + items.length) % items.length;
+                    break;
 
-                if (link) {
-                    link.click();
+                case Mautic.isEnterKey(key): {
+                    const link = items.eq(activeIndex).find('a').get(0);
+                    if (link) {
+                        link.click();
+                    }
+                    return;
                 }
-                return;
-            } else if (key === 'Escape' || key === 'Esc' || key === 27) {
-                mQuery('#gsearchModal').modal('hide');
-                return;
-            } else {
-                return;
+
+                case Mautic.isEscapeKey(key):
+                    mQuery('#gsearchModal').modal('hide');
+                    return;
+
+                default:
+                    return;
             }
+
 
             items.removeClass('active');
 
