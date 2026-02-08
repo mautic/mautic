@@ -20,6 +20,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -66,13 +68,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use VariantEntityTrait<Email>
  * @use TranslationEntityTrait<Email>
  */
-class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
+class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use VariantEntityTrait;
     use TranslationEntityTrait;
     use DynamicContentEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    use OptimisticLockTrait;
 
     public const ENTITY_NAME = 'email';
 
@@ -434,6 +437,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'email_projects_xref', 'email_id');
+        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

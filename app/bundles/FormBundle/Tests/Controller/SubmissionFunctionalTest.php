@@ -439,13 +439,13 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $formCrawler->filter('.mauticform-text'));
     }
 
-    public function testAddContactToCampaignByForm(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('formTypeDataProvider')]
+    public function testAddContactToCampaignByForm(?string $formType): void
     {
         // Create the test form via API.
         $payload = [
             'name'        => 'Submission test form',
             'description' => 'Form created via submission test',
-            'formType'    => 'campaign',
             'isPublished' => true,
             'fields'      => [
                 [
@@ -462,6 +462,10 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
+        if (null !== $formType) {
+            $payload['formType'] = $formType;
+        }
+
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -474,18 +478,12 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var CampaignModel $campaignModel */
         $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
 
-        $publishedCampaign = new Campaign();
-        $publishedCampaign->setName('Published');
-        $publishedCampaign->setIsPublished(true);
-        $campaignModel->setLeadSources($publishedCampaign, $campaignSources, []);
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign');
+        $campaign->setIsPublished(true);
+        $campaignModel->setLeadSources($campaign, $campaignSources, []);
 
-        $unpublishedCampaign =  new Campaign();
-        $unpublishedCampaign->setName('Unpublished');
-        $unpublishedCampaign->setIsPublished(false);
-        $campaignModel->setLeadSources($unpublishedCampaign, $campaignSources, []);
-
-        $this->em->persist($publishedCampaign);
-        $this->em->persist($unpublishedCampaign);
+        $this->em->persist($campaign);
         $this->em->flush();
 
         // Submit the form:
@@ -494,12 +492,24 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
-            'mauticform[email]' => 'xx@xx.com',
+            'mauticform[email]' => 'test@example.com',
         ]);
         $this->client->submit($form);
 
-        $submissions = $this->em->getRepository(Lead::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['campaign' => $campaign->getId()]);
+        Assert::assertCount(1, $campaignLeads);
+    }
+
+    /**
+     * @return array<string, array{formType: string|null}>
+     */
+    public static function formTypeDataProvider(): array
+    {
+        return [
+            'campaign form type'   => ['formType' => 'campaign'],
+            'standalone form type' => ['formType' => 'standalone'],
+            'no form type'         => ['formType' => null],
+        ];
     }
 
     protected function beforeTearDown(): void
@@ -618,7 +628,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $form = new Form();
         $form->setName('Submission test form');
         $form->setAlias('submissiontestform');
-        $form->setFormType('standalone');
         $form->setIsPublished(true);
 
         $lookup = new Field();

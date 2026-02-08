@@ -87,11 +87,6 @@ class LeadModel extends FormModel
     public const CHANNEL_FEATURE = 'contact_preference';
 
     /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
      * @var array
      */
     protected $leadFields = [];
@@ -119,7 +114,7 @@ class LeadModel extends FormModel
         protected IpLookupHelper $ipLookupHelper,
         protected PathsHelper $pathsHelper,
         protected IntegrationHelper $integrationHelper,
-        FieldModel $leadFieldModel,
+        protected FieldModel $leadFieldModel,
         protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected ListModel $leadListModel,
         protected FormFactoryInterface $formFactory,
@@ -140,8 +135,6 @@ class LeadModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
     ) {
-        $this->leadFieldModel       = $leadFieldModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -1527,7 +1520,11 @@ class LeadModel extends FormModel
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
 
-                if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
+                if (
+                    'email' === $leadField['type']
+                    && isset($fieldData[$leadField['alias']])
+                    && '' !== $fieldData[$leadField['alias']]
+                ) {
                     try {
                         $this->emailValidator->validate($fieldData[$leadField['alias']], false);
                     } catch (\Exception $exception) {

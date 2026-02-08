@@ -138,12 +138,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param class-string $className
      *
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray($className, &$data)
+    public function createFromArray($className, &$data): object
     {
         $entity        = new $className();
         $meta          = $this->_em->getClassMetadata($className);

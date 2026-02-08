@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -48,21 +49,35 @@ class LeadListRepository extends CommonRepository
      */
     protected $companyTableSchema;
 
-    /**
-     * @param int $id
-     */
-    public function getEntity($id = 0): ?LeadList
+    private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList
     {
         try {
-            return $this
-                ->createQueryBuilder('l')
-                ->where('l.id = :listId')
-                ->setParameter('listId', $id)
+            $q = $this
+                ->createQueryBuilder('l');
+            $q->where('l.id = :listId');
+            if ($ignoreDeleted) {
+                $q->andWhere($q->expr()->isNull($this->getTableAlias().'.deleted'));
+            }
+
+            return $q->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
         } catch (\Exception) {
             return null;
         }
+    }
+
+    /**
+     * @param int $id
+     */
+    public function getEntity($id = 0): ?LeadList
+    {
+        return $this->getSingleEntity($id);
+    }
+
+    public function getSoftDeletedEntity(int $id): ?LeadList
+    {
+        return $this->getSingleEntity($id, false);
     }
 
     /**
@@ -102,6 +117,8 @@ class LeadListRepository extends CommonRepository
                 $q->expr()->neq('l.id', $id)
             );
         }
+
+        $q->andWhere($q->expr()->isNull($this->getTableAlias().'.deleted'));
 
         $q->orderBy('l.name');
 
@@ -661,6 +678,17 @@ SQL;
             ->fetchFirstColumn();
     }
 
+    public function setSegmentAsDeleted(int $leadListId): void
+    {
+        $dateTime = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+
+        $this->getEntityManager()->getConnection()->update(
+            MAUTIC_TABLE_PREFIX.LeadList::TABLE_NAME,
+            ['deleted'   => $dateTime, 'is_published' => 0],
+            ['id'        => $leadListId]
+        );
+    }
+
     /**
      * @return mixed[]
      */
@@ -863,5 +891,31 @@ SQL;
         $result = $qb->getQuery()->getArrayResult();
 
         return array_column($result, 'id');
+    }
+
+    /**
+     * Get segment IDs for a contact.
+     *
+     * @param string $contactId Contact ID (supports BIGINT UNSIGNED)
+     *
+     * @return int[]
+     */
+    public function getContactSegmentIds(string $contactId): array
+    {
+        $result = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('ll.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->innerJoin('ll', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'll.leadlist_id = l.id')
+            ->where('ll.lead_id = :contactId')
+            ->andWhere('ll.manually_removed = 0')
+            ->andWhere('l.is_published = 1')
+            ->setParameter('contactId', $contactId)
+            ->orderBy('ll.leadlist_id', 'ASC')
+            ->executeQuery()
+            ->fetchAllNumeric();
+
+        return array_map(fn ($row) => (int) $row[0], $result);
     }
 }

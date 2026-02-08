@@ -18,5 +18,6 @@ upload_dirs:
 webimage_extra_packages: ["php${DDEV_PHP_VERSION}-imap"]
 use_dns_when_possible: true
 composer_version: "2"
+nodejs_version: "24"
 web_environment: []
 corepack_enable: false

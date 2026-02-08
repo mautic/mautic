@@ -5,14 +5,25 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriberTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->configParams['delete_segment_in_background'] = false;
+        parent::setUp();
+
+        $this->saveContacts();
+    }
+
     /**
      * @param mixed[]  $filters
      * @param string[] $expectedTranslations
@@ -73,6 +84,64 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
                 'operator' => 'endsWith',
             ],
         ], ['mautic.lead_list.filter.alert.endwith']];
+    }
+
+    public function testSegmentDeleteWhenBackgroundConfigFalse(): void
+    {
+        $filters = [
+            [
+                'glue'       => 'and',
+                'field'      => 'firstname',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'operator'   => 'like',
+                'properties' => ['filter' => 'Contact'],
+            ],
+        ];
+        $segment   = $this->saveSegment('SegmentD', 'segment-d', $filters);
+        $segmentId = $segment->getId();
+
+        // Run segments update command.
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
+
+        $listModel = $this->getContainer()->get('mautic.lead.model.list');
+        \assert($listModel instanceof ListModel);
+
+        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
+        self::assertSame(5, $leadCount);
+
+        $listModel->deleteEntity($segment);
+        $this->em->flush();
+
+        self::assertNull($listModel->getEntity($segmentId));
+
+        $deletedEntity = $listModel->getSoftDeletedEntity($segmentId);
+        self::assertNull($deletedEntity);
+
+        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
+        self::assertSame(0, $leadCount);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function saveContacts(): array
+    {
+        // Add 5 contacts
+        $contactRepo = $this->em->getRepository(Lead::class);
+        \assert($contactRepo instanceof LeadRepository);
+
+        $contacts = [];
+
+        for ($i = 1; $i <= 5; ++$i) {
+            $contact = new Lead();
+            $contact->setFirstname('Contact '.$i);
+            $contacts[] = $contact;
+        }
+
+        $contactRepo->saveEntities($contacts);
+
+        return $contacts;
     }
 
     /**
