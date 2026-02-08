@@ -239,8 +239,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Added dateAdded column.
      *
-     * @param bool|false $nullable
-     *
      * @return $this
      */
     public function addDateAdded(bool $nullable = false, int $precision = 0): static
