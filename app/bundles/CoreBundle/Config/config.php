@@ -900,7 +900,7 @@ return [
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
         'rememberme_key'                  => '%mautic.secret_key%',
-        'rememberme_lifetime'             => 31_536_000, // 365 days in seconds
+        'rememberme_lifetime'             => 7_776_000, // 90 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
         'default_pagelimit'               => 30,

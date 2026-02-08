@@ -86,10 +86,10 @@ class ListController extends FormController
             'string' => $search,
         ];
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tableAlias = $model->getRepository()->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
-            $tableAlias        = $model->getRepository()->getTableAlias();
             $filter['where'][] = [
                 'expr' => 'orX',
                 'val'  => [
@@ -99,7 +99,8 @@ class ListController extends FormController
             ];
         }
 
-        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+        $filter['force'][]   = ['column' => $tableAlias.'.deleted', 'expr' => 'isNull'];
+        [$count, $items]     = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             // the number of entities are now less then the current page so redirect to the last page

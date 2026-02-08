@@ -15,6 +15,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -53,12 +55,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use TranslationEntityTrait<Page>
  * @use VariantEntityTrait<Page>
  */
-class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
+class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    use OptimisticLockTrait;
+
     public const ENTITY_NAME = 'page';
 
     public const TABLE_NAME = 'pages';
@@ -309,6 +313,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         self::addVariantMetadata($builder, self::class);
         static::addUuidField($builder);
         self::addProjectsField($builder, 'page_projects_xref', 'page_id');
+        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

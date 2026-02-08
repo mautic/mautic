@@ -15,18 +15,18 @@ class WebhookQueue
 
     private ?string $id = null;
 
-    private ?Webhook $webhook;
+    private ?Webhook $webhook = null;
 
-    private ?\DateTime $dateAdded;
+    private ?\DateTime $dateAdded = null;
 
-    private ?\DateTimeImmutable $dateModified; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+    private ?\DateTimeImmutable $dateModified = null; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
 
     /**
      * @var string|resource|null
      */
     private $payloadCompressed;
 
-    private ?Event $event;
+    private ?Event $event = null;
 
     private int $retries = 0;
 

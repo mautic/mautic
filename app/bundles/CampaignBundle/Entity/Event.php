@@ -154,7 +154,7 @@ class Event implements ChannelInterface, UuidInterface
     private $triggerRestrictedDaysOfWeek = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    private ?int $triggerWindow;
+    private ?int $triggerWindow = null;
 
     /**
      * @var string|null

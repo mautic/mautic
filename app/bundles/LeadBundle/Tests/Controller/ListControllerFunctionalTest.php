@@ -33,6 +33,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
+        $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
         $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
@@ -201,6 +202,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
         $segmentId = $segment->getId();
+        $this->segmentCountCacheHelper->deleteSegmentContactCount($segmentId);
 
         // Save manual segment without filters.
         $manualSegment   = $this->saveSegment('Lead List 2', 'lead-list-2');

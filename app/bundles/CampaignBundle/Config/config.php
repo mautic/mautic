@@ -55,6 +55,10 @@ return [
                 'path'       => '/campaign/import/{objectAction}',
                 'controller' => 'Mautic\CampaignBundle\Controller\ImportController::executeAction',
             ],
+            'mautic_campaign_metrics_event_details' => [
+                'path'       => '/campaign/metrics/event-details/{objectId}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::eventDetailsAction',
+            ],
         ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [

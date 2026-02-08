@@ -359,6 +359,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://niziol.me"><img src="https://avatars.githubusercontent.com/u/947620?v=4?s=100" width="100px;" alt="Krzysztof Nizioł"/><br /><sub><b>Krzysztof Nizioł</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=kniziol" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://extrahourdevs.com"><img src="https://avatars.githubusercontent.com/u/5159138?v=4?s=100" width="100px;" alt="Alexander Petermann"/><br /><sub><b>Alexander Petermann</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=lexxxel" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

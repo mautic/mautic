@@ -1127,6 +1127,7 @@ class MailHelper
     {
         try {
             $this->message->from($from->toMailerAddress());
+            $this->message->sender($from->toMailerAddress());
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }

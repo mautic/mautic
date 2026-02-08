@@ -65,6 +65,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('condition', $responseData['eventType']);
         $this->assertSame('campaignEvent', $responseData['mauticContent']);
         $this->assertSame(1, $responseData['closeModal']);
+        Assert::assertTrue($responseData['formSubmitted'], $response->getContent());
     }
 
     /**
@@ -312,6 +313,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             $event1->getName(),
             $response['event']['name']
         );
+        Assert::assertFalse($response['formSubmitted'], $this->client->getResponse()->getContent());
     }
 
     public function testEventsAreDeleted(): void

@@ -12,9 +12,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Lock\LockInterface;
 
 class ModeratedCommandTest extends TestCase
 {
+    private string $lockFilePath;
     private CoreParametersHelper|MockObject $coreParametersHelper;
 
     /**
@@ -33,11 +35,25 @@ class ModeratedCommandTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->lockFilePath         = sys_get_temp_dir().'/test_lock_file.lock';
         $this->input                = $this->createMock(InputInterface::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->output               = new NullOutput();
-        $this->fakeModeratedCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+
+        $this->fakeModeratedCommand = new FakeModeratedCommand(
+            $this->pathsHelper,
+            $this->coreParametersHelper
+        );
+
+        $this->fakeModeratedCommand->setLockFile($this->lockFilePath);
+    }
+
+    protected function tearDown(): void
+    {
+        if (file_exists($this->lockFilePath)) {
+            unlink($this->lockFilePath);
+        }
     }
 
     public function testUnableToWriteLockFileThrowsAnException(): void
@@ -225,5 +241,59 @@ class ModeratedCommandTest extends TestCase
         $iterator->rewind();
 
         return $iterator->current();
+    }
+
+    public function testCompleteRunRemovesLockFileWhenItExists(): void
+    {
+        // Create a dummy lock file
+        file_put_contents($this->lockFilePath, 'test_lock');
+        $this->assertFileExists($this->lockFilePath);
+
+        // Mock the lock object to ensure release is called if it exists
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())
+            ->method('release');
+
+        $this->fakeModeratedCommand->setLock($lock);
+
+        // Call the completeRun method
+        $this->fakeModeratedCommand->forceCompleteRun();
+
+        // Assert that the lock file is removed
+        $this->assertFileDoesNotExist($this->lockFilePath);
+    }
+
+    public function testCompleteRunDoesNothingWhenLockFileDoesNotExist(): void
+    {
+        $this->assertFileDoesNotExist($this->lockFilePath);
+
+        // Mock the lock object to ensure release is called if it exists
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())
+            ->method('release');
+
+        $this->fakeModeratedCommand->setLock($lock);
+
+        // Call the completeRun method
+        $this->fakeModeratedCommand->forceCompleteRun();
+
+        // Assert that no error is thrown and file still does not exist
+        $this->assertFileDoesNotExist($this->lockFilePath);
+    }
+
+    public function testCompleteRunHandlesNullLockObject(): void
+    {
+        // Ensure lock object is null
+        $this->fakeModeratedCommand->setLock(null);
+
+        // Create a dummy lock file
+        file_put_contents($this->lockFilePath, 'test_lock');
+        $this->assertFileExists($this->lockFilePath);
+
+        // Call the completeRun method
+        $this->fakeModeratedCommand->forceCompleteRun();
+
+        // Assert that the lock file is removed
+        $this->assertFileDoesNotExist($this->lockFilePath);
     }
 }
