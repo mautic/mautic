@@ -109,6 +109,7 @@ class CampaignRepositoryTest extends TestCase
             ->method('getResult')
             ->willReturn($queryResult);
 
+        /** @phpstan-ignore-next-line */
         $result = $this->repository->fetchEmailIdsById($id);
 
         $this->assertEquals($expectedResult, $result);

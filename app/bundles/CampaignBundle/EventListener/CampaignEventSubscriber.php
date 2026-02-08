@@ -64,7 +64,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         $changes  = $campaign->getChanges();
 
         if (array_key_exists('isPublished', $changes)) {
-            list($actual, $inMemory) = $changes['isPublished'];
+            [$actual, $inMemory] = $changes['isPublished'];
 
             // If we're publishing the campaign
             if (false === $actual && true === $inMemory) {

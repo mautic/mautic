@@ -66,15 +66,11 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         }
 
         foreach ($groupedByTableName as $tableName => $generatedColumns) {
-            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(function (GeneratedColumnInterface $generatedColumn) {
-                return $generatedColumn->getAddColumnSql();
-            }, $generatedColumns));
+            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn) => $generatedColumn->getAddColumnSql(), $generatedColumns));
 
             $this->executeAlterQuery($query, $tableName, 'adding generated columns', $output);
 
-            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(function (GeneratedColumnInterface $generatedColumn) {
-                return $generatedColumn->getAddIndexSql();
-            }, $generatedColumns));
+            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn) => $generatedColumn->getAddIndexSql(), $generatedColumns));
 
             $this->executeAlterQuery($query, $tableName, 'adding indices', $output);
         }

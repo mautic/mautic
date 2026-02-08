@@ -57,7 +57,7 @@ class Download
     private $ipAddress;
 
     #[Groups(['download:read', 'download:write'])]
-    private ?Lead $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var int

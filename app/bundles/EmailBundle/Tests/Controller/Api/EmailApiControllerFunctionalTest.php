@@ -297,10 +297,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider publishNewPermissionProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('publishNewPermissionProvider')]
     public function testCreateEmailWithoutPublishPermissionWillBeIgnored(array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $user = $this->getUser('sales');
@@ -360,10 +359,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider publishExistingPermissionProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('publishExistingPermissionProvider')]
     public function testEditEmailWithoutPublishPermissionWillBeIgnored(string $creatorUsername, array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $owner = $this->getUser($creatorUsername);
