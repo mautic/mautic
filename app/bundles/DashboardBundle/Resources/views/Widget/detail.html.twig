@@ -1,4 +1,4 @@
-<div class="tile" style="height: {{ widget.height|default('310') - 10 }}px;">
+<div class="tile" style="min-height: {{ widget.height|default('310') - 10 }}px;">
     <div class="card-header d-flex jc-space-between ai-center">
         <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
