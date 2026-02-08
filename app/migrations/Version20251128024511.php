@@ -30,45 +30,56 @@ final class Version20251128024511 extends AbstractMauticMigration
         'stage_lead_action_log'   => ['date_fired'],
     ];
 
+    private const NULLABLE_COLUMNS = [
+        'date_triggered',
+        'date_read',
+        'last_opened',
+        'date_left',
+    ];
+
     public function up(Schema $schema): void
     {
-        /** @var AbstractPlatform $platform */
-        $platform        = $this->connection->getDatabasePlatform();
-        $isMysql         = $platform instanceof MySQLPlatform;
-        $type            = $isMysql ? 'DATETIME(3)' : 'TIMESTAMP(3) WITHOUT TIME ZONE';
-        $nullableColumns = ['date_triggered', 'date_read', 'last_opened', 'date_left'];
-
-        foreach (self::TABLES_AND_COLUMNS as $table => $columns) {
-            $tableName = $this->getPrefixedTableName($table);
-            foreach ($columns as $column) {
-                if ($isMysql) {
-                    $isNullable = in_array($column, $nullableColumns, true);
-                    $nullDef    = $isNullable ? 'NULL DEFAULT NULL' : 'NOT NULL';
-                    $this->addSql(sprintf('ALTER TABLE %s MODIFY %s %s %s', $tableName, $column, $type, $nullDef));
-                } else { // Assuming PostgreSQL
-                    $this->addSql(sprintf('ALTER TABLE %s ALTER COLUMN %s TYPE %s', $tableName, $column, $type));
-                }
-            }
-        }
+        $this->alterColumns(true);
     }
 
     public function down(Schema $schema): void
     {
+        $this->alterColumns(false);
+    }
+
+    private function alterColumns(bool $withMilliseconds): void
+    {
         /** @var AbstractPlatform $platform */
-        $platform        = $this->connection->getDatabasePlatform();
-        $isMysql         = $platform instanceof MySQLPlatform;
-        $type            = $isMysql ? 'DATETIME' : 'TIMESTAMP(0) WITHOUT TIME ZONE';
-        $nullableColumns = ['date_triggered', 'date_read', 'last_opened', 'date_left'];
+        $platform = $this->connection->getDatabasePlatform();
+        $isMysql  = $platform instanceof MySQLPlatform;
+
+        $type = $withMilliseconds
+            ? ($isMysql ? 'DATETIME(3)' : 'TIMESTAMP(3) WITHOUT TIME ZONE')
+            : ($isMysql ? 'DATETIME' : 'TIMESTAMP(0) WITHOUT TIME ZONE');
 
         foreach (self::TABLES_AND_COLUMNS as $table => $columns) {
             $tableName = $this->getPrefixedTableName($table);
+
             foreach ($columns as $column) {
                 if ($isMysql) {
-                    $isNullable = in_array($column, $nullableColumns, true);
-                    $nullDef    = $isNullable ? 'NULL DEFAULT NULL' : 'NOT NULL';
-                    $this->addSql(sprintf('ALTER TABLE %s MODIFY %s %s %s', $tableName, $column, $type, $nullDef));
-                } else { // Assuming PostgreSQL
-                    $this->addSql(sprintf('ALTER TABLE %s ALTER COLUMN %s TYPE %s', $tableName, $column, $type));
+                    $nullDef = in_array($column, self::NULLABLE_COLUMNS, true)
+                        ? 'NULL DEFAULT NULL'
+                        : 'NOT NULL';
+
+                    $this->addSql(sprintf(
+                        'ALTER TABLE %s MODIFY %s %s %s',
+                        $tableName,
+                        $column,
+                        $type,
+                        $nullDef
+                    ));
+                } else {
+                    $this->addSql(sprintf(
+                        'ALTER TABLE %s ALTER COLUMN %s TYPE %s',
+                        $tableName,
+                        $column,
+                        $type
+                    ));
                 }
             }
         }
