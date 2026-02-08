@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -151,7 +152,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+        /** @var ListModel $listModel */
         $listModel = static::getContainer()->get('mautic.lead.model.list');
         $listModel->addLead($contact, $segment);
         $this->em->flush();
