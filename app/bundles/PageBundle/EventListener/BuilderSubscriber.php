@@ -143,7 +143,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $expr           = $this->connection->createExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
             $dwcTokens      = $dwcTokenHelper->getFormattedTokens(
                 static::dwcTokenRegex,
-                TokenFormatOptions::simplePrefix('mautic.core.dynamicContent'),
+                TokenFormatOptions::simplePrefix('mautic.page.token.dwc'),
                 $labelFilter,
                 'name',
                 'slot_name',
