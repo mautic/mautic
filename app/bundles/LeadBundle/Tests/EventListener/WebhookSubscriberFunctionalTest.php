@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
@@ -16,6 +17,8 @@ use PHPUnit\Framework\Assert;
 
 class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -67,6 +70,8 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $webhook = new Webhook();
         $event   = new Event();
 
+        $userCreator = $this->getUser(self::ADMIN_USER);
+
         $event->setEventType('mautic.lead_list_change');
         $event->setWebhook($webhook);
 
@@ -75,12 +80,19 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $webhook->setWebhookUrl('https:://whatever.url');
         $webhook->setSecret('any_secret_will_do');
         $webhook->isPublished(true);
-        $webhook->setCreatedBy(1);
+        $webhook->setCreatedBy($userCreator->getId());
 
         $this->em->persist($event);
         $this->em->persist($webhook);
         $this->em->flush();
 
         return $webhook;
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
