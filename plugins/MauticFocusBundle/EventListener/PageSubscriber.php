@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
@@ -38,7 +39,13 @@ class PageSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
-            $event->addTokensFromHelper($tokenHelper, $this->regex, 'name');
+            $tokens      = $tokenHelper->getFormattedTokens(
+                $this->regex,
+                TokenFormatOptions::simplePrefix('mautic.focus.focus_item')
+            );
+            if ($tokens) {
+                $event->addTokens($tokens);
+            }
         }
     }
 

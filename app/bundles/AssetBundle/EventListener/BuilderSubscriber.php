@@ -3,6 +3,7 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper;
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -40,7 +41,16 @@ class BuilderSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested($this->assetToken)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
-            $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', true);
+            $tokens      = $tokenHelper->getFormattedTokens(
+                $this->assetToken,
+                TokenFormatOptions::linkWithId('mautic.asset.asset', 'assetlink=(\d+)'),
+                '',
+                'alias',
+                'id'
+            );
+            if ($tokens) {
+                $event->addTokens($tokens);
+            }
         }
     }
 

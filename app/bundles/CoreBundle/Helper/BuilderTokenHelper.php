@@ -4,8 +4,11 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
+use Mautic\CoreBundle\DTO\TokenLabelFormat;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderTokenHelper
 {
@@ -29,6 +32,7 @@ class BuilderTokenHelper
         private ModelFactory $modelFactory,
         private Connection $connection,
         private UserHelper $userHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -122,6 +126,58 @@ class BuilderTokenHelper
         }
 
         return $tokens;
+    }
+
+    /**
+     * Get tokens with formatted labels based on the provided format options.
+     *
+     * @param string              $tokenRegex    Token regex without wrapping regex escape characters
+     * @param TokenFormatOptions  $formatOptions Formatting options for token labels
+     * @param string              $filter        String to filter results by
+     * @param string              $labelColumn   The column that houses the label
+     * @param string              $valueColumn   The column that houses the value
+     * @param CompositeExpression $expr          Optional expression for filtering
+     *
+     * @return array<string,string>
+     */
+    public function getFormattedTokens(
+        string $tokenRegex,
+        TokenFormatOptions $formatOptions,
+        string $filter = '',
+        string $labelColumn = 'name',
+        string $valueColumn = 'id',
+        ?CompositeExpression $expr = null,
+    ): array {
+        $tokens = $this->getTokens($tokenRegex, $filter, $labelColumn, $valueColumn, $expr);
+
+        if (empty($tokens)) {
+            return [];
+        }
+
+        $prefix    = $this->translator->trans($formatOptions->translationKey).': ';
+        $formatted = [];
+
+        foreach ($tokens as $token => $label) {
+            $formatted[$token] = match ($formatOptions->format) {
+                TokenLabelFormat::SIMPLE_PREFIX => $prefix.$label,
+                TokenLabelFormat::LINK_WITH_ID  => $this->formatLinkWithId($token, $label, $prefix, $formatOptions->tokenIdPattern),
+            };
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * Format a token label with link prefix and ID like "a:Page: my-alias (123)".
+     */
+    private function formatLinkWithId(string $token, string $label, string $prefix, ?string $tokenIdPattern): string
+    {
+        $id = '';
+        if (null !== $tokenIdPattern && preg_match('/'.$tokenIdPattern.'/', $token, $matches)) {
+            $id = ' ('.$matches[1].')';
+        }
+
+        return 'a:'.$prefix.$label.$id;
     }
 
     /**

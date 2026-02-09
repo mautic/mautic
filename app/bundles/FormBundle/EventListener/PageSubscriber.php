@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\FormEvents;
@@ -49,7 +50,13 @@ class PageSubscriber implements EventSubscriberInterface
 
         if ($event->tokensRequested($this->formRegex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('form');
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name');
+            $tokens      = $tokenHelper->getFormattedTokens(
+                $this->formRegex,
+                TokenFormatOptions::simplePrefix('mautic.form.form')
+            );
+            if ($tokens) {
+                $event->addTokens($tokens);
+            }
         }
     }
 
