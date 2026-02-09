@@ -436,7 +436,13 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         /** @var FieldModel $fieldModel */
         $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
-        $firstnameField = $fieldModel->getEntity(2);
+        // Fetch firstname field by alias
+        $firstnameField = $fieldModel->getRepository()->findOneBy(['alias' => 'firstname']);
+
+        if (!$firstnameField) {
+            $this->fail('Core field "firstname" not found in test database. Ensure LeadFieldData fixture is loaded.');
+        }
+
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
