@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -36,7 +38,9 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionValid(): void
     {
-        $crawler                 = $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+
+        $crawler                 = $this->client->request('GET', '/s/users/edit/'.$user->getId());
         $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
         $form                    = $buttonCrawlerNode->form();
         $form['user[firstName]'] = 'test';
@@ -49,7 +53,9 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionInvalid(): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$user->getId());
 
         $form = $crawler->selectButton('Save')->form([
             'user[firstName]'               => '',
@@ -129,7 +135,9 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$user->getId());
 
         $form = $crawler->selectButton('Save')->form($data);
 
@@ -206,5 +214,12 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastLogin('2024-02-22 10:30:00');
 
         return $user;
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }

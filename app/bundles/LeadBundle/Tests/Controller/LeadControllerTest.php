@@ -27,6 +27,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -36,6 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+    private const ADMIN_USER = 'admin';
 
     protected function setUp(): void
     {
@@ -245,6 +247,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
     {
+        $adminUser = $this->getUser(self::ADMIN_USER);
+
         $company = new Company();
         $company->setName('Doe Corp');
 
@@ -273,7 +277,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
 
         /** @var AuditLog $auditLog */
-        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
+        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => $adminUser->getId()]);
 
         Assert::assertTrue(isset($auditLog->getDetails()['fields']), json_encode($auditLog, JSON_PRETTY_PRINT));
 
@@ -1089,6 +1093,8 @@ EMAIL;
     {
         $this->loadFixtures([LoadLeadData::class]);
 
+        $adminUser = $this->getUser(self::ADMIN_USER);
+
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $content = $this->client->getInternalResponse()->getContent();
 
@@ -1100,7 +1106,7 @@ EMAIL;
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
             'object' => 'ContactExports',
             'bundle' => 'lead',
-            'userId' => 1,
+            'userId' => $adminUser->getId(),
             'action' => 'create',
         ]);
         $this->assertNotNull($auditLog);
@@ -1204,5 +1210,12 @@ EMAIL;
         $this->assertResponseIsSuccessful();
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
         $this->assertEquals(0, $leadsTableRows->count(), 'Should find 0 results for an invalid campaign ID format.');
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
