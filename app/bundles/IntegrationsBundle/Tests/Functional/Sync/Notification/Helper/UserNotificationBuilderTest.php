@@ -12,6 +12,8 @@ use PHPUnit\Framework\Assert;
 
 class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
+    private const SALES_USER = 'sales';
+
     /**
      * @var UserNotificationBuilder
      */
@@ -33,7 +35,7 @@ class UserNotificationBuilderTest extends MauticMysqlTestCase
 
     public function testGetUserIdsWithExistentObject(): void
     {
-        $user = $this->em->find(User::class, 2);
+        $user = $this->getUser(self::SALES_USER);
         $lead = new Lead();
         $lead->setOwner($user);
         $this->em->persist($lead);
@@ -63,5 +65,12 @@ class UserNotificationBuilderTest extends MauticMysqlTestCase
         $header = $this->notificationBuilder->formatMessage('Some message', 'Some link');
 
         Assert::assertSame('Some link failed to sync with message, &quot;Some message&quot;', $header);
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
