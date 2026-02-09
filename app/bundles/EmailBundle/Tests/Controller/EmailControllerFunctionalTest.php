@@ -565,6 +565,29 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
     }
 
+    public function testOptimisticLock(): void
+    {
+        $version = 1;
+        $email   = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
+        $this->em->flush();
+        $this->assertEmailVersion($email->getId(), $version);
+
+        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailVersion($email->getId(), ++$version, 'The version should be incremented after submitting the form.');
+
+        $form    = $crawler->selectButton('Save')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailVersion($email->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
+        Assert::assertStringContainsString(
+            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
+            $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.',
+        );
+    }
+
     /**
      * @param array<mixed> $emails
      *
@@ -1177,5 +1200,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+    }
+
+    private function assertEmailVersion(int $id, int $expectedVersion, string $message = ''): void
+    {
+        $this->em->clear();
+        $email = $this->em->find(Email::class, $id);
+        Assert::assertSame($expectedVersion, $email->getVersion(), $message);
     }
 }

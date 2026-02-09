@@ -100,12 +100,10 @@ class SourceControllerTest extends MauticMysqlTestCase
         $form1 = new Form();
         $form1->setName('test');
         $form1->setAlias('test');
-        $form1->setFormType('campaign');
 
         $form2 = new Form();
         $form2->setName('test');
         $form2->setAlias('test');
-        $form2->setFormType('campaign');
 
         $this->em->persist($form1);
         $this->em->persist($form2);
