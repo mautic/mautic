@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ImportUrlValidationTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     private string $csvFile;
