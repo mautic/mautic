@@ -77,10 +77,11 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested([static::pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
+            $tokenFilter = $event->getTokenFilter();
             $tokens      = $tokenHelper->getFormattedTokens(
                 static::pageTokenRegex,
                 TokenFormatOptions::linkWithId('mautic.page.page', 'pagelink=(\d+)'),
-                '',
+                'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
                 'alias',
                 'id'
             );
@@ -125,10 +126,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         if ($event->tokensRequested([static::pageTokenRegex, static::dwcTokenRegex])) {
-            $tokens = $tokenHelper->getFormattedTokens(
+            $tokenFilter = $event->getTokenFilter();
+            $labelFilter = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
+            $tokens      = $tokenHelper->getFormattedTokens(
                 static::pageTokenRegex,
                 TokenFormatOptions::linkWithId('mautic.page.page', 'pagelink=(\d+)'),
-                '',
+                $labelFilter,
                 'alias',
                 'id'
             );
@@ -142,7 +145,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $dwcTokens      = $dwcTokenHelper->getFormattedTokens(
                 static::dwcTokenRegex,
                 TokenFormatOptions::simplePrefix('mautic.core.dynamicContent'),
-                '',
+                $labelFilter,
                 'name',
                 'slot_name',
                 $expr

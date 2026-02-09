@@ -50,9 +50,11 @@ class PageSubscriber implements EventSubscriberInterface
 
         if ($event->tokensRequested($this->formRegex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('form');
+            $tokenFilter = $event->getTokenFilter();
             $tokens      = $tokenHelper->getFormattedTokens(
                 $this->formRegex,
-                TokenFormatOptions::simplePrefix('mautic.form.form')
+                TokenFormatOptions::simplePrefix('mautic.form.form'),
+                'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
             if ($tokens) {
                 $event->addTokens($tokens);

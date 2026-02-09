@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
@@ -71,10 +72,7 @@ class EmailSubscriber implements EventSubscriberInterface
         $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));
     }
 
-    /**
-     * @param EmailBuilderEvent|PageBuilderEvent $event
-     */
-    private function addContactFieldTokens($event): void
+    private function addContactFieldTokens(BuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
@@ -84,7 +82,9 @@ class EmailSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens = $tokenHelper->getTokens(self::$contactFieldRegex, '', 'label', 'alias');
+        $tokenFilter = $event->getTokenFilter();
+        $filter      = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
+        $tokens      = $tokenHelper->getTokens(self::$contactFieldRegex, $filter, 'label', 'alias');
         if (!$tokens) {
             return;
         }

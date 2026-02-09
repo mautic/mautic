@@ -106,9 +106,8 @@ class BuilderTokenHelper
         }
 
         if (!empty($filter)) {
-            $expr = $expr->with(
-                $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
-            );
+            $filterExpr = $exprBuilder->like('LOWER('.$labelColumn.')', ':label');
+            $expr       = isset($expr) ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [
                 'label' => strtolower($filter).'%',
@@ -173,7 +172,7 @@ class BuilderTokenHelper
     private function formatLinkWithId(string $token, string $label, string $prefix, ?string $tokenIdPattern): string
     {
         $id = '';
-        if (null !== $tokenIdPattern && preg_match('/'.$tokenIdPattern.'/', $token, $matches)) {
+        if (null !== $tokenIdPattern && preg_match('#'.$tokenIdPattern.'#', $token, $matches)) {
             $id = ' ('.$matches[1].')';
         }
 

@@ -39,9 +39,11 @@ class PageSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
+            $tokenFilter = $event->getTokenFilter();
             $tokens      = $tokenHelper->getFormattedTokens(
                 $this->regex,
-                TokenFormatOptions::simplePrefix('mautic.focus.focus_item')
+                TokenFormatOptions::simplePrefix('mautic.focus.focus_item'),
+                'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
             if ($tokens) {
                 $event->addTokens($tokens);
