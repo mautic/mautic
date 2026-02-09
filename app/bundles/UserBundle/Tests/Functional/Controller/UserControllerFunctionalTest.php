@@ -24,7 +24,9 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditGetPage(): void
     {
-        $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+
+        $this->client->request('GET', '/s/users/edit/'.$user->getId());
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 

@@ -635,7 +635,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $expr = preg_replace('/\s+AS\s+.*$/i', '', trim($selectExpression));
 
         // Quick skip for pure constants/literals/simple aggregates with no columns
-        if (preg_match('/^\s*(([\'"].*[\'"])|(\d+\.?\d*)|(COUNT|SUM|AVG|MIN|MAX|SELECT)\s*\(\s*(\*|\d+)\s*\))\s*$/ix', $expr)) {
+        if (preg_match('/^\s*((\d+\.?\d*)|(COUNT|SUM|AVG|MIN|MAX|SELECT)\s*\(\s*(\*|\d+)\s*\))\s*$/ix', $expr)) {
             return [];
         }
 

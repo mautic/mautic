@@ -14,8 +14,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
 
-    private string $prefix;
-
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -28,8 +26,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
-
-        $this->prefix = MAUTIC_TABLE_PREFIX;
     }
 
     public function testValuesAreEscapedProperly(): void
