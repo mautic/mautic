@@ -9,8 +9,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -31,16 +29,10 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_SEND                      => ['onEmailGenerate', 0],
             EmailEvents::EMAIL_ON_DISPLAY                   => ['onEmailDisplay', 0],
             EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT => ['onEmailAddressReplacement', 0],
-            PageEvents::PAGE_ON_BUILD                       => ['onPageBuild', 0],
         ];
     }
 
     public function onEmailBuild(EmailBuilderEvent $event): void
-    {
-        $this->addContactFieldTokens($event);
-    }
-
-    public function onPageBuild(PageBuilderEvent $event): void
     {
         $this->addContactFieldTokens($event);
     }

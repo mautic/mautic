@@ -7,8 +7,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\PageEvents;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -36,16 +34,10 @@ class OwnerSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_DISPLAY  => ['onEmailDisplay', 0],
             SmsEvents::ON_SMS_TOKENS_BUILD => ['onSmsTokensBuild', 0],
             SmsEvents::TOKEN_REPLACEMENT   => ['onSmsTokenReplacement', 0],
-            PageEvents::PAGE_ON_BUILD      => ['onPageBuild', 0],
         ];
     }
 
     public function onEmailBuild(EmailBuilderEvent $event): void
-    {
-        $event->addTokens($this->getTokens());
-    }
-
-    public function onPageBuild(PageBuilderEvent $event): void
     {
         $event->addTokens($this->getTokens());
     }
