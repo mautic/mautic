@@ -76,7 +76,7 @@ SQL;
      */
     private function findSingleLeadIdIndexes(string $tableName): array
     {
-        $indexes = $this->connection->getSchemaManager()->listTableIndexes($tableName);
+        $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
 
         $toDrop = [];
         foreach ($indexes as $index) {

@@ -18,6 +18,7 @@ class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
             'show_php_version_warning_if_under' => '7.4.0',
             'minimum_mautic_version'            => '3.2.0',
             'announcement_url'                  => '',
+            'minimum_postgresql_version'        => '12.0.0',
             'minimum_mysql_version'             => '5.6.0', // Our CI has a higher version than this so we're good
             'minimum_mariadb_version'           => '10.1.0', // Our CI has a higher version than this so we're good
         ];
@@ -40,6 +41,7 @@ class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
             'show_php_version_warning_if_under' => '7.4.0',
             'minimum_mautic_version'            => '3.2.0',
             'announcement_url'                  => '',
+            'minimum_postgresql_version'        => '12.0.0',
             'minimum_mysql_version'             => '999.99.99', // Hopefully this version will never exist
             'minimum_mariadb_version'           => '999.99.99', // Hopefully this version will never exist
         ];

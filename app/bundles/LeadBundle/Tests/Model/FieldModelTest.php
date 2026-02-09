@@ -415,10 +415,11 @@ class FieldModelTest extends MauticMysqlTestCase
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
             $sql = 'SELECT 
-                    t.relname AS table_name,
-                    i.relname AS index_name,
-                    a.attname AS column_name,
-                    ix.indisunique AS is_unique
+                    t.relname          AS "TABLE_NAME",
+                    i.relname          AS "INDEX_NAME",
+                    a.attname          AS "COLUMN_NAME",
+                    ix.indisunique     AS "IS_UNIQUE",
+                    ix.indisprimary    AS "IS_PRIMARY"
                 FROM 
                     pg_index ix
                 JOIN 
