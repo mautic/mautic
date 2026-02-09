@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+    private const ADMIN_USER = 'admin';
+    private const SALES_USER = 'sales';
 
     protected function setUp(): void
     {
@@ -280,6 +283,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
+        $userOwner = $this->getUser(self::ADMIN_USER);
+
         $companyA = $this->createCompany('CompanyA corp', 'contact@companya.corp');
         $companyB = $this->createCompany('CompanyB corp', 'contact@companya.corp');
         $this->em->flush();
@@ -294,7 +299,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'country'          => 'United States',
                 'preferred_locale' => 'es_SV',
                 'timezone'         => 'America/Chicago',
-                'owner'            => 1,
+                'owner'            => $userOwner->getId(),
                 'company'          => $companyA->getId(),
             ],
             [
@@ -413,7 +418,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Update owner
         $payload[0]['owner'] = null;
-        $payload[1]['owner'] = 1;
+        $payload[1]['owner'] = $userOwner->getId();
 
         // Set some tags to contact 2 to see if tags update
         $payload[1]['tags'] = ['testbatch1', 'testbatch2', '-batchremovetest'];
@@ -584,6 +589,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSingleNewEndpointCreateAndUpdate(): void
     {
+        $adminUser = $this->getUser(self::ADMIN_USER);
+        $salesUser = $this->getUser(self::SALES_USER);
+
         $payload = [
             'email'            => 'apiemail1@email.com',
             'firstname'        => 'API',
@@ -595,7 +603,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'country'          => 'United States',
             'preferred_locale' => 'es_SV',
             'timezone'         => 'America/Chicago',
-            'owner'            => 1,
+            'owner'            => $adminUser->getId(),
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
@@ -662,7 +670,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'lastname' => 'Update',
             'city'     => 'Boston',
             'state'    => 'Massachusetts',
-            'owner'    => 2,
+            'owner'    => $salesUser->getId(),
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/contacts/new', $updatedValues);
@@ -696,10 +704,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($updatedValues['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertSame(4, $response['contact']['points']);
         $this->assertNull($response['contact']['stage']); // stage was not set on the contact
-        $this->assertSame(2, $response['contact']['owner']['id']);
+        $this->assertSame($salesUser->getId(), $response['contact']['owner']['id']);
 
         // set the owner again for the other tests to work
-        $updatedValues['owner'] = 2;
+        $updatedValues['owner'] = $salesUser->getId();
 
         // Test getting a contact
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contactId);
@@ -744,7 +752,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'email'  => 'apiemail1@email.com',
             'city'   => 'Boston',
             'state'  => 'Massachusetts',
-            'owner'  => 2,
+            'owner'  => $salesUser->getId(),
             'points' => 1,
         ];
 
@@ -776,6 +784,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testSingleNewEndpointCreateAndDeleteWithDnc(): void
     {
+        $userOwner = $this->getUser(self::ADMIN_USER);
+
         $payload = [
             'email'            => 'apidnc@email.com',
             'firstname'        => 'API',
@@ -787,7 +797,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'country'          => 'United States',
             'preferred_locale' => 'es_SV',
             'timezone'         => 'America/Chicago',
-            'owner'            => 1,
+            'owner'            => $userOwner->getId(),
             'doNotContact'     => [
                 [
                     'channel' => 'email',
@@ -812,6 +822,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchNewEndpointCreateAndUpdate(): void
     {
+        $adminUser = $this->getUser(self::ADMIN_USER);
+        $salesUser = $this->getUser(self::SALES_USER);
+
         $payload = [
             [
                 'email'            => 'apiemail1@email.com',
@@ -824,7 +837,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'country'          => 'United States',
                 'preferred_locale' => 'es_SV',
                 'timezone'         => 'America/Chicago',
-                'owner'            => 1,
+                'owner'            => $adminUser->getId(),
             ], [
                 'email'            => 'apiemail2@email.com',
                 'firstname'        => 'API2',
@@ -920,7 +933,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'lastname' => 'Update',
                 'city'     => 'Boston',
                 'state'    => 'Massachusetts',
-                'owner'    => 2,
+                'owner'    => $salesUser->getId(),
             ],
         ];
 
@@ -989,7 +1002,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'city'      => 'Boston',
                 'state'     => 'Massachusetts',
                 'firstname' => '', // This will be ignored because overwriteWithBlank is false by default.
-                'owner'     => 2,
+                'owner'     => $salesUser->getId(),
                 'points'    => 1,
             ],
         ];
@@ -1377,5 +1390,12 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $campaignLead->setDateAdded(new \DateTime());
         $campaignLead->setManuallyRemoved($manuallyRemoved);
         $this->em->persist($campaignLead);
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }

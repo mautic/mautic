@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,11 +91,13 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(): Import
     {
+        $userCreator = $this->getUser(self::ADMIN_USER);
+
         $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now);
-        $import->setCreatedBy(1);
+        $import->setCreatedBy($userCreator->getId());
         $import->setDir('/tmp');
         $import->setFile(basename($this->csvFile));
         $import->setOriginalFile(basename($this->csvFile));
@@ -172,5 +175,12 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
             '--id'    => $import->getId(),
             '--limit' => 10000,
         ]);
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
