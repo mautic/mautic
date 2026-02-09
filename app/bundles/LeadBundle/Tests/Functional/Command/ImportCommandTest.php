@@ -77,7 +77,7 @@ class ImportCommandTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(int $status = Import::QUEUED): Import
     {
-        $csvFile = $this->generateSmallCSV();
+        $csvFile     = $this->generateSmallCSV();
         $userCreator = $this->getUser(self::ADMIN_USER);
 
         $now    = new \DateTime();
