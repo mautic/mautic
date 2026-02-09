@@ -44,10 +44,9 @@ class BuilderSubscriber implements EventSubscriberInterface
             $tokenFilter = $event->getTokenFilter();
             $tokens      = $tokenHelper->getFormattedTokens(
                 $this->assetToken,
-                TokenFormatOptions::linkWithId('mautic.asset.asset', 'assetlink=(\d+)'),
+                TokenFormatOptions::linkWithId('mautic.asset.asset', $this->assetToken),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
-                'alias',
-                'id'
+                'alias'
             );
             if ($tokens) {
                 $event->addTokens($tokens);

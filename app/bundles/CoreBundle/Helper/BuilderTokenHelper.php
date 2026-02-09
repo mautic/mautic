@@ -130,13 +130,6 @@ class BuilderTokenHelper
     /**
      * Get tokens with formatted labels based on the provided format options.
      *
-     * @param string              $tokenRegex    Token regex without wrapping regex escape characters
-     * @param TokenFormatOptions  $formatOptions Formatting options for token labels
-     * @param string              $filter        String to filter results by
-     * @param string              $labelColumn   The column that houses the label
-     * @param string              $valueColumn   The column that houses the value
-     * @param CompositeExpression $expr          Optional expression for filtering
-     *
      * @return array<string,string>
      */
     public function getFormattedTokens(
