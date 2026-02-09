@@ -1423,7 +1423,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         var searchStr = mQuery(el).val().trim();
 
         var spaceKeyPressed = (event.which == 32 || event.keyCode == 32);
-        var enterKeyPressed = (event.which == 13 || event.keyCode == 13);
+        var enterKeyPressed = Mautic.isEnterKey(event.which || event.keyCode);
         var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
 
         if (!enterKeyPressed && Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
