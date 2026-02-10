@@ -118,7 +118,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 if (empty($params['limit'])) {
                     // Count the pages limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 44) - 1);
                 } else {
                     $limit = $params['limit'];
                 }
@@ -162,7 +162,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 if (empty($params['limit'])) {
                     // Count the pages limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 44) - 1);
                 } else {
                     $limit = $params['limit'];
                 }

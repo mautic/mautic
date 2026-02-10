@@ -57,7 +57,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if (!$event->isCached()) {
             $height = $event->getWidget()->getHeight();
-            $limit  = (int) round(($height - 80) / 75);
+            $limit  = (int) round(($height - 80) / 88);
             $logs   = $this->auditLogModel->getLogForObject(null, null, null, $limit);
 
             // Get names of log's items

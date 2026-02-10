@@ -185,7 +185,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             $height = $widget->getHeight();
-            $limit  = round(($height - 80) / 60);
+            $limit  = round(($height - 80) / 70);
 
             $upcomingEmails = $this->emailModel->getUpcomingEmails($limit, $canViewOthers);
 
@@ -346,6 +346,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     private function getDefaultLimit(Widget $widget): float
     {
-        return round((($widget->getHeight() - 80) / 35) - 1);
+        return round((($widget->getHeight() - 80) / 44) - 1);
     }
 }

@@ -19,7 +19,7 @@
         <div class="clearfix"></div>
         <div class="pull-left"><a href="{{ link[key] }}"> {{ value[key] }} Contacts</div></a>
         <div class="clearfix"></div>
-        <div style="height:{{ chartHeight / 2.3 }}px;">
+        <div style="height:{{ chartHeight / 3 }}px;">
             {% if  chartType is defined %}
           <canvas class="chart {{ chartType }}-chart" style="font-size:9px!important;">{{ chartData|json_encode }}</canvas>
             {% endif %}
@@ -32,7 +32,7 @@
         <div>
           <div class="chart-legend pt-sd pr-md pb-md pl-md"><h5>{{ 'mautic.lead.lifecycle.graph.stage.cycle'|trans }}</h5></div>
           <div class="clearfix"></div>
-          <div style="height:{{ chartHeight / 2.3 }}px;">
+          <div style="height:{{ chartHeight / 3 }}px;">
             <canvas class="chart liefechart-bar-chart" style="font-size: 9px!important;">{{ stages[key]|json_encode }}</canvas>
           </div>
           <div class="legend" style="font-size: 9px;"></div>
@@ -44,7 +44,7 @@
             <div>
                 <div class="chart-legend pt-sd pr-md pb-md pl-md"><h5>{{ 'mautic.lead.lifecycle.graph.device.granularity'|trans }}</h5></div>
                 <div class="clearfix"></div>
-                <div style="height:{{ chartHeight / 5 }}px;">
+                <div style="height:{{ chartHeight / 6 }}px;">
                     <canvas class="chart horizontal-bar-chart" style="font-size: 9px!important;">{{ devices[key]|json_encode }}</canvas>
                 </div>
                 <div class="legend" style="font-size: 9px;"></div>
