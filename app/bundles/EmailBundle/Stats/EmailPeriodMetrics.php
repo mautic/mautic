@@ -99,9 +99,9 @@ class EmailPeriodMetrics
 
         $queryBuilder
             ->from("({$hoursSubQuery->getSQL()})", 'h')
-            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', 'c.hit_hour{$hourCast} = h.hour')
-            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', 's.sent_hour{$hourCast} = h.hour')
-            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', 'r.read_hour{$hourCast} = h.hour')
+            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', "c.hit_hour{$hourCast} = h.hour")
+            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', "s.sent_hour{$hourCast} = h.hour")
+            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', "r.read_hour{$hourCast} = h.hour")
             ->setParameter('source_ids', $eventsIds, ArrayParameterType::INTEGER)
             ->setParameter('timezoneOffset', $timezoneOffset)
             ->setParameter('format', '%H')
