@@ -95,12 +95,13 @@ class EmailPeriodMetrics
                     'IFNULL(c.hit_count, 0) AS hit_count'
                 );
         }
+        $hourCast = $platform instanceof PostgreSQLPlatform ? '::integer' : ' + 0';
 
         $queryBuilder
             ->from("({$hoursSubQuery->getSQL()})", 'h')
-            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', 'c.hit_hour = h.hour')
-            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', 's.sent_hour = h.hour')
-            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', 'r.read_hour = h.hour')
+            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', 'c.hit_hour{$hourCast} = h.hour')
+            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', 's.sent_hour{$hourCast} = h.hour')
+            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', 'r.read_hour{$hourCast} = h.hour')
             ->setParameter('source_ids', $eventsIds, ArrayParameterType::INTEGER)
             ->setParameter('timezoneOffset', $timezoneOffset)
             ->setParameter('format', '%H')
