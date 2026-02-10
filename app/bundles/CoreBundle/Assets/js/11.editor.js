@@ -398,7 +398,6 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
             extraPlugins: [Mautic.MentionLinks],
             dynamicTokenLabel: 'Insert token',
             dynamicToken: tokens,
-            tokenContext: tokenCallback,
             mention: {
                 feeds: [
                     {
