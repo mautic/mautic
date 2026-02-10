@@ -72,9 +72,10 @@
       {% if data is not empty %}
           {%- set buttons = buttons|merge([{
               'attr': {
-                  'data-toggle': 'download',
+                  'data-toggle': 'ajaxmodal',
+                  'data-target': '#ExportCSVModal',
                   'class': 'btn btn-ghost btn-nospin',
-                  'href': path('mautic_report_export', {'objectId': report.id, 'format': 'csv'}),
+                  'href': path('mautic_report_export_schedule', {'objectId': report.id, 'format': 'csv'}),
               },
               'btnText': 'mautic.form.result.export.csv'|trans,
               'iconClass': 'ri-file-text-line',
