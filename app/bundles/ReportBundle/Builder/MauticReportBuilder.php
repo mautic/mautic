@@ -291,7 +291,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        $selectText .= ' AS '.$fieldOptions['alias'];
+                        $selectText .= ' AS '.$this->db->quoteIdentifier($fieldOptions['alias']);
                     }
 
                     $selectColumns[] = $selectText;
