@@ -57,7 +57,11 @@ class AssetController extends FormController
         }
 
         if ($this->security->isGranted('asset:assets:full')) {
-            $filter['force'][] =
+            $filter['force'][] = [
+                'column' => 'a.createdBy',
+                'expr' => 'eq',
+                'value' => $this->user->getId(),
+            ];
                 ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
