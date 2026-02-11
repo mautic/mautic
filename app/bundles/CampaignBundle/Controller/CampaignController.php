@@ -1046,7 +1046,11 @@ class CampaignController extends AbstractStandardFormController
             }
 
             if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+                $filter['force'][] = [
+                    'column' => 'cat.id',
+                    'expr' => 'in',
+                    'value' => $catIds,
+                ];
             }
         }
 
