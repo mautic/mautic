@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
@@ -835,7 +836,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $isPg       = $platform instanceof PostgreSQLPlatform;
 
         $metadata   = $this->getClassMetadata();
         $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
@@ -1171,27 +1172,38 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
+        // PostgreSQL LIKE is case sensitive
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $isPg     = $platform instanceof PostgreSQLPlatform;
+
         $ormQb = true;
 
         if ($q instanceof QueryBuilder) {
-            $xFunc    = 'orX';
-            $exprFunc = 'like';
+            $expr = $q->expr()->orX();
+            foreach ($columns as $col) {
+                $expr->add(
+                    $q->expr()->like(
+                        $isPg ? $q->expr()->lower($col) : $col,
+                        ":$unique"
+                    )
+                );
+            }
         } else {
             $ormQb = false;
             if ($filter->not) {
                 $xFunc    = 'andX';
-                $exprFunc = 'notLike';
+                $exprFunc = $isPg ? 'NOT ILIKE' : 'NOT LIKE'; // 'notLike';
             } else {
                 $xFunc    = 'orX';
-                $exprFunc = 'like';
+                $exprFunc = $isPg ? 'ILIKE' : 'LIKE'; // 'like';
             }
-        }
 
-        $expr = $q->expr()->$xFunc();
-        foreach ($columns as $col) {
-            $expr->add(
-                $q->expr()->$exprFunc($col, ":$unique")
-            );
+            $expr = $q->expr()->$xFunc();
+            foreach ($columns as $col) {
+                $expr->add(
+                    $q->expr()->comparison($col, $exprFunc, ":$unique")
+                );
+            }
         }
 
         if ($filter->not) {
@@ -1200,7 +1212,7 @@ class CommonRepository extends ServiceEntityRepository
 
         return [
             $expr,
-            ["$unique" => $string],
+            ["$unique" => $isPg && $ormQb ? mb_strtolower($string) : $string],
         ];
     }
 
