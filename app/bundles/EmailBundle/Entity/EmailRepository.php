@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -396,8 +397,16 @@ class EmailRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
-                    ->setParameter('search', "%{$search}%");
+                $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+                $isPg     = $platform instanceof PostgreSQLPlatform;
+
+                if ($isPg) {
+                    $q->andWhere($q->expr()->like($q->expr()->lower('e.name'), ':search'));
+                    $q->setParameter('search', '%'.mb_strtolower($search).'%');
+                } else {
+                    $q->andWhere($q->expr()->like('e.name', ':search'));
+                    $q->setParameter('search', "%{$search}%");
+                }
             }
         }
 
