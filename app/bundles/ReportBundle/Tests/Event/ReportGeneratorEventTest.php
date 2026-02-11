@@ -335,7 +335,7 @@ class ReportGeneratorEventTest extends TestCase
     public static function applyFilterProvider(): array
     {
         return [
-            [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s'],
+            [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s.u'],
             [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'],
         ];
     }
@@ -387,7 +387,7 @@ class ReportGeneratorEventTest extends TestCase
     public static function applyFilterWithoutNullValuesProvider(): array
     {
         return [
-            [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s'],
+            [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s.u'],
             [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'],
         ];
     }
