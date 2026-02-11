@@ -584,14 +584,21 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                     'utm_term'     => 'getUtmTerm',
                     'utm_source'   => 'getUtmSource',
                 ];
+                // Always fetch previous UtmTag if not provided
+                $previous = null;
+                $utmtagsCollection = $this->getUtmTags();
+                if ($utmtagsCollection instanceof \Doctrine\Common\Collections\Collection && !$utmtagsCollection->isEmpty()) {
+                    $previous = $utmtagsCollection->last();
+                }
                 foreach ($fields as $field => $getterMethod) {
                     $newValue = $val->$getterMethod();
-                    $oldValue = null;
-                    if ($current instanceof UtmTag) {
-                        $oldValue = $current->$getterMethod();
+                    $oldVal = null;
+                    if ($previous instanceof UtmTag) {
+                        $oldVal = $previous->$getterMethod();
                     }
-                    if ($newValue !== $oldValue) {
-                        $this->changes['utmtags'][$field] = [$oldValue, $newValue];
+                    // Only log if at least one value is not empty and they differ
+                    if ((($oldVal !== null && $oldVal !== '') || ($newValue !== null && $newValue !== '')) && $newValue !== $oldVal) {
+                        $this->changes['utmtags'][$field] = [$oldVal, $newValue];
                     }
                 }
             }

@@ -38,12 +38,12 @@
                         {% endif %}
                 {% elseif values[0] is defined or values[1] is defined %}
                         {% if values[1] is defined and values[1] is not empty %}
-                            <td>{{ normalizeStringValue(values[1])|e }}</td>
+                            <td>{{ normalizeStringValue(values[1]|replace({', ':''})|trim(','))|e }}</td>
                         {% else %}
                             <td>&nbsp;</td>
                         {% endif %}
                         {% if values[0] is defined and values[0] is not empty %}
-                            <td>{{ normalizeStringValue(values[0])|e }}</td>
+                            <td>{{ normalizeStringValue(values[0]|replace({', ':''})|trim(','))|e }}</td>
                         {% else %}
                             <td>&nbsp;</td>
                         {% endif %}
@@ -64,4 +64,4 @@
         {% endif %}
         </tr>
     {% endfor %}
-</table>	
+</table>
