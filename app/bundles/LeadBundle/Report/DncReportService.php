@@ -34,9 +34,9 @@ class DncReportService
     {
         $groupConcat = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform
             // PostgreSQL: STRING_AGG is the native equivalent of GROUP_CONCAT
-            ? "STRING_AGG(CONCAT(dnc.reason, ':', dnc.channel), ',' ORDER BY dnc.date_added DESC, dnc.id ASC)"
+            ? "STRING_AGG(CONCAT(dnc.reason, ':', dnc.channel), ',' ORDER BY dnc.date_added DESC, dnc.id DESC)"
             // MySQL: keep original (with SEPARATOR for MySQL 8+ compatibility)
-            : "GROUP_CONCAT(CONCAT(dnc.reason, ':', dnc.channel) ORDER BY dnc.date_added DESC, dnc.id ASC SEPARATOR ',')";
+            : "GROUP_CONCAT(CONCAT(dnc.reason, ':', dnc.channel) ORDER BY dnc.date_added DESC, dnc.id DESC SEPARATOR ',')";
 
         return [
             'dnc_preferences' => [
