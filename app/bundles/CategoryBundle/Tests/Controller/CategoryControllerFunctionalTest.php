@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const SALES_USER = 'sales';
+
     private TranslatorInterface $translator;
 
     /**
@@ -105,9 +106,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     {
         /** @var CategoryModel $categoryModel */
         $categoryModel      = static::getContainer()->get('mautic.category.model.category');
-        /** @var UserModel $userModel */
-        $userModel      = static::getContainer()->get('mautic.user.model.user');
-        $user           = $userModel->getEntity(2);
+        $user               = $this->getUser(['username' => self::SALES_USER]);
 
         $category = new Category();
         $category->setTitle('New Category');
@@ -298,5 +297,12 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($user);
 
         return $user;
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
