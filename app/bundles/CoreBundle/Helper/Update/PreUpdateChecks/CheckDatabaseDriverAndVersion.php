@@ -19,8 +19,10 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         $metadata   = $this->getUpdateCandidateMetadata();
         $connection = $this->em->getConnection();
 
-        // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
-        $version  = $connection->executeQuery('SELECT VERSION()')->fetchOne();
+        // Version strings are in the format:
+        // 10.3.30-MariaDB-1:10.3.30+maria~focal-log
+        // PostgreSQL 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit
+        $version  = $this->extractDatabaseVersion($connection->executeQuery('SELECT VERSION()')->fetchOne());
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($connection->getDatabasePlatform()::class);
@@ -33,6 +35,8 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
         } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
+        } elseif (str_contains($platform, 'postgresql')) {
+            $minSupported = $metadata->getMinSupportedPostgreSqlVersion();
         } else {
             $supportedDrivers = implode(', ', DoctrineStep::getDriverKeys());
 
@@ -47,13 +51,24 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         if (true !== version_compare($version, $minSupported, 'gt')) {
             return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError('mautic.core.update.check.database_version',
                 [
-                    '%currentversion%'    => $version,
-                    '%mysqlminversion%'   => $metadata->getMinSupportedMySqlVersion(),
-                    '%mariadbminversion%' => $metadata->getMinSupportedMariaDbVersion(),
+                    '%currentversion%'          => $version,
+                    '%mysqlminversion%'         => $metadata->getMinSupportedMySqlVersion(),
+                    '%mariadbminversion%'       => $metadata->getMinSupportedMariaDbVersion(),
+                    '%postgresqlminversion%'    => $metadata->getMinSupportedPostgreSqlVersion(),
                 ]),
             ]);
         }
 
         return new PreUpdateCheckResult(true, $this);
+    }
+
+    private function extractDatabaseVersion(string $version): string
+    {
+        // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
+        if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
+            return $matches[0];
+        }
+
+        return '0.0'; // string_compare not accept NULL, prevent NULL errors
     }
 }

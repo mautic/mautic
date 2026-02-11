@@ -10,10 +10,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
     private TranslatorInterface $translator;
     private CustomFieldNotification $notifier;
@@ -40,11 +43,12 @@ class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 
     public function testNotificationForLeadFieldCanNotUpdate(): void
     {
-        $this->notifier->customFieldCannotBeUpdated($this->leadField, 1);
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->notifier->customFieldCannotBeUpdated($this->leadField, $user->getId());
 
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo   = $this->em->getRepository(Notification::class);
-        $notifications      = $notificationRepo->getNotifications(1);
+        $notifications      = $notificationRepo->getNotifications($user->getId());
         $this->assertEquals(1, count($notifications));
 
         $notification = array_shift($notifications);
@@ -68,5 +72,12 @@ class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $fieldModel->getRepository()->detachEntity($field);
 
         return $field;
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
