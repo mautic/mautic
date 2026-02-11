@@ -54,22 +54,22 @@ class AssetController extends FormController
         if (!$permissions['asset:assets:viewother']) {
             $filter['force'][] = [
                 'column' => 'a.createdBy',
-                'expr' => 'eq',
-                'value' => $this->user->getId(),
+                'expr'   => 'eq',
+                'value'  => $this->user->getId(),
             ];
         }
 
         if ($this->security->isGranted('asset:assets:full')) {
             $filter['force'][] = [
                 'column' => 'a.createdBy',
-                'expr' => 'eq',
-                'value' => $this->user->getId(),
+                'expr'   => 'eq',
+                'value'  => $this->user->getId(),
             ];
         }
 
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('asset', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('asset', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [

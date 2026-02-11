@@ -700,6 +700,9 @@ class TriggerController extends FormController
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
     }
 
+    /**
+     * @return array{0: int, 1: int, 2: string, 3: array<string, array<int, array<string, mixed>>>}
+     */
     private function initializeIndexFilters(PageHelperInterface $pageHelper, Request $request, string $sessionFilterKey): array
     {
         $limit  = $pageHelper->getLimit();

@@ -915,8 +915,8 @@ class CampaignController extends AbstractStandardFormController
                 $joinLists         = true;
                 $filter['force'][] = [
                     'column' => 'l.id',
-                    'expr' => 'in',
-                    'value' => $listIds,
+                    'expr'   => 'in',
+                    'value'  => $listIds,
                 ];
             }
 
@@ -924,16 +924,16 @@ class CampaignController extends AbstractStandardFormController
                 $joinForms         = true;
                 $filter['force'][] = [
                     'column' => 'f.id',
-                    'expr' => 'in',
-                    'value' => $formIds,
+                    'expr'   => 'in',
+                    'value'  => $formIds,
                 ];
             }
 
             if (!empty($catIds)) {
                 $filter['force'][] = [
                     'column' => 'cat.id',
-                    'expr' => 'in',
-                    'value' => $catIds,
+                    'expr'   => 'in',
+                    'value'  => $catIds,
                 ];
             }
         }
@@ -1277,6 +1277,13 @@ class CampaignController extends AbstractStandardFormController
         return $campaignLogCountsProcessed;
     }
 
+    /**
+     * @param array<int|string, mixed> $typeFilters
+     * @param array<int|string, array<string, mixed>> $categories
+     * @param array<int> $listIds
+     * @param array<int> $formIds
+     * @param array<int> $catIds
+     */
     private function processTypeFilters(string $type, array $typeFilters, array $categories, array &$listIds, array &$formIds, array &$catIds): void
     {
         foreach ($typeFilters as $fltr) {
