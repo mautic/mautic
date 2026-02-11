@@ -617,7 +617,6 @@ class FieldType extends AbstractType
                 'attr'  => [
                     'tooltip'         => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
                     'onchange'        => 'Mautic.displayUniqueIdentifierWarning(this);',
-                    'data-disable-on' => '{"leadfield_object":"company"}',
                 ],
                 'data' => (!empty($data)),
             ]

@@ -395,10 +395,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
             return false;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return false;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
         if (empty($query) || !is_array($query)) {
