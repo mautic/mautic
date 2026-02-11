@@ -866,10 +866,10 @@ class ListController extends FormController
         $updatedFilters = $request->get('filters', false);
 
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('segment', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('segment', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-        $listFilters = [
+        $listFilters          = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
                 'multiple'    => true,

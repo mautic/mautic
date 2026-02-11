@@ -111,8 +111,8 @@ class PageController extends FormController
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('page', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('page', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [

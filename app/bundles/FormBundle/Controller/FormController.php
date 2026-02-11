@@ -93,8 +93,8 @@ class FormController extends CommonFormController
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('form', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('form', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [

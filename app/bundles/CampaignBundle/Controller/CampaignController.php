@@ -847,10 +847,10 @@ class CampaignController extends AbstractStandardFormController
     {
         $sourceLists = $this->getCampaignModel()->getSourceLists();
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories  = $categoryModel->getLookupResults('campaign', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('campaign', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-        $listFilters = [
+        $listFilters          = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.campaign.filter.placeholder'),
                 'multiple'    => true,
@@ -881,7 +881,7 @@ class CampaignController extends AbstractStandardFormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$clmn, $fltr]       = explode(':', $updatedFilter);
                     $newFilters[$clmn][] = $fltr;
                 }
 
@@ -901,10 +901,10 @@ class CampaignController extends AbstractStandardFormController
                 }
 
                 $key = match ($type) {
-                    'list' => 'mautic.campaign.leadsource.list',
-                    'form' => 'mautic.campaign.leadsource.form',
+                    'list'     => 'mautic.campaign.leadsource.list',
+                    'form'     => 'mautic.campaign.leadsource.form',
                     'category' => 'mautic.core.filter.categories',
-                    default => $type,
+                    default    => $type,
                 };
                 $listFilters['filters']['groups'][$key]['values'] = $typeFilters;
 
@@ -1278,11 +1278,11 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param array<int|string, mixed> $typeFilters
+     * @param array<int|string, mixed>                $typeFilters
      * @param array<int|string, array<string, mixed>> $categories
-     * @param array<int> $listIds
-     * @param array<int> $formIds
-     * @param array<int> $catIds
+     * @param array<int>                              $listIds
+     * @param array<int>                              $formIds
+     * @param array<int>                              $catIds
      */
     private function processTypeFilters(string $type, array $typeFilters, array $categories, array &$listIds, array &$formIds, array &$catIds): void
     {

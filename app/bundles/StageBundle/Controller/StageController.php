@@ -43,8 +43,8 @@ class StageController extends AbstractFormController
 
         [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.stage.filter');
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('stage', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('stage', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [

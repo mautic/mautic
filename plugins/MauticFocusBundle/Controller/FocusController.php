@@ -62,18 +62,20 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param mixed $start
-     * @param mixed $limit
-     * @param mixed $filter
-     * @param mixed $orderBy
-     * @param mixed $orderByDir
+     * @param mixed   $start
+     * @param mixed   $limit
+     * @param mixed   $filter
+     * @param mixed   $orderBy
+     * @param mixed   $orderByDir
      * @param mixed[] $args
+     *
+     * @return array{0: int, 1: array<int, mixed>}
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('plugin:focus', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('plugin:focus', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
@@ -100,7 +102,7 @@ class FocusController extends AbstractStandardFormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$clmn, $fltr]       = explode(':', $updatedFilter);
                     $newFilters[$clmn][] = $fltr;
                 }
 

@@ -42,8 +42,8 @@ class TriggerController extends FormController
         [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.point.trigger.filter');
 
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('point', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('point', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
@@ -69,7 +69,7 @@ class TriggerController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$clmn, $fltr]       = explode(':', $updatedFilter);
                     $newFilters[$clmn][] = $fltr;
                 }
 

@@ -50,18 +50,20 @@ class WebhookController extends FormController
     }
 
     /**
-     * @param mixed $start
-     * @param mixed $limit
-     * @param mixed $filter
-     * @param mixed $orderBy
-     * @param mixed $orderByDir
+     * @param mixed   $start
+     * @param mixed   $limit
+     * @param mixed   $filter
+     * @param mixed   $orderBy
+     * @param mixed   $orderByDir
      * @param mixed[] $args
+     *
+     * @return array{0: int, 1: array<int, mixed>}
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('Webhook', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('Webhook', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
@@ -89,7 +91,7 @@ class WebhookController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$clmn, $fltr]       = explode(':', $updatedFilter);
                     $newFilters[$clmn][] = $fltr;
                 }
 
@@ -142,6 +144,12 @@ class WebhookController extends FormController
         return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
     }
 
+    /**
+     * @param array<string, mixed> $args
+     * @param mixed                $action
+     *
+     * @return array<string, mixed>
+     */
     public function getViewArguments(array $args, $action): array
     {
         if ('index' === $action) {

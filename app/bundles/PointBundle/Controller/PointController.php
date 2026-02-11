@@ -42,8 +42,8 @@ class PointController extends AbstractFormController
         $search         = $request->get('search', $request->getSession()->get('mautic.point.filter', ''));
         $filter         = ['string' => $search, 'force' => []];
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('point', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('point', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [

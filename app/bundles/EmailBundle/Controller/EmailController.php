@@ -121,9 +121,9 @@ class EmailController extends FormController
 
         // retrieve a list of categories
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories = $categoryModel->getLookupResults('email', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
+        $categoryModel                                                     = $this->getModel('category');
+        $categories                                                        = $categoryModel->getLookupResults('email', '', 0);
+        $categoryFilterPrefix                                              = $this->translator->trans('mautic.core.searchcommand.category');
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
             'options' => $categories,
             'prefix'  => $categoryFilterPrefix,
@@ -139,7 +139,7 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $flt] = explode(':', $updatedFilter);
+                    [$column, $flt]        = explode(':', $updatedFilter);
                     $newFilters[$column][] = $flt;
                 }
 
@@ -157,19 +157,12 @@ class EmailController extends FormController
                     $type = 'category';
                 }
 
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                    case 'theme':
-                        $key = 'themes';
-                        break;
-                    default:
-                        $key = $type;
-                }
+                $key = match ($type) {
+                    'list'     => 'lists',
+                    'category' => 'categories',
+                    'theme'    => 'themes',
+                    default    => $type,
+                };
 
                 $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
 

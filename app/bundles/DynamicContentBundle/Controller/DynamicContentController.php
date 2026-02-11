@@ -63,8 +63,8 @@ class DynamicContentController extends FormController
         ];
 
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category');
-        $categories     = $categoryModel->getLookupResults('dynamicContent', '', 0);
+        $categoryModel        = $this->getModel('category');
+        $categories           = $categoryModel->getLookupResults('dynamicContent', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
@@ -90,7 +90,7 @@ class DynamicContentController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$clmn, $fltr]       = explode(':', $updatedFilter);
                     $newFilters[$clmn][] = $fltr;
                 }
 
