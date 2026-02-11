@@ -106,7 +106,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     {
         /** @var CategoryModel $categoryModel */
         $categoryModel      = static::getContainer()->get('mautic.category.model.category');
-        $user               = $this->getUser(['username' => self::SALES_USER]);
+        $user               = $this->getUser(self::SALES_USER);
 
         $category = new Category();
         $category->setTitle('New Category');

@@ -25,6 +25,16 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      */
     public const MARIADB_MINIMUM_VERSION = '10.2.6';
 
+    /**
+     * @var string
+     *
+     * Minimum Version (Stored): PostgreSQL 12.
+     * Minimum Version (Virtual): PostgreSQL 18 (released September 2025) as the new default.
+     *
+     * @see https://www.postgresql.org/docs/current/ddl-generated-columns.html
+     */
+    public const POSTGRESQL_MINIMUM_VERSION = '12.0.0';
+
     private GeneratedColumns $generatedColumns;
 
     public function __construct(
@@ -54,6 +64,9 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
 
     public function getMinimalSupportedVersion(): string
     {
+        if ($this->versionProvider->isPostgreSql()) {
+            return self::POSTGRESQL_MINIMUM_VERSION;
+        }
         if ($this->versionProvider->isMariaDb()) {
             return self::MARIADB_MINIMUM_VERSION;
         }
