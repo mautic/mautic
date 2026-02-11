@@ -122,4 +122,26 @@ class CampaignControllerTest extends MauticMysqlTestCase
         // Verify that the target event is marked as a redirect target
         Assert::assertStringContainsString('"isRedirectTarget": true', $content);
     }
+
+    public function testIndexActionWithTypeFilters(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign for Filters');
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request('GET', '/s/campaigns');
+        $this->assertResponseIsSuccessful();
+
+        $this->client->request('GET', '/s/campaigns?filters=["list:1"]');
+        $this->assertResponseIsSuccessful();
+
+        $this->client->request('GET', '/s/campaigns?filters=["form:1"]');
+        $this->assertResponseIsSuccessful();
+
+        $categoryFilterPrefix = $this->getContainer()->get('translator')->trans('mautic.core.searchcommand.category');
+        $this->client->request('GET', '/s/campaigns?filters=["'.$categoryFilterPrefix.':test-category"]');
+        $this->assertResponseIsSuccessful();
+    }
 }

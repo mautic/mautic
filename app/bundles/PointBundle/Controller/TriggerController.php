@@ -4,6 +4,7 @@ namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -38,10 +39,7 @@ class TriggerController extends FormController
 
         $pageHelper = $pageHelperFactory->make('mautic.point.trigger', $page);
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.point.trigger.filter', ''));
-        $filter     = ['string' => $search, 'force' => []];
+        [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.point.trigger.filter');
 
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
@@ -700,5 +698,15 @@ class TriggerController extends FormController
         $session = $request->getSession();
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
+    }
+
+    private function initializeIndexFilters(PageHelperInterface $pageHelper, Request $request, string $sessionFilterKey): array
+    {
+        $limit  = $pageHelper->getLimit();
+        $start  = $pageHelper->getStart();
+        $search = $request->get('search', $request->getSession()->get($sessionFilterKey, ''));
+        $filter = ['string' => $search, 'force' => []];
+
+        return [$limit, $start, $search, $filter];
     }
 }

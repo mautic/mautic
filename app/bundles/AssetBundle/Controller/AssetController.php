@@ -52,8 +52,11 @@ class AssetController extends FormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['asset:assets:viewother']) {
-            $filter['force'][] =
-                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = [
+                'column' => 'a.createdBy',
+                'expr' => 'eq',
+                'value' => $this->user->getId(),
+            ];
         }
 
         if ($this->security->isGranted('asset:assets:full')) {
@@ -62,7 +65,6 @@ class AssetController extends FormController
                 'expr' => 'eq',
                 'value' => $this->user->getId(),
             ];
-                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */

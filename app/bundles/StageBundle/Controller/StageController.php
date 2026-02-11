@@ -4,6 +4,7 @@ namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -40,10 +41,7 @@ class StageController extends AbstractFormController
 
         $pageHelper = $pageHelperFactory->make('mautic.stage', $page);
 
-        $limit          = $pageHelper->getLimit();
-        $start          = $pageHelper->getStart();
-        $search         = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
-        $filter         = ['string' => $search, 'force' => []];
+        [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.stage.filter');
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel = $this->getModel('category');
         $categories     = $categoryModel->getLookupResults('stage', '', 0);
@@ -548,5 +546,15 @@ class StageController extends AbstractFormController
                 ]
             )
         );
+    }
+
+    private function initializeIndexFilters(PageHelperInterface $pageHelper, Request $request, string $sessionFilterKey): array
+    {
+        $limit  = $pageHelper->getLimit();
+        $start  = $pageHelper->getStart();
+        $search = $request->get('search', $request->getSession()->get($sessionFilterKey, ''));
+        $filter = ['string' => $search, 'force' => []];
+
+        return [$limit, $start, $search, $filter];
     }
 }
