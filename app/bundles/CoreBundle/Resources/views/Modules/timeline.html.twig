@@ -11,7 +11,7 @@
             {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
             {% if eventLabel is iterable %}
                 {% set eventLabel %}
-                  <a href="{{ eventLabel.href }}" {% if eventLabel.isExternal is not defined %}data-toggle="ajax"{% else %}target="_new"{% endif %}>
+                  <a href="{{ eventLabel.href }}" target="_new">
                     {{- eventLabel.label|purify -}}
                   </a>
                 {% endset %}
