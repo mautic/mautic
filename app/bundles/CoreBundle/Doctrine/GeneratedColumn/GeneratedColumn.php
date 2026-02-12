@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+
 final class GeneratedColumn implements GeneratedColumnInterface
 {
     private string $tablePrefix;
@@ -72,15 +75,20 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return $this->timeUnit;
     }
 
-    public function getAlterTableSql(): string
+    public function getAlterTableSql(?AbstractPlatform $platform = null): string
     {
-        return "ALTER TABLE {$this->getTableName()} {$this->getAddColumnSql()};
+        return "ALTER TABLE {$this->getTableName()} {$this->getAddColumnSql($platform)};
             ALTER TABLE {$this->getTableName()} {$this->getAddIndexSql()}";
     }
 
-    public function getAddColumnSql(): string
+    public function getAddColumnSql(?AbstractPlatform $platform = null): string
     {
-        return "ADD {$this->getColumnName()} {$this->getColumnDefinition()}";
+        $add = 'ADD';
+        if ($platform instanceof PostgreSQLPlatform) {
+            $add .= ' COLUMN';
+        }
+
+        return "{$add} {$this->getColumnName()} {$this->getColumnDefinition($platform)}";
     }
 
     public function getAddIndexSql(): string
@@ -88,11 +96,22 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return "ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
     }
 
-    public function getColumnDefinition(): string
+    public function getColumnDefinition(?AbstractPlatform $platform = null): string
     {
         $stored = $this->stored ? ' STORED' : '';
+        $as     = 'AS';
 
-        return "{$this->columnType} AS ({$this->as}){$stored} COMMENT '(DC2Type:generated)'";
+        // Check if we are running on PostgreSQL
+        if ($platform instanceof PostgreSQLPlatform) {
+            $as = 'GENERATED ALWAYS '.$as;
+            // PostgreSQL 12-17 requires 'STORED'
+            // PostgreSQL 18 supports 'VIRTUAL' (if $this->stored is false)
+            if (!$this->stored) {
+                $stored = ' VIRTUAL';
+            }
+        }
+
+        return "{$this->columnType} {$as} ({$this->as}){$stored} COMMENT '(DC2Type:generated)'";
     }
 
     public function getIndexColumns(): array

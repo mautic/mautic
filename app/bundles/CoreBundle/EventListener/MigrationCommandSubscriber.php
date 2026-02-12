@@ -66,7 +66,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         }
 
         foreach ($groupedByTableName as $tableName => $generatedColumns) {
-            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn) => $generatedColumn->getAddColumnSql(), $generatedColumns));
+            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn) => $generatedColumn->getAddColumnSql($this->connection->getDatabasePlatform()), $generatedColumns));
 
             $this->executeAlterQuery($query, $tableName, 'adding generated columns', $output);
 
