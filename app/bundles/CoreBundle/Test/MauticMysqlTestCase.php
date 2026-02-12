@@ -462,12 +462,32 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function resetCustomFields(): bool
     {
         $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object, is_unique_identifer, is_index FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
+
+            // Drop column from main table
             try {
                 $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
             } catch (\Exception) {
+            }
+
+            if ($this->isPostgresqlPlatform()) {
+                // Drop dynamic search/unique index table if the field required it
+                // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
+                if ($data['is_unique_identifer'] || $data['is_index']) {
+                    $searchTable = $prefix.$data['alias'].'_search';
+
+                    try {
+                        $this->connection->executeStatement(sprintf(
+                            'DROP INDEX IF EXISTS %s CASCADE',
+                            $searchTable
+                        ));
+                        $droppedSomething = true;
+                    } catch (\Exception $e) {
+                        // Ignore if table doesn't exist
+                    }
+                }
             }
         }
 

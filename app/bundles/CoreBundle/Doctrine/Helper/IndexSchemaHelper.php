@@ -228,22 +228,24 @@ class IndexSchemaHelper
                 i.relname AS index_name,
                 array_agg(a.attname ORDER BY c.ordinality) AS columns,
                 ix.indisunique AS is_unique,
-                ix.indisprimary AS is_primary
+                ix.indisprimary AS is_primary,
+                t.relkind AS relation_kind
+            
             FROM
                 pg_class t
                 JOIN pg_namespace ns ON ns.oid = t.relnamespace
-                JOIN pg_index ix ON t.oid = ix.indrelid
-                JOIN pg_class i ON ix.indexrelid = i.oid
-                JOIN unnest(ix.indkey) WITH ORDINALITY AS c(attnum, ordinality) ON true
-                JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = c.attnum
+                LEFT JOIN pg_index ix ON t.oid = ix.indrelid
+                LEFT JOIN pg_class i ON ix.indexrelid = i.oid
+                LEFT JOIN unnest(ix.indkey) WITH ORDINALITY AS c(attnum, ordinality) ON true
+                LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = c.attnum
             WHERE
-                t.relkind = 'r'
+                t.relkind IN ('r', 'i', 'm', 'p')
                 AND t.relname = :table
                 AND ns.nspname = CURRENT_SCHEMA()
             GROUP BY
-                i.relname, ix.indisunique, ix.indisprimary, i.oid
+                i.relname, t.relkind, ix.indisunique, ix.indisprimary, i.oid
             ORDER BY
-                i.relname
+                i.relname;
         ";
 
         $stmt    = $this->db->prepare($sql);
