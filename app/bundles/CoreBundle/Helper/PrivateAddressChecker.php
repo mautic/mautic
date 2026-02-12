@@ -26,7 +26,7 @@ class PrivateAddressChecker
     public function __construct(
         private $dnsResolver = null,
     ) {
-        $this->dnsResolver = $dnsResolver ?? 'gethostbynamel';
+        $this->dnsResolver = $dnsResolver ?? 'gethostbyname';
     }
 
     /**
@@ -41,44 +41,36 @@ class PrivateAddressChecker
 
     public function isPrivateUrl(string $url): bool
     {
-        try {
-            $parsedUrl = parse_url($url);
+        $parsedUrl = parse_url($url);
 
-            if (!isset($parsedUrl['host'])) {
-                throw new \InvalidArgumentException('Invalid URL format');
-            }
+        if (!isset($parsedUrl['host'])) {
+            throw new \InvalidArgumentException('Invalid URL format');
+        }
 
-            $host = strtolower($parsedUrl['host']);
+        $host = strtolower($parsedUrl['host']);
 
-            if ('localhost' === $host) {
+        if ('localhost' === $host) {
+            return true;
+        }
+
+        // Handle IPv6 addresses with brackets
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            $ip = substr($host, 1, -1); // Remove brackets
+
+            return $this->isPrivateIp($ip);
+        }
+
+        if (!filter_var($host, FILTER_VALIDATE_IP)) {
+            $ip = $this->resolveHostName($host);
+
+            if ($this->isPrivateIp($ip)) {
                 return true;
             }
 
-            // Handle IPv6 addresses with brackets
-            if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
-                $ip = substr($host, 1, -1); // Remove brackets
-
-                return $this->isPrivateIp($ip);
-            }
-
-            if (!filter_var($host, FILTER_VALIDATE_IP)) {
-                $ips = ($this->dnsResolver)($host);
-                if (false === $ips) {
-                    throw new \InvalidArgumentException('Could not resolve hostname');
-                }
-                foreach ($ips as $ip) {
-                    if ($this->isPrivateIp($ip)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            return $this->isPrivateIp($host);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage());
+            return false;
         }
+
+        return $this->isPrivateIp($host);
     }
 
     public function isPrivateIp(string $ip): bool
@@ -162,20 +154,25 @@ class PrivateAddressChecker
             }
 
             // Resolve hostname to IPs and check if any are in allowed addresses
-            $ips = ($this->dnsResolver)($host);
-            if (false === $ips) {
-                throw new \InvalidArgumentException('Could not resolve hostname');
-            }
+            $ip = $this->resolveHostName($host);
 
-            foreach ($ips as $ip) {
-                if (in_array($ip, $this->allowedPrivateAddresses, true)) {
-                    return true;
-                }
+            if (in_array($ip, $this->allowedPrivateAddresses, true)) {
+                return true;
             }
 
             return false;
-        } catch (\Exception $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage());
         }
+    }
+
+    private function resolveHostName(string $host): string
+    {
+        $ip = ($this->dnsResolver)($host);
+        if ($host === $ip) {
+            throw new \InvalidArgumentException("Could not resolve hostname {$host}");
+        }
+
+        return $ip;
     }
 }
