@@ -24,9 +24,8 @@ class PrivateAddressChecker
      * @param callable|null $dnsResolver
      */
     public function __construct(
-        private $dnsResolver = null,
+        private $dnsResolver = 'gethostbyname',
     ) {
-        $this->dnsResolver = $dnsResolver ?? 'gethostbyname';
     }
 
     /**
@@ -153,7 +152,7 @@ class PrivateAddressChecker
                 return in_array($host, $this->allowedPrivateAddresses, true);
             }
 
-            // Resolve hostname to IPs and check if any are in allowed addresses
+            // Resolve hostname to an IP address and check if any are in allowed addresses
             $ip = $this->resolveHostName($host);
 
             if (in_array($ip, $this->allowedPrivateAddresses, true)) {

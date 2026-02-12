@@ -23,7 +23,7 @@ class AjaxController extends CommonAjaxController
             );
         } catch (\InvalidArgumentException $e) {
             return $this->createErrorResponse($e->getMessage());
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $this->createErrorResponse(
                 'mautic.webhook.label.warning'
             );
