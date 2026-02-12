@@ -14,11 +14,6 @@
         {% else %}
           {% set details = '' %}
         {% endif %}
-        {% if event.eventLabelHref is defined and event.eventLabelHref is not empty %}
-          {% set label %}
-            <a href="{{ event.eventLabelHref }}" target="_new">{{ event.eventLabel|purify }}</a>
-          {% endset %}
-        {% endif %}
         {% set panelTag = details is not empty ? 'button' : 'div' %}
         <{{ panelTag }}
           class="panel"
@@ -28,7 +23,12 @@
             data-html="true"
           {% endif %}
         >
-          <h3 class="type-heading-01 mb-sm">{{ label|default(event.eventLabel|purify)|raw }}</h3>
+        <h3 class="type-heading-01 mb-sm">
+          {{ event.eventLabelHref is defined and event.eventLabelHref is not empty
+            ? '<a href="' ~ event.eventLabelHref ~ '" target="_new">' ~ (event.eventLabel|purify) ~ '</a>'
+            : event.eventLabel|purify
+          |raw }}
+        </h3>
           {% if event.eventDescription is defined %}
             <div class="panel-meta">
               <span class="event-description">{{ event.eventDescription }}</span>
