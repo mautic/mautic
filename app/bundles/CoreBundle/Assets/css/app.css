@@ -8196,7 +8196,6 @@ lesshat-selector { -lh-property: 0 ;
 }
 .timeline .events {
   padding-left: 0px;
-  overflow: auto;
 }
 .timeline .events .figure {
   display: flex;
