@@ -26,6 +26,15 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $coreParametersHelper;
 
+    private const TEN_MINUTES_AGO    = '-10 minutes';
+    private const TEN_MINUTES_IN     = '+10 minutes';
+    private const MINUTES_AGO        = 'minute(s) ago';
+    private const MINUTES            = 'minute(s)';
+    private const REGEX_MINUTES_AGO  = '/\d+ minute\(s\) ago/';
+    private const REGEX_MINUTES_IN   = '/in \d+ minute\(s\)/';
+    private const TIMEZONE_NEW_YORK  = 'America/New_York';
+    private const DATE_FORMAT_CUSTOM = 'Y/m/d H:i';
+
     public static function setUpBeforeClass(): void
     {
         self::$oldTimezone = date_default_timezone_get();
@@ -170,10 +179,10 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('just now', $this->helper->toHumanized($now));
 
         // Test minutes ago - use 10 minutes to avoid timing issues
-        $tenMinutesAgo = new \DateTime('-10 minutes', new \DateTimeZone('UTC'));
+        $tenMinutesAgo = new \DateTime(self::TEN_MINUTES_AGO, new \DateTimeZone('UTC'));
         $result        = $this->helper->toHumanized($tenMinutesAgo);
-        $this->assertStringContainsString('minute(s) ago', $result);
-        $this->assertMatchesRegularExpression('/\d+ minute\(s\) ago/', $result);
+        $this->assertStringContainsString(self::MINUTES_AGO, $result);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_AGO, $result);
 
         // Test hours ago
         $twoHoursAgo = new \DateTime('-2 hours', new \DateTimeZone('UTC'));
@@ -192,11 +201,11 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
 
         // Test minutes in future - use 10 minutes to avoid timing issues
-        $tenMinutesIn = new \DateTime('+10 minutes', new \DateTimeZone('UTC'));
+        $tenMinutesIn = new \DateTime(self::TEN_MINUTES_IN, new \DateTimeZone('UTC'));
         $resultIn     = $this->helper->toHumanized($tenMinutesIn);
-        $this->assertStringContainsString('minute(s)', $resultIn);
+        $this->assertStringContainsString(self::MINUTES, $resultIn);
         $this->assertStringContainsString('in', $resultIn);
-        $this->assertMatchesRegularExpression('/in \d+ minute\(s\)/', $resultIn);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_IN, $resultIn);
 
         // Test hours in future - use 3 hours to avoid timing issues
         $threeHoursIn  = new \DateTime('+3 hours', new \DateTimeZone('UTC'));
@@ -234,19 +243,19 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Test with string datetime - use 10 minutes to avoid timing issues
         $tenMinutesAgo = clone $now;
-        $tenMinutesAgo->modify('-10 minutes');
+        $tenMinutesAgo->modify(self::TEN_MINUTES_AGO);
         $dateString = $tenMinutesAgo->format('Y-m-d H:i:s');
         $result     = $this->helper->toHumanized($dateString, 'UTC');
-        $this->assertStringContainsString('minute(s) ago', $result);
-        $this->assertMatchesRegularExpression('/\d+ minute\(s\) ago/', $result);
+        $this->assertStringContainsString(self::MINUTES_AGO, $result);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_AGO, $result);
 
         $tenMinutesIn = clone $now;
-        $tenMinutesIn->modify('+10 minutes');
+        $tenMinutesIn->modify(self::TEN_MINUTES_IN);
         $dateStringIn = $tenMinutesIn->format('Y-m-d H:i:s');
         $resultIn     = $this->helper->toHumanized($dateStringIn, 'UTC');
-        $this->assertStringContainsString('minute(s)', $resultIn);
+        $this->assertStringContainsString(self::MINUTES, $resultIn);
         $this->assertStringContainsString('in', $resultIn);
-        $this->assertMatchesRegularExpression('/in \d+ minute\(s\)/', $resultIn);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_IN, $resultIn);
     }
 
     public function testToHumanizedWithDifferentTimezone(): void
@@ -254,19 +263,19 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('UTC');
 
         // Test with different timezone - use 10 minutes to avoid timing issues
-        $now           = new \DateTime('now', new \DateTimeZone('America/New_York'));
+        $now           = new \DateTime('now', new \DateTimeZone(self::TIMEZONE_NEW_YORK));
         $tenMinutesAgo = clone $now;
-        $tenMinutesAgo->modify('-10 minutes');
-        $result = $this->helper->toHumanized($tenMinutesAgo, 'America/New_York');
-        $this->assertStringContainsString('minute(s) ago', $result);
-        $this->assertMatchesRegularExpression('/\d+ minute\(s\) ago/', $result);
+        $tenMinutesAgo->modify(self::TEN_MINUTES_AGO);
+        $result = $this->helper->toHumanized($tenMinutesAgo, self::TIMEZONE_NEW_YORK);
+        $this->assertStringContainsString(self::MINUTES_AGO, $result);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_AGO, $result);
 
         $tenMinutesIn = clone $now;
-        $tenMinutesIn->modify('+10 minutes');
-        $resultIn = $this->helper->toHumanized($tenMinutesIn, 'America/New_York');
-        $this->assertStringContainsString('minute(s)', $resultIn);
+        $tenMinutesIn->modify(self::TEN_MINUTES_IN);
+        $resultIn = $this->helper->toHumanized($tenMinutesIn, self::TIMEZONE_NEW_YORK);
+        $this->assertStringContainsString(self::MINUTES, $resultIn);
         $this->assertStringContainsString('in', $resultIn);
-        $this->assertMatchesRegularExpression('/in \d+ minute\(s\)/', $resultIn);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_IN, $resultIn);
     }
 
     public function testToHumanizedWithCustomFormat(): void
@@ -276,19 +285,19 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Test with custom format - use 10 minutes to avoid timing issues
         $tenMinutesAgo = clone $now;
-        $tenMinutesAgo->modify('-10 minutes');
-        $dateString = $tenMinutesAgo->format('Y/m/d H:i');
-        $result     = $this->helper->toHumanized($dateString, 'UTC', 'Y/m/d H:i');
-        $this->assertStringContainsString('minute(s) ago', $result);
-        $this->assertMatchesRegularExpression('/\d+ minute\(s\) ago/', $result);
+        $tenMinutesAgo->modify(self::TEN_MINUTES_AGO);
+        $dateString = $tenMinutesAgo->format(self::DATE_FORMAT_CUSTOM);
+        $result     = $this->helper->toHumanized($dateString, 'UTC', self::DATE_FORMAT_CUSTOM);
+        $this->assertStringContainsString(self::MINUTES_AGO, $result);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_AGO, $result);
 
         $tenMinutesIn = clone $now;
-        $tenMinutesIn->modify('+10 minutes');
-        $dateStringIn = $tenMinutesIn->format('Y/m/d H:i');
-        $resultIn     = $this->helper->toHumanized($dateStringIn, 'UTC', 'Y/m/d H:i');
-        $this->assertStringContainsString('minute(s)', $resultIn);
+        $tenMinutesIn->modify(self::TEN_MINUTES_IN);
+        $dateStringIn = $tenMinutesIn->format(self::DATE_FORMAT_CUSTOM);
+        $resultIn     = $this->helper->toHumanized($dateStringIn, 'UTC', self::DATE_FORMAT_CUSTOM);
+        $this->assertStringContainsString(self::MINUTES, $resultIn);
         $this->assertStringContainsString('in', $resultIn);
-        $this->assertMatchesRegularExpression('/in \d+ minute\(s\)/', $resultIn);
+        $this->assertMatchesRegularExpression(self::REGEX_MINUTES_IN, $resultIn);
     }
 
     private function setDefaultLocalTimezone(string $timezone): void

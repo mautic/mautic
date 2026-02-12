@@ -251,6 +251,11 @@ final class DateHelper
         $diff     = $now->diff($date);
         $isFuture = $date > $now;
 
+        return $this->getHumanizedTimeString($diff, $isFuture);
+    }
+
+    private function getHumanizedTimeString(\DateInterval $diff, bool $isFuture): string
+    {
         if ($diff->y > 0) {
             return $isFuture
                 ? $this->translator->trans('mautic.core.date.years.in', ['%count%' => $diff->y])
