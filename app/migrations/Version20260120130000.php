@@ -121,7 +121,7 @@ final class Version20260120130000 extends AbstractMigration
             'CREATE OR REPLACE FUNCTION day(date) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(DAY FROM $1)::integer;$$',
             'CREATE OR REPLACE FUNCTION day(timestamp with time zone) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(DAY FROM $1)::integer;$$',
 
-            'CREATE OR REPLACE FUNCTION lower(data jsonb) RETURNS text AS $$SELECT lower(data::text);$$',
+            'CREATE OR REPLACE FUNCTION lower(data jsonb) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT lower(data::text);$$',
 
             // if (CASE emulation)
             'CREATE OR REPLACE FUNCTION if(cond boolean, then_val anyelement, else_val anyelement)
