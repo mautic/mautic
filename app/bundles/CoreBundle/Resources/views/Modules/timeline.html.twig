@@ -10,7 +10,7 @@
           <i class="{{ event.icon|default('ri-history-line') }}"></i>
         </div>
         {% if event.contentTemplate is defined %}
-          {% set details = include(event.contentTemplate, ignore_missing=true)|trim %}
+          {% set details = include(event.contentTemplate, {'event': event}, ignore_missing=true)|trim %}
         {% else %}
           {% set details = '' %}
         {% endif %}
@@ -19,7 +19,9 @@
           class="panel"
           {% if details is not empty %}
             data-toggle="popover"
-            data-content="{{ details|e }}"
+            data-container="body"
+            data-content="{{ details|escape('html_attr') }}"
+            data-placement="left"
             data-html="true"
           {% endif %}
         >
