@@ -6,13 +6,12 @@
     {% endif %}
     
     <ul class="events">
-        {% for event in events.events %}
+        {% for event in events %}
             {% set icon = event.icon is defined ? event.icon : 'ri-history-line' %}
-            {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
-            {% if eventLabel is iterable %}
+            {% if event.eventLabelHref is defined and is not empty %}
                 {% set eventLabel %}
-                  <a href="{{ eventLabel.href }}" target="_new">
-                    {{- eventLabel.label|purify -}}
+                  <a href="{{ event.eventLabelHref }}" target="_new">
+                    {{- event.eventLabel|purify -}}
                   </a>
                 {% endset %}
             {% endif %}
