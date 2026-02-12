@@ -350,10 +350,8 @@ class Mailbox
      */
     public function getImapStream()
     {
-        if (!$this->isConnected()) {
+        if (!$this->isConnected() || !@imap_reopen($this->imapStream, $this->imapFullPath)) {
             $this->imapStream = $this->initImapStream();
-        } else {
-            @imap_reopen($this->imapStream, $this->imapFullPath);
         }
 
         return $this->imapStream;
