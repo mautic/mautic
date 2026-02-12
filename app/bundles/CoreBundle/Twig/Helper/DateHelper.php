@@ -232,7 +232,7 @@ final class DateHelper
     }
 
     /**
-     * Returns a humanized date string like "X hours ago".
+     * Returns a humanized date string like "X hours ago" or "in X hours".
      *
      * @param \DateTime|string $datetime
      */
@@ -245,26 +245,36 @@ final class DateHelper
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
         $date = $this->helper->getDateTime();
 
-        // Use default timezone if 'local' is provided
         $nowTimezone = ('local' === $timezone) ? date_default_timezone_get() : $timezone;
         $now         = new \DateTime('now', new \DateTimeZone($nowTimezone));
 
         $diff = $now->diff($date);
+        $isFuture = $date > $now;
 
         if ($diff->y > 0) {
-            return $this->translator->trans('mautic.core.date.years.ago', ['%count%' => $diff->y]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.years.in', ['%count%' => $diff->y])
+                : $this->translator->trans('mautic.core.date.years.ago', ['%count%' => $diff->y]);
         }
         if ($diff->m > 0) {
-            return $this->translator->trans('mautic.core.date.months.ago', ['%count%' => $diff->m]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.months.in', ['%count%' => $diff->m])
+                : $this->translator->trans('mautic.core.date.months.ago', ['%count%' => $diff->m]);
         }
         if ($diff->d > 0) {
-            return $this->translator->trans('mautic.core.date.days.ago', ['%count%' => $diff->d]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.days.in', ['%count%' => $diff->d])
+                : $this->translator->trans('mautic.core.date.days.ago', ['%count%' => $diff->d]);
         }
         if ($diff->h > 0) {
-            return $this->translator->trans('mautic.core.date.hours.ago', ['%count%' => $diff->h]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.hours.in', ['%count%' => $diff->h])
+                : $this->translator->trans('mautic.core.date.hours.ago', ['%count%' => $diff->h]);
         }
         if ($diff->i > 0) {
-            return $this->translator->trans('mautic.core.date.minutes.ago', ['%count%' => $diff->i]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.minutes.in', ['%count%' => $diff->i])
+                : $this->translator->trans('mautic.core.date.minutes.ago', ['%count%' => $diff->i]);
         }
 
         return $this->translator->trans('mautic.core.date.just.now');

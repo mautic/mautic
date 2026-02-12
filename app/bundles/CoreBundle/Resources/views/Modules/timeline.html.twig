@@ -22,8 +22,7 @@
                 {% set details = include(event.contentTemplate, ignore_missing=true)|trim %}
             {% endif %}
 
-            {% set wrapperClass = loop.index is odd ? 'wrapper' : 'wrapper' %}
-            <li class="{{ wrapperClass }}">
+            <li class="wrapper">
                 <div class="figure">
                     <i class="{{ icon }}"></i>
                 </div>
@@ -40,7 +39,7 @@
                         </div>
                         {% endif %}
                         <div class="event-timestamp type-label-01 text-secondary mt-xs">
-                            <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp) }}">{{ dateToText(event.timestamp, 'local', true) }}</span>
+                            <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp) }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
                         </div>
                     </div>
                 {% if details is not empty %}
