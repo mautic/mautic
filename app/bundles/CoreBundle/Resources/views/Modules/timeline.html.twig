@@ -19,7 +19,7 @@
 
             {% set details = '' %}
             {% if event.contentTemplate is defined %}
-                {% set details = include(event.contentTemplate, {'event': event, 'lead': lead}, with_context=false, ignore_missing=true)|trim %}
+                {% set details = include(event.contentTemplate, ignore_missing=true)|trim %}
             {% endif %}
 
             {% set wrapperClass = loop.index is odd ? 'wrapper' : 'wrapper' %}
@@ -34,9 +34,11 @@
                 {% endif %}
                     <div class="">
                         <h3 class="type-heading-01 mb-sm">{{ eventLabel }}</h3>
+                        {% if event.eventDescription is defined %}
                         <div class="panel-meta">
-                            <span class="event-type">{% if event.eventType is defined %}{{ event.eventType }}{% endif %}</span>
+                            <span class="event-description">{{ event.eventDescription }}</span>
                         </div>
+                        {% endif %}
                         <div class="event-timestamp type-label-01 text-secondary mt-xs">
                             <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp) }}">{{ dateToText(event.timestamp, 'local', true) }}</span>
                         </div>
@@ -47,13 +49,6 @@
                 </div>
                 {% endif %}
             </li>
-
-            {% if loop.index % 4 == 0 %}
-                <div class="header">
-                    {{ dateToText(event.timestamp, 'local', 'F Y') }}
-                </div>
-            {% endif %}
         {% endfor %}
     </ul>
 </div>
-
