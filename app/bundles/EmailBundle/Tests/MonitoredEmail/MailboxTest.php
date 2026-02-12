@@ -1,9 +1,100 @@
 <?php
 
+namespace Mautic\EmailBundle\MonitoredEmail;
+
+if (!class_exists(MockImap::class)) {
+    final class MockImap
+    {
+        // Enable imap_* function mocks
+        public static bool $enabled               = false;
+        public static bool $pingReturn            = true;
+        public static bool $pingThrowValueError   = false;
+        public static bool $reopenReturn          = true;
+        public static bool $reopenThrowValueError = false;
+        public static int $imapOpenCount          = 0;
+        public static int $imapCloseCount         = 0;
+
+        public static function enable(): void
+        {
+            self::$enabled = true;
+            self::reset();
+        }
+
+        public static function disable(): void
+        {
+            self::$enabled = false;
+        }
+
+        public static function reset(): void
+        {
+            self::$pingReturn            = true;
+            self::$pingThrowValueError   = false;
+            self::$reopenReturn          = true;
+            self::$reopenThrowValueError = false;
+            self::$imapOpenCount         = 0;
+            self::$imapCloseCount        = 0;
+        }
+    }
+
+    function imap_timeout($type, $timeout): bool
+    {
+        return MockImap::$enabled ? true : \imap_timeout($type, $timeout);
+    }
+
+    function imap_open($path, $user, $password, $options = 0, $retries = 0, $params = null)
+    {
+        ++MockImap::$imapOpenCount;
+
+        return MockImap::$enabled ? new \stdClass() : \imap_open($path, $user, $password, $options, $retries, $params);
+    }
+
+    function imap_ping($stream): bool
+    {
+        if (!MockImap::$enabled) {
+            return \imap_ping($stream);
+        }
+        if (MockImap::$pingThrowValueError) {
+            throw new \ValueError('IMAP connection is already closed');
+        }
+
+        return MockImap::$pingReturn;
+    }
+
+    function imap_reopen($stream, $path): bool
+    {
+        if (!MockImap::$enabled) {
+            return \imap_reopen($stream, $path);
+        }
+        if (MockImap::$reopenThrowValueError) {
+            throw new \ValueError('IMAP connection is already closed');
+        }
+
+        return MockImap::$reopenReturn;
+    }
+
+    function imap_close($stream, $flags = 0): bool
+    {
+        ++MockImap::$imapCloseCount;
+
+        return MockImap::$enabled ? true : \imap_close($stream, $flags);
+    }
+
+    function imap_errors(): array
+    {
+        return MockImap::$enabled ? [] : \imap_errors();
+    }
+
+    function imap_alerts(): array
+    {
+        return MockImap::$enabled ? [] : \imap_alerts();
+    }
+}
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\EmailBundle\MonitoredEmail\MockImap;
 
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
@@ -92,6 +183,16 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
                 'override_settings' => true,
                 'folder'            => 'INBOX',
             ],
+            'EmailBundle_unsubscribes' => [
+                'address'           => 'barfoo@foo.com',
+                'host'              => 'imap.barfoo.com',
+                'port'              => '993',
+                'encryption'        => '/ssl/novalidate-cert',
+                'user'              => 'barfoo@foo.com',
+                'password'          => 'ultrasecret',
+                'override_settings' => true,
+                'folder'            => 'INBOX',
+            ],
         ];
 
         $parametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -111,6 +212,12 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('folder', $settings);
         $this->assertEquals('INBOX', $settings['folder']);
         $this->assertEquals('bar@foo.com', $settings['address']);
+
+        $settings = $mailbox->getMailboxSettings('EmailBundle', 'unsubscribes');
+
+        $this->assertArrayHasKey('folder', $settings);
+        $this->assertEquals('INBOX', $settings['folder']);
+        $this->assertEquals('barfoo@foo.com', $settings['address']);
     }
 
     public function testUseAttachments(): void
@@ -192,5 +299,46 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         $isConnectedMethod = $reflection->getMethod('isConnected');
 
         $this->assertFalse($isConnectedMethod->invoke($mailbox));
+    }
+
+    public function testGetImapStreamHandlesErrorOnReopen(): void
+    {
+        $parametersHelper = $this->createMock(CoreParametersHelper::class);
+        $parametersHelper->method('get')->willReturn([
+            'general' => [
+                'host'     => 'localhost',
+                'port'     => '993',
+                'user'     => 'test',
+                'password' => 'test',
+            ],
+        ]);
+
+        $pathsHelper = $this->createMock(PathsHelper::class);
+
+        MockImap::enable();
+        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+
+        // opens connection
+        $mailbox->getImapStream();
+        $this->assertEquals(1, MockImap::$imapOpenCount);
+
+        // Case 1: imap_reopen returns false
+        MockImap::$reopenReturn = false;
+        $mailbox->getImapStream();
+
+        // Should close the old stream and open a new one
+        $this->assertEquals(2, MockImap::$imapOpenCount);
+        $this->assertEquals(1, MockImap::$imapCloseCount);
+
+        // Case 2: imap_reopen throws ValueError
+        MockImap::reset();
+        MockImap::$reopenReturn          = true;
+        MockImap::$reopenThrowValueError = true;
+
+        $mailbox->getImapStream();
+        // Should again close the old stream and open a new one
+        $this->assertEquals(1, MockImap::$imapOpenCount);
+        $this->assertEquals(1, MockImap::$imapCloseCount);
+        MockImap::disable();
     }
 }
