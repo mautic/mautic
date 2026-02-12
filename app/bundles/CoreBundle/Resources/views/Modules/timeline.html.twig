@@ -1,8 +1,9 @@
-{# Timeline implementation using timeline.less styling #}
 <div class="timeline timeline-right">
-    <div class="header">
-        {{ 'mautic.lead.timeline.displaying_events'|trans }}
-    </div>
+    {% if header is defined and header is not empty %}
+        <div class="header">
+            {{ header|trans }}
+        </div>
+    {% endif %}
     
     <ul class="events">
         {% for event in events.events %}
