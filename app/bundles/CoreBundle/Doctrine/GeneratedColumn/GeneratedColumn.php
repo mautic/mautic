@@ -98,12 +98,16 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     public function getColumnDefinition(?AbstractPlatform $platform = null): string
     {
-        $stored = $this->stored ? ' STORED' : '';
-        $as     = 'AS';
+        $stored  = $this->stored ? ' STORED' : '';
+        $as      = 'AS';
+        $comment = " COMMENT '(DC2Type:generated)'";
 
         // Check if we are running on PostgreSQL
         if ($platform instanceof PostgreSQLPlatform) {
             $as = 'GENERATED ALWAYS '.$as;
+            // PostgreSQL does not support the COMMENT clause directly
+            // inside the ADD COLUMN statement when adding generated columns
+            $comment = '';
             // PostgreSQL 12-17 requires 'STORED'
             // PostgreSQL 18 supports 'VIRTUAL' (if $this->stored is false)
             if (!$this->stored) {
@@ -111,7 +115,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
             }
         }
 
-        return "{$this->columnType} {$as} ({$this->as}){$stored} COMMENT '(DC2Type:generated)'";
+        return "{$this->columnType} {$as} ({$this->as}){$stored}{$comment}";
     }
 
     public function getIndexColumns(): array
