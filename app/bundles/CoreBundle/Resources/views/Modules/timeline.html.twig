@@ -30,16 +30,14 @@
                 {% else %}
                 <div class="panel">
                 {% endif %}
-                    <div class="">
-                        <h3 class="type-heading-01 mb-sm">{{ eventLabel }}</h3>
-                        {% if event.eventDescription is defined %}
-                        <div class="panel-meta">
-                            <span class="event-description">{{ event.eventDescription }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="event-timestamp type-label-01 text-secondary mt-xs">
-                            <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp) }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
-                        </div>
+                    <h3 class="type-heading-01 mb-sm">{{ eventLabel }}</h3>
+                    {% if event.eventDescription is defined %}
+                    <div class="panel-meta">
+                        <span class="event-description">{{ event.eventDescription }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="event-timestamp type-label-01 text-secondary mt-xs">
+                        <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp) }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
                     </div>
                 {% if details is not empty %}
                 </button>
