@@ -248,7 +248,7 @@ final class DateHelper
         $nowTimezone = ('local' === $timezone) ? date_default_timezone_get() : $timezone;
         $now         = new \DateTime('now', new \DateTimeZone($nowTimezone));
 
-        $diff = $now->diff($date);
+        $diff     = $now->diff($date);
         $isFuture = $date > $now;
 
         if ($diff->y > 0) {
