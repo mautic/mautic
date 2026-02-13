@@ -32,7 +32,11 @@ class UniqueCustomFieldValidator extends ConstraintValidator
         \assert($object instanceof Lead || $object instanceof Company);
 
         $form = $this->context->getRoot();
-        \assert($form instanceof Form);
+
+        // When using API Platform, the root is not a Form instance
+        if (!$form instanceof Form) {
+            return;
+        }
 
         $publishedUniqueFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier([
             'isPublished'       => true,

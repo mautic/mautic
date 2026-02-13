@@ -40,7 +40,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     public function getVars(): array
     {
@@ -48,7 +48,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param array<string, string> $vars
+     * @param array<string, mixed> $vars
      */
     public function setVars(array $vars): self
     {

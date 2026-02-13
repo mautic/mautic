@@ -138,6 +138,13 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
 
+        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
+            return;
+        }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
+
         // Download triggered by lead
         if (empty($systemEntry)) {
             // check for any clickthrough info
@@ -427,21 +434,30 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Generate url for an asset.
      *
-     * @param Asset $entity
-     * @param bool  $absolute
-     * @param array $clickthrough
-     *
-     * @return string
+     * @param array<string, mixed> $clickthrough
      */
-    public function generateUrl($entity, $absolute = true, $clickthrough = [])
+    public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
-        $assetSlug = $entity->getId().':'.$entity->getAlias();
+        $entityId  = $entity->getId();
+        $alias     = $entity->getAlias();
+        $assetSlug = $entityId.':'.$alias;
 
-        $slugs = [
-            'slug' => $assetSlug,
-        ];
+        $routeParams = ['slug' => $assetSlug];
+        if (!is_null($stream)) {
+            $routeParams['stream'] = $stream;
+        }
 
-        return $this->buildUrl('mautic_asset_download', $slugs, $absolute, $clickthrough);
+        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+        $url           = $this->router->generate('mautic_asset_download', $routeParams, $referenceType);
+
+        if (empty($clickthrough)) {
+            return $url;
+        }
+
+        $ct        = $this->encodeArrayForUrl($clickthrough);
+        $separator = (null !== parse_url($url, PHP_URL_QUERY)) ? '&' : '?';
+
+        return $url.$separator.'ct='.$ct;
     }
 
     /**

@@ -16,12 +16,14 @@ use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
+use Mautic\LeadBundle\Validator\Constraints\SafeUrl;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -274,6 +276,8 @@ trait EntityFieldsBuildFormTrait
                         case HtmlType::class:
                             $cleaningRules[$field['alias']] = 'html';
                             break;
+                        case UrlType::class:
+                            $constraints[] = new SafeUrl();
                     }
 
                     $builder->add(

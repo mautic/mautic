@@ -2,14 +2,20 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
-class LeadEventLog implements ChannelInterface
+class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {
+    use OptimisticLockTrait;
+
     public const TABLE_NAME = 'campaign_lead_event_log';
 
     /**
@@ -99,6 +105,8 @@ class LeadEventLog implements ChannelInterface
      */
     private $rescheduleInterval;
 
+    private ?\DateTime $dateQueued = null;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -168,6 +176,13 @@ class LeadEventLog implements ChannelInterface
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
+
+        $builder->createField('dateQueued', Types::DATETIME_MUTABLE)
+            ->columnName('date_queued')
+            ->nullable()
+            ->build();
+
+        self::addVersionField($builder);
     }
 
     /**
@@ -342,12 +357,23 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setTriggerDate(?\DateTimeInterface $triggerDate = null)
+    public function setTriggerDate(?\DateTimeInterface $triggerDate = null, ?string $note = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
+        $this->logTriggerDateChange($triggerDate, $note);
 
         return $this;
+    }
+
+    private function logTriggerDateChange(?\DateTimeInterface $newTriggerDate, ?string $note): void
+    {
+        $this->metadata['triggerDateLog'] ??= [];
+        $this->metadata['triggerDateLog'][] = [
+            'date'      => (new \DateTime())->format(DateTimeHelper::FORMAT_DB),
+            'changedTo' => $newTriggerDate ? $newTriggerDate->format(DateTimeHelper::FORMAT_DB) : null,
+            'note'      => $note,
+        ];
     }
 
     /**
@@ -536,5 +562,17 @@ class LeadEventLog implements ChannelInterface
     public function getRescheduleInterval(): ?\DateInterval
     {
         return $this->rescheduleInterval;
+    }
+
+    public function getDateQueued(): ?\DateTime
+    {
+        return $this->dateQueued;
+    }
+
+    public function setDateQueued(?\DateTime $dateQueued): LeadEventLog
+    {
+        $this->dateQueued = $dateQueued;
+
+        return $this;
     }
 }

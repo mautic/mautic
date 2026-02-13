@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -22,7 +24,7 @@ class LeadCategoryType extends AbstractType
     {
         $resolver->setDefaults([
             'choices'           => function (Options $options): array {
-                $categories = $this->categoryModel->getLookupResults('global', '', 300);
+                $categories = $this->categoryModel->getLookupResults('email', '', 0);
                 $choices    = [];
 
                 foreach ($categories as $cat) {

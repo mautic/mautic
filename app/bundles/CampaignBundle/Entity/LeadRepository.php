@@ -162,7 +162,8 @@ class LeadRepository extends CommonRepository
      *
      * @return array<string, \DateTimeInterface>
      */
-    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter,
+        bool $ignoreParentCheck = false): array
     {
         // Main query
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
@@ -213,7 +214,7 @@ class LeadRepository extends CommonRepository
             $q->andWhere(
                 sprintf('EXISTS (%s)', $grandparentQb->getSQL())
             );
-        } else {
+        } elseif (!$ignoreParentCheck) {
             // Limit to events that have no grandparent and any of events was already executed by jump to event
             $anyEventQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
             $anyEventQb->select('null')

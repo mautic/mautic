@@ -34,13 +34,18 @@
   {%- set icon = 'ri-toggle-line text-danger' %}
   {%- set text = 'mautic.core.form.inactive'|trans %}
 {%- elseif status is same as 'expired' %}
-  {%- set icon = 'ri-checkbox-circle-line text-info' %}
-  {%- set text = 'mautic.core.form.expired_to'|trans({'%date%': dateToFull(item.publishDown)}) %}
+    {%- set icon = 'ri-checkbox-circle-line text-info' %}
+    {%- set text = 'mautic.core.form.expired_to'|trans({'%date%': dateToFull(item.publishDown)}) %}
 {%- elseif status is same as 'pending' %}
-  {%- set icon = 'ri-donut-chart-line text-info' %}
-  {%- set text = 'mautic.core.form.pending.start_at'|trans({'%date%': dateToFull(item.publishUp)}) %}
+    {%- set icon = 'ri-donut-chart-line text-info' %}
+    {%- set text = 'mautic.core.form.pending.start_at'|trans({'%date%': dateToFull(item.publishUp)}) %}
+{%- elseif status is same as 'sending' %}
+    {%- set icon = 'ri-send-plane-line text-info' %}
+    {%- set text = 'mautic.core.form.sending'|trans %}
+{%- elseif status is same as 'sent' %}
+    {%- set icon = 'ri-checkbox-circle-line text-info' %}
+    {%- set text = 'mautic.core.form.sent'|trans %}
 {%- endif %}
-
 {%- if true is same as status %}
   {%- set icon = 'ri-toggle-fill text-success' %}
   {%- set text = 'mautic.core.form.public'|trans %}

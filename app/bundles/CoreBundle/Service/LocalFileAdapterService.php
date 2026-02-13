@@ -34,14 +34,24 @@ class LocalFileAdapterService extends LocalFilesystemAdapter
     }
 
     /**
+     * Override to ensure correct directory permissions are applied.
+     *
+     * Flysystem's LocalFilesystemAdapter::createDirectory() doesn't call chmod() after
+     * mkdir(), which means the directory gets created with permissions affected by umask.
+     * We explicitly set visibility after creation to ensure correct permissions.
+     *
      * @see https://github.com/thephpleague/flysystem/issues/1584#issuecomment-1527372297
      */
     public function createDirectory(string $dirname, Config $config): void
     {
-        $umask = umask(0);
-
         parent::createDirectory($dirname, $config);
 
-        umask($umask);
+        // Explicitly set visibility to ensure correct permissions via chmod()
+        $visibility = $config->get(Config::OPTION_VISIBILITY, $config->get(Config::OPTION_DIRECTORY_VISIBILITY));
+        if (null === $visibility) {
+            $visibility = Visibility::PUBLIC;
+        }
+
+        $this->setVisibility($dirname, $visibility);
     }
 }

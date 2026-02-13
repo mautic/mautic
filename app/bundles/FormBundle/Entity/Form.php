@@ -2,20 +2,48 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown')"),
+        new Put(security: "is_granted('form:forms:editown')"),
+        new Patch(security: "is_granted('form:forms:editother')"),
+        new Delete(security: "is_granted('form:forms:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['form:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'fields', 'actions'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['form:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Form extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -26,105 +54,129 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $id;
 
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private ?string $language = null;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $formAttributes;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
+    #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $cachedHtml;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $postAction = 'message';
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $postActionProperty;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $publishDown;
 
     /**
      * @var ArrayCollection<int, Field>
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $fields;
 
     /**
      * @var ArrayCollection<string, Action>
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $actions;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $template;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $inKioskMode = false;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $renderStyle = false;
 
     /**
      * @var Collection<int, Submission>
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private Collection $submissions;
 
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     public int $submission_count = 0;
 
     /**
      * @var string|null
+     *
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      */
-    private $formType;
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private $formType = 'standalone';
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $noIndex;
 
     /**
      * @var int|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $progressiveProfilingLimit;
 
     /**
@@ -132,6 +184,7 @@ class Form extends FormEntity implements UuidInterface
      *
      * @var bool
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read'])]
     private $usesProgressiveProfiling;
 
     public function __clone()
@@ -188,7 +241,7 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->createOneToMany('fields', 'Field')
             ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
+            ->setOrderBy(['order' => 'ASC', 'id' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -257,8 +310,9 @@ class Form extends FormEntity implements UuidInterface
             'groups'  => ['urlRequiredPassTwo'],
         ]));
 
-        $metadata->addPropertyConstraint('formType', new Assert\Choice([
-            'choices' => ['standalone', 'campaign'],
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
+            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
+            'groups'  => ['hideformRequired'],
         ]));
 
         $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
@@ -279,6 +333,8 @@ class Form extends FormEntity implements UuidInterface
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        } elseif ('hideform' == $postAction) {
+            $groups[] = 'hideformRequired';
         }
 
         if ('' != $data->getProgressiveProfilingLimit()) {
@@ -579,7 +635,6 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
      * @return string[]
@@ -742,20 +797,27 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
+     *
      * @return mixed
      */
     public function getFormType()
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::getFormType() is deprecated and will be removed in 8.0.');
+
         return $this->formType;
     }
 
     /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
+     *
      * @param mixed $formType
      *
      * @return Form
      */
     public function setFormType($formType)
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
         $this->formType = $formType;
 
         return $this;
@@ -813,8 +875,13 @@ class Form extends FormEntity implements UuidInterface
         return $this->language;
     }
 
+    /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. All forms can now be used in campaigns.
+     */
     public function isStandalone(): bool
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::isStandalone() is deprecated and will be removed in 8.0.');
+
         return 'campaign' != $this->formType;
     }
 

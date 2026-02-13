@@ -230,6 +230,163 @@ final class FixtureHelper
         return $campaign;
     }
 
+    /**
+     * Creates a campaign with conditional email sent action.
+     *
+     * Campaign diagram:
+     * -------------------
+     *    Start segment
+     * -------------------
+     *          |
+     * -------------------
+     *    Has x points? (default x=1)
+     * -------------------
+     *         | Yes
+     * -------------------
+     *     Send email
+     * -------------------
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function createCampaignWithConditionalEmail(int $emailId, int $points = 1, bool $allowRestart = false): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test conditional email');
+        $campaign->setAllowRestart($allowRestart);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Create point condition event
+        $eventCondition = new Event();
+        $eventCondition->setCampaign($campaign);
+        $eventCondition->setName('Check if the contact has points');
+        $eventCondition->setType('lead.points');
+        $eventCondition->setEventType('condition');
+        $eventCondition->setTriggerMode('immediate');
+        $eventCondition->setOrder(1);
+        $eventCondition->setProperties([
+            'canvasSettings' => [
+                'droppedX' => '549',
+                'droppedY' => '155',
+            ],
+            'name'                       => 'Lead points',
+            'triggerMode'                => 'immediate',
+            'triggerDate'                => null,
+            'triggerInterval'            => '1',
+            'triggerIntervalUnit'        => 'd',
+            'triggerHour'                => '',
+            'triggerRestrictedStartHour' => '',
+            'triggerRestrictedStopHour'  => '',
+            'order'                      => 1,
+            'anchor'                     => 'leadsource',
+            'properties'                 => [
+                'operator' => 'gte',
+                'score'    => $points,
+            ],
+            'type'            => 'lead.points',
+            'eventType'       => 'condition',
+            'anchorEventType' => 'source',
+            'operator'        => 'gte',
+            'score'           => $points,
+        ]);
+
+        $this->em->persist($eventCondition);
+        $this->em->flush();
+
+        // Create email send event
+        $eventEmail = new Event();
+        $eventEmail->setCampaign($campaign);
+        $eventEmail->setName('Send email');
+        $eventEmail->setType('email.send');
+        $eventEmail->setChannel('email');
+        $eventEmail->setChannelId($emailId);
+        $eventEmail->setEventType('action');
+        $eventEmail->setTriggerMode('immediate');
+        $eventEmail->setOrder(2);
+        $eventEmail->setDecisionPath('yes');
+        $eventEmail->setParent($eventCondition);
+        $eventEmail->setProperties([
+            'canvasSettings' => [
+                'droppedX' => '549',
+                'droppedY' => '300',
+            ],
+            'name'                       => '',
+            'triggerMode'                => 'immediate',
+            'triggerDate'                => null,
+            'triggerInterval'            => '1',
+            'triggerIntervalUnit'        => 'd',
+            'triggerHour'                => '',
+            'triggerRestrictedStartHour' => '',
+            'triggerRestrictedStopHour'  => '',
+            'anchor'                     => 'yes',
+            'properties'                 => [
+                'email'      => $emailId,
+                'email_type' => 'transactional',
+                'priority'   => '2',
+                'attempts'   => '3',
+            ],
+            'type'            => 'email.send',
+            'eventType'       => 'action',
+            'anchorEventType' => 'condition',
+            'email'           => $emailId,
+            'email_type'      => 'transactional',
+            'priority'        => 2,
+            'attempts'        => 3.0,
+        ]);
+        $this->em->persist($eventEmail);
+        $this->em->flush();
+
+        // Set up canvas with connections
+        $campaign->setCanvasSettings([
+            'nodes' => [
+                [
+                    'id'        => $eventCondition->getId(),
+                    'positionX' => '549',
+                    'positionY' => '155',
+                ],
+                [
+                    'id'        => $eventEmail->getId(),
+                    'positionX' => '549',
+                    'positionY' => '300',
+                ],
+                [
+                    'id'        => 'lists',
+                    'positionX' => '596',
+                    'positionY' => '50',
+                ],
+            ],
+            'connections' => [
+                [
+                    'sourceId' => 'lists',
+                    'targetId' => $eventCondition->getId(),
+                    'anchors'  => [
+                        'source' => 'leadsource',
+                        'target' => 'top',
+                    ],
+                ],
+                [
+                    'sourceId' => $eventCondition->getId(),
+                    'targetId' => $eventEmail->getId(),
+                    'anchors'  => [
+                        'source' => 'yes',
+                        'target' => 'top',
+                    ],
+                ],
+            ],
+        ]);
+
+        $campaign->addEvent($eventCondition->getId(), $eventCondition);
+        $campaign->addEvent($eventEmail->getId(), $eventEmail);
+        $campaign->setIsPublished(true);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
     /** @return array<int, array<string, mixed>> */
     public static function getPayload(): array
     {

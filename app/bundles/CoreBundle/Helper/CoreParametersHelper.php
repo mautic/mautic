@@ -71,4 +71,13 @@ class CoreParametersHelper
             $this->resolvedParameters[$key] = $this->get($key, $value);
         }
     }
+
+    public function getDefaultTimezone(): string
+    {
+        if (!empty($this->get('default_timezone'))) {
+            return $this->get('default_timezone');
+        }
+
+        return 'UTC';
+    }
 }

@@ -2,6 +2,13 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -13,9 +20,29 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'User',
+    operations: [
+        new GetCollection(uriTemplate: '/users', security: "is_granted('user:users:viewown')"),
+        new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown')"),
+        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['user:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['user:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'User';
@@ -23,8 +50,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @var ?int
      */
+    #[Groups(['user:read'])]
     protected $id;
 
+    #[Groups(['user:read', 'user:write'])]
     protected ?string $username = null;
 
     /**
@@ -37,6 +66,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      *
      * @var ?string
      */
+    #[Groups(['user:write'])]
     private $plainPassword;
 
     /**
@@ -49,46 +79,55 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @var string
      */
+    #[Groups(['user:read', 'user:write'])]
     private $firstName;
 
     /**
      * @var string
      */
+    #[Groups(['user:read', 'user:write'])]
     private $lastName;
 
     /**
      * @var string
      */
+    #[Groups(['user:read', 'user:write'])]
     private $email;
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $position;
 
     /**
      * @var Role
      */
+    #[Groups(['user:read', 'user:write'])]
     private $role;
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $timezone = '';
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $locale = '';
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['user:read'])]
     private $lastLogin;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['user:read'])]
     private $lastActive;
 
     /**
@@ -99,11 +138,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @var array
      */
+    #[Groups(['user:read', 'user:write'])]
     private $preferences = [];
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $signature;
 
     /**
@@ -223,6 +264,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
                 'fields'           => ['email'],
                 'message'          => 'mautic.user.user.email.unique',
                 'repositoryMethod' => 'checkUniqueUsernameEmail',
+            ]
+        ));
+
+        $metadata->addPropertyConstraint('position', new Assert\Length(
+            [
+                'max'        => 191,
+                'maxMessage' => 'mautic.user.user.position.toolong',
             ]
         ));
 
