@@ -314,8 +314,8 @@ class FieldModelTest extends MauticMysqlTestCase
         Assert::assertEquals('ui1', $columns[1]['COLUMN_NAME']);
         $alteredIndexes = $stack->getIndexQueries();
         Assert::assertCount(3, $alteredIndexes);
-        Assert::assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
-        Assert::assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
+        Assert::assertEquals(sprintf('DROP INDEX %1$slead_unique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
+        Assert::assertEquals(sprintf('CREATE INDEX %1$slead_unique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
         Assert::assertEquals(sprintf('CREATE INDEX %1$sui1_search ON %1$sleads (ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
         $stack->resetQueries();
 
@@ -340,9 +340,9 @@ class FieldModelTest extends MauticMysqlTestCase
         Assert::assertEquals('ui2', $columns[2]['COLUMN_NAME']);
         $alteredIndexes = $stack->getIndexQueries();
         Assert::assertCount(4, $alteredIndexes);
-        Assert::assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
+        Assert::assertEquals(sprintf('DROP INDEX %1$slead_unique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
         Assert::assertEquals(
-            sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX),
+            sprintf('CREATE INDEX %1$slead_unique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX),
             $alteredIndexes[1]
         );
         Assert::assertEquals(sprintf('CREATE INDEX %1$sui2_search ON %1$sleads (ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
@@ -393,11 +393,11 @@ class FieldModelTest extends MauticMysqlTestCase
     /**
      * @return array<mixed>
      */
-    private function getUniqueIdentifierIndexColumns(string $table): array
+    private function getUniqueIdentifierIndexColumns(string $table, string $object = 'lead'): array
     {
         $platform  = $this->connection->getDatabasePlatform();
         $fullTable = MAUTIC_TABLE_PREFIX.$table;
-        $indexName = MAUTIC_TABLE_PREFIX.'unique_identifier_search';
+        $indexName = MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search';
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
             $sql = sprintf(

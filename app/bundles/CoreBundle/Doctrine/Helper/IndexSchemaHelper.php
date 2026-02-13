@@ -191,7 +191,7 @@ class IndexSchemaHelper
     {
         return $this->_hasIndex(
             $this->prefix.$leadField->getCustomFieldObject(),
-            $this->prefix.'unique_identifier_search',
+            $this->prefix.$leadField->getObject().'_unique_identifier_search',
             $uniqueIdentifierColumns
         );
     }
@@ -203,7 +203,7 @@ class IndexSchemaHelper
     {
         return $this->_hasIndex(
             $this->prefix.$leadField->getCustomFieldObject(),
-            $this->prefix.'unique_identifier_search'
+            $this->prefix.$leadField->getObject().'_unique_identifier_search'
         );
     }
 

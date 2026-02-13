@@ -136,7 +136,7 @@ class CustomFieldIndex
             return;
         }
 
-        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
+        $modifySchema->addIndex($indexColumns, $leadField->getObject().'_unique_identifier_search');
         $modifySchema->executeChanges();
     }
 
@@ -154,7 +154,7 @@ class CustomFieldIndex
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
         $indexColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
-        $modifySchema->dropIndex($indexColumns, 'unique_identifier_search');
+        $modifySchema->dropIndex($indexColumns, $leadField->getObject().'_unique_identifier_search');
 
         $modifySchema->executeChanges();
     }

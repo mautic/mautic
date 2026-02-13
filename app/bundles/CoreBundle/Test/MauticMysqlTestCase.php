@@ -476,15 +476,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 // Drop dynamic search/unique index table if the field required it
                 // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
                 if ($data['is_unique_identifer'] || $data['is_index']) {
-                    $searchTable = $prefix.$data['alias'].'_search';
+                    $indexName = $prefix.$data['alias'].'_search';
 
                     try {
                         $this->connection->executeStatement(sprintf(
                             'DROP INDEX IF EXISTS %s CASCADE',
-                            $searchTable
+                            $indexName
                         ));
-                        $droppedSomething = true;
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         // Ignore if table doesn't exist
                     }
                 }
