@@ -130,6 +130,11 @@ mQuery( document ).ready(function() {
     });
 
     // Try to keep alive the session.
+    const sessionLifetimeSeconds =
+        (typeof mauticSessionLifetime === 'number' && Number.isFinite(mauticSessionLifetime) && mauticSessionLifetime > 0)
+            ? mauticSessionLifetime
+            : 1440;
+
     setInterval(function() {
         if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
             mQuery.get('/s/keep-alive')
@@ -137,7 +142,7 @@ mQuery( document ).ready(function() {
                     console.error('Error with keep-alive:', errorThrown);
                 });
         }
-    }, mauticSessionLifetime * 1000 / 2);
+    }, sessionLifetimeSeconds * 1000 / 2);
 
     // Copy code blocks when clicked
     mQuery(document).on('click', 'code', function(e) {
