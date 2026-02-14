@@ -315,6 +315,7 @@ class LanguageHelper
                 }
 
                 asort($files[$bundle['bundle']]);
+                $files[$bundle['bundle']] = array_values($files[$bundle['bundle']]);
             }
         }
 
