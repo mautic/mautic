@@ -80,7 +80,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
-        $connection = $event->getQueryBuilder()->getConnection();
+        $connection = $event->getQueryBuilder()->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
         $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
         $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
@@ -136,8 +136,9 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $filterGlue = 'or';
         }
 
-        $isPg      = $queryBuilder->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
+        $connection = $event->getQueryBuilder()->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
         if ($isPg) {
             $fieldExpr .= '::text';
@@ -186,9 +187,10 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
-        $qb        = $event->getQueryBuilder();
-        $isPg      = $qb->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $fieldExpr = $leadsTableAlias.'.'.$event->getFilter()->getField();
+        $qb         = $event->getQueryBuilder();
+        $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
         if ($isPg && in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
             $fieldExpr .= '::text';

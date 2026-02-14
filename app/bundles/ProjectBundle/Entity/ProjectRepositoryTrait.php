@@ -22,7 +22,8 @@ trait ProjectRepositoryTrait
             'project.id = projectxref.project_id'
         );
 
-        $platform = $queryBuilder->getConnection()->getDatabasePlatform();
+        $connection = $queryBuilder->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $platform   = $connection->getDatabasePlatform();
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
             // case insensitive compare for Postgresql
@@ -33,7 +34,7 @@ trait ProjectRepositoryTrait
 
         $queryBuilder->setParameter('name', $projectName);
         $ids = $queryBuilder->executeQuery()->fetchFirstColumn() ?: [0];
-        $ids = array_map('intval', $ids);
+        $ids = array_map(function ($id) { return (string) intval($id); }, $ids);
 
         if ($negation) {
             $expr = $queryBuilder->expr()->notIn("{$parentTableAlias}.id", $ids);

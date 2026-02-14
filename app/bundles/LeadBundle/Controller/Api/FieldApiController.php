@@ -137,11 +137,11 @@ class FieldApiController extends CommonApiController
                 'isIndex',
             ];
             foreach ($presetBooleanProperties as $presetBooleanProperty) {
-                if (isset($parameter[$presetBooleanProperty])) {
+                if (isset($parameters[$presetBooleanProperty])) {
                     $getter = ('isIndex' == $presetBooleanProperty ? 'is' : 'get').ucfirst($presetBooleanProperty);
                     if (is_null($entity->$getter())) {
                         $setter = 'set'.ucfirst($presetBooleanProperty);
-                        $entity->$setter($parameter[$presetBooleanProperty]);
+                        $entity->$setter($parameters[$presetBooleanProperty]);
                     }
                 }
             }

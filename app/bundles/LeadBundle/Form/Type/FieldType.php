@@ -510,7 +510,7 @@ class FieldType extends AbstractType
                 }
 
                 $event->setData($data);
-                $setupOrderField($event->getForm(), $data['object'], $data['group']);
+                $setupOrderField($event->getForm());
             }
         );
 
