@@ -85,6 +85,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             [
                 'label'      => 'bool',
                 'type'       => 'boolean',
+                'order'      => $this->getOrder(), // Race-condition in PostgreSQL require order to be added.
                 'properties' => [
                     'no'  => 'No',
                     'yes' => 'Yes',
@@ -157,6 +158,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             [
                 'label'      => 'bool',
                 'type'       => 'boolean',
+                'order'      => $this->getOrder(),
                 'properties' => [
                     'no'  => 'No',
                     'yes' => 'Yes',
@@ -249,6 +251,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             [
                 'label'      => 'bool',
                 'type'       => 'boolean',
+                'order'      => $this->getOrder(),
                 'properties' => [
                     'no'  => 'No',
                     'yes' => 'Yes',
@@ -343,5 +346,13 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
+    }
+
+    private function getOrder(string $group = 'core', string $object = 'lead'): ?int
+    {
+        $orderField = $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadField::class)
+            ->findOneBy(['group' => $group, 'object' => $object, 'isFixed' => false], ['order' => 'DESC']);
+
+        return $orderField ? $orderField->getId() : null;
     }
 }
