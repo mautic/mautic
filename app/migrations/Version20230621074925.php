@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
@@ -97,8 +97,9 @@ final class Version20230621074925 extends PreUpAssertionMigration
 
             $contactTable = $schema->getTable($this->contactTableName);
             $idColumn     = $contactTable->getColumn('id');
+            $typeName     = Type::getTypeRegistry()->lookupName($idColumn->getType());
 
-            $contactScoreTable->addColumn('contact_id', $idColumn->getType()->getName(), [
+            $contactScoreTable->addColumn('contact_id', $typeName, [
                 'unsigned' => $idColumn->getUnsigned(),
                 'notnull'  => true,
             ]);
