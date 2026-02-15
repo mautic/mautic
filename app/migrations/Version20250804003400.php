@@ -18,6 +18,9 @@ final class Version20250804003400 extends AbstractMauticMigration
         return $this->prefix.'lead_lists';
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function getMultiselectLists(): array
     {
         $table = $this->getLeadListsTable();

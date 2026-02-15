@@ -118,6 +118,9 @@ final class Version20211209022550 extends AbstractMauticMigration
         // echo $string.PHP_EOL;
     }
 
+    /**
+     * @param array<Permission> $newPermissions
+     */
     private function updateRolePermissions(Role $role, int $bitwise, array $newPermissions, EntityManagerInterface $em): void
     {
         $updated = false;

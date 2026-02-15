@@ -73,6 +73,8 @@ SQL;
 
     /**
      * Find any single-column indexes on lead_id (to safely drop old ones).
+     *
+     * @return array<string>
      */
     private function findSingleLeadIdIndexes(string $tableName): array
     {

@@ -54,7 +54,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--user' => 1,
+            '--user' => $userCreator->getId(),
             '--id'   => $leadField->getId(),
         ]);
 

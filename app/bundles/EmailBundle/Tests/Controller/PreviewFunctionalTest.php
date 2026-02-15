@@ -129,6 +129,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
             [
                 'label'      => 'bool',
                 'type'       => 'boolean',
+                'order'      => $this->getOrder(),
                 'properties' => [
                     'no'  => 'No',
                     'yes' => 'Yes',
@@ -298,5 +299,13 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         // Anonymous visitor
         $this->assertPageContent($url, $contentNoContactInfo);
         $this->assertPageContent($urlWithContact, $contentNoContactInfo);
+    }
+
+    private function getOrder(string $group = 'core', string $object = 'lead'): ?int
+    {
+        $orderField = $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadField::class)
+            ->findOneBy(['group' => $group, 'object' => $object, 'isFixed' => false], ['order' => 'DESC']);
+
+        return $orderField ? $orderField->getId() : null;
     }
 }

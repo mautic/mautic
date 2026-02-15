@@ -38,6 +38,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'type'                => 'multiselect',
             'isPubliclyUpdatable' => true,
             'isUniqueIdentifier'  => false,
+            'order'               => $this->getOrder(),
             'properties'          => [
                 'list' => [
                     ['label' => 'label1', 'value' => 'value1'],
@@ -116,6 +117,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'label'               => 'Request a meeting',
             'alias'               => 'meeting',
             'type'                => 'boolean',
+            'order'               => $this->getOrder(),
             'isPubliclyUpdatable' => true,
             'isUniqueIdentifier'  => false,
         ];
@@ -488,6 +490,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isListable'          => false,
             'isIndex'             => true, // Must be true, because if isUniqueIdentifier field is true the contact field *must* be indexed.
             'charLengthLimit'     => 25,
+            'order'               => $this->getOrder(), // Order must be defined to prevent race-condition on PostgreSQL
             'properties'          => [],
         ];
     }
@@ -511,5 +514,13 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'charLengthLimit'     => 50,
             'properties'          => [],
         ];
+    }
+
+    private function getOrder(string $group = 'core', string $object = 'lead'): ?int
+    {
+        $orderField = $this->em->getRepository(LeadField::class)
+            ->findOneBy(['group' => $group, 'object' => $object, 'isFixed' => false], ['order' => 'DESC']);
+
+        return $orderField ? $orderField->getId() : null;
     }
 }

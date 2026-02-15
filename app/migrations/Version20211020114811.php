@@ -142,6 +142,8 @@ final class Version20211020114811 extends PreUpAssertionMigration
     /**
      * Returns tables that still need conversion (not utf8mb4_unicode_ci)
      * On PostgreSQL we return an empty array or implement different logic if needed.
+     *
+     * @return array<mixed>
      */
     private function getTablesToConvert(): array
     {
