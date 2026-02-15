@@ -34,7 +34,7 @@ trait ProjectRepositoryTrait
 
         $queryBuilder->setParameter('name', $projectName);
         $ids = $queryBuilder->executeQuery()->fetchFirstColumn() ?: [0];
-        $ids = array_map(function ($id) { return (string) intval($id); }, $ids);
+        $ids = array_map(fn ($id) => (string) intval($id), $ids);
 
         if ($negation) {
             $expr = $queryBuilder->expr()->notIn("{$parentTableAlias}.id", $ids);
