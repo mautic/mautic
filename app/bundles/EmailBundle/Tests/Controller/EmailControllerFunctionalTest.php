@@ -228,22 +228,44 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($emailChild);
         $this->em->flush();
 
-        $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
-        $htmlLine1    = $crawler->filter('.email-list > tbody > tr:nth-child(1)')->html();
-        $htmlLine2    = $crawler->filter('.email-list > tbody > tr:nth-child(2)')->html();
-        $htmlLine3    = $crawler->filter('.email-list > tbody > tr:nth-child(3)')->html();
+        $crawler   = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $emailRows = $crawler->filter('.email-list > tbody > tr');
 
-        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine3);
-        Assert::assertStringContainsString('Is A/B variant', $htmlLine3);
-        Assert::assertStringContainsString('Email C', $htmlLine3);
-        Assert::assertStringContainsString('Email B', $htmlLine2);
-        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine2);
-        Assert::assertStringContainsString('Is A/B variant', $htmlLine2);
-        Assert::assertStringContainsString('ri-organization-chart', $htmlLine2);
-        Assert::assertStringContainsString('Has A/B tests', $htmlLine2);
-        Assert::assertStringContainsString('Has A/B tests', $htmlLine1);
-        Assert::assertStringContainsString('ri-organization-chart', $htmlLine1);
-        Assert::assertStringContainsString('Email A', $htmlLine1);
+        // Find rows by email name to avoid relying on table order
+        $emailARow = null;
+        $emailBRow = null;
+        $emailCRow = null;
+
+        foreach ($emailRows as $row) {
+            $rowCrawler = new \Symfony\Component\DomCrawler\Crawler($row);
+            $html       = $rowCrawler->html();
+
+            if (str_contains($html, 'Email A')) {
+                $emailARow = $html;
+            } elseif (str_contains($html, 'Email B')) {
+                $emailBRow = $html;
+            } elseif (str_contains($html, 'Email C')) {
+                $emailCRow = $html;
+            }
+        }
+
+        Assert::assertNotNull($emailARow, 'Could not find Email A row');
+        Assert::assertNotNull($emailBRow, 'Could not find Email B row');
+        Assert::assertNotNull($emailCRow, 'Could not find Email C row');
+
+        // Email C (child) - should have A/B variant icon only
+        Assert::assertStringContainsString('ri-a-b fs-14', $emailCRow);
+        Assert::assertStringContainsString('Is A/B variant', $emailCRow);
+
+        // Email B (parent) - should have both A/B variant icon AND organization chart icon
+        Assert::assertStringContainsString('ri-a-b fs-14', $emailBRow);
+        Assert::assertStringContainsString('Is A/B variant', $emailBRow);
+        Assert::assertStringContainsString('ri-organization-chart', $emailBRow);
+        Assert::assertStringContainsString('Has A/B tests', $emailBRow);
+
+        // Email A (grandparent) - should have organization chart icon only
+        Assert::assertStringContainsString('Has A/B tests', $emailARow);
+        Assert::assertStringContainsString('ri-organization-chart', $emailARow);
     }
 
     public function testSegmentEmailSend(): void
