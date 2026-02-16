@@ -316,29 +316,33 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         $pathsHelper = $this->createMock(PathsHelper::class);
 
         MockImap::enable();
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
 
-        // opens connection
-        $mailbox->getImapStream();
-        $this->assertEquals(1, MockImap::$imapOpenCount);
+        try {
+            $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
 
-        // Case 1: imap_reopen returns false
-        MockImap::$reopenReturn = false;
-        $mailbox->getImapStream();
+            // opens connection
+            $mailbox->getImapStream();
+            $this->assertEquals(1, MockImap::$imapOpenCount);
 
-        // Should close the old stream and open a new one
-        $this->assertEquals(2, MockImap::$imapOpenCount);
-        $this->assertEquals(1, MockImap::$imapCloseCount);
+            // Case 1: imap_reopen returns false
+            MockImap::$reopenReturn = false;
+            $mailbox->getImapStream();
 
-        // Case 2: imap_reopen throws ValueError
-        MockImap::reset();
-        MockImap::$reopenReturn          = true;
-        MockImap::$reopenThrowValueError = true;
+            // Should close the old stream and open a new one
+            $this->assertEquals(2, MockImap::$imapOpenCount);
+            $this->assertEquals(1, MockImap::$imapCloseCount);
 
-        $mailbox->getImapStream();
-        // Should again close the old stream and open a new one
-        $this->assertEquals(1, MockImap::$imapOpenCount);
-        $this->assertEquals(1, MockImap::$imapCloseCount);
-        MockImap::disable();
+            // Case 2: imap_reopen throws ValueError
+            MockImap::reset();
+            MockImap::$reopenReturn          = true;
+            MockImap::$reopenThrowValueError = true;
+
+            $mailbox->getImapStream();
+            // Should again close the old stream and open a new one
+            $this->assertEquals(1, MockImap::$imapOpenCount);
+            $this->assertEquals(1, MockImap::$imapCloseCount);
+        } finally {
+            MockImap::disable();
+        }
     }
 }
