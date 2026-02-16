@@ -350,18 +350,18 @@ class Mailbox
      */
     public function getImapStream()
     {
-        $need_reconnect = !$this->isConnected();
+        $needReconnect = !$this->isConnected();
 
-        if (!$need_reconnect) {
+        if (!$needReconnect) {
             try {
                 if (!@imap_reopen($this->imapStream, $this->imapFullPath)) {
-                    $need_reconnect = true;
+                    $needReconnect = true;
                 }
             } catch (\ValueError|\TypeError) {
-                $need_reconnect = true;
+                $needReconnect = true;
             }
             try {
-                if ($need_reconnect) {
+                if ($needReconnect) {
                     imap_errors();
                     imap_alerts();
                     @imap_close($this->imapStream, CL_EXPUNGE);
@@ -370,7 +370,7 @@ class Mailbox
             }
         }
 
-        if ($need_reconnect) {
+        if ($needReconnect) {
             // In case initImapStream throws, imapStream is cleared.
             $this->imapStream = null;
             $this->imapStream = $this->initImapStream();
