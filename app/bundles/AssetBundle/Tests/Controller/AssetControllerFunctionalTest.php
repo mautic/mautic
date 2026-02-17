@@ -30,7 +30,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->configParams['validate_remote_domains'] = false;
         $this->configParams['site_url']                = 'https://site.tld';
 
-        if (str_starts_with($this->name(), 'testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled')) {
+        if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
