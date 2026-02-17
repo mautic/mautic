@@ -808,27 +808,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
     }
 
-    public function testLoadSegmentFilterFormForCompanyAllField(): void
-    {
-        $this->client->request(
-            Request::METHOD_POST,
-            '/s/ajax',
-            [
-                'action'      => 'lead:loadSegmentFilterForm',
-                'fieldAlias'  => 'companycity',
-                'fieldObject' => 'company_all',
-                'operator'    => '=',
-                'filterNum'   => 2,
-            ]
-        );
-
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-
-        Assert::assertArrayHasKey('viewParameters', $response);
-        Assert::assertStringContainsString('leadlist_filters_2_properties_filter', $response['viewParameters']['form']);
-    }
-
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()

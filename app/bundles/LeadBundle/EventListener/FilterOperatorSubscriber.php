@@ -84,30 +84,12 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
             $event->addChoice($field->getObject(), $field->getAlias(), $choiceConfig);
 
-            if (ContactSegmentFilterCrate::COMPANY_OBJECT === $field->getObject() && $this->shouldAddCompanyAllChoice($event)) {
+            if (ContactSegmentFilterCrate::COMPANY_OBJECT === $field->getObject() && !$event->isForAjaxFilterFormLoading() && ($event->isForSegmentation() || null === $event->getRequest())) {
                 $companyAllConfig           = $choiceConfig;
                 $companyAllConfig['object'] = ContactSegmentFilterCrate::COMPANY_ALL_OBJECT;
                 $event->addChoice(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $field->getAlias(), $companyAllConfig);
             }
         });
-    }
-
-    private function shouldAddCompanyAllChoice(LeadListFiltersChoicesEvent $event): bool
-    {
-        if (!$event->isForSegmentation() && null !== $event->getRequest()) {
-            return false;
-        }
-
-        if (!$event->isForAjaxFilterFormLoading()) {
-            return true;
-        }
-
-        $request = $event->getRequest();
-        if (null === $request) {
-            return false;
-        }
-
-        return ContactSegmentFilterCrate::COMPANY_ALL_OBJECT === $request->request->get('fieldObject');
     }
 
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
