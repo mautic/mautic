@@ -84,7 +84,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
             $event->addChoice($field->getObject(), $field->getAlias(), $choiceConfig);
 
-            if (ContactSegmentFilterCrate::COMPANY_OBJECT === $field->getObject() && $event->isForSegmentation()) {
+            if (ContactSegmentFilterCrate::COMPANY_OBJECT === $field->getObject() && !$event->isForAjaxFilterFormLoading() && ($event->isForSegmentation() || null === $event->getRequest())) {
                 $companyAllConfig           = $choiceConfig;
                 $companyAllConfig['object'] = ContactSegmentFilterCrate::COMPANY_ALL_OBJECT;
                 $event->addChoice(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $field->getAlias(), $companyAllConfig);

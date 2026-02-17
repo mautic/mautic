@@ -14,8 +14,8 @@ class AnyCompanyRelationValueFilterQueryBuilder extends PrimaryCompanyRelationVa
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $filterOperator  = $filter->getOperator();
+        $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $filterOperator   = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();
 
         if (is_array($filterParameters)) {
@@ -44,7 +44,7 @@ class AnyCompanyRelationValueFilterQueryBuilder extends PrimaryCompanyRelationVa
 
         $this->applyCompanyFilterExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias);
 
-        $existsExpression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
+        $existsExpression    = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
         $allowMissingCompany = in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true)
             && !$filter->contactSegmentFilterCrate->isCompanyAllType();
 

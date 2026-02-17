@@ -6,12 +6,11 @@ use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
-use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
+use Mautic\LeadBundle\Segment\Decorator\CompanyAllDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
-use Mautic\LeadBundle\Segment\Decorator\CompanyAllDecorator;
 use Mautic\LeadBundle\Segment\Decorator\PrimaryCompanyDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -35,11 +34,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|CustomMappedDecorator
      */
     private MockObject $customMappedDecorator;
-
-    /**
-     * @var MockObject|CompanyDecorator
-     */
-    private MockObject $companyDecorator;
 
     /**
      * @var MockObject|PrimaryCompanyDecorator
@@ -66,7 +60,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         $this->contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
         $this->baseDecorator                  = $this->createMock(BaseDecorator::class);
         $this->customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
-        $this->companyDecorator               = $this->createMock(CompanyDecorator::class);
         $this->primaryCompanyDecorator        = $this->createMock(PrimaryCompanyDecorator::class);
         $this->companyAllDecorator            = $this->createMock(CompanyAllDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
@@ -75,7 +68,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             $this->baseDecorator,
             $this->customMappedDecorator,
             $this->dateOptionFactory,
-            $this->companyDecorator,
             $this->primaryCompanyDecorator,
             $this->companyAllDecorator,
             $this->eventDispatcherMock);

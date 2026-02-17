@@ -17,7 +17,6 @@ class DecoratorFactory
         private BaseDecorator $baseDecorator,
         private CustomMappedDecorator $customMappedDecorator,
         private DateOptionFactory $dateOptionFactory,
-        private CompanyDecorator $companyDecorator,
         private PrimaryCompanyDecorator $primaryCompanyDecorator,
         private CompanyAllDecorator $companyAllDecorator,
         private EventDispatcherInterface $eventDispatcher,

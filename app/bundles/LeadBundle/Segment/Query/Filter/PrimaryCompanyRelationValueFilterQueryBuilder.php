@@ -15,8 +15,8 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $filterOperator  = $filter->getOperator();
+        $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $filterOperator   = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();
 
         if (is_array($filterParameters)) {
@@ -46,7 +46,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
 
         $this->applyCompanyFilterExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias);
 
-        $existsExpression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
+        $existsExpression    = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
         $allowMissingCompany = in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true);
 
         if ($allowMissingCompany) {
@@ -74,7 +74,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
         ContactSegmentFilter $filter,
         string $filterOperator,
         mixed $filterParametersHolder,
-        string $companyAlias
+        string $companyAlias,
     ): void {
         switch ($filterOperator) {
             case 'empty':
@@ -104,6 +104,11 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
                 break;
             case 'startsWith':
             case 'endsWith':
+                $expression = $subQueryBuilder->expr()->like(
+                    $companyAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+                break;
             case 'gt':
             case 'eq':
             case 'gte':

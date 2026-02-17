@@ -585,7 +585,6 @@ return [
                     'mautic.lead.model.lead_segment_decorator_base',
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
-                    'mautic.lead.model.lead_segment_decorator_company',
                     'mautic.lead.model.lead_segment_decorator_company_primary',
                     'mautic.lead.model.lead_segment_decorator_company_all',
                     'event_dispatcher',
