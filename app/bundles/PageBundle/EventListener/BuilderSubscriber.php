@@ -80,7 +80,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $tokenFilter = $event->getTokenFilter();
             $tokens      = $tokenHelper->getFormattedTokens(
                 self::pageTokenRegex,
-                TokenFormatOptions::linkWithId('mautic.page.page', self::pageTokenRegex),
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
                 'alias',
                 'id'
@@ -130,7 +130,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $labelFilter = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
             $tokens      = $tokenHelper->getFormattedTokens(
                 self::pageTokenRegex,
-                TokenFormatOptions::linkWithId('mautic.page.page', self::pageTokenRegex),
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
                 $labelFilter,
                 'alias'
             );
