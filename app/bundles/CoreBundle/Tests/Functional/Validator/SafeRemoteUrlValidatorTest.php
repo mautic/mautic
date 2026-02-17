@@ -20,7 +20,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $this->configParams['validate_remote_domains'] = false;
         $this->configParams['site_url']                = 'https://site.tld';
 
-        if ('testWithValidateRemoteDomainsEnabled' === $this->name()) {
+        if (str_starts_with($this->name(), 'testWithValidateRemoteDomainsEnabled')) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = ['allowed-domain.tld'];
         }
