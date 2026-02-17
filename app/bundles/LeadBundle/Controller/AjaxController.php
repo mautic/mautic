@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
@@ -137,13 +138,22 @@ class AjaxController extends CommonAjaxController
         $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $formAdjustmentsProvider->adjustForm(
-                $form,
-                $fieldAlias,
-                $fieldObject,
-                $operator,
-                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
-            );
+            $choiceFields = $listModel->getChoiceFields($search);
+            $fieldConfig  = $choiceFields[$fieldObject][$fieldAlias] ?? null;
+
+            if (null === $fieldConfig && ContactSegmentFilterCrate::COMPANY_ALL_OBJECT === $fieldObject) {
+                $fieldConfig = $choiceFields[ContactSegmentFilterCrate::COMPANY_OBJECT][$fieldAlias] ?? null;
+            }
+
+            if (null !== $fieldConfig) {
+                $formAdjustmentsProvider->adjustForm(
+                    $form,
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $fieldConfig
+                );
+            }
         }
 
         $formHtml = $this->renderView(

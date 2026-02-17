@@ -13,8 +13,8 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
@@ -138,7 +138,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentMatchesSecondaryCompanyFields(): void
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead = $this->getReference('lead-1');
         $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
         \assert($lead instanceof Lead);
@@ -206,17 +206,17 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $leadWithCompany */
+        /** @var Lead $leadWithCompany */
         $leadWithCompany = $this->getReference('lead-1');
         $leadWithCompany = $this->em->getRepository(Lead::class)->find($leadWithCompany->getId());
         \assert($leadWithCompany instanceof Lead);
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $leadWithCompanyMatchingValue */
+        /** @var Lead $leadWithCompanyMatchingValue */
         $leadWithCompanyMatchingValue = $this->getReference('lead-0');
         $leadWithCompanyMatchingValue = $this->em->getRepository(Lead::class)->find($leadWithCompanyMatchingValue->getId());
         \assert($leadWithCompanyMatchingValue instanceof Lead);
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $leadWithoutCompany */
+        /** @var Lead $leadWithoutCompany */
         $leadWithoutCompany = $this->getReference('lead-5');
         $leadWithoutCompany = $this->em->getRepository(Lead::class)->find($leadWithoutCompany->getId());
         \assert($leadWithoutCompany instanceof Lead);

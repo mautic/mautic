@@ -585,8 +585,7 @@ return [
                     'mautic.lead.model.lead_segment_decorator_base',
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
-                    'mautic.lead.model.lead_segment_decorator_company_primary',
-                    'mautic.lead.model.lead_segment_decorator_company_all',
+                    'mautic.lead.model.lead_segment_decorator_company',
                     'event_dispatcher',
                 ],
             ],
@@ -606,20 +605,6 @@ return [
             ],
             'mautic.lead.model.lead_segment_decorator_company' => [
                 'class'     => Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_operator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_company_primary' => [
-                'class'     => Mautic\LeadBundle\Segment\Decorator\PrimaryCompanyDecorator::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_operator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_company_all' => [
-                'class'     => Mautic\LeadBundle\Segment\Decorator\CompanyAllDecorator::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',

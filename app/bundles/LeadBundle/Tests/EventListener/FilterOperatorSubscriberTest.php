@@ -13,6 +13,7 @@ use Mautic\LeadBundle\EventListener\FilterOperatorSubscriber;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -633,6 +634,76 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'type' => 'text',
                         ],
                         'object'    => 'company',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
+            ],
+            $event->getChoices()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddCustomFieldsForCompanyAllValueAjaxRequest(): void
+    {
+        $request = new Request();
+        $request->attributes->set('action', 'loadSegmentFilterForm');
+        $request->request->set('fieldObject', ContactSegmentFilterCrate::COMPANY_ALL_OBJECT);
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
+
+        $field = new LeadField();
+        $field->setType('text');
+        $field->setLabel('Test Text');
+        $field->setAlias('test_text');
+        $field->setObject(ContactSegmentFilterCrate::COMPANY_OBJECT);
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getOperatorsForFieldType')
+            ->with('text')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->fieldChoicesProvider->expects($this->once())
+            ->method('getChoicesForField')
+            ->with('text')
+            ->willThrowException(new ChoicesNotFoundException());
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+
+        $this->assertSame(
+            [
+                ContactSegmentFilterCrate::COMPANY_OBJECT => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => ContactSegmentFilterCrate::COMPANY_OBJECT,
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
+                ContactSegmentFilterCrate::COMPANY_ALL_OBJECT => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
                         'operators' => [
                             'equals'    => '=',
                             'not equal' => '!=',

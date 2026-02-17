@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValueFilterQueryBuilder
@@ -18,15 +19,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();
-
-        if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
-        }
+        $parameters       = $this->buildParameters($filterParameters);
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 
@@ -41,21 +34,16 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
                 $companyAlias,
                 $companyAlias.'.id = '.$relationAlias.'.'.$filter->getRelationJoinTableField()
             )
-            ->andWhere($subQueryBuilder->expr()->eq($relationAlias.'.lead_id', $leadsTableAlias.'.id'))
-            ->andWhere($subQueryBuilder->expr()->eq($relationAlias.'.is_primary', 1));
+            ->andWhere($subQueryBuilder->expr()->eq($relationAlias.'.lead_id', $leadsTableAlias.'.id'));
+
+        $this->addRelationScopeCondition($subQueryBuilder, $relationAlias);
 
         $this->applyCompanyFilterExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias);
 
-        $existsExpression    = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
-        $allowMissingCompany = in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true);
+        $existsExpression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
 
-        if ($allowMissingCompany) {
-            $relationExistsAlias = $this->generateRandomParameterName();
-            $relationExistsQuery = $queryBuilder->createQueryBuilder();
-            $relationExistsQuery->select('1')
-                ->from($filter->getRelationJoinTable(), $relationExistsAlias)
-                ->andWhere($relationExistsQuery->expr()->eq($relationExistsAlias.'.lead_id', $leadsTableAlias.'.id'))
-                ->andWhere($relationExistsQuery->expr()->eq($relationExistsAlias.'.is_primary', 1));
+        if ($this->shouldAllowMissingCompany($filterOperator)) {
+            $relationExistsQuery = $this->createRelationExistsQuery($queryBuilder, $filter, $leadsTableAlias);
 
             $existsExpression = $queryBuilder->expr()->or(
                 $existsExpression,
@@ -67,6 +55,36 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
+    }
+
+    protected function shouldAllowMissingCompany(string $filterOperator): bool
+    {
+        return in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true);
+    }
+
+    protected function requiresPrimaryCompany(): bool
+    {
+        return true;
+    }
+
+    private function createRelationExistsQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter, string $leadsTableAlias): QueryBuilder
+    {
+        $relationAlias = $this->generateRandomParameterName();
+        $relationQuery = $queryBuilder->createQueryBuilder();
+        $relationQuery->select('1')
+            ->from($filter->getRelationJoinTable(), $relationAlias)
+            ->andWhere($relationQuery->expr()->eq($relationAlias.'.lead_id', $leadsTableAlias.'.id'));
+
+        $this->addRelationScopeCondition($relationQuery, $relationAlias);
+
+        return $relationQuery;
+    }
+
+    private function addRelationScopeCondition(QueryBuilder $queryBuilder, string $relationAlias): void
+    {
+        if ($this->requiresPrimaryCompany()) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq($relationAlias.'.is_primary', 1));
+        }
     }
 
     protected function applyCompanyFilterExpression(
@@ -143,7 +161,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
                 $expression = $subQueryBuilder->expr()->and(...$expressions);
                 break;
             default:
-                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+                throw UnsupportedFilterOperatorException::fromOperator($filterOperator);
         }
 
         $subQueryBuilder->andWhere($expression);

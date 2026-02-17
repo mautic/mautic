@@ -6,12 +6,11 @@ use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
-use Mautic\LeadBundle\Segment\Decorator\CompanyAllDecorator;
+use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
-use Mautic\LeadBundle\Segment\Decorator\PrimaryCompanyDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,14 +35,9 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     private MockObject $customMappedDecorator;
 
     /**
-     * @var MockObject|PrimaryCompanyDecorator
+     * @var MockObject|CompanyDecorator
      */
-    private MockObject $primaryCompanyDecorator;
-
-    /**
-     * @var MockObject|CompanyAllDecorator
-     */
-    private MockObject $companyAllDecorator;
+    private MockObject $companyDecorator;
 
     /**
      * @var MockObject|DateOptionFactory
@@ -60,16 +54,14 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         $this->contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
         $this->baseDecorator                  = $this->createMock(BaseDecorator::class);
         $this->customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
-        $this->primaryCompanyDecorator        = $this->createMock(PrimaryCompanyDecorator::class);
-        $this->companyAllDecorator            = $this->createMock(CompanyAllDecorator::class);
+        $this->companyDecorator               = $this->createMock(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $this->contactSegmentFilterDictionary,
             $this->baseDecorator,
             $this->customMappedDecorator,
             $this->dateOptionFactory,
-            $this->primaryCompanyDecorator,
-            $this->companyAllDecorator,
+            $this->companyDecorator,
             $this->eventDispatcherMock);
     }
 
@@ -108,7 +100,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertSame(
-            $this->primaryCompanyDecorator,
+            $this->companyDecorator,
             $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
         );
     }
@@ -122,7 +114,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertSame(
-            $this->companyAllDecorator,
+            $this->companyDecorator,
             $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
         );
     }

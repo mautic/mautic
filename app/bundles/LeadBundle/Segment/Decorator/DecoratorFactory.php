@@ -17,8 +17,7 @@ class DecoratorFactory
         private BaseDecorator $baseDecorator,
         private CustomMappedDecorator $customMappedDecorator,
         private DateOptionFactory $dateOptionFactory,
-        private PrimaryCompanyDecorator $primaryCompanyDecorator,
-        private CompanyAllDecorator $companyAllDecorator,
+        private CompanyDecorator $companyDecorator,
         private EventDispatcherInterface $eventDispatcher,
     ) {
     }
@@ -38,12 +37,8 @@ class DecoratorFactory
         if ($contactSegmentFilterCrate->isDateType()) {
             $dateDecorator = $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
 
-            if ($contactSegmentFilterCrate->isPrimaryCompanyType()) {
-                return new DatePrimaryCompanyDecorator($dateDecorator);
-            }
-
-            if ($contactSegmentFilterCrate->isCompanyAllType()) {
-                return new DateCompanyAllDecorator($dateDecorator);
+            if ($contactSegmentFilterCrate->isCompanyType()) {
+                return new DateCompanyDecorator($dateDecorator);
             }
 
             return $dateDecorator;
@@ -56,12 +51,8 @@ class DecoratorFactory
 
             return $this->customMappedDecorator;
         } catch (FilterNotFoundException) {
-            if ($contactSegmentFilterCrate->isPrimaryCompanyType()) {
-                return $this->primaryCompanyDecorator;
-            }
-
-            if ($contactSegmentFilterCrate->isCompanyAllType()) {
-                return $this->companyAllDecorator;
+            if ($contactSegmentFilterCrate->isCompanyType()) {
+                return $this->companyDecorator;
             }
 
             return $this->baseDecorator;
