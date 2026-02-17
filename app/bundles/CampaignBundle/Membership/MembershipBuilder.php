@@ -72,7 +72,8 @@ class MembershipBuilder
         if ($this->output) {
             $countResult = $this->campaignLeadRepository->getCountsForCampaignContactsBySegment(
                 $this->campaign->getId(),
-                $this->contactLimiter
+                $this->contactLimiter,
+                $this->campaign->allowRestart()
             );
 
             $this->output->writeln(

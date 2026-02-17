@@ -12,16 +12,13 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Entity\LockTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
-use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -29,13 +26,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(
-    name: 'mautic:campaigns:trigger',
-    description: 'Trigger timed events for published campaigns.'
-)]
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
+    use LockTrait;
 
     private bool $kickoffOnly  = false;
 
@@ -64,8 +58,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         private ListModel $listModel,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private ProcessSignalService $processSignalService,
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -73,6 +66,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     protected function configure()
     {
         $this
+            ->setName('mautic:campaigns:trigger')
             ->addOption(
                 '--campaign-id',
                 '-i',
@@ -167,16 +161,12 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $fn = fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal));
-        $this->processSignalService->registerSignalHandler($fn);
-
         $quiet              = $input->getOption('quiet');
         $this->output       = $quiet ? new NullOutput() : $output;
         $this->kickoffOnly  = $input->getOption('kickoff-only');
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only');
 
-        $id               = $input->getOption('campaign-id');
         $batchLimit       = $input->getOption('batch-limit');
         $campaignLimit    = $input->getOption('campaign-limit');
         $contactMinId     = $input->getOption('min-contact-id');
@@ -187,34 +177,6 @@ class TriggerCampaignCommand extends ModeratedCommand
         $maxThreads       = $input->getOption('max-threads');
         $excludeCampaigns = $input->getOption('exclude');
 
-        if (is_numeric($id)) {
-            $id = (int) $id;
-        }
-
-        if (is_numeric($maxThreads)) {
-            $maxThreads = (int) $maxThreads;
-        }
-
-        if (is_numeric($threadId)) {
-            $threadId = (int) $threadId;
-        }
-
-        if (is_numeric($contactMaxId)) {
-            $contactMaxId = (int) $contactMaxId;
-        }
-
-        if (is_numeric($contactMinId)) {
-            $contactMinId = (int) $contactMinId;
-        }
-
-        if (is_numeric($contactId)) {
-            $contactId = (int) $contactId;
-        }
-
-        if (is_numeric($campaignLimit)) {
-            $campaignLimit = (int) $campaignLimit;
-        }
-
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
@@ -224,64 +186,69 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        $id = $input->getOption('campaign-id');
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
-        try {
-            // Specific campaign;
-            if ($id) {
-                $statusCode = ExitCode::SUCCESS;
-                /** @var Campaign $campaign */
-                if ($campaign = $this->campaignRepository->getEntity($id)) {
-                    $this->triggerCampaign($campaign);
-                } else {
-                    $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
-                    $statusCode = ExitCode::FAILURE;
-                }
-                $this->completeRun();
 
-                return (int) $statusCode;
-            }
-            // All published campaigns
-            $filter = [
-                'iterable_mode' => true,
-                'orderBy'       => 'c.dateAdded',
-                'orderByDir'    => 'DESC',
-            ];
-
-            // exclude excluded campaigns
-            if (is_array($excludeCampaigns) && count($excludeCampaigns) > 0) {
-                $filter['filter'] = [
-                    'force' => [
-                        [
-                            'expr'   => 'notIn',
-                            'column' => $this->campaignRepository->getTableAlias().'.id',
-                            'value'  => $excludeCampaigns,
-                        ],
-                    ],
-                ];
-            }
-
-            /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-            $campaigns = $this->campaignRepository->getEntities($filter);
-
-            foreach ($campaigns as $campaign) {
+        // Specific campaign;
+        if ($id) {
+            $statusCode = 0;
+            /** @var Campaign $campaign */
+            if ($campaign = $this->campaignRepository->getEntity($id)) {
+                $campaign->setLock($this->lock);
                 $this->triggerCampaign($campaign);
-                if ($this->limiter->hasCampaignLimit()) {
-                    $this->limiter->resetCampaignLimitRemaining();
-                }
+            } else {
+                $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+                $statusCode = 1;
             }
 
             $this->completeRun();
 
-            return ExitCode::SUCCESS;
-        } catch (SignalCaughtException) {
-            $exitCode = ExitCode::TERMINATED;
+            return (int) $statusCode;
         }
 
-        return $exitCode;
+        // All published campaigns
+        $filter = [
+            'iterable_mode' => true,
+            'orderBy'       => 'c.dateAdded',
+            'orderByDir'    => 'DESC',
+        ];
+
+        // exclude excluded campaigns
+        if (is_array($excludeCampaigns) && count($excludeCampaigns) > 0) {
+            $filter['filter'] = [
+                'force' => [
+                    [
+                        'expr'   => 'notIn',
+                        'column' => $this->campaignRepository->getTableAlias().'.id',
+                        'value'  => $excludeCampaigns,
+                    ],
+                ],
+            ];
+        }
+
+        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
+        $campaigns = $this->campaignRepository->getEntities($filter);
+
+        foreach ($campaigns as $campaign) {
+            if ($this->isEntityLocked((string) $campaign->getId())) {
+                $this->output->writeln('<comment>'.$this->translator->trans('mautic.core.command.sub_lock_active', ['%id%' => $campaign->getId()]).'</comment>');
+
+                continue;
+            }
+            $campaign->setLock($this->lock);
+            $this->triggerCampaign($campaign);
+            if ($this->limiter->hasCampaignLimit()) {
+                $this->limiter->resetCampaignLimitRemaining();
+            }
+        }
+
+        $this->completeRun();
+
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
@@ -342,8 +309,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-        } catch (SignalCaughtException $e) {
-            throw $e;
         } catch (\Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
@@ -415,15 +380,13 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private function updateCampaignSegmentContactCount(Campaign $campaign): void
     {
-        $segmentIds                     = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
-        $updateSegmentCountInBackground = $this->coreParametersHelper->get('update_segment_contact_count_in_background', false);
+        $segmentIds = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
+
         foreach ($segmentIds as $segmentId) {
-            if ($updateSegmentCountInBackground) {
-                $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
-            } else {
-                $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
-                $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
-            }
+            $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+
+    protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

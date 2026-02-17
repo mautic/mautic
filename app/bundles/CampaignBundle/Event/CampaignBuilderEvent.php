@@ -196,4 +196,46 @@ class CampaignBuilderEvent extends Event
 
         return $this->{$property};
     }
+
+    /**
+     * Remove a specific action by its key.
+     *
+     * @param string $key The action key to remove
+     */
+    public function removeAction(string $key): void
+    {
+        if (isset($this->actions[$key])) {
+            unset($this->actions[$key]);
+            // Invalidate sort cache for actions
+            unset($this->sortCache['actions']);
+        }
+    }
+
+    /**
+     * Remove a specific condition by its key.
+     *
+     * @param string $key The condition key to remove
+     */
+    public function removeCondition(string $key): void
+    {
+        if (isset($this->conditions[$key])) {
+            unset($this->conditions[$key]);
+            // Invalidate sort cache for conditions
+            unset($this->sortCache['conditions']);
+        }
+    }
+
+    /**
+     * Remove a specific decision by its key.
+     *
+     * @param string $key The decision key to remove
+     */
+    public function removeDecision(string $key): void
+    {
+        if (isset($this->decisions[$key])) {
+            unset($this->decisions[$key]);
+            // Invalidate sort cache for decisions
+            unset($this->sortCache['decisions']);
+        }
+    }
 }

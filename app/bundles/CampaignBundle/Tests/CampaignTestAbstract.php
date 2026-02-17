@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -15,33 +14,45 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends TestCase
+class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 {
-    protected static int $mockId      = 232;
-    protected static string $mockName = 'Mock name';
+    protected static $mockId   = 232;
 
-    protected function initCampaignModel(): CampaignModel
+    protected static $mockName = 'Mock name';
+
+    /**
+     * @return CampaignModel
+     */
+    protected function initCampaignModel()
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this
+            ->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $security = $this->createMock(CorePermissions::class);
+        $security = $this->getMockBuilder(CorePermissions::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $security->expects($this->any())
             ->method('isGranted')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
 
-        $userHelper = $this->createMock(UserHelper::class);
+        $userHelper = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $formRepository = $this->createMock(FormRepository::class);
+        $formRepository = $this->getMockBuilder(FormRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $formRepository->expects($this->any())
             ->method('getFormList')
-            ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
+            ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
 
         $leadListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
@@ -50,7 +61,7 @@ class CampaignTestAbstract extends TestCase
 
         $leadListModel->expects($this->any())
             ->method('getUserLists')
-            ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
+            ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
 
         $formModel = $this->getMockBuilder(FormModel::class)
             ->disableOriginalConstructor()
@@ -59,15 +70,19 @@ class CampaignTestAbstract extends TestCase
 
         $formModel->expects($this->any())
             ->method('getRepository')
-            ->willReturn($formRepository);
+            ->will($this->returnValue($formRepository));
 
-        return new CampaignModel(
+        $eventCollector    = $this->createMock(EventCollector::class);
+        $membershipBuilder = $this->createMock(MembershipBuilder::class);
+
+        $contactTracker = $this->createMock(ContactTracker::class);
+
+        $campaignModel = new CampaignModel(
             $leadListModel,
             $formModel,
-            $this->createMock(EventCollector::class),
-            $this->createMock(MembershipBuilder::class),
-            $this->createMock(ContactTracker::class),
-            $this->createMock(GeneratedColumnsProviderInterface::class),
+            $eventCollector,
+            $membershipBuilder,
+            $contactTracker,
             $entityManager,
             $security,
             $this->createMock(EventDispatcherInterface::class),
@@ -75,7 +90,9 @@ class CampaignTestAbstract extends TestCase
             $this->createMock(Translator::class),
             $userHelper,
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createMock(CoreParametersHelper::class)
         );
+
+        return $campaignModel;
     }
 }

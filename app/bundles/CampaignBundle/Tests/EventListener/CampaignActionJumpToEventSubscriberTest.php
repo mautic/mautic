@@ -47,10 +47,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             ) {
             }
 
-            /**
-             * @return Event[]
-             */
-            public function getEntities(array $args = []): array
+            public function getEntities(array $args = [])
             {
                 Assert::assertSame(
                     [
@@ -90,7 +87,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+            public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 Assert::assertSame('mautic.campaign.campaign.jump_to_event.target_not_exist', $id);
 
@@ -165,10 +162,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             ) {
             }
 
-            /**
-             * @return Event[]
-             */
-            public function getEntities(array $args = []): array
+            public function getEntities(array $args = [])
             {
                 Assert::assertSame(
                     [

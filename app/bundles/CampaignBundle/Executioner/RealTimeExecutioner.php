@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner as Executioner;
 use Mautic\CampaignBundle\Executioner\Exception\CampaignNotExecutableException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
-use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
@@ -44,7 +43,6 @@ class RealTimeExecutioner
         private EventScheduler $scheduler,
         private ContactTracker $contactTracker,
         private DecisionHelper $decisionHelper,
-        private EventRedirectionHelper $redirectionHelper,
     ) {
     }
 
@@ -89,8 +87,6 @@ class RealTimeExecutioner
 
         /** @var Event $event */
         foreach ($this->events as $event) {
-            $event = $this->redirectionHelper->handleEventRedirection($event, null, null);
-
             try {
                 $this->evaluateDecisionForContact($event, $passthrough, $channel, $channelId);
             } catch (DecisionNotApplicableException $exception) {
@@ -129,8 +125,6 @@ class RealTimeExecutioner
 
         /** @var Event $child */
         foreach ($children as $key => $child) {
-            $child = $this->redirectionHelper->handleEventRedirection($child, $children, $key);
-
             $executionDate = $this->scheduler->getExecutionDateTime($child, $now);
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
@@ -195,7 +189,7 @@ class RealTimeExecutioner
         // to fail resulting in the decision never being evaluated. Therefore we are going to self heal these decisions.
         /** @var Event $event */
         foreach ($this->events as $event) {
-            if ('1' === $event->getChannelId()) {
+            if (1 === $event->getChannelId()) {
                 ChannelExtractor::setChannel($event, $event, $this->collector->getEventConfig($event));
 
                 $this->eventRepository->saveEntity($event);

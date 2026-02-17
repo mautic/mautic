@@ -2,138 +2,87 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Order;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CampaignBundle\Validator\Constraints\NoOrphanEvents;
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\LockTrait;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
-use Mautic\CoreBundle\Entity\UuidInterface;
-use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-#[ApiResource(
-    operations: [
-        new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
-        new Post(security: "is_granted('campaign:campaigns:create')"),
-        new Get(security: "is_granted('campaign:campaigns:viewown')"),
-        new Put(security: "is_granted('campaign:campaigns:editown')"),
-        new Patch(security: "is_granted('campaign:campaigns:editother')"),
-        new Delete(security: "is_granted('campaign:campaigns:deleteown')"),
-    ],
-    normalizationContext: [
-        'groups'                  => ['campaign:read'],
-        'swagger_definition_name' => 'Read',
-        'api_included'            => ['category', 'events', 'lists', 'forms', 'fields', 'actions'],
-    ],
-    denormalizationContext: [
-        'groups'                  => ['campaign:write'],
-        'swagger_definition_name' => 'Write',
-    ]
-)]
-class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
+class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface
 {
-    use UuidTrait;
-
     use OptimisticLockTrait;
-
+    use LockTrait;
     use ProjectTrait;
 
-    public const TABLE_NAME  = 'campaigns';
-    public const ENTITY_NAME = 'campaign';
-
+    public const TABLE_NAME = 'campaigns';
     /**
      * @var int
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $name;
 
     /**
      * @var string|null
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $description;
 
     /**
      * @var \DateTimeInterface|null
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $publishDown;
 
-    #[Groups(['campaign:read', 'campaign:write'])]
     public ?\DateTimeInterface $deleted = null;
 
-    // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
-    #[Groups(['campaign:read', 'campaign:write'])]
-    private ?string $republishBehavior = null;
-
     /**
-     * @var Category|null
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $category;
 
     /**
-     * @var Collection<int, Event>|ArrayCollection<int, Event>
+     * @var ArrayCollection<int, Event>
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
     private $events;
 
     /**
      * @var ArrayCollection<int, Lead>
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
-    private Collection $leads;
+    private $leads;
 
     /**
-     * @var Collection<int, LeadList>
+     * @var ArrayCollection<int, LeadList>
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
-    private Collection $lists;
+    private $lists;
 
     /**
-     * @var Collection<int, Form>
+     * @var ArrayCollection<int, Form>
      */
-    #[Groups(['campaign:read', 'campaign:write'])]
-    private Collection $forms;
+    private $forms;
 
-    #[Groups(['campaign:read', 'campaign:write'])]
-    private array $canvasSettings = [];
+    /**
+     * @var array
+     */
+    private $canvasSettings = [];
 
-    #[Groups(['campaign:read', 'campaign:write'])]
     private bool $allowRestart = false;
 
     public function __construct()
@@ -166,12 +115,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $builder->addIdColumns();
 
         $builder->addPublishDates();
-
-        $builder->createField('republishBehavior', Types::STRING)
-            ->columnName('republish_behavior')
-            ->nullable()
-            ->length(32)
-            ->build();
 
         $builder->addCategory();
 
@@ -211,7 +154,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $builder->addNullableField('deleted', 'datetime');
 
         self::addVersionField($builder);
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
 
@@ -225,8 +167,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
                 ]
             )
         );
-
-        $metadata->addConstraint(new NoOrphanEvents());
     }
 
     /**
@@ -248,7 +188,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
                     'allowRestart',
                     'publishUp',
                     'publishDown',
-                    'republishBehavior',
                     'events',
                     'forms',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
@@ -292,58 +231,22 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
-        } elseif ('projects' === $prop) {
-            // Initialize project tracking on first change
-            if (!isset($this->changes['projects']['old'])) {
-                $currentProjects           = array_map(fn ($project) => $project->getName(), iterator_to_array($current));
-                $this->changes['projects'] = [
-                    'old' => $currentProjects,
-                    'new' => $currentProjects,
-                ];
-            }
-
-            // Update the new state based on the operation
-            if ($val instanceof Project) {
-                // Add project if not already in the list
-                $projectName = $val->getName();
-                if (!in_array($projectName, $this->changes['projects']['new'], true)) {
-                    $this->changes['projects']['new'][] = $projectName;
-                }
-            } else {
-                // Remove project from the list
-                $this->changes['projects']['new'] = array_values(
-                    array_diff($this->changes['projects']['new'], [$val])
-                );
-            }
         } else {
             parent::isChanged($prop, $val);
         }
     }
 
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Override to convert projects changes to final format.
-     */
-    public function getChanges($includePast = false)
-    {
-        $changes = parent::getChanges($includePast);
-
-        // Convert projects format if it exists and is in the intermediate format
-        if (isset($changes['projects']['old']) && isset($changes['projects']['new'])) {
-            $changes['projects'] = [
-                implode(', ', $changes['projects']['old']),
-                implode(', ', $changes['projects']['new']),
-            ];
-        }
-
-        return $changes;
-    }
-
-    /**
+     * Set description.
+     *
      * @param string $description
      *
      * @return Campaign
@@ -357,6 +260,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Get description.
+     *
      * @return string
      */
     public function getDescription()
@@ -365,9 +270,13 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Set name.
+     *
+     * @param string $name
+     *
      * @return Campaign
      */
-    public function setName(string $name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -376,6 +285,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Get name.
+     *
      * @return string
      */
     public function getName()
@@ -398,6 +309,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Add events.
+     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)
@@ -410,6 +323,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
+    /**
+     * Remove events.
+     */
     public function removeEvent(Event $event): void
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
@@ -418,7 +334,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Event>
+     * Get events.
+     *
+     * @return ArrayCollection
      */
     public function getEvents()
     {
@@ -435,7 +353,17 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         );
         $events   = $this->getEvents()->matching($criteria);
 
-        return $this->reindexEventsByIdKey($events);
+        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
+        // @see https://github.com/doctrine/doctrine2/issues/4693
+        $keyedArrayCollection = new ArrayCollection();
+        /** @var Event $event */
+        foreach ($events as $event) {
+            $keyedArrayCollection->set($event->getId(), $event);
+        }
+
+        unset($events);
+
+        return $keyedArrayCollection;
     }
 
     public function getInactionBasedEvents(): ArrayCollection
@@ -443,7 +371,17 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
         $events   = $this->getEvents()->matching($criteria);
 
-        return $this->reindexEventsByIdKey($events);
+        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
+        // @see https://github.com/doctrine/doctrine2/issues/4693
+        $keyedArrayCollection = new ArrayCollection();
+        /** @var Event $event */
+        foreach ($events as $event) {
+            $keyedArrayCollection->set($event->getId(), $event);
+        }
+
+        unset($events);
+
+        return $keyedArrayCollection;
     }
 
     /**
@@ -456,7 +394,17 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->getEvents()->matching($criteria);
 
-        return $this->reindexEventsByIdKey($events);
+        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
+        // @see https://github.com/doctrine/doctrine2/issues/4693
+        $keyedArrayCollection = new ArrayCollection();
+        /** @var Event $event */
+        foreach ($events as $event) {
+            $keyedArrayCollection->set($event->getId(), $event);
+        }
+
+        unset($events);
+
+        return $keyedArrayCollection;
     }
 
     /**
@@ -487,6 +435,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Set publishUp.
+     *
      * @param ?\DateTime $publishUp
      *
      * @return Campaign
@@ -500,7 +450,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * Get publishUp.
+     *
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -508,6 +460,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Set publishDown.
+     *
      * @param ?\DateTime $publishDown
      *
      * @return Campaign
@@ -520,20 +474,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
-    public function getRepublishBehavior(): ?string
-    {
-        return $this->republishBehavior;
-    }
-
-    public function setRepublishBehavior(?string $republishBehavior): self
-    {
-        $this->isChanged('republishBehavior', $republishBehavior);
-        $this->republishBehavior = $republishBehavior;
-
-        return $this;
-    }
-
     /**
+     * Get publishDown.
+     *
      * @return \DateTimeInterface
      */
     public function getPublishDown()
@@ -559,6 +502,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Add lead.
+     *
      * @return Campaign
      */
     public function addLead($key, Lead $lead)
@@ -572,6 +517,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
+    /**
+     * Remove lead.
+     */
     public function removeLead(Lead $lead): void
     {
         $leadEntity                                              = $lead->getLead();
@@ -580,7 +528,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return Lead[]|Collection
+     * Get leads.
+     *
+     * @return Lead[]|\Doctrine\Common\Collections\Collection
      */
     public function getLeads()
     {
@@ -588,7 +538,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, LeadList>
+     * @return ArrayCollection
      */
     public function getLists()
     {
@@ -596,6 +546,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Add list.
+     *
      * @return Campaign
      */
     public function addList(LeadList $list)
@@ -607,6 +559,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
+    /**
+     * Remove list.
+     */
     public function removeList(LeadList $list): void
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
@@ -614,7 +569,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Form>
+     * @return ArrayCollection
      */
     public function getForms()
     {
@@ -622,6 +577,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
+     * Add form.
+     *
      * @return Campaign
      */
     public function addForm(Form $form)
@@ -633,6 +590,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
+    /**
+     * Remove form.
+     */
     public function removeForm(Form $form): void
     {
         $this->changes['forms']['removed'][$form->getId()] = $form->getName();
@@ -650,36 +610,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public function setCanvasSettings(array $canvasSettings): void
     {
         $this->canvasSettings = $canvasSettings;
-    }
-
-    /**
-     * Check if there are any orphan events that are not connected to any parent node.
-     */
-    public function hasOrphanEvents(): bool
-    {
-        $canvasSettings = $this->getCanvasSettings() ?? [];
-
-        if (empty($canvasSettings['nodes'])) {
-            return false;
-        }
-
-        // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
-        $eventIds = array_filter(
-            array_column($canvasSettings['nodes'], 'id'),
-            fn ($id) => !in_array($id, ['lists', 'forms'])
-        );
-
-        if (empty($eventIds)) {
-            return false;
-        }
-
-        // Extract connected event IDs from connections
-        $connectedEventIds = [];
-        if (!empty($canvasSettings['connections'])) {
-            $connectedEventIds = array_filter(array_column($canvasSettings['connections'], 'targetId'));
-        }
-
-        return !empty(array_diff($eventIds, $connectedEventIds));
     }
 
     public function getAllowRestart(): bool
@@ -720,29 +650,25 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     /**
      * Get contact membership.
+     *
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getContactMembership(Contact $contact): Collection
+    public function getContactMembership(Contact $contact)
     {
         return $this->leads->matching(
             Criteria::create()
-                ->where(Criteria::expr()->eq('lead', $contact))
-                ->orderBy(['dateAdded' => Order::Descending->value])
+                    ->where(
+                        Criteria::expr()->eq('lead', $contact)
+                    )
+                    ->orderBy(['dateAdded' => Criteria::DESC])
         );
     }
 
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     */
     public function getOnclickMethod(): string
     {
         return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
     }
 
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     *
-     * @return array<string, string>
-     */
     public function getDataAttributes(): array
     {
         return [
@@ -752,11 +678,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         ];
     }
 
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     *
-     * @return array<string, string>
-     */
     public function getTranslationKeysDataAttributes(): array
     {
         return [
@@ -764,24 +685,5 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             'data-confirm-text' => 'mautic.campaign.form.confirmation.confirm_text',
             'data-cancel-text'  => 'mautic.campaign.form.confirmation.cancel_text',
         ];
-    }
-
-    /**
-     * Re-index collection by event ID to work around Doctrine's indexBy mapping issue.
-     *
-     * @see https://github.com/doctrine/doctrine2/issues/4693
-     */
-    private function reindexEventsByIdKey(Collection $events): ArrayCollection
-    {
-        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
-        // @see https://github.com/doctrine/doctrine2/issues/4693
-        $keyedArrayCollection = new ArrayCollection();
-        /** @var Event $event */
-        foreach ($events as $event) {
-            $keyedArrayCollection->set($event->getId(), $event);
-        }
-        unset($events);
-
-        return $keyedArrayCollection;
     }
 }

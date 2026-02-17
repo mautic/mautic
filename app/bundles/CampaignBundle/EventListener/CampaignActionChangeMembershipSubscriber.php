@@ -77,8 +77,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
             foreach ($campaigns as $campaign) {
                 $this->membershipManager->removeContacts(
                     $event->getContactsKeyedById(),
-                    $campaign,
-                    true
+                    $campaign
                 );
             }
         }

@@ -7,24 +7,20 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Entity\LockTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(
-    name: 'mautic:campaigns:rebuild',
-    description: 'Rebuild campaigns based on contact segments.',
-    aliases: ['mautic:campaigns:update']
-)]
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
+    use LockTrait;
     private int $runLimit = 0;
 
     private ContactLimiter $contactLimiter;
@@ -46,6 +42,8 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
+            ->setName('mautic:campaigns:rebuild')
+            ->setAliases(['mautic:campaigns:update'])
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
@@ -126,30 +124,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this->output     = ($this->quiet) ? new NullOutput() : $output;
         $excludeCampaigns = $input->getOption('exclude');
 
-        if (is_numeric($id)) {
-            $id = (int) $id;
-        }
-
-        if (is_numeric($maxThreads)) {
-            $maxThreads = (int) $maxThreads;
-        }
-
-        if (is_numeric($threadId)) {
-            $threadId = (int) $threadId;
-        }
-
-        if (is_numeric($contactMaxId)) {
-            $contactMaxId = (int) $contactMaxId;
-        }
-
-        if (is_numeric($contactMinId)) {
-            $contactMinId = (int) $contactMinId;
-        }
-
-        if (is_numeric($contactId)) {
-            $contactId = (int) $contactId;
-        }
-
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
@@ -163,13 +137,14 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this->contactLimiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
 
         if ($id) {
+            /** @var Campaign $campaign */
             $campaign = $this->campaignRepository->getEntity($id);
             if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
                 return \Symfony\Component\Console\Command\Command::FAILURE;
             }
-
+            $campaign->setLock($this->lock);
             $this->updateCampaign($campaign);
         } else {
             $filter = [
@@ -190,6 +165,12 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {
+                if ($this->isEntityLocked((string) $campaign->getId())) {
+                    $this->output->writeln('<comment>'.$this->translator->trans('mautic.core.command.sub_lock_active', ['%id%' => $campaign->getId()]).'</comment>');
+
+                    continue;
+                }
+                $campaign->setLock($this->lock);
                 $this->updateCampaign($campaign);
 
                 unset($campaign);
@@ -235,4 +216,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->output->writeln('');
     }
+
+    protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

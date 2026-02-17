@@ -171,7 +171,7 @@ final class CampaignEvents
     /**
      * The mautic.campaign_on_event_decision_evaluation_results event is dispatched when a batch of contacts were evaluted for a decision.
      *
-     * The event listener receives a Mautic\CampaignBundle\Event\DecisionBatchEvent instance.
+     * The event listener receives a Mautic\CampaignBundle\Event\DecisionResultsEvent instance.
      *
      * @var string
      */
@@ -185,6 +185,15 @@ final class CampaignEvents
      * @var string
      */
     public const ON_EVENT_CONDITION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
+
+    /**
+     * The mautic.campaign_on_event_decision_evaluation_inactive event is dispatched when a batch of contacts were analyzed for a innactive path.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\DecisionInactiveEvent instance.
+     *
+     * @var string
+     */
+    public const ON_EVENT_DECISION_ANALYZED_INACTIVE = 'mautic.campaign_on_event_decision_analyzed_inactive';
 
     /**
      * The mautic.campaign_on_event_jump_to_event event is dispatched when a campaign jump to event is triggered.
@@ -226,22 +235,4 @@ final class CampaignEvents
      * @var string
      */
     public const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
-
-    /**
-     * The mautic.campaign_failure_notify event is dispatched after campaign event is failed for a contact.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfFailureEvent
-     *
-     * @var string
-     */
-    public const ON_CAMPAIGN_FAILURE_NOTIFY = 'mautic.campaign_failure_notify';
-
-    /**
-     * The mautic.campaign_unpublish_notify event is dispatched after campaign event is auto unpublished after failures.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent
-     *
-     * @var string
-     */
-    public const ON_CAMPAIGN_UNPUBLISH_NOTIFY = 'mautic.campaign_unpublish_notify';
 }

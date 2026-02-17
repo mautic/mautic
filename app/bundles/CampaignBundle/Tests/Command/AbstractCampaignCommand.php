@@ -36,7 +36,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     protected $prefix;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTime
      */
     protected $eventDate;
 

@@ -8,7 +8,10 @@ class ConnectionBuilder
 {
     private static array $eventTypes = [];
 
-    private static array $connectionRestrictions = ['anchor' => []];
+    /**
+     * @var array
+     */
+    private static $connectionRestrictions = ['anchor' => []];
 
     /**
      * Used by JS/JsPlumb to restrict how events can be associated to each other in the UI.

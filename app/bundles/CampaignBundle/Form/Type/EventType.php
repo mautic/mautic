@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
+use Mautic\FormBundle\Validator\Constraint\IntegerNumberConstraint;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -17,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Range;
 
 /**
  * @extends AbstractType<mixed>
@@ -61,10 +63,9 @@ class EventType extends AbstractType
                 $choices['optimized'] = 'mautic.campaign.form.type.optimized';
             }
 
-            if (isset($options['data']['anchor']) && isset($options['data']['anchorEventType'])
-                && 'no' === $options['data']['anchor']
-                && 'condition' !== $options['data']['anchorEventType']
-                && 'condition' !== $options['data']['eventType']) {
+            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['anchorEventType']
+                && 'condition' != $options['data']['eventType']
+            ) {
                 $label .= '_inaction';
 
                 unset($choices['immediate']);
@@ -106,7 +107,6 @@ class EventType extends AbstractType
                     'widget' => 'single_text',
                     'html5'  => false,
                     'format' => 'yyyy-MM-dd HH:mm',
-                    'data'   => $this->getTimeValue($options['data'], 'triggerDate'),
                 ]
             );
 
@@ -118,10 +118,21 @@ class EventType extends AbstractType
                 [
                     'label' => false,
                     'attr'  => [
-                        'class'    => 'form-control',
-                        'preaddon' => 'symbol-hashtag',
+                        'class'          => 'form-control',
+                        'preaddon'       => 'symbol-hashtag',
+                        'data-toggle'    => 'tooltip',
+                        'data-placement' => 'top',
+                        'title'          => 'mautic.campaign.form.type.date_value.custom.tooltip',
                     ],
-                    'data'  => $data,
+                    'data'        => $data,
+                    'required'    => false,
+                    'constraints' => [
+                        new Range([
+                            'min' => 0,
+                            'max' => null,
+                        ]),
+                        new IntegerNumberConstraint(),
+                    ],
                 ]
             );
 
@@ -290,7 +301,6 @@ class EventType extends AbstractType
                 'save_text'       => $btnValue,
                 'save_icon'       => $btnIcon,
                 'save_onclick'    => 'Mautic.submitCampaignEvent(event)',
-                'cancel_onclick'  => 'Mautic.cancelCampaignEvent(event)',
                 'apply_text'      => false,
                 'container_class' => 'bottom-form-buttons',
             ]
@@ -329,14 +339,10 @@ class EventType extends AbstractType
             return $data[$name];
         }
 
-        if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
-            return new \DateTime($data[$name]['date']);
-        } elseif (is_string($data[$name])) {
-            return new \DateTime($data[$name]);
-        }
+        return new \DateTime($data[$name]);
     }
 
-    public function getBlockPrefix(): string
+    public function getBlockPrefix()
     {
         return 'campaignevent';
     }

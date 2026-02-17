@@ -4,8 +4,6 @@ namespace Mautic\CampaignBundle\Executioner\Result;
 
 class Counter
 {
-    private int $rescheduled = 0;
-
     /**
      * @param int $eventCount
      * @param int $evaluated
@@ -38,16 +36,6 @@ class Counter
     public function advanceEventCount($step = 1): void
     {
         $this->eventCount += $step;
-    }
-
-    public function advanceRescheduled(int $step = 1): void
-    {
-        $this->rescheduled += $step;
-    }
-
-    public function getRescheduled(): int
-    {
-        return $this->rescheduled;
     }
 
     /**

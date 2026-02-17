@@ -2,25 +2,19 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
-use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
-use Mautic\CoreBundle\Event\JobExtendTimeEvent;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
-use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
@@ -43,11 +37,6 @@ class KickoffExecutioner implements ExecutionerInterface
         private TranslatorInterface $translator,
         private EventExecutioner $executioner,
         private EventScheduler $scheduler,
-        private ProcessSignalService $processSignalService,
-        private CoreParametersHelper $coreParametersHelper,
-        private EventDispatcherInterface $eventDispatcher,
-        private EventRedirectionHelper $redirectionHelper,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -77,9 +66,7 @@ class KickoffExecutioner implements ExecutionerInterface
             if ($this->progressBar) {
                 $this->progressBar->finish();
             }
-            if ($this->coreParametersHelper->get('campaign_use_summary')) {
-                $this->executioner->persistSummaries();
-            }
+            $this->executioner->persistSummaries();
         }
 
         return $this->counter;
@@ -143,11 +130,8 @@ class KickoffExecutioner implements ExecutionerInterface
 
             /** @var Event $event */
             foreach ($rootEvents as $key => $event) {
-                $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
-                $this->entityManager->refresh($event);
-                $event = $this->redirectionHelper->handleEventRedirection($event, $rootEvents, $key);
 
                 try {
                     // Get the date the event would be executed on as if it was based on days only
@@ -182,13 +166,11 @@ class KickoffExecutioner implements ExecutionerInterface
                 break;
             }
 
-            $this->processSignalService->throwExceptionIfSignalIsCaught();
-
             $this->logger->debug('CAMPAIGN: Fetching the next batch of kickoff contacts starting with contact ID '.$batchMinContactId);
             $this->limiter->setBatchMinContactId($batchMinContactId);
+
             // Get the next batch
             $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
-            $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
         }
     }
 }

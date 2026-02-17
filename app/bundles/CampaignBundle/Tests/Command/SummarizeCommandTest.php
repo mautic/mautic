@@ -5,10 +5,10 @@ namespace Mautic\CampaignBundle\Tests\Command;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
-use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
+use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use PHPUnit\Framework\Assert;
 
-final class SummarizeCommandTest extends AbstractCampaignTestCase
+final class SummarizeCommandTest extends AbstractCampaignTest
 {
     /**
      * @throws \Exception

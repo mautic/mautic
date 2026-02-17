@@ -12,7 +12,7 @@ interface ChannelInterface
     public function setChannel($channel): void;
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getChannelId();
 

@@ -97,46 +97,23 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     public function testWhileLoopBreaksWithNoMoreContacts(): void
     {
         $campaign = new class extends Campaign {
-            public function getId(): int
+            public function getId()
             {
                 return 111;
             }
         };
 
         $contactLimiter = new ContactLimiter(1);
-        $matcher        = $this->exactly(4);
 
-        $this->campaignMemberRepository->expects($matcher)
-            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertFalse($parameters[2]);
-
-                    return [20];
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertFalse($parameters[2]);
-
-                    return [21];
-                }
-                if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertFalse($parameters[2]);
-
-                    return [22];
-                }
-                if (4 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertFalse($parameters[2]);
-
-                    return [];
-                }
-            });
+        $this->campaignMemberRepository->expects($this->exactly(4))
+            ->method('getCampaignContactsBySegments')
+            ->withConsecutive(
+                [111, $contactLimiter, false],
+                [111, $contactLimiter, false],
+                [111, $contactLimiter, false],
+                [111, $contactLimiter, false]
+            )
+            ->willReturnOnConsecutiveCalls([20], [21], [22], []);
 
         $this->manager->expects($this->exactly(3))
             ->method('addContacts');
@@ -158,7 +135,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     public function testWhileLoopBreaksWithNoMoreContactsForRepeatableCampaign(): void
     {
         $campaign = new class extends Campaign {
-            public function getId(): int
+            public function getId()
             {
                 return 111;
             }
@@ -167,39 +144,16 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $campaign->setAllowRestart(true);
 
         $contactLimiter = new ContactLimiter(1);
-        $matcher        = $this->exactly(4);
 
-        $this->campaignMemberRepository->expects($matcher)
-            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertTrue($parameters[2]);
-
-                    return [20];
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertTrue($parameters[2]);
-
-                    return [21];
-                }
-                if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertTrue($parameters[2]);
-
-                    return [22];
-                }
-                if (4 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(111, $parameters[0]);
-                    $this->assertSame($contactLimiter, $parameters[1]);
-                    $this->assertTrue($parameters[2]);
-
-                    return [];
-                }
-            });
+        $this->campaignMemberRepository->expects($this->exactly(4))
+            ->method('getCampaignContactsBySegments')
+            ->withConsecutive(
+                [111, $contactLimiter, true],
+                [111, $contactLimiter, true],
+                [111, $contactLimiter, true],
+                [111, $contactLimiter, true]
+            )
+            ->willReturnOnConsecutiveCalls([20], [21], [22], []);
 
         $this->manager->expects($this->exactly(3))
             ->method('addContacts');

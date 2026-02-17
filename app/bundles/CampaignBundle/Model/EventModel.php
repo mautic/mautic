@@ -58,33 +58,31 @@ class EventModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * Deletes campaign events and sets their redirect targets.
-     */
     public function deleteEvents($currentEvents, $deletedEvents): void
     {
         $deletedKeys = [];
-        $deletedData = [];
-
-        foreach ($deletedEvents as $k => $deleteInfo) {
-            $eventId       = $deleteInfo['id'];
-            $redirectEvent = $deleteInfo['redirectEvent'] ?? null;
-
-            if (str_starts_with($eventId, 'new') || isset($currentEvents[$eventId])) {
-                unset($deletedEvents[$k]);
-                continue;
+        foreach ($deletedEvents as $k => $deleteMe) {
+            if ($deleteMe instanceof Event) {
+                $deleteMe = $deleteMe->getId();
             }
 
-            $deletedKeys[] = $eventId;
-            $deletedData[] = [
-                'id'              => $eventId,
-                'redirectEvent'   => $redirectEvent instanceof Event ? $redirectEvent->getId() : $redirectEvent,
-            ];
+            if (str_starts_with($deleteMe, 'new')) {
+                unset($deletedEvents[$k]);
+            }
+
+            if (isset($currentEvents[$deleteMe])) {
+                unset($deletedEvents[$k]);
+            }
+
+            if (isset($deletedEvents[$k])) {
+                $deletedKeys[] = $deleteMe;
+            }
         }
 
-        if ($deletedKeys) {
+        if (count($deletedEvents)) {
+            // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
-            $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
+            $this->getRepository()->setEventsAsDeleted($deletedEvents);
             $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);
         }
     }
@@ -100,8 +98,7 @@ class EventModel extends FormModel
      */
     public function deleteEventsByEventIds(array $eventIds): void
     {
-        $deletedData = array_map(fn ($id) => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
-        $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
+        $this->getRepository()->deleteEvents($eventIds);
         $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }
 

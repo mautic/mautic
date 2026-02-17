@@ -58,7 +58,7 @@ class CampaignListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent()
     {
         return ChoiceType::class;
     }

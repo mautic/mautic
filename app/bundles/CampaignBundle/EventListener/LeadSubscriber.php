@@ -3,14 +3,11 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -25,7 +22,6 @@ class LeadSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
         private RouterInterface $router,
-        private EventRepository $eventRepository,
     ) {
     }
 
@@ -93,30 +89,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
                 $label = $log['event_name'].' / '.$log['campaign_name'];
 
-                // Case 1: This event was executed as a redirect because original event was deleted
-                // Show "Rescheduled from" message when:
-                // - Check metadata for rescheduled event information
-                if (!empty($log['metadata'])
-                    && is_array($log['metadata'])
-                    && !empty($log['metadata']['redirect_applied'])
-                    && !empty($log['metadata']['originalEventName'])) {
-                    $label = $log['event_name'].' / '.$log['campaign_name'].
-                        ' <span class="small">'.$this->translator->trans('mautic.campaign.event.redirected',
-                            ['%original%' => $log['metadata']['originalEventName']]).'</span>';
-                }
-
-                // Case 2: Event executed before being deleted - show "Deleted" label
-                // Show only if:
-                // - Event is marked as deleted
-                // - Event has been triggered (not just scheduled)
-                if (!empty($log['event_deleted_timestamp'])) {
-                    $label .= ' <span class="label label-danger">'.$this->translator->trans('mautic.campaign.deleted').
-                        '</span>';
-                }
-
-                // Case 3: Event scheduled to execute deleted event - don't show any special message
-                // (default display with no additional labels)
-
                 if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
                     // Note as cancelled
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
@@ -131,18 +103,6 @@ class LeadSubscriber implements EventSubscriberInterface
                 $extra = [
                     'log' => $log,
                 ];
-
-                if (!empty($log['parent_id'])) {
-                    $parentEvent = $this->getParentEvent($log['parent_id']);
-                    if ($parentEvent) {
-                        $extra['parentDetails'] = $this->getParentDetails($parentEvent, $log);
-
-                        $toolTipClass = 'yes' === $log['decision_path'] ? 'text-success' : 'text-danger';
-                        $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst($log['decision_path'])]);
-
-                        $label .= sprintf(' <i class="ri-node-tree %s" data-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
-                    }
-                }
 
                 if ($event->isForTimeline()) {
                     $extra['campaignEventSettings'] = $eventSettings;
@@ -169,43 +129,5 @@ class LeadSubscriber implements EventSubscriberInterface
                 );
             }
         }
-    }
-
-    /**
-     * Fetch the parent event if exists.
-     */
-    private function getParentEvent(int $parentId): ?Event
-    {
-        $entities = $this->eventRepository->findBy([
-            'id'        => $parentId,
-            'eventType' => [Event::TYPE_CONDITION, Event::TYPE_DECISION],
-        ]);
-
-        return $entities[0] ?? null;
-    }
-
-    /**
-     * Get details for the parent event.
-     *
-     * @param array<string, mixed> $log
-     *
-     * @return array<string, mixed>
-     */
-    private function getParentDetails(Event $parentEvent, array $log): array
-    {
-        $properties = ArrayHelper::removeEmptyValues($parentEvent->getProperties());
-
-        // Remove unnecessary properties
-        $keysToRemove = ['canvasSettings', 'anchor', 'type', 'eventType', 'campaignId', '_token', 'buttons', 'anchorEventType', 'tempId', 'id', 'order', 'contactLog', 'changes', 'failedCount', 'properties'];
-        foreach ($keysToRemove as $key) {
-            unset($properties[$key]);
-        }
-
-        return [
-            'name'       => $parentEvent->getName(),
-            'type'       => $parentEvent->getEventType(),
-            'path'       => $log['decision_path'],
-            'properties' => $properties,
-        ];
     }
 }

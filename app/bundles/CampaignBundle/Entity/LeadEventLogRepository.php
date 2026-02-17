@@ -5,8 +5,8 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
-use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -72,8 +72,6 @@ class LeadEventLogRepository extends CommonRepository
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
                     e.description AS event_description,
-                    e.parent_id AS parent_id,
-                    e.decision_path AS decision_path,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
@@ -83,10 +81,9 @@ class LeadEventLogRepository extends CommonRepository
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
-                    fl.reason as fail_reason,
-                    e.deleted AS event_deleted_timestamp,
-                    e.redirect_event_id,
-                    ll.metadata')
+                    fl.reason as fail_reason
+                    '
+                      )
                         ->add('from', [
                             'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                             'alias' => 'll',
@@ -139,6 +136,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Get a lead's upcoming events.
+     *
+     * @throws Exception
      */
     public function getUpcomingEvents(?array $options = null): array
     {
@@ -173,8 +172,16 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (isset($options['type'])) {
-            $query->andwhere('e.type = :type')
-            ->setParameter('type', $options['type']);
+            $eventIdQuery = $this->_em->getConnection()->createQueryBuilder();
+            $eventIdQuery->select('e.id')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')
+                ->where($eventIdQuery->expr()->eq('e.type', ':type'))
+                ->setParameter('type', $options['type']);
+
+            $eventIds = $eventIdQuery->executeQuery()->fetchFirstColumn();
+            if (!empty($eventIds)) {
+                $query->andWhere($query->expr()->in('ll.event_id', $eventIds));
+            }
         }
 
         if (isset($options['eventType'])) {
@@ -459,7 +466,8 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->in('o.id', $ids),
                     $q->expr()->eq('o.isScheduled', 1),
                     $q->expr()->eq('c.isPublished', 1),
-                    $q->expr()->isNull('c.deleted')
+                    $q->expr()->isNull('c.deleted'),
+                    $q->expr()->isNull('e.deleted')
                 )
             );
 
@@ -573,7 +581,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * @param string $message
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function unscheduleEvents(Lead $campaignMember, $message): void
     {
@@ -627,105 +635,21 @@ SQL;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
-            $deleteEntries = $conn->executeStatement($sql, [$campaignId], [Types::INTEGER]);
+            $deleteEntries = $conn->executeQuery($sql, [$campaignId], [Types::INTEGER])->rowCount();
         }
     }
 
     /**
-     * Check if last lead/event failed.
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @param string[] $eventIds
      */
-    public function isLastFailed(int $leadId, int $eventId): bool
+    public function removeEventLogs(array $eventIds): void
     {
-        /** @var LeadEventLog $log */
-        $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
-
-        if (null !== $log && null !== $log->getFailedLog()) {
-            return true;
+        $table_name    = $this->getTableName();
+        $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        $deleteEntries = true;
+        while ($deleteEntries) {
+            $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
         }
-
-        return false;
-    }
-
-    public function deleteAnonymousContacts(): int
-    {
-        $conn           = $this->getEntityManager()->getConnection();
-        $tableName      = $this->getTableName();
-        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
-        $tempTableName  = 'to_delete';
-        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select id AS lead_id from %s where date_identified is null;', $tempTableName, $leadsTableName));
-        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::LOG_DELETE_BATCH_SIZE);
-        $deletedRecordCount= 0;
-        while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
-            $deletedRecordCount += $deletedRows;
-        }
-
-        return $deletedRecordCount;
-    }
-
-    /**
-     * @param string[] $ids
-     */
-    public function markEventLogsQueued(array $ids): void
-    {
-        if (!$ids) {
-            return;
-        }
-
-        $this->getEntityManager()
-            ->getConnection()
-            ->createQueryBuilder()
-            ->update($this->getTableName())
-            ->set('date_queued', 'NOW()')
-            ->where('id IN (:ids)')
-            ->setParameter('ids', $ids, ArrayParameterType::STRING)
-            ->executeStatement();
-    }
-
-    public function getEventLogStats(int $eventId): EventLogStatsDto
-    {
-        $qb = $this->getReplicaConnection()->createQueryBuilder();
-        $qb->select([
-            'COUNT(log.id) as total_logs',
-            'COUNT(DISTINCT log.lead_id) as unique_executions',
-            'SUM(log.is_scheduled) as pending_executions',
-            'SUM(CASE WHEN log.non_action_path_taken = 1 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as negative_path_count',
-            'SUM(CASE WHEN log.non_action_path_taken = 0 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as positive_path_count',
-            'MIN(log.date_triggered) as first_execution_date',
-            'MAX(log.date_triggered) as last_execution_date',
-            'MAX(log.rotation) as max_rotations',
-        ])
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
-            ->where(
-                $qb->expr()->and(
-                    $qb->expr()->eq('log.event_id', ':eventId')
-                )
-            )
-            ->setParameter('eventId', $eventId)
-            ->groupBy('log.event_id');
-
-        $result = $qb->executeQuery()->fetchAssociative();
-
-        if (false === $result) {
-            return new EventLogStatsDto();
-        }
-
-        $totalLogs         = (int) ($result['total_logs'] ?? 0);
-        $pendingExecutions = (int) ($result['pending_executions'] ?? 0);
-        $uniqueExecutions  = (int) ($result['unique_executions'] ?? 0);
-        $maxRotations      = (int) ($result['max_rotations'] ?? 0);
-
-        return new EventLogStatsDto(
-            totalExecutions: $totalLogs - $pendingExecutions,
-            uniqueExecutions: $uniqueExecutions,
-            pendingExecutions: $pendingExecutions,
-            maxRotations: $maxRotations,
-            negativePathCount: (int) ($result['negative_path_count'] ?? 0),
-            positivePathCount: (int) ($result['positive_path_count'] ?? 0),
-            firstExecutionDate: $result['first_execution_date'] ? new \DateTimeImmutable($result['first_execution_date']) : null,
-            lastExecutionDate: $result['last_execution_date'] ? new \DateTimeImmutable($result['last_execution_date']) : null
-        );
     }
 }

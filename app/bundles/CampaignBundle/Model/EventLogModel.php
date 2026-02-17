@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -163,8 +162,7 @@ class EventLogModel extends AbstractCommonModel
                         );
                     }
                     $log->setTriggerDate(
-                        new \DateTime($value),
-                        'Trigger date updated via EventLogModel (API)'
+                        new \DateTime($value)
                     );
                     break;
                 case 'ipAddress':
@@ -212,6 +210,6 @@ class EventLogModel extends AbstractCommonModel
             $triggerDate = new \DateTime();
         }
 
-        $this->eventScheduler->rescheduleLogs(new ArrayCollection([$entity]), $triggerDate);
+        $this->eventScheduler->reschedule($entity, $triggerDate);
     }
 }

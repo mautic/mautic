@@ -16,7 +16,7 @@
     {% if event['eventType'] == 'decision' %}
     <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1 pa-md">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
-        <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+        <span>{{ event['settings']['label'] is defined ? event['settings']['label'] : ('mautic.campaign.'~event['type'])|trans }}</span>
         <span class="campaign-event-name label label-info ml-5 mr-lg ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
         </span>
@@ -27,7 +27,7 @@
         <div class="campaign-event-content d-flex fw-nowrap ai-center gap-sm">
             <div class="campaign-event-icon pa-sm mr-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
             <div class="d-flex fd-column ai-start">
-                <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+                <span class="fs-18 fw-l">{{ event['settings']['label'] is defined ? event['settings']['label'] : ('mautic.campaign.'~event['type'])|trans }}</span>
                 <span class="campaign-event-name ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
             </div>
         </div>
@@ -35,7 +35,7 @@
     {% elseif event['eventType'] == 'condition' %}
     <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1 pa-md">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
-        <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+        <span>{{ event['settings']['label'] is defined ? event['settings']['label'] : ('mautic.campaign.'~event['type'])|trans }}</span>
             <span class="campaign-event-name label label-warning ml-5 mr-lg ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
             </span>
@@ -84,7 +84,6 @@
                         'data-toggle': 'ajaxmodal',
                         'data-prevent-dismiss': 'true',
                         'data-target': '#CampaignEventModal',
-                        'data-method': 'POST',
                         'class': 'btn-edit'
                     }
                 },
@@ -101,7 +100,7 @@
                     icon_only: true,
                     label: 'mautic.campaign.event.remove.btn.tooltip'|trans,
                     attributes: {
-                        'data-toggle': 'ajax-delete',
+                        'data-toggle': 'ajax',
                         'data-target': 'CampaignEvent_' ~ event['id'],
                         'data-ignore-formexit': 'true',
                         'data-method': 'POST',

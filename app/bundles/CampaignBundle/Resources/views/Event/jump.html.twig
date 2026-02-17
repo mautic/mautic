@@ -35,7 +35,6 @@
                     'data-toggle': 'ajaxmodal',
                     'data-prevent-dismiss': 'true',
                     'data-target': '#CampaignEventModal',
-                    'data-method': 'POST',
                     'class': 'btn-edit'
                 }
             },
@@ -52,7 +51,7 @@
                 icon_only: true,
                 label: 'mautic.campaign.event.remove.btn.tooltip'|trans,
                 attributes: {
-                    'data-toggle': 'ajax-delete',
+                    'data-toggle': 'ajax',
                     'data-target': 'CampaignEvent_' ~ event['id'],
                     'data-ignore-formexit': 'true',
                     'data-method': 'POST',

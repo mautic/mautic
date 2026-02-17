@@ -4,11 +4,11 @@
     </a>
 </div>
 {% else %}
-<a href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
-    <span class="fw-sb">{{ item.name }}</span>
-    <span class="ml-4 mr-sm">#{{ item.id }}</span>
+<a href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaign.id}) }}" data-toggle="ajax">
+    <span class="fw-sb">{{ campaign.name }}</span>
+    <span class="ml-4 mr-sm">#{{ campaign.getId() }}</span>
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
-        'entity': item,
+        'entity': campaign,
         'status': 'active',
         'simplified': 'true'
     }) -}}

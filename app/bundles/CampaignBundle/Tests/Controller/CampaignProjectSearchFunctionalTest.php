@@ -32,9 +32,6 @@ final class CampaignProjectSearchFunctionalTest extends AbstractProjectSearchTes
         $this->searchAndAssert($searchTerm, $expectedEntities, $unexpectedEntities, ['/api/campaigns', '/s/campaigns']);
     }
 
-    /**
-     * @return \Generator<string, array{searchTerm: string, expectedEntities: array<string>, unexpectedEntities: array<string>}>
-     */
     public static function searchDataProvider(): \Generator
     {
         yield 'search by one project' => [
@@ -43,46 +40,22 @@ final class CampaignProjectSearchFunctionalTest extends AbstractProjectSearchTes
             'unexpectedEntities'  => ['Campaign Gamma', 'Campaign Delta'],
         ];
 
-        yield 'search by one project AND campaign name' => [
-            'searchTerm'          => 'project:"Project Two" AND Beta',
-            'expectedEntities'    => ['Campaign Beta'],
-            'unexpectedEntities'  => ['Campaign Alpha', 'Campaign Gamma', 'Campaign Delta'],
-        ];
-
-        yield 'search by one project OR campaign name' => [
-            'searchTerm'          => 'project:"Project Two" OR Gamma',
-            'expectedEntities'    => ['Campaign Alpha', 'Campaign Beta', 'Campaign Gamma'],
-            'unexpectedEntities'  => ['Campaign Delta'],
-        ];
-
-        yield 'search by NOT one project' => [
-            'searchTerm'          => '!project:"Project Two"',
-            'expectedEntities'    => ['Campaign Gamma', 'Campaign Delta'],
-            'unexpectedEntities'  => ['Campaign Alpha', 'Campaign Beta'],
-        ];
-
-        yield 'search by two projects with AND' => [
-            'searchTerm'          => 'project:"Project Two" AND project:"Project Three"',
-            'expectedEntities'    => ['Campaign Beta'],
-            'unexpectedEntities'  => ['Campaign Alpha', 'Campaign Gamma', 'Campaign Delta'],
-        ];
-
-        yield 'search by two projects with NOT AND' => [
-            'searchTerm'          => '!project:"Project Two" AND !project:"Project Three"',
-            'expectedEntities'    => ['Campaign Gamma', 'Campaign Delta'],
-            'unexpectedEntities'  => ['Campaign Alpha', 'Campaign Beta'],
-        ];
-
-        yield 'search by two projects with OR' => [
-            'searchTerm'          => 'project:"Project Two" OR project:"Project Three"',
+        yield 'search by two projects' => [
+            'searchTerm'          => 'project:"Project One" OR project:"Project Three"',
             'expectedEntities'    => ['Campaign Alpha', 'Campaign Beta'],
             'unexpectedEntities'  => ['Campaign Gamma', 'Campaign Delta'],
         ];
 
-        yield 'search by two projects with NOT OR' => [
-            'searchTerm'          => '!project:"Project Two" OR !project:"Project Three"',
-            'expectedEntities'    => ['Campaign Alpha', 'Campaign Gamma', 'Campaign Delta'],
-            'unexpectedEntities'  => ['Campaign Beta'],
+        yield 'search by project with AND operator' => [
+            'searchTerm'          => 'project:"Project Two" AND campaign:"Alpha"',
+            'expectedEntities'    => ['Campaign Alpha'],
+            'unexpectedEntities'  => ['Campaign Beta', 'Campaign Gamma', 'Campaign Delta'],
+        ];
+
+        yield 'search by project with exclusion' => [
+            'searchTerm'          => 'project:"Project Two" NOT campaign:"Beta"',
+            'expectedEntities'    => ['Campaign Alpha'],
+            'unexpectedEntities'  => ['Campaign Beta', 'Campaign Gamma', 'Campaign Delta'],
         ];
     }
 

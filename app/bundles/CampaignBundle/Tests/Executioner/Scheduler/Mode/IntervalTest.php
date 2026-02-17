@@ -18,9 +18,10 @@ use Psr\Log\NullLogger;
 class IntervalTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @dataProvider provideBatchReschedulingData
+     *
      * @param array<int> $restrictedDays
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideBatchReschedulingData')]
     public function testBatchRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, string $localTimezone = 'UTC', ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = []): void
     {
         $contact1 = $this->createMock(Lead::class);
@@ -68,7 +69,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string, array<mixed>>
      */
-    public static function provideBatchReschedulingData(): array
+    public function provideBatchReschedulingData(): array
     {
         return [
             'test on specified hour'                     => [new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')],
@@ -106,9 +107,10 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider provideReschedulingData
+     *
      * @param array<int> $restrictedDays
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideReschedulingData')]
     public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
     {
         $event = $this->createMock(Event::class);
@@ -478,8 +480,10 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     private function getInterval(): Interval
     {
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('getDefaultTimezone')
-            ->willReturn('America/New_York');
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(
+                fn ($param, $default) => 'America/New_York'
+            );
 
         return new Interval(new NullLogger(), $coreParametersHelper);
     }

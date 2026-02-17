@@ -3,63 +3,45 @@
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\CampaignEvent;
-use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
-use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
-use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignEventSubscriber;
-use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignEventSubscriberTest extends TestCase
 {
     private CampaignEventSubscriber $fixture;
 
-    private EventRepository|MockObject $eventRepo;
+    /**
+     * @var EventRepository|MockObject
+     */
+    private $eventRepo;
 
-    private MockObject|CampaignModel $campaignModelMock;
+    /**
+     * @var NotificationHelper|MockObject
+     */
+    private $notificationHelper;
 
-    private MockObject|LeadEventLogRepository $leadEventLogRepositoryMock;
-
-    private MockObject|EventDispatcherInterface $eventDispatcherMock;
-
-    private DateHelper $dateHelper;
+    /**
+     * @var CampaignRepository|MockObject
+     */
+    private $campaignRepository;
 
     public function setUp(): void
     {
-        $this->eventRepo                  = $this->createMock(EventRepository::class);
-        $this->campaignModelMock          = $this->createMock(CampaignModel::class);
-        $this->leadEventLogRepositoryMock = $this->createMock(LeadEventLogRepository::class);
-        $this->eventDispatcherMock        = $this->createMock(EventDispatcherInterface::class);
-        $this->dateHelper                 = new DateHelper(
-            'F j, Y g:i a T',
-            'D, M d',
-            'F j, Y',
-            'g:i a',
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(CoreParametersHelper::class)
-        );
-        $this->fixture                    = new CampaignEventSubscriber(
-            $this->eventRepo,
-            $this->campaignModelMock,
-            $this->leadEventLogRepositoryMock,
-            $this->eventDispatcherMock,
-            $this->dateHelper
-        );
+        $this->eventRepo          = $this->createMock(EventRepository::class);
+        $this->notificationHelper = $this->createMock(NotificationHelper::class);
+        $this->campaignRepository = $this->createMock(CampaignRepository::class);
+        $this->fixture            = new CampaignEventSubscriber($this->eventRepo, $this->notificationHelper, $this->campaignRepository);
     }
 
     public function testEventFailedCountsGetResetOnCampaignPublish(): void
@@ -103,15 +85,7 @@ class CampaignEventSubscriberTest extends TestCase
 
     public function testFailedEventGeneratesANotification(): void
     {
-        $this->leadEventLogRepositoryMock->expects($this->once())
-            ->method('isLastFailed')
-            ->with(42, 42)
-            ->willReturn(false);
-
         $mockLead     = $this->createMock(Lead::class);
-        $mockLead->expects($this->any())
-            ->method('getId')
-            ->willReturn(42);
         $mockCampaign = $this->createMock(Campaign::class);
         $mockCampaign->expects($this->once())
             ->method('getLeads')
@@ -121,23 +95,15 @@ class CampaignEventSubscriberTest extends TestCase
         $mockEvent->expects($this->once())
             ->method('getCampaign')
             ->willReturn($mockCampaign);
-        $mockEvent->expects($this->any())
-            ->method('getId')
-            ->willReturn(42);
 
         $mockEventLog = $this->createMock(LeadEventLog::class);
         $mockEventLog->expects($this->once())
             ->method('getEvent')
             ->willReturn($mockEvent);
 
-        $mockEventLog->expects($this->any())
+        $mockEventLog->expects($this->once())
             ->method('getLead')
             ->willReturn($mockLead);
-
-        $this->eventRepo->expects($this->once())
-            ->method('getFailedCountLeadEvent')
-            ->withAnyParameters()
-            ->willReturn(105);
 
         // Set failed count to 5% of getLeads()->count()
         $this->eventRepo->expects($this->once())
@@ -145,14 +111,9 @@ class CampaignEventSubscriberTest extends TestCase
             ->with($mockEvent)
             ->willReturn(5);
 
-        $this->eventDispatcherMock->expects($this->once())
-            ->method('hasListeners')
-            ->with(CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY)
-            ->willReturn(true);
-
-        $this->eventDispatcherMock->expects($this->once())
-            ->method('dispatch')
-            ->willReturn(new NotifyOfFailureEvent($mockLead, $mockEvent));
+        $this->notificationHelper->expects($this->once())
+            ->method('notifyOfFailure')
+            ->with($mockLead, $mockEvent);
 
         $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
 
@@ -161,15 +122,7 @@ class CampaignEventSubscriberTest extends TestCase
 
     public function testFailedCountOverDisableCampaignThresholdDisablesTheCampaign(): void
     {
-        $this->leadEventLogRepositoryMock->expects($this->once())
-            ->method('isLastFailed')
-            ->with(42, 42)
-            ->willReturn(false);
-
         $mockLead     = $this->createMock(Lead::class);
-        $mockLead->expects($this->any())
-            ->method('getId')
-            ->willReturn(42);
         $mockCampaign = $this->createMock(Campaign::class);
         $mockCampaign->expects($this->once())
             ->method('isPublished')
@@ -183,174 +136,40 @@ class CampaignEventSubscriberTest extends TestCase
         $mockEvent->expects($this->once())
             ->method('getCampaign')
             ->willReturn($mockCampaign);
-        $mockEvent->expects($this->any())
-            ->method('getId')
-            ->willReturn(42);
 
         $mockEventLog = $this->createMock(LeadEventLog::class);
         $mockEventLog->expects($this->once())
             ->method('getEvent')
             ->willReturn($mockEvent);
 
-        $mockEventLog->expects($this->any())
+        $mockEventLog->expects($this->once())
             ->method('getLead')
             ->willReturn($mockLead);
 
-        $this->eventRepo->expects($this->once())
-            ->method('getFailedCountLeadEvent')
-            ->withAnyParameters()
-            ->willReturn(200);
-
-        // Set failed count to 35% of getLeads()->count()
+        // Set failed count to 10% of getLeads()->count()
         $this->eventRepo->expects($this->once())
             ->method('incrementFailedCount')
             ->with($mockEvent)
-            ->willReturn(35);
+            ->willReturn(10);
 
-        $this->eventDispatcherMock->expects($this->exactly(2))
-            ->method('hasListeners')
-            ->willReturnMap([
-                [CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY, true],
-                [CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY, true],
-            ]);
+        $this->notificationHelper->expects($this->once())
+            ->method('notifyOfFailure')
+            ->with($mockLead, $mockEvent);
 
-        $this->eventDispatcherMock->expects($this->exactly(2))
-            ->method('dispatch')
-            ->willReturnOnConsecutiveCalls(
-                new NotifyOfFailureEvent($mockLead, $mockEvent),
-                new NotifyOfUnpublishEvent($mockEvent)
-            );
-
-        $this->campaignModelMock->expects($this->once())
-            ->method('transactionalCampaignUnPublish')
-            ->with($mockCampaign);
+        $this->notificationHelper->expects($this->once())
+            ->method('notifyOfUnpublish')
+            ->with($mockEvent);
 
         $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
 
-        $this->fixture->onEventFailed($failedEvent);
-    }
+        $this->campaignRepository->expects($this->once())
+            ->method('saveEntity')
+            ->with($mockCampaign);
 
-    public function testOnEventExecutedDecreaseTheCounter(): void
-    {
-        $mockEventLog = $this->createMock(LeadEventLog::class);
+        $mockCampaign->expects($this->once())
+            ->method('setIsPublished')
+            ->with(false);
 
-        $lead = new Lead();
-        $lead->setId(42);
-
-        $eventMock = $this->createMock(Event::class);
-        $eventMock->expects($this->any())
-            ->method('getId')
-            ->willReturn(42);
-
-        $mockEventLog->expects($this->once())
-            ->method('getEvent')
-            ->willReturn($eventMock);
-
-        $mockEventLog->expects($this->any())
-            ->method('getLead')
-            ->willReturn($lead);
-
-        $this->leadEventLogRepositoryMock->expects($this->once())
-            ->method('isLastFailed')
-            ->with(42, 42)
-            ->willReturn(true);
-
-        $executedEvent = new ExecutedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
-
-        $this->eventRepo->expects($this->once())
-            ->method('getFailedCountLeadEvent')
-            ->withAnyParameters()
-            ->willReturn(101);
-
-        $this->eventRepo->expects($this->once())
-            ->method('decreaseFailedCount')
-            ->with($eventMock);
-
-        $this->fixture->onEventExecuted($executedEvent);
-    }
-
-    public function testOnEventExecutedForDeletedContacts(): void
-    {
-        $mockEventLog = $this->createMock(LeadEventLog::class);
-
-        $lead            = new Lead();
-        $lead->deletedId = 10;
-
-        $eventMock = $this->createMock(Event::class);
-        $eventMock->expects($this->any())
-            ->method('getId')
-            ->willReturn(1);
-
-        $mockEventLog->expects($this->once())
-            ->method('getEvent')
-            ->willReturn($eventMock);
-
-        $mockEventLog->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead);
-
-        $this->leadEventLogRepositoryMock->expects($this->once())
-            ->method('isLastFailed')
-            ->with($lead->deletedId, 1)
-            ->willReturn(true);
-
-        $executedEvent = new ExecutedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
-
-        $this->eventRepo->expects($this->once())
-            ->method('getFailedCountLeadEvent')
-            ->with($lead->deletedId, 1)
-            ->willReturn(101);
-
-        $this->eventRepo->expects($this->once())
-            ->method('decreaseFailedCount')
-            ->with($eventMock);
-
-        $this->fixture->onEventExecuted($executedEvent);
-    }
-
-    public function testOnFailedEventGeneratesOneUnPublishNotificationAndEmail(): void
-    {
-        // Set up mocks
-        $leadEventLogMock = $this->createMock(LeadEventLog::class);
-        $eventMock        = $this->createMock(Event::class);
-        $leadEventLogMock->expects($this->once())->method('getEvent')->willReturn($eventMock);
-        $leadMock = $this->createMock(Lead::class);
-        $leadEventLogMock->expects($this->once())->method('getLead')->willReturn($leadMock);
-
-        // Set up campaign mock with isPublished returning false to simulate campaign already unpublished
-        $campaignMock = $this->createMock(Campaign::class);
-        $campaignMock->expects($this->once())->method('isPublished')->willReturn(false);
-        $eventMock->expects($this->any())->method('getCampaign')->willReturn($campaignMock);
-
-        // Mock behavior for threshold calculations
-        $leadMock->expects($this->any())->method('getId')->willReturn(1);
-        $eventMock->expects($this->any())->method('getId')->willReturn(1);
-        $this->eventRepo->expects($this->once())->method('getFailedCountLeadEvent')
-            ->with(1, 1)->willReturn(101);
-        $this->leadEventLogRepositoryMock->expects($this->once())->method('isLastFailed')
-            ->with(1, 1)->willReturn(false);
-        $this->eventRepo->expects($this->once())->method('incrementFailedCount')
-            ->with($eventMock)->willReturn(35);
-
-        // Set up leads collection
-        $totalLeads = array_fill(0, 100, new Lead());
-        $campaignMock->expects($this->once())->method('getLeads')->willReturn(new ArrayCollection($totalLeads));
-
-        // Expect failure notification to be dispatched
-        $this->eventDispatcherMock->expects($this->once())
-            ->method('hasListeners')
-            ->with(CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY)
-            ->willReturn(true);
-
-        $this->eventDispatcherMock->expects($this->once())
-            ->method('dispatch')
-            ->willReturn(new NotifyOfFailureEvent($leadMock, $eventMock));
-
-        // Unpublish notification should not be dispatched because campaign is already unpublished
-        $this->campaignModelMock->expects($this->never())->method('transactionalCampaignUnPublish');
-
-        // Execute the test
-        $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $leadEventLogMock);
         $this->fixture->onEventFailed($failedEvent);
     }
 }

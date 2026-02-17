@@ -4,6 +4,7 @@ namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -23,31 +24,31 @@ class InactiveContactFinder
         private LeadRepository $leadRepository,
         private CampaignLeadRepository $campaignLeadRepository,
         private LoggerInterface $logger,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
     /**
+     * @param int $campaignId
+     *
+     * @return ArrayCollection
+     *
      * @throws NoContactsFoundException
      */
-    public function getContacts(
-        int $campaignId,
-        Event $decisionEvent,
-        ContactLimiter $limiter,
-        bool $ignoreParentEvent = false,
-    ): ArrayCollection {
+    public function getContacts($campaignId, Event $decisionEvent, ContactLimiter $limiter)
+    {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             // Limit was reached but do not trigger the NoContactsFoundException
             return new ArrayCollection();
         }
 
         // Get list of all campaign leads
-        $decisionParentEvent            = $ignoreParentEvent ? null : $decisionEvent->getParent();
+        $decisionParentEvent            = $decisionEvent->getParent();
         $this->campaignMemberDatesAdded = $this->campaignLeadRepository->getInactiveContacts(
             $campaignId,
             $decisionEvent->getId(),
             ($decisionParentEvent) ? $decisionParentEvent->getId() : null,
-            $limiter,
-            $ignoreParentEvent
+            $limiter
         );
 
         if (empty($this->campaignMemberDatesAdded)) {
@@ -94,6 +95,14 @@ class InactiveContactFinder
      */
     public function clear(Collection $contacts): void
     {
-        $this->leadRepository->detachEntities($contacts->toArray());
+        $unitOfWork  = $this->entityManager->getUnitOfWork();
+        $identityMap = $unitOfWork->getIdentityMap();
+
+        // Clear Lead entities that might still be in the identity map
+        if (isset($identityMap[Lead::class])) {
+            foreach ($identityMap[Lead::class] as $entity) {
+                $this->entityManager->detach($entity);
+            }
+        }
     }
 }

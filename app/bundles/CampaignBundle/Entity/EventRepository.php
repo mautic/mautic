@@ -2,12 +2,8 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\EmailBundle\Entity\Email;
 
 /**
  * @extends CommonRepository<Event>
@@ -95,6 +91,7 @@ class EventRepository extends CommonRepository
                     ),
                     $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
+                    $q->expr()->isNull('e.deleted'),
                     $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
                     $q->expr()->eq('l.manuallyRemoved', 0),
                     $q->expr()->notIn('e.id', $eventQb->getDQL()),
@@ -147,37 +144,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Fetch Email entities assigned to a campaign via email events.
-     *
-     * @return Email[]
-     */
-    public function getCampaignEmailEvents(int $campaignId): array
-    {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-
-        return $qb
-            ->select('DISTINCT em')
-            ->from(Event::class, 'e')
-            ->innerJoin(
-                Email::class,
-                'em',
-                Expr\Join::WITH,
-                $qb->expr()->eq('em.id', 'e.channelId')
-            )
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('e.campaign', ':campaignId'),
-                    $qb->expr()->eq('e.channel', ':channel'),
-                    $qb->expr()->isNull('e.deleted')
-                )
-            )
-            ->setParameter('campaignId', $campaignId)
-            ->setParameter('channel', Event::CHANNEL_EMAIL)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * @param int  $campaignId
      * @param bool $ignoreDeleted
      *
@@ -191,7 +157,7 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.order', Order::Ascending->value);
+            ->orderBy('e.order', \Doctrine\Common\Collections\Criteria::ASC);
 
         if ($ignoreDeleted) {
             $q->andWhere($q->expr()->isNull('e.deleted'));
@@ -304,84 +270,19 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Sets events as deleted and updates their redirect_event_id.
-     * Also handles redirection chain updates for other events that point to the deleted events.
-     *
-     * @param array<int, array{id: int, redirectEvent: ?int}> $eventData Array of event data
+     * @param string[] $eventIds
      */
-    public function setEventsAsDeletedWithRedirect(array $eventData): void
+    public function setEventsAsDeleted(array $eventIds): void
     {
-        if (empty($eventData)) {
-            return;
-        }
-
-        $dateTime = (new \DateTime())->format(DateTimeHelper::FORMAT_DB);
-        $conn     = $this->getEntityManager()->getConnection();
-
-        // First, get all events current state in one query
-        $eventIds = array_column($eventData, 'id');
-        $qbSelect = $conn->createQueryBuilder();
-        $qbSelect->select('id, deleted')
-            ->from(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
-            ->where($qbSelect->expr()->in('id', ':eventIds'))
-            ->setParameter('eventIds', $eventIds, ArrayParameterType::INTEGER);
-
-        $eventStates = [];
-        foreach ($qbSelect->executeQuery()->fetchAllAssociative() as $row) {
-            $eventStates[$row['id']] = $row['deleted'];
-        }
-
-        foreach ($eventData as $eventId => $eventInfo) {
-            $eventId       = $eventInfo['id'];
-            $redirectEvent = $eventInfo['redirectEvent'] ?? null;
-
-            if (!empty($eventStates[$eventId])) {
-                unset($eventData[$eventId]);
-                continue;
-            }
-
-            $qb = $conn->createQueryBuilder();
-            $qb->update(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
-                ->set('deleted', ':deleted')
-                ->setParameter('deleted', $dateTime);
-
-            if (null !== $redirectEvent) {
-                $qb->set('redirect_event_id', ':redirectEvent')
-                   ->setParameter('redirectEvent', $redirectEvent);
-            }
-
-            $qb->where($qb->expr()->eq('id', ':eventId'))
-               ->setParameter('eventId', $eventId)
-               ->executeStatement();
-        }
-
-        if (!empty($eventData)) {
-            $this->updateRedirectionChains($eventData);
-        }
-    }
-
-    /**
-     * Update redirection chains for other events that point to deleted events.
-     * For each deleted event, find all events that redirect to it and update them
-     * to redirect to the deleted event's redirect target.
-     *
-     * @param array<int, array{id: int, redirectEvent: ?int}> $eventData Array of event data
-     */
-    private function updateRedirectionChains(array $eventData): void
-    {
-        $conn = $this->getEntityManager()->getConnection();
-
-        foreach ($eventData as $eventInfo) {
-            $redirectTarget = $eventInfo['redirectEvent'] ?? null;
-
-            $updateQb = $conn->createQueryBuilder();
-            $updateQb->update(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
-                ->set('redirect_event_id', ':newRedirectId')
-                ->where('redirect_event_id = :deletedEventId')
-                ->setParameter('newRedirectId', $redirectTarget)
-                ->setParameter('deletedEventId', $eventInfo['id']);
-            $updateQb->executeStatement();
-        }
+        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
+        $qb       = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
+            ->set('deleted', ':deleted')
+            ->setParameter('deleted', $dateTime)
+            ->where(
+                $qb->expr()->in('id', $eventIds)
+            )
+            ->executeStatement();
     }
 
     public function getTableAlias(): string
@@ -397,6 +298,32 @@ class EventRepository extends CommonRepository
     public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
+    }
+
+    /**
+     * @param string $eventType
+     */
+    public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
+    {
+        $q = $this->getEntityManager()->createQueryBuilder();
+
+        $q->select('e')
+            ->from(Event::class, 'e', 'e.id')
+            ->where('e.channel = :channel')
+            ->setParameter('channel', $channel);
+
+        if ($campaignId) {
+            $q->andWhere('IDENTITY(e.campaign) = :campaignId')
+                ->setParameter('campaignId', $campaignId)
+                ->orderBy('e.order');
+        }
+
+        if ($eventType) {
+            $q->andWhere('e.eventType', ':eventType')
+            ->setParameter('eventType', $eventType);
+        }
+
+        return $q->getQuery()->getResult();
     }
 
     /**
@@ -468,23 +395,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Update the failed count using DBAL to avoid
-     * race conditions and deadlocks.
-     */
-    public function decreaseFailedCount(Event $event): void
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
-            ->set('failed_count', 'failed_count - 1')
-            ->where($q->expr()->eq('id', ':id'))
-            ->andWhere($q->expr()->gt('failed_count', 0))
-            ->setParameter('id', $event->getId());
-
-        $q->executeStatement();
-    }
-
-    /**
      * Get the up to date failed count
      * for the given Event.
      */
@@ -515,21 +425,5 @@ class EventRepository extends CommonRepository
             ->setParameter('campaignId', $campaign->getId());
 
         $q->executeStatement();
-    }
-
-    /**
-     * Get the count of failed event for Lead/Event.
-     */
-    public function getFailedCountLeadEvent(int $leadId, int $eventId): int
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('count(le.id)')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
-            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
-            ->where('le.lead_id = :leadId')
-            ->andWhere('le.event_id = :eventId')
-            ->setParameters(['leadId' => $leadId, 'eventId' => $eventId]);
-
-        return (int) $q->executeQuery()->fetchOne();
     }
 }

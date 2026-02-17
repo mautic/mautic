@@ -12,7 +12,7 @@
     <div class="bundle-form-header mb-10">
         <h3>{{ eventHeader }}</h3>
         {% if eventDescription is defined %}
-          <h6 class="text-secondary">{{ eventDescription|purify }}</h6>
+          <h6 class="text-muted">{{ eventDescription|purify }}</h6>
         {% endif %}
     </div>
 
@@ -25,7 +25,27 @@
 
     {% if form.triggerMode is defined %}
     <div class="mb-lg{% if hideTriggerMode %} hide{% endif %}">
-        {{ form_row(form.triggerMode) }}
+        <div class="form-group">
+            <label class="control-label" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.campaign.form.type.help'|trans }}">
+                {{ form.triggerMode.vars.label|trans }} <i class="ri-question-line"></i>
+            </label>
+
+            <div class="choice-wrapper">
+                <div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm btn-block" data-toggle="buttons">
+                    {% for child in form.triggerMode %}
+                        <label class="btn{% if child.vars.checked %} active{% endif %} btn-block mt-0 list-group-item">
+                            {{ form_widget(child, {'attr': {'onchange': 'Mautic.campaignToggleTimeframes();'}}) }}
+                            <span class="list-group-item-text btn-block text-left">
+                                {{ child.vars.label|trans }}
+                                {% if child.vars.value == 'optimized' %}
+                                 <i class="ri-bard-line ml-5"></i>
+                                {% endif %}
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
         <div{% if ('date' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerDate">
             {{ form_row(form.triggerDate) }}
@@ -111,6 +131,6 @@
         </div>
     </div>
     {% endif %}
-    <input type="hidden" name="submit" value="1">
+
     {{ form_end(form) }}
 </div>

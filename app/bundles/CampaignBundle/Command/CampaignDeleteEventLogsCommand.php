@@ -7,19 +7,17 @@ namespace Mautic\CampaignBundle\Command;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(
-    name: CampaignDeleteEventLogsCommand::COMMAND_NAME,
-    description: 'Delete campaign event logs'
-)]
 class CampaignDeleteEventLogsCommand extends Command
 {
+    /**
+     * @var string
+     */
     public const COMMAND_NAME = 'mautic:campaign:delete-event-logs';
 
     public function __construct(private LeadEventLogRepository $leadEventLogRepository, private CampaignModel $campaignModel, private EventModel $eventModel)
@@ -29,7 +27,8 @@ class CampaignDeleteEventLogsCommand extends Command
 
     protected function configure(): void
     {
-        $this
+        $this->setName(self::COMMAND_NAME)
+            ->setDescription('Delete campaign event logs')
             ->addArgument(
                 'campaign_event_ids',
                 InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
@@ -49,16 +48,15 @@ class CampaignDeleteEventLogsCommand extends Command
         $campaignId = (int) $input->getOption('campaign-id');
 
         if (!empty($campaignId)) {
-            // For entire campaign deletion, remove both events and logs
             $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
             $this->eventModel->deleteEventsByCampaignId($campaignId);
             $campaign = $this->campaignModel->getEntity($campaignId);
             $this->campaignModel->deleteCampaign($campaign);
         } elseif (!empty($eventIds)) {
-            // For individual event deletion, just soft-delete the event but keep logs
+            $this->leadEventLogRepository->removeEventLogs($eventIds);
             $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 
-        return Command::SUCCESS;
+        return 0;
     }
 }

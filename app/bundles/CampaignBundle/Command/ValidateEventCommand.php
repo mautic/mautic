@@ -5,17 +5,12 @@ namespace Mautic\CampaignBundle\Command;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(
-    name: 'mautic:campaigns:validate',
-    description: 'Validate if a contact has been inactive for a decision and execute events if so.'
-)]
 class ValidateEventCommand extends Command
 {
     use WriteCountTrait;
@@ -31,6 +26,7 @@ class ValidateEventCommand extends Command
     protected function configure()
     {
         $this
+            ->setName('mautic:campaigns:validate')
             ->addOption(
                 '--decision-id',
                 null,
@@ -62,15 +58,6 @@ class ValidateEventCommand extends Command
 
         $decisionId = $input->getOption('decision-id');
         $contactId  = $input->getOption('contact-id');
-
-        if (is_numeric($decisionId)) {
-            $decisionId = (int) $decisionId;
-        }
-
-        if (is_numeric($contactId)) {
-            $contactId = (int) $contactId;
-        }
-
         $contactIds = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
 
         if (!$contactIds && !$contactId) {
@@ -90,4 +77,6 @@ class ValidateEventCommand extends Command
 
         return Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';
 }

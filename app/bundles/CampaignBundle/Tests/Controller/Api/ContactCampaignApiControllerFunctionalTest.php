@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
-use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
+use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCase
+class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTest
 {
     public function testContactCampaignApiEndpoints(): void
     {

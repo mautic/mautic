@@ -93,16 +93,18 @@ class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetCountsForPendingContactsWithEventLogsWithNonMatchingRotations(): void
     {
-        $campaign   = $this->createCampaign();
-        $logOne     = $this->createEventLog($campaign);
-        $leadOne    = $logOne->getLead();
-        $eventOne   = $logOne->getEvent();
-        $logTwo     = $this->createEventLog($campaign, $campaignLeadTwo);
-        $leadTwo    = $logTwo->getLead();
-        $eventTwo   = $logTwo->getEvent();
-        $logThree   = $this->createEventLog($campaign);
-        $leadThree  = $logThree->getLead();
-        $eventThree = $logThree->getEvent();
+        $campaign        = $this->createCampaign();
+        $logOne          = $this->createEventLog($campaign);
+        $leadOne         = $logOne->getLead();
+        $eventOne        = $logOne->getEvent();
+        $campaignLeadTwo = null;
+        $logTwo          = $this->createEventLog($campaign, $campaignLeadTwo);
+        $leadTwo         = $logTwo->getLead();
+        $eventTwo        = $logTwo->getEvent();
+        $logThree        = $this->createEventLog($campaign);
+        $leadThree       = $logThree->getLead();
+        $eventThree      = $logThree->getEvent();
+        // Increment rotation to create a mismatch between campaign_lead.rotation and lead_event_log.rotation
         $campaignLeadTwo->setRotation($logTwo->getRotation() + 1);
         $this->em->flush();
 
@@ -117,31 +119,6 @@ class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
             $result,
             'Only lead two should match as it is the only one who has a non-matching rotation.'
         );
-    }
-
-    public function testGetCampaignPublishAndVersionData(): void
-    {
-        $campaign = $this->createCampaign();
-        $this->em->flush();
-
-        $result = $this->repository->getCampaignPublishAndVersionData($campaign->getId());
-
-        Assert::assertIsArray($result);
-        Assert::assertArrayHasKey('is_published', $result);
-        Assert::assertArrayHasKey('version', $result);
-        Assert::assertEquals('1', $result['is_published']);
-        // Version should be a string representation of an integer
-        Assert::assertIsString($result['version']);
-        Assert::assertGreaterThanOrEqual('1', $result['version']);
-    }
-
-    public function testGetCampaignPublishAndVersionDataWithNonExistentCampaign(): void
-    {
-        $nonExistentId = 99999;
-
-        $result = $this->repository->getCampaignPublishAndVersionData($nonExistentId);
-
-        Assert::assertEquals([], $result);
     }
 
     private function createLead(Campaign $campaign, ?CampaignLead &$campaignLead = null): Lead // @phpstan-ignore parameterByRef.unusedType

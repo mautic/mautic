@@ -44,7 +44,7 @@ class CampaignEventJumpToEventType extends AbstractType
         $builder->get('jumpToEvent')->resetViewTransformers();
     }
 
-    public function getBlockPrefix(): string
+    public function getBlockPrefix()
     {
         return 'campaignevent_jump_to_event';
     }

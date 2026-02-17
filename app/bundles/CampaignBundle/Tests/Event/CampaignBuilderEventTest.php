@@ -129,15 +129,17 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
     protected function initEvent()
     {
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function () {
+            ->will($this->returnCallback(function () {
                 $args = func_get_args();
 
                 return $args[0];
-            });
+            }));
 
         return new CampaignBuilderEvent($translator);
     }
