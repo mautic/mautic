@@ -67,7 +67,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'cached_html'          => $form->getCachedHtml(),
             'post_action'          => $form->getPostAction(),
             'template'             => $form->getTemplate(),
-            'form_type'            => $form->getFormType(),
+            'form_type'            => $form->getFormType(), // @phpstan-ignore-line
             'render_style'         => $form->getRenderStyle(),
             'post_action_property' => $form->getPostActionProperty(),
             'form_attr'            => $form->getFormAttributes(),

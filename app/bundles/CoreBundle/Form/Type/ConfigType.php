@@ -638,6 +638,25 @@ class ConfigType extends AbstractType
             )->addViewTransformer($arrayLinebreakTransformer)
         );
 
+        if ($this->coreParametersHelper->get('validate_remote_domains')) {
+            $builder->add(
+                $builder->create(
+                    'allowed_remote_domains',
+                    TextareaType::class,
+                    [
+                        'label'      => 'mautic.core.config.allowed.remote.domains',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.core.config.allowed.remote.domains.tooltip',
+                            'rows'    => 8,
+                        ],
+                        'required'   => false,
+                    ]
+                )->addViewTransformer($arrayLinebreakTransformer)
+            );
+        }
+
         $builder->add(
             'headers_sts',
             YesNoButtonGroupType::class,

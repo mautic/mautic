@@ -331,6 +331,10 @@ class PageType extends AbstractType
             ]
         );
 
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
         $extraButtons['pre_extra_buttons'] = [
             [
                 'name'  => 'builder',

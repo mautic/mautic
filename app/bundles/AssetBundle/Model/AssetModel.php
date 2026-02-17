@@ -138,6 +138,13 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
 
+        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
+            return;
+        }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
+
         // Download triggered by lead
         if (empty($systemEntry)) {
             // check for any clickthrough info
