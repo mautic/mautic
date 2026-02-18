@@ -114,5 +114,4 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         // something else such as dynamic content
         return false;
     }
-
 }
