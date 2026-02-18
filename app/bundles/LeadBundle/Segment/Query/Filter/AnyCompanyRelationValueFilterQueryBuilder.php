@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-class AnyCompanyRelationValueFilterQueryBuilder extends PrimaryCompanyRelationValueFilterQueryBuilder
+final class AnyCompanyRelationValueFilterQueryBuilder extends PrimaryCompanyRelationValueFilterQueryBuilder
 {
     public static function getServiceId(): string
     {

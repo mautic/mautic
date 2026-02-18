@@ -115,10 +115,4 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         return false;
     }
 
-    public function isForAjaxFilterFormLoading(): bool
-    {
-        $request = $this->getRequest();
-
-        return null !== $request && 'loadSegmentFilterForm' === $request->attributes->get('action');
-    }
 }
