@@ -4,43 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
-use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
-use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\RandomParameterName;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
+class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTest
 {
-    use MockedConnectionTrait;
-
-    /**
-     * @var MockObject|RandomParameterName
-     */
-    private MockObject $randomParameter;
-
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
-
-    /**
-     * @var Connection&MockObject
-     */
-    private MockObject $connectionMock;
-
     private PrimaryCompanyRelationValueFilterQueryBuilder $queryBuilder;
 
     protected function setUp(): void
     {
-        $this->randomParameter = $this->createMock(RandomParameterName::class);
-        $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock  = $this->getMockedConnection();
+        parent::setUp();
 
         $this->queryBuilder = new PrimaryCompanyRelationValueFilterQueryBuilder(
             $this->randomParameter,
@@ -58,9 +31,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAllowsMissingCompanyForEmptyOperator(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -95,9 +66,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAppliesNotEmptyOperatorCondition(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -119,9 +88,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAppliesNotEqualOperatorWithNullCondition(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -141,9 +108,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAppliesStartsWithOperator(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -161,9 +126,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAppliesGtOperator(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -181,9 +144,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAppliesNotInOperatorAndMissingRelationHandling(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -208,9 +169,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryAppliesNegatedMultiselectOperator(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -231,9 +190,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQuerySupportsEqualOperator(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -252,9 +209,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
 
     public function testApplyQueryThrowsOnUnsupportedOperator(): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder = $this->createQueryBuilder();
 
         $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
             'par1',
@@ -268,78 +223,5 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends TestCase
         $this->expectExceptionMessage('Unsupported filter operator "unsupported".');
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
-    }
-
-    /**
-     * @param array<string, mixed> $batch
-     */
-    private function createFilter(string $operator, mixed $value, array $batch = []): ContactSegmentFilter
-    {
-        return new class($operator, $value, $batch) extends ContactSegmentFilter {
-            /**
-             * @param array<string, mixed> $batch
-             */
-            public function __construct(
-                private string $operator,
-                private mixed $value,
-                private array $batch,
-            ) {
-            }
-
-            public function getOperator(): string
-            {
-                return $this->operator;
-            }
-
-            public function getParameterValue(): mixed
-            {
-                return $this->value;
-            }
-
-            /**
-             * @return array<string>|string
-             */
-            public function getParameterHolder(mixed $argument): array|string
-            {
-                if (is_array($argument)) {
-                    return array_map(
-                        static fn ($value) => ':'.$value,
-                        $argument
-                    );
-                }
-
-                return ':'.$argument;
-            }
-
-            public function getField(): string
-            {
-                return 'company_name';
-            }
-
-            public function getTable(): string
-            {
-                return MAUTIC_TABLE_PREFIX.'companies';
-            }
-
-            public function getRelationJoinTable(): string
-            {
-                return MAUTIC_TABLE_PREFIX.'companies_leads';
-            }
-
-            public function getRelationJoinTableField(): string
-            {
-                return 'company_id';
-            }
-
-            public function getGlue(): string
-            {
-                return 'and';
-            }
-
-            public function getBatchLimiters(): array
-            {
-                return $this->batch;
-            }
-        };
     }
 }

@@ -78,6 +78,42 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    private function findLeadByReference(string $reference): Lead
+    {
+        /** @var Lead $lead */
+        $lead = $this->getReference($reference);
+        $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        \assert($lead instanceof Lead);
+
+        return $lead;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     */
+    private function createSegment(array $filters, string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name)
+            ->setPublicName($name)
+            ->setAlias($alias)
+            ->setFilters($filters);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function getSegmentLeadIds(LeadList $segment): array
+    {
+        $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
+
+        return array_map('intval', array_column($results[$segment->getId()], 'id'));
+    }
+
     public function testSegmentCountIsCorrect(): void
     {
         $this->testSymfonyCommand('mautic:segments:update', ['--env' => 'test']);
@@ -138,10 +174,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentMatchesSecondaryCompanyFields(): void
     {
-        /** @var Lead $lead */
-        $lead = $this->getReference('lead-1');
-        $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
-        \assert($lead instanceof Lead);
+        $lead = $this->findLeadByReference('lead-1');
 
         $company = new Company();
         $company->setDateAdded(new \DateTime());
@@ -157,90 +190,55 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $companyLead->setPrimary(false);
         $this->em->getRepository(CompanyLead::class)->saveEntity($companyLead);
 
-        $segment = new LeadList();
-        $segment->setName('Segment Secondary Company')
-            ->setPublicName('Segment Secondary Company')
-            ->setAlias('segment-secondary-company')
-            ->setFilters([
-                [
-                    'glue'     => 'and',
-                    'type'     => 'text',
-                    'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
-                    'field'    => 'companycity',
-                    'operator' => '=',
-                    'filter'   => 'Codexville',
-                    'display'  => '',
-                ],
-            ]);
-        $this->em->persist($segment);
-        $this->em->flush();
-
-        $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
-        $leadIds = array_map('intval', array_column($results[$segment->getId()], 'id'));
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'companycity',
+                'operator' => '=',
+                'filter'   => 'Codexville',
+                'display'  => '',
+            ],
+        ], 'Segment Secondary Company', 'segment-secondary-company');
+        $leadIds = $this->getSegmentLeadIds($segment);
 
         Assert::assertContains($lead->getId(), $leadIds);
 
-        $primarySegment = new LeadList();
-        $primarySegment->setName('Segment Primary Company')
-            ->setPublicName('Segment Primary Company')
-            ->setAlias('segment-primary-company')
-            ->setFilters([
-                [
-                    'glue'     => 'and',
-                    'type'     => 'text',
-                    'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
-                    'field'    => 'companycity',
-                    'operator' => '=',
-                    'filter'   => 'Codexville',
-                    'display'  => '',
-                ],
-            ]);
-        $this->em->persist($primarySegment);
-        $this->em->flush();
-
-        $primaryResults = $this->contactSegmentService->getNewLeadListLeads($primarySegment, []);
-        $primaryLeadIds = array_map('intval', array_column($primaryResults[$primarySegment->getId()], 'id'));
+        $primarySegment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
+                'field'    => 'companycity',
+                'operator' => '=',
+                'filter'   => 'Codexville',
+                'display'  => '',
+            ],
+        ], 'Segment Primary Company', 'segment-primary-company');
+        $primaryLeadIds = $this->getSegmentLeadIds($primarySegment);
 
         Assert::assertNotContains($lead->getId(), $primaryLeadIds);
     }
 
     public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
     {
-        /** @var Lead $leadWithCompany */
-        $leadWithCompany = $this->getReference('lead-1');
-        $leadWithCompany = $this->em->getRepository(Lead::class)->find($leadWithCompany->getId());
-        \assert($leadWithCompany instanceof Lead);
+        $leadWithCompany              = $this->findLeadByReference('lead-1');
+        $leadWithCompanyMatchingValue = $this->findLeadByReference('lead-0');
+        $leadWithoutCompany           = $this->findLeadByReference('lead-5');
 
-        /** @var Lead $leadWithCompanyMatchingValue */
-        $leadWithCompanyMatchingValue = $this->getReference('lead-0');
-        $leadWithCompanyMatchingValue = $this->em->getRepository(Lead::class)->find($leadWithCompanyMatchingValue->getId());
-        \assert($leadWithCompanyMatchingValue instanceof Lead);
-
-        /** @var Lead $leadWithoutCompany */
-        $leadWithoutCompany = $this->getReference('lead-5');
-        $leadWithoutCompany = $this->em->getRepository(Lead::class)->find($leadWithoutCompany->getId());
-        \assert($leadWithoutCompany instanceof Lead);
-
-        $segment = new LeadList();
-        $segment->setName('Segment Company All Not Like')
-            ->setPublicName('Segment Company All Not Like')
-            ->setAlias('segment-company-all-not-like')
-            ->setFilters([
-                [
-                    'glue'     => 'and',
-                    'type'     => 'text',
-                    'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
-                    'field'    => 'companycity',
-                    'operator' => 'notLike',
-                    'filter'   => 'Boston',
-                    'display'  => '',
-                ],
-            ]);
-        $this->em->persist($segment);
-        $this->em->flush();
-
-        $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
-        $leadIds = array_map('intval', array_column($results[$segment->getId()], 'id'));
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'companycity',
+                'operator' => 'notLike',
+                'filter'   => 'Boston',
+                'display'  => '',
+            ],
+        ], 'Segment Company All Not Like', 'segment-company-all-not-like');
+        $leadIds = $this->getSegmentLeadIds($segment);
 
         Assert::assertContains($leadWithCompany->getId(), $leadIds);
         Assert::assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
