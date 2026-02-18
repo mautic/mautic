@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 use PHPUnit\Framework\Assert;
 
-class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTest
+class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTestCase
 {
     private ComplexRelationValueFilterQueryBuilder $queryBuilder;
 

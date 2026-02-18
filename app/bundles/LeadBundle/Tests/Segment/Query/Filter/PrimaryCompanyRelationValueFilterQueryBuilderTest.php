@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 use PHPUnit\Framework\Assert;
 
-class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTest
+class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTestCase
 {
     private PrimaryCompanyRelationValueFilterQueryBuilder $queryBuilder;
 

@@ -13,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-abstract class AbstractRelationValueFilterQueryBuilderTest extends TestCase
+abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
 {
     use MockedConnectionTrait;
 
