@@ -322,6 +322,23 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
             $event->addChoice('lead', $alias, $fieldOptions);
         }
+
+        $companyTagField = [
+            'label'      => $this->translator->trans('mautic.lead.list.filter.company_tags'),
+            'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+            'object'     => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            'properties' => [
+                'type' => 'tags',
+                'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
+            ],
+            'iconClass' => $this->getSegmentFilterIcon('company_tags'),
+        ];
+
+        $event->addChoice(ContactSegmentFilterCrate::COMPANY_OBJECT, 'company_tags', $companyTagField);
+
+        $companyAllTagField           = $companyTagField;
+        $companyAllTagField['object'] = ContactSegmentFilterCrate::COMPANY_ALL_OBJECT;
+        $event->addChoice(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, 'company_tags', $companyAllTagField);
     }
 
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void

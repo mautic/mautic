@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
@@ -86,6 +87,16 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         \assert($lead instanceof Lead);
 
         return $lead;
+    }
+
+    private function findCompanyByReference(string $reference): Company
+    {
+        /** @var Company $company */
+        $company = $this->getReference($reference);
+        $company = $this->em->getRepository(Company::class)->find($company->getId());
+        \assert($company instanceof Company);
+
+        return $company;
     }
 
     /**
@@ -243,6 +254,83 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         Assert::assertContains($leadWithCompany->getId(), $leadIds);
         Assert::assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
         Assert::assertNotContains($leadWithoutCompany->getId(), $leadIds);
+    }
+
+    public function testSegmentCanCombineContactAndCompanyTags(): void
+    {
+        $leadWithBothTags       = $this->findLeadByReference('lead-1');
+        $leadWithoutCompanyTag  = $this->findLeadByReference('lead-3');
+        $leadWithoutAnyCompany  = $this->findLeadByReference('lead-5');
+        $companyWithEnterprise  = $this->findCompanyByReference('company-1');
+
+        $vipTag        = new Tag('VIP');
+        $enterpriseTag = new Tag('Enterprise');
+
+        $leadWithBothTags->addTag($vipTag);
+        $leadWithoutCompanyTag->addTag($vipTag);
+        $companyWithEnterprise->addTag($enterpriseTag);
+
+        $this->em->persist($leadWithBothTags);
+        $this->em->persist($leadWithoutCompanyTag);
+        $this->em->persist($companyWithEnterprise);
+        $this->em->flush();
+
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'tags',
+                'object'   => ContactSegmentFilterCrate::CONTACT_OBJECT,
+                'field'    => 'tags',
+                'operator' => 'in',
+                'filter'   => [$vipTag->getId()],
+                'display'  => '',
+            ],
+            [
+                'glue'     => 'and',
+                'type'     => 'tags',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'company_tags',
+                'operator' => 'in',
+                'filter'   => [$enterpriseTag->getId()],
+                'display'  => '',
+            ],
+        ], 'Segment Contact and Company Tags', 'segment-contact-company-tags');
+        $leadIds = $this->getSegmentLeadIds($segment);
+
+        Assert::assertContains($leadWithBothTags->getId(), $leadIds);
+        Assert::assertNotContains($leadWithoutCompanyTag->getId(), $leadIds);
+        Assert::assertNotContains($leadWithoutAnyCompany->getId(), $leadIds);
+    }
+
+    public function testCompanyTagsEmptyFilterExcludesContactsWithoutCompanies(): void
+    {
+        $leadWithTaggedCompany   = $this->findLeadByReference('lead-1');
+        $leadWithUntaggedCompany = $this->findLeadByReference('lead-3');
+        $leadWithoutCompany      = $this->findLeadByReference('lead-5');
+        $companyWithTag          = $this->findCompanyByReference('company-1');
+
+        $enterpriseTag = new Tag('Enterprise');
+        $companyWithTag->addTag($enterpriseTag);
+        $this->em->persist($companyWithTag);
+        $this->em->flush();
+
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'tags',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'company_tags',
+                'operator' => 'empty',
+                'filter'   => '',
+                'display'  => '',
+            ],
+        ], 'Segment Company Tags Empty', 'segment-company-tags-empty');
+        $leadIds = $this->getSegmentLeadIds($segment);
+
+        Assert::assertNotContains($leadWithTaggedCompany->getId(), $leadIds);
+        Assert::assertContains($leadWithUntaggedCompany->getId(), $leadIds);
+        Assert::assertNotContains($leadWithoutCompany->getId(), $leadIds);
+        Assert::assertGreaterThan(1, count($leadIds));
     }
 
     public function testSegmentRebuildCommand(): void

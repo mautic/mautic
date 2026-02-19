@@ -252,6 +252,16 @@ return [
                 'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::removeContactAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_companyaddtags' => [
+                'path'       => '/companies/{companyId}/tags/add',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::addTagsAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companyremovetag' => [
+                'path'       => '/companies/{companyId}/tag/{tagId}/remove',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::removeTagAction',
+                'method'     => 'POST',
+            ],
             'mautic_api_fieldsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'fields',
@@ -804,6 +814,14 @@ return [
             ],
             'mautic.lead.query.builder.complex_relation.any_company' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+            ],
+            'mautic.lead.query.builder.complex_relation.primary_company_tag' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyTagRelationValueFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
+            ],
+            'mautic.lead.query.builder.complex_relation.any_company_tag' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyTagRelationValueFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.channel_click.value' => [

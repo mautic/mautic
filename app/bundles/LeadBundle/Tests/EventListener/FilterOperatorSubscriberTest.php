@@ -436,6 +436,26 @@ final class FilterOperatorSubscriberTest extends TestCase
             ],
             $choices['lead']['dnc_manual_email']
         );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.company_tags',
+                'operators'  => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object'     => 'company',
+                'properties' => [
+                    'type' => 'tags',
+                    'list' => [
+                        'Choice A' => 'choice_a',
+                        'Choice B' => 'choice_b',
+                    ],
+                ],
+                'iconClass' => 'ri-hashtag',
+            ],
+            $choices['company']['company_tags']
+        );
     }
 
     public function testOnGenerateSegmentFiltersAddBehaviors(): void
@@ -753,6 +773,26 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'iconClass' => 'ri-mail-forbid-line',
             ],
             $choices['lead']['dnc_manual_email']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.company_tags',
+                'operators'  => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object'     => 'company',
+                'properties' => [
+                    'type' => 'tags',
+                    'list' => [
+                        'Choice A' => 'choice_a',
+                        'Choice B' => 'choice_b',
+                    ],
+                ],
+                'iconClass' => 'ri-hashtag',
+            ],
+            $choices['company']['company_tags']
         );
     }
 

@@ -12,11 +12,11 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -44,6 +44,7 @@ class CompanyApiController extends CommonApiController
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
         $this->serializerGroups[] = 'companyDetails';
+        $this->serializerGroups[] = 'tagList';
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
@@ -60,12 +61,29 @@ class CompanyApiController extends CommonApiController
         return $this->model->getEntity();
     }
 
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    {
+        if (isset($parameters['tags'])) {
+            unset($parameters['tags']);
+        }
+
+        foreach ($entity->getTags() as $tag) {
+            $parameters['tags'][] = $tag->getId();
+        }
+
+        return $parameters;
+    }
+
     /**
-     * @param Lead   &$entity
-     * @param string $action
+     * @param Company &$entity
+     * @param string  $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
+        if (isset($this->entityRequestParameters['tags'])) {
+            $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
+        }
+
         $this->setCustomFieldValues($entity, $form, $parameters);
     }
 
@@ -128,6 +146,68 @@ class CompanyApiController extends CommonApiController
         }
 
         $this->model->removeLeadFromCompany($company, $contact);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Adds tags to a company.
+     *
+     * @return Response
+     */
+    public function addTagsAction(Request $request, $companyId)
+    {
+        $requestParameters = $request->request->all();
+        $tags              = $requestParameters['tags'] ?? [];
+        if (!is_array($tags) && !is_string($tags)) {
+            $tags = [];
+        }
+
+        return $this->applyTagsAction((int) $companyId, 'modifyTags', $tags);
+    }
+
+    /**
+     * Removes a tag from a company.
+     *
+     * @return Response
+     */
+    public function removeTagAction($companyId, $tagId)
+    {
+        return $this->applyTagsAction((int) $companyId, 'removeTag', (int) $tagId);
+    }
+
+    /**
+     * Add/Remove tags to/from a company.
+     *
+     * @return Response
+     */
+    protected function applyTagsAction(int $companyId, string $method, mixed $data)
+    {
+        $company = $this->model->getEntity($companyId);
+        if (null === $company) {
+            return $this->notFound();
+        }
+
+        if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $result = $this->model->$method($company, $data);
+        if (false === $result) {
+            return $this->badRequest();
+        }
+
+        if ('removeTag' === $method) {
+            $view = $this->view(
+                [
+                    'recordFound'        => $result,
+                    $this->entityNameOne => $company,
+                ],
+                Response::HTTP_OK
+            );
+        } else {
+            $view = $this->view([$this->entityNameOne => $company], Response::HTTP_OK);
+        }
 
         return $this->handleView($view);
     }

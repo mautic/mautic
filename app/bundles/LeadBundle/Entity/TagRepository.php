@@ -15,26 +15,17 @@ class TagRepository extends CommonRepository
      */
     public function deleteOrphans(): void
     {
-        $qb       = $this->_em->getConnection()->createQueryBuilder();
-        $havingQb = $this->_em->getConnection()->createQueryBuilder();
+        $connection   = $this->_em->getConnection();
+        $queryBuilder = $connection->createQueryBuilder();
 
-        $havingQb->select('count(x.lead_id) as the_count')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
-            ->where('x.tag_id = t.id');
+        $queryBuilder->delete(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
+            ->where('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref x WHERE x.tag_id = t.id)');
 
-        $qb->select('t.id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
-            ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->executeQuery()->fetchAssociative();
-
-        if (count($delete)) {
-            $qb->resetQueryParts();
-            $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
-                ->where(
-                    $qb->expr()->in('id', $delete)
-                )
-                ->executeStatement();
+        if ($connection->createSchemaManager()->tablesExist([MAUTIC_TABLE_PREFIX.'companies_tags_xref'])) {
+            $queryBuilder->andWhere('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_tags_xref cx WHERE cx.tag_id = t.id)');
         }
+
+        $queryBuilder->executeStatement();
     }
 
     /**

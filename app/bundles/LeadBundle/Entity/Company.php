@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -141,8 +143,15 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     #[Groups(['company:read', 'company:write'])]
     private $description;
 
+    /**
+     * @var Collection<string, Tag>
+     */
+    #[Groups(['company:read', 'company:write'])]
+    private $tags;
+
     public function __construct()
     {
+        $this->tags = new ArrayCollection();
         $this->initializeProjects();
     }
 
@@ -213,6 +222,18 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             FieldModel::$coreCompanyFields
         );
 
+        $builder->createManyToMany('tags', Tag::class)
+            ->setJoinTable('companies_tags_xref')
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(['tag' => 'ASC'])
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
+
         self::addProjectsField($builder, 'company_projects_xref', 'company_id');
     }
 
@@ -246,6 +267,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                     'id',
                     'fields',
                     'score',
+                    'tags',
                 ]
             )
             ->build();
@@ -295,6 +317,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                     $current->getName().'('.$current->getId().')',
                     $val->getName().'('.$val->getId().')',
                 ];
+            }
+        } elseif ('tags' == $prop) {
+            if ($val instanceof Tag) {
+                $this->changes['tags']['added'][] = $val->getTag();
+            } else {
+                $this->changes['tags']['removed'][] = $val;
             }
         } else {
             parent::isChanged($prop, $val);
@@ -620,6 +648,41 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         $this->isChanged('companydescription', $description);
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return Company
+     */
+    public function addTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag);
+        $this->tags[$tag->getTag()] = $tag;
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): void
+    {
+        $this->isChanged('tags', $tag->getTag());
+        $this->tags->removeElement($tag);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
 
         return $this;
     }
