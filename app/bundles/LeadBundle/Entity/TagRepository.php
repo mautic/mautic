@@ -210,7 +210,13 @@ class TagRepository extends CommonRepository
         $persisted = 0;
 
         foreach ($entityIds as $entityId) {
-            $entity = $this->_em->find($entityClass, (int) $entityId);
+            $entity = null;
+            if (Lead::class === $entityClass) {
+                $entity = $this->_em->find(Lead::class, (int) $entityId);
+            } elseif (Company::class === $entityClass) {
+                $entity = $this->_em->find(Company::class, (int) $entityId);
+            }
+
             if (!$entity instanceof Lead && !$entity instanceof Company) {
                 continue;
             }

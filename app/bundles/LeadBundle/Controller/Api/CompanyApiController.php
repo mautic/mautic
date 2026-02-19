@@ -152,10 +152,8 @@ class CompanyApiController extends CommonApiController
 
     /**
      * Adds tags to a company.
-     *
-     * @return Response
      */
-    public function addTagsAction(Request $request, $companyId)
+    public function addTagsAction(Request $request, int $companyId): Response
     {
         $requestParameters = $request->request->all();
         $tags              = $requestParameters['tags'] ?? [];
@@ -168,12 +166,10 @@ class CompanyApiController extends CommonApiController
 
     /**
      * Removes a tag from a company.
-     *
-     * @return Response
      */
-    public function removeTagAction($companyId, $tagId)
+    public function removeTagAction(int $companyId, int $tagId): Response
     {
-        return $this->applyTagsAction((int) $companyId, 'removeTag', (int) $tagId);
+        return $this->applyTagsAction($companyId, 'removeTag', $tagId);
     }
 
     /**

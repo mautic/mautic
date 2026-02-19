@@ -680,7 +680,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @return $this
      */
-    public function setTags($tags)
+    public function setTags(mixed $tags)
     {
         $this->tags = $tags;
 

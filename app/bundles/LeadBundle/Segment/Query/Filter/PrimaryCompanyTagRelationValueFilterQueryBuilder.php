@@ -139,8 +139,7 @@ class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBu
                 $subQueryBuilder->andWhere(
                     $subQueryBuilder->expr()->between(
                         $tagAlias.'.'.$field,
-                        $filterParametersHolder[0],
-                        $filterParametersHolder[1]
+                        [$filterParametersHolder[0], $filterParametersHolder[1]]
                     )
                 );
                 break;

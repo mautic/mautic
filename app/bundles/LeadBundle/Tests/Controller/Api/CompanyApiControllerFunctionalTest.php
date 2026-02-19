@@ -229,10 +229,10 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('score', $responseData);
 
             // Verify the company was actually created in the database
-            $companyRepository = $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class);
+            $companyRepository = $this->em->getRepository(Company::class);
             $company           = $companyRepository->find($responseData['id']);
 
-            $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+            $this->assertInstanceOf(Company::class, $company);
             $this->assertSame($companyData['name'] ?? null, $company->getName());
             $this->assertSame($companyData['score'] ?? 0, $company->getScore());
             $this->assertSame($companyData['city'] ?? null, $company->getCity());
