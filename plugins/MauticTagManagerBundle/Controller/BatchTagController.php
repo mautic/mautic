@@ -11,9 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BatchTagController extends AbstractFormController
 {
-    public function indexAction(): Response
+    public function indexAction(Request $request): Response
     {
-        $route = $this->generateUrl('mautic_tagmanager_batch_set_action');
+        $objectType = $this->getObjectType($request);
+        $route      = $this->generateUrl('mautic_tagmanager_batch_set_action', ['objectType' => $objectType]);
 
         $form = $this->createForm(BatchTagType::class, [],
             [
@@ -48,8 +49,9 @@ class BatchTagController extends AbstractFormController
 
     public function execAction(Request $request): JsonResponse
     {
-        $params   = $request->get('batch_tag');
-        $tagModel = $this->getModel('tagmanager.tag');
+        $params     = $request->get('batch_tag');
+        $objectType = $this->getObjectType($request);
+        $tagModel   = $this->getModel('tagmanager.tag');
         assert($tagModel instanceof TagModel);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
         if (empty($ids)) {
@@ -80,21 +82,40 @@ class BatchTagController extends AbstractFormController
             ]);
         }
 
-        if (!empty($tagsToAdd)) {
-            $tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
-        }
+        if ('company' === $objectType) {
+            if (!empty($tagsToAdd)) {
+                $tagModel->getRepository()->addTagsToCompanies($ids, $tagsToAdd);
+            }
 
-        if (!empty($tagsToRemove)) {
-            $tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
-        }
+            if (!empty($tagsToRemove)) {
+                $tagModel->getRepository()->removeTagsFromCompanies($ids, $tagsToRemove);
+            }
 
-        $this->addFlashMessage('mautic.lead.batch_leads_affected', [
-            '%count%'     => count($ids),
-        ]);
+            $this->addFlashMessage('mautic.company.batch_companies_affected', [
+                '%count%' => count($ids),
+            ]);
+        } else {
+            if (!empty($tagsToAdd)) {
+                $tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
+            }
+
+            if (!empty($tagsToRemove)) {
+                $tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
+            }
+
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
+                '%count%' => count($ids),
+            ]);
+        }
 
         return new JsonResponse([
             'closeModal' => true,
             'flashes'    => $this->getFlashContent(),
         ]);
+    }
+
+    private function getObjectType(Request $request): string
+    {
+        return 'company' === $request->query->get('objectType') ? 'company' : 'lead';
     }
 }

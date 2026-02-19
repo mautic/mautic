@@ -131,33 +131,7 @@ class TagRepository extends CommonRepository
      */
     public function updateTagsInLeads(array $leadIds, array $tagIds, string $addOrRemove = 'add'): array
     {
-        $result = [];
-
-        if (empty($leadIds) || empty($tagIds)) {
-            return $result;
-        }
-
-        $tags = $this->getTagById($tagIds);
-
-        if (empty($tags)) {
-            return $result;
-        }
-
-        foreach ($leadIds as $leadId) {
-            $lead = $this->_em->find(Lead::class, $leadId);
-            foreach ($tags as $tag) {
-                if ('add' === $addOrRemove) {
-                    $lead->addTag($tag);
-                } else {
-                    $lead->removeTag($tag);
-                }
-                $result[$leadId][$tag->getId()] = true;
-            }
-            $this->_em->persist($lead);
-            $this->_em->flush();
-        }
-
-        return $result;
+        return $this->updateTagsInEntities($leadIds, $tagIds, Lead::class, $addOrRemove);
     }
 
     /**
@@ -171,6 +145,98 @@ class TagRepository extends CommonRepository
     public function removeTagsFromLeads(array $leadIds, array $tagIds): array
     {
         return $this->updateTagsInLeads($leadIds, $tagIds, 'remove');
+    }
+
+    /**
+     * Add tags to companies.
+     *
+     * @param array<int> $companyIds
+     * @param array<int> $tagIds
+     *
+     * @return array<mixed>
+     */
+    public function addTagsToCompanies(array $companyIds, array $tagIds): array
+    {
+        return $this->updateTagsInCompanies($companyIds, $tagIds);
+    }
+
+    /**
+     * Update tags in companies.
+     *
+     * @param array<int> $companyIds
+     * @param array<int> $tagIds
+     *
+     * @return array<mixed>
+     */
+    public function updateTagsInCompanies(array $companyIds, array $tagIds, string $addOrRemove = 'add'): array
+    {
+        return $this->updateTagsInEntities($companyIds, $tagIds, Company::class, $addOrRemove);
+    }
+
+    /**
+     * Remove tags from companies.
+     *
+     * @param array<int> $companyIds
+     * @param array<int> $tagIds
+     *
+     * @return array<mixed>
+     */
+    public function removeTagsFromCompanies(array $companyIds, array $tagIds): array
+    {
+        return $this->updateTagsInCompanies($companyIds, $tagIds, 'remove');
+    }
+
+    /**
+     * @param array<int> $entityIds
+     * @param array<int> $tagIds
+     *
+     * @return array<mixed>
+     */
+    private function updateTagsInEntities(array $entityIds, array $tagIds, string $entityClass, string $addOrRemove = 'add'): array
+    {
+        $result = [];
+
+        if (empty($entityIds) || empty($tagIds)) {
+            return $result;
+        }
+
+        $tags = $this->getTagById($tagIds);
+
+        if (empty($tags)) {
+            return $result;
+        }
+
+        $batchSize = 100;
+        $persisted = 0;
+
+        foreach ($entityIds as $entityId) {
+            $entity = $this->_em->find($entityClass, (int) $entityId);
+            if (!$entity instanceof Lead && !$entity instanceof Company) {
+                continue;
+            }
+
+            foreach ($tags as $tag) {
+                if ('add' === $addOrRemove) {
+                    $entity->addTag($tag);
+                } else {
+                    $entity->removeTag($tag);
+                }
+
+                $result[(int) $entityId][$tag->getId()] = true;
+            }
+
+            $this->_em->persist($entity);
+
+            if (0 === ++$persisted % $batchSize) {
+                $this->_em->flush();
+            }
+        }
+
+        if ($persisted > 0) {
+            $this->_em->flush();
+        }
+
+        return $result;
     }
 
     /**

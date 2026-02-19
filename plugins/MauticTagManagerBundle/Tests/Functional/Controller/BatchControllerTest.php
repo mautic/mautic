@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
@@ -21,6 +22,11 @@ class BatchControllerTest extends MauticMysqlTestCase
      */
     private array $leads;
 
+    /**
+     * @var array<int, Company>
+     */
+    private array $companies;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -34,6 +40,7 @@ class BatchControllerTest extends MauticMysqlTestCase
         $this->tagRepository = $tagModel->getRepository();
         $this->tags          = $this->addTags($tags);
         $this->leads         = $this->addLeads();
+        $this->companies     = $this->addCompanies();
     }
 
     public function testBatchViewAction(): void
@@ -87,6 +94,27 @@ class BatchControllerTest extends MauticMysqlTestCase
         $this->assertContains($this->tags[2], $lead1->getTags()->toArray());
     }
 
+    public function testAddTagBatchSetActionForCompany(): void
+    {
+        $crawler                                = $this->client->request('GET', '/s/tags/batch/view?objectType=company');
+        $form                                   = $crawler->filter('form[name=batch_tag]')->form();
+        $values                                 = $form->getValues();
+        $values['batch_tag[tags][add_tags]']    = [$this->tags[0]->getId(), $this->tags[1]->getId()];
+        $values['batch_tag[tags][remove_tags]'] = [$this->tags[2]->getId()];
+        $values['batch_tag[ids]']               = '["'.$this->companies[0]->getId().'","'.$this->companies[1]->getId().'"]';
+        $form->setValues($values);
+        $this->client->submit($form);
+
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('2 companies affected', $this->client->getResponse()->getContent());
+
+        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $company1     = $companyModel->getEntity($this->companies[0]->getId());
+        $this->assertContains($this->tags[0], $company1->getTags()->toArray());
+        $this->assertContains($this->tags[1], $company1->getTags()->toArray());
+        $this->assertNotContains($this->tags[2], $company1->getTags()->toArray());
+    }
+
     /**
      * @param array<string> $tags
      *
@@ -132,5 +160,25 @@ class BatchControllerTest extends MauticMysqlTestCase
         $this->leads[] = $lead;
 
         return $this->leads;
+    }
+
+    /**
+     * @return array<int, Company>
+     */
+    public function addCompanies(): array
+    {
+        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $company      = $companyModel->getEntity();
+
+        $company->setName('Company 1');
+        $companyModel->saveEntity($company);
+        $this->companies[] = $company;
+
+        $company = $companyModel->getEntity();
+        $company->setName('Company 2');
+        $companyModel->saveEntity($company);
+        $this->companies[] = $company;
+
+        return $this->companies;
     }
 }
