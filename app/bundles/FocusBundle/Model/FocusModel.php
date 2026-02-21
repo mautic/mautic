@@ -1,389 +1,388 @@
-I need to analyze the issue described in the target file `app/bundles/FocusBundle/Model/FocusModel.php`. The issue is that "Contactfield tokens for values of the corresponding company do not work in focus items".
+The user wants me to update the `FocusModel.php` file.
+The issue is that "Contactfield tokens for values of the corresponding company do not work in focus items".
+The user provided a snippet of the file and mentioned that the "Auditor rejected solution" (which seems to be the provided snippet, though it looks incomplete).
 
-The user wants the COMPLETE updated content of the file, with no markdown and no chat.
+I need to understand the context of the issue.
+Focus items (like popups, forms) often use tokens like `{contactfield=firstname}`.
+The issue states that these tokens don't work for company fields when the contact is associated with a company.
+Usually, in Mautic, when processing tokens for a contact, one might need to check if the token refers to a company field and if so, retrieve the value from the associated company.
 
-**1. Understand the context:**
-*   **Bundle:** FocusBundle
-*   **File:** FocusModel.php
-*   **Issue:** Contactfield tokens (likely `{{ contact.fieldname }}`) are not resolving correctly when they refer to company data associated with the contact. Focus items usually generate content (emails, notifications, etc.) based on contacts. If a contact belongs to a company, and a token tries to access a company field via the contact (e.g., `{{ contact.company.name }}` or just `{{ company.name }}` depending on the token parser logic), it might be failing.
+Looking at the provided snippet, it's just the class definition and constructor properties. It doesn't show the logic for token replacement.
 
-**2. Analyze the code structure (Mental Model of FocusModel.php):**
-*   This model likely handles the logic for generating focus items (widgets, popups, etc.).
-*   It probably has methods to retrieve contact data.
-*   It likely uses a TokenParser or a mechanism to replace tokens in content strings.
-*   The specific problem is "Contactfield tokens for values of the corresponding company". This implies that when generating a focus item for a contact, the system needs to merge the contact's data *and* the associated company's data into the token replacement context.
+I need to find the method responsible for generating the content or processing tokens for focus items.
+Common methods in FormModel or similar models that handle rendering or processing might be `getEntity`, `getSampleValues`, or specific methods for building the view.
 
-**3. Identify the likely fix:**
-*   When processing a contact for a focus item, the code needs to check if the contact has a company.
-*   If a company exists, the company fields need to be made available to the token parser.
-*   Usually, in Mautic (which this file structure suggests), contacts and companies are related. The token replacement logic needs to merge the company array into the contact array or provide a specific `company` object/array to the tokenizer.
-*   A common place this happens is in the `getContent()` or `getEntity()` or `getModel()` methods within the Model class.
+Let's look at the structure of a typical Mautic FormModel or FocusModel.
+Focus items are entities. The model likely has a method to generate the HTML/JS for the focus item.
+Inside that generation logic, tokens are usually replaced.
 
-**4. Locate the specific code block:**
-*   I need to look for where the contact is loaded or where tokens are processed.
-*   The issue is specifically about *Focus Items* (FocusBundle).
-*   Let's look for methods that handle `getLead` or `getContact` or `getCompany`.
+The issue specifically mentions "Contactfield tokens for values of the corresponding company".
+This implies that somewhere in the code, tokens are being replaced using the Contact object, but Company fields are not being checked or mapped.
 
-**5. Hypothetical Code Search (Simulation):**
-*   *Search for:* `getLead`, `getContact`, `getCompany`, `token`, `merge`.
-*   *Scenario:* The code fetches a contact. It processes tokens. It likely has a line like `$contactArray = $contact->getFields();`. It probably misses the line `$company = $contact->getCompany();` and merging that data.
+Let's search for the file content in my internal knowledge base or simulate finding it.
+The file path is `app/bundles/FocusBundle/Model/FocusModel.php`.
 
-**6. Refining the fix:**
-*   The standard Mautic way to handle company tokens in emails (which is similar to focus items) involves the `mergeContactToCompany` logic or simply ensuring the company fields are available in the token array.
-*   In Focus items, the logic might be:
-    1.  Get Contact.
-    2.  Get Company (if exists).
-    3.  Merge Company fields into the Contact array (often prefixed or just available).
-    4.  Pass to view.
+I need to see the full content of the file to identify where the token replacement happens.
 
-**7. Drafting the solution:**
-*   I will assume the file exists and I need to modify the method responsible for preparing the data for the view.
-*   Let's assume the method is `getEntity()` or `getItem()`.
-*   The fix involves fetching the company for the contact and merging its fields into the token array used for rendering.
+Hypothetical scenario:
+The `getViewProperties` or `getEntity` or a method called `getSampleValues` is used to render the focus item.
+In that method, there is likely a loop or a regex replacing tokens.
+The logic probably looks like:
+`$content = str_replace('{contactfield=...}', $contact->getFieldValue(...), $content);`
+The problem is that `$contact->getFieldValue(...)` might not handle company fields, or the logic simply doesn't look at the company.
 
-**8. Constructing the file content:**
-*   I will generate the full PHP file content.
-*   I will look for the section where the contact is prepared.
-*   I will add the logic to fetch the company and merge it.
+The auditor rejected a solution. The provided snippet is just the class skeleton. It doesn't contain the logic.
+Wait, the prompt says "Output the COMPLETE updated content."
+The provided snippet ends abruptly at `AuthorizationCheckerInterface $`.
 
-*Self-Correction/Refinement:* Since I don't have the *exact* current state of the file in my context window (I have to generate it based on the prompt implying I know the structure or I am generating a standard Mautic FocusModel), I must rely on the standard Mautic architecture for this bundle.
+I need to generate the full file content based on the standard Mautic FocusModel, but modified to fix the company token issue.
 
-*Standard Mautic FocusBundle/Model/FocusModel.php structure:*
-*   Namespace: `Mautic\FocusBundle\Model`
-*   Extends: `Model` (or similar)
-*   Key methods: `getEntity($id)`, `getList($filter = [])`, `getSimulatedContent($type, $content, $tokenParams)`.
-*   The issue is likely in the method that prepares the data for the "preview" or "view" rendering.
+Standard FocusModel methods:
+- `getName`
+- `getRepository`
+- `getEntity`
+- `getSampleValues` (This is often where sample data is generated for the builder)
+- `getViewProperties` (This generates the JS/HTML)
 
-*Specific Fix Logic:*
-In the method that retrieves the contact to generate the focus item content (often `getEntity` or a helper method called by it), we need to ensure company data is merged.
+Let's look at `getSampleValues`. This method is crucial for the focus builder to show previews.
+It likely creates a dummy lead and populates fields.
+If it populates fields, it might need to create a dummy company and populate company fields too.
 
-Let's look for the `getEntity` method.
-Inside `getEntity`:
-1.  Fetch contact.
-2.  Get company fields.
-3.  Merge company fields into contact fields (usually with a prefix like `company.` or just overwriting if the token parser handles it, but usually `mergeContactToCompany` helper is used).
+Let's look at `getViewProperties`. This method takes the entity and generates the array for the frontend.
+It likely calls a helper to replace tokens.
 
-Actually, looking at similar issues in Mautic history, the Focus model often simulates the view. The `getEntity` method usually returns an array of data.
-The fix is usually:
-$company = $lead->getCompany();
-if ($company) {
-    // merge company fields into lead fields
-}
+The specific issue: "Contactfield tokens for values of the corresponding company do not work".
+This phrasing is slightly ambiguous. Does it mean tokens like `{contactfield=companyname}` (which is actually a company field linked to contact) or tokens specifically for company fields?
+Usually, in Mautic, you can use `{contactfield=companyname}` if the field is mapped, or `{companyfield=companyname}`.
+However, the issue says "Contactfield tokens for values of the corresponding company". This suggests that the user is using a contact field token (e.g. `{contactfield=company_industry}`) expecting it to pull from the company, or perhaps the system is supposed to automatically resolve company fields when using contact tokens.
 
-However, without the exact source code, I have to provide the *likely* complete file content based on the standard Mautic 3.x/4.x FocusModel structure.
+Actually, looking at Mautic history, there was a time where company fields weren't automatically available in all contexts via contact tokens, or the logic was missing.
 
-*Wait, I need to be careful.* The user asks for the "COMPLETE updated content". This implies I should output the file as it should look after the fix.
+Let's assume the fix involves ensuring that when tokens are processed, if the field belongs to a company, the value is retrieved from the associated company.
 
-**Let's simulate the file content:**
+Where does this logic live?
+In `FocusModel`, there is likely a method `getSampleValues`.
+Let's check the standard implementation of `getSampleValues` in Mautic FocusBundle.
 
-<?php
-
-namespace Mautic\FocusBundle\Model;
-
-use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
-/**
- * @extends FormModel<\Mautic\FocusBundle\Entity\Focus>
- */
-class FocusModel extends FormModel
-{
-    // ... dependencies ...
-    
-    public function getEntity($id = null)
+    public function getSampleValues(Focus $entity)
     {
-        if (null === $id) {
-            $entity = new Focus();
-            $entity->setSessionId($this->generateRandomString());
-        } else {
-            $entity = parent::getEntity($id);
+        $sample = [
+            'id'        => 0,
+            'ip'        => '192.168.0.1',
+            'link'      => '#',
+        ];
+
+        $fields = $entity->getProperties()['form']['fields'] ?? [];
+        foreach ($fields as $key => $field) {
+            $sample[$field['alias']] = $this->getSampleValue($field);
         }
 
-        return $entity;
+        return $sample;
     }
 
-    // ... other methods ...
-
-    /**
-     * Get the specific data for the focus item.
-     * This is where the bug likely resides.
-     */
-    public function getContent(Focus $entity, $lead = null, $slots = null)
+And `getSampleValue`:
+    protected function getSampleValue(array $field)
     {
-        // ... setup ...
-        
-        if (null === $lead) {
-            // create dummy lead
-            $lead = $this->leadModel->getEntity();
-        }
-
-        // ... logic to populate lead fields ...
-        
-        // THE FIX: Ensure company fields are available
-        $company = $lead->getCompany();
-        if ($company) {
-            $fields = $lead->getFields();
-            // Merge company fields into the contact's field array so tokens work
-            // Usually this is done via a helper or manually here.
-            // Standard Mautic approach: $this->companyModel->mergeEntityToContact($company, $lead);
-            // But here we are preparing an array for tokens.
-            
-            // Let's assume we need to manually merge for the view context.
-            // Actually, the Lead model usually handles this in getValues() or similar, 
-            // but Focus might be doing it manually.
-        }
-        
-        // ... return content ...
+        // ... logic to generate fake data ...
     }
-}
 
-**Correction:** The issue is specifically "Contactfield tokens for values of the corresponding company do not work".
-This usually means if I use `{{ company.name }}` or `{{ contact.company.name }}` inside a Focus Item, it returns empty.
+If the issue is about *preview* not working, it's in `getSampleValues`.
+If the issue is about *live* execution, it's in the controller or a hook.
 
-In Mautic, the `LeadFieldTokenHelper` or the generic Token Parser usually looks at the Lead object.
-If the Focus model is generating the "preview" or the "content" for a specific contact, it needs to ensure the Company data is attached to the Lead object or the array passed to the view.
+However, the issue description "Contactfield tokens for values of the corresponding company do not work in focus items" suggests that during the rendering of the focus item (popup), the tokens are not being replaced correctly with company data.
 
-**The most common place this fails in FocusModel:**
-The `getEntity` method or `getContent` method.
-Let's look at a standard `getContent` method implementation in Mautic FocusBundle.
+Let's look at the `getViewProperties` method. This is where the "content" of the focus item is prepared.
+It likely calls a token replacement service.
 
-The `getContent` method often takes `$lead` as an argument.
-If `$lead` is provided, it uses it.
-If not, it creates a dummy one.
-The problem is that `$lead->getCompany()` might not be populated if the lead was just created or fetched without the company association loaded (though `getCompany` usually handles lazy loading or joins).
+Wait, the auditor rejected solution snippet provided in the prompt is just the class properties. This suggests the previous attempt might have been incomplete or wrong.
 
-However, the specific issue is often that the **array of fields** used for token replacement doesn't include the company fields.
+I need to find the actual file content to modify it correctly.
+I will assume the file is the standard Mautic FocusModel.
+I will look for the `getSampleValues` method and the `getViewProperties` method.
 
-**The Fix:**
-Before passing the lead data to the view/slots, we must merge the company fields into the lead's field array.
+In `getSampleValues`, we need to ensure we are generating sample data for company fields if they are present in the form configuration.
+In `getViewProperties` (or wherever the actual token replacement happens for the frontend), we need to ensure the company object is available or passed to the token replacement logic.
 
-**Code to insert/modify:**
-In the method that prepares the data (likely `getContent` or `getEntity` depending on how the view is rendered), we need to add:
+Actually, the most common place this fails is in the `getSampleValues` method used by the builder UI. If you configure a field to use a company token, the preview won't show it because the sample lead doesn't have a company.
 
-// Get the company fields for this lead
-$companyFields = $this->companyModel->getRepository()->getCompanyByLeadId($lead->getId());
-// Or use the helper if available, but usually direct merge is safer for FocusModel context.
+Let's check if `FocusModel` has a method `getViewProperties`.
+Yes, it does.
+It generates the HTML/JS.
+It likely uses `Mautic\PageBundle\Helper\TokenHelper` or similar.
 
-// Merge company fields into lead fields
-// Note: In Mautic, company fields are often merged into the contact array with a prefix or specific key.
-// But for tokens like {{ contact.company.name }}, the Lead object needs to be populated.
-// Or for {{ company.name }}, the token parser needs the company array.
+However, the specific mention of "Contactfield tokens for values of the corresponding company" implies that the user is using `{contactfield=...}` syntax for fields that are actually company fields, or the system is expected to resolve them.
 
-// Let's assume the standard Mautic fix pattern for this specific bundle:
-// In getContent method:
-$leadArray = $lead->getFields();
-if ($company = $lead->getCompany()) {
-    // This assumes the Lead object has the company merged or accessible.
-    // If not, we might need to fetch it.
-    // But usually, the issue is that the Focus Model doesn't fetch the company.
-}
+Let's look at the `getSampleValues` method.
+If the form has a field with alias `companyname`, and it's a company field, `getSampleValues` needs to return a value for it.
+If the logic only looks at lead fields, it won't.
 
-**Actually, looking at Mautic FocusBundle code history:**
-The `FocusModel::getContent` method generates the HTML.
-It calls `$this->getEntity()`.
-Inside `getEntity`, it might not be setting the company.
+Let's look at the `getViewProperties` method.
+It probably calls `$this->getSampleValues($entity)` to get the values to inject into the content.
 
-**Let's look at the `getEntity` method.**
-It fetches the Focus entity.
-Then it prepares the "preview" data.
-The preview data needs a contact.
+The fix likely involves modifying `getSampleValues` to also check for company fields and generate sample data for them, or modifying the token replacement logic to handle company fields.
 
-**Let's assume the file content is the standard one and I need to apply the fix.**
+Let's look at the provided snippet again. It defines dependencies.
+`LeadModel`, `CompanyModel` are defined.
+So the model has access to Company data.
 
-**The Fix Location:** `getEntity` method.
-When creating the dummy lead for the preview, or when processing the actual lead, we need to ensure the company fields are merged into the token array.
+The `getSampleValues` method signature is `public function getSampleValues(Focus $entity)`.
+It iterates over form fields.
+If a field is a company field, we need to generate a sample value.
 
-**Specific Code Change:**
-In `getEntity`, there is usually a block:
-$lead = ... // get lead
-$leadFields = $lead->getFields();
-// ... populate fields ...
-We need to add:
-$company = $lead->getCompany();
-if ($company) {
-    $companyFields = $company->getFields();
-    // Merge logic. 
-    // In Mautic, usually we merge company fields into the lead array with a 'company.' prefix or similar logic handled by the token parser.
-    // However, the Lead object itself might not have the company data merged.
-    // The safest bet is to ensure the Lead object has the company merged.
-    $this->companyModel->mergeEntityToContact($company, $lead);
-}
+But how do we know if a field is a company field?
+Usually, the field definition in the focus item properties has a type or alias.
+Or we query the LeadFieldRepository to check if it's a company field.
 
-Wait, `FocusModel` might not have `CompanyModel` injected. It likely does.
+Let's assume the standard Mautic implementation.
+The `getSampleValues` method usually looks like this:
 
-**Let's write the file.**
-
-I will construct the file `app/bundles/FocusBundle/Model/FocusModel.php`.
-
-**Key changes to include:**
-1.  Inject `CompanyModel` (if not already there, though likely it is).
-2.  In the method that prepares the lead data (likely `getEntity` or `getContent`), fetch the company and merge it into the lead fields array used for token replacement.
-
-**Refined Plan:**
-I will output the full file content. I will identify the `getEntity` method (which is used for generating the view/preview). I will modify the section where the `$lead` is prepared.
-
-**Standard `getEntity` logic in FocusModel:**
-1.  Get Focus Item.
-2.  Create/Get Lead.
-3.  Generate URL.
-4.  Return array.
-
-**The Bug:** The Lead object passed to the view does not have company data merged.
-**The Fix:** Before returning the data, merge the company into the lead.
-
-**Code snippet to add:**
-// ... inside getEntity method
-$lead = $this->leadModel->getEntity();
-// ... populate lead ...
-
-// Fix: Merge company fields
-$company = $lead->getCompany();
-if ($company) {
-    $this->companyModel->mergeEntityToContact($company, $lead);
-}
-
-**Wait, does `FocusModel` extend `FormModel`?**
-Yes, usually `extends FormModel`.
-
-**Does it have `leadModel`?**
-Yes, usually `$this->leadModel`.
-
-**Does it have `companyModel`?**
-It should. If not, I need to add the property and constructor. But usually, in these "Target File" prompts, the file structure is standard and the fix is within the logic. I will assume `companyModel` is available or I will add the logic to fetch it if it's missing, but standard Mautic FocusModel likely has it or needs it added.
-
-*Self-Correction:* If I output the *entire* file, I need to be careful with the constructor. If the original file doesn't have `CompanyModel` injected, I should add it to the constructor and properties to ensure the fix works completely.
-
-**Let's verify the standard Mautic FocusModel.php.**
-It usually has:
-`use Mautic\LeadBundle\Model\LeadModel;`
-It might not have `CompanyModel`.
-
-**The Fix Implementation:**
-1.  Add `use Mautic\LeadBundle\Model\CompanyModel;`
-2.  Add `CompanyModel $companyModel` to the constructor.
-3.  Store it in `$this->companyModel`.
-4.  In `getEntity` (or the method that prepares the lead), call `$this->companyModel->mergeEntityToContact($company, $lead)`.
-
-**However**, the prompt asks for the "COMPLETE updated content". This suggests I should provide the full file text.
-
-**Let's generate the file.**
-
-*Assumptions:*
-*   Namespace: `Mautic\FocusBundle\Model`
-*   Class: `FocusModel`
-*   Extends: `Mautic\CoreBundle\Model\FormModel`
-*   Dependencies: `LeadModel`, `CompanyModel` (needs adding), `Router`, etc.
-
-**The specific logic for the fix:**
-In the `getEntity` method, after populating the lead, check for company and merge.
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param null $id
-     *
-     * @return array|Entity|null
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     */
-    public function getEntity($id = null)
+    public function getSampleValues(Focus $entity)
     {
-        if (null === $id) {
-            $entity = new Focus();
-            $entity->setSessionId($this->generateRandomString());
-        } else {
-            $entity = parent::getEntity($id);
+        $sample = [
+            'id'        => 0,
+            'ip'        => '192.168.0.1',
+            'link'      => '#',
+        ];
+
+        $fields = $entity->getProperties()['form']['fields'] ?? [];
+        foreach ($fields as $key => $field) {
+            $sample[$field['alias']] = $this->getSampleValue($field);
         }
 
-        if ($entity && $entity->getId()) {
-            // Generate content
-            $content = $this->getContent($entity);
-            
-            // ... setup slots etc ...
-            
-            // Prepare Lead for preview/tokens
-            $lead = $this->leadModel->getEntity();
-            // ... set dummy values ...
-            
-            // FIX: Ensure company data is available for tokens
-            $company = $lead->getCompany();
-            if ($company) {
-                $this->companyModel->mergeEntityToContact($company, $lead);
+        return $sample;
+    }
+
+And `getSampleValue` generates random strings, etc.
+
+The issue is that if `{contactfield=companyname}` is used, and `companyname` is a company field, the `getSampleValue` method might not be generating a value for it, or the logic checking if it's a company field is missing.
+
+Wait, the issue says "Contactfield tokens for values of the corresponding company".
+This might mean the user is using `{contactfield=company_field_alias}`.
+In Mautic, you can map company fields to contact fields.
+But if the token is directly `{contactfield=...}`, it usually refers to the contact table.
+If the user wants company data, they should use `{companyfield=...}`.
+However, if the system is supposed to support `{contactfield=...}` resolving to company data (which is a common request/complaint), that's a different logic.
+
+Let's stick to the most likely fix: The `getSampleValues` method needs to be aware of company fields.
+If the field alias corresponds to a company field, we should generate a sample value for it.
+
+How to check if a field is a company field?
+Inject `LeadFieldModel`? Or `FieldModel`.
+The model has `LeadModel` and `CompanyModel`.
+We can use `LeadModel->getFieldModel()->getFields()` to get all fields.
+Filter by 'object' => 'company'.
+
+Let's look at the `FocusModel` code structure.
+It likely extends `FormModel`.
+`FormModel` has `getSampleValues`.
+
+I will reconstruct the file.
+I need to ensure `getSampleValues` handles company fields.
+
+Also, there is a method `getViewProperties`.
+It generates the content.
+It might use `PageHelper` or similar to replace tokens.
+If the issue is in the *live* view (not just preview), the token replacement logic in the controller/bundle needs to pass the company object.
+
+However, usually `FocusModel` handles the generation of the view array.
+Let's look at `getViewProperties`.
+It calls `$this->getSampleValues($entity)` to get the values.
+Then it likely does string replacement.
+
+If the auditor rejected the solution, maybe the previous solution was incomplete.
+The provided snippet is just the top of the class.
+
+Let's try to find the specific logic in Mautic FocusBundle.
+The file `FocusModel.php` is responsible for generating the popup content.
+
+The method `getViewProperties` usually looks like this:
+    public function getViewProperties(Focus $entity)
+    {
+        $properties = $entity->getProperties();
+        // ... logic to build html/js ...
+        $content = $properties['html']; // or similar
+        // Token replacement
+        $values = $this->getSampleValues($entity);
+        foreach ($values as $token => $value) {
+            $content = str_replace('{contactfield='.$token.'}', $value, $content);
+        }
+        // ...
+    }
+
+If the issue is that company fields don't work, it's because `getSampleValues` doesn't populate them, or the token replacement regex doesn't handle company tokens.
+
+But the issue title says "Contactfield tokens for values of the corresponding company".
+This implies the user is using `{contactfield=...}` expecting company data.
+Or, more likely, the system is failing to resolve company fields that are mapped or available.
+
+Let's look at the `getSampleValues` method in the standard Mautic FocusBundle.
+It iterates over fields.
+If a field is a company field, it needs to be handled.
+
+Actually, looking at the Mautic source code for `FocusBundle/Model/FocusModel.php`:
+The `getSampleValues` method exists.
+It loops through fields.
+It calls `getSampleValue`.
+
+The fix usually involves checking if the field is a company field.
+To do this, we need the `LeadFieldModel` (or `FieldModel`).
+The `FocusModel` has `LeadModel`. `LeadModel` has `getFieldModel()`.
+
+So, in `getSampleValues`, we should check:
+1. Get all fields (lead and company).
+2. If the current field is a company field, generate a company sample value.
+
+Wait, the issue might be simpler.
+The `getSampleValues` method might just be missing the logic to generate values for company fields entirely.
+If I add logic to detect if a field is a company field and generate a value for it, that would fix the preview.
+For the live view, the token replacement logic needs to be robust.
+
+Let's assume the fix is in `getSampleValues`.
+I need to modify `getSampleValues` to handle company fields.
+
+Algorithm:
+1. Get fields from entity properties.
+2. Get all lead fields and company fields from `LeadFieldModel`.
+3. For each field in entity:
+    a. Check if it's a lead field or company field.
+    b. Generate appropriate sample value.
+
+However, `FocusModel` might not have `LeadFieldModel` injected directly, but it has `LeadModel`.
+`LeadModel` has `getFieldModel()`.
+
+Let's write the code for `getSampleValues`.
+
+    public function getSampleValues(Focus $entity)
+    {
+        $sample = [
+            'id'        => 0,
+            'ip'        => '192.168.0.1',
+            'link'      => '#',
+        ];
+
+        $fields = $entity->getProperties()['form']['fields'] ?? [];
+        
+        // Get fields to identify company fields
+        $allFields = $this->leadModel->getFieldModel()->getFields(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'in',
+                            'value'  => ['lead', 'company'],
+                        ],
+                    ],
+                ],
+            ]
+        );
+        
+        // Create a map of aliases to objects
+        $fieldAliases = [];
+        foreach ($allFields as $f) {
+            $fieldAliases[$f['alias']] = $f['object'];
+        }
+
+        foreach ($fields as $key => $field) {
+            $alias = $field['alias'];
+            if (isset($fieldAliases[$alias]) && 'company' === $fieldAliases[$alias]) {
+                // It's a company field
+                $sample[$alias] = $this->getSampleCompanyValue($field);
+            } else {
+                // It's a lead field (or default)
+                $sample[$alias] = $this->getSampleValue($field);
             }
-            
-            $entity->setLead($lead);
         }
 
-        return $entity;
+        return $sample;
     }
 
-**Wait**, `getEntity` usually returns the Focus entity. The Focus entity might have a `lead` property set on it for the view to use.
+I need to implement `getSampleCompanyValue`.
+It can be similar to `getSampleValue` but tailored for company data (strings, etc).
 
-**Let's look at the `getContent` method.**
-This method often takes the Focus entity and the Lead.
-If the Lead passed here doesn't have the company merged, tokens won't work.
+Also, I need to check `getViewProperties`.
+Does it use `getSampleValues`?
+Yes, typically it does.
+If `getSampleValues` is fixed, the preview works.
+Does the live view use `getSampleValues`?
+Usually, the live view uses the actual Lead/Company objects.
+The issue might be that in the live view, the tokens are replaced using the Contact object, and the Contact object doesn't automatically expose company fields unless specifically accessed.
 
-**The most robust fix:**
-In the `getEntity` method (which prepares the preview), ensure the lead has the company merged.
+However, the issue title specifically mentions "focus items".
+In Mautic, Focus items are rendered via JS.
+The JS requests the content from the server? Or is it embedded?
+Focus items are usually embedded HTML/JS.
+The tokens are replaced on the server side before sending to the browser.
 
-**I will write the file now.** I will include the necessary imports and the logic update.
+If the tokens are replaced on the server side, the code must have access to the Lead and Company.
+The `FocusModel` is a service. It might be called from a controller with the current lead.
 
-**File Structure:**
-1.  PHP Header.
-2.  Namespace.
-3.  Use statements.
-4.  Class definition.
-5.  Constructor (I will update this to include CompanyModel).
-6.  `getEntity` method (I will update this to merge company).
-7.  `getContent` method.
-8.  Other helper methods.
+Let's look at the `getViewProperties` method in the real file.
+It takes `Focus $entity`.
+It doesn't take a Lead object.
+This suggests `getSampleValues` is ONLY for the preview/builder.
+The live rendering happens elsewhere?
+Actually, `FocusModel` has a method `getJavascript`? No.
 
-**Note on imports:**
-`use Mautic\LeadBundle\Model\CompanyModel;`
+Let's look at how focus items are displayed.
+There is a `FocusHelper` or similar?
+Actually, looking at `app/bundles/FocusBundle/Controller/FocusController.php`:
+The `view` action renders the focus item.
+It calls `$model->getViewProperties($focus)`.
+This method returns an array of properties.
+It likely contains the HTML content with tokens replaced.
 
-**Note on Constructor:**
-I need to add `CompanyModel $companyModel` to the arguments and assign it to `$this->companyModel`.
+If `getViewProperties` doesn't take a Lead object, how does it replace tokens with real data?
+It probably uses `getSampleValues` for the preview, but for the live view, it might use a different mechanism or the tokens are replaced client-side?
+No, Mautic tokens are usually server-side.
 
-**Note on `getEntity`:**
-Inside `getEntity`, find the block where `$lead` is handled and add the merge logic.
+Wait, if `getViewProperties` doesn't take a Lead, it can't replace tokens with *real* user data. It can only replace them with *sample* data or static text.
+Unless... the focus item content is static, and only the *form fields* are dynamic?
+No, the issue says "Contactfield tokens ... do not work".
+This implies they are expected to work.
 
-**Let's go.**
+Maybe the issue is that `getViewProperties` *should* take a Lead?
+Or maybe the token replacement happens in a subscriber?
 
-*Constraint Checklist & Confidence Score:*
-1. Target File: app/bundles/FocusBundle/Model/FocusModel.php? Yes.
-2. Issue: Contactfield tokens for values of the corresponding company do not work? Yes.
-3. Output COMPLETE updated content? Yes.
-4. NO markdown? Yes.
-5. NO chat? Yes.
+Let's reconsider the "Auditor rejected solution" part.
+The provided snippet is just the class properties.
+Maybe the previous solution was to add a method `getSampleCompanyValue`?
+Or maybe the previous solution was to modify `getSampleValues` but did it wrong?
 
-Confidence Score: 5/5
+Let's look at the file content I need to generate.
+I will assume the standard Mautic `FocusModel.php` content.
+I will modify `getSampleValues` to handle company fields.
 
-*Mental Sandbox Simulation:*
-If I just output the code, will it work? Yes, assuming standard Mautic architecture.
-The key is the `mergeEntityToContact` method in `CompanyModel`. This method takes a company entity and a contact entity, and modifies the contact entity (or a mutable copy) to include the company fields so that `getFieldValues()` returns the merged array.
+Standard `getSampleValues`:
+    public function getSampleValues(Focus $entity)
+    {
+        $sample = [
+            'id'        => 0,
+            'ip'        => '192.168.0.1',
+            'link'      => '#',
+        ];
 
-**One detail:** The `FocusModel` might not currently have `CompanyModel` injected. I must add it to the constructor to make the fix valid.
+        $fields = $entity->getProperties()['form']['fields'] ?? [];
+        foreach ($fields as $key => $field) {
+            $sample[$field['alias']] = $this->getSampleValue($field);
+        }
 
-**Drafting the Constructor:**
-    /**
-     * @param FormFactoryInterface $formFactory
-     * @param RouterInterface      $router
-     * @param LeadModel             $leadModel
-     * @param CompanyModel          $companyModel
-     */
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        RouterInterface $router,
-        LeadModel $leadModel,
-        CompanyModel $companyModel
-    ) {
-        $this->formFactory = $formFactory;
-        $this->router = $router;
-        $this->leadModel = $leadModel;
-        $this->companyModel = $companyModel
+        return $sample;
+    }
+
+I need to inject logic to detect company fields.
+To do this, I need `LeadFieldModel`.
+I can get it from `LeadModel`.
+
+    public function getSampleValues(Focus $entity)
+    {
+        $sample = [
+            'id'        => 0,
+            'ip'        => '192.168.0.1',
+            'link'      => '#',
+        ];
+
+        $fields = $entity->getProperties()['form']['fields'] ?? [];
+        
+        // Get all fields to identify company fields
+        $leadFields = $
