@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\User;
 
 trait CreateTestEntitiesTrait
@@ -174,5 +175,15 @@ trait CreateTestEntitiesTrait
         $this->em->persist($companyLead);
 
         return $companyLead;
+    }
+
+    private function createProject(string $name): Project
+    {
+        $project = new Project();
+        $project->setName($name);
+        $project->setIsPublished(true);
+        $this->em->persist($project);
+
+        return $project;
     }
 }

@@ -262,11 +262,6 @@ $container->loadFromExtension('jms_serializer', [
     ],
 ]);
 
-// Twig Configuration
-$container->loadFromExtension('twig', [
-    'exception_controller' => null,
-]);
-
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [

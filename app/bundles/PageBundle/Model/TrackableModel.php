@@ -300,15 +300,16 @@ class TrackableModel extends AbstractCommonModel
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
         uksort($this->contentReplacements['second_pass'], fn ($a, $b): int => strlen($b) - strlen($a));
 
-        if ('html' == $type) {
-            // For HTML, replace only the links; leaving the link text (if a URL) intact
+        if ('html' === $type) {
+            // Hours spent trying to handle through \DomDocument: 9h. The issue is that tokens "{token}" is replaced
+            // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 // Make the search regular expression match both "&" and "&amp;".
                 $search  = preg_quote($search, '/');
                 $search  = str_replace('&amp;', '&', $search);
                 $search  = str_replace('&', '(?:&|&amp;)', $search);
                 $content = preg_replace(
-                    '/<(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>/i',
+                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
@@ -867,12 +868,8 @@ class TrackableModel extends AbstractCommonModel
     {
         $trackableUrls = [];
         /** @var \DOMElement $link */
-        foreach ($links as $link) {
+        foreach ($this->extractHrefs($links) as $link) {
             $url = $link->getAttribute('href');
-
-            if ('' === $url) {
-                continue;
-            }
 
             // Check for a do not track
             if ($link->hasAttribute('mautic:disable-tracking')) {
@@ -888,5 +885,22 @@ class TrackableModel extends AbstractCommonModel
         }
 
         return $trackableUrls;
+    }
+
+    /**
+     * @return \Generator<int, \DOMElement>
+     */
+    private function extractHrefs(\DOMNodeList $elements): \Generator
+    {
+        /** @var \DOMElement $element */
+        foreach ($elements as $element) {
+            $url = $element->getAttribute('href');
+
+            if ('' === $url) {
+                continue;
+            }
+
+            yield $element;
+        }
     }
 }

@@ -432,7 +432,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
     Mautic.campaignBuilderLabels[domEventId] = (response.label) ? response.label : '';
 
-    if (!response.success && Mautic.campaignBuilderConnectionRequiresUpdate) {
+    if (response.formSubmitted && !response.success && Mautic.campaignBuilderConnectionRequiresUpdate) {
         // Modal exited - check to see if a connection needs to be removed
         Mautic.campaignBuilderInstance.deleteConnection(Mautic.campaignBuilderLastConnection);
     }

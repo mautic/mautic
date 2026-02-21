@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -407,7 +408,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $dateTime  = $dateTime ?: new \DateTime();
         $userAgent = $request->server->get('HTTP_USER_AGENT');
-        if (array_key_exists('ct', $query) && array_key_exists('email', $query['ct']) && array_key_exists('stat', $query['ct'])) {
+        if (array_key_exists('ct', $query) && is_array($query['ct']) && array_key_exists('email', $query['ct']) && array_key_exists('stat', $query['ct'])) {
             /** @var Stat $stat */
             $stat = $this->statRepository->findOneBy(['trackingHash' => $query['ct']['stat']]);
             if (null !== $stat && $this->botRatioHelper->isHitByBot($stat, $dateTime, $ipAddress, (string) $userAgent)) {
@@ -1018,11 +1019,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private function getQueryFromUrl(string $pageUrl): array
     {
-        $query             = [];
-        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+        $query    = [];
+        $urlQuery = parse_url($pageUrl, PHP_URL_QUERY);
+
+        if (empty($urlQuery)) {
+            return $query;
+        }
 
         if (is_string($urlQuery)) {
-            parse_str($urlQuery, $urlQueryArray);
+            $urlQueryArray = Query::parse($urlQuery);
 
             foreach ($urlQueryArray as $key => $value) {
                 if (is_string($value)) {

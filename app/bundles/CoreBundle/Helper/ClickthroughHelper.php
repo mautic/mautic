@@ -34,6 +34,20 @@ class ClickthroughHelper
             throw new InvalidDecodedStringException($decoded);
         }
 
-        return Serializer::decode($decoded);
+        try {
+            $result = Serializer::decode($decoded);
+
+            if (!is_array($result)) {
+                throw new InvalidDecodedStringException($decoded);
+            }
+        } catch (\Throwable $e) {
+            if (!$e instanceof InvalidDecodedStringException) {
+                throw new InvalidDecodedStringException($decoded, 0, $e);
+            }
+
+            throw $e;
+        }
+
+        return $result;
     }
 }

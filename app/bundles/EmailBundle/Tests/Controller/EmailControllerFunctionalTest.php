@@ -245,21 +245,23 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Email A', $htmlLine1);
     }
 
-    public function testSegmentEmailSend(): void
+    #[DataProvider('provideHtmlForEmailTracking')]
+    public function testSegmentEmailSend(string $htmlContent, bool $singleOrDoubleQuotes): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', $htmlContent, $segment);
 
         $this->addContactsToSegment($segment, ['contact@one.email', 'contact@two.email']);
         $this->em->flush();
 
         $this->sendBatchEmail($email);
 
-        $email = $this->getMailerMessage();
+        $email = self::getMailerMessage();
 
+        $quote = $singleOrDoubleQuotes ? '\'' : '"';
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());
         Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
@@ -271,6 +273,28 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('', $email->getReplyTo()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
         Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
+    public static function provideHtmlForEmailTracking(): \Generator
+    {
+        $variantQuotes   = ['single quote' => "'", 'double quote' => '"'];
+        $variantSpaces   = ['no space' => '$', 'start space' => ' $', 'end space' => '$ ', 'both spaces' => ' $ '];
+        $variantNewlines = ['no newlines' => '$', 'start \r\n' => "\r\n$", 'end \r\n' => "$\r\n", 'both \r\n' => "\r\n$\r\n", 'start \n' => "\n$", 'end \n' => "$\n", 'both \n' => "\n$\n"];
+
+        foreach ($variantQuotes as $quotesName => $variantQuote) {
+            foreach ($variantSpaces as $spaceName => $variantSpace) {
+                foreach ($variantNewlines as $newLineName => $variantNewline) {
+                    $href = $variantQuote
+                        .str_replace('$', str_replace('$', 'https://mautic.org', $variantSpace), $variantNewline)
+                        .$variantQuote;
+
+                    yield $quotesName.', '.$spaceName.', '.$newLineName => [
+                        'Ahoy <i>{contactfield=email}</i><a href='.$href.'>Mautic</a>',
+                        'single quote' === $quotesName,
+                    ];
+                }
+            }
+        }
     }
 
     public function testSegmentEmailSendWithAdvancedOptions(): void

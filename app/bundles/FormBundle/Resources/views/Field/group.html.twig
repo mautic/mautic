@@ -225,9 +225,9 @@
     {% set labelAttributes = labelAttributes|merge({
             'for': firstId,
     }) %}
-    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>
+    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify_allow_target_blank }}</label>
   {% endif %}
-  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify_allow_target_blank }}</span>{% endif %}
 
   {% for listValue, listLabel in list|default([]) %}
     {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
@@ -251,7 +251,7 @@
             'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
             'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
     }) %}
-    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel|purify }}</label>
+    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel|purify_allow_target_blank }}</label>
 
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}

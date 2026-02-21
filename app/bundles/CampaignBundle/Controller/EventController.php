@@ -174,6 +174,7 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
         ];
 
@@ -315,6 +316,7 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => !$cancelled && $valid,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
             'modifiedEvents'=> $modifiedEvents,
             'eventId'       => $event['id'] ?? '',
