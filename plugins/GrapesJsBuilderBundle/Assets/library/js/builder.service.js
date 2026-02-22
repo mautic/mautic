@@ -227,11 +227,8 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: contentService.getOriginalContentHtml().body.innerHTML,
+      components: (contentService.getOriginalContentHtml().body ? contentService.getOriginalContentHtml().body.innerHTML : ''),
       height: '100%',
-      canvas: {
-        styles: contentService.getStyles(),
-      },
       storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
       assetManager: this.getAssetManagerConf(),
       styleManager: {
