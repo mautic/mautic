@@ -83,7 +83,17 @@ class CodeEditor {
    * @todo show validation results in UI
    */
   updateCode() {
-    const code = this.codeEditor.editor.getValue();
+    let code = this.codeEditor.editor.getValue();
+    
+    // Extract body content if the code contains <html> or <head> tags
+    // to prevent duplicating head content into body
+    if (code.includes('<html') || code.includes('<head') || code.includes('<body')) {
+      const bodyMatch = code.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      if (bodyMatch && bodyMatch[1]) {
+        code = bodyMatch[1].trim();
+      }
+    }
+    
     // validate MJML code
     if (ContentService.isMjmlMode(this.editor)) {
       MjmlService.mjmlToHtml(code);
