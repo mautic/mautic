@@ -396,7 +396,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Test creating a new field
 
-        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $typeSafePayload          = $this->generateTypeSafePayload($payload);
+        $typeSafePayload['order'] = $this->getOrder(); // Order must be defined to prevent race-condition on PostgreSQL
+
         $this->client->request('POST', '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -496,7 +498,6 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isListable'          => false,
             'isIndex'             => true, // Must be true, because if isUniqueIdentifier field is true the contact field *must* be indexed.
             'charLengthLimit'     => 25,
-            'order'               => $this->getOrder(), // Order must be defined to prevent race-condition on PostgreSQL
             'properties'          => [],
         ];
     }
