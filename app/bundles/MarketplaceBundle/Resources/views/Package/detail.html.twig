@@ -45,10 +45,10 @@
 {% set buttons = buttons|merge([{
     'attr': {
         'id': 'ratePackage',
-        'data-toggle': 'ajaxmodal',
-        'data-target': '#MauticSharedModal',
-        'data-header': 'mautic.marketplace.rate.package'|trans,
-        'href': path('mautic_marketplace_rate_package', {'vendor': packageDetail.packageBase.getVendorName(), 'package': packageDetail.packageBase.getPackageName()}),
+        'href': 'https://marketplace-staging.mautic.org/package/' ~ packageDetail.packageBase.getVendorName() ~ '/' ~ packageDetail.packageBase.getPackageName(),
+        'target': '_blank',
+        'rel': 'noopener noreferrer',
+        'data-toggle': '',
     },
     'btnText': 'mautic.marketplace.rate.package'|trans,
     'iconClass': 'ri-mail-send-line',
