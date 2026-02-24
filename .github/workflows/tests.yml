@@ -151,6 +151,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Add this step to resolve the Node v18 vs v20 mismatch
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or '22' to match your requirements
+          cache: 'npm'       # Optional: enables faster local caching
+
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
