@@ -255,8 +255,16 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // update existing values
-        foreach ($fieldValues as &$groupFields) {
+        foreach ($fieldValues as $group => &$groupFields) {
+            if ('all' === $group || !is_array($groupFields)) {
+                continue;
+            }
+
             foreach ($groupFields as $alias => &$field) {
+                if (!is_array($field)) {
+                    continue;
+                }
+
                 if (!isset($field['value'])) {
                     $field['value'] = null;
                 }

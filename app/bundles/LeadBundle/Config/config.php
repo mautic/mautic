@@ -252,16 +252,6 @@ return [
                 'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::removeContactAction',
                 'method'     => 'POST',
             ],
-            'mautic_api_companyaddtags' => [
-                'path'       => '/companies/{companyId}/tags/add',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::addTagsAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_companyremovetag' => [
-                'path'       => '/companies/{companyId}/tag/{tagId}/remove',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::removeTagAction',
-                'method'     => 'POST',
-            ],
             'mautic_api_fieldsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'fields',
