@@ -29,11 +29,6 @@ return [
                 'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RemoveController::viewAction',
                 'method'     => 'GET|POST',
             ],
-            RouteProvider::ROUTE_RATE_PACKAGE => [
-                'path'       => '/marketplace/rate/package/{vendor}/{package}',
-                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RateController::rateAction',
-                'method'     => 'GET',
-            ],
             RouteProvider::ROUTE_CLEAR_CACHE => [
                 'path'       => '/marketplace/clear/cache',
                 'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
@@ -82,8 +77,5 @@ return [
     // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
         Config::MARKETPLACE_ENABLED                => true,
-        Config::MARKETPLACE_AUTH0_DOMAIN           => 'mautic-dev.us.auth0.com',
-        Config::MARKETPLACE_AUTH0_CLIENT_ID        => 'oJZKD8pJJM5UFAhadKDivh3pffWZdkdz',
-        Config::MARKETPLACE_REVIEWS_API_URL        => 'https://marketplace-api.mautic.org/functions/v1/api-marketplace-reviews',
     ],
 ];
