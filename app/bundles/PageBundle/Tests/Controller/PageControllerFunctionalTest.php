@@ -131,4 +131,34 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals('New Page', $this->em->find(Page::class, $pageId)->getTitle());
     }
+
+    public function testOptimisticLock(): void
+    {
+        $version = 1;
+        $page    = $this->createPage();
+        $this->em->flush();
+        $this->assertPageVersion($page->getId(), $version);
+
+        $crawler = $this->client->request('GET', '/s/pages/edit/'.$page->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertPageVersion($page->getId(), ++$version, 'The version should be incremented after submitting the form.');
+
+        $form    = $crawler->selectButton('Save')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertPageVersion($page->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
+        Assert::assertStringContainsString(
+            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
+            $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.',
+        );
+    }
+
+    private function assertPageVersion(int $id, int $expectedVersion, string $message = ''): void
+    {
+        $this->em->clear();
+        $page = $this->em->find(Page::class, $id);
+        Assert::assertSame($expectedVersion, $page->getVersion(), $message);
+    }
 }

@@ -103,9 +103,8 @@ class FormSubscriber implements EventSubscriberInterface
             'formTypeCleanMasks' => [
                 'message' => 'raw',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticForm/Action/form_email.html.twig',
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'  => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [
@@ -119,8 +118,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
 
