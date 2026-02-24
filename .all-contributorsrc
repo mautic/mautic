@@ -1688,6 +1688,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "introfini",
+      "name": "José Fernandes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104880?v=4",
+      "profile": "https://github.com/introfini",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
