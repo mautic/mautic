@@ -97,7 +97,6 @@ class CodeEditor {
       const parser = new DOMParser();
       const doc = parser.parseFromString(code, 'text/html');
       const bodyContent = doc.body.innerHTML;
-    
       this.editor.setComponents(bodyContent.trim());
 
       // Reinitialize the content after parsing MJML.
