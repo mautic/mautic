@@ -144,3 +144,6 @@ tests/**/*.sql
 !/themes/blank-big.png
 
 /translations
+AGENTS.md
+CLAUDE.md
+GEMINI.md
