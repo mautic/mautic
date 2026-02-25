@@ -620,7 +620,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'read_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'COALESCE(ROUND((e.read_count / NULLIF(e.sent_count, 0)) * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND((e.read_count * 100.0) / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'e.sent_count' => [
@@ -669,7 +669,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'COALESCE(ROUND((SUM(CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) / NULLIF(e.sent_count, 0)) * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND((SUM(CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'bounced' => [
@@ -682,7 +682,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'bounced_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'COALESCE(ROUND((SUM(CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END) / NULLIF(e.sent_count, 0)) * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND((SUM(CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'vp.id' => [
@@ -711,14 +711,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'hits_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'COALESCE(ROUND(cut.hits / NULLIF(e.sent_count, 0) * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND(cut.hits * 100.0 / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'unique_ratio' => [
                 'alias'   => 'unique_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'COALESCE(ROUND(cut.unique_hits / NULLIF(e.sent_count, 0) * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND(cut.unique_hits * 100.0 / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
         ];
