@@ -42,6 +42,19 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testMarketplaceListWithSearchQuery(): void
+    {
+        /** @var MockHandler $handlerStack */
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))
+        );
+
+        $crawler = $this->client->request('GET', 's/marketplace?search=recaptcha');
+
+        $this->assertResponseIsSuccessful();
+    }
+
     public function testMarketplaceListHandlesEmptyResults(): void
     {
         /** @var MockHandler $handlerStack */

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Collection;
 
 use Mautic\MarketplaceBundle\DTO\Review;
-use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class ReviewCollection implements \Iterator, \Countable, \ArrayAccess
+class ReviewCollection implements \Iterator, \Countable
 {
     /**
      * @var Review[]
@@ -81,33 +80,5 @@ class ReviewCollection implements \Iterator, \Countable, \ArrayAccess
     public function count(): int
     {
         return count($this->records);
-    }
-
-    public function offsetSet($offset, $value): void
-    {
-        if (is_null($offset)) {
-            $this->records[] = $value;
-        } else {
-            $this->records[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset): bool
-    {
-        return isset($this->records[$offset]);
-    }
-
-    public function offsetUnset($offset): void
-    {
-        unset($this->records[$offset]);
-    }
-
-    public function offsetGet($offset): Review
-    {
-        if (isset($this->records[$offset])) {
-            return $this->records[$offset];
-        }
-
-        throw new RecordNotFoundException("Review on offset {$offset} was not found");
     }
 }
