@@ -92,7 +92,13 @@ class CodeEditor {
     try {
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim())
+
+      // Parse HTML to extract only <body> content to prevent <head> duplication
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(code, 'text/html');
+      const bodyContent = doc.body.innerHTML;
+    
+      this.editor.setComponents(bodyContent.trim());
 
       // Reinitialize the content after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
