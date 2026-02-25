@@ -35,7 +35,7 @@ class ReviewCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(
             array_map(
                 fn (array $record) => Review::fromArray($record),
-                $array
+                array_filter($array, fn ($record) => is_array($record))
             )
         );
     }

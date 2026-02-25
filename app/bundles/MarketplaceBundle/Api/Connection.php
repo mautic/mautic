@@ -23,9 +23,17 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        $offset = ($page - 1) * $limit + 1;
+        $offset      = ($page - 1) * $limit;
+        $queryParams = [
+            '_limit'  => $limit,
+            '_offset' => $offset,
+        ];
+        if ('' !== $query) {
+            $queryParams['_query'] = $query;
+        }
+        $url = 'https://marketplace-api.mautic.org/functions/v1/api-marketplace-packages?'.http_build_query($queryParams);
 
-        return $this->makeRequest("https://marketplace-api.mautic.org/functions/v1/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}&_order=");
+        return $this->makeRequest($url);
     }
 
     /**

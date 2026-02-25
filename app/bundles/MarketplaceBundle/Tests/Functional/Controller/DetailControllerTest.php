@@ -48,13 +48,13 @@ final class DetailControllerTest extends MauticMysqlTestCase
             'mautic/unicorn',
             SymfonyResponse::HTTP_NOT_FOUND,
             'mautic/unicorn',
-            'Package &#039;mautic/unicorn&#039; not found in allowlist.',
+            'Package &#039;mautic/unicorn&#039; not found.',
         ];
 
         yield [
             'koco/mautic-recaptcha-bundle',
             SymfonyResponse::HTTP_OK,
-            'Mautic Recaptcha Bundle', // The KocoCaptcha was in the "ApiResponse/allowlist.json".
+            'Mautic Recaptcha Bundle', // Display name comes from the Packagist API response (detail.json).
             'This plugin brings reCAPTCHA integration to mautic.',
             '<a href="https://github.com/KonstantinCodes/mautic-recaptcha/releases/tag/3.0.1" id="latest-version" target="_blank" rel="noopener noreferrer">',
         ];
@@ -68,7 +68,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json'))
         );
 
-        $this->client->request('GET', 's/marketplace/detail/koco/mautic-recaptcha-bundle');
+        $crawler = $this->client->request('GET', 's/marketplace/detail/koco/mautic-recaptcha-bundle');
 
         $this->assertResponseIsSuccessful();
 
@@ -79,5 +79,31 @@ final class DetailControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Excellent reCAPTCHA integration!', $responseContent);
         Assert::assertStringContainsString('jane_smith', $responseContent);
         Assert::assertStringContainsString('Works great with Mautic forms', $responseContent);
+
+        // Verify star ratings are rendered (john_doe has 5 stars, jane_smith has 4)
+        $starRows = $crawler->filter('.ri-star-fill');
+        Assert::assertGreaterThanOrEqual(9, $starRows->count()); // 5 + 4 filled stars
+    }
+
+    public function testMarketplaceDetailPageHandlesNoReviews(): void
+    {
+        /** @var MockHandler $handlerStack */
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail_no_reviews.json'))
+        );
+
+        $crawler = $this->client->request('GET', 's/marketplace/detail/koco/mautic-recaptcha-bundle');
+
+        $this->assertResponseIsSuccessful();
+
+        $responseContent = $this->client->getResponse()->getContent();
+
+        // Verify the page renders successfully with no reviews
+        Assert::assertStringContainsString('Mautic Recaptcha Bundle', $responseContent);
+
+        // Verify no review blocks are rendered
+        Assert::assertSame(0, $crawler->filter('blockquote')->count());
+        Assert::assertSame(0, $crawler->filter('.ri-star-fill')->count());
     }
 }

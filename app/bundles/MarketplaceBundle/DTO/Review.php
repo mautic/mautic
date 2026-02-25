@@ -14,13 +14,13 @@ final class Review
     }
 
     /**
-     * @param array{name?: string, user?: string, rating: int, review?: string} $array
+     * @param array{rating?: int, name?: string, user?: string, review?: string} $array
      */
     public static function fromArray(array $array): self
     {
         return new self(
             $array['name'] ?? $array['user'] ?? 'Unknown user',
-            (int) $array['rating'],
+            (int) ($array['rating'] ?? 0),
             $array['review'] ?? ''
         );
     }
