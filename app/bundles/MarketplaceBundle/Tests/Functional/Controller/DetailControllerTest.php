@@ -103,7 +103,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Mautic Recaptcha Bundle', $responseContent);
 
         // Verify no review blocks are rendered
-        Assert::assertSame(0, $crawler->filter('blockquote')->count());
-        Assert::assertSame(0, $crawler->filter('.ri-star-fill')->count());
+        Assert::assertCount(0, $crawler->filter('blockquote'));
+        Assert::assertCount(0, $crawler->filter('.ri-star-fill'));
     }
 }
