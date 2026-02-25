@@ -75,7 +75,14 @@ class SegmentDependencyTreeFactory
             }
         }
 
-        return $this->segmentModel->getRepository()->findBy(['id' => $childSegmentIds]);
+        // findBy does not guarantee any specific order
+        return $this->segmentModel->getRepository()
+            ->createQueryBuilder('s')
+            ->where('s.id IN (:ids)')
+            ->setParameter('ids', $childSegmentIds)
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     private function generateSegmentDetailRoute(LeadList $segment): string

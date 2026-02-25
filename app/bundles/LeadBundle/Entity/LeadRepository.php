@@ -965,6 +965,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
                 $filter->strict = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.campaign_membership'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.campaign_membership', [], null, 'en_US'):
+                // Silently convert any non-numeric value to 0
+                // This prevents PostgreSQL "invalid input syntax for type integer" error
+                // while keeping the same behaviour as MySQL (no results for bad input)
+                $filter->string  = is_numeric($string) ? $string : '0';   // use the sanitized value
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
