@@ -9,6 +9,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -1482,6 +1483,21 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $newSelect = $currentSelect.', '.implode(', ', $additionalSelects);
             $q->select($newSelect);
         }
+    }
+
+    /**
+     * Override for Lead entity because unique identifiers are dynamic (custom fields).
+     */
+    protected function getUpsertConflictTarget(ClassMetadata $metadata, string $pkColumn): ?string
+    {
+        $uniqueColumns = $this->getUniqueIdentifierColumns();
+
+        if (!empty($uniqueColumns)) {
+            return implode(', ', $uniqueColumns);
+        }
+
+        // Fallback - use default behaviour
+        return parent::getUpsertConflictTarget($metadata, $pkColumn);
     }
 
     /**

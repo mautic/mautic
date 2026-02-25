@@ -1901,7 +1901,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Tries to find a suitable unique constraint for ON CONFLICT (prefers non-PK).
      */
-    private function getUpsertConflictTarget(ClassMetadata $metadata, string $pkColumn): ?string
+    protected function getUpsertConflictTarget(ClassMetadata $metadata, string $pkColumn): ?string
     {
         // From mapping attributes/annotations
         $uniqueConstraints = $metadata->table['uniqueConstraints'] ?? [];
