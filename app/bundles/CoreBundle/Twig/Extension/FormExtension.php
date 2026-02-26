@@ -23,7 +23,6 @@ class FormExtension extends AbstractExtension
             new TwigFunction('formFieldFormatList', [$this, 'formatList'], ['is_safe' => ['all']]),
             new TwigFunction('formContainsErrors', [$this, 'containsErrors'], ['is_safe' => ['all']]),
             new TwigFunction('formRowIfExists', [$this, 'rowIfExists'], ['is_safe' => ['html']]),
-            new TwigFunction('formFieldExists', [$this, 'fieldExists']),
         ];
     }
 
@@ -75,10 +74,5 @@ class FormExtension extends AbstractExtension
         }
 
         return $this->formRenderer->searchAndRenderBlock($form[$fieldName], 'row', $variables);
-    }
-
-    public function fieldExists(FormView $form, string $fieldName): bool
-    {
-        return isset($form[$fieldName]);
     }
 }

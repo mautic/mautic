@@ -36,15 +36,4 @@ class FormExtensionTest extends TestCase
 
         $this->assertSame('<div>row</div>', $extension->rowIfExists($form, 'existing_field', ['label' => 'My label']));
     }
-
-    public function testFieldExistsReturnsExpectedValue(): void
-    {
-        $form                             = new FormView();
-        $form->children['existing_field'] = new FormView($form);
-
-        $extension = new FormExtension($this->createMock(FormRendererInterface::class));
-
-        $this->assertTrue($extension->fieldExists($form, 'existing_field'));
-        $this->assertFalse($extension->fieldExists($form, 'missing_field'));
-    }
 }

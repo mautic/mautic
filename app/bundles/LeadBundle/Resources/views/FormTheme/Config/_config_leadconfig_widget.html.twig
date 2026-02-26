@@ -42,21 +42,19 @@
 </div>
 
 
-{% if formFieldExists(form, 'background_import_if_more_rows_than') %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.importconfig'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.importconfig.description'|trans }}</div>
-    <div class="row">
-        <div class="panel panel-default mb-md">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-xs-12">
-                        {{ formRowIfExists(form, 'background_import_if_more_rows_than') }}
-                    </div>
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.importconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.importconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ formRowIfExists(form, 'background_import_if_more_rows_than') }}
                 </div>
             </div>
         </div>
     </div>
-{% endif %}
+</div>
 
 <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.exportconfig'|trans }}</h4>
 <div class="text-muted small pb-md">{{ 'mautic.core.config.header.exportconfig.description'|trans }}</div>
