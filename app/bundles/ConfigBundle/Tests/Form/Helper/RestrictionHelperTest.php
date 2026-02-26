@@ -197,6 +197,29 @@ class RestrictionHelperTest extends TypeTestCase
         );
     }
 
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that adjacent restricted sibling fields are all removed')]
+    public function testAdjacentRestrictedSiblingFieldsAreRemoved(): void
+    {
+        $this->restrictedFields = [
+            'mailer_from_name',
+            'mailer_from_email',
+        ];
+
+        // Rebuild factory to get updated RestrictionHelper
+        $this->factory = Forms::createFormFactoryBuilder()
+            ->addExtensions($this->getExtensions())
+            ->getFormFactory();
+
+        $form = $this->factory->create(ConfigType::class, $this->forms);
+
+        $this->assertTrue($form->has('emailconfig'));
+
+        $emailConfig = $form->get('emailconfig');
+
+        $this->assertFalse($emailConfig->has('mailer_from_name'));
+        $this->assertFalse($emailConfig->has('mailer_from_email'));
+    }
+
     /**
      * @return array
      */
