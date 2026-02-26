@@ -12,6 +12,7 @@ use PHPUnit\Framework\Assert;
 
 class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
     private const SALES_USER = 'sales';
 
     /**
@@ -28,9 +29,10 @@ class UserNotificationBuilderTest extends MauticMysqlTestCase
 
     public function testGetUserIdsWithNonExistentObject(): void
     {
+        $user    = $this->getUser(self::ADMIN_USER);
         $userIds = $this->notificationBuilder->getUserIds('lead', 253);
 
-        Assert::assertSame([1], $userIds);
+        Assert::assertSame([$user->getId()], $userIds);
     }
 
     public function testGetUserIdsWithExistentObject(): void

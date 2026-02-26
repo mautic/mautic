@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Entity;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 class ProjectRepository extends CommonRepository
@@ -23,19 +24,29 @@ class ProjectRepository extends CommonRepository
         return 'p';
     }
 
-    public function checkProjectNameExists(string $name, ?int $ignoredId = null): bool
+    public function getProjectByName(string $name, ?int $ignoredId = null): ?Project
     {
+        $connection   = $this->getEntityManager()->getConnection();
+        $isPostgreSql = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $where        = ($isPostgreSql ?
+            'LOWER('.$this->getTableAlias().'.name) = LOWER(:name)' :
+            $this->getTableAlias().'.name = :name'
+        );
+
         $q = $this->createQueryBuilder($this->getTableAlias());
-        $q->select('1');
-        $q->where($this->getTableAlias().'.name = :name');
+        $q->where($where);
         $q->setParameter('name', $name);
-        $q->setMaxResults(1);
 
         if (null !== $ignoredId) {
             $q->andWhere($q->expr()->neq($this->getTableAlias().'.id', ':ignoredId'));
             $q->setParameter('ignoredId', $ignoredId);
         }
 
-        return !empty($q->getQuery()->getResult());
+        return $q->getQuery()->getOneOrNullResult();
+    }
+
+    public function checkProjectNameExists(string $name, ?int $ignoredId = null): bool
+    {
+        return !empty($this->getProjectByName($name, $ignoredId));
     }
 }
