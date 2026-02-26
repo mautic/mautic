@@ -100,7 +100,13 @@ class SubmissionRepository extends CommonRepository
         $fieldAliases = array_map(fn ($alias) => $databasePlatform->quoteIdentifier($alias), $fieldAliases);
 
         $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
-        $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
+        $dq->select(
+            'r.submission_id, '.
+            's.date_submitted as '.$databasePlatform->quoteIdentifier('dateSubmitted').', '.
+            's.lead_id as '.$databasePlatform->quoteIdentifier('leadId').', '.
+            's.referer, '.
+            'i.ip_address as '.$databasePlatform->quoteIdentifier('ipAddress').
+            $fieldAliasSql);
         $results = $dq->executeQuery()->fetchAllAssociative();
 
         // loop over results to put form submission results in something that can be assigned to the entities
@@ -212,6 +218,8 @@ class SubmissionRepository extends CommonRepository
      */
     public function getEntitiesByPage(array $args = []): array
     {
+        $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
+
         $activePage = $args['activePage'];
 
         $dq = $this->_em->getConnection()->createQueryBuilder();
@@ -234,7 +242,13 @@ class SubmissionRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('s.id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.form_id as formId, s.referer, i.ip_address as ipAddress');
+        $dq->select(
+            's.id',
+            's.date_submitted as '.$databasePlatform->quoteIdentifier('dateSubmitted'),
+            's.lead_id as '.$databasePlatform->quoteIdentifier('leadId'),
+            's.form_id as '.$databasePlatform->quoteIdentifier('formId'),
+            's.referer',
+            'i.ip_address as '.$databasePlatform->quoteIdentifier('ipAddress'));
         $results = $dq->executeQuery()->fetchAllAssociative();
 
         return [
@@ -282,8 +296,11 @@ class SubmissionRepository extends CommonRepository
      */
     public function getSubmissions(array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted", fs.lead_id')
+        $connection       = $this->_em->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+
+        $query = $connection->createQueryBuilder();
+        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS '.$databasePlatform->quoteIdentifier('dateSubmitted').', fs.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
