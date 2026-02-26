@@ -22,8 +22,8 @@ class FormExtensionTest extends TestCase
 
     public function testRowIfExistsRendersExistingField(): void
     {
-        $form      = new FormView();
-        $childView = new FormView($form);
+        $form                             = new FormView();
+        $childView                        = new FormView($form);
         $form->children['existing_field'] = $childView;
 
         $renderer = $this->createMock(FormRendererInterface::class);
@@ -39,7 +39,7 @@ class FormExtensionTest extends TestCase
 
     public function testFieldExistsReturnsExpectedValue(): void
     {
-        $form = new FormView();
+        $form                             = new FormView();
         $form->children['existing_field'] = new FormView($form);
 
         $extension = new FormExtension($this->createMock(FormRendererInterface::class));

@@ -31,7 +31,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
-            $translator = static::getContainer()->get('translator');
+            $translator        = static::getContainer()->get('translator');
             $restrictionHelper = new RestrictionHelper(
                 $translator,
                 ['upload_dir'],
