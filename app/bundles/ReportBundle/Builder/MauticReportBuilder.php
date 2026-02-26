@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -327,9 +328,22 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
-                $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
+                switch ($aggregator['function']) {
+                    case 'AVG': // PostgreSQL and MySQL default AVG precision is different
+                        $appendix   = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform ? '::numeric(10, '.FormatterHelper::FLOAT_PRECISION.')' : '';
+                        $selectText = sprintf('%s(%s)%s', $aggregator['function'], $this->sanitizeColumnName($columnSelect), $appendix);
+                        break;
+                    default:
+                        $selectText = sprintf('%s(%s)', $aggregator['function'], $this->sanitizeColumnName($columnSelect));
+                }
 
-                $aggregatorSelect[]  = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
+                // Build alias like "MIN l.points"
+                $label = $aggregator['function'].' '.$aggregator['column'];
+
+                // Use Doctrine's platform-aware quoting (" on PostgreSQL, ` on MySQL)
+                $quotedLabel = $this->sanitizeColumnName($label, true);
+
+                $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedLabel);
                 $aggregatedColumns[] = $columnSelect; // Track aggregated columns
             }
 
@@ -719,8 +733,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * Aliases like "8e296a06" makes MySql to think it is a number.
      * Expects param in format "table_alias.column_name".
      */
-    private function sanitizeColumnName(string $fullColumnName): string
+    private function sanitizeColumnName(string $fullColumnName, bool $isLabel = false): string
     {
+        if ($isLabel) {
+            return $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform
+                ? "\"$fullColumnName\""
+                : "`$fullColumnName`";
+        }
+
         [$tableAlias, $columnName] = explode('.', $fullColumnName);
 
         return $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform
