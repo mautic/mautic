@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -28,6 +29,17 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
+
+        if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
+            $translator = static::getContainer()->get('translator');
+            $restrictionHelper = new RestrictionHelper(
+                $translator,
+                ['upload_dir'],
+                RestrictionHelper::MODE_REMOVE
+            );
+            static::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
+            static::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
+        }
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
     }
@@ -231,6 +243,17 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
         Assert::assertEquals($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
         Assert::assertEquals($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+    }
+
+    public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        // Restricted explicitly in test setUp().
+        $this->assertCount(0, $crawler->filter('#config_assetconfig_upload_dir'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_max_size'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_allowed_extensions'));
     }
 
     public function testUserAndSystemLocale(): void
