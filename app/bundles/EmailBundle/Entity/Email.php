@@ -940,10 +940,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getPublishDown()
     {
-        if ($this->isSegmentEmail() && !$this->isContinueSending()) {
-            return null;
-        }
-
         return $this->publishDown;
     }
 
