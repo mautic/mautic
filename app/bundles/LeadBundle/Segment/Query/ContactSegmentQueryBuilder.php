@@ -113,13 +113,16 @@ class ContactSegmentQueryBuilder
             }
         }
 
-        $qb->select('DISTINCT '.$primary.' as leadIdPrimary');
+        $qb->select('DISTINCT '.$primary.' as '.$connection->quoteIdentifier('leadIdPrimary'));
         foreach ($currentSelects as $select) {
             $qb->addSelect($select);
         }
 
-        $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId, min(leadIdPrimary) minId')
-            ->from('('.$qb->getSQL().')', 'sss');
+        $queryBuilder->select(
+            'count('.$connection->quoteIdentifier('leadIdPrimary').') AS '.$connection->quoteIdentifier('count'),
+            'max('.$connection->quoteIdentifier('leadIdPrimary').') AS '.$connection->quoteIdentifier('maxId'),
+            'min('.$connection->quoteIdentifier('leadIdPrimary').') AS '.$connection->quoteIdentifier('minId')
+        )->from('('.$qb->getSQL().')', 'sss');
 
         $queryBuilder->setParameters($qb->getParameters(), $qb->getParameterTypes());
 

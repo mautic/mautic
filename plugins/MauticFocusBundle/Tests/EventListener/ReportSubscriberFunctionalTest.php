@@ -49,12 +49,12 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Order-independent assertion (safe for PostgreSQL + MySQL)
         $this->assertEqualsCanonicalizing([
-            ['1', 'FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', 'http://example1.com'],
-            ['2', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', 'http://example1.com'],
-            ['3', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '0', '0', 'http://example2.com'],
-            ['4', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', 'http://example2.com'],
-            ['5', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
-            ['6', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
+            ['FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', 'http://example1.com'],
+            ['FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', 'http://example1.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '0', '0', 'http://example2.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', 'http://example2.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
         ], $table);
     }
 
