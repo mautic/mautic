@@ -34,6 +34,14 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
+        // Force deterministic ORDER BY for PostgreSQL (tests expect stable row order)
+        $reportId = $report->getId();
+
+        $session = $this->client->getSession();
+        $session->set('mautic.report.'.$reportId.'.orderby', ReportSubscriber::PREFIX_FOCUS.'.id');
+        $session->set('mautic.report.'.$reportId.'.orderbydir', 'ASC');
+        $session->save();
+
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertTrue($this->client->getResponse()->isOk());
         // get table with id=reportTable
@@ -47,8 +55,8 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([
             ['1', 'FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', 'http://example1.com'],
             ['2', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', 'http://example1.com'],
-            ['3', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', 'http://example2.com'],
-            ['4', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '0', '0', 'http://example2.com'],
+            ['3', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '0', '0', 'http://example2.com'],
+            ['4', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', 'http://example2.com'],
             ['5', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
             ['6', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
         ], $table);

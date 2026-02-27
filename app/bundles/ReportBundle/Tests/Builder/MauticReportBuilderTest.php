@@ -212,7 +212,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `a`.`id`, AVG(IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)) AS \'AVG a.bounced\' GROUP BY a.id
+            SELECT `a`.`id`, AVG(IF(`dnc`.`id` IS NOT NULL AND `dnc`.`reason`=2, 1, 0)) AS \'AVG a.bounced\' GROUP BY a.id
         ')), $query->getSql());
     }
 

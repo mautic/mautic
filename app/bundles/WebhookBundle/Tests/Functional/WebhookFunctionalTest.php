@@ -322,7 +322,9 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return ?array<int,int> $range
+     * Returns the minimum and maximum queue ID for a given webhook.
+     *
+     * @return array{0: int, 1: int} // [minId, maxId]
      */
     private function getWebhookQueueRange(int $webhookId): array
     {

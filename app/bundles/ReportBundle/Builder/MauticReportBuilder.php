@@ -8,7 +8,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -321,6 +320,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $aggregatedColumns = [];
 
         if ($aggregators && $groupByOptions) {
+            $isPostgreSql = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform;
             foreach ($aggregators as $aggregator) {
                 if (isset($options['columns'][$aggregator['column']]) && isset($options['columns'][$aggregator['column']]['formula'])) {
                     $columnSelect = $options['columns'][$aggregator['column']]['formula'];
@@ -328,22 +328,19 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
+                // Recursively sanitize inner column references
+                $innerExpression = $this->sanitizeExpression($columnSelect);
+
                 switch ($aggregator['function']) {
                     case 'AVG': // PostgreSQL and MySQL default AVG precision is different
-                        $appendix   = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform ? '::numeric(10, '.FormatterHelper::FLOAT_PRECISION.')' : '';
-                        $selectText = sprintf('%s(%s)%s', $aggregator['function'], $this->sanitizeColumnName($columnSelect), $appendix);
+                        $appendix   = $isPostgreSql ? '::numeric(10, 4)' : '';
+                        $selectText = sprintf('%s(%s)%s', $aggregator['function'], $innerExpression, $appendix);
                         break;
                     default:
-                        $selectText = sprintf('%s(%s)', $aggregator['function'], $this->sanitizeColumnName($columnSelect));
+                        $selectText = sprintf('%s(%s)', $aggregator['function'], $innerExpression);
                 }
 
-                // Build alias like "MIN l.points"
-                $label = $aggregator['function'].' '.$aggregator['column'];
-
-                // Use Doctrine's platform-aware quoting (" on PostgreSQL, ` on MySQL)
-                $quotedLabel = $this->sanitizeColumnName($label, true);
-
-                $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedLabel);
+                $aggregatorSelect[]  = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
                 $aggregatedColumns[] = $columnSelect; // Track aggregated columns
             }
 
@@ -726,6 +723,42 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         return $uniqueColumns;
+    }
+
+    /**
+     * Sanitizes expressions recursively.
+     * - If the expression starts with a function (AVG(, IF(, ROUND(, etc.) or contains SELECT,
+     *   it recurses into the arguments and sanitizes only real column references (table.column).
+     * - Simple labels/aliases that are not expressions are left untouched.
+     */
+    private function sanitizeExpression(string $expression): string
+    {
+        $trimmed = trim($expression);
+
+        // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
+        if (!$this->isComplexExpression($trimmed)) {
+            return $trimmed;
+        }
+
+        // Recursively sanitize all column references inside the expression
+        return preg_replace_callback(
+            '/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i',
+            function ($matches) {
+                return $this->sanitizeColumnName($matches[1]);
+            },
+            $trimmed
+        );
+    }
+
+    /**
+     * Returns true if the string looks like a complex SQL expression (function call or SELECT).
+     */
+    private function isComplexExpression(string $expression): bool
+    {
+        $expr = trim($expression);
+
+        // Starts with a function name followed by '(' or contains SELECT
+        return preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
     }
 
     /**
