@@ -743,9 +743,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Recursively sanitize all column references inside the expression
         return preg_replace_callback(
             '/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i',
-            function ($matches) {
-                return $this->sanitizeColumnName($matches[1]);
-            },
+            fn ($matches) => $this->sanitizeColumnName($matches[1]),
             $trimmed
         );
     }
