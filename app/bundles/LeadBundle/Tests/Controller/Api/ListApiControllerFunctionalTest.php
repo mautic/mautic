@@ -86,7 +86,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($expectedResponseCode, $this->client->getResponse()->getStatusCode());
 
         if ($expectedErrorMessage) {
-            Assert::assertStringContainsString(
+            Assert::assertStringContainsStringIgnoringCase(
                 $expectedErrorMessage,
                 json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
                 $this->client->getResponse()->getContent()

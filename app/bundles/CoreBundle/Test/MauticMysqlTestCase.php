@@ -338,8 +338,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function createDatabase(): void
     {
-        $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
-        $this->testSymfonyCommand('doctrine:database:create');
+        if (!$this->isPostgresqlPlatform()) {
+            // DROP doesnt work on postgresq with existing connection
+            $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
+        }
+        $this->testSymfonyCommand('doctrine:database:create', ['--if-not-exists' => true]);
         if ($this->isPostgresqlPlatform()) {
             // Database can't be dropped if there is existing connection (drop schema instead)
             $this->testSymfonyCommand('doctrine:schema:drop', ['--force' => true, '--full-database' => true]);
@@ -461,33 +464,36 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function resetCustomFields(): bool
     {
-        $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object, is_unique_identifer, is_index FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
-        foreach ($result as $data) {
-            $table = 'company' === $data['object'] ? 'companies' : 'leads';
+        try {
+            $prefix = $this->getTablePrefix();
+            $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object, is_unique_identifer, is_index FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+            foreach ($result as $data) {
+                $table = 'company' === $data['object'] ? 'companies' : 'leads';
 
-            // Drop column from main table
-            try {
-                $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
-            } catch (\Exception) {
-            }
+                // Drop column from main table
+                try {
+                    $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
+                } catch (DBALException) {
+                    // Ignore if table doesn't exist
+                }
 
-            if ($this->isPostgresqlPlatform()) {
-                // Drop dynamic search/unique index table if the field required it
-                // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
-                if ($data['is_unique_identifer'] || $data['is_index']) {
-                    $indexName = $prefix.$data['alias'].'_search';
+                if ($this->isPostgresqlPlatform()) {
+                    // Drop dynamic search/unique index table if the field required it
+                    // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
+                    if ($data['is_unique_identifer'] || $data['is_index']) {
+                        $indexName = $prefix.$data['alias'].'_search';
 
-                    try {
                         $this->connection->executeStatement(sprintf(
                             'DROP INDEX IF EXISTS %s CASCADE',
                             $indexName
                         ));
-                    } catch (\Exception) {
-                        // Ignore if table doesn't exist
                     }
                 }
             }
+        } catch (DBALException) {
+            // SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:
+            // current transaction is aborted, commands ignored until end of transaction block
+            $result = true; // on any error we force database clean
         }
 
         return (bool) $result;
@@ -529,12 +535,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $fullTable = $this->getTablePrefix().'ip_addresses';
-        if ($this->isPostgresqlPlatform()) {
-            $sequence = $this->getSerialSequence($fullTable);
-            $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '0.0.0.0')");
-        } else {
-            $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('0.0.0.0')");
+        try {
+            $fullTable = $this->getTablePrefix().'ip_addresses';
+            if ($this->isPostgresqlPlatform()) {
+                $sequence = $this->getSerialSequence($fullTable);
+                $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '0.0.0.0')");
+            } else {
+                $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('0.0.0.0')");
+            }
+        } catch (DBALException) {
+            // SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:
+            // current transaction is aborted, commands ignored until end of transaction block
         }
     }
 
