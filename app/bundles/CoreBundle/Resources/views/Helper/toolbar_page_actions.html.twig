@@ -23,7 +23,7 @@
             {
                 variant: 'ghost',
                 label: toolbarOptionsLabel|default('mautic.core.options'),
-                icon_only: true,
+                icon_only: not (toolbarOptionsShowLabel|default(false)),
                 icon: toolbarOptionsIcon|default('ri-settings-5-line ri-1x'),
                 attributes: {
                     'class': 'dropdown-toggle',
