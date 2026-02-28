@@ -1150,7 +1150,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function getFieldSegments(LeadField $field)
     {
-        $alias       = $field->getAlias();
+        $alias       = mb_strtolower($field->getAlias());
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
         $filter      = [

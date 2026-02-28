@@ -45,6 +45,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
                     ['label' => 'label2', 'value' => 'value2'],
                 ],
             ],
+            'order' => $this->getOrder(),
         ];
 
         $typeSafePayload = $this->generateTypeSafePayload($payload);
