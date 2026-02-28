@@ -339,8 +339,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     default:
                         $selectText = sprintf('%s(%s)', $aggregator['function'], $innerExpression);
                 }
-
-                $aggregatorSelect[]  = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
+                $alias               = sprintf('%s %s', $selectText, $aggregator['function'], $aggregator['column']);
+                $quotedAlias         = $this->sanitizeColumnName($alias, true);
+                $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedAlias);
                 $aggregatedColumns[] = $columnSelect; // Track aggregated columns
             }
 
@@ -737,6 +738,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
         if (!$this->isComplexExpression($trimmed)) {
+            if (preg_match('/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i', $trimmed)) {
+                return $this->sanitizeColumnName($trimmed); // if its simple column, we sanitize it, otherwise its inner query
+            }
+
             return $trimmed;
         }
 

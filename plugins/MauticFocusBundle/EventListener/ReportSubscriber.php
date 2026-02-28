@@ -332,7 +332,8 @@ final class ReportSubscriber implements EventSubscriberInterface
                 $queryBuilder->groupBy(
                     self::PREFIX_STATS.'.focus_id',
                     self::PREFIX_STATS.'.type',
-                    self::PREFIX_STATS.'.lead_id'
+                    self::PREFIX_STATS.'.lead_id',
+                    self::PREFIX_LEADS.'.id'
                 );
 
                 break;
