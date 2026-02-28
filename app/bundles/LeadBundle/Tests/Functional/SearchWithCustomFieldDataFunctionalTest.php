@@ -9,8 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
-    private const COMPANY_CUSTOM_FIELD  = 'client_id';
-    private const LEAD_CUSTOM_FIELD     = 'client_id';
+    private const COMPANY_CUSTOM_FIELD     = 'client_id_company';
+    private const CONTACT_CUSTOM_FIELD     = 'client_id_contact';
 
     protected $useCleanupRollback = false;
 
@@ -52,7 +52,7 @@ class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void
     {
         // Create a custom field for Contact
-        $customFieldAlias = self::LEAD_CUSTOM_FIELD;
+        $customFieldAlias = self::CONTACT_CUSTOM_FIELD;
         $this->createSearchableField($customFieldAlias, 'lead');
 
         // Create three contacts, one without custom field data.
