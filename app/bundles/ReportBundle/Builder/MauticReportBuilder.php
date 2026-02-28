@@ -339,7 +339,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     default:
                         $selectText = sprintf('%s(%s)', $aggregator['function'], $innerExpression);
                 }
-                $alias               = sprintf('%s %s', $selectText, $aggregator['function'], $aggregator['column']);
+                $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
                 $quotedAlias         = $this->sanitizeColumnName($alias, true);
                 $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedAlias);
                 $aggregatedColumns[] = $columnSelect; // Track aggregated columns
