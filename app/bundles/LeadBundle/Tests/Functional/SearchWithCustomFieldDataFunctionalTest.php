@@ -52,8 +52,7 @@ class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void
     {
         // Create a custom field for Contact
-        $customFieldAlias = self::CONTACT_CUSTOM_FIELD;
-        $this->createSearchableField($customFieldAlias, 'lead');
+        $this->createSearchableField(self::CONTACT_CUSTOM_FIELD, 'lead');
 
         // Create three contacts, one without custom field data.
         $contactData = [
@@ -62,14 +61,14 @@ class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
                 'lastname'      => 'One',
                 'email'         => 'c@one.com',
                 'company'       => 'One',
-                'customFields'  => [$customFieldAlias => 'client_1'],
+                'customFields'  => [self::CONTACT_CUSTOM_FIELD => 'client_1'],
             ],
             [
                 'firstname'     => 'Contact',
                 'lastname'      => 'Two',
                 'email'         => 'c@two.com',
                 'company'       => 'Two',
-                'customFields'  => [$customFieldAlias => 'client_2'],
+                'customFields'  => [self::CONTACT_CUSTOM_FIELD => 'client_2'],
             ],
             [
                 'firstname' => 'Contact',
@@ -101,14 +100,13 @@ class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
     public function testSearchCompaniesWithCustomFields(): void
     {
         // Create a custom field for Company
-        $customFieldAlias = self::COMPANY_CUSTOM_FIELD;
-        $this->createSearchableField($customFieldAlias, 'company');
+        $this->createSearchableField(self::CONTACT_CUSTOM_FIELD, 'company');
 
         // Create companies
         $this->createCompany([
             'name'          => 'ABC',
             'email'         => 'hello@abcexample.com',
-            'customFields'  => [$customFieldAlias => self::COMPANY_CUSTOM_FIELD],
+            'customFields'  => [self::CONTACT_CUSTOM_FIELD => self::COMPANY_CUSTOM_FIELD],
         ]);
 
         $this->createCompany([
