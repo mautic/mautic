@@ -487,6 +487,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                             'DROP INDEX IF EXISTS %s CASCADE',
                             $indexName
                         ));
+
+                        $this->connection->executeStatement(
+                            sprintf('DROP TABLE IF EXISTS %s CASCADE',
+                                $indexName
+                            ));
                     }
                 }
             }
