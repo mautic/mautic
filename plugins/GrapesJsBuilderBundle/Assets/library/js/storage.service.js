@@ -78,7 +78,14 @@ export default class StorageService {
     }
 
     addFormSubmitListeners() {
-        mQuery(this.getForm()).on('submit:success', (e, requestUrl, response) => {
+        const form = this.getForm();
+        
+        // Sync editor content to textarea before form submission
+        mQuery(form).on('submit', () => {
+            this.syncToTextarea();
+        });
+        
+        mQuery(form).on('submit:success', (e, requestUrl, response) => {
             const lastRequestUrlPart = requestUrl.split('/').pop();
             const lastResponseUrlPart = response.route.split('/').pop();
 
@@ -90,6 +97,14 @@ export default class StorageService {
                 this.removeStorageItemById(`gjs-${this.mode}-${Mautic.builderTheme}-new`);
             }
         });
+    }
+
+    syncToTextarea() {
+        const textarea = mQuery('textarea.builder-html');
+        if (textarea.length) {
+            const content = this.getEditorContent();
+            textarea.val(content);
+        }
     }
 
     handleUpdate() {
@@ -117,6 +132,11 @@ export default class StorageService {
             content = MjmlService.getEditorMjmlContent(this.editor);
         } else {
             content = ContentService.getEditorHtmlContent(this.editor);
+            const parser = new DOMParser();
+            const parsedDoc = parser.parseFromString(content, 'text/html');
+            if (parsedDoc.body.innerHTML) {
+                content = parsedDoc.body.innerHTML;
+            }
         }
         return content;
     }
