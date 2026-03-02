@@ -21,7 +21,9 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->useCleanupRollback = false;
+        if ($this->isMysqlPlatform()) {
+            $this->useCleanupRollback = false;
+        }
     }
 
     public function testWithIdAndUserArgs(): void
