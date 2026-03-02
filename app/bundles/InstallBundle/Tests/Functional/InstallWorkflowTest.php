@@ -71,7 +71,6 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form         = $submitButton->form();
 
         $form['install_doctrine_step[driver]']->setValue($this->connection->getParams()['driver']);
-        $form['install_doctrine_step[charset]']->setValue($this->connection->getParams()['charset']);
         $form['install_doctrine_step[host]']->setValue($this->connection->getParams()['host']);
         $form['install_doctrine_step[port]']->setValue((string) $this->connection->getParams()['port']);
         $form['install_doctrine_step[name]']->setValue($this->connection->getParams()['dbname']);

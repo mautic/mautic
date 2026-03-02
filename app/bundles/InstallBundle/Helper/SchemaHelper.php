@@ -7,6 +7,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
@@ -164,7 +165,7 @@ class SchemaHelper
             }
         }
 
-        $noForeignKeyChecks = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $noForeignKeyChecks = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform || $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
         $sql                = $noForeignKeyChecks ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
@@ -263,7 +264,7 @@ class SchemaHelper
             } else {
                 // existing backup to be dropped
                 $dropTables[]    = $t;
-                array_push($dropSequences, $sequence);
+                $dropSequences[] = $sequences;
             }
 
             foreach ($restraints as $restraint) {
@@ -356,28 +357,26 @@ class SchemaHelper
 
         // drop tables
         foreach ($tables as $t) {
-            if (isset($mauticTables[$t])) {
-                if ($this->platform instanceof PostgreSQLPlatform) {
-                    foreach ($sm->listTableColumns($t) as $c) {
-                        /*
-                         * Can't use $c->getAutoincrement() check as doctrine dont set
-                         * sequence ownership to column/table for postgresql
-                         * need to check all
-                         */
-                        $sequence = $this->getSerialSequence($t, $c->getName());
-                        if ($sequence) {
-                            $sql[] = $this->platform->getDropSequenceSQL($sequence);
-                        }
+            if ($this->platform instanceof PostgreSQLPlatform) {
+                foreach ($sm->listTableColumns($t) as $c) {
+                    /*
+                     * Can't use $c->getAutoincrement() check as doctrine dont set
+                     * sequence ownership to column/table for postgresql
+                     * need to check all
+                     */
+                    $sequence = $this->getSerialSequence($t, $c->getName());
+                    if ($sequence) {
+                        $sql[] = $this->platform->getDropSequenceSQL($sequence);
                     }
                 }
-
-                $dropSql = $this->platform->getDropTableSQL($t);
-                if ($this->platform instanceof PostgreSQLPlatform) {
-                    // this prevent constraint on table test_assets depends on table test_categories errors
-                    $dropSql .= ' CASCADE';
-                }
-                $sql[] = $dropSql;
             }
+
+            $dropSql = $this->platform->getDropTableSQL($t);
+            if ($this->platform instanceof PostgreSQLPlatform) {
+                // this prevent constraint on table test_assets depends on table test_categories errors
+                $dropSql .= ' CASCADE';
+            }
+            $sql[] = $dropSql;
         }
 
         return $sql;

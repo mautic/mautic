@@ -3,8 +3,10 @@
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -27,6 +29,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * @var bool
      */
     protected $useCleanupRollback = true;
+
+    /**
+     * @var AbstractSchemaManager<AbstractPlatform>|null
+     */
+    private ?AbstractSchemaManager $schemaManager = null;
 
     public function __construct(?string $name = null)
     {
@@ -647,6 +654,23 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         return $sequence;
     }
 
+    protected function findSerialSequence(string $table, ?string $field = null): ?string
+    {
+        $fullTable = $this->getTablePrefix().$table;
+
+        if (!$field) {
+            foreach ($this->getSchemaManager()->listTableColumns($table) as $column) {
+                if ($sequence = $this->getSerialSequence($fullTable, $column->getName())) {
+                    return $sequence;
+                }
+            }
+
+            return null; // sequence not found
+        }
+
+        return $this->getSerialSequence($fullTable, $field);
+    }
+
     /**
      * Helper method to ensure booleans are strings in HTTP payloads.
      *
@@ -661,5 +685,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         });
 
         return $payload;
+    }
+
+    /**
+     * @return AbstractSchemaManager<AbstractPlatform>
+     */
+    private function getSchemaManager(): AbstractSchemaManager
+    {
+        if (null !== $this->schemaManager) {
+            return $this->schemaManager;
+        }
+
+        return $this->schemaManager = $this->connection->createSchemaManager();
     }
 }

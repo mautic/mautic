@@ -21,15 +21,13 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        if ($this->isMysqlPlatform()) {
-            // This enables transaction rollback for cleanup, which works for PostgreSQL
-            // as DDL statements are transactional there. The entire test operations,
-            // including schema changes (ADD COLUMN), will be rolled back in tearDown,
-            // undoing the added columns without needing a full database reset.
-            // This avoids calling resetDatabase() and the external psql process,
-            // preventing the timeout issue caused by lock contention.
-            $this->useCleanupRollback = false;
-        }
+        // Removed: $this->useCleanupRollback = false;
+        // This enables transaction rollback for cleanup, which works for PostgreSQL
+        // as DDL statements are transactional there. The entire test operations,
+        // including schema changes (ADD COLUMN), will be rolled back in tearDown,
+        // undoing the added columns without needing a full database reset.
+        // This avoids calling resetDatabase() and the external psql process,
+        // preventing the timeout issue caused by lock contention.
     }
 
     public function testWithIdAndUserArgs(): void
