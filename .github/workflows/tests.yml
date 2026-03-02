@@ -130,7 +130,6 @@ jobs:
           POSTGRES_PASSWORD: mautic
         ports:
           - 5432
-        #  - 5432:5432
         options: >-
           --health-cmd "pg_isready -U mautic -d mautictest"
           --health-interval 10s
@@ -151,6 +150,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: PHPUnit cache
+        if: ${{matrix.php-versions == '8.2'}}
+        uses: actions/cache@v4
+        with:
+          path: ./var/cache/phpunit
+          key: ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}
+            ${{ runner.os }}-phpunit-
+
       # Add this step to resolve the Node v18 vs v20 mismatch
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -162,17 +171,28 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, pgsql, pdo_pgsql
           coverage: pcov
           ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
+
+      - name: Install PostgreSQL ${{ matrix.postgres-versions }} client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl ca-certificates gnupg lsb-release
+          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-${{ matrix.postgres-versions }}
+
+      - name: Set SYMFONY_ENV to test
+        run: |
+          echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+          echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
       - name: Install dependencies
         uses: "ramsey/composer-install@v3"
 
-      - name: Install psql client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
-
-      - name: Configure env for postgres
+      - name: Configure env for postgress
         run: |
           echo "DB_DRIVER=pdo_pgsql" > .env.test
           echo "DB_HOST=localhost" >> .env.test
