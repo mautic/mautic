@@ -3,9 +3,10 @@
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -28,6 +29,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * @var bool
      */
     protected $useCleanupRollback = true;
+
+    /**
+     * @var AbstractSchemaManager<AbstractPlatform>|null
+     */
+    private ?AbstractSchemaManager $schemaManager = null;
 
     public function __construct(?string $name = null)
     {
@@ -195,11 +201,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isPostgresqlPlatform()) {
                 // Reset sequences (equivalent to MySQL AUTO_INCREMENT reset)
                 // and cascade to handle foreign key references (equivalent to disabling checks)
+                // this will not work as doctrine do not register sequence ownership
                 $sql .= ' RESTART IDENTITY CASCADE';
             }
 
             $this->connection->executeQuery($sql);
         }
+
+        if ($this->isPostgresqlPlatform()) {
+            $this->resetAutoincrement($tables);
+        }
+
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         }
@@ -276,12 +288,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (!file_exists($sqlDumpFile)) {
             $this->installDatabase();
 
-            if ($this->databaseInstalled && $this->isMysqlPlatform()) {
-                // Only generate full dump and reset SQL for MySQL
+            if ($this->databaseInstalled) {
                 $this->dumpToFile($sqlDumpFile);
-                $this->generateResetDatabaseSql($this->getSqlFilePath('reset_db'));
-            } elseif ($this->databaseInstalled && $this->isPostgresqlPlatform()) {
-                // Generate fast TRUNCATE-based reset SQL for PostgreSQL
                 $this->generateResetDatabaseSql($this->getSqlFilePath('reset_db'));
             }
 
@@ -295,33 +303,37 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $resetFile = $this->getSqlFilePath('reset_db');
 
-        if (file_exists($resetFile) && ($this->isMysqlPlatform() || $this->isPostgresqlPlatform())) {
+        if (file_exists($resetFile)) {
             $this->applySqlFromFile($resetFile);
-
-            // PostgreSQL needs essential fixtures reloaded after TRUNCATE
-            if ($this->isPostgresqlPlatform()) {
-                $this->loadEssentialFixtures();
-            }
         } else {
             // Fallback (rare)
-            if ($this->isPostgresqlPlatform()) {
-                $prefix        = $this->getTablePrefix();
-                $schemaManager = $this->connection->createSchemaManager();
-                $tables        = $schemaManager->listTableNames();
+            $prefix        = $this->getTablePrefix();
+            $schemaManager = $this->connection->createSchemaManager();
+            $tables        = $schemaManager->listTableNames();
 
-                $prefixedTables = array_filter($tables, function ($table) use ($prefix) {
-                    return str_starts_with($table, $prefix);
-                });
+            $prefixedTables = array_filter($tables, function ($table) use ($prefix) {
+                return str_starts_with($table, $prefix);
+            });
 
-                if (!empty($prefixedTables)) {
+            if (!empty($prefixedTables)) {
+                if ($this->isMysqlPlatform()) {
+                    $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+                    foreach ($prefixedTables as $table) {
+                        $quotedTable = $this->connection->quoteIdentifier($table);
+                        $this->connection->executeQuery("TRUNCATE TABLE $quotedTable");
+                    }
+                    $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+                } elseif ($this->isPostgresqlPlatform()) {
                     $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
                     $this->connection->executeStatement(
                         'TRUNCATE TABLE '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
                     );
-                }
 
-                $this->loadEssentialFixtures();
+                    $this->resetAutoincrement($tables);
+                }
             }
+
+            $this->loadEssentialFixtures();
         }
     }
 
@@ -407,6 +419,29 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $content = "-- PostgreSQL reset script for prefixed tables\n";
         $content .= 'TRUNCATE TABLE '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
 
+        // Append data dump (COPY statements and setval for sequences)
+        $connectionParams = $this->connection->getParams();
+        $password         = $connectionParams['password'] ?? '';
+        $passwordCmd      = $password ? 'PGPASSWORD='.escapeshellarg($password).' ' : '';
+        $port             = $connectionParams['port'] ?? 5432;
+        $command          = $passwordCmd.sprintf(
+            'pg_dump -h %s -p %s -U %s -d %s --data-only --no-owner --no-privileges --no-comments',
+            escapeshellarg($connectionParams['host']),
+            escapeshellarg((string) $port),
+            escapeshellarg($connectionParams['user']),
+            escapeshellarg($connectionParams['dbname'])
+        );
+
+        $process = Process::fromShellCommandline($command);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \Exception($command.' failed with status code '.$process->getExitCode().': '.$process->getErrorOutput());
+        }
+
+        $dataInserts = $process->getOutput();
+        $content .= "\n".$dataInserts;
+
         file_put_contents($file, $content);
     }
 
@@ -415,22 +450,34 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
-        if (!$this->isMysqlPlatform()) {
-            // Skip full dump for PostgreSQL (not needed with TRUNCATE-based reset)
-            return;
-        }
-
         $connectionParams = $this->connection->getParams();
-        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
-        $command          = sprintf(
-            'mysqldump --opt -h%s -P%s -u%s %s %s > %s',
-            escapeshellarg($connectionParams['host']),
-            escapeshellarg((string) $connectionParams['port']),
-            escapeshellarg($connectionParams['user']),
-            $password,
-            escapeshellarg($connectionParams['dbname']),
-            escapeshellarg($sqlDumpFile)
-        );
+
+        if ($this->isMysqlPlatform()) {
+            $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+            $command          = sprintf(
+                'mysqldump --opt -h%s -P%s -u%s %s %s > %s',
+                escapeshellarg($connectionParams['host']),
+                escapeshellarg((string) $connectionParams['port']),
+                escapeshellarg($connectionParams['user']),
+                $password,
+                escapeshellarg($connectionParams['dbname']),
+                escapeshellarg($sqlDumpFile)
+            );
+        } elseif ($this->isPostgresqlPlatform()) {
+            $password    = $connectionParams['password'] ?? '';
+            $passwordCmd = $password ? 'PGPASSWORD='.escapeshellarg($password).' ' : '';
+            $port        = $connectionParams['port'] ?? 5432;
+            $command     = $passwordCmd.sprintf(
+                'pg_dump -h %s -p %s -U %s -d %s --no-owner --no-privileges --no-comments > %s',
+                escapeshellarg($connectionParams['host']),
+                escapeshellarg((string) $port),
+                escapeshellarg($connectionParams['user']),
+                escapeshellarg($connectionParams['dbname']),
+                escapeshellarg($sqlDumpFile)
+            );
+        } else {
+            throw new \RuntimeException('Unsupported database platform');
+        }
 
         $process = Process::fromShellCommandline($command);
         $process->run();
@@ -581,25 +628,47 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $cacheProvider->clear();
     }
 
-    protected function getSerialSequence(string $fullTable, string $field = 'id'): string
+    protected function getSerialSequence(string $fullTable, ?string $field = 'id'): ?string
     {
-        // Step 1: Try standard pg_get_serial_sequence (may return NULL)
-        $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
+        try {
+            // Step 1: Try standard pg_get_serial_sequence (may return NULL)
+            $sequence = $this->connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
 
-        // Step 2: Fallback - set common sequence name as doctrine do
-        if (!$sequence) {
-            // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-            // without linking a named sequence in a way visible to pg_get_serial_sequence()
-            // Test DB uses a different config that doesn't register the sequence properly
-            $doctrineSequence = $fullTable.'_'.$field.'_seq';
-            if ($this->connection->fetchOne(
-                "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                [$doctrineSequence])) {
-                $sequence = $doctrineSequence;
+            // Step 2: Fallback - set common sequence name as doctrine do
+            if (!$sequence) {
+                // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
+                // without linking a named sequence in a way visible to pg_get_serial_sequence()
+                // Test DB uses a different config that doesn't register the sequence properly
+                $doctrineSequence = $fullTable.'_'.$field.'_seq';
+                if ($this->connection->fetchOne(
+                    "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
+                    [$doctrineSequence])) {
+                    $sequence = $doctrineSequence;
+                }
             }
+        } catch (DBALException) {
+            // sequence not found
+            $sequence = null;
         }
 
         return $sequence;
+    }
+
+    protected function findSerialSequence(string $table, ?string $field = null): ?string
+    {
+        $fullTable = $this->getTablePrefix().$table;
+
+        if (!$field) {
+            foreach ($this->getSchemaManager()->listTableColumns($table) as $column) {
+                if ($sequence = $this->getSerialSequence($fullTable, $column->getName())) {
+                    return $sequence;
+                }
+            }
+
+            return null; // sequence not found
+        }
+
+        return $this->getSerialSequence($fullTable, $field);
     }
 
     /**
@@ -616,5 +685,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         });
 
         return $payload;
+    }
+
+    /**
+     * @return AbstractSchemaManager<AbstractPlatform>
+     */
+    private function getSchemaManager(): AbstractSchemaManager
+    {
+        if (null !== $this->schemaManager) {
+            return $this->schemaManager;
+        }
+
+        return $this->schemaManager = $this->connection->createSchemaManager();
     }
 }
