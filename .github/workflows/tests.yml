@@ -184,6 +184,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-${{ matrix.postgres-versions }}
 
+      - name: add PostgreSQL config file
+        run: |
+          pg_dump --version
+          # No user config file equivalent to .my.cnf for pg_dump (options are passed via command-line or env vars).
+          # No need to disable column-statistics, as pg_dump does not export them by default.
+          DB_LOG_NAME="${{ matrix.db-types }}"
+          echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
+
       - name: Set SYMFONY_ENV to test
         run: |
           echo "SYMFONY_ENV=test" >> $GITHUB_ENV

@@ -4,7 +4,6 @@ namespace Mautic\InstallBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
@@ -39,7 +38,7 @@ class SchemaHelper
     private ?AbstractSchemaManager $schemaManager = null;
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function __construct(array $dbParams)
     {
@@ -117,7 +116,7 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
     public function installSchema(): bool
@@ -152,19 +151,6 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        // Add Doctrine-managed OAuth tables which are missing from metadata
-        $doctrineDirectTables = [
-            'oauth2_accesstokens',
-            'oauth2_authcodes',
-            'oauth2_clients',
-            'oauth2_refreshtokens',
-        ];
-        foreach ($doctrineDirectTables as $table) {
-            if (!isset($mauticTables[$table])) {
-                $mauticTables[$table] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $table);
-            }
-        }
-
         $noForeignKeyChecks = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform || $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
         $sql                = $noForeignKeyChecks ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
@@ -175,6 +161,7 @@ class SchemaHelper
 
         $sql = array_merge($sql, $installSchema->toSql($this->platform));
 
+        // Execute drop queries
         foreach ($sql as $q) {
             try {
                 $this->db->executeStatement($q);
@@ -221,7 +208,7 @@ class SchemaHelper
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
     {
@@ -239,32 +226,15 @@ class SchemaHelper
             }
 
             $restraints = $sm->listTableForeignKeys($t);
-            $sequences  = [];
-
-            if ($this->platform instanceof PostgreSQLPlatform) {
-                foreach ($sm->listTableColumns($t) as $c) {
-                    /*
-                      * Can't use $c->getAutoincrement() check as doctrine dont set
-                      * sequence ownership to column/table for postgresql
-                      * need to check all
-                      */
-                    $sequence = $this->getSerialSequence($t, $c->getName());
-                    if ($sequence) {
-                        $sequences[] = $sequence;
-                    }
-                }
-            }
 
             if (isset($mauticTables[$t])) {
                 // to be backed up
                 $backupRestraints[$mauticTables[$t]] = $restraints;
                 $backupTables[$t]                    = $mauticTables[$t];
                 $backupIndexes[$t]                   = $sm->listTableIndexes($t);
-                $backupSequences[$t]                 = $sequences;
             } else {
                 // existing backup to be dropped
-                $dropTables[]    = $t;
-                $dropSequences[] = $sequences;
+                $dropTables[] = $t;
             }
 
             foreach ($restraints as $restraint) {
@@ -273,18 +243,8 @@ class SchemaHelper
         }
 
         // now drop all the backup tables
-        foreach ($dropSequences as $s) {
-            $sql[] = $this->platform->getDropSequenceSQL($s);
-        }
-
         foreach ($dropTables as $t) {
-            $dropSql = $this->platform->getDropTableSQL($t);
-            if ($this->platform instanceof PostgreSQLPlatform) {
-                // this prevent constraint on tables
-                $dropSql .= ' CASCADE';
-            }
-
-            $sql[] = $dropSql;
+            $sql[] = $this->platform->getDropTableSQL($t);
         }
 
         // now backup tables
@@ -315,12 +275,6 @@ class SchemaHelper
             // rename table
             $queries = $this->platform->getRenameTableSQL($t, $backup);
             $sql     = array_merge($sql, $queries);
-
-            // rename sequences
-            foreach ($backupSequences[$t] as $oldSequence) {
-                $newSequence = str_replace($t, $backup, $oldSequence);
-                $sql[]       = 'ALTER SEQUENCE '.$this->db->quoteIdentifier($oldSequence).' RENAME TO '.$this->db->quoteIdentifier($newSequence);
-            }
 
             // create new index
             if (!empty($newIndexes)) {
@@ -353,30 +307,12 @@ class SchemaHelper
     protected function dropExistingSchema($tables, $mauticTables): array
     {
         $sql = [];
-        $sm  = $this->getSchemaManager();
 
         // drop tables
         foreach ($tables as $t) {
-            if ($this->platform instanceof PostgreSQLPlatform) {
-                foreach ($sm->listTableColumns($t) as $c) {
-                    /*
-                     * Can't use $c->getAutoincrement() check as doctrine dont set
-                     * sequence ownership to column/table for postgresql
-                     * need to check all
-                     */
-                    $sequence = $this->getSerialSequence($t, $c->getName());
-                    if ($sequence) {
-                        $sql[] = $this->platform->getDropSequenceSQL($sequence);
-                    }
-                }
+            if (isset($mauticTables[$t])) {
+                $sql[] = $this->platform->getDropTableSQL($t);
             }
-
-            $dropSql = $this->platform->getDropTableSQL($t);
-            if ($this->platform instanceof PostgreSQLPlatform) {
-                // this prevent constraint on table test_assets depends on table test_categories errors
-                $dropSql .= ' CASCADE';
-            }
-            $sql[] = $dropSql;
         }
 
         return $sql;
@@ -417,31 +353,5 @@ class SchemaHelper
         }
 
         return '0.0'; // string_compare not accept NULL, prevent NULL errors
-    }
-
-    protected function getSerialSequence(string $fullTable, string $field = 'id'): ?string
-    {
-        try {
-            // Step 1: Try standard pg_get_serial_sequence (may return NULL)
-            $sequence = $this->db->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
-
-            // Step 2: Fallback - set common sequence name as doctrine do
-            if (!$sequence) {
-                // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-                // without linking a named sequence in a way visible to pg_get_serial_sequence()
-                // Test DB uses a different config that doesn't register the sequence properly
-                $doctrineSequence = $fullTable.'_'.$field.'_seq';
-                if ($this->db->fetchOne(
-                    "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                    [$doctrineSequence])) {
-                    $sequence = $doctrineSequence;
-                }
-            }
-        } catch (DBALException) {
-            // sequence not found
-            $sequence = null;
-        }
-
-        return $sequence;
     }
 }

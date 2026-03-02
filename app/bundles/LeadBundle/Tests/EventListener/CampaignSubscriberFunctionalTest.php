@@ -145,7 +145,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'type'       => 'lead.stages',
                 'properties' => [
                     'type'   => 'lead.stages',
-                    'stages' => [0 => $stageIds[0]],
+                    'stages' => [0 => '1'],
                 ],
             ],
             'eventDetails'    => [],

@@ -17,8 +17,11 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
     public function setUp(): void
     {
-        $this->useCleanupRollback = false;
         parent::setUp();
+
+        if ($this->isMysqlPlatform()) {
+            $this->useCleanupRollback = false;
+        }
     }
 
     public function testNewAction(): void
