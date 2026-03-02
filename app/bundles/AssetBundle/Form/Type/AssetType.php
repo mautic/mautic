@@ -184,7 +184,12 @@ class AssetType extends AbstractType
         if (!is_string($object) && $object instanceof Asset) {
             $fileName = $object->getOriginalFileName();
         }
-        $fileExtension    = pathinfo($fileName, PATHINFO_EXTENSION);
+        $path = parse_url((string) $fileName, PHP_URL_PATH);
+        if (!is_string($path) || '' === $path) {
+            $path = (string) $fileName;
+        }
+
+        $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
         if (!in_array(strtolower($fileExtension), array_map('strtolower', $extensions), true)) {
             $context->buildViolation('mautic.asset.asset.error.file.extension', [
                 '%fileExtension%'=> $fileExtension,
