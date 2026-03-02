@@ -13,7 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if ($this->isMysqlPlatform()) {
+            $this->useCleanupRollback = false;
+        }
+    }
 
     public function testSaveSubmissionChangeCompanyField(): void
     {
