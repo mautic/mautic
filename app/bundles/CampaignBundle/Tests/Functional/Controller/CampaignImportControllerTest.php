@@ -17,17 +17,11 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
     public function setUp(): void
     {
-        parent::setUp();
-
-        if ($this->isMysqlPlatform()) {
-            // This enables transaction rollback for cleanup, which works for PostgreSQL
-            // as DDL statements are transactional there. The entire test operations,
-            // including schema changes (ADD COLUMN), will be rolled back in tearDown,
-            // undoing the added columns without needing a full database reset.
-            // This avoids calling resetDatabase() and the external psql process,
-            // preventing the timeout issue caused by lock contention.
+        // we keep it on if non PSQL
+        if ('pdo_pgsql' != $this->configParams['db_driver']) {
             $this->useCleanupRollback = false;
         }
+        parent::setUp();
     }
 
     public function testNewAction(): void
