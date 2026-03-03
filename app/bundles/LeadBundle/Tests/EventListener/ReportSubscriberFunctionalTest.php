@@ -184,6 +184,9 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 
     public function testLeadReportWithEmailDomainColumn(): void
     {
+        if ($this->isPostgresqlPlatform()) {
+            $this->markTestSkipped('Generated columns are disabled on PostgreSQL');
+        }
         $leads[] = $this->createContact('test1@d1.example.com');
         $leads[] = $this->createContact('test2@d2.example.com');
         $leads[] = $this->createContact('test3@d3.example.com');
