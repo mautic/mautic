@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -291,6 +292,29 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
+        } elseif ('projects' === $prop) {
+            // Initialize project tracking on first change
+            if (!isset($this->changes['projects']['old'])) {
+                $currentProjects           = array_map(fn ($project) => $project->getName(), iterator_to_array($current));
+                $this->changes['projects'] = [
+                    'old' => $currentProjects,
+                    'new' => $currentProjects,
+                ];
+            }
+
+            // Update the new state based on the operation
+            if ($val instanceof Project) {
+                // Add project if not already in the list
+                $projectName = $val->getName();
+                if (!in_array($projectName, $this->changes['projects']['new'], true)) {
+                    $this->changes['projects']['new'][] = $projectName;
+                }
+            } else {
+                // Remove project from the list
+                $this->changes['projects']['new'] = array_values(
+                    array_diff($this->changes['projects']['new'], [$val])
+                );
+            }
         } else {
             parent::isChanged($prop, $val);
         }
@@ -299,6 +323,24 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * Override to convert projects changes to final format.
+     */
+    public function getChanges($includePast = false)
+    {
+        $changes = parent::getChanges($includePast);
+
+        // Convert projects format if it exists and is in the intermediate format
+        if (isset($changes['projects']['old']) && isset($changes['projects']['new'])) {
+            $changes['projects'] = [
+                implode(', ', $changes['projects']['old']),
+                implode(', ', $changes['projects']['new']),
+            ];
+        }
+
+        return $changes;
     }
 
     /**

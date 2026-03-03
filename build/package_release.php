@@ -129,9 +129,11 @@ if (!isset($args['repackage'])) {
 
     // Include assets just in case they weren't
     $assetFiles = [
-        'media/css/'       => true,
-        'media/js/'        => true,
-        'media/libraries/' => true,
+        'media/css/'                                  => true,
+        'media/js/'                                   => true,
+        'media/libraries/'                            => true,
+        'media/bundles/'                              => true,
+        'app/bundles/CoreBundle/Assets/pictograms/'   => true,
     ];
     $modifiedFiles = $modifiedFiles + $assetFiles;
 
