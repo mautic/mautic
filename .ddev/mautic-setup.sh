@@ -5,36 +5,26 @@ setup_mautic() {
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
-    # CI DUMMY WORKAROUND FOR ABANDONED gaufrette/extras
-    if [[ "$GITHUB_ACTIONS" == "true" ]]; then
-        printf "CI detected — creating dummy gaufrette/extras package...\n"
+    # CI workaround: Fork for gaufrette/extras
+    printf "CI: Forcing gaufrette/extras from K-Phoen fork...\n"
+    composer config repositories.gaufrette-extras \
+      '{"type":"vcs","url":"https://github.com/K-Phoen/gaufrette-extras.git"}' --no-plugins
 
-        mkdir -p dummy-extras/src/Gaufrette/Extras
-        cat <<'EOF' > dummy-extras/composer.json
-{
-  "name": "gaufrette/extras",
-  "description": "Dummy stub for abandoned package in CI",
-  "version": "0.1.0",
-  "type": "library",
-  "autoload": {"psr-4": {"Gaufrette\\Extras\\": "src/Gaufrette/Extras/"}},
-  "require": {}
-}
-EOF
-        echo '<?php namespace Gaufrette\Extras; class Stub {}' > dummy-extras/src/Gaufrette/Extras/Stub.php
-
-        composer config repositories.dummy-extras path ./dummy-extras --file composer.json
-        composer require gaufrette/extras:0.1.0 --no-update --ignore-platform-reqs --no-plugins
-    fi
+    # we need to delete lock file for the workaround to work
+    rm -fr composer.lock
 
     printf "Installing Mautic Composer dependencies...\n"
     composer install \
       --no-interaction \
+      --prefer-source \
       --prefer-dist \
       --optimize-autoloader \
       --ignore-platform-reqs \
       --no-plugins \
+      --no-scripts \
       -vvv || {
-        printf "Composer install had warnings — continuing for CI...\n"
+        printf "Fallback: Updating only gaufrette/extras...\n"
+        composer update gaufrette/extras --prefer-source --no-interaction --ignore-platform-reqs -vvv || true
       }
 
     cp ./.ddev/local.config.php.dist ./config/local.php
