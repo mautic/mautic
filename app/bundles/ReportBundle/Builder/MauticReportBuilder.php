@@ -497,6 +497,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'string':
                             case 'email':
                             case 'url':
+                            case 'datetime':
                                 switch ($exprFunction) {
                                     case 'like':
                                     case 'notLike':
