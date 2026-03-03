@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -162,7 +163,8 @@ class LeadRepository extends CommonRepository
      *
      * @return array<string, \DateTimeInterface>
      */
-    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter,
+        bool $ignoreParentCheck = false): array
     {
         // Main query
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
@@ -213,7 +215,7 @@ class LeadRepository extends CommonRepository
             $q->andWhere(
                 sprintf('EXISTS (%s)', $grandparentQb->getSQL())
             );
-        } else {
+        } elseif (!$ignoreParentCheck) {
             // Limit to events that have no grandparent and any of events was already executed by jump to event
             $anyEventQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
             $anyEventQb->select('null')
@@ -307,7 +309,7 @@ class LeadRepository extends CommonRepository
             )
         )
             ->setParameter('campaign', $campaign)
-            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->getQuery()->getResult();
 
@@ -333,7 +335,7 @@ class LeadRepository extends CommonRepository
                 )
             )
             ->setParameter('campaignId', (int) $campaignId)
-            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
@@ -494,7 +496,7 @@ class LeadRepository extends CommonRepository
                     $q->expr()->eq('cl.campaign_id', ':campaignId')
                 )
             )
-            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER)
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER)
             ->setParameter('campaignId', (int) $campaignId)
             ->executeStatement();
     }
@@ -648,5 +650,24 @@ class LeadRepository extends CommonRepository
         }
 
         return $deletedRecordCount;
+    }
+
+    /**
+     * @param array<int> $campaignIds
+     *
+     * @return array<mixed>
+     */
+    public function getCampaignContactCounts(array $campaignIds): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('cl.campaign_id, COUNT(DISTINCT cl.lead_id) as contact_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where('cl.campaign_id IN (:campaignIds)')
+            ->andWhere('cl.manually_removed = :manuallyRemoved')
+            ->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER)
+            ->setParameter('manuallyRemoved', 0)
+            ->groupBy('cl.campaign_id');
+
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

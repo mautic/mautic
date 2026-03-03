@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Company;
@@ -15,7 +16,8 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $auditLogModel  = $this->createMock(AuditLogModel::class);
-        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel);
+        $entityManager  = $this->createMock(EntityManager::class);
+        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel, $entityManager);
 
         $this->assertEquals(
             [
@@ -57,7 +59,8 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $subscriber = new CompanySubscriber($ipLookupHelper, $auditLogModel);
+        $entityManager  = $this->createMock(EntityManager::class);
+        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel, $entityManager);
 
         $company            = $this->createMock(Company::class);
         $company->deletedId = $companyId;
@@ -103,7 +106,8 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $subscriber = new CompanySubscriber($ipLookupHelper, $auditLogModel);
+        $entityManager  = $this->createMock(EntityManager::class);
+        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel, $entityManager);
 
         $company = $this->createMock(Company::class);
         $company->expects($this->once())

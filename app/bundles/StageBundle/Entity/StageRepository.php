@@ -3,12 +3,15 @@
 namespace Mautic\StageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Stage>
  */
 class StageRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     public function getEntities(array $args = [])
     {
         $q = $this
@@ -98,7 +101,17 @@ class StageRepository extends CommonRepository
 
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return match ($filter->command) {
+            $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'stage_id',
+                'stage_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            ),
+            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+        };
     }
 
     /**
@@ -106,7 +119,7 @@ class StageRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
     }
 
     /**
@@ -191,7 +204,7 @@ class StageRepository extends CommonRepository
     /**
      * @param string|int $value
      *
-     * @return array
+     * @return Stage|null
      */
     public function findByIdOrName($value)
     {

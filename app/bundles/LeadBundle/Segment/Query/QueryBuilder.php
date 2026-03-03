@@ -454,9 +454,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function &parentProperty(string $property)
     {
-        return \Closure::bind(function &() use ($property) {
-            return $this->$property;
-        }, $this, parent::class)();
+        return \Closure::bind(fn &() => $this->$property, $this, parent::class)();
     }
 
     /**
@@ -466,8 +464,6 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function parentMethod(string $method, ...$arguments)
     {
-        return \Closure::bind(function () use ($method, $arguments) {
-            return $this->$method(...$arguments);
-        }, $this, parent::class)();
+        return \Closure::bind(fn () => $this->$method(...$arguments), $this, parent::class)();
     }
 }

@@ -2576,6 +2576,12 @@ a.disabled {
 .btn.btn-wide {
   width: 100%;
 }
+.btn ~ .btn,
+.btn ~ .btn-group,
+.btn-group ~ .btn,
+.btn-group ~ .btn-group {
+  margin-left: 5px;
+}
 .btn-primary,
 .btn-primary + .dropdown-toggle {
   background-color: var(--button-primary);
@@ -2711,7 +2717,7 @@ fieldset[disabled] .btn-primary.focus,
 fieldset[disabled] .btn-primary + .dropdown-toggle.focus {
   background-color: var(--button-disabled);
   color: var(--text-on-color-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-primary[disabled] i,
 .btn-primary + .dropdown-toggle[disabled] i,
@@ -2874,7 +2880,7 @@ fieldset[disabled] .btn-primary.btn-danger.focus,
 fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
   background-color: var(--button-disabled);
   color: var(--text-on-color-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-primary.btn-danger[disabled] i,
 .btn-primary + .dropdown-toggle.btn-danger[disabled] i,
@@ -2989,7 +2995,7 @@ fieldset[disabled] .btn-secondary:focus,
 fieldset[disabled] .btn-secondary.focus {
   background-color: var(--button-disabled);
   color: var(--text-on-color-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-secondary[disabled] i,
 .btn-secondary.disabled i,
@@ -3092,7 +3098,7 @@ fieldset[disabled] .btn-tertiary:focus,
 fieldset[disabled] .btn-tertiary.focus {
   background-color: transparent;
   color: var(--text-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-tertiary[disabled] i,
 .btn-tertiary.disabled i,
@@ -3195,7 +3201,7 @@ fieldset[disabled] .btn-tertiary.btn-danger:focus,
 fieldset[disabled] .btn-tertiary.btn-danger.focus {
   background-color: var(--button-disabled);
   color: var(--text-disabled);
-  border: 1px solid var(--button-disabled);
+  border: 1px solid;
 }
 .btn-tertiary.btn-danger[disabled] i,
 .btn-tertiary.btn-danger.disabled i,
@@ -3222,6 +3228,17 @@ fieldset[disabled] .btn-tertiary.btn-danger.focus i {
 .btn-secondary:has(i),
 .btn-tertiary:has(i) {
   padding-right: var(--spacing-05);
+}
+.btn-primary:not(:has(i)),
+.btn-secondary:not(:has(i)),
+.btn-tertiary:not(:has(i)) {
+  padding-left: var(--spacing-07);
+  padding-right: var(--spacing-07);
+}
+.btn-primary:not(:has(i)) span,
+.btn-secondary:not(:has(i)) span,
+.btn-tertiary:not(:has(i)) span {
+  display: initial;
 }
 .btn-primary.btn--icon-only,
 .btn-secondary.btn--icon-only,
@@ -3330,7 +3347,7 @@ fieldset[disabled] .btn-ghost:focus,
 fieldset[disabled] .btn-ghost.focus {
   background-color: transparent;
   color: var(--text-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-ghost[disabled] i,
 .btn-ghost.disabled i,
@@ -3484,7 +3501,7 @@ fieldset[disabled] .btn-ghost.btn-danger.focus,
 fieldset[disabled] .btn-ghost.btn-danger.btn--icon-only.focus {
   background-color: transparent;
   color: var(--text-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-ghost.btn-danger[disabled] i,
 .btn-ghost.btn-danger.btn--icon-only[disabled] i,
@@ -3599,7 +3616,7 @@ fieldset[disabled] .btn-ghost.btn--icon-only:focus,
 fieldset[disabled] .btn-ghost.btn--icon-only.focus {
   background-color: transparent;
   color: var(--icon-disabled);
-  border: 1px solid transparent;
+  border: 1px solid;
 }
 .btn-ghost.btn--icon-only[disabled] i,
 .btn-ghost.btn--icon-only.disabled i,
@@ -4335,9 +4352,13 @@ blockquote > p:after {
 }
 code {
   padding: var(--spacing-01) var(--spacing-03);
-  cursor: pointer;
   overflow: hidden;
-  border-radius: clamp(1px, var(--border-radius-sm), 4px);
+  border-radius: clamp(4px, var(--border-radius-sm), 6px);
+}
+pre {
+  min-height: 40px;
+  max-height: 100px;
+  overflow: hidden;
 }
 kbd {
   min-width: 20px;
@@ -4487,22 +4508,31 @@ kbd {
   color: var(--text-inverse);
 }
 .alert-growl--warning {
-  border-left-color: #FDB933;
+  border-left-color: var(--support-warning);
 }
 .alert-growl--warning a {
-  color: #FDB933;
+  color: var(--support-warning);
 }
 .alert-growl--warning a:hover {
-  color: #fedc98;
+  color: var(--support-warning-inverse);
 }
 .alert-growl--error {
-  border-left-color: #F86B4F;
+  border-left-color: var(--support-error);
 }
 .alert-growl--error a {
-  color: #F86B4F;
+  color: var(--support-error);
 }
 .alert-growl--error a:hover {
-  color: #fcbdb1;
+  color: var(--support-error-inverse);
+}
+.alert-growl--success {
+  border-left-color: var(--support-success);
+}
+.alert-growl--success a {
+  color: var(--support-success);
+}
+.alert-growl--success a:hover {
+  color: var(--support-success-inverse);
 }
 .alert-growl-container {
   position: fixed;
@@ -9982,6 +10012,32 @@ lesshat-selector { -lh-property: 0 ;
 .animation--slide-scale-in-right {
   animation: animationSlideScaleInRight var(--duration-expressive) forwards;
 }
+.animation--grow {
+  transition: transform var(--duration-expressive);
+}
+.animation--grow:hover {
+  transform: scale(1.02);
+}
+.animation--shrink {
+  transition: transform var(--duration-expressive);
+}
+.animation--shrink:hover {
+  transform: scale(0.9);
+}
+.animation--grow-in {
+  transform: scale(0);
+  transition: transform var(--duration-expressive);
+}
+.animation--grow-in.active {
+  transform: scale(1);
+}
+.animation--shrink-out {
+  transform: scale(1);
+  transition: transform var(--duration-expressive);
+}
+.animation--shrink-out.active {
+  transform: scale(0);
+}
 @keyframes animationSlideInUp {
   from {
     transform: translateY(20px);
@@ -11306,6 +11362,53 @@ code:hover > .copy-icon {
 }
 .modal.fade .modal-dialog {
   animation: modal-fade var(--duration-productive) var(--easing-standard-productive);
+}
+.code-snippet {
+  position: relative;
+}
+.code-snippet button {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.code-snippet--single code {
+  min-height: 24px;
+  display: flex;
+  text-wrap: nowrap;
+  align-items: center;
+}
+.code-snippet--single:has(button) code {
+  padding-inline-end: 30px;
+}
+.code-snippet--single:has(button) code:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 80%, var(--layer) 95%);
+  border-top-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+  border-bottom-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+  pointer-events: none;
+}
+.code-snippet--single button {
+  border-top-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+  border-bottom-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+}
+.code-snippet--multi pre:before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: linear-gradient(to top, var(--layer) 5%, transparent);
+  pointer-events: none;
+  max-height: 100%;
+}
+.code-snippet--inline {
+  display: inline-flex;
+}
+.code-snippet--inline code {
+  cursor: pointer;
 }
 .asset-preview {
   width: 100%;

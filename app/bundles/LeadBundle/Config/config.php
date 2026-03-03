@@ -670,6 +670,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.user.model.user',
                     'mautic.lead.model.lead',
+                    'mautic.lead.report.dnc_report_service',
                 ],
             ],
             'mautic.lead.factory.device_detector_factory' => [
@@ -832,10 +833,6 @@ return [
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
             ],
-            'mautic.helper.segment.count.cache' => [
-                'class'     => Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
-                'arguments' => ['mautic.helper.cache_storage'],
-            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [
@@ -895,6 +892,8 @@ return [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
         'contact_api_count_cache_ttl'         => 5, // in seconds, set null to disable.
+        'delete_segment_in_background'        => false,
+        'segment_api_count_cache_ttl'         => 43200, // 12 hours in seconds
         'contact_columns'                     => [
             '0' => 'name',
             '1' => 'email',
@@ -916,5 +915,6 @@ return [
         'contact_allow_multiple_companies'                                                      => true,
         'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
         'update_segment_contact_count_in_background'                                            => false,
+        'clear_export_files_after_days'                                                         => 7,
     ],
 ];

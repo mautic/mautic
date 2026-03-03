@@ -249,6 +249,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->leadDeviceRepository     = $this->createMock(LeadDeviceRepository::class);
         $this->botRatioHelperMock       = $this->createMock(BotRatioHelper::class);
 
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
             $this->themeHelper,
@@ -366,7 +368,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['weight' => '25']);
 
         $this->emailEntity->method('getVariantChildren')
-            ->willReturn([$variantA, $variantB]);
+            ->willReturn(new ArrayCollection([$variantA, $variantB]));
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -500,7 +502,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['weight' => '25']);
 
         $this->emailEntity->method('getVariantChildren')
-            ->willReturn([$variantA, $variantB]);
+            ->willReturn(new ArrayCollection([$variantA, $variantB]));
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -963,6 +965,38 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(
             ['EN' => [123 => 'Email 123']],
             $this->emailModel->getLookupResults('email', '', 0, 0)
+        );
+    }
+
+    public function testGetLookupResultsIdTextWithWithDefaultOptions(): void
+    {
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->emailRepository);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getEmailList')
+            ->with(
+                '',
+                0,
+                0,
+                null,
+                false,
+                null,
+                [],
+                null
+            )
+            ->willReturn([
+                [
+                    'id'       => 123,
+                    'name'     => 'Email 123',
+                    'language' => 'EN',
+                ],
+            ]);
+
+        $this->assertSame(
+            ['EN' => [123 => 'Email 123 (123)']],
+            $this->emailModel->getLookupResultsWithIdName('email', '', 0, 0)
         );
     }
 

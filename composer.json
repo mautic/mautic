@@ -40,14 +40,14 @@
     "phpstan/phpstan-doctrine": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
-    "phpunit/phpunit": "^10.0",
-    "rector/rector": "2.0",
-    "symfony/browser-kit": "^7.3",
-    "symfony/dom-crawler": "^7.3",
+    "phpunit/phpunit": "^10.5.62",
+    "rector/rector": "2.2",
+    "symfony/browser-kit": "~7.4.0",
+    "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
-    "symfony/phpunit-bridge": "^7.3",
-    "symfony/var-dumper": "^7.3",
-    "symfony/web-profiler-bundle": "^7.3",
+    "symfony/phpunit-bridge": "~7.4.0",
+    "symfony/var-dumper": "~7.4.0",
+    "symfony/web-profiler-bundle": "~7.4.0",
     "symplify/easy-coding-standard": "^12.0.13"
   },
   "replace": {
@@ -101,7 +101,8 @@
     "mautic/theme-capture": "self.version",
     "mautic/theme-chord": "self.version",
     "mautic/theme-formscape": "self.version",
-    "mautic/theme-reachout": "self.version"
+    "mautic/theme-reachout": "self.version",
+    "mautic/theme-multi-step": "self.version"
   },
   "autoload": {
     "psr-4": {
@@ -162,7 +163,7 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate"
+    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
   },
   "config": {
     "platform": {

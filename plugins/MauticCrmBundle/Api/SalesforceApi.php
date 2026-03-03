@@ -670,7 +670,7 @@ class SalesforceApi extends CrmApi
             $leadsQuery = sprintf($baseQuery, join(', ', $fields));
             $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
         } catch (ApiErrorException $e) {
-            list($missingField, $entityType) = $this->parseMissingField($e->getMessage());
+            [$missingField, $entityType] = $this->parseMissingField($e->getMessage());
             if (!$missingField) {
                 throw $e;
             }

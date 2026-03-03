@@ -267,7 +267,7 @@ return [
         'mailer_append_tracking_pixel'   => true,
         'mailer_convert_embed_images'    => false,
         'mailer_custom_headers'          => [],
-        'mailer_dsn'                     => 'smtp://localhost:25',
+        'mailer_dsn'                     => 'smtp://localhost:1025',
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,
@@ -336,5 +336,7 @@ return [
             'LinkedInBot/1.0 (compatible; Mozilla/5.0; Jakarta Commons-HttpClient/3.1 +http://www.linkedin.com)',
         ],
         'bot_helper_blocked_ip_addresses'                                   => [],
+        'smime_signing_enabled'                                             => false,
+        'smime_certificates_path'                                           => '%kernel.project_dir%/var/smime_certificates',
     ],
 ];

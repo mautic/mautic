@@ -103,12 +103,14 @@ class ImportModel extends FormModel
     /**
      * Generates a HTML link to the import detail.
      */
-    public function generateLink(Import $import): string
+    public function generateLink(Import $import, ?string $text = null): string
     {
+        $linkText = $text ?? $import->getOriginalFile().' ('.$import->getId().')';
+
         return '<a href="'.$this->router->generate(
             'mautic_import_action',
             ['objectAction' => 'view', 'object' => 'lead', 'objectId' => $import->getId()]
-        ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>';
+        ).'" data-toggle="ajax">'.$linkText.'</a>';
     }
 
     /**
@@ -152,13 +154,18 @@ class ImportModel extends FormModel
      * Start import. This is meant for the CLI command since it will import
      * the whole file at once.
      *
-     * @param int $limit Number of records to import before delaying the import. 0 will import all
+     * @param int   $limit Number of records to import before delaying the import. 0 will import all
+     * @param float $start Start time for timing calculation
      *
      * @throws ImportFailedException
      * @throws ImportDelayedException
      */
-    public function beginImport(Import $import, Progress $progress, $limit = 0): void
+    public function beginImport(Import $import, Progress $progress, $limit = 0, ?float $start = null): void
     {
+        if (null === $start) {
+            $start = microtime(true);
+        }
+
         $this->setGhostImportsAsFailed();
 
         if (!$import) {
@@ -229,12 +236,18 @@ class ImportModel extends FormModel
         if ($import->getCreatedBy()) {
             $this->notificationModel->addNotification(
                 $this->translator->trans(
-                    'mautic.lead.import.result.info',
-                    ['%import%' => $this->generateLink($import)]
+                    'mautic.lead.import.result',
+                    [
+                        '%lines%'   => $import->getProcessedRows(),
+                        '%created%' => $import->getInsertedCount(),
+                        '%updated%' => $import->getUpdatedCount(),
+                        '%ignored%' => $import->getIgnoredCount(),
+                        '%time%'    => round(microtime(true) - $start, 2),
+                    ]
                 ),
                 'info',
                 false,
-                $this->translator->trans('mautic.lead.import.completed'),
+                $this->generateLink($import, $this->translator->trans('mautic.lead.import.completed')),
                 'ri-download-line',
                 null,
                 $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
@@ -396,7 +409,8 @@ class ImportModel extends FormModel
             }
         }
 
-        if ($import->getLastLineImported() < $import->getLineCount()) {
+        $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
+        if ($isPublished && $import->getLastLineImported() < $import->getLineCount()) {
             $import->setStatus($import::DELAYED);
             $this->saveEntity($import);
         }

@@ -1,0 +1,51 @@
+{# === INLINE VARIANT === #}
+{% if variant == 'inline' %}
+<a class="code-snippet code-snippet--inline type-label-01" {% if disabled is defined and disabled %}disabled{% endif %} data-toggle="tooltip" title="{{ copyButtonDescription|default('mautic.core.copy_code_snippet')|trans }}" {% if disabled is not defined or not disabled %} data-copy="{{ copyText|default(innerText)|escape('html_attr') }}" tabindex="0"{% endif %}>
+    <code class="code-snippet__code {{ className|default('') }}" aria-label="{{ ariaLabel|default(copyButtonDescription|default('mautic.core.copy_code_snippet')|trans) }}">
+        {{ innerText|escape('html_attr') }}
+    </code>
+</a>
+
+{# === SINGLE VARIANT === #}
+{% elseif variant == 'single' %}
+<div class="code-snippet code-snippet--single" {% if disabled is defined and disabled %}disabled{% endif %}>
+    <code class="code-snippet__code {{ className|default('') }}" aria-label="{{ ariaLabel|default(copyButtonDescription|default('mautic.core.copy_code_snippet')|trans) }}">
+        {{ innerText|escape('html_attr') }}
+    </code>
+    {% if hideCopyButton is not defined or not hideCopyButton %}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [{
+        variant: 'icon',
+        size: 'xs',
+        icon: 'ri-file-copy-line',
+        icon_only: true,
+        label: copyButtonDescription|default('mautic.core.copy_code_snippet')|trans,
+        attributes: {
+            'data-copy': copyText|default(innerText)|escape('html_attr'),
+            'type': 'button',
+        },
+        }]
+    } %}
+    {% endif %}
+</div>
+
+{# === MULTI VARIANT === #}
+{% elseif variant == 'multi' %}
+<div class="code-snippet code-snippet--multi" {% if disabled is defined and disabled %}disabled{% endif %}>
+    <pre class="code-snippet__code {{ className|default('') }}" aria-label="{{ ariaLabel|default(copyButtonDescription|default('mautic.core.copy_code_snippet')|trans) }}">{{ innerText|raw }}</pre>
+    {% if hideCopyButton is not defined or not hideCopyButton %}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [{
+        variant: 'icon',
+        icon: 'ri-file-copy-line',
+        icon_only: true,
+        label: copyButtonDescription|default('mautic.core.copy_code_snippet')|trans,
+        attributes: {
+            'data-copy': copyText|default(innerText)|escape('html_attr'),
+            'type': 'button',
+        },
+        }]
+    } %}
+    {% endif %}
+</div>
+{% endif %}

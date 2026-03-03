@@ -2,7 +2,9 @@
     'published': {'icon': 'success', 'text': 'green'},
     'unpublished': {'icon': 'danger', 'text': 'red'},
     'expired': {'icon': 'info', 'text': 'blue'},
-    'pending': {'icon': 'info', 'text': 'blue'}
+    'pending': {'icon': 'info', 'text': 'blue'},
+    'sent': {'icon': 'info', 'text': 'blue'},
+    'sending': {'icon': 'success', 'text': 'green'},
 } %}
 
 {# Define the labels based on the combination of status and publishStatus #}
@@ -11,27 +13,35 @@
         'published': 'mautic.core.form.available',
         'pending': 'mautic.core.form.not_yet_available',
         'expired': 'mautic.core.form.no_longer_available',
-        'unpublished': 'mautic.core.form.unavailable'
+        'unpublished': 'mautic.core.form.unavailable',
+        'sent': 'mautic.email.stat.sent',
+        'sending': 'mautic.core.form.sending',
     },
     'sending': {
         'published': 'mautic.core.form.sending',
         'pending': 'mautic.core.form.scheduled_to_send',
         'expired': 'mautic.core.form.sending_expired',
-        'unpublished': 'mautic.core.form.unavailable'
+        'unpublished': 'mautic.core.form.unavailable',
+        'sent': 'mautic.email.stat.sent',
+        'sending': 'mautic.core.form.sending',
     },
     'active': {
         'published': 'mautic.core.form.active',
         'pending': 'mautic.core.form.pending',
         'expired': 'mautic.core.form.expired',
-        'unpublished': 'mautic.core.form.inactive'
+        'unpublished': 'mautic.core.form.inactive',
+        'sent': 'mautic.email.stat.sent',
+        'sending': 'mautic.core.form.sending',
     }
 } %}
 
-{% set labelTextKey = (labelMappings[status|default('active')][entity.getPublishStatus()]) %}
+{% set sendingStatus = sendingStatus|default(entity.getPublishStatus()) %}
 
-<div class="label label-{{ statusColors[entity.getPublishStatus()].text }} d-inline-flex ai-center gap-xs fw-b"{% if simplified is defined and simplified %} size="sm"{% endif %}>
+{% set labelTextKey = (labelMappings[status|default('active')][sendingStatus]) %}
+
+<div class="label label-{{ statusColors[sendingStatus].text }} d-inline-flex ai-center gap-xs fw-b"{% if simplified is defined and simplified %} size="sm"{% endif %}>
     {% if not (simplified is defined and simplified) %}
-        <span aria-hidden="true" focusable="false" class="bg-{{ statusColors[entity.getPublishStatus()].icon }} publishstatus_pulse">
+        <span aria-hidden="true" focusable="false" class="bg-{{ statusColors[sendingStatus].icon }} publishstatus_pulse">
         </span>
     {% endif %}
     {{ labelTextKey|trans }}

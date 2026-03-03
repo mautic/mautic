@@ -3,9 +3,26 @@
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->configParams['validate_remote_domains'] = false;
+        $this->configParams['site_url']                = 'https://site.tld';
+
+        if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
+            $this->configParams['validate_remote_domains'] = true;
+            $this->configParams['allowed_remote_domains']  = [
+                'first-allowed.tld',
+                'second-allowed.tld',
+            ];
+        }
+
+        parent::setUp();
+    }
+
     public function testCreateNewRemoteAsset(): void
     {
         $payload = [
@@ -35,6 +52,38 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(400, $clientResponse->getContent());
         $this->assertEquals('{"errors":[{"code":400,"message":"remotePath: The remote should be a valid URL.","details":{"remotePath":["The remote should be a valid URL."]}}]}', $clientResponse->getContent());
+    }
+
+    /**
+     * @return iterable<array{string, bool}>
+     */
+    public static function dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(): iterable
+    {
+        yield 'Not in allowed domains' => ['https://some-domain.com/foo.jpg', false];
+        yield 'Is in allowed domains' => ['https://second-allowed.tld/foo.jpg', true];
+        yield 'Using site URL' => ['https://site.tld/foo.jpg', true];
+    }
+
+    #[DataProvider('dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled')]
+    public function testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(string $file, bool $isAllowed): void
+    {
+        $message = 'remotePath: The remote domain in the URL is not allowed due to security reasons.';
+        $payload = [
+            'file'            => $file,
+            'storageLocation' => 'remote',
+            'title'           => 'title',
+        ];
+        $this->client->request('POST', 'api/assets/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $content        = $clientResponse->getContent();
+
+        if ($isAllowed) {
+            $this->assertSame(201, $clientResponse->getStatusCode(), $content);
+            $this->assertStringNotContainsString($message, $content);
+        } else {
+            $this->assertSame(400, $clientResponse->getStatusCode(), $content);
+            $this->assertStringContainsString($message, $content);
+        }
     }
 
     public function testCreateNewLocalAsset(): void

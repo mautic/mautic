@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -89,7 +90,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function batchDeleteStandard(Request $request)
     {
@@ -225,7 +226,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Clone an entity.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function cloneStandard(Request $request, $objectId)
     {
@@ -256,7 +257,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function deleteStandard(Request $request, $objectId)
     {
@@ -318,7 +319,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -904,7 +905,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -1041,7 +1042,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param string|null $listPage
      * @param string      $itemName
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {
@@ -1094,7 +1095,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'viewParameters' => [
                 $itemName     => $entity,
                 'logs'        => $logs,
-                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details',
                 'permissions' => $this->security->isGranted(
                     [
                         $this->getPermissionBase().':view',
@@ -1182,5 +1183,22 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $entity->markForVersionIncrement();
 
         return true;
+    }
+
+    public function returnOptimizedResponse(Request $request, FormInterface $form, string $link, string $content, string $route, array $data = []): ?JsonResponse
+    {
+        if ($request->request->get('is_optimized_response', false)) {
+            return new JsonResponse(
+                $data + [
+                    'activeLink'      => $link,
+                    'mauticContent'   => $content,
+                    'route'           => $route,
+                    'validationError' => $this->getFormErrorForBuilder($form),
+                    'flashes'         => $this->getFlashContent(),
+                ]
+            );
+        }
+
+        return null;
     }
 }

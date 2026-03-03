@@ -40,7 +40,10 @@
                     <div class="form-group">
                         <div class="form-control-static ml-10">
                             <span class="text-muted">{{ 'mautic.config.dsn.using_current_dsn'|trans }}:</span>
-                            <code>{{ form.vars.currentDsn|default('n/a') }}</code>
+                            {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                                variant: 'inline',
+                                innerText: form.vars.currentDsn|default('n/a'),
+                            } %}
                         </div>
                     </div>
                 </div>

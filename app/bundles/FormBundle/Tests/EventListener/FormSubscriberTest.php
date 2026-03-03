@@ -1,6 +1,6 @@
 <?php
 
-namespace FormBundle\Tests\EventListener;
+namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -494,7 +494,6 @@ New line',
         $form = new Form();
         $form->setName('Test Form');
         $form->setAlias('test_form');
-        $form->setFormType('standalone');
 
         return $form;
     }

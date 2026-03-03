@@ -5,44 +5,34 @@ namespace Mautic\CampaignBundle\Tests\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveContactFinder
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $inactiveContactFinder;
+    private MockObject&InactiveContactFinder $inactiveContactFinder;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject&Translator $translator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
+    private MockObject&EventScheduler $eventScheduler;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveHelper
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $inactiveHelper;
+    private MockObject&InactiveHelper $inactiveHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventExecutioner;
+    private MockObject&EventExecutioner $eventExecutioner;
+
+    private MockObject&EventRedirectionHelper $redirectionHelper;
 
     protected function setUp(): void
     {
@@ -55,6 +45,12 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
         $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+
+        $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
+
+        // Configure the redirection helper mock to return the event it receives
+        $this->redirectionHelper->method('handleEventRedirection')
+            ->willReturnCallback(fn (Event $event) => $event);
     }
 
     public function testNoContactsFoundResultsInNothingExecuted(): void
@@ -97,6 +93,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection([$decision]));
+        $campaign->expects($this->any())
+            ->method('getId')
+            ->willReturn(1);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -106,7 +105,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->inactiveContactFinder->expects($this->exactly(3))
             ->method('getContacts')
-            ->with(null, $decision, $limiter)
+            ->with(1, $decision, $limiter)
             ->willReturnOnConsecutiveCalls(
                 new ArrayCollection([3 => new Lead()]),
                 new ArrayCollection([10 => new Lead()]),
@@ -154,6 +153,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
+        $campaign->expects($this->any())
+            ->method('getId')
+            ->willReturn(1);
 
         $decision = new Event();
         $decision->setCampaign($campaign);
@@ -171,7 +173,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->inactiveContactFinder->expects($this->exactly(3))
             ->method('getContacts')
-            ->with(null, $decision, $limiter)
+            ->with(1, $decision, $limiter)
             ->willReturnOnConsecutiveCalls(
                 new ArrayCollection([3 => new Lead()]),
                 new ArrayCollection([10 => new Lead()]),
@@ -198,7 +200,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventScheduler,
             $this->inactiveHelper,
             $this->eventExecutioner,
-            $this->createMock(ProcessSignalService::class)
+            $this->createMock(ProcessSignalService::class),
+            $this->redirectionHelper,
+            $this->createMock(LeadRepository::class)
         );
     }
 }

@@ -4,6 +4,8 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
+use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -14,6 +16,8 @@ class DoNotContact implements MauticModelInterface
     public function __construct(
         protected LeadModel $leadModel,
         protected DoNotContactRepository $dncRepo,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected CacheProvider $cacheProvider,
     ) {
     }
 
@@ -196,6 +200,27 @@ class DoNotContact implements MauticModelInterface
 
         // Re-add the entry to the lead
         $contact->addDoNotContactEntry($dnc);
+    }
+
+    /**
+     * Get all available reason-channel combinations.
+     *
+     * @return array<array{reason: int, channel: string}>
+     */
+    public function getReasonChannelCombinations(bool $useCache = true): array
+    {
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $this->cacheProvider->getItem('dnc.reason_channel_combinations');
+        if ($useCache && $cacheItem->isHit()) {
+            return $cacheItem->get();
+        } else {
+            $reasonChannelCombinations = $this->dncRepo->getReasonChannelCombinations();
+            $cacheItem->set($reasonChannelCombinations);
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $this->cacheProvider->save($cacheItem);
+
+            return $reasonChannelCombinations;
+        }
     }
 
     /**
