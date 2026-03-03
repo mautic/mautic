@@ -56,6 +56,8 @@ return [
                 'class'     => MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
                 'arguments' => [
                     'translator',
+                    'mautic.native.connector',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
