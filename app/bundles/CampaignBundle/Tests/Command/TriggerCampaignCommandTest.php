@@ -561,9 +561,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignActionChangeMembership(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
         $campaign1 = $this->createCampaign('Campaign 1');
         $campaign2 = $this->createCampaign('Campaign 2');
         $lead      = $this->createLead('Lead');
@@ -587,10 +584,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignActionChangeMembershipRestartRotation(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         $campaign1 = $this->createCampaign('Campaign 1');
         // create campaign with restart allowed
         $campaign2 = $this->createCampaign('Campaign 2');
@@ -624,9 +617,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignActionAfterChangeMembership(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
         $campaign  = $this->createCampaign('Campaign 1');
         $lead      = $this->createLead('Lead');
         $this->createCampaignLead($campaign, $lead);
@@ -653,10 +643,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignActionBeforeChangeMembership(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         $campaign  = $this->createCampaign('Campaign 1');
         $lead      = $this->createLead('Lead');
         $this->createCampaignLead($campaign, $lead);
@@ -685,10 +671,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignExclusion(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         $campaign1 = $this->createCampaign('Campaign 1');
         $campaign2 = $this->createCampaign('Campaign 2');
         $lead      = $this->createLead('Lead');
@@ -759,10 +741,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignExecuteOrderByDateCreatedDesc(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         $oldCampaign = $this->createCampaign('Some old campaign');
         $oldCampaign->setDateAdded(new \DateTime('2019-01-03 03:54:25'));
         $newCampaign = $this->createCampaign('New campaign');
@@ -846,10 +824,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         bool $expectedIsScheduled,
         array $expectedTriggerDateLog,
     ): void {
-        if ($this->isPostgresqlPlatform()) {
-            // $this->markTestSkipped('Skipped on PostgreSQL due to race conditions');
-        }
-
         // Create an unpublished campaign with specified republish behavior
         $campaign = new Campaign();
         $campaign->setName("Campaign with {$republishBehavior} behavior");
