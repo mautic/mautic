@@ -327,6 +327,27 @@ class TrackableModelTest extends TestCase
         $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
     }
 
+    public function testOwnerFieldTokenizedHostWithoutTokenValue(): void
+    {
+        $url   = 'http://{ownerfield=firstname}.com';
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [],
+            'email',
+            1
+        );
+
+        $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
+
+        // Assert that a trackable token exists
+        $this->assertTrue((bool) $tokenFound, $content);
+
+        // Assert the Trackable exists
+        $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
+    }
+
     #[\PHPUnit\Framework\Attributes\TestDox('Test that tokens that are supposed to be ignored are')]
     public function testIgnoredTokensAreNotConverted(): void
     {

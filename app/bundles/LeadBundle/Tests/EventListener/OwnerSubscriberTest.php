@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Entity\User;
@@ -338,6 +339,40 @@ class OwnerSubscriberTest extends TestCase
             $subscriber->onSmsTokenReplacement($event);
             $this->assertEquals($expected, $event->getContent());
         }
+    }
+
+    public function testOnUrlTokenReplace(): void
+    {
+        $leadModel      = $this->createMock(LeadModel::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'Rahul']);
+        $leadModel->method('getRepository')->willReturn($leadRepository);
+
+        $subscriber = new OwnerSubscriber($leadModel, $this->createMock(TranslatorInterface::class));
+
+        $lead = $this->createMock(Lead::class);
+        $lead->method('getProfileFields')->willReturn(['id' => 123]);
+        $lead->method('getOwner')->willReturn($this->getUser());
+
+        $event = new UrlTokenReplaceEvent('https://example.mautic/author/{ownerfield=firstname}/', $lead);
+        $subscriber->onUrlTokenReplace($event);
+
+        $this->assertSame('https://example.mautic/author/Rahul/', $event->getContent());
+    }
+
+    public function testOnUrlTokenReplaceWithNoOwner(): void
+    {
+        $leadModel  = $this->createMock(LeadModel::class);
+        $subscriber = new OwnerSubscriber($leadModel, $this->createMock(TranslatorInterface::class));
+
+        $lead = $this->createMock(Lead::class);
+        $lead->method('getProfileFields')->willReturn(['id' => 123]);
+        $lead->method('getOwner')->willReturn(null);
+
+        $event = new UrlTokenReplaceEvent('https://example.mautic/author/{ownerfield=firstname}/', $lead);
+        $subscriber->onUrlTokenReplace($event);
+
+        $this->assertSame('https://example.mautic/author//', $event->getContent());
     }
 
     protected function getUser(): User
