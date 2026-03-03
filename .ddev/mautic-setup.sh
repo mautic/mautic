@@ -5,27 +5,8 @@ setup_mautic() {
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
-    # CI workaround: Fork for gaufrette/extras
-    printf "CI: Forcing gaufrette/extras from K-Phoen fork...\n"
-    composer config repositories.gaufrette-extras \
-      '{"type":"vcs","url":"https://github.com/K-Phoen/gaufrette-extras.git"}' --no-plugins
-
-    # we need to delete lock file for the workaround to work
-    rm -fr composer.lock
-
     printf "Installing Mautic Composer dependencies...\n"
-    composer install \
-      --no-interaction \
-      --prefer-source \
-      --prefer-dist \
-      --optimize-autoloader \
-      --ignore-platform-reqs \
-      --no-plugins \
-      --no-scripts \
-      -vvv || {
-        printf "Fallback: Updating only gaufrette/extras...\n"
-        composer update gaufrette/extras --prefer-source --no-interaction --ignore-platform-reqs -vvv || true
-      }
+    composer install
 
     cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
