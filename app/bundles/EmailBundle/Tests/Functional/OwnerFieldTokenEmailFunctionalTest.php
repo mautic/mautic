@@ -11,7 +11,6 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -44,7 +43,8 @@ final class OwnerFieldTokenEmailFunctionalTest extends MauticMysqlTestCase
             '<html><body>'
             .'Owner first name: {ownerfield=firstname} '
             .'Owner last name: {ownerfield=lastname} '
-            .'Owner email: {ownerfield=email}'
+            .'Owner email: {ownerfield=email} '
+            .'<a id="owner-profile-link" href="https://example.mautic/author/{ownerfield=firstname}/">Owner profile</a>'
             .'</body></html>'
         );
 
@@ -77,13 +77,13 @@ final class OwnerFieldTokenEmailFunctionalTest extends MauticMysqlTestCase
                 'lead'  => $lead->getId(),
             ]
         );
-        Assert::assertNotNull($emailStat);
+        $this->assertNotNull($emailStat);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/email/view/'.$emailStat->getTrackingHash());
         $body    = $crawler->filter('body');
 
-        // Remove injected tracking tags for stable assertions.
-        $body->filter('a,img,div')->each(function (Crawler $crawler): void {
+        // Remove injected tracking tags for stable assertions, but keep links for URL assertions.
+        $body->filter('img,div')->each(function (Crawler $crawler): void {
             foreach ($crawler as $node) {
                 $node->parentNode->removeChild($node);
             }
@@ -91,9 +91,22 @@ final class OwnerFieldTokenEmailFunctionalTest extends MauticMysqlTestCase
 
         $content = $body->html();
 
-        Assert::assertStringContainsString('Owner first name: Contact', $content);
-        Assert::assertStringContainsString('Owner last name: Owner', $content);
-        Assert::assertStringContainsString('Owner email: '.$owner->getEmail(), $content);
-        Assert::assertStringNotContainsString('{ownerfield=', $content);
+        $this->assertStringContainsString('Owner first name: Contact', $content);
+        $this->assertStringContainsString('Owner last name: Owner', $content);
+        $this->assertStringContainsString('Owner email: '.$owner->getEmail(), $content);
+        $this->assertStringNotContainsString('{ownerfield=', $content);
+
+        $profileLinkHref = $crawler->filter('#owner-profile-link')->attr('href');
+        $this->assertNotNull($profileLinkHref);
+        $this->assertStringNotContainsString('{ownerfield=', $profileLinkHref);
+        if (str_starts_with($profileLinkHref, 'https://example.mautic/author/')) {
+            $this->assertSame('https://example.mautic/author/Contact/', $profileLinkHref);
+        } else {
+            $this->client->followRedirects(false);
+            $this->client->request(Request::METHOD_GET, $profileLinkHref);
+            $location = $this->client->getResponse()->headers->get('Location');
+            $this->assertNotNull($location);
+            $this->assertStringContainsString('https://example.mautic/author/Contact/', $location);
+        }
     }
 }
