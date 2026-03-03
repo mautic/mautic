@@ -5,23 +5,24 @@ setup_mautic() {
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
-    # ───────────────────────────────────────────────────────────────
-    # GitHub Actions workaround: Use K-Phoen fork for abandoned gaufrette/extras
-    # ───────────────────────────────────────────────────────────────
-    printf "Applying workaround — aliasing K-Phoen/gaufrette-extras fork as gaufrette/extras:0.1.0...\n"
-
+    # CI workaround: Fork for gaufrette/extras
+    printf "CI: Forcing gaufrette/extras from K-Phoen fork...\n"
     composer config repositories.gaufrette-extras \
       '{"type":"vcs","url":"https://github.com/K-Phoen/gaufrette-extras.git"}' --no-plugins
 
-    # Alias dev-master from fork as if it were the original 0.1.0
-    composer require "gaufrette/extras:dev-master as 0.1.0" --no-update --ignore-platform-reqs --no-plugins || {
-        printf "Alias require had issues — continuing...\n"
-    }
-
-    printf "Fork aliased successfully.\n"
-
     printf "Installing Mautic Composer dependencies...\n"
-    composer install
+    composer install \
+      --no-interaction \
+      --prefer-source \
+      --prefer-dist \
+      --optimize-autoloader \
+      --ignore-platform-reqs \
+      --no-plugins \
+      --no-scripts \
+      -vvv || {
+        printf "Fallback: Updating only gaufrette/extras...\n"
+        composer update gaufrette/extras --prefer-source --no-interaction --ignore-platform-reqs -vvv || true
+      }
 
     cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
