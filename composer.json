@@ -130,8 +130,7 @@
     }
   ],
   "conflict": {
-    "mautic/core": "*",
-    "gaufrette/extras": "*"
+    "mautic/core": "*"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
