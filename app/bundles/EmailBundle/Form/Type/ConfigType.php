@@ -492,6 +492,21 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+
+        $builder->add(
+            'email_draft_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.enable.draft',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => $options['data']['email_draft_enabled'] ?? false,
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.enable.draft.tooltip',
+                ],
+            ]
+        );
     }
 
     public function getBlockPrefix(): string

@@ -19,10 +19,23 @@
         <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb{{ id }}" value="{{ id|escape }}"/>
     </span>
 
-    <div class="input-group-btn">
-        <button type="button" class="btn btn-ghost btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
-            <i class="ri-more-2-line"></i>
-        </button>
+    <div class="ml-xs">
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.options',
+                    size: 'sm',
+                    variant: 'ghost',
+                    icon: 'ri-more-2-line',
+                    icon_only: true,
+                    spin: false,
+                    attributes: {
+                        'data-toggle': 'dropdown',
+                        'type': 'button'
+                    }
+                }
+            ]
+        } %}
         {% if tooltip is defined and tooltip is not empty %}<i class="ri-question-line"></i>{% endif %}
         <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
             {% if templateButtons.edit is defined and templateButtons.edit is not empty %}

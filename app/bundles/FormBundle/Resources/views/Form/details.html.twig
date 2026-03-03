@@ -17,6 +17,18 @@
 
 {% block mauticContent %}form{% endblock %}
 
+{% block indexButton %}
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': activeForm,
+    'templateButtons': {
+        'close': securityHasEntityAccess(permissions['form:forms:viewown'], permissions['form:forms:viewother'], activeForm.createdBy),
+    },
+    'routeBase': 'form',
+    'langVar': 'form',
+    'targetLabel': 'mautic.form.forms'|trans
+}) }}
+{% endblock %}
+
 {% block headerTitle %}{{ activeForm.name }}{% endblock %}
 
 {% block actions %}
@@ -26,7 +38,6 @@
                 'edit': securityHasEntityAccess(permissions['form:forms:editown'], permissions['form:forms:editother'], activeForm.createdBy),
                 'clone': permissions['form:forms:create'],
                 'delete': securityHasEntityAccess(permissions['form:forms:deleteown'], permissions['form:forms:deleteother'], activeForm.createdBy),
-                'close': securityHasEntityAccess(permissions['form:forms:viewown'], permissions['form:forms:viewother'], activeForm.createdBy),
             },
             'routeBase': 'form',
             'langVar': 'form',
@@ -58,6 +69,18 @@
     'entity': activeForm,
     'status': 'available'
 }) -}}
+{% include '@MauticCore/Helper/_tag.html.twig' with {
+    tags: [
+        {
+            type: 'read-only',
+            color: 'warm-gray',
+            label: activeForm.formType == 'campaign'
+                ? 'mautic.form.type.campaign.header'
+                : 'mautic.form.type.standalone.header'
+        }
+    ]
+} %}
+
 {% endblock %}
 
 {% block content %}
@@ -68,13 +91,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- form detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10">
-                        <div class="text-muted">{{ activeForm.description|purify }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeForm.description} %}
             <!--/ form detail header -->
 
             <!-- form detail collapseable -->
@@ -227,8 +244,31 @@
                 <div class="panel-body">
                     <h5 class="fw-sb mb-sm">{{ 'mautic.form.form.header.copy'|trans }}</h5>
                     <p class="mb-sm">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
-                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-automatic-copy">{{ 'mautic.form.form.header.embedded'|trans }}</a>
-                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-manual-copy">{{ 'mautic.form.form.header.selfhosted'|trans }}</a>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.form.form.header.embedded',
+                                variant: 'info',
+                                size: 'sm',
+                                href: '#',
+                                attributes: {
+                                    'data-toggle': 'modal',
+                                    'data-target': '#modal-automatic-copy'
+                                }
+                            },
+                            {
+                                label: 'mautic.form.form.header.selfhosted',
+                                variant: 'info',
+                                size: 'sm',
+                                href: '#',
+                                attributes: {
+                                    'data-toggle': 'modal',
+                                    'data-target': '#modal-manual-copy'
+                                }
+                            }
+                        ]
+                    } %}
+
                 </div>
             </div>
         </div>

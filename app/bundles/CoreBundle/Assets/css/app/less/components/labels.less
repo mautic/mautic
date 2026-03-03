@@ -114,10 +114,17 @@
   color: var(--label-color-brand);
 }
 
-.label-outline {
+.label-outline,
+.label-selectable {
   background-color: transparent;
   color: var(--text-primary);
-  &, &:hover {outline: 1px solid var(--background-inverse);}
+  &, &:hover {border: 1px solid var(--background-inverse);}
+}
+
+.label-selectable.active {
+  background-color: var(--layer-selected-inverse);
+  color: var(--text-inverse);
+  border-color: var(--layer-selected-inverse);
 }
 
 .label-high-contrast {

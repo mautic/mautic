@@ -195,6 +195,19 @@ class AssetGenerationHelper
                                     unlink($assetFile);
                                 }
 
+                                $missing = [];
+                                foreach ($files as $file) {
+                                    if (file_exists($file['fullPath'])) {
+                                        continue;
+                                    }
+
+                                    $missing[] = $file['fullPath'];
+                                }
+
+                                if ([] !== $missing) {
+                                    throw new \ErrorException('These files are missing: '.implode(', ', $missing).'. Have you forgot to install/update modules?');
+                                }
+
                                 if ('css' == $type) {
                                     $minifier = new Minify\CSS(...array_column($files, 'fullPath'));
                                     $minifier->minify($assetFile);

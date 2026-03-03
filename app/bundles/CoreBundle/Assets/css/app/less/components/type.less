@@ -113,7 +113,7 @@ h1, h2, h3, h4, h5, h6,
 .text-success { .text-emphasis-variants(@brand-success); }
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
-.text-info { .text-emphasis-variant(@brand-info); }
+.text-info { color: var(--support-info); }
 .text-twitter { .text-emphasis-variant(@brand-twitter); }
 .text-facebook { .text-emphasis-variant(@brand-facebook); }
 .text-google { .text-emphasis-variant(@brand-google); }
@@ -171,6 +171,7 @@ code {
   padding: var(--spacing-01) var(--spacing-03);
   cursor: pointer;
   overflow: hidden;
+  border-radius: clamp(1px, var(--border-radius-sm), 4px);
 }
 
 kbd {
@@ -184,17 +185,28 @@ kbd {
 .tooltip-inner { padding: 12px; }
 .popover {
   border-radius: 10px;
+  padding: 0;
+  border: 0;
 }
 .popover-title {
   padding: 16px 16px 12px;
-  background-color: var(--layer);
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   line-height: 1em;
   font-size: calc(1em + 1px);
   border-radius: 8px 8px 0 0;
+  .background-blur()
 }
 
 .popover-content {
   padding: 12px 16px 16px;
+  border-radius: var(--border-radius-md);
+  background-color: var(--layer-02);
+}
+
+@media (min-width: 768px) {
+  .popover:has([class^="col-"]) {
+    max-width: 450px;
+    width: 450px;
+  }
 }

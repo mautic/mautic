@@ -70,7 +70,7 @@
             {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
             <div class="dropdown">
                 <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-toggle="dropdown" aria-expanded="false">
-                  {{ 'mautic.dashboard.quick_filters'|trans }}
+                  {{ 'mautic.core.quick_filters'|trans }}
                   <i class="ri-arrow-down-s-line"></i>
                 </a>
                 <ul class="dropdown-menu">
@@ -82,9 +82,7 @@
                 </ul>
               </div>
         </div>
-
       </div>
-
   </div>
 
   {% if widgets|length > 0 %}
@@ -106,9 +104,15 @@
               <div class="col-xs-9">
                   <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="ri-double-quotes-r"></i></h4>
                   <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
-                  <a href="{{ path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': 'default.json'}) }}" class="btn btn-success">
-                      Apply the default dashboard
-                  </a>
+                  {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: [
+                        {
+                            label: 'mautic.dashboard.apply_default',
+                            variant: 'success',
+                            href: path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': 'default.json'})
+                        }
+                    ]
+                } %}
               </div>
           </div>
       </div>

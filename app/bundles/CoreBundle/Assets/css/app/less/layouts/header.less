@@ -208,6 +208,7 @@
       .open {
         // reset default bootstrap `navbar-nav` `dropdown-menu`
         .dropdown-menu {
+          background-color: var(--layer);
           position: absolute;
           top: 100%;
           margin-top: 5px;
@@ -215,6 +216,8 @@
           float: left;
           border: 1px solid @dropdown-fallback-border; // IE8 fallback
           border: 1px solid @dropdown-border;
+          border-top-left-radius: var(--border-radius-md);
+          border-top-right-radius: var(--border-radius-md);
           .box-shadow(0 3px 6px rgba(0,0,0,.06));
         }
 

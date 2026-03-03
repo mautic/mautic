@@ -222,15 +222,13 @@
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
   &:hover { outline: 2px var(--outline-style) transparent; }
-  &:active, &.active,
-  &:focus, &.focus { outline: 2px var(--outline-style) var(--focus); }
+  &:focus, &.focus, &:focus-visible { outline: 2px var(--outline-style) var(--focus); }
 }
 
 .outline-noff() {
   outline: 2px solid transparent;
   outline-offset: 1px;
   &:hover { outline: 2px solid transparent; }
-  &:active, &.active,
   &:focus, &.focus {
     outline: 2px solid var(--focus);
     outline-offset: 1px;
@@ -259,18 +257,13 @@
   border: 1px solid @border-color;
   .outline();
 
-  i {
-    color: @text-color;
-  }
+  i { color: @text-color; }
 
   &:hover {
     color: @hover-text-color;
     background-color: @hover-background;
     border: 1px solid @hover-background;
-
-    i {
-      color: @hover-text-color;
-    }
+    i { color: @hover-text-color; }
   }
 
   &:active,
@@ -278,11 +271,8 @@
   .open > .dropdown-toggle& {
     color: @hover-text-color;
     background-color: @active-background;
-    border: 1px solid @active-background;
-
-    i {
-      color: @hover-text-color;
-    }
+    border: 1px solid transparent;
+    i { color: @hover-text-color; }
 
     &:hover,
     &:focus,
@@ -290,6 +280,7 @@
       color: @hover-text-color;
       background-color: @active-background;
       border-color: @active-background;
+      i { color: @hover-text-color; }
     }
   }
 
@@ -299,17 +290,20 @@
     background-color: @active-background;
     border: 1px solid @active-background;
     box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background,#ffffff);
+    i { color: @hover-text-color; }
   }
 
   &[disabled],
   &.disabled,
   fieldset[disabled] & {
+    &,
     &:hover,
     &:focus,
     &.focus {
       background-color: @disabled-background;
       color: @disabled-text-color;
       border: 1px solid @disabled-background;
+      i { color: @disabled-text-color; }
     }
   }
 }

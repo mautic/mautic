@@ -190,10 +190,6 @@ table.table > tbody > tr > td.long-text {
   white-space: normal;
 }
 
-.dynamicContentFilterContainer .btn-primary:hover {
-  color:#5d6c7c;
-}
-
 #dynamicContentContainer .remove-item {
   display:block;
 }
@@ -338,18 +334,114 @@ ul.media-list.media-list-feed div.media-body
   display: inline-flex;
   opacity: 0;
   transform: translateX(-0.25rem);
-  transition: var(--transition-all-expressive);
-  margin-right: -22px;
+  transition: var(--transition-all-productive);
+  margin-right: -18px;
   background-color: var(--layer);
   z-index: 2;
   position: relative;
-  border-radius: 0 3px 3px 0;
+  border-radius: clamp(1px, var(--border-radius-sm), 4px);
   aspect-ratio: 1 / 1;
   color: var(--icon-interactive);
-  height: 17px;
+  height: 18px;
   vertical-align: middle;
+  justify-content: center;
+  align-items: center;
 }
 code:hover > .copy-icon {
   opacity: 1;
   transform: none;
+}
+
+// Logo
+// --------------------------------------------------
+
+// mautic-brand
+.mautic-brand {
+  display: block;
+  height: @header-height;
+  padding-left: 35px;
+  padding-right: 32px;
+  width: 100%;
+  overflow: hidden;
+
+  &.pull-left {
+    width: 75%;
+  }
+
+  // mautic logo figure
+  > svg.mautic-logo-figure {
+    width: @mautic-logo-figure-width;
+    height: @header-height;
+    .circle {
+      fill: @mautic-logo-figure-circle-fill;
+    }
+    .m,
+    .m-arrow {
+      fill: @mautic-logo-figure-m-fill;
+    }
+  }
+
+  // mautic logo text
+  > svg.mautic-logo-text {
+    height: @header-height;
+    width: @mautic-logo-text-width;
+    .m,.a,.u,.t,.i,.c {
+      fill: @mautic-logo-text-fill
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  svg.mautic-logo-text {
+    display: none;
+  }
+}
+
+.list-toolbar {
+  .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
+  .form-control.search,
+  .input-group .input-group-btn button,
+  .btn,
+  div {
+    height: 48px;
+    border-radius: unset;
+    margin: 0;
+  }
+  .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
+  .form-control.search,
+  .input-group .input-group-btn button,
+  .btn-ghost {
+    &:hover {background-color: var(--field-hover);}
+  }
+
+  > .btn {
+    &:last-child, &:only-of-type + .input-group > input { border-radius: 0 var(--border-radius-lg) 0 0; }
+    &:first-child { border-radius: var(--border-radius-lg) 0 0 0; }
+  }
+}
+.well { box-shadow: none; }
+
+.collapsed .arrow { transform: scaleY(-1); }
+
+.description {
+  width: 410px;
+  max-width: 410px;
+  transition-delay: 2s;
+  .transition(var(--transition-all-expressive));
+}
+.description:has(.collapsed) {
+  width: 140px;
+  .transition(all 1.5s var(--easing-standard-expressive));
+}
+.description-content { width: 388px; }
+.dropup.quick-help {
+  position: fixed;
+  z-index: 9999;
+  bottom: 15px;
+  right: 15px;
+}
+.dropdown-toggle.quick-help {
+    background-color: var(--background);
+    border: 1px solid var(--border-subtle);
+    box-shadow: rgba(0, 0, 0, 0.07) 0px -1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px, rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 8px 8px, rgba(0, 0, 0, 0.07) 0px 16px 16px;
 }

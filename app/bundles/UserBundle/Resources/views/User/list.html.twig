@@ -7,46 +7,45 @@
 {% block headerTitle %}
 	{% trans %}mautic.user.users{% endtrans %}
 {% endblock %}
-{% block actions %}
-	{{- include('@MauticCore/Helper/page_actions.html.twig', {
-        'templateButtons' : {
-                'new' : permissions['create'],
-        },
-        'routeBase' : 'user',
-        'langVar'   : 'user.user',
-    }) -}}
-{% endblock %}
 
 {% block content %}
 	{% if isIndex %}
+	<div id="page-list-wrapper" class="panel panel-default">
 		{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue' : searchValue,
-            'searchHelp'  : 'mautic.user.user.help.searchcommands',
-            'action'      : currentRoute,
+			'searchValue': searchValue,
+			'action': currentRoute,
+			'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+				'templateButtons': {
+					'new': permissions['create'],
+				},
+				'routeBase': 'user',
+				'langVar': 'user.user',
+			}),
 			'quickFilters': [
 				{
-					'search': 'is:admin',
+					'search': 'mautic.user.user.searchcommand.isadmin',
 					'label': 'mautic.user.role.form.isadmin',
 					'tooltip': 'mautic.core.search.quickfilter.is_admin',
 					'icon': 'ri-admin-line'
 				},
 				{
-					'search': 'is:published',
+					'search': 'mautic.core.searchcommand.ispublished',
 					'label': 'mautic.core.form.active',
 					'tooltip': 'mautic.core.search.quickfilter.is_published',
 					'icon': 'ri-check-line'
 				},
 				{
-					'search': 'is:unpublished',
+					'search': 'mautic.core.searchcommand.isunpublished',
 					'label': 'mautic.core.form.inactive',
 					'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
 					'icon': 'ri-close-line'
 				}
 			]
-        }) -}}
+		}) -}}
 		<div class="page-list">
 			{{ block('listResults') }}
 		</div>
+	</div>
 	{% else %}
 		{{ block('listResults') }}
 	{% endif %}

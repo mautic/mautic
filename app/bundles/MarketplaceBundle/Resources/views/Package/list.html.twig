@@ -34,7 +34,7 @@
                 {% trans %}marketplace.composer.required{% endtrans %}
             </div>
         {% endif %}
-        <div id="page-list-wrapper">
+        <div id="page-list-wrapper" class="panel panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,

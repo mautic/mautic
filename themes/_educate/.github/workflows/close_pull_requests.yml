@@ -1,0 +1,26 @@
+# Workflow name:
+name: Close Pull Requests
+
+# Workflow triggers:
+on:
+  pull_request_target:
+    types: [opened]
+
+# Workflow jobs:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: superbrothers/close-pull-request@v3
+      with:
+        comment: |
+          Thank you for submitting a pull request. :raised_hands:
+          
+          We greatly appreciate your willingness to submit a contribution. However, we are not accepting pull requests against this repository, as all development happens on the [main project repository](https://github.com/mautic/mautic).
+          
+          We kindly request that you submit this pull request against the respective directory `/themes/_educate` of the [main repository](https://github.com/mautic/mautic) where we'll review and provide feedback. If this is your first Mautic contribution, be sure to read the [contributing guide](https://mau.tc/create-pr) which provides guidelines and instructions for submitting contributions.
+          
+          Thank you again, and we look forward to receiving your contribution! :smiley:
+          
+          Best,
+          The Mautic team 

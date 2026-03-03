@@ -26,28 +26,15 @@ import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 export default class BuilderService {
   editor;
 
-  assets;
-
-  uploadPath;
-
-  deletePath;
-
   storageService;
 
-  /**
-   * @param {*} assets
-   */
-  constructor(assets) {
-    if (!assets.conf.uploadPath) {
-      throw Error('No uploadPath found');
-    }
-    if (!assets.conf.deletePath) {
-      throw Error('No deletePath found');
-    }
+  assetService;
 
-    this.assets = assets.files;
-    this.uploadPath = assets.conf.uploadPath;
-    this.deletePath = assets.conf.deletePath;
+  /**
+   * @param {AssetService} assetService
+   */
+  constructor(assetService) {
+    this.assetService = assetService;
   }
 
   /**
@@ -96,9 +83,57 @@ export default class BuilderService {
     this.editor.on('asset:remove', (response) => {
       // Delete file on server
       mQuery.ajax({
-        url: this.deletePath,
+        url: this.assetService.getDeletePath(),
         data: { filename: response.getFilename() },
       });
+    });
+
+    this.editor.on('asset:open', () => {
+      const editor = this.editor;
+      const assetsService = this.assetService;
+      const assetsContainer = document.querySelector('.gjs-am-assets');
+      const $assetsSpinner = document.createElement('div');
+      $assetsSpinner.className = 'gjs-assets-spinner';
+      $assetsSpinner.innerHTML = '<i class="ri-loader-3-line ri-spin"></i>';
+
+      if (assetsContainer) {
+        let isLoading = false;
+
+        const loadNextPage = async () => {
+          if (isLoading) return;
+          isLoading = true;
+          assetsContainer.appendChild($assetsSpinner);
+
+          try {
+            const result = await assetsService.getAssetsNextPageXhr();
+            if (result) {
+              const assetManager = editor.AssetManager;
+              const currentAssets = assetManager.getAll().models;
+              const newAssets = result.data;
+
+              // Combine current assets with new assets
+              const combinedAssets = [...currentAssets, ...newAssets];
+
+              // Reset the entire collection with combined assets
+              assetManager.getAll().reset(combinedAssets);
+              assetManager.render();
+            }
+          } catch (error) {
+            console.error('Error loading next page of assets:', error);
+          } finally {
+            isLoading = false;
+          }
+        };
+
+        assetsContainer.addEventListener('scroll', function() {
+          const hasScrolledToBottom = this.scrollTop + this.clientHeight >= this.scrollHeight - 5;
+          if (hasScrolledToBottom && !assetsService.hasLoadedAllAssets()) {
+            loadNextPage();
+          }
+        });
+      } else {
+        console.warn('Element with class "gjs-am-assets" not found');
+      }
     });
 
     const triggerBuilderHide = () => {
@@ -226,6 +261,16 @@ export default class BuilderService {
     return this.editor;
   }
 
+  mjmlToHtml(mjml) {
+      const converted = MjmlService.mjmlToHtml(mjml);
+
+      if (0 === converted.errors.length) {
+          return converted.html;
+      }
+
+      return '';
+  }
+
   initEmailMjml() {
     const components = MjmlService.getOriginalContentMjml();
     // validate
@@ -278,6 +323,8 @@ export default class BuilderService {
     this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
     });
+
+    this.removeSelectedElementsEmailMjml();
 
     return this.editor;
   }
@@ -445,9 +492,9 @@ export default class BuilderService {
    */
   getAssetManagerConf() {
     return {
-      assets: this.assets,
+      assets: [],
       noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
-      upload: this.uploadPath,
+      upload: this.assetService.getUploadPath(),
       uploadName: 'files',
       multiUpload: 1,
       embedAsBase64: false,
@@ -505,6 +552,16 @@ export default class BuilderService {
         });
       }
     });
+  }
+
+  removeSelectedElementsEmailMjml() {
+
+    // Remove the RAW block (it's just not usable)
+    const rawblock = this.editor.BlockManager.get('mj-raw');
+
+    if (rawblock !== null) {
+      this.editor.BlockManager.remove(rawblock);
+    }
   }
 
   /**

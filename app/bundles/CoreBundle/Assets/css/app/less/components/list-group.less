@@ -8,19 +8,50 @@
   overflow: hidden;
 }
 
+.nav-justified {
+  .list-group-item.btn {
+    border: 1px solid transparent;
+    .outline();
+
+    &:first-child {
+      border-top-left-radius: clamp(4px, var(--border-radius-md), 12px);
+      border-bottom-left-radius: clamp(4px, var(--border-radius-md), 12px);
+    }
+
+    &:last-child {
+      border-top-right-radius: clamp(4px, var(--border-radius-md), 12px);
+      border-bottom-right-radius: clamp(4px, var(--border-radius-md), 12px);
+    }
+  }
+}
+
 .list-group-item {
   transition: var(--transition-all-productive);
   border: 0;
   padding: 0;
   vertical-align: middle;
 
-  > a, > label {
+  &:first-child > a {
+    border-top-left-radius: clamp(4px, var(--border-radius-md), 12px);
+    border-top-right-radius: clamp(4px, var(--border-radius-md), 12px);
+  }
+
+  &:last-child > a {
+    border-bottom-left-radius: clamp(4px, var(--border-radius-md), 12px);
+    border-bottom-right-radius: clamp(4px, var(--border-radius-md), 12px);
+  }
+
+
+
+  > a, > label, .list-group-item-text {
     position: relative;
     z-index: 1;
     display: block;
     padding: 10px 15px;
     cursor: pointer;
     color: @list-group-link-color;
+    .outline();
+
     input {
       position: absolute;
       top: 0;
@@ -100,7 +131,7 @@ label.list-group-item {
       line-height: @marker-size;
       font-size: calc(@marker-size - 5px);
       color: var(--icon-secondary);
-      transition: var(--all);
+      transition: var(--transition-all-productive);
       top: 11.8px;
       vertical-align: middle;
     }

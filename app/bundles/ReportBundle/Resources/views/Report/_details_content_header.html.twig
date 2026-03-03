@@ -2,11 +2,7 @@
 {%- set hideDateRangeFilter = (report.settings.hideDateRangeFilter is defined and report.settings.hideDateRangeFilter) -%}
 
 <!-- report detail header -->
-{% if report.description %}
-  <div class="pr-md pl-md pt-lg pb-lg">
-      <div class="text-white dark-sm mb-0">{{ report.description|purify }}</div>
-  </div>
-{% endif %}
+{% include '@MauticCore/Helper/description.html.twig' with {'description': report.description} %}
 <!--/ report detail header -->
 <!-- report detail collapseable -->
 <div id="report-shelves" class="mb-5" aria-multiselectable="true">

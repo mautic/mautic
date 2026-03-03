@@ -8,9 +8,23 @@
         <div class="panel panel-default">
             <div class="panel-heading pt-sm">
                 <div class="panel-title notification notification-title">
-                    <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
+                    <h6 class="fw-sb d-flex jc-space-between ai-center">{{ 'mautic.core.notifications'|trans }}
                         {% if notifications is not empty %}
-                        <a href="javascript:void(0);" class="btn-link btn-nospin pull-right" onclick="Mautic.clearNotification(0);">{% trans %}mautic.core.notifications.clearall{% endtrans %}</a>
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.notifications.clearall',
+                                        variant: 'ghost',
+                                        size: 'xs',
+                                        icon_only: true,
+                                        icon: 'ri-delete-bin-2-line',
+                                        attributes: {
+                                            'class': 'pull-right',
+                                        },
+                                        onclick: 'Mautic.clearNotification(0);'
+                                    }
+                                ]
+                            } %}
                         {% endif %}
                     </h6>
                 </div>

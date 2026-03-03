@@ -15,18 +15,38 @@
                         </div>
                         <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                             <i class="hidden-xs ri-shuffle-line ri-lg"></i>
-                            <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-success" data-type="Decision">
-                                {{ 'mautic.core.select'|trans }}
-                            </button>
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.select',
+                                        variant: 'ghost',
+                                        size: 'sm',
+                                        attributes: {
+                                            class: 'visible-xs pull-right text-success',
+                                            'data-type': 'Decision'
+                                        }
+                                    }
+                                ]
+                            } %}
                         </div>
                     </div>
                     <div class="panel-body">
                         {{ 'mautic.campaign.event.decision.descr'|trans }}
                     </div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-ghost btn-nospin text-success" data-type="Decision">
-                            {{ 'mautic.core.select'|trans }}
-                        </button>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.select',
+                                    variant: 'ghost',
+                                    size: 'md',
+                                    attributes: {
+                                        'data-type': 'Decision',
+                                        type: 'button'
+                                    }
+                                }
+                            ]
+                        } %}
                     </div>
                 </div>
             </div>
@@ -38,18 +58,39 @@
                         </div>
                         <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                             <i class="hidden-xs ri-focus-2-line ri-lg"></i>
-                            <button class="visible-xs pull-right btn btn-sm btn-ghost btn-nospin text-primary" data-type="Action">
-                                {{ 'mautic.core.select'|trans }}
-                            </button>
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.select',
+                                        size: 'sm',
+                                        attributes: {
+                                            'class': 'visible-xs pull-right',
+                                            'data-type': 'Action',
+                                            type: 'button'
+                                        },
+                                        variant: 'ghost',
+                                    }
+                                ]
+                            } %}
                         </div>
                     </div>
                     <div class="panel-body">
                         {{ 'mautic.campaign.event.action.descr'|trans }}
                     </div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-ghost btn-nospin text-primary" data-type="Action">
-                            {{ 'mautic.core.select'|trans }}
-                        </button>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.select',
+                                    variant: 'ghost',
+                                    size: 'md',
+                                    attributes: {
+                                        'data-type': 'Action',
+                                        type: 'button'
+                                    }
+                                }
+                            ]
+                        } %}
                     </div>
                 </div>
             </div>
@@ -61,23 +102,44 @@
                         </div>
                         <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                             <i class="hidden-xs ri-filter-2-fill ri-lg"></i>
-                            <button class="visible-xs pull-right btn btn-sm btn-ghost btn-nospin text-danger" data-type="Condition">
-                                {{ 'mautic.core.select'|trans }}
-                            </button>
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.select',
+                                        size: 'sm',
+                                        attributes: {
+                                            'class': 'visible-xs pull-right',
+                                            'data-type': 'Condition',
+                                            type: 'button'
+                                        },
+                                        variant: 'ghost',
+                                    }
+                                ]
+                            } %}
                         </div>
                     </div>
                     <div class="panel-body">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-ghost btn-nospin" data-type="Condition">
-                            {{ 'mautic.core.select'|trans }}
-                        </button>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.select',
+                                    variant: 'ghost',
+                                    size: 'md',
+                                    attributes: {
+                                        'data-type': 'Condition',
+                                        type: 'button'
+                                    }
+                                }
+                            ]
+                        } %}
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-12">
-                <div id="CampaignPasteContainer mt-10" class="panel">
+            <div class="mr-0 ml-0 pl-xs pr-xs mt-xs campaign-group-container col-md-12">
+                <div id="CampaignPasteContainer mt-10" class="panel mb-0">
                     <div id="CampaignPasteDescription" class="panel-body">
                         <div><b>{{ 'mautic.campaign.event.clone.header'|trans }}</b></div>
                         <div><span class="text-muted">{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span></div>
@@ -85,9 +147,29 @@
 
                     </div>
                     <div class="panel-footer">
-                        <a id="EventInsertButton" data-toggle="ajax" data-target="CampaignEvent_" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'insert', 'campaignId': campaignId, 'anchor': 'none', 'anchorEventType': 'none'}) }}"  class="btn btn-lg btn-ghost">
-                            {{ 'mautic.campaign.event.clone.insert'|trans }}
-                        </a>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.campaign.event.clone.insert',
+                                    size: 'md',
+                                    href: path(route, {
+                                        'objectAction': 'insert',
+                                        'campaignId': campaignId,
+                                        'anchor': 'none',
+                                        'anchorEventType': 'none'
+                                    }),
+                                    variant: 'ghost',
+                                    attributes: {
+                                        'id': 'EventInsertButton',
+                                        'data-toggle': 'ajax',
+                                        'data-target': 'CampaignEvent_',
+                                        'data-ignore-formexit': 'true',
+                                        'data-method': 'POST',
+                                        'data-hide-loadingbar': 'true'
+                                    }
+                                }
+                            ]
+                        } %}
                     </div>
                 </div>
             </div>

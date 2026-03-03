@@ -25,20 +25,44 @@ Variables:
                     <span class="small text-muted">{{ dateToFullConcat(note.dateTime) }}</span>
                     <div class="pull-right btn-group">
                         {% if permissions['edit'] %}
-                        <a class="btn btn-ghost btn-icon btn-ghost btn-xs"
-                            href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}"
-                            data-toggle="ajaxmodal" data-target="#MauticSharedModal"
-                            data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="ri-edit-line"></i></a>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.lead.note.header.edit',
+                                    variant: 'ghost',
+                                    icon_only: true,
+                                    icon: 'ri-edit-line',
+                                    size: 'xs',
+                                    href: url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}),
+                                    attributes: {
+                                        'data-toggle': 'ajaxmodal',
+                                        'data-target': '#MauticSharedModal'
+                                    }
+                                }
+                            ]
+                        } %}
                         {% endif %}
                         {% if permissions['delete'] %}
-                        <a class="btn btn-ghost btn-icon btn-xs" data-toggle="confirmation"
-                            href="{{ path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}) }}"
-                            data-message="{{ 'mautic.lead.note.confirmdelete'|trans|e }}"
-                            data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}"
-                            data-confirm-callback="executeAction"
-                            data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
-                            <i class="ri-delete-bin-line text-danger"></i>
-                        </a>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.lead.note.confirmdelete',
+                                    variant: 'ghost',
+                                    icon_only: true,
+                                    danger: 'true',
+                                    icon: 'ri-delete-bin-line',
+                                    size: 'xs',
+                                    href: path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}),
+                                    attributes: {
+                                        'data-toggle': 'confirmation',
+                                        'data-message': 'mautic.lead.note.confirmdelete'|trans,
+                                        'data-confirm-text': 'mautic.core.form.delete'|trans,
+                                        'data-confirm-callback': 'executeAction',
+                                        'data-cancel-text': 'mautic.core.form.cancel'|trans
+                                    }
+                                }
+                            ]
+                        } %}
                         {% endif %}
                     </div>
                 </div>

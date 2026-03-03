@@ -21,7 +21,6 @@
   width: fit-content;
   &:hover {
     border: 1px solid transparent;
-    color: var(--text-primary);
   }
   &,
   &:active,
@@ -93,6 +92,12 @@
   &.btn-block {width: 100%;}
 }
 
+.btn ~ .btn,
+.btn ~ .btn-group,
+.btn-group ~ .btn,
+.btn-group ~ .btn-group {
+  margin-left: 5px;
+}
 
 // Hierarchycal buttons
 // ---------------------------------
@@ -156,7 +161,6 @@
     @disabled-background: transparent,
     @disabled-text-color: var(--text-disabled)
   );
-  margin-left: -1px;
 
   /// Tertiary danger
   &.btn-danger {
@@ -188,6 +192,7 @@
     justify-content: space-between;
     gap: var(--spacing-07);
     width: 100%;
+    height: 100%;
   }
 }
 
@@ -254,40 +259,15 @@
   padding: 2px;
 }
 
-.btn-group {
-  > .btn {
-    &.btn-yes,
-    &.btn-no {
-      &:first-child:not(:last-child):not(.dropdown-toggle),
-      &:not(:first-child):not(:last-child):not(.dropdown-toggle),
-      &:last-child:not(:first-child),
-      & {
-        padding: 5px;
-        aspect-ratio: 1/1;
-        align-items: center;
-        justify-content: center;
-      }
-    }
-
-    &.active {
-      &.btn-yes,
-      &.btn-no {
-        outline-color: transparent;
-      }
-    }
-  }
-}
-
 // Standard sizes
-.btn-xs { height: var(--spacing-06); line-height: var(--spacing-06);}
-.btn-sm { height: var(--spacing-07); line-height: var(--spacing-07);}
-.btn-md { height: var(--spacing-08); line-height: var(--spacing-08);}
-.btn-lg { height: var(--spacing-09); line-height: var(--spacing-09);}
-.btn-xl { height: var(--spacing-10); line-height: var(--spacing-08); align-items: flex-start;}
-.btn-2xl { height: var(--spacing-11); line-height: var(--spacing-08); align-items: flex-start;}
+.btn-xs, .btn[size="xs"] { height: var(--spacing-06); line-height: var(--spacing-06); }
+.btn-sm, .btn[size="sm"] { height: var(--spacing-07); line-height: var(--spacing-07); }
+.btn-md, .btn[size="md"] { height: var(--spacing-08); line-height: var(--spacing-08); }
+.btn-lg, .btn[size="lg"] { height: var(--spacing-09); line-height: var(--spacing-09); }
+.btn-xl, .btn[size="xl"] { height: var(--spacing-10); line-height: var(--spacing-08); align-items: flex-start; }
+.btn-2xl, .btn[size="2xl"] { height: var(--spacing-11); line-height: var(--spacing-08); align-items: flex-start; }
 
 // Fix for outline
-.btn.active,
 .dropdown-toggle,
 .dropdown-menu > .active > a,
 .open > a,
@@ -303,6 +283,9 @@
 // Make a button look and behave like a link
 .btn-link {
   font-weight: @btn-font-weight;
+  height: auto;
+  line-height: normal;
+  padding: 0;
   &:hover,
   &:focus { text-decoration: none; }
 }
@@ -310,6 +293,13 @@
 .btn-info {
   color: @gray-dark;
   &:hover { color: @gray-dark; }
+}
+
+// Back to index button
+.btn-back {
+  gap: var(--spacing-02);
+  font-size: 92%;
+  i { order: unset; }
 }
 
 // Modal footer buttons
@@ -324,14 +314,35 @@
         align-items: flex-start;
         height: var(--spacing-10);
         width: var(--spacing-13);
-        &:first-child { border-radius: var(--border-radius-md) 0 0 0; }
-      }
-      .btn + .btn {
         border-radius: 0;
-        margin: 0;
+        &:first-child { border-radius: 0 0 0 calc(var(--border-radius-md) + 3px); }
+        &:last-child { border-radius: 0 0 calc(var(--border-radius-md) + 3px) 0; }
+        &:only-child {
+          border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
+          flex-grow: 1;
+        }
       }
-
+      .btn + .btn { margin: 0; }
       &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
       &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
    }
+}
+
+// Popover footer
+.footer-buttons {
+  margin-bottom: -15px;
+  .btn {
+    align-items: flex-start;
+    min-width: 0;
+    width: var(--spacing-13);
+    border-radius: 0;
+    &:first-child { border-radius: 0 0 0 var(--border-radius-md); }
+    &:last-child { border-radius: 0 0 var(--border-radius-md) 0; }
+    &:only-child {
+      border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
+      flex-grow: 1;
+    }
+  }
+  .btn + .btn { margin: 0; }
+  &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
 }

@@ -4,6 +4,24 @@
 
 {% block mauticContent 'email' %}
 
+{% block indexButton %}
+    {% if not isEmbedded %}
+        {{- include('@MauticCore/Helper/page_actions.html.twig', {
+            'item'            : email,
+            'templateButtons' : {
+                'close' : securityHasEntityAccess(
+                    permissions['email:emails:viewown'],
+                    permissions['email:emails:viewother'],
+                    email.getCreatedBy()
+                ),
+            },
+            'routeBase'     : 'email',
+            'targetLabel': 'mautic.email.emails'|trans,
+            'customButtons' : []
+        }) -}}
+    {% endif %}
+{% endblock %}
+
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
         'activeEntity': email,
         'variants': variants,
@@ -60,7 +78,6 @@
         },
         'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
-        'primary'   : true,
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
     {% set heatmapButton = {
@@ -83,12 +100,43 @@
 {% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
 
 {% block publishStatus %}
-  {% if not isEmbedded %}
-  {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
-    'entity': email,
-    'status': 'available'
-}) -}}
-  {% endif %}
+    {% if not isEmbedded %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': email,
+        'status': email.getPublishUp() is not null ? 'sending' : 'available'
+    }) -}}
+
+
+
+
+        {% set tags = [
+            {
+                color: 'warm-gray',
+                label: emailType == 'list'
+                    ? 'mautic.email.type.list.header'
+                    : (emailType == 'template' ? 'mautic.email.type.template.header' : type)
+            }
+        ] %}
+
+        {# Additional tags based on conditions #}
+        {% set tags = tags
+            |merge(email.isVariant and not email.isVariant(true)
+                ? [{ color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]
+                : [])
+            |merge(email.isVariant(true)
+                ? [{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]
+                : [])
+            |merge(email.isTranslation and not email.isTranslation(true)
+                ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+                : [])
+            |merge(email.isTranslation(true)
+                ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
+                : [])
+        %}
+
+        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+
+    {% endif %}
 {% endblock %}
 
 {% block actions %}
@@ -108,18 +156,12 @@
                     permissions['email:emails:deleteother'],
                     email.getCreatedBy()
                 ),
-                'close' : securityHasEntityAccess(
-                    permissions['email:emails:viewown'],
-                    permissions['email:emails:viewother'],
-                    email.getCreatedBy()
-                ),
             },
             'routeBase'     : 'email',
             'customButtons' : customButtons,
         }) -}}
     {% endif %}
 {% endblock %}
-
 
 {% block content %}
   <!-- start: box layout -->
@@ -406,9 +448,21 @@
                               </div>
                               <input id="content_preview_url" data-route="email/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
                               <span class="input-group-btn">
-                              <button id="content_preview_url_button" class="btn btn-ghost btn-icon btn-sm btn-md btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
-                                  <i class="ri-external-link-line"></i>
-                              </button>
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.open_link',
+                                            variant: 'ghost',
+                                            icon_only: true,
+                                            icon: 'ri-external-link-line',
+                                            attributes: {
+                                                'id': 'content_preview_url_button',
+                                                'type': 'button'
+                                            },
+                                            onclick: 'window.open("' ~ previewUrl ~ '", "_blank");'
+                                        }
+                                    ]
+                                } %}
                           </span>
                               <input type="hidden" id="content_preview_settings_object_id" value="{{ email.id }}">
                               <input type="hidden" id="content_preview_settings_contact_id" value="">
@@ -417,6 +471,34 @@
                   </div>
               </div>
           </div>
+
+          <!-- Draft preview URL -->
+          {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
+          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
+              </div>
+              <div class="panel-body pt-xs">
+                  <div class="input-group">
+                      <div class="input-group-addon">
+                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                              'item'  : email.getDraft(),
+                              'model' : 'email.email_draft',
+                              'query' : 'customToggle=publicPreview'
+                          }) -}}
+                      </div>
+                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                             readonly
+                             value="{{ draftPreviewUrl|escape }}"/>
+                      <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                  </div>
+              </div>
+          </div>
+          {% endif %}
 
           <!-- email usages -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
@@ -430,7 +512,6 @@
 
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
-
 
       </div>
       <!-- right section -->

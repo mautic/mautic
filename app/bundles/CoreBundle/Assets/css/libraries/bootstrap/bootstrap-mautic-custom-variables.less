@@ -4,6 +4,7 @@
 // Variables
 // --------------------------------------------------
 
+@import "../../app/less/components/brand";
 
 //== Colors
 //
@@ -105,9 +106,9 @@
 @line-height-large:         1.25;
 @line-height-small:         1.456;
 
-@border-radius-base:        3px;
-@border-radius-large:       4px;
-@border-radius-small:       2px;
+@border-radius-base:        min(max(1.8 * @border-radius, 0px), 14px);
+@border-radius-large:       min(max(2.6 * @border-radius, 0px), 21px);
+@border-radius-small:       min(max(@border-radius, 0px), 6px);
 
 //** Global color for active items (e.g., navs or dropdowns).
 @component-active-color:    #fff;
@@ -174,9 +175,9 @@
 @btn-link-disabled-color:        @gray-light;
 
 // Allows for customizing button radius independently from global border radius
-@btn-border-radius-base:         @border-radius-base;
-@btn-border-radius-large:        @border-radius-large;
-@btn-border-radius-small:        @border-radius-small;
+@btn-border-radius-base:         32px;
+@btn-border-radius-large:        32px;
+@btn-border-radius-small:        32px;
 
 
 //== Forms
@@ -196,9 +197,9 @@
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
 // This has no effect on `<select>`s in some browsers, due to the limited stylability of `<select>`s in CSS.
-@input-border-radius:            @border-radius-base;
+@input-border-radius:            @border-radius-small;
 //** Large `.form-control` border radius
-@input-border-radius-large:      @border-radius-large;
+@input-border-radius-large:      @border-radius-small;
 //** Small `.form-control` border radius
 @input-border-radius-small:      @border-radius-small;
 
@@ -235,7 +236,7 @@
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-@dropdown-bg:                    var(--layer);
+@dropdown-bg:                    var(--layer-translucent);
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,0.06);
 
@@ -249,7 +250,7 @@
 //** Hover color for dropdown links.
 @dropdown-link-hover-color:      var(--text-primary);
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         var(--layer-hover);
+@dropdown-link-hover-bg:         var(--layer-hover-translucent);
 
 //** Active dropdown menu item text color.
 @dropdown-link-active-color:     @component-active-color;
@@ -540,7 +541,7 @@
 //##
 
 //** Popover body background color
-@popover-bg:                          var(--layer-alternate);
+@popover-bg:                          transparent;
 //** Popover maximum width
 @popover-max-width:                   276px;
 //** Popover border color
@@ -554,12 +555,12 @@
 //** Popover arrow width
 @popover-arrow-width:                 10px;
 //** Popover arrow color
-@popover-arrow-color:                 @popover-bg;
+@popover-arrow-color:                 var(--layer-02);
 
 //** Popover outer arrow width
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
-@popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
+@popover-arrow-outer-color:           @popover-border-color;
 //** Popover outer arrow fallback color
 @popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
@@ -600,7 +601,7 @@
 @modal-title-line-height:     @line-height-base;
 
 //** Background color of modal content area
-@modal-content-bg:                             var(--layer);
+@modal-content-bg:                             var(--background);
 //** Modal content border color
 @modal-content-border-color:                   transparent;
 //** Modal content border color **for IE8**
@@ -712,15 +713,15 @@
 @panel-body-padding:          15px;
 @panel-heading-padding:       10px 15px;
 @panel-footer-padding:        @panel-heading-padding;
-@panel-border-radius:         @border-radius-base;
+@panel-border-radius:         @border-radius-large;
 
 //** Border color for elements within panels
-@panel-inner-border:          @hr-border;
-@panel-footer-bg:             inherit;
+@panel-inner-border:          @panel-footer-bg;
+@panel-footer-bg:             var(--layer);
 
 @panel-default-text:          inherit;
-@panel-default-border:        @hr-border;
-@panel-default-heading-bg:    inherit;
+@panel-default-border:        @panel-inner-border;
+@panel-default-heading-bg:    @panel-footer-bg;
 
 @panel-primary-text:          var(--text-on-color);
 @panel-primary-border:        transparent;

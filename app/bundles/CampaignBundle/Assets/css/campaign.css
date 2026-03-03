@@ -26,10 +26,13 @@
 }
 
 #CampaignEventPanel {
+    display: flex;
+    height: auto;
+    flex-direction: column;
     position: absolute;
     padding: 10px 20px;
-    background-color: var(--layer);
-    border-radius: 4px;
+    background-color: var(--background);
+    border-radius: var(--border-radius-lg);
     z-index:1035;
 }
 

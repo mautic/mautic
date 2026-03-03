@@ -1,7 +1,7 @@
 body:has(.s-dashboard) {
     background-color: var(--layer);
-    --field: var(--field-alternate);
-    --field-hover: var(--field-hover-alternate);
+    --field: var(--field-02);
+    --field-hover: var(--field-hover-02);
 }
 
 .input-group-addon label {
