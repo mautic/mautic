@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
@@ -40,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Asset>
  */
-class AssetModel extends FormModel
+class AssetModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var int
@@ -63,7 +64,7 @@ class AssetModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -107,13 +108,12 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param string $code
-     * @param array  $systemEntry
+     * @param array $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = []): void
+    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -124,6 +124,12 @@ class AssetModel extends FormModel
             $request = $this->requestStack->getCurrentRequest();
         }
 
+        if (!($request instanceof Request)) {
+            // likely this download came via a cron (no request), do not bother logging the download.
+            // https://github.com/mautic/mautic/issues/13577
+            return;
+        }
+
         $download = new Download();
         $download->setDateDownload(new \DateTime());
         $download->setUtmCampaign($request->get('utm_campaign'));
@@ -131,6 +137,13 @@ class AssetModel extends FormModel
         $download->setUtmMedium($request->get('utm_medium'));
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
+
+        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
+            return;
+        }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Download triggered by lead
         if (empty($systemEntry)) {
@@ -245,7 +258,7 @@ class AssetModel extends FormModel
 
         $download->setTrackingId($trackingId);
 
-        if (!empty($asset) && empty($systemEntry)) {
+        if (empty($systemEntry)) {
             $download->setAsset($asset);
 
             $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
@@ -256,10 +269,7 @@ class AssetModel extends FormModel
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
-
-        if (null !== $request) {
-            $download->setReferer($request->server->get('HTTP_REFERER'));
-        }
+        $download->setReferer($request->server->get('HTTP_REFERER'));
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
@@ -354,7 +364,7 @@ class AssetModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -424,21 +434,30 @@ class AssetModel extends FormModel
     /**
      * Generate url for an asset.
      *
-     * @param Asset $entity
-     * @param bool  $absolute
-     * @param array $clickthrough
-     *
-     * @return string
+     * @param array<string, mixed> $clickthrough
      */
-    public function generateUrl($entity, $absolute = true, $clickthrough = [])
+    public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
-        $assetSlug = $entity->getId().':'.$entity->getAlias();
+        $entityId  = $entity->getId();
+        $alias     = $entity->getAlias();
+        $assetSlug = $entityId.':'.$alias;
 
-        $slugs = [
-            'slug' => $assetSlug,
-        ];
+        $routeParams = ['slug' => $assetSlug];
+        if (!is_null($stream)) {
+            $routeParams['stream'] = $stream;
+        }
 
-        return $this->buildUrl('mautic_asset_download', $slugs, $absolute, $clickthrough);
+        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+        $url           = $this->router->generate('mautic_asset_download', $routeParams, $referenceType);
+
+        if (empty($clickthrough)) {
+            return $url;
+        }
+
+        $ct        = $this->encodeArrayForUrl($clickthrough);
+        $separator = (null !== parse_url($url, PHP_URL_QUERY)) ? '&' : '?';
+
+        return $url.$separator.'ct='.$ct;
     }
 
     /**
@@ -598,10 +617,8 @@ class AssetModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param array $options
-     *
-     * @return array
      */
-    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
+    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')

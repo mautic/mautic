@@ -37,7 +37,7 @@ class FromEmailHelper
     /**
      * @param mixed[] $contact
      */
-    public function getFromAddressConsideringOwner(AddressDTO $address, array $contact = null, Email $email = null): AddressDTO
+    public function getFromAddressConsideringOwner(AddressDTO $address, ?array $contact = null, ?Email $email = null): AddressDTO
     {
         // Reset last owner
         $this->lastOwner = null;
@@ -61,7 +61,7 @@ class FromEmailHelper
     /**
      * @param mixed[] $contact
      */
-    public function getFromAddressDto(AddressDTO $address, array $contact = null, Email $email = null): AddressDTO
+    public function getFromAddressDto(AddressDTO $address, ?array $contact = null, ?Email $email = null): AddressDTO
     {
         // Reset last owner
         $this->lastOwner = null;
@@ -79,7 +79,7 @@ class FromEmailHelper
      *
      * @throws OwnerNotFoundException
      */
-    public function getContactOwner(int $userId, Email $email = null): array
+    public function getContactOwner(int $userId, ?Email $email = null): array
     {
         // Reset last owner
         $this->lastOwner = null;
@@ -130,7 +130,7 @@ class FromEmailHelper
         return $signature;
     }
 
-    private function getFrom(?Email $email): AddressDTO
+    public function getFrom(?Email $email): AddressDTO
     {
         if ($email && $email->getFromAddress()) {
             return new AddressDTO($email->getFromAddress(), $email->getFromName());
@@ -159,7 +159,7 @@ class FromEmailHelper
     /**
      * @param mixed[] $contact
      */
-    private function getEmailFromToken(AddressDTO $address, array $contact = null, bool $asOwner = true, Email $email = null): AddressDTO
+    private function getEmailFromToken(AddressDTO $address, ?array $contact = null, bool $asOwner = true, ?Email $email = null): AddressDTO
     {
         try {
             if (!$contact) {
@@ -196,7 +196,7 @@ class FromEmailHelper
      *
      * @throws OwnerNotFoundException
      */
-    private function getFromEmailAsOwner(array $contact, Email $email = null): AddressDTO
+    private function getFromEmailAsOwner(array $contact, ?Email $email = null): AddressDTO
     {
         if (empty($contact['owner_id'])) {
             throw new OwnerNotFoundException();

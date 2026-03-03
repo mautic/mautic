@@ -4,25 +4,29 @@ namespace Mautic\MarketplaceBundle\Command;
 
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: RemoveCommand::NAME,
+    description: 'Removes a plugin that is currently installed'
+)]
 class RemoveCommand extends Command
 {
     public const NAME = 'mautic:marketplace:remove';
 
     public function __construct(
         private ComposerHelper $composer,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName(self::NAME);
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package of the plugin to remove (e.g. mautic/example-plugin)');
 
         parent::configure();
@@ -54,6 +58,4 @@ class RemoveCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Removes a plugin that is currently installed';
 }

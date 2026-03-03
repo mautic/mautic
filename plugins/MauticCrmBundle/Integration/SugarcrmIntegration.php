@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -19,14 +20,13 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\UserBundle\Model\UserModel;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -52,11 +52,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
         EntityManager $entityManager,
-        Session $session,
         RequestStack $requestStack,
-        Router $router,
+        RouterInterface $router,
         TranslatorInterface $translator,
-        Logger $logger,
+        LoggerInterface $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,
         CompanyModel $companyModel,
@@ -64,14 +63,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected DoNotContact $doNotContactModel,
-        private UserModel $userModel
+        private UserModel $userModel,
     ) {
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,
             $entityManager,
-            $session,
             $requestStack,
             $router,
             $translator,
@@ -83,7 +82,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $notificationModel,
             $fieldModel,
             $integrationEntityModel,
-            $doNotContactModel
+            $doNotContactModel,
+            $fieldsWithUniqueIdentifier
         );
     }
 
@@ -151,10 +151,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return sprintf('%s/%s', $this->keys['sugarcrm_url'], $apiUrl);
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
@@ -384,7 +381,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
                         }
                     } else {
-                        throw new ApiErrorException($this->authorizationError);
+                        throw new ApiErrorException($this->authorizationError ?? '');
                     }
                 }
             }
@@ -727,7 +724,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $MODULE_FIELD_NAME = '_module';
         }
 
-        if (isset($data[$RECORDS_LIST_NAME]) and 'Activity' !== $object) {
+        if (isset($RECORDS_LIST_NAME, $data[$RECORDS_LIST_NAME]) && 'Activity' !== $object) {
             // Get assigned user ids
             $assignedUserIds            = [];
             $onwerEmailByAssignedUserId = [];
@@ -798,32 +795,28 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
                 if ('6' == $SUGAR_VERSION) {
                     foreach ($record['name_value_list'] as $item) {
-                        if ('Activity' !== $object) {
-                            if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
-                                $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
-                                $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
-                            } else {
-                                $dataObject[$item['name'].$newName] = $item['value'];
-                            }
-                            if ('date_entered' == $item['name']) {
-                                $itemDateEntered = new \DateTime($item['value']);
-                            }
-                            if ('date_modified' == $item['name']) {
-                                $itemDateModified = new \DateTime($item['value']);
-                            }
+                        if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
+                            $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
+                            $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
+                        } else {
+                            $dataObject[$item['name'].$newName] = $item['value'];
+                        }
+                        if ('date_entered' == $item['name']) {
+                            $itemDateEntered = new \DateTime($item['value']);
+                        }
+                        if ('date_modified' == $item['name']) {
+                            $itemDateModified = new \DateTime($item['value']);
                         }
                     }
                 } else {
-                    if ('Activity' !== $object) {
-                        if (isset($record['date_entered']) && '' != $record['date_entered']) {
-                            $itemDateEntered = new \DateTime($record['date_entered']);
-                        }
-                        if (isset($record['date_modified']) && '' != $record['date_modified']) {
-                            $itemDateEntered = new \DateTime($record['date_modified']);
-                        }
-                        foreach ($record as $k => $item) {
-                            $dataObject[$k.$newName] = $item;
-                        }
+                    if (isset($record['date_entered']) && '' != $record['date_entered']) {
+                        $itemDateEntered = new \DateTime($record['date_entered']);
+                    }
+                    if (isset($record['date_modified']) && '' != $record['date_modified']) {
+                        $itemDateEntered = new \DateTime($record['date_modified']);
+                    }
+                    foreach ($record as $k => $item) {
+                        $dataObject[$k.$newName] = $item;
                     }
                 }
                 if ('Leads' == $object && isset($dataObject['email1__Leads']) && null != $dataObject['email1__Leads']
@@ -1336,7 +1329,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function fetchDncToMautic(Lead $lead = null, array $data): void
+    private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
         if (is_null($lead)) {
             return;

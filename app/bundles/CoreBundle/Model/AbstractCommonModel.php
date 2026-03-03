@@ -3,8 +3,12 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
+use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -28,7 +32,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         protected Translator $translator,
         protected UserHelper $userHelper,
         protected LoggerInterface $logger,
-        protected CoreParametersHelper $coreParametersHelper
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -85,7 +89,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return object[]|array<int,mixed>|iterable<object>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
      */
     public function getEntities(array $args = [])
     {
@@ -100,6 +104,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Get a specific entity.
+     *
+     * @param string|int|mixed[]|null $id
      */
     public function getEntity($id = null): ?object
     {
@@ -134,7 +140,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**
@@ -241,5 +251,50 @@ abstract class AbstractCommonModel implements MauticModelInterface
     protected function getServiceRepository(string $class)
     {
         return $this->em->getRepository($class);
+    }
+
+    public function getEntitiesForGlobalSearch(GlobalSearchFilterDTO $filterDTO): ?Paginator
+    {
+        $filter = $filterDTO->getFilters();
+
+        if (!$this->canViewOthersEntity()) {
+            $filter['force'][] = [
+                'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->userHelper->getUser()->getId(),
+            ];
+        }
+
+        return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+    }
+
+    public function canViewOwnEntity(): bool
+    {
+        if ($this->security->isAdmin()) {
+            return true;
+        }
+
+        $isGranted      = false;
+        $permissionBase = $this->getPermissionBase();
+        if ($this->security->checkPermissionExists("$permissionBase:viewown")) {
+            $isGranted = $this->security->isGranted("$permissionBase:viewown");
+        }
+
+        return $isGranted;
+    }
+
+    public function canViewOthersEntity(): bool
+    {
+        if ($this->security->isAdmin()) {
+            return true;
+        }
+
+        $isGranted      = false;
+        $permissionBase = $this->getPermissionBase();
+        if ($this->security->checkPermissionExists("$permissionBase:viewother")) {
+            $isGranted = $this->security->isGranted(["$permissionBase:viewother"]);
+        }
+
+        return $isGranted;
     }
 }

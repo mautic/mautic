@@ -17,7 +17,7 @@ class ContactGroupPointsType extends AbstractType
     private const SCORE_FIELD_PREFIX = 'score_group_';
 
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

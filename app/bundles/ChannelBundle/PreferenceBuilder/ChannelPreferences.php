@@ -14,7 +14,7 @@ class ChannelPreferences
     private array $organizedByPriority = [];
 
     public function __construct(
-        private Event $event
+        private Event $event,
     ) {
     }
 

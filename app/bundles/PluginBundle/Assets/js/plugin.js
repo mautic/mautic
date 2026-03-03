@@ -256,10 +256,7 @@ Mautic.getIntegrationFields = function(settings, page, el) {
             if (inModal) {
                 Mautic.stopModalLoadingBar(modalId);
             }
-        },
-        false,
-        false,
-        "GET"
+        }
     );
 };
 
@@ -324,25 +321,20 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
     );
 };
 
-Mautic.getIntegrationCampaigns = function (el, settings) {
-    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+Mautic.initPluginEvents = function () {
+    const $integrationModal = mQuery('#IntegrationEditModal');
 
-    var data = {integration: mQuery(el).val()};
+    $integrationModal.off('mautic:onPageLoad:before');
+    $integrationModal.on('mautic:onPageLoad:before', function(e, container, response) {
+        if (container === '#IntegrationEditModal' && response && response.pluginVersion) {
+            const $modalLabel = mQuery('#IntegrationEditModal-label');
+            if ($modalLabel.find('.plugin-version-badge').length === 0) {
+                const $badge = mQuery('<span>')
+                    .addClass('plugin-version-badge label label-default ml-xs')
+                    .text('v' + String(response.pluginVersion));
 
-    mQuery('.integration-campaigns').html('');
-
-    Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
-        function (response) {
-            if (response.success) {
-                mQuery('.integration-campaigns').html(response.html);
-                Mautic.onPageLoad('.integration-campaigns', response);
+                $modalLabel.append(' ').append($badge);
             }
-
-            Mautic.integrationConfigOnLoad('.integration-campaigns');
-            Mautic.removeLabelLoadingIndicator();
-        },
-        false,
-        false,
-        "GET"
-    );
+        }
+    });
 };

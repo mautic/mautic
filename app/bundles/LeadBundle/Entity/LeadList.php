@@ -2,86 +2,137 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class LeadList extends FormEntity
+#[ApiResource(
+    shortName: 'Segments',
+    operations: [
+        new GetCollection(uriTemplate: '/segments', security: "is_granted('lead:lists:viewown')"),
+        new Post(uriTemplate: '/segments', security: "is_granted('lead:lists:create')"),
+        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown')"),
+        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown')"),
+        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother')"),
+        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['segment:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['segment:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class LeadList extends FormEntity implements UuidInterface
 {
-    public const TABLE_NAME = 'lead_lists';
+    use UuidTrait;
+
+    use ProjectTrait;
+
+    public const TABLE_NAME  = 'lead_lists';
+    public const ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $name;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $publicName;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 
     /**
      * @var string|null
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $alias;
 
     /**
      * @var array
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $filters = [];
 
     /**
      * @var bool
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $isGlobal = true;
 
     /**
      * @var bool
      */
+    #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
+     * @var ArrayCollection<ListLead>
      */
     private $leads;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltDate;
 
     /**
      * @var float|null
      */
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltTime;
+
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
     {
         $this->leads = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -90,8 +141,8 @@ class LeadList extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist')
-            ->addIndex(['alias'], 'lead_list_alias');
+            ->addIndex(['alias'], 'lead_list_alias')
+            ->addIndex(['deleted'], 'segment_deleted');
 
         $builder->addIdColumns();
 
@@ -114,7 +165,6 @@ class LeadList extends FormEntity
             ->build();
 
         $builder->createOneToMany('leads', 'ListLead')
-            ->setIndexBy('id')
             ->mappedBy('list')
             ->fetchExtraLazy()
             ->build();
@@ -128,6 +178,11 @@ class LeadList extends FormEntity
             ->columnName('last_built_time')
             ->nullable()
             ->build();
+
+        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
+        $builder->addNullableField('deleted', 'datetime');
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -169,6 +224,8 @@ class LeadList extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'leadList');
     }
 
     /**
@@ -177,6 +234,11 @@ class LeadList extends FormEntity
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -221,7 +283,7 @@ class LeadList extends FormEntity
         return $this->description;
     }
 
-    public function setCategory(Category $category = null): LeadList
+    public function setCategory(?Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -274,10 +336,28 @@ class LeadList extends FormEntity
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated
         }
 
         return $this->filters;
+    }
+
+    public function needsRebuild(): bool
+    {
+        // Manual or unpublished segments never require rebuild
+        if (empty($this->getFilters()) || !$this->isPublished()) {
+            return false;
+        }
+
+        // A segment with filters requires rebuild if it was changed since the last build date, or was never built
+        if (null === $this->getLastBuiltDate()) {
+            return true;
+        }
+        if (null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp()) {
+            return true;
+        }
+
+        return false;
     }
 
     public function hasFilterTypeOf(string $type): bool
@@ -395,13 +475,13 @@ class LeadList extends FormEntity
                 if (isset($filter['properties']) && $filter['properties'] && array_key_exists('filter', $filter['properties'])) {
                     $filter['filter'] = $filter['properties']['filter'];
                 } else {
-                    $filter['filter'] = $filter['filter'] ?? null;
+                    $filter['filter'] ??= null;
                 }
 
                 if (isset($filter['properties']) && $filter['properties'] && array_key_exists('display', $filter['properties'])) {
                     $filter['display'] = $filter['properties']['display'];
                 } else {
-                    $filter['display'] = $filter['display'] ?? null;
+                    $filter['display'] ??= null;
                 }
 
                 return $filter;
@@ -426,15 +506,6 @@ class LeadList extends FormEntity
         $this->setLastBuiltDate($now);
     }
 
-    public function initializeLastBuiltDate(): void
-    {
-        if ($this->getLastBuiltDate() instanceof \DateTime) {
-            return;
-        }
-
-        $this->setLastBuiltDateToCurrentDatetime();
-    }
-
     public function getLastBuiltTime(): ?float
     {
         return $this->lastBuiltTime;
@@ -443,6 +514,11 @@ class LeadList extends FormEntity
     public function setLastBuiltTime(?float $lastBuiltTime): void
     {
         $this->lastBuiltTime = $lastBuiltTime;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deletedDate): void
+    {
+        $this->deleted = $deletedDate;
     }
 
     /**
@@ -458,5 +534,10 @@ class LeadList extends FormEntity
         }
 
         return $filters;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 }

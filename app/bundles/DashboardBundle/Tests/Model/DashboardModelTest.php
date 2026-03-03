@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -25,48 +25,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class DashboardModelTest extends TestCase
 {
-    /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
-     * @var PathsHelper|MockObject
-     */
-    private MockObject $pathsHelper;
-
-    /**
-     * @var MockObject|Filesystem
-     */
-    private MockObject $filesystem;
-
-    /**
-     * @var MockObject|Session
-     */
-    private MockObject $session;
-
+    private MockObject&CoreParametersHelper $coreParametersHelper;
+    private MockObject&Session $session;
     private DashboardModel $model;
-
-    private WidgetDetailEventFactory $widgetDetailEventFactory;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
-        $this->pathsHelper              = $this->createMock(PathsHelper::class);
-        $this->widgetDetailEventFactory = $this->createMock(WidgetDetailEventFactory::class);
-        $this->filesystem               = $this->createMock(Filesystem::class);
-        $this->session                  = $this->createMock(Session::class);
-        $requestStack                   = $this->createMock(RequestStack::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->session              = $this->createMock(Session::class);
+        $requestStack               = $this->createMock(RequestStack::class);
         $requestStack->method('getSession')
             ->willReturn($this->session);
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
-            $this->pathsHelper,
-            $this->widgetDetailEventFactory,
-            $this->filesystem,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(WidgetDetailEventFactory::class),
+            $this->createMock(Filesystem::class),
             $requestStack,
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(CorePermissions::class),
@@ -75,7 +50,7 @@ final class DashboardModelTest extends TestCase
             $this->createMock(Translator::class),
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CacheProviderInterface::class),
+            $this->createMock(CacheProviderTagAwareInterface::class),
         );
     }
 

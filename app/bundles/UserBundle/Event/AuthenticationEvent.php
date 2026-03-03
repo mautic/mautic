@@ -58,7 +58,7 @@ class AuthenticationEvent extends Event
         protected Request $request,
         protected $isLoginCheck = false,
         protected $authenticatingService = null,
-        protected $integrations = null
+        protected $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 
@@ -123,10 +123,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the username used.
-     *
-     * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->token->getUserIdentifier();
     }
@@ -147,12 +145,12 @@ class AuthenticationEvent extends Event
      * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
      * @param bool|true $createIfNotExists
      */
-    public function setIsAuthenticated($service, User $user = null, $createIfNotExists = true): void
+    public function setIsAuthenticated($service, ?User $user = null, $createIfNotExists = true): void
     {
         $this->authenticatingService = $service;
-        $this->isAuthenticated       = true;
 
         if (null !== $user) {
+            $this->isAuthenticated = true;
             $this->setUser($user, $createIfNotExists);
         }
 

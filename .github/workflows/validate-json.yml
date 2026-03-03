@@ -1,0 +1,47 @@
+name: Validate JSON on PR
+
+on:
+  pull_request:
+    paths:
+      - '**/*.json'  # Runs only when JSON files are modified
+
+jobs:
+  validate-json:
+    name: Validate modified JSON files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get modified JSON files
+        id: changed-json-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: "**/*.json"
+
+      - name: Validate JSON files
+        if: steps.changed-json-files.outputs.any_changed == 'true'
+        run: |
+          set -e
+          INVALID_FILES=()
+          
+          for file in ${{ steps.changed-json-files.outputs.all_changed_files }}; do
+            echo -n "🔍 Validating $file ... "
+            if jq empty "$file" >/dev/null 2>&1; then
+              echo "✅ OK"
+            else
+              echo "❌ Invalid"
+              INVALID_FILES+=("$file")
+            fi
+          done
+          
+          # If there are invalid files, print a summary and exit with an error
+          if [ ${#INVALID_FILES[@]} -ne 0 ]; then
+            echo ""
+            echo "❌ The following JSON files are invalid:"
+            for file in "${INVALID_FILES[@]}"; do
+              echo "   - $file"
+            done
+            exit 1
+          fi

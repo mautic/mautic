@@ -11,7 +11,7 @@ class FilePathResolver
 {
     public function __construct(
         private Filesystem $filesystem,
-        private InputHelper $inputHelper
+        private InputHelper $inputHelper,
     ) {
     }
 

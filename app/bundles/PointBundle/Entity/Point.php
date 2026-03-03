@@ -2,73 +2,118 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Point extends FormEntity
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('point:triggers:viewown')"),
+        new Post(security: "is_granted('point:triggers:create')"),
+        new Get(security: "is_granted('point:triggers:viewown')"),
+        new Put(security: "is_granted('point:triggers:editown')"),
+        new Patch(security: "is_granted('point:triggers:editother')"),
+        new Delete(security: "is_granted('point:triggers:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['point:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['point:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Point extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+    public const ENTITY_NAME = 'point';
+
     /**
      * @var int
      */
+    #[Groups(['point:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['point:read', 'point:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['point:read', 'point:write'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['point:read', 'point:write'])]
     private $type;
 
     /**
      * @var bool
      */
+    #[Groups(['point:read', 'point:write'])]
     private $repeatable = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['point:read', 'point:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['point:read', 'point:write'])]
     private $publishDown;
 
     /**
      * @var int
      */
+    #[Groups(['point:read', 'point:write'])]
     private $delta = 0;
 
     /**
      * @var array
      */
+    #[Groups(['point:read', 'point:write'])]
     private $properties = [];
 
     /**
-     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
+     * @var ArrayCollection<int,LeadPointLog>
      */
     private $log;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['point:read', 'point:write'])]
     private $category;
 
+    #[Groups(['point:read', 'point:write'])]
     private ?Group $group = null;
 
     public function __clone()
@@ -81,6 +126,7 @@ class Point extends FormEntity
     public function __construct()
     {
         $this->log = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -118,6 +164,9 @@ class Point extends FormEntity
         $builder->createManyToOne('group', Group::class)
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
+
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'point_projects_xref', 'point_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -165,6 +214,8 @@ class Point extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'point');
     }
 
     /**

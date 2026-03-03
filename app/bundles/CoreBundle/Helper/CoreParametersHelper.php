@@ -12,7 +12,7 @@ class CoreParametersHelper
     private ?array $resolvedParameters = null;
 
     public function __construct(
-        private ContainerInterface $container
+        private ContainerInterface $container,
     ) {
         $loader = new ParameterLoader();
 
@@ -58,14 +58,6 @@ class CoreParametersHelper
         return $this->resolvedParameters;
     }
 
-    /**
-     * @deprecated 3.0.0 to be removed in 4.0; use get() instead
-     */
-    public function getParameter($name, $default = null)
-    {
-        return $this->get($name, $default);
-    }
-
     private function stripMauticPrefix(string $name): string
     {
         return str_replace('mautic.', '', $name);
@@ -78,5 +70,14 @@ class CoreParametersHelper
         foreach ($all as $key => $value) {
             $this->resolvedParameters[$key] = $this->get($key, $value);
         }
+    }
+
+    public function getDefaultTimezone(): string
+    {
+        if (!empty($this->get('default_timezone'))) {
+            return $this->get('default_timezone');
+        }
+
+        return 'UTC';
     }
 }

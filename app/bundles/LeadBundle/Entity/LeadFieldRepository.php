@@ -3,7 +3,8 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
@@ -12,6 +13,11 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class LeadFieldRepository extends CommonRepository
 {
+    /**
+     * @var array<int|string, array<string,mixed>>|null
+     */
+    private ?array $fields = null;
+
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields.
      *
@@ -61,6 +67,26 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function getFields(): array
+    {
+        if (!isset($this->fields)) {
+            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where('f.is_published = :published')
+                ->setParameter('published', true, 'boolean')
+                ->addOrderBy('f.field_order', 'asc');
+            $results = $fq->executeQuery()->fetchAllAssociative();
+
+            $this->fields = array_column($results, null, 'alias');
+        }
+
+        return $this->fields;
+    }
+
+    /**
      * @return LeadField[]
      */
     public function getFieldsForObject(string $object): array
@@ -77,19 +103,25 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return array<int|string, array<string, mixed>>
+     * Retrieves the aliases of searchable fields that are indexed and published.
+     *
+     * @return string[]
      */
-    public function getFields(): array
+    public function getSearchableFieldAliases(?string $object = null): array
     {
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-            ->where('f.is_published = :published')
-            ->setParameter('published', true, 'boolean')
-            ->addOrderBy('f.field_order', 'asc');
-        $results = $fq->executeQuery()->fetchAllAssociative();
+        $fq = $this->createQueryBuilder($this->getTableAlias());
+        $fq->select($this->getTableAlias().'.alias')
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isIndex', true))
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true));
 
-        return array_column($results, null, 'alias');
+        if (!empty($object)) {
+            $fq->andWhere($fq->expr()->eq($this->getTableAlias().'.object', ':object'))
+                ->setParameter('object', $object, ParameterType::STRING);
+        }
+
+        $results = $fq->getQuery()->getResult();
+
+        return array_column($results, 'alias');
     }
 
     public function getTableAlias(): string
@@ -269,14 +301,14 @@ class LeadFieldRepository extends CommonRepository
                     $q->expr()->eq('l.id', ':lead')
                 );
 
-                $innerExpr = [];
+                $innerExpr  = [];
+                $paramCount = 0;
                 foreach ($values as $v) {
-                    $v = $q->expr()->literal(
-                        InputHelper::clean($v)
-                    );
-
-                    $v           = trim($v, "'");
-                    $innerExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
+                    // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
+                    $paramName   = 'value'.$paramCount++;
+                    $v           = trim((string) $v, "'");
+                    $innerExpr[] = $property." $operator :".$paramName;
+                    $q->setParameter($paramName, "\\|?$v\\|?");
                 }
 
                 if (str_starts_with($operatorExpr, 'not')) {
@@ -289,8 +321,7 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $q->where($expr)
-                    ->setParameter('lead', (int) $lead)
-                    ->setParameter('values', $values, ArrayParameterType::STRING);
+                    ->setParameter('lead', (int) $lead);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
@@ -338,6 +369,30 @@ class LeadFieldRepository extends CommonRepository
 
             return !empty($result['id']);
         }
+    }
+
+    /**
+     * Compare a form result value with empty value for defined lead.
+     */
+    public function compareEmptyDateValue(int $lead, string $field, string $operatorExpr): bool
+    {
+        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $property = $this->getPropertyByField($field, $q);
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    ('empty' === $operatorExpr) ?
+                        $q->expr()->isNull($property)
+                        :
+                        $q->expr()->isNotNull($property)
+                )
+            )
+            ->setParameter('lead', $lead, \PDO::PARAM_INT);
+        $result = $q->executeQuery()->fetchAssociative();
+
+        return !empty($result['id']);
     }
 
     /**
@@ -400,7 +455,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
         $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
-        $qb->orderBy("{$this->getTableAlias()}.dateAdded", \Doctrine\Common\Collections\Criteria::ASC);
+        $qb->orderBy("{$this->getTableAlias()}.dateAdded", Order::Ascending->value);
         $qb->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -454,7 +509,7 @@ class LeadFieldRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }

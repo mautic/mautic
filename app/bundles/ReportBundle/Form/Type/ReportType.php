@@ -27,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ReportType extends AbstractType
 {
     public function __construct(
-        private ReportModel $reportModel
+        private ReportModel $reportModel,
     ) {
     }
 
@@ -393,6 +393,21 @@ class ReportType extends AbstractType
                     $columns = $data['columns'] ?? [];
                     $source  = $data['source'] ?? null;
                     $formModifier($event->getForm(), $source, $columns, $graphs, $data);
+                }
+            );
+
+            $builder->addEventListener(
+                FormEvents::PRE_SUBMIT,
+                function (FormEvent $event): void {
+                    $data = $event->getData();
+
+                    if (SchedulerEnum::UNIT_NOW === $data['scheduleUnit'] || SchedulerEnum::UNIT_DAILY === $data['scheduleUnit']) {
+                        unset($data['scheduleDay'], $data['scheduleMonthFrequency']);
+                    } elseif (SchedulerEnum::UNIT_WEEKLY === $data['scheduleUnit']) {
+                        unset($data['scheduleMonthFrequency']);
+                    }
+
+                    $event->setData($data);
                 }
             );
 

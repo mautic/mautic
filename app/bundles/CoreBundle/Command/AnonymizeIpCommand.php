@@ -8,10 +8,15 @@ use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: AnonymizeIpCommand::COMMAND_NAME,
+    description: 'Delete all stored ip addresses.'
+)]
 class AnonymizeIpCommand extends Command
 {
     /**
@@ -22,12 +27,6 @@ class AnonymizeIpCommand extends Command
     public function __construct(private IpAddressRepository $ipAddressRepository, private CoreParametersHelper $coreParametersHelper, private AuditLogRepository $auditLogRepository)
     {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Delete all stored ip addresses.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -43,7 +42,7 @@ class AnonymizeIpCommand extends Command
             return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function exitWithError(string $message, OutputInterface $output): int

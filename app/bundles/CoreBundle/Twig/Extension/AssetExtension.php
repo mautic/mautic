@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 class AssetExtension extends AbstractExtension
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper
+        protected AssetsHelper $assetsHelper,
     ) {
     }
 
@@ -107,7 +107,7 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function addScript(string $script, string $location = 'head', bool $async = false, string $name = null): AssetsHelper
+    public function addScript(string $script, string $location = 'head', bool $async = false, ?string $name = null): AssetsHelper
     {
         return $this->assetsHelper->addScript($script, $location, $async, $name);
     }

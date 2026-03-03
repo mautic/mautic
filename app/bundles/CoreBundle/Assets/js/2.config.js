@@ -34,3 +34,32 @@ Mautic.getIpLookupFormConfig = function() {
         mQuery('#ip_lookup_attribution').html(response.attribution);
     }, false, false, "GET");
 };
+
+Mautic.configOnLoad = function(container) {
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        const attributeName = radio.dataset.attributeToggle;
+        const modifiedName = attributeName.replace('-', '_');
+        const hiddenInput = document.querySelector(`input[type="hidden"][id*="${modifiedName}"]`);
+
+        if (hiddenInput && hiddenInput.value) {
+            const correspondingRadio = document.querySelector(
+                `input[name="${attributeName}"][data-attribute-value="${hiddenInput.value}"]`
+            );
+            if (correspondingRadio) correspondingRadio.checked = true;
+        } else if (radio.checked && hiddenInput) {
+            hiddenInput.value = radio.dataset.attributeValue;
+        }
+    });
+
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const attributeName = this.dataset.attributeToggle;
+                const modifiedName = attributeName.replace('-', '_');
+                const hiddenInput = document.querySelector(`input[type="hidden"][id*="${modifiedName}"]`);
+                if (hiddenInput) hiddenInput.value = this.dataset.attributeValue;
+            }
+        });
+    });
+};
+

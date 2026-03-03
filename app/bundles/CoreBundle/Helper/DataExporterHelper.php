@@ -16,14 +16,14 @@ class DataExporterHelper
      *
      * @template T of object
      *
-     * @return array
+     * @return mixed[]|null
      */
     public function getDataForExport(
         $start,
         AbstractCommonModel $model,
         array $args,
-        callable $resultsCallback = null,
-        bool $skipOrdering = false
+        ?callable $resultsCallback = null,
+        bool $skipOrdering = false,
     ) {
         $args['limit']        = max($args['limit'], 200);
         $args['start']        = $start;

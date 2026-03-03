@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
@@ -12,6 +13,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -21,27 +23,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Twig\Environment;
 
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
     use AjaxLookupControllerTrait;
 
-    /**
-     * @return JsonResponse
-     */
-    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory)
+    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, EmailModel $emailModel, Environment $twig): JsonResponse
     {
-        return $this->getAbTestForm(
+        return $this->sendJsonResponse($this->getAbTestForm(
             $request,
-            $formFactory,
-            'email',
-            AbTestPropertiesType::class,
+            $emailModel,
+            fn ($formType, $formOptions) => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn ($form)                   => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
-            'emailform',
-            '@MauticEmail/AbTest/form.html.twig',
-            ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig']
-        );
+            'emailform'
+        ));
     }
 
     public function sendBatchAction(Request $request): JsonResponse
@@ -116,14 +114,12 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getAttachmentsSizeAction(Request $request): JsonResponse
+    public function getAttachmentsSizeAction(Request $request, AssetModel $assetModel): JsonResponse
     {
-        $assets = $request->query->get('assets') ?? [];
+        $assets = $request->query->all()['assets'] ?? [];
         $size   = 0;
         if ($assets) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
-            $assetModel = $this->getModel('asset');
-            $size       = $assetModel->getTotalFilesize($assets);
+            $size = $assetModel->getTotalFilesize($assets);
         }
 
         return $this->sendJsonResponse(['size' => $size]);
@@ -132,7 +128,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Tests monitored email connection settings.
      */
-    public function testMonitoredEmailServerConnectionAction(Request $request): JsonResponse
+    public function testMonitoredEmailServerConnectionAction(Request $request, Mailbox $mailbox): JsonResponse
     {
         $dataArray = ['success' => 0, 'message' => ''];
 
@@ -146,12 +142,9 @@ class AjaxController extends CommonAjaxController
                 }
             }
 
-            /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $helper */
-            $helper = $this->factory->getHelper('mailbox');
-
             try {
-                $helper->setMailboxSettings($settings);
-                $folders = $helper->getListingFolders();
+                $mailbox->setMailboxSettings($settings);
+                $folders = $mailbox->getListingFolders();
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
@@ -196,7 +189,7 @@ class AjaxController extends CommonAjaxController
         $model = $this->getModel('email');
 
         $id  = $request->query->get('id');
-        $ids = $request->query->get('ids');
+        $ids = $request->query->all()['ids'] ?? [];
 
         // Support for legacy calls
         if (!$ids && $id) {

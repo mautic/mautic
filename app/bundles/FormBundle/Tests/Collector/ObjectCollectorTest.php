@@ -14,10 +14,10 @@ final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {
-        $dispatcher                               = new class() extends EventDispatcher {
+        $dispatcher                               = new class extends EventDispatcher {
             public int $dispatchMethodCallCounter = 0;
 
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 ++$this->dispatchMethodCallCounter;
 
@@ -28,12 +28,11 @@ final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
         };
 
         $objectCollector  = new ObjectCollector($dispatcher);
-        $objectCollection = $objectCollector->getObjects();
+        $objectCollector->getObjects();
 
         // Calling for the second time to ensure it's cached and the dispatcher is called only once.
         $objectCollection = $objectCollector->getObjects();
 
-        Assert::assertInstanceOf(ObjectCollection::class, $objectCollection);
         Assert::assertEquals(1, $dispatcher->dispatchMethodCallCounter);
     }
 }

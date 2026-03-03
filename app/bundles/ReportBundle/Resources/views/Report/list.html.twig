@@ -12,13 +12,20 @@
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
       'searchValue': searchValue,
       'action': currentRoute,
-      'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+      'page_actions': {
           'templateButtons': {
               'new': permissions['report:reports:create'],
           },
           'routeBase': 'report',
           'langVar': 'report.report',
-      }),
+      },
+      'bulk_actions': {
+        'langVar': 'report.report',
+        'routeBase': 'report',
+        'templateButtons': {
+            'delete': permissions['report:reports:deleteown'] or permissions['report:reports:deleteother'],
+        },
+      },
       'quickFilters': [
           {
               'search': 'mautic.core.searchcommand.ispublished',
@@ -45,7 +52,7 @@
       </div>
   </div>
 
-  {{ include('@MauticCore/Helper/protip.html.twig', {
+  {{ include('@MauticCore/Modules/protip.html.twig', {
     tip: random(['mautic.protip.reports.dnc'])
 }) }}
   {% else %}

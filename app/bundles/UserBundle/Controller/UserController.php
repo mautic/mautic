@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
@@ -13,6 +16,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
+use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -22,11 +26,9 @@ class UserController extends FormController
     /**
      * Generate's default user list.
      *
-     * @param int $page
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         if (!$this->security->isGranted('user:users:view')) {
             return $this->accessDenied();
@@ -107,7 +109,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
+    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper)
     {
         if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
@@ -134,7 +136,7 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user') ?? [];
+                $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
 
@@ -182,7 +184,7 @@ class UserController extends FormController
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $page],
+                    'viewParameters'  => ['page' => $page, 'isSamlUser' => false],
                     'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_user_index',
@@ -190,12 +192,12 @@ class UserController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($request, $languageHelper, $hasher, $user->getId(), true);
+                return $this->editAction($request, $languageHelper, $hasher, $samlHelper, $user->getId(), true);
             }
         }
 
         return $this->delegateView([
-            'viewParameters'  => ['form' => $form->createView()],
+            'viewParameters'  => ['form' => $form->createView(), 'isSamlUser' => false],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_new',
@@ -213,7 +215,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();
@@ -270,13 +272,18 @@ class UserController extends FormController
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form   = $model->createForm($user, $this->formFactory, $action);
 
+        $isSamlUser    = $samlHelper->isSamlSession();
+        if ($isSamlUser) {
+            $form->remove('plainPassword');
+        }
+
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user') ?? [];
+                $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
                 $newEmail          = $formUser['email'] ?? null;
@@ -342,11 +349,12 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'form'          => $form->createView(),
-                'logs'          => $userActivity,
-                'users'         => $users,
-                'roles'         => $roles,
-                'editAction'    => true,
+                'form'                   => $form->createView(),
+                'logs'                   => $userActivity,
+                'users'                  => $users,
+                'roles'                  => $roles,
+                'editAction'             => true,
+                'isSamlUser'             => $isSamlUser,
             ],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
@@ -432,10 +440,8 @@ class UserController extends FormController
      * Contacts a user.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -461,7 +467,7 @@ class UserController extends FormController
         $currentUser = $this->user;
 
         if ('POST' === $request->getMethod()) {
-            $contact   = $request->request->get('contact') ?? [];
+            $contact   = $request->request->all()['contact'] ?? [];
             $formUrl   = $contact['returnUrl'] ?? '';
             $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
@@ -502,7 +508,7 @@ class UserController extends FormController
                         'objectId'  => $entityId,
                         'action'    => 'communication',
                         'details'   => $details,
-                        'ipAddress' => $this->factory->getIpAddressFromRequest(),
+                        'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $auditLogModel = $this->getModel('core.auditlog');
                     \assert($auditLogModel instanceof AuditLogModel);
@@ -551,10 +557,8 @@ class UserController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.user.page', 1);
         $returnUrl = $this->generateUrl('mautic_user_index', ['page' => $page]);

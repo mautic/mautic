@@ -14,7 +14,7 @@ class ContactSegmentService
     public function __construct(
         private ContactSegmentFilterFactory $contactSegmentFilterFactory,
         private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
-        private \Psr\Log\LoggerInterface $logger
+        private \Psr\Log\LoggerInterface $logger,
     ) {
     }
 
@@ -61,7 +61,7 @@ class ContactSegmentService
      *
      * @throws \Exception
      */
-    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null): array
+    public function getTotalLeadListLeadsCount(LeadList $segment, ?array $batchLimiters = null): array
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 

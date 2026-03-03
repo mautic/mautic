@@ -19,11 +19,11 @@ class SegmentDependencyTreeFactory
 
     public function __construct(
         private ListModel $segmentModel,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
-    public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface
+    public function buildTree(LeadList $segment, ?NodeInterface $rootNode = null): NodeInterface
     {
         $rootNode ??= new IntNode($segment->getId());
         $childSegments = $this->findChildSegments($segment);

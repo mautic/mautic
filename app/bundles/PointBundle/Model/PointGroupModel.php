@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
@@ -20,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Group>
  */
-class PointGroupModel extends CommonFormModel
+class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
     public function getRepository(): GroupRepository
     {
@@ -70,7 +71,7 @@ class PointGroupModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);

@@ -45,6 +45,8 @@ Mautic.renderCharts = function(scope) {
                     Mautic.renderSimpleBarChart(canvas)
                 } else if (canvas.hasClass('horizontal-bar-chart')) {
                     Mautic.renderHorizontalBarChart(canvas)
+                } else if (canvas.hasClass('hour-chart')) {
+                    Mautic.renderHourChart(canvas)
                 }
             }
             canvas.addClass('chart-rendered');
@@ -117,6 +119,45 @@ Mautic.renderLineChart = function(canvas) {
     });
     Mautic.chartObjects.push(chart);
 };
+
+Mautic.renderHourChart = function(canvas) {
+    const data = JSON.parse(canvas.text());
+    const chart = new Chart(canvas, {
+        type: 'line',
+        data,
+        options: {
+            tooltips: { mode: 'index', intersect: false },
+            scales: {
+                xAxes: [{
+                    gridLines: { display: false },
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 6,
+                        maxRotation: 0,
+                        callback: value => value.split(' - ')[0]
+                    }
+                }],
+                yAxes: [{
+                    afterBuildTicks: scale => {
+                        scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max];
+                    },
+                    gridLines: { drawBorder: false },
+                    ticks: {
+                        beginAtZero: true,
+                        callback: (value, index, values) => {
+                            if (index === 0 || index === values.length - 1) return value;
+                            if (/^\d+\.5$/.test(value.toString())) return '';
+                            if (index === Math.floor(values.length / 2)) return value !== 0.5 ? value : '';
+                            return '';
+                        }
+                    }
+                }]
+            }
+        }
+    });
+    Mautic.chartObjects.push(chart);
+};
+
 
 /**
  * Render the chart.js pie chart
@@ -268,126 +309,6 @@ Mautic.renderHorizontalBarChart = function(canvas) {
         }
     });
     Mautic.chartObjects.push(chart);
-};
-
-/**
- * Render vector maps
- * @deprecated please use MauticMap class
- * @param mQuery element scope
- */
-Mautic.renderMaps = function(scope) {
-    var maps = [];
-
-    if (mQuery.type(scope) === 'string') {
-        maps = mQuery(scope).find('.vector-map');
-    } else if (scope) {
-        maps = scope.find('.vector-map');
-    } else {
-        maps = mQuery('.vector-map');
-    }
-
-    if (maps.length) {
-        maps.each(function(index, element) {
-            Mautic.renderMap(mQuery(element));
-        });
-    }
-};
-
-/**
- * @deprecated please use MauticMap class
- * @param wrapper
- * @returns {*}
- */
-Mautic.renderMap = function(wrapper) {
-    // Map render causes a JS error on FF when the element is hidden
-    if (wrapper.is(':visible')) {
-        if (!Mautic.mapObjects) Mautic.mapObjects = [];
-        var data = wrapper.data('map-data');
-        if (typeof data === 'undefined' || !data.length) {
-            try {
-                data = JSON.parse(wrapper.text());
-                wrapper.data('map-data', data);
-            } catch (error) {
-
-                return;
-            }
-        }
-
-        // Markers have numerical indexes
-        var firstKey = Object.keys(data)[0];
-
-        // Check type of data
-        if (firstKey == "0") {
-            // Markers
-            var markersData = data,
-                regionsData = {};
-        } else {
-            // Regions
-            var markersData = {},
-                regionsData = data;
-        }
-
-        wrapper.text('');
-        wrapper.vectorMap({
-            backgroundColor: 'transparent',
-            zoomOnScroll: false,
-            markers: markersData,
-            markerStyle: {
-                initial: {
-                    fill: '#40C7B5'
-                },
-                selected: {
-                    fill: '#40C7B5'
-                }
-            },
-            regionStyle: {
-                initial: {
-                    "fill": '#dce0e5',
-                    "fill-opacity": 1,
-                    "stroke": 'none',
-                    "stroke-width": 0,
-                    "stroke-opacity": 1
-                },
-                hover: {
-                    "fill-opacity": 0.7,
-                    "cursor": 'pointer'
-                }
-            },
-            map: 'world_mill_en',
-            series: {
-                regions: [{
-                    values: regionsData,
-                    scale: ['#dce0e5', '#40C7B5'],
-                    normalizeFunction: 'polynomial'
-                }]
-            },
-            onRegionTipShow: function (event, label, index) {
-                if (data[index] > 0) {
-                    label.html(
-                        '<b>'+label.html()+'</b></br>'+
-                        data[index]+' Leads'
-                    );
-                }
-            }
-        });
-        wrapper.addClass('map-rendered');
-        Mautic.mapObjects.push(wrapper);
-        return wrapper;
-    }
-};
-
-/**
- * Destroy a jVector map
- * @deprecated please use MauticMap class
- */
-Mautic.destroyMap = function(wrapper) {
-    if (wrapper.hasClass('map-rendered')) {
-        var map = wrapper.vectorMap('get', 'mapObject');
-        map.removeAllMarkers();
-        map.remove();
-        wrapper.empty();
-        wrapper.removeClass('map-rendered');
-    }
 };
 
 /**

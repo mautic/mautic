@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
@@ -42,7 +41,6 @@ class CommonController extends AbstractController implements MauticController
      */
     public function __construct(
         protected ManagerRegistry $doctrine,
-        protected MauticFactory $factory,
         protected ModelFactory $modelFactory,
         UserHelper $userHelper,
         protected CoreParametersHelper $coreParametersHelper,
@@ -50,9 +48,9 @@ class CommonController extends AbstractController implements MauticController
         protected Translator $translator,
         private FlashBag $flashBag,
         private ?RequestStack $requestStack,
-        protected ?CorePermissions $security
+        protected ?CorePermissions $security,
     ) {
-        $this->user                 = $userHelper->getUser();
+        $this->user = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request
@@ -90,7 +88,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel($modelNameKey)
+    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -111,6 +109,27 @@ class CommonController extends AbstractController implements MauticController
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+    }
+
+    /**
+     * eventAwareRenderView.
+     *
+     * @param array<string, string> $parameters
+     */
+    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
+    {
+        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
+            $event = $this->dispatcher->dispatch(
+                new CustomTemplateEvent($request, $contentTemplate, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+            );
+
+            $contentTemplate   = $event->getTemplate();
+            $parameters        = $event->getVars(); // @phpstan-ignore parameterByRef.type
+        }
+
+        // It's not uncommon that the vars are array of mixed. Not just strings. I beliveve this is Symfony's issue.
+        return $this->renderView($contentTemplate, $parameters); // @phpstan-ignore parameterByRef.type
     }
 
     /**
@@ -199,10 +218,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
-     *
-     * @return RedirectResponse
      */
-    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
+    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
         return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
@@ -210,7 +227,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects /s and /s/ to /s/dashboard.
      */
-    public function redirectSecureRootAction()
+    public function redirectSecureRootAction(): RedirectResponse
     {
         return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
@@ -219,10 +236,8 @@ class CommonController extends AbstractController implements MauticController
      * Redirects controller if not ajax or retrieves html output for ajax request.
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
-     *
-     * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    public function postActionRedirect(array $args = []): RedirectResponse|Response
     {
         $request = $this->getCurrentRequest();
 
@@ -291,7 +306,7 @@ class CommonController extends AbstractController implements MauticController
             $ajaxRouteName = false;
 
             try {
-                $routeParams   = $this->get('router')->match($routePath);
+                $routeParams   = $this->container->get('router')->match($routePath);
                 $ajaxRouteName = $routeParams['_route'];
 
                 $request->attributes->set('ajaxRoute',
@@ -317,12 +332,14 @@ class CommonController extends AbstractController implements MauticController
 
         // Ajax call so respond with json
         $newContent = '';
+        $ignoreAjax = $request->get('ignoreAjax', false); // get the value here as the forward can overwrite it.
         if ($contentTemplate) {
             if ($forward) {
                 // the content is from another controller action so we must retrieve the response from it instead of
                 // directly parsing the template
-                $query              = ['ignoreAjax' => true, 'request' => $request, 'subrequest' => true];
-                $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
+                $query                 = ['ignoreAjax' => true, 'subrequest' => true];
+                $parameters['request'] = $request;
+                $newContentResponse    = $this->forward($contentTemplate, $parameters, $query);
                 if ($newContentResponse instanceof RedirectResponse) {
                     $passthrough['redirect'] = $newContentResponse->getTargetUrl();
                     $passthrough['route']    = false;
@@ -330,8 +347,11 @@ class CommonController extends AbstractController implements MauticController
                     $newContent = $newContentResponse->getContent();
                 }
             } else {
+                $parameters['mauticTemplate']     = $contentTemplate;
+                $parameters['mauticTemplateVars'] = $parameters;
+
                 $GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'] = 1; // for error handling
-                $newContent                           = $this->renderView($contentTemplate, $parameters);
+                $newContent                           = $this->eventAwareRenderView($contentTemplate, $parameters, $request);
 
                 unset($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER']);
             }
@@ -339,7 +359,7 @@ class CommonController extends AbstractController implements MauticController
 
         // there was a redirect within the controller leading to a double call of this function so just return the content
         // to prevent newContent from being json
-        if ($request->get('ignoreAjax', false)) {
+        if ($ignoreAjax) {
             return new Response($newContent, $code);
         }
 
@@ -565,10 +585,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders flashes' HTML.
-     *
-     * @return string
      */
-    protected function getFlashContent()
+    protected function getFlashContent(): string
     {
         return $this->renderView('@MauticCore/Notification/flash_messages.html.twig');
     }
@@ -576,7 +594,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Renders notification info for ajax.
      */
-    protected function getNotificationContent(Request $request = null): array
+    protected function getNotificationContent(?Request $request = null): array
     {
         if (null === $request) {
             $request = $this->getCurrentRequest();
@@ -603,18 +621,6 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param bool|true $isRead
-     *
-     * @deprecated Will be removed in Mautic 3.0 as unused.
-     */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null): void
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime);
-    }
-
-    /**
      * @param string       $message
      * @param array<mixed> $messageVars
      * @param string|null  $level
@@ -628,10 +634,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param array|\Iterator $toExport
-     *
-     * @return StreamedResponse
      */
-    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper)
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
@@ -656,7 +660,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
     {
         $data = new DataExporterHelper();
 

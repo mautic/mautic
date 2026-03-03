@@ -13,12 +13,7 @@
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#leadListTable',
-                        'langVar': 'lead.list',
-                        'routeBase': 'segment',
-                        'templateButtons': {
-                            'delete': permissions['lead:lists:deleteother'],
-                        },
-                }) }}
+                    }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'lead.list',
                         'orderBy': 'l.name',
@@ -74,5 +69,25 @@
         </div>
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
+                        'pictogram': 'circle--packing',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.lead.list.contentblock.heading',
+                subheading: 'mautic.lead.list.contentblock.subheading',
+                copy: 'mautic.lead.list.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -18,7 +19,7 @@ class AuditLogRepository extends CommonRepository
     /**
      * @return int
      */
-    public function getAuditLogsCount(Lead $lead, array $filters = null)
+    public function getAuditLogsCount(Lead $lead, ?array $filters = null)
     {
         $query = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
@@ -28,7 +29,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -50,7 +52,7 @@ class AuditLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAuditLogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -60,7 +62,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -101,7 +104,7 @@ class AuditLogRepository extends CommonRepository
     /**
      * @return array
      */
-    public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
+    public function getAuditLogsForLeads(array $listOfContacts, ?array $filters = null, ?array $orderBy = null, $dateAdded = null)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -111,7 +114,8 @@ class AuditLogRepository extends CommonRepository
             ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -184,7 +188,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+        $query->orderBy('al.dateAdded', Order::Descending->value)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
@@ -193,7 +197,7 @@ class AuditLogRepository extends CommonRepository
     /**
      * @return array
      */
-    public function getLeadIpLogs(Lead $lead = null, array $options = [])
+    public function getLeadIpLogs(?Lead $lead = null, array $options = [])
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -257,6 +261,6 @@ class AuditLogRepository extends CommonRepository
         $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
         $conn       = $this->getEntityManager()->getConnection();
 
-        return $conn->executeQuery($sql)->rowCount();
+        return $conn->executeStatement($sql);
     }
 }

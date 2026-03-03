@@ -30,7 +30,7 @@ final class AddressDTO
         return new self($email, $address[$email] ?? null);
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }

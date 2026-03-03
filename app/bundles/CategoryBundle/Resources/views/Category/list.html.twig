@@ -11,53 +11,62 @@
 
 {% block content %}
 	{% if isIndex %}
-		<div id="page-list-wrapper" class="panel panel-default">
+		<div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
 			{# //TODO - Restore these buttons to the listactions when custom content is supported #}
 			{# <div class="btn-group">
-							        <button type="button" class="btn btn-ghost"><i class="ri-upload-line"></i></button>
-							        <button type="button" class="btn btn-ghost"><i class="ri-archive-2-line"></i></button>
-							    </div> #}
-                                {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-                                    'searchValue': searchValue,
-                                    'filters': {
-                                        'bundle': {
-                                            'options': categoryTypes,
-                                            'values': {0: bundle},
-                                            'translateLabels': true,
-                                        },
-                                    },
-                                    'action': currentRoute,
-                                    'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
-                                        'templateButtons': {
-                                            'new': permissions[permissionBase ~ ":create"]
-                                        },
-                                        'routeBase': 'category',
-                                        'query': {
-                                            'bundle': bundle,
-                                            'show_bundle_select': true,
-                                        },
-                                        'editMode': 'ajaxModal',
-                                        'editAttr': {
-                                            'data-target': '#MauticSharedModal',
-                                            'data-header': 'mautic.category.header.new'|trans,
-                                            'data-toggle': 'ajaxmodal',
-                                        },
-                                    }),
-                                    'quickFilters': [
-                                        {
-                                            'search': 'mautic.core.searchcommand.ispublished',
-                                            'label': 'mautic.core.form.available',
-                                            'tooltip': 'mautic.core.searchcommand.ispublished.description',
-                                            'icon': 'ri-check-line'
-                                        },
-                                        {
-                                            'search': 'mautic.core.searchcommand.isunpublished',
-                                            'label': 'mautic.core.form.unavailable',
-                                            'tooltip': 'mautic.core.searchcommand.isunpublished.description',
-                                            'icon': 'ri-close-line'
-                                        }
-                                    ]
-                                }) -}}
+                    <button type="button" class="btn btn-ghost"><i class="ri-upload-line"></i></button>
+                    <button type="button" class="btn btn-ghost"><i class="ri-archive-2-line"></i></button>
+                </div> #}
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'filters': {
+                    'bundle': {
+                        'options': categoryTypes,
+                        'values': {0: bundle},
+                        'translateLabels': true,
+                    },
+                },
+                'action': currentRoute,
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions[permissionBase ~ ":create"]
+                    },
+                    'routeBase': 'category',
+                    'query': {
+                        'bundle': bundle,
+                        'show_bundle_select': true,
+                    },
+                    'editMode': 'ajaxModal',
+                    'editAttr': {
+                        'data-target': '#MauticSharedModal',
+                        'data-header': 'mautic.category.header.new'|trans,
+                        'data-toggle': 'ajaxmodal',
+                    },
+                },
+                'bulk_actions': {
+                    'routeBase': 'category',
+                    'templateButtons': {
+                        'delete': permissions[permissionBase ~ ':delete']
+                    },
+                    'query': {
+                        'bundle': bundle
+                    }
+                },
+                'quickFilters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.available',
+                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.unavailable',
+                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                        'icon': 'ri-close-line'
+                    }
+                ]
+            }) -}}
             <div class="page-list">
                 {{ block('listResults') }}
 			</div>
@@ -77,14 +86,7 @@
 					<tr>
 						{{- include('@MauticCore/Helper/tableheader.html.twig', {
                             'checkall'        :  'true',
-                            'target'          :  '#categoryTable',
-                            'routeBase'       :  'category',
-                            'templateButtons' :  {
-                                'delete' :  permissions[permissionBase ~ ':delete'],
-                            },
-                            'query' :  {
-                                'bundle' :  bundle,
-                            },
+                            'target'          :  '#categoryTable'
                         }) -}}
 
 						{{- include(
@@ -158,13 +160,12 @@
                                     {% if permissions[permissionBase ~ ':edit'] %}
                                         </a>
                                     {% endif %}
+                                    {{ customContent('category.name', _context) }}
                                 </div>
                                 {% set description = item.getDescription() %}
-                                {% if description %}
-                                    <div class="text-muted mt-4">
-                                        <small>{{ description }}</small>
-                                    </div>
-                                {% endif %}
+                                {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                    'description': item.description
+                                }) }}
                             </td>
                             <td class="visible-md visible-lg">
                                 {% if categoryTypes[item.getBundle()] is defined %}
@@ -193,6 +194,26 @@
 				</tbody>
 			</div>
 		{% else %}
-			{{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.category.noresults.tip'}) -}}
+            {% if searchValue is not empty %}
+                {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.category.noresults.tip'}) -}}
+            {% else %}
+                <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+                    {% set childContainer %}
+                        <div class="mt-32 mb-md">
+                            {% include '@MauticCore/Components/pictogram.html.twig' with {
+                                'pictogram': 'folder',
+                                'size': '80'
+                            } %}
+                        </div>
+                    {% endset %}
+        
+                    {{ include('@MauticCore/Components/content-block.html.twig', {
+                        heading: 'mautic.category.contentblock.heading',
+                        subheading: 'mautic.category.contentblock.subheading',
+                        copy: 'mautic.category.contentblock.copy',
+                        childContainer: childContainer,
+                    }) }}
+                </div>
+            {% endif %}
 		{% endif %}
 	{% endblock %}

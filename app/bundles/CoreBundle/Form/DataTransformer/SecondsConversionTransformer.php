@@ -10,7 +10,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class SecondsConversionTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private $viewFormat = 'H'
+        private $viewFormat = 'H',
     ) {
     }
 
@@ -21,7 +21,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         $value = (int) $value;
 
@@ -43,7 +43,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         $value = (int) $value;
 

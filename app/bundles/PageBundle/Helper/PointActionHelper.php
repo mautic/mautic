@@ -2,23 +2,22 @@
 
 namespace Mautic\PageBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
-    /**
-     * @param MauticFactory $factory
-     */
-    public static function validatePageHit($factory, $eventDetails, $action): bool
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
+
+    public static function validatePageHit($eventDetails, $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
-            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel               = $factory->getModel('page');
-            [$parent, $children]     = $pageHit->getVariants();
+            [$parent, $children] = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
@@ -38,10 +37,7 @@ class PointActionHelper
         return true;
     }
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public static function validateUrlHit($factory, $eventDetails, $action): bool
+    public function validateUrlHit($eventDetails, $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();
@@ -52,7 +48,7 @@ class PointActionHelper
             return false;
         }
 
-        $hitRepository = $factory->getEntityManager()->getRepository(Hit::class);
+        $hitRepository = $this->entityManager->getRepository(Hit::class);
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 
@@ -64,11 +60,11 @@ class PointActionHelper
                 $changePoints['first_time'] = true;
             }
         }
-        $now       = new \DateTime();
+        $now = new \DateTime();
 
         if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
             // get the latest hit only when it's needed
-            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), 'urls' => [$urlWithSqlWC], 'second_to_last' => $eventDetails->getId()]);
         } else {
             $latestHit = null;
         }
@@ -99,18 +95,10 @@ class PointActionHelper
             }
         }
         if ($action['properties']['returns_within']) {
-            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
-                $changePoints['returns_within'] = true;
-            } else {
-                $changePoints['returns_within'] = false;
-            }
+            $changePoints['returns_within'] = $latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within'];
         }
         if ($action['properties']['returns_after']) {
-            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
-                $changePoints['returns_after'] = true;
-            } else {
-                $changePoints['returns_after'] = false;
-            }
+            $changePoints['returns_after'] = $latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after'];
         }
 
         // return true only if all configured options are true

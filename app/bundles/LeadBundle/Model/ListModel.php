@@ -13,8 +13,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -49,7 +51,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadList>
  */
-class ListModel extends FormModel
+class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
 
@@ -65,13 +67,14 @@ class ListModel extends FormModel
         private SegmentChartQueryFactory $segmentChartQueryFactory,
         private RequestStack $requestStack,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private DoNotContactRepository $doNotContactRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -131,13 +134,13 @@ class ListModel extends FormModel
         // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+        $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+            $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -157,12 +160,50 @@ class ListModel extends FormModel
     }
 
     /**
+     * @param array<int> $ids
+     *
+     * @return array<object>
+     */
+    public function deleteEntities($ids): array
+    {
+        $entities = [];
+        foreach ($ids as $listId) {
+            $leadList = $this->getEntity($listId);
+            if ($leadList) {
+                $entities[$listId] = $leadList;
+                $this->deleteEntity($leadList);
+            }
+        }
+
+        return $entities;
+    }
+
+    /**
+     * @param LeadList $entity
+     */
+    public function deleteEntity($entity): void
+    {
+        $id    = $entity->getId();
+        $this->dispatchEvent('pre_delete', $entity);
+        $this->getRepository()->setSegmentAsDeleted($id);
+
+        $entity->deletedId = $id;
+        $this->dispatcher->dispatch(new LeadListEvent($entity), LeadEvents::ON_LIST_DELETE);
+        $entity->setId(null);
+    }
+
+    public function hardDeleteEntity(LeadList $leadList): void
+    {
+        $leadList->deletedId = $leadList->getId();
+        $this->getRepository()->deleteEntity($leadList);
+        $this->dispatchEvent('post_delete', $leadList);
+    }
+
+    /**
      * @param string|null $action
      * @param array       $options
      *
      * @return FormInterface<LeadList>
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
@@ -189,10 +230,15 @@ class ListModel extends FormModel
         return parent::getEntity($id);
     }
 
+    public function getSoftDeletedEntity(int $id): ?LeadList
+    {
+        return $this->getRepository()->getSoftDeletedEntity($id);
+    }
+
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -311,7 +357,7 @@ class ListModel extends FormModel
      *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null): int
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, ?OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -511,8 +557,12 @@ class ListModel extends FormModel
             }
         }
 
-        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
-        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+        } else {
+            $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        }
 
         return $leadsProcessed;
     }
@@ -632,7 +682,11 @@ class ListModel extends FormModel
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            }
         }
 
         if (!empty($persistLists)) {
@@ -750,7 +804,11 @@ class ListModel extends FormModel
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            }
 
             unset($listLead);
         }
@@ -782,6 +840,11 @@ class ListModel extends FormModel
         unset($lead, $deleteLists, $persistLists, $lists);
     }
 
+    public function removeLeadsByListId(int $listId): void
+    {
+        $this->getListLeadRepository()->removeLeadsByListId($listId);
+    }
+
     /**
      * Batch sleep according to settings.
      */
@@ -810,10 +873,8 @@ class ListModel extends FormModel
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true)
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -1103,10 +1164,8 @@ class ListModel extends FormModel
 
     /**
      * @param $segmentId *
-     *
-     * @return array
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name'): array
     {
         $filter = [
             'force'  => [
@@ -1238,9 +1297,9 @@ class ListModel extends FormModel
                     continue;
                 }
 
-                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
                 $bcFilterValue     = $eachFilter['filter'] ?? [];
                 $filterValue       = $eachFilter['properties']['filter'] ?? $bcFilterValue;
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $filterValue));
                 foreach ($filterValue as $val) {
                     if (!empty($dependency[$val])) {
                         $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);
@@ -1269,7 +1328,7 @@ class ListModel extends FormModel
     /**
      * Get a list of source choices.
      */
-    public function getSourceLists(string $sourceType = null): array
+    public function getSourceLists(?string $sourceType = null): array
     {
         $choices = [];
         switch ($sourceType) {
@@ -1334,6 +1393,14 @@ class ListModel extends FormModel
         }
 
         return $leadCounts;
+    }
+
+    public function getActiveSegmentContactCount(int $segmentId): int
+    {
+        $total = $this->getRepository()->getLeadCount($segmentId);
+        $dnc   = $this->doNotContactRepository->getCount(null, null, null, $segmentId);
+
+        return max(0, $total - $dnc);
     }
 
     /**

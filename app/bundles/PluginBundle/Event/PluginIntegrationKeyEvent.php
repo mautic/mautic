@@ -8,7 +8,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private ?array $keys = null
+        private ?array $keys = null,
     ) {
         $this->integration = $integration;
     }

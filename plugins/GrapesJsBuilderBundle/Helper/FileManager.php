@@ -20,12 +20,14 @@ class FileManager
     public function __construct(
         private FileUploader $fileUploader,
         private CoreParametersHelper $coreParametersHelper,
-        private PathsHelper $pathsHelper
+        private PathsHelper $pathsHelper,
     ) {
     }
 
     /**
      * @return array
+     *
+     * @throws FileUploadException
      */
     public function uploadFiles($request)
     {
@@ -35,10 +37,11 @@ class FileManager
             $uploadedFiles = [];
 
             foreach ($files as $file) {
-                try {
-                    $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
-                } catch (FileUploadException) {
-                }
+                $this->fileUploader->validateImage($file);
+            }
+
+            foreach ($files as $file) {
+                $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
             }
         }
 
@@ -70,8 +73,8 @@ class FileManager
 
     public function getFullUrl($fileName, $separator = '/'): string
     {
-        // if a static_url (CDN) is configured use that, otherwiese use the site url
-        $url = $this->coreParametersHelper->getParameter('static_url') ?? $this->coreParametersHelper->getParameter('site_url');
+        // if a static_url (CDN) is configured use that, otherwise use the site url
+        $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
 
         return $url
             .$separator

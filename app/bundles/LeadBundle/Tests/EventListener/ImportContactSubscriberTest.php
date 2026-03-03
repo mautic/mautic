@@ -40,7 +40,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event      = new ImportValidateEvent('contacts', $formMock);
         $subscriber = new ImportContactSubscriber(
-            new class() extends FieldList {
+            new class extends FieldList {
                 public function __construct()
                 {
                 }
@@ -77,7 +77,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event      = new ImportValidateEvent('contacts', $formMock);
         $subscriber = new ImportContactSubscriber(
-            new class() extends FieldList {
+            new class extends FieldList {
                 public function __construct()
                 {
                 }
@@ -114,7 +114,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $subscriber = new ImportContactSubscriber(
             $this->getFieldListFake(),
-            new class() extends CorePermissions {
+            new class extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -141,7 +141,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $subscriber = new ImportContactSubscriber(
             $this->getFieldListFake(),
-            new class() extends CorePermissions {
+            new class extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -184,7 +184,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnFieldMapping(): void
     {
         $subscriber = new ImportContactSubscriber(
-            new class() extends FieldList {
+            new class extends FieldList {
                 public function __construct()
                 {
                 }
@@ -254,16 +254,12 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new ImportContactSubscriber(
             $this->getFieldListFake(),
             $this->getCorePermissionsFake(),
-            new class() extends LeadModel {
+            new class extends LeadModel {
                 public function __construct()
                 {
                 }
 
-                /**
-                 * @param array<string> $fields
-                 * @param array<string> $data
-                 */
-                public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
+                public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false): bool
                 {
                     return true;
                 }
@@ -279,7 +275,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getFieldListFake(): FieldList
     {
-        return new class() extends FieldList {
+        return new class extends FieldList {
             public function __construct()
             {
             }
@@ -288,7 +284,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getCorePermissionsFake(): CorePermissions
     {
-        return new class() extends CorePermissions {
+        return new class extends CorePermissions {
             public function __construct()
             {
             }
@@ -297,7 +293,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getLeadModelFake(): LeadModel
     {
-        return new class() extends LeadModel {
+        return new class extends LeadModel {
             public function __construct()
             {
             }
@@ -306,7 +302,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getTranslatorFake(): TranslatorInterface
     {
-        return new class() extends Translator {
+        return new class extends Translator {
             public function __construct()
             {
             }

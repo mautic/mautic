@@ -28,7 +28,7 @@ class BuilderTokenHelper
         private CorePermissions $security,
         private ModelFactory $modelFactory,
         private Connection $connection,
-        private UserHelper $userHelper
+        private UserHelper $userHelper,
     ) {
     }
 
@@ -39,7 +39,7 @@ class BuilderTokenHelper
         string $modelName,
         ?string $viewPermissionBase = null,
         ?string $bundleName = null,
-        ?string $langVar = null
+        ?string $langVar = null,
     ): void {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
@@ -71,7 +71,7 @@ class BuilderTokenHelper
         $filter = '',
         $labelColumn = 'name',
         $valueColumn = 'id',
-        CompositeExpression $expr = null
+        ?CompositeExpression $expr = null,
     ) {
         if (!$this->isConfigured) {
             throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
@@ -95,7 +95,7 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->createExpressionBuilder();
 
-        if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if (isset($expr) && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
@@ -130,18 +130,5 @@ class BuilderTokenHelper
     public function setPermissionSet(array $permissions): void
     {
         $this->permissionSet = $permissions;
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public static function getVisualTokenHtml($token, $description, $forPregReplace = false): string
-    {
-        if ($forPregReplace) {
-            return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')
-            .'(.*?)'.preg_quote('**</strong>', '/');
-        }
-
-        return '<strong contenteditable="false" data-token="'.$token.'">**'.$description.'**</strong>';
     }
 }

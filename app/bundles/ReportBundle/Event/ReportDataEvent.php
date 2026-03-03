@@ -12,7 +12,7 @@ class ReportDataEvent extends AbstractReportEvent
         Report $report,
         private array $data,
         $totalResults,
-        private array $options
+        private array $options,
     ) {
         $this->context      = $report->getSource();
         $this->report       = $report;
@@ -46,5 +46,15 @@ class ReportDataEvent extends AbstractReportEvent
     public function getTotalResults(): int
     {
         return $this->totalResults;
+    }
+
+    public function updateColumnType(string $alias, string $type): void
+    {
+        foreach ($this->options['columns'] as &$column) {
+            if ($column['alias'] === $alias) {
+                $column['type'] = $type;
+                break;
+            }
+        }
     }
 }

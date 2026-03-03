@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -21,18 +22,20 @@ class FieldModelTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
 
-        $platform = new class() {
+        $platform = new class {
             public function getReservedKeywordsList(): object
             {
-                return new class() {
-                    public function isKeyword(): void
+                return new class {
+                    public function isKeyword(): bool
                     {
+                        return false;
                     }
                 };
             }
 
-            public function isKeyword(): void
+            public function isKeyword(): bool
             {
+                return false;
             }
         };
 
@@ -41,6 +44,7 @@ class FieldModelTest extends TestCase
 
         $leadFieldModel = $this->createMock(\Mautic\LeadBundle\Model\FieldModel::class);
         $entityManager  = $this->createMock(EntityManager::class);
+        $schemaHelper   = $this->createMock(ColumnSchemaHelper::class);
         $fieldModel     = new FieldModel(
             $leadFieldModel,
             $entityManager,
@@ -52,6 +56,7 @@ class FieldModelTest extends TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class),
             $this->createMock(RequestStack::class),
+            $schemaHelper
         );
 
         $entityManager->expects($this->any())

@@ -6,17 +6,24 @@
 {% block headerTitle %}{{ 'mautic.point.group.header.index'|trans }}{% endblock %}
 
 {% block content %}
-    <div id="page-list-wrapper" class="panel panel-default">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': permissions['point:groups:create']
                 },
                 'routeBase': 'point.group',
                 'langVar': 'point.group'
-            })
+            },
+            'bulk_actions': {
+                'langVar': 'point.group',
+                'routeBase': 'point.group',
+                'templateButtons': {
+                    'delete': permissions['point:groups:delete'],
+                },
+            },
         }) -}}
         <div class="page-list">
             {% if items is defined and items is not empty %}
@@ -24,17 +31,10 @@
                     <table class="table table-hover" id="groupTable">
                         <thead>
                         <tr>
-                            {{ include(
-                                '@MauticCore/Helper/tableheader.html.twig',
-                                {
-                                    'checkall': 'true',
-                                    'target': '#groupTable',
-                                    'langVar': 'point.group',
-                                    'routeBase': 'point.group',
-                                    'templateButtons': {
-                                    'delete': permissions['point:groups:delete'],
-                                }
-                                }) }}
+                            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                'checkall': 'true',
+                                'target': '#groupTable',
+                            }) }}
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
@@ -92,11 +92,9 @@
                                         {% endif %}
                                     </div>
                                     {% set description = item.getDescription() %}
-                                    {% if description %}
-                                        <div class="text-muted mt-4">
-                                            <small>{{ description|purify }}</small>
-                                        </div>
-                                    {% endif %}
+                                    {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                        'description': item.description
+                                    }) }}
                                 </td>
                                 <td class="visible-md visible-lg">{{ item.getId() }}</td>
                             </tr>
@@ -114,7 +112,27 @@
                     </div>
                 </div>
             {% else %}
-                {{ include('@MauticCore/Helper/noresults.html.twig') }}
+                {% if searchValue is not empty %}
+                    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+                {% else %}
+                    <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+                        {% set childContainer %}
+                            <div class="mb-md">
+                                {% include '@MauticCore/Components/pictogram.html.twig' with {
+                                    'pictogram': 'filter-and-group-data',
+                                    'size': '80'
+                                } %}
+                            </div>
+                        {% endset %}
+                
+                        {{ include('@MauticCore/Components/content-block.html.twig', {
+                            heading: 'mautic.point.group.onboarding.heading',
+                            subheading: 'mautic.point.group.onboarding.subheading',
+                            copy: 'mautic.point.group.onboarding.copy',
+                            childContainer: childContainer,
+                        }) }}
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>

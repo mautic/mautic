@@ -4,23 +4,28 @@ namespace MauticPlugin\MauticSocialBundle\Command;
 
 use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'mautic:social:monitoring',
+    description: 'Looks at the records of monitors and iterates through them.'
+)]
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private MonitoringModel $monitoringModel
+        private MonitoringModel $monitoringModel,
     ) {
         parent::__construct();
     }
 
     protected function configure()
     {
-        $this->setName('mautic:social:monitoring')
+        $this
             ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
             ->addOption(
                 'batch-size',
@@ -47,8 +52,14 @@ class MauticSocialMonitoringCommand extends Command
             return Command::SUCCESS;
         }
 
+        if (!is_numeric($batchSize)) {
+            $output->writeln('batch-size is not number.');
+
+            return self::FAILURE;
+        }
+
         // max iterations
-        $maxPerIterations = ceil($batchSize / count($monitorList));
+        $maxPerIterations = ceil((int) $batchSize / count($monitorList));
 
         foreach ($monitorList as $monitor) {
             $output->writeln('Executing Monitor Item '.$monitor->getId());
@@ -131,6 +142,4 @@ class MauticSocialMonitoringCommand extends Command
 
         return $returnCode;
     }
-
-    protected static $defaultDescription = 'Looks at the records of monitors and iterates through them. ';
 }

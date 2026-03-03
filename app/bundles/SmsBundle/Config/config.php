@@ -74,16 +74,6 @@ return [
                 ],
                 'tag'   => 'mautic.sms_callback_handler',
             ],
-
-            // @deprecated - this should not be used; use `mautic.sms.twilio.transport` instead.
-            // Only kept as BC in case someone is passing the service by name in 3rd party
-            'mautic.sms.transport.twilio' => [
-                'class'        => Mautic\SmsBundle\Api\TwilioApi::class,
-                'arguments'    => [
-                    'mautic.sms.twilio.configuration',
-                    'monolog.logger.mautic',
-                ],
-            ],
             'mautic.sms.broadcast.executioner' => [
                 'class'        => Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
                 'arguments'    => [
@@ -108,7 +98,6 @@ return [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
                     'doctrine.orm.entity_manager',
-                    'session',
                     'request_stack',
                     'router',
                     'translator',
@@ -121,6 +110,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
+                    'mautic.lead.field.fields_with_unique_identifier',
                 ],
             ],
         ],

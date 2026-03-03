@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -14,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class LeadCategoryType extends AbstractType
 {
     public function __construct(
-        private CategoryModel $categoryModel
+        private CategoryModel $categoryModel,
     ) {
     }
 
@@ -22,7 +24,7 @@ class LeadCategoryType extends AbstractType
     {
         $resolver->setDefaults([
             'choices'           => function (Options $options): array {
-                $categories = $this->categoryModel->getLookupResults('global');
+                $categories = $this->categoryModel->getLookupResults('email', '', 0);
                 $choices    = [];
 
                 foreach ($categories as $cat) {
@@ -36,18 +38,12 @@ class LeadCategoryType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadcategory_choices';
     }

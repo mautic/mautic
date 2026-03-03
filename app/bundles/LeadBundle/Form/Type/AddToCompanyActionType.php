@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class AddToCompanyActionType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 
@@ -58,10 +58,7 @@ class AddToCompanyActionType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'addtocompany_action';
     }

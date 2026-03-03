@@ -13,9 +13,8 @@ class StatTest extends TestCase
 {
     /**
      * @param int $count How many openDetails to add to the entity
-     *
-     * @dataProvider addOpenDetailsTestProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('addOpenDetailsTestProvider')]
     public function testAddOpenDetails(int $count): void
     {
         $stat = new Stat();

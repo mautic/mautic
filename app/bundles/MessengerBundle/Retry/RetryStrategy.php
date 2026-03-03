@@ -14,16 +14,16 @@ class RetryStrategy implements RetryStrategyInterface
     private RetryStrategyInterface $retryStrategy;
 
     public function __construct(
-        private CoreParametersHelper $parametersHelper
+        private CoreParametersHelper $parametersHelper,
     ) {
     }
 
-    public function isRetryable(Envelope $message): bool
+    public function isRetryable(Envelope $message, ?\Throwable $throwable = null): bool
     {
         return $this->getRetryStrategy()->isRetryable($message);
     }
 
-    public function getWaitingTime(Envelope $message): int
+    public function getWaitingTime(Envelope $message, ?\Throwable $throwable = null): int
     {
         return $this->getRetryStrategy()->getWaitingTime($message);
     }

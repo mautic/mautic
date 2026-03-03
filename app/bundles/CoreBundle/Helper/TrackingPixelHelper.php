@@ -13,10 +13,7 @@ class TrackingPixelHelper
         $response->send();
     }
 
-    /**
-     * @return Response
-     */
-    public static function getResponse(Request $request)
+    public static function getResponse(Request $request): Response
     {
         $response = new Response();
 

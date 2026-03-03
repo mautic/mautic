@@ -15,27 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
-    /**
-     * @var string|null
-     */
-    private $singleEmailMode;
-
     private array $failedContacts = [];
 
-    /**
-     * @var array
-     */
-    private $errorMessages = [];
+    private array $errorMessages = [];
 
-    /**
-     * @var array
-     */
-    private $badEmails = [];
+    private array $badEmails = [];
 
-    /**
-     * @var array
-     */
-    private $emailSentCounts = [];
+    private array $emailSentCounts = [];
 
     /**
      * @var array|null
@@ -51,16 +37,13 @@ class SendEmailToContact
 
     private int $statBatchCounter = 0;
 
-    /**
-     * @var array
-     */
-    private $contact = [];
+    private array $contact = [];
 
     public function __construct(
         private MailHelper $mailer,
         private StatHelper $statHelper,
         private DoNotContact $dncModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -78,8 +61,6 @@ class SendEmailToContact
             // Check to see if failed recipients were stored by the transport
             if (!empty($sendFailures['failures'])) {
                 $this->processSendFailures($sendFailures);
-            } elseif ($this->singleEmailMode) {
-                $this->errorMessages[$this->singleEmailMode] = implode('; ', $sendFailures);
             }
         }
 
@@ -109,7 +90,7 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], string $emailType = null)
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], ?string $emailType = null)
     {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -117,7 +98,7 @@ class SendEmailToContact
         // Enable the queue if applicable to the transport
         $this->mailer->enableQueue();
 
-        if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
+        if ($this->mailer->setEmail($email, true, $assetAttachments)) {
             $this->mailer->setEmailType($emailType);
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
@@ -208,7 +189,6 @@ class SendEmailToContact
         $this->emailEntityErrors = null;
         $this->emailEntityId     = null;
         $this->emailSentCounts   = [];
-        $this->singleEmailMode   = null;
         $this->listId            = null;
         $this->statBatchCounter  = 0;
         $this->contact           = [];

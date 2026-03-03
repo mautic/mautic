@@ -16,7 +16,7 @@ class IpAddressModel
 
     public function __construct(
         protected EntityManager $entityManager,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 

@@ -19,13 +19,12 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
     /**
-     * @dataProvider provider
-     *
      * @param mixed $value
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
     public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
-        $context = new class() extends ExecutionContext {
+        $context = new class extends ExecutionContext {
             /**
              * @var callable
              */
@@ -49,7 +48,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
         $context->violationResult = $violationResult;
 
-        $translator = new class() extends Translator {
+        $translator = new class extends Translator {
             public function __construct()
             {
             }
@@ -57,25 +56,25 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return $id;
             }
         };
 
-        $dispatcher = new class() extends EventDispatcher {
+        $dispatcher = new class extends EventDispatcher {
             public function __construct()
             {
                 parent::__construct();
             }
 
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return $event;
             }
         };
 
-        $fieldModel = new class() extends FieldModel {
+        $fieldModel = new class extends FieldModel {
             /**
              * @var callable
              */

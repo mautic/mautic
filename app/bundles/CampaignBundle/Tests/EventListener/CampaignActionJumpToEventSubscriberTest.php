@@ -27,13 +27,13 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
     {
         $event    = new Event();
         $campaign = new Campaign();
-        $leadLog  = new class() extends LeadEventLog {
+        $leadLog  = new class extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
             }
         };
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 789;
@@ -43,11 +43,14 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $eventRepository = new class($campaign) extends EventRepository {
             public function __construct(
-                private Campaign $campaign
+                private Campaign $campaign,
             ) {
             }
 
-            public function getEntities(array $args = [])
+            /**
+             * @return Event[]
+             */
+            public function getEntities(array $args = []): array
             {
                 Assert::assertSame(
                     [
@@ -74,12 +77,12 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
 
-        $eventExecutioner = new class() extends EventExecutioner {
+        $eventExecutioner = new class extends EventExecutioner {
             public function __construct()
             {
             }
         };
-        $translator = new class() extends Translator {
+        $translator = new class extends Translator {
             public function __construct()
             {
             }
@@ -87,20 +90,20 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 Assert::assertSame('mautic.campaign.campaign.jump_to_event.target_not_exist', $id);
 
                 return $id;
             }
         };
-        $leadRepository = new class() extends LeadRepository {
+        $leadRepository = new class extends LeadRepository {
             public function __construct()
             {
             }
         };
 
-        $eventScheduler = new class() extends EventScheduler {
+        $eventScheduler = new class extends EventScheduler {
             public function __construct()
             {
             }
@@ -136,19 +139,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
     public function testOnJumpToEventWhenEventExists(): void
     {
         $event    = new Event();
-        $campaign = new class() extends Campaign {
+        $campaign = new class extends Campaign {
             public function getId(): int
             {
                 return 111;
             }
         };
-        $leadLog = new class() extends LeadEventLog {
+        $leadLog = new class extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
             }
         };
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 789;
@@ -158,11 +161,14 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $eventRepository = new class($campaign) extends EventRepository {
             public function __construct(
-                private Campaign $campaign
+                private Campaign $campaign,
             ) {
             }
 
-            public function getEntities(array $args = [])
+            /**
+             * @return Event[]
+             */
+            public function getEntities(array $args = []): array
             {
                 Assert::assertSame(
                     [
@@ -186,7 +192,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 );
 
                 return [
-                    new class() extends Event {
+                    new class extends Event {
                         public function getId()
                         {
                             return 222;
@@ -196,7 +202,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
 
-        $eventExecutioner = new class() extends EventExecutioner {
+        $eventExecutioner = new class extends EventExecutioner {
             public function __construct()
             {
             }
@@ -208,12 +214,12 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 Assert::assertSame(789, $contacts->first()->getId());
             }
         };
-        $translator = new class() extends Translator {
+        $translator = new class extends Translator {
             public function __construct()
             {
             }
         };
-        $leadRepository = new class() extends LeadRepository {
+        $leadRepository = new class extends LeadRepository {
             public function __construct()
             {
             }
@@ -225,7 +231,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
 
-        $eventScheduler = new class() extends EventScheduler {
+        $eventScheduler = new class extends EventScheduler {
             public function __construct()
             {
             }
@@ -233,7 +239,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @return \DateTime
              */
-            public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
+            public function getExecutionDateTime(Event $event, ?\DateTimeInterface $compareFromDateTime = null, ?\DateTime $comparedToDateTime = null): \DateTimeInterface
             {
                 return new \DateTime();
             }

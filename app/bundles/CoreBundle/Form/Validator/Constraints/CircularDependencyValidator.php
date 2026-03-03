@@ -16,7 +16,7 @@ class CircularDependencyValidator extends ConstraintValidator
 {
     public function __construct(
         private ListModel $model,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -43,7 +43,7 @@ class CircularDependencyValidator extends ConstraintValidator
     private function getSegmentIdFromRequest(): int
     {
         $request     = $this->requestStack->getCurrentRequest();
-        $routeParams = $request->get('_route_params');
+        $routeParams = $request->request->all()['_route_params'] ?? [];
 
         if (empty($routeParams['objectId'])) {
             throw new \UnexpectedValueException('Segment ID is missing in the request');
@@ -55,7 +55,7 @@ class CircularDependencyValidator extends ConstraintValidator
     private function reduceToSegmentIds(array $filters): array
     {
         $segmentFilters = array_filter($filters, fn (array $filter): bool => 'leadlist' === $filter['type']
-            && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]));
+            && in_array($filter['operator'], [OperatorOptions::INCLUDING_ANY, OperatorOptions::EXCLUDING_ANY, OperatorOptions::EXCLUDING_ALL, OperatorOptions::INCLUDING_ALL]));
 
         $segentIdsInFilter = array_map(function (array $filter) {
             $bcValue = $filter['filter'] ?? [];

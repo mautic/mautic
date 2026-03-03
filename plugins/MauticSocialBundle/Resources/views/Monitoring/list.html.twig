@@ -12,13 +12,20 @@
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': securityIsGranted('mauticSocial:monitoring:create'),
                 },
                 'routeBase': 'social',
                 'langVar': 'monitoring',
-            }),
+            },
+            'bulk_actions': {
+                'langVar': 'mautic.social.monitoring',
+                'routeBase': 'social',
+                'templateButtons': {
+                    'delete': securityIsGranted('mauticSocial:monitoring:delete'),
+                },
+            },
             'quickFilters': [
                 {
                     'search': 'mautic.core.searchcommand.ispublished',

@@ -69,6 +69,10 @@ class MobileNotificationController extends FormController
                     'col'  => 'mobile',
                     'val'  => 1,
                 ],
+                [
+                    'expr' => 'isNull',
+                    'col'  => 'translationParent',
+                ],
             ],
         ];
 
@@ -192,7 +196,7 @@ class MobileNotificationController extends FormController
         $logs = $auditLogModel->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
@@ -205,6 +209,8 @@ class MobileNotificationController extends FormController
 
         // Get click through stats
         $trackableLinks = $model->getNotificationClickStats($notification->getId());
+
+        [$translationParent, $translationChildren] = $notification->getTranslations();
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $notification->getId()]),
@@ -234,6 +240,10 @@ class MobileNotificationController extends FormController
                     ]
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'translations'  => [
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren,
+                ],
             ],
             'contentTemplate' => '@MauticNotification/MobileNotification/details.html.twig',
             'passthroughVars' => [
@@ -270,7 +280,7 @@ class MobileNotificationController extends FormController
         // set the page we came from
         $page         = $session->get('mautic.mobile_notification.page', 1);
         $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'new']);
-        $notification = $request->request->get('notification') ?? [];
+        $notification = $request->request->all()['notification'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -439,7 +449,7 @@ class MobileNotificationController extends FormController
 
         // Create the form
         $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $notification = $request->request->get('notification') ?? [];
+        $notification = $request->request->all()['notification'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -645,10 +655,8 @@ class MobileNotificationController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.mobile_notification.page', 1);
         $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
@@ -744,7 +752,7 @@ class MobileNotificationController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

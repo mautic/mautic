@@ -3,7 +3,8 @@
 namespace Mautic\ApiBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use FOS\OAuthServerBundle\Event\PreAuthorizationEvent;
+use FOS\OAuthServerBundle\Event\OAuthEvent;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -13,14 +14,14 @@ class PreAuthorizationEventListener
     public function __construct(
         private EntityManager $em,
         private CorePermissions $mauticSecurity,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
     /**
      * @throws AccessDeniedException
      */
-    public function onPreAuthorizationProcess(PreAuthorizationEvent $event): void
+    public function onPreAuthorizationProcess(OAuthEvent $event): void
     {
         if ($user = $this->getUser($event)) {
             // check to see if user has api access
@@ -28,17 +29,21 @@ class PreAuthorizationEventListener
                 throw new AccessDeniedException($this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'));
             }
             $client = $event->getClient();
-            $event->setAuthorizedClient(
-                $client->isAuthorizedClient($user, $this->em)
-            );
+
+            if ($client instanceof Client) {
+                $event->setAuthorizedClient(
+                    $client->isAuthorizedClient($user)
+                );
+            }
         }
     }
 
-    public function onPostAuthorizationProcess(PreAuthorizationEvent $event): void
+    public function onPostAuthorizationProcess(OAuthEvent $event): void
     {
-        if ($event->isAuthorizedClient()) {
-            if (null !== $client = $event->getClient()) {
-                $user = $this->getUser($event);
+        $client = $event->getClient();
+
+        if ($event->isAuthorizedClient() && $client instanceof Client) {
+            if ($user = $this->getUser($event)) {
                 $client->addUser($user);
                 $this->em->persist($client);
                 $this->em->flush();
@@ -49,7 +54,7 @@ class PreAuthorizationEventListener
     /**
      * @return mixed
      */
-    protected function getUser(PreAuthorizationEvent $event)
+    protected function getUser(OAuthEvent $event)
     {
         return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUserIdentifier());
     }

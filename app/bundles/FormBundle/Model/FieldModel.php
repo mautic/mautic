@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -17,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -38,7 +38,8 @@ class FieldModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private ColumnSchemaHelper $columnSchemaHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -62,29 +63,6 @@ class FieldModel extends CommonFormModel
         }
 
         return $formFactory->create(FieldType::class, $entity, $options);
-    }
-
-    /**
-     * @deprecated to be removed in Mautic 4. This method is not used anymore.
-     *
-     * @return array{mixed[], mixed[]}
-     */
-    public function getObjectFields($object = 'lead'): array
-    {
-        $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
-        $choices = [];
-
-        foreach ($fields as $alias => $field) {
-            if (empty($field['isPublished'])) {
-                continue;
-            }
-            if (!isset($choices[$field['group_label']])) {
-                $choices[$field['group_label']] = [];
-            }
-            $choices[$field['group_label']][$field['label']] = $alias;
-        }
-
-        return [$fields, $choices];
     }
 
     /**
@@ -153,7 +131,7 @@ class FieldModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -187,5 +165,19 @@ class FieldModel extends CommonFormModel
         }
 
         return null;
+    }
+
+    /**
+     * Updates the table structure for form results.
+     */
+    public function removeFieldColumn(Field $field): void
+    {
+        $form = $field->getForm();
+
+        $name = 'form_results_'.$form->getId().'_'.$form->getAlias();
+
+        $schemaHelper = $this->columnSchemaHelper->setName($name);
+        $schemaHelper->dropColumn($field->getAlias());
+        $schemaHelper->executeChanges();
     }
 }

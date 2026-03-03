@@ -2,20 +2,41 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\EventPreview;
+use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
+use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
+use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
+use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventSubscriber implements EventSubscriberInterface
 {
-    private float $disableCampaignThreshold = 0.1;
+    public const LOOPS_TO_FAIL = 100;
 
-    public function __construct(private EventRepository $eventRepository, private NotificationHelper $notificationHelper, private CampaignRepository $campaignRepository)
-    {
+    private const MINIMUM_CONTACTS_FOR_DISABLE = 100;
+    private const DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
+
+    public function __construct(
+        private EventRepository $eventRepository,
+        private CampaignModel $campaignModel,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private EventDispatcherInterface $eventDispatcher,
+        private DateHelper $dateHelper,
+    ) {
     }
 
     /**
@@ -23,11 +44,13 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      *
      * @return array<string,mixed>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_PRE_SAVE => ['onCampaignPreSave', 0],
-            CampaignEvents::ON_EVENT_FAILED   => ['onEventFailed', 0],
+            CampaignEvents::CAMPAIGN_PRE_SAVE        => ['onCampaignPreSave', 0],
+            CampaignEvents::ON_EVENT_FAILED          => ['onEventFailed', 0],
+            CampaignEvents::ON_EVENT_EXECUTED        => ['onEventExecuted', 0],
+            EventPreview::class                      => ['onEventPreviewRequest', 0],
         ];
     }
 
@@ -41,7 +64,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         $changes  = $campaign->getChanges();
 
         if (array_key_exists('isPublished', $changes)) {
-            list($actual, $inMemory) = $changes['isPublished'];
+            [$actual, $inMemory] = $changes['isPublished'];
 
             // If we're publishing the campaign
             if (false === $actual && true === $inMemory) {
@@ -53,22 +76,111 @@ class CampaignEventSubscriber implements EventSubscriberInterface
     /**
      * Process the FailedEvent event. Notifies users and checks
      * failed thresholds to notify CS and/or disable the campaign.
+     *
+     * @throws Exception
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
      */
     public function onEventFailed(FailedEvent $event): void
     {
-        $log           = $event->getLog();
-        $failedEvent   = $log->getEvent();
-        $campaign      = $failedEvent->getCampaign();
+        $log                  = $event->getLog();
+        $failedEvent          = $log->getEvent();
+        $campaign             = $failedEvent->getCampaign();
+        $lead                 = $log->getLead();
+        $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($lead->getId(), $failedEvent->getId());
+
+        // Do not increase if under LOOPS_TO_FAIL || Do not increase twice
+        if (($countFailedLeadEvent < self::LOOPS_TO_FAIL) || ($countFailedLeadEvent > self::LOOPS_TO_FAIL
+                && $this->leadEventLogRepository->isLastFailed($lead->getId(), $failedEvent->getId())
+        )) {
+            return;
+        }
+        // Increase if LOOPS_TO_FAIL or last success
         $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent);
         $contactCount  = $campaign->getLeads()->count();
         $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
 
-        $this->notificationHelper->notifyOfFailure($log->getLead(), $failedEvent);
+        if ($this->eventDispatcher->hasListeners(CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY)) {
+            $this->eventDispatcher->dispatch(
+                new NotifyOfFailureEvent($lead, $failedEvent),
+                CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY
+            );
+        }
 
-        if ($failedPercent >= $this->disableCampaignThreshold && $campaign->isPublished()) {
-            $this->notificationHelper->notifyOfUnpublish($failedEvent);
-            $campaign->setIsPublished(false);
-            $this->campaignRepository->saveEntity($campaign);
+        if ($contactCount >= self::MINIMUM_CONTACTS_FOR_DISABLE
+            && $failedPercent >= self::DISABLE_CAMPAIGN_THRESHOLD
+            // Trigger only if published, if unpublished, do not trigger further notifications
+            && $campaign->isPublished()) {
+            try {
+                $this->campaignModel->transactionalCampaignUnPublish($campaign);
+            } catch (CampaignAlreadyUnpublishedException|CampaignVersionMismatchedException) {
+                return;
+            }
+
+            if ($this->eventDispatcher->hasListeners(CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY)) {
+                $this->eventDispatcher->dispatch(
+                    new NotifyOfUnpublishEvent($failedEvent),
+                    CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY
+                );
+            }
+        }
+    }
+
+    /**
+     * Check the fail log if the lead is recorded there. If yes it decrease the failed count. It prevents counting
+     * the same failure twice.
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function onEventExecuted(ExecutedEvent $event): void
+    {
+        $log                  = $event->getLog();
+        $executedEvent        = $log->getEvent();
+        $lead                 = $log->getLead();
+        $leadId               = ($lead->getId() > 0) ? $lead->getId() : $lead->deletedId;
+
+        $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($leadId, $executedEvent->getId());
+        // Decrease if success event and last failed
+        if (!$this->leadEventLogRepository->isLastFailed($leadId, $executedEvent->getId())
+            || $countFailedLeadEvent < self::LOOPS_TO_FAIL
+        ) {
+            // Do not decrease if under LOOPS_TO_FAIL or last success
+            return;
+        }
+        // Decrease if last failed and over the LOOPS_TO_FAIL
+        $this->eventRepository->decreaseFailedCount($executedEvent);
+    }
+
+    public function onEventPreviewRequest(EventPreview $eventPreview): void
+    {
+        $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());
+
+        if ($logStats->firstExecutionDate && $logStats->lastExecutionDate) {
+            $firstExecutionDate = new DateTimeHelper($logStats->firstExecutionDate);
+            $lastExecutionDate  = new DateTimeHelper($logStats->lastExecutionDate);
+
+            $eventPreview->addEventStat(
+                key: 'first_execution_date',
+                value: $this->dateHelper->toText($firstExecutionDate->toLocalString()),
+                tooltip: $firstExecutionDate->toLocalString()
+            );
+            $eventPreview->addEventStat(
+                key: 'last_execution_date',
+                value: $this->dateHelper->toText($lastExecutionDate->toLocalString()),
+                tooltip: $lastExecutionDate->toLocalString()
+            );
+        }
+        $eventPreview->addEventStat('total_executions', $logStats->totalExecutions);
+        if ($eventPreview->isCampaignRestartAllowed()) {
+            $eventPreview->addEventStat('unique_executions', $logStats->uniqueExecutions);
+            $eventPreview->addEventStat('max_rotations', $logStats->maxRotations);
+        }
+        $eventPreview->addEventStat('pending_executions', $logStats->pendingExecutions);
+
+        if (in_array($eventPreview->event->getEventType(), ['condition', 'decision'])) {
+            $eventPreview->addEventStat('negative_path_count', $logStats->negativePathCount);
+            $eventPreview->addEventStat('positive_path_count', $logStats->positivePathCount);
         }
     }
 }

@@ -2,40 +2,36 @@
 
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PluginFactory implements SecurityFactoryInterface
+class PluginFactory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
+    public const PRIORITY = -30;
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $providerId = 'security.authentication.provider.mautic.'.$id;
-        $container->setDefinition($providerId, new ChildDefinition('mautic.user.preauth_authenticator'))
-            ->replaceArgument(3, new Reference($userProvider))
-            ->replaceArgument(4, $id);
+        $authenticatorId = 'security.authentication.provider.mautic.'.$firewallName;
 
-        $listenerId = 'security.authentication.listener.mautic.'.$id;
-        $container->setDefinition($listenerId, new ChildDefinition('mautic.security.authentication_listener'))
-            ->replaceArgument(5, $id);
+        $authenticator = $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.mautic_api'))
+            ->replaceArgument('$firewallName', $firewallName)
+            ->replaceArgument('$userProvider', new Reference($userProviderId));
 
-        return [$providerId, $listenerId, $defaultEntryPoint];
+        $container->setDefinition($authenticatorId, $authenticator);
+
+        return $authenticatorId;
     }
 
-    /**
-     * @return string
-     */
-    public function getPosition()
+    public function getPriority(): int
     {
-        return 'pre_auth';
+        return self::PRIORITY;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return 'mautic_plugin_auth';
     }

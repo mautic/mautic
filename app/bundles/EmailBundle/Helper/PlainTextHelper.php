@@ -133,7 +133,7 @@ class PlainTextHelper
         '/<(b)( [^>]*)?>(.*?)<\/b>/i',                           // <b>
         '/<(strong)( [^>]*)?>(.*?)<\/strong>/i',                 // <strong>
         '/<(th)( [^>]*)?>(.*?)<\/th>/i',                         // <th> and </th>
-        '/<(a) [^>]*href=("|\')([^"\']+)\2([^>]*)>(.*?)<\/a>/i',  // <a href="">
+        '/<(a) [^>]*href=("|\')([^"\']+)\2([^>]*)>(.*?)<\/a>/is',  // <a href="">
     ];
 
     /**
@@ -223,13 +223,13 @@ class PlainTextHelper
     /**
      * Set the source HTML.
      *
-     * @param string $html HTML source content
+     * @param string|null $html HTML source content
      *
      * @return PlainTextHelper
      */
     public function setHtml($html)
     {
-        $this->html      = $html;
+        $this->html      = $html ?? '';
         $this->converted = false;
 
         return $this;

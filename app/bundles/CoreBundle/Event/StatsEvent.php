@@ -83,7 +83,7 @@ class StatsEvent extends Event
         $limit,
         protected array $order,
         array $where,
-        protected User $user
+        protected User $user,
     ) {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;
@@ -96,7 +96,7 @@ class StatsEvent extends Event
      *
      * @param CommonRepository<object>|null $repository
      */
-    public function isLookingForTable($table, CommonRepository $repository = null): bool
+    public function isLookingForTable($table, ?CommonRepository $repository = null): bool
     {
         $this->tables[] = $table = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
         if ($repository) {
@@ -141,7 +141,7 @@ class StatsEvent extends Event
     /**
      * @return $this
      */
-    public function setSelect(array $select = null)
+    public function setSelect(?array $select = null)
     {
         $this->select = $select;
 

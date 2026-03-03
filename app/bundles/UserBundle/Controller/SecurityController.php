@@ -1,14 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -18,6 +31,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SecurityController extends CommonController implements EventSubscriberInterface
 {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        ?RequestStack $requestStack,
+        ?CorePermissions $security,
+        private AuthorizationCheckerInterface $authorizationChecker,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     public function onRequest(RequestEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');
@@ -27,12 +55,9 @@ class SecurityController extends CommonController implements EventSubscriberInte
             return;
         }
 
-        $authChecker = $this->get('security.authorization_checker');
-        \assert($authChecker instanceof AuthorizationCheckerInterface);
-
         // redirect user if they are already authenticated
-        if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY')
-            || $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
+        if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')
+            || $this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
             $event->setResponse(new RedirectResponse($redirectUrl));
@@ -41,10 +66,8 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
     /**
      * Generates login form and processes login.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
 
@@ -57,11 +80,14 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
+            } elseif ($error instanceof Exception\AuthenticationException) {
+                $msg = $error->getMessageKey();
             } else {
                 $msg = $error->getMessage();
             }
 
-            $this->addFlashMessage($msg, [], FlashBag::LEVEL_ERROR, null, false);
+            $messageVars = $error instanceof Exception\AuthenticationException ? $error->getMessageData() : [];
+            $this->addFlashMessage($msg, $messageVars, FlashBag::LEVEL_ERROR, null);
         }
         $request->query->set('tmpl', 'login');
 
@@ -105,6 +131,29 @@ class SecurityController extends CommonController implements EventSubscriberInte
         // The plugin should be handling this in it's listener
 
         return new RedirectResponse($this->generateUrl('login'));
+    }
+
+    public function samlLoginRetryAction(Request $request, SAMLHelper $samlHelper, SessionInterface $session): Response
+    {
+        if (!$samlHelper->isSamlEnabled()) {
+            return new RedirectResponse($this->generateUrl('login'));
+        }
+
+        $session->invalidate();
+
+        $this->addFlashMessage('mautic.user.security.saml.clearsession', [], FlashBag::LEVEL_ERROR);
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'loginRoute' => $this->generateUrl('lightsaml_sp.discovery'),
+            ],
+            'contentTemplate' => '@MauticUser/Security/saml_login_retry.html.twig',
+            'passthroughVars' => [
+                'route'          => $this->generateUrl('mautic_base_index'),
+                'mauticContent'  => 'user',
+                'sessionExpired' => true,
+            ],
+        ]);
     }
 
     /**

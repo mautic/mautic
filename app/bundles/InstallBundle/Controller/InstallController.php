@@ -5,8 +5,8 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -17,9 +17,8 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +29,6 @@ class InstallController extends CommonController
         private Configurator $configurator,
         private InstallService $installer,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -38,9 +36,9 @@ class InstallController extends CommonController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
-        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -48,11 +46,9 @@ class InstallController extends CommonController
      *
      * @param int $index The step number to process
      *
-     * @return JsonResponse|Response
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
+    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
@@ -78,8 +74,8 @@ class InstallController extends CommonController
             return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface $step */
         $step   = $this->configurator->getStep($index)[0];
+        \assert($step instanceof StepInterface);
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);
@@ -92,7 +88,7 @@ class InstallController extends CommonController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 // Post-step processing
-                $formData = $form->getData();
+                $formData = (array) $form->getData();
 
                 switch ($index) {
                     case InstallService::CHECK_STEP:
@@ -101,11 +97,10 @@ class InstallController extends CommonController
                         break;
                     case InstallService::DOCTRINE_STEP:
                         // password field does not retain configured defaults
-                        if (empty($formData->password) && !empty($params['db_password'])) {
-                            $formData->password = $params['db_password'];
+                        if (empty($formData['password']) && !empty($params['db_password'])) {
+                            $formData['password'] = $params['db_password'];
                         }
-                        $dbParams = (array) $formData;
-                        $messages = $this->installer->createDatabaseStep($step, $dbParams);
+                        $messages = $this->installer->createDatabaseStep($step, $formData);
                         if (!empty($messages)) {
                             $this->handleInstallerErrors($form, $messages);
                             break;
@@ -122,8 +117,7 @@ class InstallController extends CommonController
                         // Refresh to install schema with new connection information in the container
                         return $this->redirectToRoute('mautic_installer_step', ['index' => 1.1]);
                     case InstallService::USER_STEP:
-                        $adminParam = (array) $formData;
-                        $messages   = $this->installer->createAdminUserStep($adminParam);
+                        $messages = $this->installer->createAdminUserStep($formData);
 
                         if (!empty($messages)) {
                             $this->handleInstallerErrors($form, $messages);
@@ -131,7 +125,7 @@ class InstallController extends CommonController
                         }
 
                         // Store the data to repopulate the form
-                        unset($formData->password);
+                        unset($formData['password']);
                         $session->set('mautic.installer.user', $formData);
 
                         $complete = true;
@@ -234,8 +228,6 @@ class InstallController extends CommonController
     /**
      * Controller action for the final step.
      *
-     * @return JsonResponse|Response
-     *
      * @throws \Exception
      */
     public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -287,7 +279,7 @@ class InstallController extends CommonController
     /**
      * Handle installer errors.
      */
-    private function handleInstallerErrors(Form $form, array $messages): void
+    private function handleInstallerErrors(FormInterface $form, array $messages): void
     {
         foreach ($messages as $type => $message) {
             match ($type) {

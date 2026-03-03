@@ -36,7 +36,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     protected $prefix;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $eventDate;
 
@@ -161,7 +161,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $segmentMember;
     }
 
-    protected function createEvent(string $name, Campaign $campaign, string $type, string $eventType, array $property = null): Event
+    protected function createEvent(string $name, Campaign $campaign, string $type, string $eventType, ?array $property = null): Event
     {
         $event = new Event();
         $event->setName($name);

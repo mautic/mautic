@@ -35,7 +35,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected PointModel $pointModel
+        protected PointModel $pointModel,
     ) {
     }
 

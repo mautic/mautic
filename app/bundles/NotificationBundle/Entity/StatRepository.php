@@ -130,68 +130,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get a contact's notifications stat.
-     *
-     * @param int $leadId
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getLeadStats($leadId, array $options = [])
-    {
-        $query = $this->createQueryBuilder('s');
-
-        $query->select('IDENTITY(s.notification) AS notification_id, s.id, s.dateRead, s.dateSent, e.title, s.isRead, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.clickDetails')
-            ->leftJoin(Notification::class, 'e', 'WITH', 'e.id = s.notification')
-            ->leftJoin(\Mautic\LeadBundle\Entity\LeadList::class, 'l', 'WITH', 'l.id = s.list')
-            ->where(
-                $query->expr()->andX(
-                    $query->expr()->eq('IDENTITY(s.lead)', $leadId),
-                    $query->expr()->eq('s.isFailed', ':false'))
-            )->setParameter('false', false, 'boolean');
-
-        if (isset($options['search']) && $options['search']) {
-            $query->andWhere(
-                $query->expr()->like('e.title', $query->expr()->literal('%'.$options['search'].'%'))
-            );
-        }
-
-        if (isset($options['order'])) {
-            [$orderBy, $orderByDir] = $options['order'];
-
-            $orderBy = match ($orderBy) {
-                'eventLabel' => 'e.title',
-                default      => 'e.dateRead, e.dateSent',
-            };
-
-            $query->orderBy($orderBy, $orderByDir);
-        }
-
-        if (!empty($options['limit'])) {
-            $query->setMaxResults($options['limit']);
-
-            if (!empty($options['start'])) {
-                $query->setFirstResult($options['start']);
-            }
-        }
-
-        $stats = $query->getQuery()->getArrayResult();
-
-        foreach ($stats as &$stat) {
-            $dateSent = new DateTimeHelper($stat['dateSent']);
-            if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
-                $stat['timeToRead'] = $dateSent->getDiff($stat['dateRead']);
-            } else {
-                $stat['timeToRead'] = false;
-            }
-        }
-
-        return $stats;
-    }
-
-    /**
      * Get pie graph data for Sent, Read and Failed notifications count.
      *
      * @param QueryBuilder $query
@@ -213,7 +151,7 @@ class StatRepository extends CommonRepository
      *
      * @param array $notificationIds
      */
-    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($notificationIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')

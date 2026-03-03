@@ -20,7 +20,7 @@ class Interval implements ScheduleModeInterface
 
     public function __construct(
         private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -102,7 +102,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null): array
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, ?\DateTimeInterface $compareFromDateTime = null): array
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
@@ -121,11 +121,12 @@ class Interval implements ScheduleModeInterface
                 $endTime,
                 $daysOfWeek
             );
-            if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
-                $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
+            $key = $groupExecutionDate->format(DateTimeHelper::FORMAT_DB);
+            if (!isset($groupedExecutionDates[$key])) {
+                $groupedExecutionDates[$key] = new GroupExecutionDateDAO($groupExecutionDate);
             }
 
-            $groupedExecutionDates[$groupExecutionDate->getTimestamp()]->addContact($contact);
+            $groupedExecutionDates[$key]->addContact($contact);
         }
 
         return $groupedExecutionDates;
@@ -186,10 +187,10 @@ class Interval implements ScheduleModeInterface
         $eventId,
         Lead $contact,
         \DateTimeInterface $compareFromDateTime,
-        \DateTimeInterface $hour = null,
-        \DateTimeInterface $startTime = null,
-        \DateTimeInterface $endTime = null,
-        array $daysOfWeek = []
+        ?\DateTimeInterface $hour = null,
+        ?\DateTimeInterface $startTime = null,
+        ?\DateTimeInterface $endTime = null,
+        array $daysOfWeek = [],
     ) {
         $this->logger->debug(
             sprintf('CAMPAIGN: Comparing calculated executed time for event ID %s and contact ID %s with %s', $eventId, $contact->getId(), $compareFromDateTime->format('Y-m-d H:i:s e'))
@@ -220,7 +221,7 @@ class Interval implements ScheduleModeInterface
             $groupDateTime = clone $compareFromDateTime;
         }
 
-        if ($daysOfWeek) {
+        if ([] !== $daysOfWeek) {
             $this->logger->debug(
                 sprintf(
                     'CAMPAIGN: Scheduling event ID %s for contact ID %s based on DOW restrictions of %s',
@@ -229,6 +230,10 @@ class Interval implements ScheduleModeInterface
                     implode(',', $daysOfWeek)
                 )
             );
+
+            if (in_array(7, $daysOfWeek, true) || in_array('7', $daysOfWeek, true)) {
+                throw new \LogicException('The Mautic accepts only 0-6 as day of week (0 is Sunday).');
+            }
 
             // Schedule for the next day of the week if applicable
             while (!in_array((int) $groupDateTime->format('w'), $daysOfWeek)) {
@@ -256,11 +261,11 @@ class Interval implements ScheduleModeInterface
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
 
         if ($groupExecutionDate <= $testGroupHour) {
+            // Schedule for the configured hour today if it's not passed yet.
             return $testGroupHour;
-        } else {
-            $groupExecutionDate->modify('+1 day')->setTime($groupHour->format('H'), $groupHour->format('i'));
         }
 
+        // Execute rigt away if the hour has passed.
         return $groupExecutionDate;
     }
 
@@ -272,7 +277,7 @@ class Interval implements ScheduleModeInterface
         \DateTimeInterface $startTime,
         \DateTimeInterface $endTime,
         $eventId,
-        \DateTimeInterface $compareFromDateTime
+        \DateTimeInterface $compareFromDateTime,
     ) {
         /* @var \DateTime $startTime */
         $startTime = clone $startTime;
@@ -320,7 +325,7 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->defaultTimezone = new \DateTimeZone(
-            $this->coreParametersHelper->get('default_timezone', 'UTC')
+            $this->coreParametersHelper->getDefaultTimezone()
         );
 
         return $this->defaultTimezone;

@@ -1,0 +1,7 @@
+<div id="emailGraphStats" class="d-flex fd-column h-384">
+    {{- include('@MauticCore/Helper/chart.html.twig', {
+        'chartData': stats,
+        'chartType': 'line',
+        'chartHeight': 300
+    }) -}}
+</div>

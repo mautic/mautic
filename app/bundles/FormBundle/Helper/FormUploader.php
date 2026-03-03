@@ -14,7 +14,7 @@ class FormUploader
 {
     public function __construct(
         private FileUploader $fileUploader,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -13,20 +13,18 @@ class RouteLoader extends Loader
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParameters
+        private CoreParametersHelper $coreParameters,
     ) {
     }
 
     /**
      * Load each bundles routing.php file.
      *
-     * @param mixed $resource
-     *
      * @return RouteCollection
      *
      * @throws \RuntimeException
      */
-    public function load($resource, $type = null)
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         // Public
         $event = new RouteEvent($this, 'public');

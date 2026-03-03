@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints\Email;
 class ConfigMonitoredMailboxesType extends AbstractType
 {
     public function __construct(
-        private Mailbox $imapHelper
+        private Mailbox $imapHelper,
     ) {
     }
 
@@ -225,7 +225,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
         $view->vars['mailbox'] = $options['mailbox'];
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'monitored_mailboxes';
     }

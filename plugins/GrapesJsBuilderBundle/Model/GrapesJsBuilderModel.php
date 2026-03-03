@@ -34,7 +34,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -68,7 +68,8 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             $grapesJsBuilder->setEmail($email);
         }
 
-        if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
+        $currentRequest = $this->requestStack->getCurrentRequest();
+        if ($currentRequest && $currentRequest->request->has('grapesjsbuilder')) {
             $data = $this->requestStack->getCurrentRequest()->get('grapesjsbuilder', '');
 
             if (isset($data['customMjml'])) {

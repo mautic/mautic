@@ -3,11 +3,11 @@
         <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="btn btn-ghost btn-icon btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <a class="btn btn-ghost btn--icon-only btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
                     <i class="ri-more-2-fill"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li class="small fw-sb text-muted ma-md ellipsis">
+                    <li class="small fw-sb text-secondary ma-md ellipsis">
                         {% if widget.isCached %}
                             <i class="ri-history-line mr-xs"></i>
                             {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
@@ -42,7 +42,7 @@
         {% endif %}
     </div>
     <hr class="bdr-b">
-    <div class="card-body">
+    <div class="card-body d-flex fd-column fg-1">
         {% if widget.errorMessage %}
             <div class="alert alert-danger" role="alert">
                 {{ widget.errorMessage|trans }}
@@ -54,6 +54,6 @@
         {% endif %}
     </div>
     <div class="widget-overlay d-flex ai-center jc-center">
-        <i class="ri-drag-drop-fill ri-4x text-primary"></i>
+        <i class="ri-drag-drop-fill ri-4x text-interactive"></i>
     </div>
 </div>

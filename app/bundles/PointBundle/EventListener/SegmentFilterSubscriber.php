@@ -17,7 +17,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
     public function __construct(
         private GroupRepository $groupRepository,
         private TypeOperatorProviderInterface $typeOperatorProvider,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

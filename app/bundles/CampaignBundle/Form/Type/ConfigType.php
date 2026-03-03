@@ -19,18 +19,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConfigType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
+            'campaign_republish_behavior',
+            RepublishBehaviorType::class
+        );
+
+        $builder->add(
             'campaign_time_wait_on_event_false',
             ChoiceType::class,
             [
                 'label'      => 'mautic.campaignconfig.campaign_time_wait_on_event_false',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.campaignconfig.campaign_time_wait_on_event_false_help',
                 'data'       => $options['data']['campaign_time_wait_on_event_false'],
                 'choices'    => [
                     'mautic.core.never' => 'null',
@@ -77,6 +83,21 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.campaignconfig.use_summary.tooltip',
                 ],
                 'data'  => (bool) ($options['data']['campaign_use_summary'] ?? false),
+            ]
+        );
+
+        $builder->add(
+            'campaign_email_stats_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.campaignconfig.campaign_email_stats_enabled',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => $options['data']['campaign_email_stats_enabled'] ?? true,
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.campaignconfig.campaign_email_stats_enabled.tooltip',
+                ],
             ]
         );
 

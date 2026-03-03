@@ -38,26 +38,27 @@ final class EmailStatModelTest extends TestCase
                 }
             );
 
-        $dispatcher = new class() extends EventDispatcher {
+        $dispatcher = new class extends EventDispatcher {
             public int $dispatchMethodCounter = 0;
 
             public function __construct()
             {
+                parent::__construct();
             }
 
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 switch ($this->dispatchMethodCounter) {
                     case 0:
                         Assert::assertSame(EmailEvents::ON_EMAIL_STAT_PRE_SAVE, $eventName);
                         Assert::assertCount(1, $event->getStats());
-                        Assert::assertSame(0, $event->getStats()[0]->getId());
+                        Assert::assertNull($event->getStats()[0]->getId());
                         break;
 
                     case 1:
                         Assert::assertSame(EmailEvents::ON_EMAIL_STAT_POST_SAVE, $eventName);
                         Assert::assertCount(1, $event->getStats());
-                        Assert::assertSame(123, $event->getStats()[0]->getId());
+                        Assert::assertSame('123', $event->getStats()[0]->getId());
                         break;
                 }
                 ++$this->dispatchMethodCounter;
@@ -85,8 +86,8 @@ class StatTest extends Stat
         $this->id = $id;
     }
 
-    public function getId(): int
+    public function getId(): ?string
     {
-        return (int) $this->id;
+        return $this->id;
     }
 }

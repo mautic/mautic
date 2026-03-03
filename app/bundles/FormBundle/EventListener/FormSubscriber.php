@@ -32,7 +32,7 @@ class FormSubscriber implements EventSubscriberInterface
         MailHelper $mailer,
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -103,8 +103,8 @@ class FormSubscriber implements EventSubscriberInterface
             'formTypeCleanMasks' => [
                 'message' => 'raw',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'  => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [
@@ -118,8 +118,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
 
@@ -391,7 +390,7 @@ class FormSubscriber implements EventSubscriberInterface
      * @param array<mixed>               $tokens
      * @param array<string, string|null> $to
      */
-    private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
+    private function setMailer(array $config, array $tokens, array $to, ?Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
 

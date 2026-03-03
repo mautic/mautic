@@ -1,5 +1,5 @@
 <li class="dropdown dropdown-custom" id="notificationsDropdown">
-    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown">
+    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown" aria-label={{ 'mautic.core.notifications'|trans }}>
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
         <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="ri-asterisk"></i></span>
         <span class="ri-notification-3-line ri-xl"></span>
@@ -38,8 +38,8 @@
                     {% set class = notifications is not empty ? ' hide' : '' %}
                     <div class="{{ class }} mautibot-image pa-lg d-flex fd-column ai-center jc-center" id="notificationMautibot">
                         <div class="fs-30">🦄</div>
-                        <div class="text-muted fw-sb">{{'mautic.core.notifications.empty'|trans}}</div>
-                        <div class="text-muted">{{'mautic.core.notifications.empty_extra'|trans}}</div>
+                        <div class="text-secondary fw-sb">{{'mautic.core.notifications.empty'|trans}}</div>
+                        <div class="text-secondary">{{'mautic.core.notifications.empty_extra'|trans}}</div>
                     </div>
                 </div>
             </div>

@@ -46,7 +46,7 @@ class PeakInteractionTimer
         private StatRepository $statRepository,
         private HitRepository $hitRepository,
         private SubmissionRepository $submissionRepository,
-        private CacheProviderInterface $cacheProvider
+        private CacheProviderInterface $cacheProvider,
     ) {
         $this->cacheTimeout          = $this->coreParametersHelper->get('peak_interaction_timer_cache_timeout');
         $this->bestDefaultHourStart  = $this->coreParametersHelper->get('peak_interaction_timer_best_default_hour_start');
@@ -227,7 +227,7 @@ class PeakInteractionTimer
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getLeadStats(int $leadId, \DateTime $fromDate = null): array
+    private function getLeadStats(int $leadId, ?\DateTime $fromDate = null): array
     {
         return $this->statRepository->getLeadStats($leadId, [
             'order'        => ['timestamp', 'DESC'],
@@ -241,7 +241,7 @@ class PeakInteractionTimer
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getLeadHits(int $leadId, \DateTime $fromDate = null): array
+    private function getLeadHits(int $leadId, ?\DateTime $fromDate = null): array
     {
         return $this->hitRepository->getLeadHits($leadId, [
             'order'        => ['timestamp', 'DESC'],
@@ -253,7 +253,7 @@ class PeakInteractionTimer
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getFormSubmissions(int $leadId, \DateTime $fromDate = null): array
+    private function getFormSubmissions(int $leadId, ?\DateTime $fromDate = null): array
     {
         return $this->submissionRepository->getSubmissions([
             'leadId'       => $leadId,

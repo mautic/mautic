@@ -7,10 +7,10 @@
 <form method="post" action="{{ path('mautic_contact_auditlog_action', {'leadId': lead.id}) }}" class="panel" id="auditlog-filters">
     <div class="form-control-icon pa-md">
         <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events['filters']['search']|e }}">
-        <span class="the-icon ri-search-line text-muted"></span>
+        <span class="the-icon ri-search-line text-secondary"></span>
     </div>
     {% if events.types is defined and events.types is iterable %}
-        <div class="history-search panel-footer text-muted">
+        <div class="history-search panel-footer text-secondary">
             <div class="row">
                 <div class="col-sm-5 mna-3">
                     <label class="pt-lg">{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}</label>
@@ -40,7 +40,6 @@
                                 href: url('mautic_contact_auditlog_export_action', {'leadId': lead.id}),
                                 icon: 'ri-download-line',
                                 label: 'mautic.core.export',
-                                size: 'sm',
                                 attributes: {
                                     'data-toggle': 'download'
                                 },
@@ -121,7 +120,7 @@
                   <td class="table-expand np">
                       <a href="javascript:void(0);"
                          data-activate-details="{{ counter }}"
-                         class="table-expand-button {% if event.contentTemplate is not defined or hasDetails == false %}disabled{% endif %}"
+                         class="table-expand-button {% if event.contentTemplate is not defined or hasDetails == false %}hide{% endif %}"
                          data-toggle="tooltip"
                          title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
                          <span class="ri-arrow-down-s-line"></span>

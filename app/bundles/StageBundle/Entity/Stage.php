@@ -2,54 +2,95 @@
 
 namespace Mautic\StageBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Stage extends FormEntity
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('stage:stages:viewown')"),
+        new Post(security: "is_granted('stage:stages:create')"),
+        new Get(security: "is_granted('stage:stages:viewown')"),
+        new Put(security: "is_granted('stage:stages:editown')"),
+        new Patch(security: "is_granted('stage:stages:editother')"),
+        new Delete(security: "is_granted('stage:stages:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['stage:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['stage:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Stage extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+
     /**
      * @var int
      */
+    #[Groups(['stage:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $description;
 
     /**
      * @var int
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $weight = 0;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['stage:read', 'stage:write'])]
     private $publishDown;
 
     /**
-     * @var ArrayCollection<int,\Mautic\StageBundle\Entity\LeadStageLog>
+     * @var ArrayCollection<int,LeadStageLog>
      */
     private $log;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
+    #[Groups(['stage:read', 'stage:write'])]
     private $category;
 
     public function __clone()
@@ -59,12 +100,10 @@ class Stage extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->log = new ArrayCollection();
+        $this->initializeProjects();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -88,6 +127,9 @@ class Stage extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -119,6 +161,8 @@ class Stage extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'stage');
     }
 
     /**
@@ -161,8 +205,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -182,8 +224,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -242,8 +282,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishDown()

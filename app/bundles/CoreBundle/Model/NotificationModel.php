@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use DateTime;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
@@ -78,7 +77,7 @@ class NotificationModel extends FormModel
      * @param string|null    $type                    Optional $type to ID the source of the notification
      * @param bool|true      $isRead                  Add unread indicator
      * @param string|null    $header                  Header for message
-     * @param string|null    $iconClass               Font Awesome CSS class for the icon (e.g. ri-eye-line)
+     * @param string|null    $iconClass               CSS class for the icon (e.g. ri-eye-line)
      * @param \DateTime|null $datetime                Date the item was created
      * @param User|null      $user                    User object; defaults to current user
      * @param string|null    $deduplicateValue        When supplied, notification will not be added if another notification with tha same $deduplicateValue exists within last 24 hours
@@ -91,10 +90,10 @@ class NotificationModel extends FormModel
         $isRead = false,
         $header = null,
         $iconClass = null,
-        \DateTime $datetime = null,
-        User $user = null,
-        string $deduplicateValue = null,
-        \DateTime $deduplicateDateTimeFrom = null
+        ?\DateTime $datetime = null,
+        ?User $user = null,
+        ?string $deduplicateValue = null,
+        ?\DateTime $deduplicateDateTimeFrom = null,
     ): void {
         if (null === $user) {
             $user = $this->userHelper->getUser();
@@ -215,7 +214,7 @@ class NotificationModel extends FormModel
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
     }
 
-    private function isDuplicate(int $userId, string $deduplicate, \DateTime $from = null): bool
+    private function isDuplicate(int $userId, string $deduplicate, ?\DateTime $from = null): bool
     {
         return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
     }

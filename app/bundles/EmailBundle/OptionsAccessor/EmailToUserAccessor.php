@@ -10,7 +10,7 @@ class EmailToUserAccessor
     private ArrayStringTransformer $transformer;
 
     public function __construct(
-        private array $config
+        private array $config,
     ) {
         $this->transformer = new ArrayStringTransformer();
     }
@@ -33,7 +33,7 @@ class EmailToUserAccessor
      *
      * @param User|null $owner If Owner is passed in and config is setted for it, adds owner to returned array
      */
-    public function getUserIdsToSend(User $owner = null): array
+    public function getUserIdsToSend(?User $owner = null): array
     {
         $userIds = empty($this->config['user_id']) ? [] : $this->config['user_id'];
 

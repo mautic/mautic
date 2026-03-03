@@ -17,7 +17,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 final class ReferenceResolver implements ReferenceResolverInterface
 {
     public function __construct(
-        private Connection $connection
+        private Connection $connection,
     ) {
     }
 
@@ -34,7 +34,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
                     Contact::NAME,
                     $objectName
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;

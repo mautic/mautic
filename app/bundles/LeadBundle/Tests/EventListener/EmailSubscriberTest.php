@@ -13,9 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class EmailSubscriberTest extends TestCase
 {
-    /**
-     * @dataProvider onEmailAddressReplacementProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('onEmailAddressReplacementProvider')]
     public function testOnEmailAddressReplacement(string $value, string $expected): void
     {
         $contact = new Lead();
@@ -23,7 +21,7 @@ class EmailSubscriberTest extends TestCase
 
         $event           = new TokenReplacementEvent($value, $contact);
         $emailSubscriber = new EmailSubscriber(
-            new class() extends BuilderTokenHelperFactory {
+            new class extends BuilderTokenHelperFactory {
                 public function __construct()
                 {
                 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\DashboardBundle\Tests\Entity;
+namespace Mautic\DashboardBundle\Tests\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -34,7 +34,7 @@ class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
     {
         $this->widget
             ->method('getParams')
-            ->willReturn(['dateFrom' => [], 'dateTo' => []]);
+            ->willReturn(['dateFrom' => '', 'dateTo' => '']);
 
         $this->translator->expects($this->once())
             ->method('getLocale')

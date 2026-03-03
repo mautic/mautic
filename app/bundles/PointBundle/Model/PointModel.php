@@ -3,13 +3,13 @@
 namespace Mautic\PointBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -30,20 +30,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @extends CommonFormModel<Point>
  */
-class PointModel extends CommonFormModel
+class PointModel extends CommonFormModel implements GlobalSearchInterface, ResetInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
+    private array $actions = [];
+
     public function __construct(
         protected RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
-        /**
-         * @deprecated https://github.com/mautic/mautic/issues/8229
-         */
-        protected MauticFactory $mauticFactory,
         private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
@@ -53,7 +55,7 @@ class PointModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private PointGroupModel $pointGroupModel
+        private PointGroupModel $pointGroupModel,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -103,7 +105,7 @@ class PointModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -147,19 +149,17 @@ class PointModel extends CommonFormModel
      */
     public function getPointActions()
     {
-        static $actions;
-
-        if (empty($actions)) {
+        if ([] === $this->actions) {
             // build them
-            $actions = [];
-            $event   = new PointBuilderEvent($this->translator);
+            $this->actions = [];
+            $event         = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::POINT_ON_BUILD);
-            $actions['actions'] = $event->getActions();
-            $actions['list']    = $event->getActionList();
-            $actions['choices'] = $event->getActionChoices();
+            $this->actions['actions'] = $event->getActions();
+            $this->actions['list']    = $event->getActionList();
+            $this->actions['choices'] = $event->getActionChoices();
         }
 
-        return $actions;
+        return $this->actions;
     }
 
     /**
@@ -171,7 +171,7 @@ class PointModel extends CommonFormModel
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false): void
+    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
@@ -193,6 +193,9 @@ class PointModel extends CommonFormModel
         /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
+        if (empty($availablePoints)) {
+            return;
+        }
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         $hasLeadPointChanges = false;
@@ -232,15 +235,18 @@ class PointModel extends CommonFormModel
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->mauticFactory, // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 
             $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
 
             if (is_callable($callback)) {
+                $object = null;
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    if (is_object($callback[0])) {
+                        $object = $callback[0];
+                    }
                 } elseif (str_contains($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
@@ -256,7 +262,8 @@ class PointModel extends CommonFormModel
                         $pass[] = null;
                     }
                 }
-                $pointsChange = $reflection->invokeArgs($this, $pass);
+
+                $pointsChange = $reflection->invokeArgs($object, $pass);
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
@@ -355,5 +362,10 @@ class PointModel extends CommonFormModel
         }
 
         return array_unique($pointActionIds);
+    }
+
+    public function reset(): void
+    {
+        $this->actions = [];
     }
 }

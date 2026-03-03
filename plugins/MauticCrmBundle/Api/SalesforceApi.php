@@ -356,7 +356,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    private function requestQueryAllAndHandle(string $queryUrl, array $fields, string $object, array $query)
+    private function requestQueryAllAndHandle(string $queryUrl, array $fields, string $object, array $query): mixed
     {
         $config = $this->integration->mergeConfigToFeatureSettings([]);
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
@@ -670,7 +670,7 @@ class SalesforceApi extends CrmApi
             $leadsQuery = sprintf($baseQuery, join(', ', $fields));
             $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
         } catch (ApiErrorException $e) {
-            list($missingField, $entityType) = $this->parseMissingField($e->getMessage());
+            [$missingField, $entityType] = $this->parseMissingField($e->getMessage());
             if (!$missingField) {
                 throw $e;
             }

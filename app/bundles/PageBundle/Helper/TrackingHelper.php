@@ -59,7 +59,6 @@ class TrackingHelper
     {
         $cacheKey = $this->getCacheKey();
         if (null !== $cacheKey) {
-            /** @var CacheItemInterface $item */
             $item = $this->cache->getItem($cacheKey);
             $item->set(serialize(array_merge($values, $this->getCacheItem())));
             $item->expiresAfter(86400); // one day in seconds
@@ -130,35 +129,5 @@ class TrackingHelper
         }
 
         return true;
-    }
-
-    /**
-     * @deprecated No session for anonymous users. Use getCacheKey.
-     */
-    public function getSessionName(): ?string
-    {
-        return $this->getCacheKey();
-    }
-
-    /**
-     * @deprecated No session for anonymous users. Use updateCacheItem.
-     *
-     * @param mixed[] $values
-     *
-     * @return mixed[]
-     */
-    public function updateSession(array $values): array
-    {
-        $this->updateCacheItem($values);
-
-        return (array) $values;
-    }
-
-    /**
-     * @deprecated No session for anonymous users. Use getCacheItem.
-     */
-    public function getSession(bool $remove = false): array
-    {
-        return $this->getCacheItem($remove);
     }
 }

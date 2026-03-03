@@ -20,7 +20,7 @@ final class AvatarHelper
         private AssetsHelper $assetsHelper,
         private PathsHelper $pathsHelper,
         private GravatarHelper $gravatarHelper,
-        private DefaultAvatarHelper $defaultAvatarHelper
+        private DefaultAvatarHelper $defaultAvatarHelper,
     ) {
     }
 
@@ -97,16 +97,6 @@ final class AvatarHelper
         $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
 
         return $imageDir.'/lead_avatars';
-    }
-
-    /**
-     * @deprecated Use DefaultAvatarHelper::getDefaultAvatar instead of it
-     *
-     * @param bool|false $absolute
-     */
-    public function getDefaultAvatar(bool $absolute = false): string
-    {
-        return $this->defaultAvatarHelper->getDefaultAvatar($absolute);
     }
 
     public function getName(): string

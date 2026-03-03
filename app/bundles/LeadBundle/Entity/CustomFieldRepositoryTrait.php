@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
@@ -144,7 +146,7 @@ trait CustomFieldRepositoryTrait
                     $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                     $this->buildSelectClause($dq, $args);
 
-                    $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
+                    $q->orderBy('ORD', Order::Ascending->value);
                 }
 
                 // only pull the leads as filtered via DBAL
@@ -361,6 +363,16 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
+     * Retrieves the aliases of searchable fields that are indexed and published.
+     *
+     * @return array<int, string>
+     */
+    public function getSearchableFieldAliases(LeadFieldRepository $leadFieldRepository, string $object): array
+    {
+        return $leadFieldRepository->getSearchableFieldAliases($object);
+    }
+
+    /**
      * @param string $object
      *
      * @return array [$fields, $fixedFields]
@@ -369,17 +381,7 @@ trait CustomFieldRepositoryTrait
     {
         if (empty($this->customFieldList)) {
             // Get the list of custom fields
-            $connection = $this->getEntityManager()->getConnection();
-            $fq         = $connection->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-                ->where('f.is_published = :published')
-                ->andWhere($fq->expr()->eq('object', ':object'))
-                ->setParameter('published', true, 'boolean')
-                ->setParameter('object', $object)
-                ->addOrderBy('f.field_order', 'asc');
-            $result  = ResultCacheHelper::executeCachedDbalQuery($connection, $fq, new ResultCacheOptions(LeadField::CACHE_NAMESPACE));
-            $results = $result->fetchAllAssociative();
+            $results = $this->getFieldList($object);
 
             $fields      = [];
             $fixedFields = [];
@@ -404,6 +406,31 @@ trait CustomFieldRepositoryTrait
                 $fields[$field] = (int) $value;
             }
         }
+    }
+
+    /**
+     * @return array<array<int|string>|int|string>
+     *
+     * @throws Exception
+     */
+    private function getFieldList(?string $object = null): array
+    {
+        // Get the list of custom fields
+        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $fq->select(
+            'f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where('f.is_published = :published')
+            ->setParameter('published', true, 'boolean')
+            ->addOrderBy('f.field_order', 'asc');
+
+        if (null !== $object) {
+            $fq->andWhere($fq->expr()->eq('object', ':object'))
+                ->setParameter('object', $object);
+        }
+
+        return $fq->executeQuery()->fetchAllAssociative() ?: [];
     }
 
     /**

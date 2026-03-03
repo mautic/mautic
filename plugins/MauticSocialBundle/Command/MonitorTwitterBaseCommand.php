@@ -53,7 +53,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         protected Translator $translator,
         protected IntegrationHelper $integrationHelper,
         private TwitterCommandHelper $twitterCommandHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
 
@@ -143,7 +143,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         }
 
         // get the mid from the cli
-        $mid = $input->getOption('mid');
+        $mid = (int) $input->getOption('mid');
 
         if (!$mid) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.mid.empty'));

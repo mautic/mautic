@@ -19,7 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
@@ -31,7 +30,7 @@ trait RequestTrait
      *
      * @throws \Exception
      */
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         // ungroup fields if need it
         foreach ($fields as $key=>$field) {
@@ -50,10 +49,7 @@ trait RequestTrait
                 continue;
             }
 
-            $type = $child->getConfig()->getType();
-            if ($type instanceof ResolvedFormTypeInterface) {
-                $type = $type->getInnerType();
-            }
+            $type = $child->getConfig()->getType()->getInnerType();
             switch ($type::class) {
                 case YesNoButtonGroupType::class:
                 case BooleanType::class:
@@ -137,7 +133,7 @@ trait RequestTrait
 
                     switch ($type::class) {
                         case DateTimeType::class:
-                            $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
+                            $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
                             break;
                         case DateType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');

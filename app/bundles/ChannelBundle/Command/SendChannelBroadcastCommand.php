@@ -7,6 +7,7 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,20 +18,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to send a scheduled broadcast.
  */
+#[AsCommand(
+    name: 'mautic:broadcasts:send',
+    description: 'Process contacts pending to receive a channel broadcast.'
+)]
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
     public function __construct(
         private TranslatorInterface $translator,
         private EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
     {
-        $this->setName('mautic:broadcasts:send')
+        $this
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
@@ -93,6 +98,30 @@ EOT
         $maxThreads    = $input->getOption('max-threads');
         $key           = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
 
+        if (is_numeric($limit)) {
+            $limit = (int) $limit;
+        }
+
+        if (is_numeric($batch)) {
+            $batch = (int) $batch;
+        }
+
+        if (is_numeric($minContactId)) {
+            $minContactId = (int) $minContactId;
+        }
+
+        if (is_numeric($maxContactId)) {
+            $maxContactId = (int) $maxContactId;
+        }
+
+        if (is_numeric($threadId)) {
+            $threadId = (int) $threadId;
+        }
+
+        if (is_numeric($maxThreads)) {
+            $maxThreads = (int) $maxThreads;
+        }
+
         if ($threadId && $maxThreads) {
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');
@@ -154,6 +183,4 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }

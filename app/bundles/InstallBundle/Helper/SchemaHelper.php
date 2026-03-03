@@ -86,9 +86,6 @@ class SchemaHelper
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function createDatabase(): bool
     {
         try {
@@ -167,7 +164,7 @@ class SchemaHelper
         // Execute drop queries
         foreach ($sql as $q) {
             try {
-                $this->db->executeQuery($q);
+                $this->db->executeStatement($q);
             } catch (\Exception $exception) {
                 $this->db->close();
 
@@ -201,7 +198,7 @@ class SchemaHelper
             throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
         }
 
-        if (true !== version_compare($version, $minSupported, 'gt')) {
+        if (version_compare($version, $minSupported, '<')) {
             throw new DatabaseVersionTooOldException($version);
         }
     }

@@ -19,7 +19,7 @@ class TransportChain
      */
     public function __construct(
         private $primaryTransport,
-        private IntegrationHelper $integrationHelper
+        private IntegrationHelper $integrationHelper,
     ) {
         $this->transports        = [];
     }
@@ -74,7 +74,7 @@ class TransportChain
      *
      * @throws \Exception
      */
-    public function sendSms(Lead $lead, $content, Stat $stat = null)
+    public function sendSms(Lead $lead, $content, ?Stat $stat = null)
     {
         return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
     }

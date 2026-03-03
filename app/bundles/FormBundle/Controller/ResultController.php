@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,6 +17,8 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -43,7 +44,7 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -462,5 +463,95 @@ class ResultController extends CommonFormController
         }
 
         return $formId;
+    }
+
+    public function addToSegmentAction(Request $request, int $objectId, FormModel $formModel, SubmissionModel $model, ListModel $segmentModel): Response
+    {
+        $form      = $formModel->getEntity($objectId);
+        $session   = $request->getSession();
+        $formPage  = $session->get('mautic.form.page', 1);
+        $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
+
+        if (null === $form) {
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $formPage],
+                'contentTemplate' => 'Mautic\\FormBundle\\Controller\\FormController::indexAction',
+                'passthroughVars' => [
+                    'activeLink'    => 'mautic_form_index',
+                    'mauticContent' => 'form',
+                ],
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.form.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        } elseif (!$this->security->hasEntityAccess('form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy())) {
+            return $this->accessDenied();
+        }
+
+        $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
+        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
+        $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
+
+        $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
+
+        $entities = $model->getEntities([
+            'limit'          => false,
+            'filter'         => ['force' => $filters],
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'form'           => $form,
+            'viewOnlyFields' => $viewOnlyFields,
+            'simpleResults'  => true,
+        ]);
+
+        if (isset($entities['results'])) {
+            $entities = $entities['results'];
+        }
+
+        $contactIds = [];
+        foreach ($entities as $result) {
+            if (!empty($result['leadId'])) {
+                $contactIds[] = (int) $result['leadId'];
+            }
+        }
+
+        $contactIds = array_values(array_unique($contactIds));
+
+        $lists = $segmentModel->getUserLists();
+        $items = [];
+        foreach ($lists as $list) {
+            $items[$list['name'].' ('.$list['id'].')'] = $list['id'];
+        }
+
+        $route = $this->generateUrl('mautic_segment_batch_contact_set');
+
+        $formView = $this->createForm(
+            BatchType::class,
+            ['ids' => json_encode($contactIds)],
+            [
+                'items'  => $items,
+                'action' => $route,
+                'attr'   => [
+                    'data-submit-callback' => 'formResultBatchSubmit',
+                ],
+            ]
+        )->createView();
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $formView,
+            ],
+            'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_form_index',
+                'mauticContent' => 'formresult',
+                'route'         => $route,
+            ],
+        ]);
     }
 }

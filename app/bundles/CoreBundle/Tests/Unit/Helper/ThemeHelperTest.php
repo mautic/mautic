@@ -231,7 +231,7 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNoNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
+            new class extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -244,17 +244,17 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class() extends Translator {
+            new class extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class() extends CoreParametersHelper {
+            new class extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class() extends Filesystem {
+            new class extends Filesystem {
                 public function __construct()
                 {
                 }
@@ -275,7 +275,7 @@ class ThemeHelperTest extends TestCase
                  * @param ?\Traversable<mixed> $iterator
                  * @param mixed[]              $options
                  */
-                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
+                public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/new-theme-name', $targetDir);
@@ -294,7 +294,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class() extends Finder {
+            new class extends Finder {
                 /** @var SplFileInfo[] */
                 private array $dirs = [];
 
@@ -302,7 +302,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs)
+                public function in($dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
@@ -325,7 +325,7 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
+            new class extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -338,17 +338,17 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class() extends Translator {
+            new class extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class() extends CoreParametersHelper {
+            new class extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class() extends Filesystem {
+            new class extends Filesystem {
                 public function __construct()
                 {
                 }
@@ -356,7 +356,7 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @param string $files
                  */
-                public function exists($files)
+                public function exists($files): bool
                 {
                     if ('/path/to/themes/requested-theme-dir' === $files) {
                         return false;
@@ -369,7 +369,7 @@ class ThemeHelperTest extends TestCase
                  * @param ?\Traversable<mixed> $iterator
                  * @param array<mixed>         $options
                  */
-                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
+                public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/requested-theme-dir', $targetDir);
@@ -388,7 +388,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class() extends Finder {
+            new class extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -398,7 +398,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs)
+                public function in($dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
@@ -503,15 +503,22 @@ class ThemeHelperTest extends TestCase
     {
         $this->builderIntegrationsHelper->method('getBuilder')
             ->willThrowException(new IntegrationNotFoundException());
+        $matcher = $this->exactly(2);
 
         $this->pathsHelper
-            ->expects($this->exactly(2))
-            ->method('getSystemPath')
-            ->withConsecutive(
-                ['themes', true],
-                ['themes', false]
-            )
-            ->willReturn(__DIR__.'/resource/themes');
+            ->expects($matcher)
+            ->method('getSystemPath')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('themes', $parameters[0]);
+                    $this->assertTrue($parameters[1]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('themes', $parameters[0]);
+                    $this->assertFalse($parameters[1]);
+                }
+
+                return __DIR__.'/resource/themes';
+            });
 
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
         Assert::assertCount(4, $themes);

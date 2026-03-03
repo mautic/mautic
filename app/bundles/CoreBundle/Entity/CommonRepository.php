@@ -18,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -34,7 +36,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @phpstan-param class-string<T>|null $entityFQCN
      */
-    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
+    public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {
         parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', static::class));
     }
@@ -136,12 +138,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param class-string $className
      *
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray($className, &$data)
+    public function createFromArray($className, &$data): object
     {
         $entity        = new $className();
         $meta          = $this->_em->getClassMetadata($className);
@@ -334,6 +334,21 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
+     */
+    public function getEntitiesForGlobalSearch(array $filter): Paginator
+    {
+        $args = [
+            'filter'           => $filter,
+            'start'            => 0,
+            'limit'            => GlobalSearchEvent::RESULTS_LIMIT,
+            'ignore_paginator' => false,
+        ];
+
+        return $this->getEntities($args);
+    }
+
+    /**
      * Get a list of entities.
      *
      * @param array<string,mixed> $args
@@ -380,23 +395,18 @@ class CommonRepository extends ServiceEntityRepository
             return $query->toIterable([], $hydrationMode);
         }
 
-        if (!empty($args['iterator_mode'])) {
-            // When you remove the following, please search for the "iterator_mode" in the project.
-            @\trigger_error('Using "iterator_mode" is deprecated. Use "iterable_mode" instead. Usage of "iterator_mode" will be removed in 6.0.', \E_USER_DEPRECATED);
-
-            return $query->iterate(null, $hydrationMode);
-        } elseif (empty($args['ignore_paginator'])) {
+        if (empty($args['ignore_paginator'])) {
             if (!empty($args['use_simple_paginator'])) {
                 // FAST paginator that can handle only simple queries using no joins or ManyToOne joins.
                 return new SimplePaginator($query);
-            } else {
-                // SLOW paginator that can handle complex queries using oneToMany/ManyToMany joins.
-                return new Paginator($query, false);
             }
-        } else {
-            // All results
-            return $query->getResult($hydrationMode);
+
+            // SLOW paginator that can handle complex queries using oneToMany/ManyToMany joins.
+            return new Paginator($query, false);
         }
+
+        // All results
+        return $query->getResult($hydrationMode);
     }
 
     /**
@@ -527,7 +537,7 @@ class CommonRepository extends ServiceEntityRepository
         $alias = null,
         $setNowParameter = true,
         $setTrueParameter = true,
-        $allowNullForPublishedUp = true
+        $allowNullForPublishedUp = true,
     ) {
         $isORM = $q instanceof QueryBuilder;
 
@@ -591,7 +601,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param int $start
      * @param int $limit
      */
-    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null, array $allowedJoins = []): array
+    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
     {
         $alias    = $this->getTableAlias();
         $metadata = $this->getClassMetadata();
@@ -676,7 +686,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @return mixed[]
      */
-    public function getSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
+    public function getSimpleList(?CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -831,12 +841,24 @@ class CommonRepository extends ServiceEntityRepository
         $set        = [];
         $update     = [];
         $hasId      = $metadata->containsForeignIdentifier;
+        $fieldNames = $metadata->getFieldNames();
 
-        foreach ($metadata->getFieldNames() as $fieldName) {
+        if ($entity instanceof OptimisticLockInterface) {
+            $fieldNames = array_diff($fieldNames, [$entity->getVersionField()]);
+        }
+
+        foreach ($fieldNames as $fieldName) {
             $value = $metadata->getFieldValue($entity, $fieldName);
             if ($metadata->isIdentifier($fieldName)) {
                 if ($value) {
                     $hasId = true;
+                } elseif ($fieldName === $identifier) {
+                    // https://bugs.php.net/bug.php?id=76896
+                    // mysql_last_insert_id might return 0 if our insert updates a row
+                    // Call LAST_INSERT_ID() for the column to ensure the correct value
+                    $column   = $metadata->getColumnName($fieldName);
+                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
+                    continue;
                 } else {
                     continue;
                 }
@@ -1114,7 +1136,7 @@ class CommonRepository extends ServiceEntityRepository
             );
         }
 
-        if ($ormQb && $filter->not) {
+        if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
@@ -1342,17 +1364,13 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param QueryBuilder|DbalQueryBuilder $query
      * @param array                         $clauses [['col' => 'column_a', 'dir' => 'ASC']]
-     *
-     * @return array
      */
-    protected function buildOrderByClauseFromArray($query, array $clauses)
+    protected function buildOrderByClauseFromArray($query, array $clauses): void
     {
-        if ($clauses && is_array($clauses)) {
-            foreach ($clauses as $clause) {
-                $clause = $this->validateOrderByClause($clause);
-                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
-                $query->addOrderBy($column, $clause['dir']);
-            }
+        foreach ($clauses as $clause) {
+            $clause = $this->validateOrderByClause($clause);
+            $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+            $query->addOrderBy($column, $clause['dir']);
         }
     }
 
@@ -1470,7 +1488,8 @@ class CommonRepository extends ServiceEntityRepository
                 if (!empty($filter['where'])) {
                     // build clauses from array
                     $this->buildWhereClauseFromArray($q, $filter['where']);
-                } elseif (!empty($filter['criteria']) || !empty($filter['force'])) {
+                }
+                if (!empty($filter['criteria']) || !empty($filter['force'])) {
                     $criteria = !empty($filter['criteria']) ? $filter['criteria'] : $filter['force'];
                     if (is_array($criteria)) {
                         // defined columns with keys of column, expr, value
@@ -1606,7 +1625,7 @@ class CommonRepository extends ServiceEntityRepository
                             break;
                         case 'in':
                         case 'notIn':
-                            $parsed = str_getcsv(html_entity_decode($clause['val']), ',', '"');
+                            $parsed = CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
 
                             $param = $this->generateRandomParameterName();
                             $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
@@ -1732,7 +1751,7 @@ class CommonRepository extends ServiceEntityRepository
                         $f->strict       = true;
                         [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                     }
-                } else {
+                } elseif ($f->string) {
                     [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                 }
             }

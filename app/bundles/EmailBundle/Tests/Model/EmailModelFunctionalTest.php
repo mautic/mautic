@@ -9,9 +9,11 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -19,9 +21,20 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
+    private EmailModel|ContainerInterface $emailModel;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->emailModel = static::getContainer()->get('mautic.email.model.email');
+    }
+
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement(['leads']);
@@ -34,14 +47,70 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
+        $emailModel = static::getContainer()->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 7);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
         $this->assertEquals($sentCount, 8);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
         $this->assertEquals($sentCount, 8);
+    }
+
+    public function testGetEmailGeneralStats(): void
+    {
+        $contacts = $this->generateContacts(12);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment($contacts, $segment);
+        $email = $this->createEmail($segment);
+
+        // Send email to segment
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment]);
+
+        // Emulate email reads
+        $statRepository = $this->em->getRepository(Stat::class);
+        $stats          = $statRepository->findBy([
+            'email' => $email,
+            'lead'  => $contacts,
+        ]);
+        for ($index = 0; $index < $readCount = 4; ++$index) {
+            $this->emulateEmailRead($stats[$index]);
+        }
+
+        // Emulate clicks
+        $this->emulateClick($contacts[0], $email, 1, 1);
+        $this->emulateClick($contacts[1], $email, 1, 1);
+
+        // Emulate unsubscribing and bounces
+        $this->createDnc('email', $contacts[3], DoNotContact::UNSUBSCRIBED, $email->getId());
+        $this->createDnc('email', $contacts[4], DoNotContact::BOUNCED, $email->getId());
+
+        // Emulate failed email
+        $this->emulateEmailFailed($stats[5]);
+
+        $this->em->flush();
+
+        $dateFrom        = new \DateTime('-7 days');
+        $dateTo          = new \DateTime();
+        $unit            = 'D';
+        $includeVariants = false;
+
+        $result = $this->emailModel->getEmailGeneralStats($email, $includeVariants, $unit, $dateFrom, $dateTo);
+
+        $this->assertIsArray($result);
+        $this->assertCount(6, $result['datasets']);
+        $this->assertEquals('Sent emails', $result['datasets'][0]['label']);
+        $this->assertEquals([0, 0, 0, 0, 0, 0, 0, $sentCount], $result['datasets'][0]['data']);
+        $this->assertEquals('Read emails', $result['datasets'][1]['label']);
+        $this->assertEquals([0, 0, 0, 0, 0, 0, 0, $readCount], $result['datasets'][1]['data']);
+        $this->assertEquals('Failed emails', $result['datasets'][2]['label']);
+        $this->assertEquals([0, 0, 0, 0, 0, 0, 0, 1], $result['datasets'][2]['data']);
+        $this->assertEquals('Unique Clicked', $result['datasets'][3]['label']);
+        $this->assertEquals([0, 0, 0, 0, 0, 0, 0, 2], $result['datasets'][3]['data']);
+        $this->assertEquals('Unsubscribed', $result['datasets'][4]['label']);
+        $this->assertEquals([0, 0, 0, 0, 0, 0, 0, 1], $result['datasets'][4]['data']);
+        $this->assertEquals('Bounced', $result['datasets'][5]['label']);
+        $this->assertEquals([0, 0, 0, 0, 0, 0, 0, 1], $result['datasets'][5]['data']);
     }
 
     /**
@@ -100,6 +169,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
+        $email->setContinueSending(true);
         $email->setIsPublished(true);
         $email->addList($segment);
         $this->em->persist($email);
@@ -115,23 +185,48 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList]     = $this->emailModel->sendEmailToLists($email, [$segment], 4, 2);
         $this->assertEquals($sentCount, 4);
-        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 3, 2);
         $this->assertEquals($sentCount, 3);
-        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 2);
         $this->assertEquals($sentCount, 2);
-        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 4);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4);
         $this->assertEquals($sentCount, 1);
 
         $email                                                  = $this->createEmail($segment);
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment]);
+        [$sentCount, $failedCount, $failedRecipientsByList]     = $this->emailModel->sendEmailToLists($email, [$segment]);
         $this->assertEquals($sentCount, 10);
 
         $email                                                  = $this->createEmail($segment);
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], null, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList]     = $this->emailModel->sendEmailToLists($email, [$segment], null, 2);
         $this->assertEquals($sentCount, 10);
+    }
+
+    public function testSendEmailToListsWithContinueSendingFalse(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment($contacts, $segment);
+
+        // Create email with continueSending = false
+        $email = new Email();
+        $email->setName('Email with Continue Sending False');
+        $email->setSubject('Email Subject');
+        $email->setCustomHtml('Email content');
+        $email->setEmailType('list');
+        $email->setPublishUp(new \DateTime('-1 day'));
+        $email->setContinueSending(false); // This should prevent sending
+        $email->setIsPublished(true);
+        $email->addList($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // Attempt to send emails - should send 0 because continueSending is false
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment]);
+        $this->assertEquals(0, $sentCount, 'No emails should be sent when continueSending is false');
+        $this->assertEquals(0, $failedCount, 'No emails should fail when continueSending is false');
+        $this->assertEmpty($failedRecipientsByList, 'No failed recipients when continueSending is false');
     }
 
     public function testNotOverwriteChildrenTranslationEmailAfterSaveParent(): void
@@ -164,10 +259,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($parentEmail);
         $this->em->detach($childrenEmail);
 
-        /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
         $parentEmail->setName('Test change');
-        $emailModel->saveEntity($parentEmail);
+        $this->emailModel->saveEntity($parentEmail);
 
         self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
         self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
@@ -226,6 +319,38 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $pageHit->setSource('email');
         $pageHit->setSourceId($email->getId());
         $this->em->persist($pageHit);
+    }
+
+    private function emulateEmailRead(Stat $emailStat): void
+    {
+        $emailStat->setIsRead(true);
+        $emailStat->setDateRead(new \DateTime());
+        $emailStat->setOpenCount(1);
+        $email = $emailStat->getEmail();
+        $email->setReadCount($email->getReadCount() + 1);
+        $this->em->persist($emailStat);
+        $this->em->persist($email);
+    }
+
+    private function emulateEmailFailed(Stat $emailStat): void
+    {
+        $emailStat->setIsFailed(true);
+        $this->em->persist($emailStat);
+    }
+
+    private function createDnc(string $channel, Lead $contact, int $reason, ?int $channelId = null): DoNotContact
+    {
+        $dnc = new DoNotContact();
+        $dnc->setChannel($channel);
+        $dnc->setLead($contact);
+        $dnc->setReason($reason);
+        $dnc->setDateAdded(new \DateTime());
+        if ($channelId) {
+            $dnc->setChannelId($channelId);
+        }
+        $this->em->persist($dnc);
+
+        return $dnc;
     }
 
     /**
@@ -338,17 +463,70 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testGetContextEntity(): void
     {
-        /** @var EmailModel $emailModel */
-        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
-
         $email = new Email();
         $email->setName('Test email');
         $this->em->persist($email);
         $this->em->flush();
 
         $id     = $email->getId();
-        $result = $emailModel->getEntity($id);
+        $result = $this->emailModel->getEntity($id);
 
         $this->assertSame($email, $result);
+    }
+
+    public function testReturnsContactAsIsIfNoId(): void
+    {
+        $contact = ['email' => 'test@example.com'];
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contact);
+
+        $this->assertSame($contact, $result);
+    }
+
+    public function testReturnsContactAsIsIfCompaniesAlreadySet(): void
+    {
+        $contact = [
+            'id'        => 1,
+            'companies' => ['company1'],
+        ];
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contact);
+
+        $this->assertSame($contact, $result);
+    }
+
+    public function testEnrichesContactWithCompanies(): void
+    {
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+
+        $this->em->persist($company);
+
+        $contact = $this->createLead('John', 'Doe', 'test@domain.tld');
+        $this->createPrimaryCompanyForLead($contact, $company);
+        $this->em->flush();
+
+        $contactArray = $contact->convertToArray();
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contactArray);
+
+        $this->assertArrayHasKey('companies', $result);
+        $this->assertSame($company->getName(), $result['companies'][0]['companyname']);
+        $this->assertSame($company->getCity(), $result['companies'][0]['companycity']);
+        $this->assertSame($company->getCountry(), $result['companies'][0]['companycountry']);
+    }
+
+    public function testEnrichesContactWithEmptyCompaniesIfNoneFound(): void
+    {
+        $contact = $this->createLead('John', 'Doe', 'test@domain.tld');
+        $this->em->flush();
+
+        $contactArray = $contact->convertToArray();
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contactArray);
+
+        $this->assertArrayHasKey('companies', $result);
+        $this->assertEmpty($result['companies']);
     }
 }

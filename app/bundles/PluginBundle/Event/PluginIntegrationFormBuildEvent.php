@@ -10,7 +10,7 @@ class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private FormBuilderInterface $builder,
-        private array $options
+        private array $options,
     ) {
         $this->integration = $integration;
     }

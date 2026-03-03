@@ -7,6 +7,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\EventListener\ReportSubscriber;
 use Mautic\ReportBundle\Entity\Report;
@@ -33,19 +34,23 @@ class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
+    private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
+
     private ReportSubscriber $subscriber;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->companyReportData = $this->createMock(CompanyReportData::class);
-        $this->hitRepository     = $this->createMock(HitRepository::class);
-        $this->translator        = $this->createMock(TranslatorInterface::class);
-        $this->subscriber        = new ReportSubscriber(
+        $this->companyReportData   = $this->createMock(CompanyReportData::class);
+        $this->hitRepository       = $this->createMock(HitRepository::class);
+        $this->translator          = $this->createMock(TranslatorInterface::class);
+        $this->dncReportService    = $this->createMock(DncReportService::class);
+        $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
-            $this->translator
+            $this->translator,
+            $this->dncReportService
         );
     }
 
@@ -228,9 +233,7 @@ class ReportSubscriberTest extends TestCase
             ->method('trans')
             ->willReturnArgument(0);
 
-        $mockExprBuilder = $this->getMockBuilder(ExpressionBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockExprBuilder = $this->createMock(ExpressionBuilder::class);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

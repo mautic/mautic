@@ -25,7 +25,7 @@ class SubmitActionEmailType extends AbstractType
 
     public function __construct(
         private TranslatorInterface $translator,
-        protected CoreParametersHelper $coreParametersHelper
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -63,7 +63,7 @@ class SubmitActionEmailType extends AbstractType
             [
                 'label'      => 'mautic.form.action.sendemail.message',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control editor editor-basic'],
+                'attr'       => ['class' => 'form-control editor editor-basic', 'allow-full-html' => true],
                 'required'   => false,
                 'data'       => $message,
             ]
@@ -128,7 +128,7 @@ class SubmitActionEmailType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'form_submitaction_sendemail';
     }

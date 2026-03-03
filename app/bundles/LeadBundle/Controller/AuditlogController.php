@@ -31,8 +31,8 @@ class AuditlogController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.auditlog.filters', $filters);
         } else {
@@ -49,9 +49,10 @@ class AuditlogController extends CommonController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'   => $lead,
-                    'page'   => $page,
-                    'events' => $events,
+                    'lead'                   => $lead,
+                    'page'                   => $page,
+                    'events'                 => $events,
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
                 ],
                 'passthroughVars' => [
                     'route'         => false,
@@ -87,8 +88,8 @@ class AuditlogController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.auditlog.filters', $filters);
         } else {

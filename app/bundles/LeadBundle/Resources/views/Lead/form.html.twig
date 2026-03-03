@@ -11,8 +11,9 @@
 {% block headerTitle %}
   {% if lead.id %}
     {{ 'mautic.lead.lead.header.edit'|trans({
-          '%name%': lead.primaryIdentifier|trans,
+        '%name%': lead.primaryIdentifier|trans,
     }) }}
+      {{ customContent('lead.name.after', _context) }}
   {% else %}
     {{ 'mautic.lead.lead.header.new'|trans }}
   {% endif %}
@@ -52,7 +53,7 @@
                   {% for g in groups %}
                       {% if fields[g] is not empty %}
                           <li class="list-group-item {% if loop.first %}active{% endif %}">
-                              <a href="#{{ g }}" class="list-group-item-text steps" data-toggle="tab">
+                              <a href="#{{ g }}" class="list-group-item-heading steps" data-toggle="tab">
                                   {{ ('mautic.lead.field.group.'~g)|trans }}
                               </a>
                           </li>

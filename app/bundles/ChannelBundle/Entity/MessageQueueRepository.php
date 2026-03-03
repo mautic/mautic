@@ -2,6 +2,7 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -43,7 +44,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('processStarted', $processStarted)
             ->indexBy('mq', 'mq.id');
 
-        $q->orderBy('mq.priority, mq.scheduledDate', \Doctrine\Common\Collections\Criteria::ASC);
+        $q->orderBy('mq.priority, mq.scheduledDate', Order::Ascending->value);
 
         if ($limit) {
             $q->setMaxResults((int) $limit);
@@ -61,7 +62,7 @@ class MessageQueueRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    public function getQueuedChannelCount($channel, array $ids = null): int
+    public function getQueuedChannelCount($channel, ?array $ids = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -102,13 +103,14 @@ class MessageQueueRepository extends CommonRepository
             mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
 
         if ($leadId) {
-            $query->where('mq.lead_id = '.(int) $leadId);
+            $query->where('mq.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->or(
-                $query->expr()->like('mq.channel', $query->expr()->literal('%'.$options['search'].'%'))
-            ));
+            $query->andWhere(
+                $query->expr()->like('mq.channel', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'mq.channel', 'mq.date_published', [], ['dateAdded'], null, 'mq.id');

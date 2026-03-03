@@ -8,6 +8,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -36,10 +37,10 @@ class QueryBuilderTest extends TestCase
 
     public function testSetParameter(): void
     {
-        $queryBuilder = $this->queryBuilder->setParameter(':one', 'first');
+        $queryBuilder = $this->queryBuilder->setParameter('one', 'first');
         Assert::assertSame($queryBuilder, $this->queryBuilder);
         $this->queryBuilder->setParameter('two', true);
-        $this->queryBuilder->setParameter(':three', false);
+        $this->queryBuilder->setParameter('three', false);
         $this->queryBuilder->setParameter(4, 'fourth');
 
         Assert::assertSame([
@@ -168,7 +169,7 @@ class QueryBuilderTest extends TestCase
         $queryBuilder = $this->queryBuilder->setParametersPairs('one', 'first');
         Assert::assertSame($queryBuilder, $this->queryBuilder);
         $this->queryBuilder->setParametersPairs('two', 'second');
-        $this->queryBuilder->setParametersPairs(':three', 'third');
+        $this->queryBuilder->setParametersPairs('three', 'third');
 
         Assert::assertSame([
             'one'   => 'first',
@@ -179,7 +180,7 @@ class QueryBuilderTest extends TestCase
 
     public function testSetParametersPairsWithArray(): void
     {
-        $queryBuilder     = $this->queryBuilder->setParametersPairs(['one', 'three', ':five'], ['first', 'third', 'fifth']);
+        $queryBuilder     = $this->queryBuilder->setParametersPairs(['one', 'three', 'five'], ['first', 'third', 'fifth']);
         Assert::assertSame($queryBuilder, $this->queryBuilder);
         Assert::assertSame([
             'one'   => 'first',
@@ -347,7 +348,7 @@ class QueryBuilderTest extends TestCase
             ->having('t.salary > :salary AND t.flag = :flag')
             ->orderBy('t.id', 'DESC')
             ->setParameter('enabled', true)
-            ->setParameter(':salary', 5000)
+            ->setParameter('salary', 5000)
             ->setParameter('states', ['new', 'active'], ArrayParameterType::STRING)
             ->setParameter('flag', 'internal')
             ->setFirstResult(30)
@@ -502,12 +503,7 @@ class QueryBuilderTest extends TestCase
 
     private function createConnectionFake(): Connection
     {
-        return new class() extends Connection {
-            /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct()
-            {
-            }
-
+        return new class([], $this->createMock(Driver::class)) extends Connection {
             public function getDatabasePlatform()
             {
                 return new MySQLPlatform();

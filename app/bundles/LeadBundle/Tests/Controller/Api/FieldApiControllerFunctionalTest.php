@@ -6,6 +6,11 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,13 +18,15 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @IgnoreAnnotation("covers")
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
-        $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->getName();
+        $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->name();
 
         parent::setUp();
     }
@@ -45,7 +52,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $fieldResponse  = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         Assert::assertTrue($fieldResponse['field']['isPublished']);
         Assert::assertGreaterThan(0, $fieldResponse['field']['id']);
         Assert::assertSame($payload['label'], $fieldResponse['field']['label']);
@@ -58,16 +65,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, '/api/fields/contact/'.$fieldResponse['field']['id'].'/delete', $payload);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful($clientResponse->getContent());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::saveEntity
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::newEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::editEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::deleteEntityAction
-     * @covers \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::execute
-     */
     public function testFieldApiEndpointsWithBackgroundProcessingEnabled(): void
     {
         $alias   = uniqid('field');
@@ -87,15 +87,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias);
+        $this->assertDeleteResponse($payload, $id, $alias, true);
+
+        // Test deleting field if used in segment is not allowed.
+        $this->assertDeleteEntityActionFieldUsedInSegment(true);
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::saveEntity
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::newEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::editEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::deleteEntityAction
-     */
     public function testFieldApiEndpointsWithBackgroundProcessingDisabled(): void
     {
         $alias   = uniqid('field');
@@ -110,14 +107,16 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias);
+        $this->assertDeleteResponse($payload, $id, $alias, false);
+
+        // Test deleting field if used in segment is not allowed.
+        $this->assertDeleteEntityActionFieldUsedInSegment(false);
     }
 
     /**
      * @param array<string, array<string, string>> $properties
-     *
-     * @dataProvider dataForCreatingNewBooleanFieldApiEndpoint
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
     public function testCreatingNewBooleanFieldApiEndpoint(array $properties, string $expectedMessage): void
     {
         $payload = [
@@ -143,7 +142,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, array<string, string>>>>
      */
-    public function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
+    public static function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
     {
         yield 'No properties' => [
             [
@@ -168,6 +167,228 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'A \'positive\' label is required.',
         ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptyMultiSelectValue')]
+    public function testMultiselectSetDefaultValue(mixed $defaultFieldValue): void
+    {
+        $fieldAlias = 'test_multi';
+
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        \assert($fieldModel instanceof FieldModel);
+
+        $fields = $fieldModel->getLeadFieldCustomFields();
+        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+
+        // Add field.
+        $leadField = new LeadField();
+        $leadField->setName('Test Field')
+            ->setAlias($fieldAlias)
+            ->setType('multiselect')
+            ->setObject('lead')
+            ->setProperties([
+                'list' => [
+                    [
+                        'label' => 'Halusky',
+                        'value' => 'halusky',
+                    ],
+                    [
+                        'label' => 'Bramborak',
+                        'value' => 'bramborak',
+                    ],
+                    [
+                        'label' => 'Makovec',
+                        'value' => 'makovec',
+                    ],
+                ],
+            ]);
+        $fieldModel->saveEntity($leadField);
+
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setEmail('email@acquia.cz');
+
+        $contact->addUpdatedField($fieldAlias, ['bramborak', 'makovec']);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Call endpoint
+        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('bramborak|makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test patch and values should be updated
+        $updatedValues = [
+            $fieldAlias  => ['halusky'],
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test empty patch and values should be updated
+        $updatedValues = [
+            $fieldAlias          => $defaultFieldValue,
+            'overwriteWithBlank' => true,
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+    }
+
+    /**
+     * @return \Iterator<string, array<string|array<string|null>|null>>
+     */
+    public static function provideEmptyMultiSelectValue(): \Iterator
+    {
+        yield 'null' => [null];
+        yield 'empty string value' => [''];
+        yield 'empty array with empty string value' => [['']];
+        yield 'empty array with null value' => [[null]];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptySelectValue')]
+    public function testSelectSetDefaultValue(mixed $defaultFieldValue): void
+    {
+        $fieldAlias = 'test_single';
+
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        \assert($fieldModel instanceof FieldModel);
+
+        $fields = $fieldModel->getLeadFieldCustomFields();
+        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+
+        // Add field.
+        $leadField = new LeadField();
+        $leadField->setName('Test Field')
+            ->setAlias($fieldAlias)
+            ->setType('select')
+            ->setObject('lead')
+            ->setProperties([
+                'list' => [
+                    [
+                        'label' => 'Halusky',
+                        'value' => 'halusky',
+                    ],
+                    [
+                        'label' => 'Bramborak',
+                        'value' => 'bramborak',
+                    ],
+                    [
+                        'label' => 'Makovec',
+                        'value' => 'makovec',
+                    ],
+                ],
+            ]);
+        $fieldModel->saveEntity($leadField);
+
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setEmail('email@acquia.cz');
+
+        $contact->addUpdatedField($fieldAlias, ['makovec']);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Call endpoint
+        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test patch and values should be updated
+        $updatedValues = [
+            $fieldAlias  => 'halusky',
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+
+        // Test empty patch and values should be updated
+        $updatedValues = [
+            $fieldAlias          => $defaultFieldValue,
+            'overwriteWithBlank' => true,
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contact->getId()),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('contact', $responseJson);
+        self::assertArrayHasKey('fields', $responseJson['contact']);
+        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
+        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        self::assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+    }
+
+    /**
+     * @return \Iterator<string, array<string|null>>
+     */
+    public static function provideEmptySelectValue(): \Iterator
+    {
+        yield 'null' => [null];
+        yield 'empty string value' => [''];
     }
 
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
@@ -234,7 +455,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    private function assertDeleteResponse(array $payload, int $id, string $alias): void
+    private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
         $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
@@ -248,7 +469,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey($key, $response['field']);
 
             match ($key) {
-                'id'     => $this->assertNull($response['field'][$key]),
+                'id'     => $isBackground ? $this->assertEquals($value, $response['field'][$key]) : $this->assertNull($response['field'][$key]),
                 'alias'  => $this->assertEquals($alias, $response['field'][$key]),
                 'object' => $this->assertEquals('lead', $response['field'][$key]),
                 'type'   => $this->assertEquals('text', $response['field'][$key]),
@@ -272,6 +493,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isUniqueIdentifier'  => true,
             'isVisible'           => false,
             'isListable'          => false,
+            'isIndex'             => true, // Must be true, because if isUniqueIdentifier field is true the contact field *must* be indexed.
+            'charLengthLimit'     => 25,
             'properties'          => [],
         ];
     }
@@ -291,7 +514,58 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isUniqueIdentifier'  => false,
             'isVisible'           => true,
             'isListable'          => true,
+            'isIndex'             => false, // Can be false, if isUniqueIdentifier the field is *not* indexed.
+            'charLengthLimit'     => 50,
             'properties'          => [],
         ];
+    }
+
+    private function assertDeleteEntityActionFieldUsedInSegment(bool $isBackground): void
+    {
+        // Create a custom field.
+        $alias   = uniqid('field');
+        $payload = $this->getCreatePayload($alias);
+        if ($isBackground) {
+            $id = $this->assertCreateResponse($payload, Response::HTTP_ACCEPTED);
+        } else {
+            $id = $this->assertCreateResponse($payload, Response::HTTP_CREATED);
+        }
+        // Execute the command to create the field
+        $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $id]);
+
+        $this->assertEquals(0, $commandTester->getStatusCode());
+
+        // Create a segment which uses the custom field we just created.
+        $segment = new LeadList();
+        $segment->setName('New Segment');
+        $segment->setPublicName('New Segment');
+        $segment->setAlias('new_segment');
+        $segment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => $alias,
+                'object'     => 'lead',
+                'type'       => 'text',
+                'properties' => ['filter' => 'John'],
+                'display'    => null,
+                'operator'   => '=',
+            ],
+        ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        // Try deleting field which is used in segment.
+        $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_CONFLICT, $clientResponse->getStatusCode());
+
+        // Test with Bulk Delete.
+        $this->client->request('DELETE', sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString(
+            'Resolve all dependencies before attempting to delete.',
+            strip_tags($clientResponse->getContent())
+        );
     }
 }

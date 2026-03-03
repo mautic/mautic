@@ -15,24 +15,27 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: CreateCustomFieldCommand::COMMAND_NAME,
+    description: 'Create custom field column in the background',
+)]
 class CreateCustomFieldCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
-
-    protected static $defaultDescription = 'Create custom field column in the background';
 
     public function __construct(
         private BackgroundService $backgroundService,
         private TranslatorInterface $translator,
         private LeadFieldRepository $leadFieldRepository,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -41,7 +44,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
     {
         parent::configure();
 
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(

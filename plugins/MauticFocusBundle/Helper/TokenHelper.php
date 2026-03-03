@@ -9,27 +9,25 @@ use Symfony\Component\Routing\RouterInterface;
 
 class TokenHelper
 {
-    private string $regex = '{focus=(.*?)}';
+    public const REGEX = '/{focus=(.*?)}/i';
 
     public function __construct(
         protected FocusModel $model,
         protected RouterInterface $router,
-        protected CorePermissions $security
+        protected CorePermissions $security,
     ) {
     }
 
     public function findFocusTokens($content): array
     {
-        $regex = '/'.$this->regex.'/i';
-
-        preg_match_all($regex, $content, $matches);
+        preg_match_all(self::REGEX, $content, $matches);
 
         $tokens = [];
 
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $token = '{focus='.$id.'}';
-                $focus = $this->model->getEntity($id);
+                $focus = $this->model->getEntity((int) $id);
                 if (null !== $focus
                     && (
                         $focus->isPublished()

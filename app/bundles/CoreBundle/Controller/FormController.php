@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -56,7 +55,7 @@ class FormController extends AbstractStandardFormController
         string $translationBase,
         string $templateBase,
         string $activeLink,
-        string $mauticContent
+        string $mauticContent,
     ) {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
@@ -75,16 +74,6 @@ class FormController extends AbstractStandardFormController
      * @return mixed[]
      */
     public function getViewArguments(array $args, $action): array
-    {
-        return $this->customizeViewArguments($args, $action);
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0; use getViewArguments instead
-     *
-     * @return array
-     */
-    public function customizeViewArguments($args, $action)
     {
         return $args;
     }
@@ -142,8 +131,8 @@ class FormController extends AbstractStandardFormController
         return $this->deprecatedPermissionBase;
     }
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $managerRegistry, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $managerRegistry, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 }

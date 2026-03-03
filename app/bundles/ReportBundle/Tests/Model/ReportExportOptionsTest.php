@@ -9,9 +9,7 @@ class ReportExportOptionsTest extends \PHPUnit\Framework\TestCase
 {
     public function testBatch(): void
     {
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelper->expects($this->once())
             ->method('get')

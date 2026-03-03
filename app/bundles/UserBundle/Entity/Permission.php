@@ -2,37 +2,72 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-class Permission implements CacheInvalidateInterface
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('user:roles:viewown')"),
+        new Post(security: "is_granted('user:roles:create')"),
+        new Get(security: "is_granted('user:roles:viewown')"),
+        new Put(security: "is_granted('user:roles:editown')"),
+        new Patch(security: "is_granted('user:roles:editother')"),
+        new Delete(security: "is_granted('user:roles:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['permission:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['permission:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Permission implements CacheInvalidateInterface, UuidInterface
 {
+    use UuidTrait;
+
     public const CACHE_NAMESPACE = 'Permission';
 
     /**
      * @var int
      */
+    #[Groups(['permission:read', 'role:read'])]
     protected $id;
 
     /**
      * @var string
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $bundle;
 
     /**
      * @var string
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $name;
 
     /**
      * @var Role
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $role;
 
     /**
      * @var int
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $bitwise;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -59,6 +94,8 @@ class Permission implements CacheInvalidateInterface
             ->build();
 
         $builder->addField('bitwise', 'integer');
+
+        static::addUuidField($builder);
     }
 
     /**
@@ -124,7 +161,7 @@ class Permission implements CacheInvalidateInterface
      *
      * @return Permission
      */
-    public function setRole(Role $role = null)
+    public function setRole(?Role $role = null)
     {
         $this->role = $role;
 

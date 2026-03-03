@@ -10,6 +10,7 @@ use Mautic\IntegrationsBundle\DependencyInjection\Compiler\BuilderIntegrationPas
 use Mautic\IntegrationsBundle\DependencyInjection\Compiler\ConfigIntegrationPass;
 use Mautic\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
 use Mautic\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
+use Mautic\IntegrationsBundle\DependencyInjection\Compiler\TestPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class IntegrationsBundle extends AbstractPluginBundle
@@ -21,5 +22,9 @@ class IntegrationsBundle extends AbstractPluginBundle
         $container->addCompilerPass(new SyncIntegrationsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new ConfigIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new BuilderIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new TestPass());
+        }
     }
 }

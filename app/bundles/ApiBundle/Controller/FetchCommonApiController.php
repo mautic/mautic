@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiInitializeEvent;
 use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -16,7 +17,7 @@ use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -28,10 +29,8 @@ use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -124,11 +123,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $serializerGroups = [];
 
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
     protected ContainerBagInterface $parametersContainer;
 
     /**
@@ -136,7 +130,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     public function __construct(
         protected CorePermissions $security,
-        Translator $translator,
+        protected Translator $translator,
         protected EntityResultHelper $entityResultHelper,
         private AppVersion $appVersion,
         private RequestStack $requestStack,
@@ -144,13 +138,20 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected ModelFactory $modelFactory,
         protected EventDispatcherInterface $dispatcher,
         protected CoreParametersHelper $coreParametersHelper,
-        protected MauticFactory $factory,
     ) {
-        $this->translator           = $translator;
-
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
         }
+
+        $event = new ApiInitializeEvent(
+            (string) $this->entityClass,
+            $this->serializerGroups,
+            $this->exclusionStrategies,
+        );
+        $this->dispatcher->dispatch($event);
+
+        $this->serializerGroups    = $event->getSerializerGroups();
+        $this->exclusionStrategies = $event->getExclusionStrategies();
     }
 
     /**
@@ -213,7 +214,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $this->extraGetEntitiesArguments
         );
 
-        if ($select = InputHelper::cleanArray($request->get('select', []))) {
+        if ($select = InputHelper::cleanArray($request->query->all()['select'] ?? $request->request->all()['select'] ?? [])) {
             $args['select']              = $select;
             $this->customSelectRequested = true;
         }
@@ -253,7 +254,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getWhereFromRequest(Request $request)
     {
-        $where = InputHelper::cleanArray($request->get('where', []));
+        $where = $request->query->all()['where'] ?? [];
 
         $this->sanitizeWhereClauseArrayFromRequest($where);
 
@@ -267,7 +268,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getOrderFromRequest(Request $request): array
     {
-        return InputHelper::cleanArray($request->get('order', []));
+        return InputHelper::cleanArray($request->query->all()['order'] ?? []);
     }
 
     /**
@@ -402,17 +403,21 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param mixed  $entity
-     * @param string $action view|create|edit|publish|delete
+     * @param FormEntity $entity
+     * @param string     $action view|create|edit|publish|delete
      *
      * @return bool|Response
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
-        if ('create' !== $action && is_object($entity) && method_exists($entity, 'getCreatedBy')) {
-            $ownPerm   = "{$this->permissionBase}:{$action}own";
-            $otherPerm = "{$this->permissionBase}:{$action}other";
+        $ownPerm   = "{$this->permissionBase}:{$action}own";
+        $otherPerm = "{$this->permissionBase}:{$action}other";
 
+        if ('publish' === $action) {
+            return $this->security->hasPublishAccessForEntity($entity, $ownPerm, $otherPerm);
+        }
+
+        if ('create' !== $action && is_object($entity) && method_exists($entity, 'getCreatedBy')) {
             $owner = (method_exists($entity, 'getPermissionUser')) ? $entity->getPermissionUser() : $entity->getCreatedBy();
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $owner);

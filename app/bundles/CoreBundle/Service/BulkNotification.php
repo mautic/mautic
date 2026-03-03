@@ -15,18 +15,18 @@ final class BulkNotification implements BulkNotificationInterface
     private array $notifications = [];
 
     public function __construct(
-        private NotificationModel $notificationModel
+        private NotificationModel $notificationModel,
     ) {
     }
 
     public function addNotification(
         string $deduplicateValue,
         string $message,
-        string $type = null,
-        string $header = null,
-        string $iconClass = null,
-        \DateTime $datetime = null,
-        User $user = null
+        ?string $type = null,
+        ?string $header = null,
+        ?string $iconClass = null,
+        ?\DateTime $datetime = null,
+        ?User $user = null,
     ): void {
         if (isset($this->notifications[$deduplicateValue])) {
             return;
@@ -45,7 +45,7 @@ final class BulkNotification implements BulkNotificationInterface
     /**
      * @param \DateTime|null $deduplicateDateTimeFrom If last 24 hours for deduplication does not fit, change it here
      */
-    public function flush(\DateTime $deduplicateDateTimeFrom = null): void
+    public function flush(?\DateTime $deduplicateDateTimeFrom = null): void
     {
         foreach ($this->notifications as $deduplicateValue => $data) {
             $this->notificationModel->addNotification(

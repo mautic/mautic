@@ -8,14 +8,18 @@ use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: DeleteContactSecondaryCompaniesCommand::NAME,
+    description: "Deletes all contact\'s secondary companies."
+)]
 class DeleteContactSecondaryCompaniesCommand extends Command
 {
-    protected static $defaultDescription = 'Deletes all contact\'s secondary companies.';
     public const NAME                    = 'mautic:contact:delete:secondary-companies';
 
     public function __construct(private LoggerInterface $logger, private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper, private CompanyLeadRepository $companyLeadsRepository)
@@ -28,7 +32,7 @@ class DeleteContactSecondaryCompaniesCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setName(self::NAME)
+        $this
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command deletes non-primary companies of every contact.

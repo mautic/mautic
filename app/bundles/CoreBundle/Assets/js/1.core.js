@@ -68,20 +68,21 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     }
     Mautic.attachDismissHandlers();
 
-    // Initialize Bootstrap Popovers
+    // Initialize popovers with custom configuration
     mQuery('[data-toggle="popover"]').popover({
-        sanitize: false
+        sanitize: false,
+        content: function() {
+            return mQuery(this).data('content');
+        }
     });
 
-    // Handle popover insertion
-    mQuery('[data-toggle="popover"]').on('inserted.bs.popover', function () {
-        // Initialize Chosen on select elements inside popover
+    // Handle popover shown event
+    mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
         mQuery('.popover-content select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
         });
 
-        // Initialize tooltips inside popovers
         mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
     });
 });
@@ -91,27 +92,7 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    Mautic.initializeCodeBlocks();
 });
-
-/**
- * Applies user interface preferences from localStorage to the HTML element.
- * Runs immediately to set attributes based on 'm-toggle-setting-' prefixed items.
- */
-(function() {
-    // Load user preferences for UI saved previously
-    const prefix = 'm-toggle-setting-';
-    Object.keys(localStorage)
-        .filter(key => key.startsWith(prefix))
-        .forEach(setting => {
-            const attributeName = setting.replace(prefix, '');
-            const value = localStorage.getItem(setting);
-
-            if (value) {
-                document.documentElement.setAttribute(attributeName, value);
-            }
-        });
-})();
 
 mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
@@ -139,15 +120,6 @@ mQuery( document ).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    // Copy code blocks when clicked
-    mQuery(document).on('click', 'code', function(e) {
-        e.preventDefault();
-        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
-            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
-            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
-        });
-    });
-    Mautic.initializeCodeBlocks();
     Mautic.attachDismissHandlers();
 });
 
@@ -345,7 +317,7 @@ var Mautic = {
         });
 
         Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
-            mQuery('#globalSearchContainer .search-button').click();
+            mQuery('.search-button').click();
         });
 
         Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {
@@ -384,19 +356,6 @@ var Mautic = {
             modalWindow.modal();
         });
 
-    },
-
-    /**
-     * Copy code blocks when clicked
-     *
-     */
-    initializeCodeBlocks: function () {
-        mQuery('code').each(function() {
-            var $codeBlock = mQuery(this);
-            if (!$codeBlock.find('.copy-icon').length) {
-                $codeBlock.append('<i class="ri-clipboard-fill copy-icon"></i>');
-            }
-        });
     },
 
     /**
@@ -682,7 +641,7 @@ var Mautic = {
                 }
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-muted'];
+                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-secondary'];
                 var appendClasses = "";
 
                 for (var j = 0; j < specialClasses.length; j++) {
@@ -809,7 +768,7 @@ var Mautic = {
      * @param textStatus
      * @param errorThrown
      */
-    processAjaxError: function (request, textStatus, errorThrown, mainContent) {
+    processAjaxError: function (request, textStatus, errorThrown, mainContent, target) {
         if (textStatus == 'abort') {
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
@@ -864,6 +823,11 @@ var Mautic = {
                 mQuery('.modal.in .modal-body-content').removeClass('hide');
                 if (mQuery('.modal.in  .loading-placeholder').length) {
                     mQuery('.modal.in  .loading-placeholder').addClass('hide');
+                }
+            } else if (response.closeModal) {
+                if (typeof target !== "undefined") {
+                    mQuery('body').removeClass('noscroll');
+                    mQuery(target).modal('hide');
                 }
             } else if (inDevMode) {
                 console.log(response);

@@ -1,6 +1,7 @@
 *.git*
 *.idea*
 .ddev/*
+.devcontainer/*
 .DS_Store
 .env.dist
 .github/*
@@ -33,7 +34,6 @@ rector.php
 tests/*
 vendor/babdev/*
 vendor/liip/*
-vendor/sensio/generator-bundle/*
 vendor/symfony/browser-kit/*
 vendor/symfony/dom-crawler/*
 vendor/symfony/web-profiler-bundle/*

@@ -24,7 +24,7 @@ class AjaxController extends CommonAjaxController
         $model = $this->getModel('sms');
 
         $id  = $request->get('id');
-        $ids = $request->get('ids');
+        $ids = $request->query->all()['ids'] ?? [];
 
         // Support for legacy calls
         if (!$ids && $id) {
@@ -66,7 +66,7 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
-    public function getBuilderTokensAction(Request $request, EventDispatcherInterface $eventDispatcher = null): JsonResponse
+    public function getBuilderTokensAction(Request $request, ?EventDispatcherInterface $eventDispatcher = null): JsonResponse
     {
         $query  = $request->get('query', '');
         $tokens = $this->getBuilderTokens($query);

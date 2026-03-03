@@ -8,17 +8,36 @@
 
 {% block content %}
     {% if isIndex %}
-        <div id="page-list-wrapper" class="panel panel-default">
+        <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'action': currentRoute,
                 'filters': filters,
-                'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'page_actions': {
                     'templateButtons': {
                         'new': permissions['email:emails:create']
                     },
                     'routeBase': 'email',
-                }),
+                },
+                'bulk_actions': {
+                    'routeBase': 'email',
+                    'templateButtons': {
+                        'delete': permissions['email:emails:deleteown'] or permissions['email:emails:deleteother']
+                    },
+                    'customButtons': [
+                        {
+                            'attr': {
+                                'class': 'btn btn-default btn-sm btn-nospin',
+                                'data-toggle': 'ajaxmodal',
+                                'data-target': '#MauticSharedModal',
+                                'href': path('mautic_email_batch_categories_view'),
+                                'data-header': 'mautic.email.batch.categories'|trans,
+                            },
+                            'btnText': 'mautic.email.batch.categories'|trans,
+                            'iconClass': 'ri-folder-line',
+                        },
+                    ]
+                },
                 'quickFilters': [
                     {
                         'search': 'mautic.core.searchcommand.ispublished',
@@ -43,15 +62,28 @@
                         'label': 'mautic.core.searchcommand.ismine.label',
                         'tooltip': 'mautic.core.searchcommand.ismine.description',
                         'icon': 'ri-user-line'
+                    },
+                    {
+                        'search': 'mautic.email.email.searchcommand.isexpired',
+                        'label': 'mautic.core.form.sending_expired',
+                        'tooltip': 'mautic.email.email.searchcommand.isexpired.description',
+                        'icon': 'ri-time-line'
+                    },
+                    {
+                        'search': 'mautic.email.email.searchcommand.ispending',
+                        'label': 'mautic.core.form.scheduled_to_send',
+                        'tooltip': 'mautic.email.email.searchcommand.ispending.description',
+                        'icon': 'ri-timer-line'
                     }
                 ]
             }) -}}
+
             <div class="page-list">
               {{ include('@MauticEmail/Email/_list.html.twig') }}
             </div>
         </div>
 
-        {{ include('@MauticCore/Helper/protip.html.twig', {
+        {{ include('@MauticCore/Modules/protip.html.twig', {
             tip: random(['mautic.protip.emails.unsubscribe', 'mautic.protip.emails.test', 'mautic.protip.emails.personalize', 'mautic.protip.emails.spam', 'mautic.protip.emails.cta'])
         }) }}
     {% else %}

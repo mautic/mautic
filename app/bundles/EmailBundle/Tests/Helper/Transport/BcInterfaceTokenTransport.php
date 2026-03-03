@@ -43,13 +43,13 @@ class BcInterfaceTokenTransport implements TransportInterface
      */
     public function __construct(
         private $validate = false,
-        $numberToFail = 1
+        $numberToFail = 1,
     ) {
         $this->numberToFail       = (int) $numberToFail;
         $this->transports['main'] = $this;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Email) {
             $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;

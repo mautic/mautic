@@ -14,14 +14,14 @@ class Writer
     public function __construct(
         private NotificationModel $notificationModel,
         private AuditLogModel $auditLogModel,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
     ) {
     }
 
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    public function writeUserNotification(string $header, string $message, int $userId, string $deduplicateValue = null, \DateTime $deduplicateDateTimeFrom = null): void
+    public function writeUserNotification(string $header, string $message, int $userId, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
     {
         $this->notificationModel->addNotification(
             $message,

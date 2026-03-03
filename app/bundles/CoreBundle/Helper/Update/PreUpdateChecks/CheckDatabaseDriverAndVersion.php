@@ -10,7 +10,7 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 {
     public function __construct(
-        private EntityManager $em
+        private EntityManager $em,
     ) {
     }
 
@@ -44,7 +44,7 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
             )]);
         }
 
-        if (true !== version_compare($version, $minSupported, 'gt')) {
+        if (version_compare($version, $minSupported, '<')) {
             return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError('mautic.core.update.check.database_version',
                 [
                     '%currentversion%'    => $version,

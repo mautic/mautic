@@ -9,6 +9,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Facade\ReloadFacade;
 use Mautic\PluginBundle\Form\Type\DetailsType;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
@@ -24,7 +25,7 @@ class PluginController extends FormController
     /**
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, IntegrationHelper $integrationHelper)
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -54,8 +55,6 @@ class PluginController extends FormController
 
         $session->set('mautic.integrations.filter', $pluginFilter);
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
         $integrations       = $foundPlugins       = [];
 
@@ -131,7 +130,7 @@ class PluginController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -142,11 +141,9 @@ class PluginController extends FormController
 
         $session   = $request->getSession();
 
-        $integrationDetailsPost = $request->request->get('integration_details') ?? [];
+        $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
@@ -169,9 +166,9 @@ class PluginController extends FormController
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
         /** @var AbstractIntegration $integrationObject */
-        $entity = $integrationObject->getIntegrationSettings();
-
-        $form = $this->createForm(
+        $entity                 = $integrationObject->getIntegrationSettings();
+        $existingPublishedState = $entity->getIsPublished();
+        $form                   = $this->createForm(
             DetailsType::class,
             $entity,
             [
@@ -203,6 +200,9 @@ class PluginController extends FormController
                                 $keys[$secretKey] = $currentKeys[$secretKey];
                             }
                         }
+                        $keys = $this->removeAuthData($keys, $currentKeys, $integrationObject);
+                        $integrationObject->encryptAndSetApiKeys($keys, $entity);
+
                         $integrationObject->encryptAndSetApiKeys($keys, $entity);
                     }
 
@@ -254,6 +254,9 @@ class PluginController extends FormController
                         $mauticLogger->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
                             $mauticLogger->info('Event dispatcher has integration config save listeners.');
+                            if (!$valid && !$existingPublishedState) {
+                                $integrationObject->getIntegrationSettings()->setIsPublished(false);
+                            }
                             $event = new PluginIntegrationEvent($integrationObject);
 
                             $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
@@ -297,7 +300,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
-                        'sidebar'       => $this->get('twig')->render('@MauticCore/LeftPanel/index.html.twig'),
+                        'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
                     ]
                 );
             }
@@ -335,6 +338,9 @@ class PluginController extends FormController
             }
         }
 
+        $plugin  = $entity->getPlugin();
+        $version = $plugin?->getVersion();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -351,7 +357,8 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
-                    'sidebar'       => $this->get('twig')->render('@MauticCore/LeftPanel/index.html.twig'),
+                    'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
+                    'pluginVersion' => $version,
                 ],
             ]
         );
@@ -360,7 +367,7 @@ class PluginController extends FormController
     /**
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function infoAction($name)
+    public function infoAction(IntegrationHelper $integrationHelper, $name)
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -379,9 +386,6 @@ class PluginController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
-
         $bundle->splitDescriptions();
 
         return $this->delegateView(
@@ -395,6 +399,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
                     'route'         => false,
+                    'pluginVersion' => $bundle->getVersion(),
                 ],
             ]
         );
@@ -431,5 +436,34 @@ class PluginController extends FormController
                 ],
             ]
         );
+    }
+
+    /**
+     * @param array <string,mixed> $keys
+     * @param array <string,mixed> $currentKeys
+     *
+     * @return array <string,mixed>
+     *
+     * @phpstan-ignore-next-line Ignore as AbstractIntegration is deprecated
+     */
+    private function removeAuthData(array $keys, array $currentKeys, AbstractIntegration $integrationObject): array
+    {
+        $resetTokens = false;
+        $secretKeys  = array_unique(array_merge($integrationObject->getSecretKeys(), [$integrationObject->getClientIdKey()]));
+
+        foreach ($secretKeys as $secretKey) {
+            if (($keys[$secretKey] ?? null) !== ($currentKeys[$secretKey] ?? null)) {
+                $resetTokens = true;
+                break;
+            }
+        }
+
+        if (!$resetTokens) {
+            return $keys;
+        }
+
+        $keysToRemove = array_unique(array_merge($integrationObject->getRefreshTokenKeys(), [$integrationObject->getAuthTokenKey()]));
+
+        return array_diff_key($keys, array_flip($keysToRemove));
     }
 }

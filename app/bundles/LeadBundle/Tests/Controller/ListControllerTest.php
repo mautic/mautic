@@ -7,9 +7,9 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use Symfony\Component\HttpFoundation\Response;
 
 class ListControllerTest extends MauticMysqlTestCase
 {
@@ -51,7 +51,7 @@ class ListControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/segments');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('Test User', $clientResponse->getContent());
@@ -64,7 +64,7 @@ class ListControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/segments?search=has%3Aresults&tmpl=list');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
     public function testSegmentView(): void
@@ -73,7 +73,7 @@ class ListControllerTest extends MauticMysqlTestCase
         $segment  = $this->addContactsToSegment($contacts, 'MySeg');
         $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
         $response = $this->client->getResponse();
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         self::assertStringContainsString('MySeg', $response->getContent());
         // Make sure that contact grid is not loaded synchronously
         self::assertStringNotContainsString('Kane', $response->getContent());
@@ -89,7 +89,7 @@ class ListControllerTest extends MauticMysqlTestCase
         $segment  = $this->addContactsToSegment($contacts, 'MySeg');
         $this->client->request('GET', sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
         $response = $this->client->getResponse();
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         self::assertStringContainsString('Kane', $response->getContent());
         self::assertStringContainsString('Jacques', $response->getContent());
     }
@@ -189,7 +189,45 @@ class ListControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', sprintf('/s/segments/clone/%d', $list->getId()));
 
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         self::assertStringContainsString('Segment clone', $clientResponse->getContent());
+    }
+
+    public function testSegmentSearchFilters(): void
+    {
+        $this->createCustomField();
+        $segment = $this->createList('filter');
+        $segment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'custom_field_test',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'operator'   => '!empty',
+                'properties' => [
+                    'filter' => null,
+                ],
+            ],
+        ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $this->client->request('GET', '/api/segments?search=filters_field:custom_field_test');
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertStringContainsString('Segment filter', $clientResponse->getContent());
+    }
+
+    private function createCustomField(): LeadField
+    {
+        $field = new LeadField();
+        $field->setType('text');
+        $field->setObject('lead');
+        $field->setGroup('core');
+        $field->setLabel('Test field');
+        $field->setAlias('custom_field_test');
+        $field->setCharLengthLimit(64);
+
+        return $field;
     }
 }

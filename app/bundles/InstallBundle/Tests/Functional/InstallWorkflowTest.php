@@ -15,11 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INSTALLER which breaks other tests.
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class InstallWorkflowTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
@@ -60,13 +58,13 @@ class InstallWorkflowTest extends MauticMysqlTestCase
     {
         // Step 0: System checks.
         $crawler = $this->client->request(Request::METHOD_GET, '/installer');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $submitButton = $crawler->selectButton('install_check_step[buttons][next]');
         $form         = $submitButton->form();
         $crawler      = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Step 1: DB.
         $submitButton = $crawler->selectButton('install_doctrine_step[buttons][next]');
@@ -80,7 +78,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form['install_doctrine_step[backup_tables]']->setValue('0');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Step 2: Admin user.
         $submitButton = $crawler->selectButton('install_user_step[buttons][next]');
@@ -93,7 +91,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form['install_user_step[email]']->setValue('mautic@example.com');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $heading = $crawler->filter('.panel-body.text-center h5');
         Assert::assertCount(1, $heading, $this->client->getResponse()->getContent());
 
@@ -116,7 +114,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         // set the memory limit lower than the recommended value.
         ini_set('memory_limit', (string) ($limit - 1));
         $crawler = $this->client->request(Request::METHOD_GET, '/installer');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $details = $crawler->filter('#minorDetails ul')->html();
         Assert::assertStringContainsString($expectedMemoryMessage, $details);
@@ -124,7 +122,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         // set the memory limit higher than the recommended value.
         ini_set('memory_limit', (string) ($limit + 1));
         $crawler = $this->client->request(Request::METHOD_GET, '/installer');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $details = $crawler->filter('#minorDetails ul')->html();
         Assert::assertStringNotContainsString($expectedMemoryMessage, $details);

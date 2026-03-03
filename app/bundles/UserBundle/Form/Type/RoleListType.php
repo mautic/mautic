@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class RoleListType extends AbstractType
 {
     public function __construct(
-        private RoleModel $roleModel
+        private RoleModel $roleModel,
     ) {
     }
 
@@ -30,10 +30,7 @@ class RoleListType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -55,7 +52,8 @@ class RoleListType extends AbstractType
             ]
         );
 
-        foreach ($roles as $role) {
+        foreach ($roles as $result) {
+            $role                          = is_array($result) ? $result[0] : $result;
             $choices[$role->getName(true)] = $role->getId();
         }
 

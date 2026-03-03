@@ -12,30 +12,6 @@ use PHPUnit\Framework\Assert;
 
 class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
-    public function testPayloadBackwardCompatible(): void
-    {
-        $webhookQueue = $this->createWebhookQueue();
-
-        $payload  = 'BC payload';
-        $property = new \ReflectionProperty(WebhookQueue::class, 'payload');
-        $property->setAccessible(true);
-        $property->setValue($webhookQueue, $payload);
-
-        Assert::assertSame($payload, $webhookQueue->getPayload());
-
-        $this->em->flush();
-
-        $payloadDbValues = $this->fetchPayloadDbValues($webhookQueue);
-        Assert::assertSame($payload, $payloadDbValues['payload']);
-        Assert::assertNull($payloadDbValues['payload_compressed']);
-
-        $this->em->clear();
-        $webhookQueue = $this->em->getRepository(WebhookQueue::class)
-            ->find($webhookQueue->getId());
-
-        Assert::assertSame($payload, $webhookQueue->getPayload());
-    }
-
     public function testPayloadCompressed(): void
     {
         $webhookQueue = $this->createWebhookQueue();
@@ -48,7 +24,6 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $payloadDbValues = $this->fetchPayloadDbValues($webhookQueue);
-        Assert::assertNull($payloadDbValues['payload']);
         Assert::assertSame($payload, gzuncompress($payloadDbValues['payload_compressed']));
 
         $this->em->clear();
@@ -85,7 +60,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
     private function fetchPayloadDbValues(WebhookQueue $webhookQueue): array
     {
         $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $query  = sprintf('SELECT payload, payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
+        $query  = sprintf('SELECT payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
 
         return $this->connection->executeQuery($query, [$webhookQueue->getId()])
             ->fetchAssociative();

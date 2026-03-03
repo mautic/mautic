@@ -14,7 +14,7 @@ class EmailHitNotification
     public function __construct(
         private string $statId,
         private Request $request,
-        \DateTimeInterface $eventTime = null
+        ?\DateTimeInterface $eventTime = null,
     ) {
         $this->setEventTime($eventTime ?? new \DateTimeImmutable());
     }

@@ -19,7 +19,7 @@ final class FormAdjustmentEvent extends Event
         private string $fieldAlias,
         private string $fieldObject,
         private string $operator,
-        private array $fieldDetails
+        private array $fieldDetails,
     ) {
     }
 
@@ -80,5 +80,10 @@ final class FormAdjustmentEvent extends Event
     public function filterShouldBeDisabled(): bool
     {
         return $this->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
+    }
+
+    public function filterShouldBeRequired(): bool
+    {
+        return !$this->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
     }
 }

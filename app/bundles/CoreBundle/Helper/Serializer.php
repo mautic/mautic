@@ -13,19 +13,19 @@ class Serializer
      * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
      *
      * @param string $serializedString
-     *
-     * @return mixed
      */
-    public static function decode($serializedString, array $options = ['allowed_classes' => false])
+    public static function decode($serializedString, array $options = ['allowed_classes' => false]): mixed
     {
         if (1 === preg_match('/(^|;|{|})O:\+?[0-9]+:"/', $serializedString)) {
             throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));
         }
 
-        if (version_compare(phpversion(), '7.0.0', '<')) {
-            return unserialize($serializedString);
+        $result = @unserialize($serializedString, $options);
+
+        if (false === $result && 'b:0;' !== $serializedString) {
+            throw new \ErrorException('The serialized string is invalid: '.$serializedString);
         }
 
-        return unserialize($serializedString, $options);
+        return $result;
     }
 }

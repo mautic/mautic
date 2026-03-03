@@ -17,7 +17,7 @@ class Installer
      * @param string $translationsDirectory
      */
     public function __construct(
-        private $translationsDirectory
+        private $translationsDirectory,
     ) {
         $this->filesystem            = new Filesystem();
     }
@@ -72,7 +72,6 @@ class Installer
         $bundles = new Finder();
         $bundles->directories()->name('*Bundle')->in($this->sourceDirectory);
 
-        /** @var \SplFileInfo $bundle */
         foreach ($bundles as $bundle) {
             $this->copyBundle($bundle);
         }

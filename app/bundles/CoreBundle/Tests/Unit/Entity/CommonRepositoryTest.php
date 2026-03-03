@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(CommonRepository::class)]
 class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -33,7 +34,6 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         /** @var EntityManager&MockObject $emMock */
         $emMock = $this->getMockBuilder(EntityManager::class)
-            ->addMethods(['none'])
             ->onlyMethods(['getClassMetadata'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -46,31 +46,24 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $classMetadata = $this->createMock(ClassMetadata::class);
         $emMock->method('getClassMetadata')->willReturn($classMetadata);
 
-        $this->repo           = $this->getMockForAbstractClass(CommonRepository::class, [$managerRegistry, Lead::class]);
+        $this->repo = $this->getMockBuilder(CommonRepository::class)
+            ->setConstructorArgs([$managerRegistry, Lead::class])
+            ->onlyMethods([])
+            ->getMock();
         $this->qb             = new QueryBuilder($emMock);
         $this->connectionMock = $this->createMock(Connection::class);
         $this->connectionMock->method('getExpressionBuilder')
             ->willReturn(new ExpressionBuilder($this->connectionMock));
     }
 
-    /**
-     * @testdox Check that the query is being build without providing any order statements
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that the query is being build without providing any order statements')]
     public function testBuildingQueryWithUndefinedOrder(): void
     {
         $this->callProtectedMethod('buildClauses', [$this->qb, []]);
         $this->assertSame('SELECT e', (string) $this->qb);
     }
 
-    /**
-     * @testdox Check that providing orderBy and orderByDir builds the query correctly
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that providing orderBy and orderByDir builds the query correctly')]
     public function testBuildingQueryWithBasicOrder(): void
     {
         $args = [
@@ -81,13 +74,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('SELECT e ORDER BY e.someCol DESC', (string) $this->qb);
     }
 
-    /**
-     * @testdox Check that array of ORDER statements is correct
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClauseFromArray
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that array of ORDER statements is correct')]
     public function testBuildingQueryWithOrderArray(): void
     {
         $args = [
@@ -104,11 +91,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('SELECT e ORDER BY e.someCol DESC', (string) $this->qb);
     }
 
-    /**
-     * @testdox Check that order by validation will allow dots in the column name
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that order by validation will allow dots in the column name')]
     public function testValidateOrderByClauseWithColContainingAliasWillNotRemoveTheDot(): void
     {
         $provided = [
@@ -125,11 +108,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @testdox Check that order validation will remove funky characters that can be used in an attack
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that order validation will remove funky characters that can be used in an attack')]
     public function testValidateOrderByClauseWillRemoveFunkyChars(): void
     {
         $provided = [
@@ -145,11 +124,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @testdox Check that order validation will throw an exception if column name is missing
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that order validation will throw an exception if column name is missing')]
     public function testValidateOrderByClauseWithMissingCol(): void
     {
         $this->expectException(\InvalidArgumentException::class);

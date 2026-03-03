@@ -105,30 +105,6 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createMock(Translator::class);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedMethodOtherwiseItLowersCodeCoverageAsItsNoLongerUsed(): void
-    {
-        $deprecationTriggered = false;
-        $errorHandler         = function (int $errorNumber, string $errorMessage) use (&$deprecationTriggered): bool {
-            if (E_USER_DEPRECATED === $errorNumber && 'EventExecutioner::recordLogsWithError() is deprecated in Mautic:4 and is removed from Mautic:5 as unused' === $errorMessage) {
-                $deprecationTriggered = true;
-            }
-
-            // returning false let the normal error handler continue
-            return false;
-        };
-
-        $this->eventLogger->expects($this->once())->method('persistCollection')->willReturn($this->eventLogger);
-
-        set_error_handler($errorHandler);
-        $this->getEventExecutioner()->recordLogsWithError(new ArrayCollection([]), 'some message'); // @phpstan-ignore-line as recordLogsWithError() is deprecated
-        restore_error_handler();
-
-        $this->assertTrue($deprecationTriggered, 'Deprecation should be triggered');
-    }
-
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
     {
         $campaign = new Campaign();
@@ -205,20 +181,20 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                     return $logs;
                 }
             );
+        $matcher = $this->exactly(2);
 
-        $this->actionExecutioner->expects($this->exactly(2))
-            ->method('execute')
-            ->withConsecutive(
-                [
-                    $otherConfig,
-                    $this->isInstanceOf(ArrayCollection::class),
-                ],
-                [
-                    $jumpConfig,
-                    $this->isInstanceOf(ArrayCollection::class),
-                ]
-            )
-            ->willReturn(new EvaluatedContacts());
+        $this->actionExecutioner->expects($matcher)
+            ->method('execute')->willReturnCallback(function (...$parameters) use ($matcher, $otherConfig, $jumpConfig) {
+                $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($otherConfig, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($jumpConfig, $parameters[0]);
+                }
+
+                return new EvaluatedContacts();
+            });
 
         // This should not be called because the rotation is already incremented in the subscriber
         $this->leadRepository->expects($this->never())
@@ -251,13 +227,11 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setCampaign($campaign)
             ->setProperties(['jumpToEvent' => 999]);
 
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->method('getId')
             ->willReturn(1);
 
-        $log = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log = $this->createMock(LeadEventLog::class);
         $log->method('getLead')
             ->willReturn($lead);
         $log->method('setIsScheduled')

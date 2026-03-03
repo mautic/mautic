@@ -56,6 +56,8 @@ return [
                 'class'     => MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
                 'arguments' => [
                     'translator',
+                    'mautic.native.connector',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
@@ -73,7 +75,10 @@ return [
     ],
 
     'categories' => [
-        'plugin:focus' => 'mautic.focus',
+        'plugin:focus' => [
+            'label' => 'mautic.focus',
+            'class' => MauticPlugin\MauticFocusBundle\Entity\Focus::class,
+        ],
     ],
 
     'parameters' => [

@@ -12,6 +12,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PointActionType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks           = [];
@@ -41,7 +45,7 @@ class PointActionType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointaction';
     }

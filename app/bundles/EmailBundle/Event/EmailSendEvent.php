@@ -61,7 +61,7 @@ class EmailSendEvent extends CommonEvent
     public function __construct(
         private ?MailHelper $helper = null,
         $args = [],
-        private $isDynamicContentParsing = false
+        private $isDynamicContentParsing = false,
     ) {
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
@@ -298,8 +298,9 @@ class EmailSendEvent extends CommonEvent
             // what entity is sending the email?
             'source' => $source,
             // the email being sent to be logged in page hit if applicable
-            'email' => (null != $email) ? $email->getId() : null,
-            'stat'  => $this->getIdHash(),
+            'email'     => (null != $email) ? $email->getId() : null,
+            'stat'      => $this->getIdHash(),
+            'sent_time' => time(),
         ];
         $lead = $this->getLead();
         if (null !== $lead) {

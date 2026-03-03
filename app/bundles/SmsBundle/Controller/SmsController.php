@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -73,6 +74,9 @@ class SmsController extends FormController
                     'value'  => $this->user->getId(),
                 ];
         }
+
+        // Not to include translations
+        $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
 
         $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
         $orderByDir = $session->get('mautic.sms.orderbydir', $this->getDefaultOrderDirection());
@@ -182,7 +186,7 @@ class SmsController extends FormController
         $logs = $auditLogModel->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
@@ -195,6 +199,13 @@ class SmsController extends FormController
 
         // Get click through stats
         $trackableLinks = $model->getSmsClickStats($sms->getId());
+
+        $translations = $sms->getTranslations();
+        if ($translations instanceof Collection) {
+            $translations = $translations->toArray();
+        }
+
+        [$translationParent, $translationChildren] = $translations;
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
@@ -225,6 +236,10 @@ class SmsController extends FormController
                     ]
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'translations'  => [
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren,
+                ],
             ],
             'contentTemplate' => '@MauticSms/Sms/details.html.twig',
             'passthroughVars' => [
@@ -261,7 +276,7 @@ class SmsController extends FormController
         // set the page we came from
         $page         = $session->get('mautic.sms.page', 1);
         $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'new']);
-        $sms          = $request->request->get('sms') ?? [];
+        $sms          = $request->request->all()['sms'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -427,7 +442,7 @@ class SmsController extends FormController
 
         // Create the form
         $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $sms          = $request->request->get('sms') ?? [];
+        $sms          = $request->request->all()['sms'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -625,10 +640,8 @@ class SmsController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.sms.page', 1);
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
@@ -728,7 +741,7 @@ class SmsController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

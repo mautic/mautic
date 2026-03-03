@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
@@ -20,7 +21,7 @@ class ThemeController extends FormController
     /**
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper)
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -34,7 +35,7 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
-        $dir    = $this->factory->getSystemPath('themes', true);
+        $dir    = $pathsHelper->getSystemPath('themes', true);
         $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
 
@@ -174,10 +175,8 @@ class ThemeController extends FormController
 
     /**
      * Deletes the theme.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
+    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
     {
         $flashes = [];
 
@@ -195,18 +194,40 @@ class ThemeController extends FormController
 
     /**
      * Deletes a group of themes.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request, ThemeHelperInterface $themeHelper)
+    public function batchDeleteAction(Request $request, ThemeHelperInterface $themeHelper): Response
     {
         $flashes = [];
+        $error   = [];
 
         if ('POST' === $request->getMethod()) {
             $themeNames = json_decode($request->query->get('ids', '{}'));
 
             foreach ($themeNames as $themeName) {
-                $flashes = $this->deleteTheme($themeHelper, $themeName);
+                $flash = $this->deleteTheme($themeHelper, $themeName)[0];
+
+                if ('error' === $flash['type']) {
+                    $error[] = $flash;
+                } else {
+                    $flashes[] = $flash;
+                }
+            }
+
+            if (count($flashes) > 1) {
+                $flashNumber = count($flashes);
+                unset($flashes);
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.core.theme.notice.batch_deleted',
+                    'msgVars' => [
+                        '%count%' => $flashNumber,
+                    ],
+                ];
+            }
+
+            if ($error) {
+                $flashes = array_merge($flashes, $error);
             }
         }
 

@@ -2,6 +2,13 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -13,9 +20,29 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'User',
+    operations: [
+        new GetCollection(uriTemplate: '/users', security: "is_granted('user:users:viewown')"),
+        new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown')"),
+        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['user:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['user:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'User';
@@ -23,12 +50,11 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @var ?int
      */
+    #[Groups(['user:read'])]
     protected $id;
 
-    /**
-     * @var string
-     */
-    protected $username;
+    #[Groups(['user:read', 'user:write'])]
+    protected ?string $username = null;
 
     /**
      * @var string
@@ -40,6 +66,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      *
      * @var ?string
      */
+    #[Groups(['user:write'])]
     private $plainPassword;
 
     /**
@@ -52,46 +79,55 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @var string
      */
+    #[Groups(['user:read', 'user:write'])]
     private $firstName;
 
     /**
      * @var string
      */
+    #[Groups(['user:read', 'user:write'])]
     private $lastName;
 
     /**
      * @var string
      */
+    #[Groups(['user:read', 'user:write'])]
     private $email;
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $position;
 
     /**
      * @var Role
      */
+    #[Groups(['user:read', 'user:write'])]
     private $role;
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $timezone = '';
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $locale = '';
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['user:read'])]
     private $lastLogin;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['user:read'])]
     private $lastActive;
 
     /**
@@ -102,18 +138,20 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @var array
      */
+    #[Groups(['user:read', 'user:write'])]
     private $preferences = [];
 
     /**
      * @var string|null
      */
+    #[Groups(['user:read', 'user:write'])]
     private $signature;
 
     /**
      * @param bool $guest
      */
     public function __construct(
-        private $guest = false
+        private $guest = false,
     ) {
     }
 
@@ -229,6 +267,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ]
         ));
 
+        $metadata->addPropertyConstraint('position', new Assert\Length(
+            [
+                'max'        => 191,
+                'maxMessage' => 'mautic.user.user.position.toolong',
+            ]
+        ));
+
         $metadata->addPropertyConstraint('role', new Assert\NotBlank(
             ['message' => 'mautic.user.user.role.notblank']
         ));
@@ -325,17 +370,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         }
     }
 
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->username;
     }
 
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->username ?? '';
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         // bcrypt generates its own salt
         return null;
@@ -366,7 +411,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->currentPassword;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         $roles = [];
 
@@ -383,10 +428,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
-        $this->plainPassword   = null;
-        $this->currentPassword = null;
     }
 
     /**
@@ -394,6 +438,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     public function __serialize(): array
     {
+        $this->plainPassword   = null;
+        $this->currentPassword = null;
+
         return [
             $this->id,
             $this->username,
@@ -411,7 +458,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             $this->id,
             $this->username,
             $this->password,
-            $published
+            $published,
         ] = $data;
         $this->setIsPublished($published);
     }
@@ -567,7 +614,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      *
      * @return User
      */
-    public function setRole(Role $role = null)
+    public function setRole(?Role $role = null)
     {
         $this->isChanged('role', $role);
         $this->role = $role;
@@ -776,6 +823,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     public function isEqualTo(UserInterface $user): bool
     {
+        if (!$user instanceof self) {
+            return false;
+        }
+
         $thisUser = $this->getId().$this->getUserIdentifier().$this->getPassword();
         $thatUser = $user->getId().$user->getUserIdentifier().$user->getPassword();
 

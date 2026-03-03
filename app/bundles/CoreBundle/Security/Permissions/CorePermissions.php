@@ -2,15 +2,17 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CorePermissions
+class CorePermissions implements ResetInterface
 {
     private array $permissionClasses = [];
 
@@ -29,9 +31,14 @@ class CorePermissions
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
         private array $bundles,
-        private array $pluginBundles
+        private array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
+    }
+
+    public function reset(): void
+    {
+        $this->permissionObjectsGenerated = false;
     }
 
     public function setPermissionObject(AbstractPermissions $permissionObject): void
@@ -83,7 +90,7 @@ class CorePermissions
             $permissionObject = $this->findPermissionObject($bundle);
         } catch (\UnexpectedValueException $e) {
             try {
-                $permissionObject = $this->instantiatePermissionObject($bundle);
+                $permissionObject = $this->instantiatePermissionObject($bundle); // @phpstan-ignore method.deprecated
                 $this->setPermissionObject($permissionObject);
             } catch (\InvalidArgumentException $e) {
                 if ($throwException) {
@@ -293,16 +300,46 @@ class CorePermissions
         return (is_array($permission)) ? $result : $result[$permission];
     }
 
+    public function hasPublishAccessForEntity(FormEntity $entity, string $ownPermission, string $otherPermission): bool
+    {
+        $user = $this->userHelper->getUser();
+
+        if (!$user) {
+            return false;
+        }
+
+        $hasOwnPermission   = $this->isGranted($ownPermission);
+        $hasOtherPermission = $this->isGranted($otherPermission);
+
+        if (!$hasOwnPermission && !$hasOtherPermission) {
+            return false;
+        }
+
+        if ($hasOwnPermission && $entity->isNew()) {
+            return true;
+        }
+
+        $ownerId = method_exists($entity, 'getPermissionUser') ? (int) $entity->getPermissionUser() : (int) $entity->getCreatedBy();
+
+        if ($hasOwnPermission && !$entity->isNew() && $ownerId === (int) $user->getId()) {
+            return true;
+        }
+
+        if ($hasOtherPermission && !$entity->isNew() && $ownerId !== (int) $user->getId()) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Checks if the user has access to the requested entity.
      *
      * @param string|bool $ownPermission
      * @param string|bool $otherPermission
      * @param User|int    $ownerId
-     *
-     * @return bool
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
+    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0): bool
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {

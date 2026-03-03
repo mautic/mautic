@@ -3,7 +3,6 @@
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\EmailBundle\Entity\Email;
 
 /**
  * @extends CommonRepository<Redirect>
@@ -23,34 +22,6 @@ class RedirectRepository extends CommonRepository
 
         $q->where($expr)
             ->setParameter('urls', $urls);
-
-        return $q->getQuery()->getResult();
-    }
-
-    /**
-     * @return array
-     */
-    public function findByIds(array $ids, Email $email = null)
-    {
-        $q = $this->createQueryBuilder('r');
-
-        $expr = $q->expr()->andX(
-            $q->expr()->in('r.id', ':ids')
-        );
-
-        if (null === $email) {
-            $expr->add(
-                $q->expr()->isNull('r.email')
-            );
-        } else {
-            $expr->add(
-                $q->expr()->eq('r.email', ':email')
-            );
-            $q->setParameter('email', $email);
-        }
-
-        $q->where($expr)
-            ->setParameter('ids', $ids);
 
         return $q->getQuery()->getResult();
     }
@@ -90,7 +61,7 @@ class RedirectRepository extends CommonRepository
         $createdByUserId = null,
         $companyId = null,
         $campaignId = null,
-        $segmentId = null
+        $segmentId = null,
     ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->addSelect('pr.url')
@@ -98,7 +69,7 @@ class RedirectRepository extends CommonRepository
             ->addSelect('count(distinct ph.tracking_id) as unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->join('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'pr.id = ph.redirect_id')
-            ->join('ph', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'ph.source = "email" and ph.source_id = es.email_id and ph.lead_id = es.lead_id')
+            ->join('ph', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'ph.source = \'email\' and ph.source_id = es.email_id and ph.lead_id = es.lead_id')
             ->join('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id')
             ->addSelect('e.id AS email_id')
             ->addSelect('e.name AS email_name');

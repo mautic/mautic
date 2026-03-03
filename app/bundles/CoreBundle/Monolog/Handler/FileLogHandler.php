@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Monolog\Handler;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
+use Monolog\Level;
 
 class FileLogHandler extends RotatingFileHandler
 {
@@ -15,7 +15,7 @@ class FileLogHandler extends RotatingFileHandler
         $logFileName = $coreParametersHelper->get('log_file_name');
         $maxFiles    = $coreParametersHelper->get('max_log_files');
         $debugMode   = $coreParametersHelper->get('debug', false) || (defined('MAUTIC_ENV') && 'dev' === MAUTIC_ENV);
-        $level       = $debugMode ? Logger::DEBUG : Logger::NOTICE;
+        $level       = $debugMode ? Level::Debug : Level::Notice;
 
         if ($debugMode) {
             $this->setFormatter($exceptionFormatter);

@@ -52,7 +52,6 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param AuthCredentialsInterface|CredentialsInterface                                                                   $credentials
      * @param ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface $config
      *
      * @throws PluginNotConfiguredException

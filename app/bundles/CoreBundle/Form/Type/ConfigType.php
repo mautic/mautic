@@ -25,7 +25,10 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -68,6 +71,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.webroot',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.core.config.form.webroot.help',
                 'attr'       => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.webroot.tooltip',
@@ -85,6 +89,7 @@ class ConfigType extends AbstractType
             [
                 'label'         => 'mautic.core.config.form.404_page',
                 'label_attr'    => ['class' => 'control-label'],
+                'help'          => 'mautic.core.config.form.404_page.help',
                 'attr'          => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
@@ -151,6 +156,7 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                    new Callback([$this, 'validateImagePath']),
                 ],
             ]
         );
@@ -179,6 +185,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
+                'help'              => 'mautic.core.config.form.locale.help',
                 'placeholder'       => false,
             ]
         );
@@ -195,7 +202,8 @@ class ConfigType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.trusted.hosts.tooltip',
                     ],
-                    'required' => false,
+                    'help'       => 'mautic.core.config.form.trusted_hosts.help',
+                    'required'   => false,
                 ]
             )->addViewTransformer($arrayStringTransformer)
         );
@@ -296,7 +304,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cached_data_timeout',
-            TextType::class,
+            NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -307,11 +315,12 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotBlank([
+                        'message' => 'mautic.core.value.required',
+                    ]),
+                    new GreaterThanOrEqual([
+                        'value' => 0,
+                    ]),
                 ],
             ]
         );
@@ -434,6 +443,7 @@ class ConfigType extends AbstractType
                 'label_attr'        => [
                     'class' => 'control-label',
                 ],
+                'help'              => 'mautic.core.config.form.ip.lookup.service.help',
                 'required'          => false,
                 'attr'              => [
                     'class'    => 'form-control',
@@ -574,6 +584,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.core.config.form.link.max_entity_lock_time.help',
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.link.max_entity_lock_time.tooltip',
@@ -596,23 +607,11 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'load_froala_assets',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.core.config.load.froala.assets',
-                'data'  => (array_key_exists('load_froala_assets', $options['data']) && !empty($options['data']['load_froala_assets'])),
-                'attr'  => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.load.froala.assets.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add(
             'cors_restrict_domains',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.config.cors.restrict.domains',
+                'help'  => 'mautic.core.config.cors.restrict.domains.help',
                 'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),
                 'attr'  => [
                     'class'   => 'form-control',
@@ -634,9 +633,29 @@ class ConfigType extends AbstractType
                         'tooltip'      => 'mautic.core.config.cors.valid.domains.tooltip',
                         'data-show-on' => '{"config_coreconfig_cors_restrict_domains_1":"checked"}',
                     ],
+                    'help'       => 'mautic.core.config.form.cors_valid_domains.help',
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
         );
+
+        if ($this->coreParametersHelper->get('validate_remote_domains')) {
+            $builder->add(
+                $builder->create(
+                    'allowed_remote_domains',
+                    TextareaType::class,
+                    [
+                        'label'      => 'mautic.core.config.allowed.remote.domains',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.core.config.allowed.remote.domains.tooltip',
+                            'rows'    => 8,
+                        ],
+                        'required'   => false,
+                    ]
+                )->addViewTransformer($arrayLinebreakTransformer)
+            );
+        }
 
         $builder->add(
             'headers_sts',
@@ -658,9 +677,9 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.core.config.response.headers.sts.expire_time',
                 'data'  => $options['data']['headers_sts_expire_time'] ?? 60,
                 'attr'  => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
-                    'min'          => 60,
+                    'class'          => 'form-control',
+                    'data-enable-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'min'            => 60,
                 ],
             ]
         );
@@ -672,9 +691,9 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.core.config.response.headers.sts.subdomains',
                 'data'  => (array_key_exists('headers_sts_subdomains', $options['data']) && !empty($options['data']['headers_sts_subdomains'])),
                 'attr'  => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
-                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'class'          => 'form-control',
+                    'tooltip'        => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
+                    'data-enable-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
                 ],
             ]
         );
@@ -686,12 +705,43 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.core.config.response.headers.sts.preload',
                 'data'  => (array_key_exists('headers_sts_preload', $options['data']) && !empty($options['data']['headers_sts_preload'])),
                 'attr'  => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.response.headers.sts.preload.tooltip',
-                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'class'          => 'form-control',
+                    'tooltip'        => 'mautic.core.config.response.headers.sts.preload.tooltip',
+                    'data-enable-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
                 ],
             ]
         );
+    }
+
+    // Validate $value to check ../ and denied system folders
+    public function validateImagePath(?string $value, ExecutionContextInterface $context): void
+    {
+        $isValid = true;
+
+        $normalizedValue = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $value);
+
+        if (
+            empty($normalizedValue)
+            || str_contains($normalizedValue, '..')
+            || str_contains($normalizedValue, '.'.DIRECTORY_SEPARATOR)
+            || DIRECTORY_SEPARATOR === $normalizedValue
+        ) {
+            $isValid = false;
+        }
+
+        $mediaFile = substr($value, 0, 6);
+
+        if ('media/' !== $mediaFile) {
+            $isValid = false;
+        }
+
+        if (!is_dir($value)) {
+            $isValid = false;
+        }
+
+        if (!$isValid) {
+            $context->buildViolation('mautic.core.config.form.image.path.invalid')->atPath('image_path')->addViolation();
+        }
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
@@ -699,7 +749,7 @@ class ConfigType extends AbstractType
         $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'coreconfig';
     }

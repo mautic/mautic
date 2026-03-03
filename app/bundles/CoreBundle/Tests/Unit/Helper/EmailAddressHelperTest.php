@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
+
 use Mautic\CoreBundle\Helper\EmailAddressHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class EmailAddressHelperTest extends TestCase
@@ -15,9 +18,7 @@ final class EmailAddressHelperTest extends TestCase
         $this->helper = new EmailAddressHelper();
     }
 
-    /**
-     * @dataProvider emailProvider
-     */
+    #[DataProvider('emailProvider')]
     public function testCleanEmail(string $email, string $expected): void
     {
         $this->assertSame($expected, $this->helper->cleanEmail($email));
@@ -37,10 +38,9 @@ final class EmailAddressHelperTest extends TestCase
     }
 
     /**
-     * @param array<int, array<int, array<int, string>|string>> $expected
-     *
-     * @dataProvider variationsProvider
+     * @param array<int, string> $expected
      */
+    #[DataProvider('variationsProvider')]
     public function testGetVariations(string $email, array $expected): void
     {
         $this->assertSame(

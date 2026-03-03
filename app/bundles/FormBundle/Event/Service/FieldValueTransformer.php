@@ -16,7 +16,7 @@ class FieldValueTransformer
     private bool $isTransformed = false;
 
     public function __construct(
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -77,13 +77,5 @@ class FieldValueTransformer
     public function getTokensToUpdate()
     {
         return $this->tokensToUpdate;
-    }
-
-    /**
-     * @deprecated will be removed in Mautic 4. This should have been a private method. Not actually needed.
-     */
-    public function isIsTransformed(): bool
-    {
-        return $this->isTransformed;
     }
 }

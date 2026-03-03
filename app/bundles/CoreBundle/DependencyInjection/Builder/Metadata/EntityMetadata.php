@@ -8,15 +8,12 @@ use Symfony\Component\Finder\Finder;
 
 class EntityMetadata
 {
-    /**
-     * @var array
-     */
-    private $ormConfig = [];
+    private array $ormConfig = [];
 
     private array $serializerConfig = [];
 
     public function __construct(
-        private BundleMetadata $metadata
+        private BundleMetadata $metadata,
     ) {
     }
 
@@ -36,7 +33,6 @@ class EntityMetadata
         $bundleNamespace = $this->metadata->getNamespace();
         $bundleName      = $this->metadata->getBundleName();
 
-        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             // Check to see if entities are organized by subfolder
             $subFolder = $file->getRelativePath() ? $file->getRelativePath().'\\' : '';

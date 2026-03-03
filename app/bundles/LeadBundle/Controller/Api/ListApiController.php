@@ -5,10 +5,10 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -35,7 +35,7 @@ class ListApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
     {
         $listModel = $modelFactory->getModel('lead.list');
         \assert($listModel instanceof ListModel);
@@ -44,9 +44,15 @@ class ListApiController extends CommonApiController
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
-        $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress', 'categoryList'];
+        $this->serializerGroups = [
+            'leadListDetails',
+            'userList',
+            'publishDetails',
+            'ipAddress',
+            'categoryList',
+        ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
@@ -75,6 +81,40 @@ class ListApiController extends CommonApiController
         }
 
         return $parameters;
+    }
+
+    /**
+     * Obtains a list of entities.
+     */
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    {
+        $withCounts = $request->query->has('withCounts');
+        $response   = parent::getEntitiesAction($request, $userHelper);
+
+        if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
+            $content = json_decode($response->getContent(), true);
+
+            if (isset($content['lists']) && is_array($content['lists'])) {
+                $segmentIds = array_column($content['lists'], 'id');
+
+                if ($segmentIds) {
+                    /** @var ListModel $model */
+                    $model      = $this->model;
+                    $leadCounts = $model->getSegmentContactCount($segmentIds);
+
+                    foreach ($content['lists'] as &$segment) {
+                        $segment['contactCount'] = $leadCounts[$segment['id']] ?? 0;
+                    }
+
+                    $view = $this->view($content, Response::HTTP_OK);
+                    $this->setSerializationContext($view);
+
+                    return $this->handleView($view);
+                }
+            }
+        }
+
+        return $response;
     }
 
     /**
@@ -230,7 +270,7 @@ class ListApiController extends CommonApiController
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         } elseif ('delete' == $action) {
-            return $this->factory->getSecurity()->hasEntityAccess(
+            return $this->security->hasEntityAccess(
                 true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );
         }

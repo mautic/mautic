@@ -46,10 +46,6 @@ return [
                 'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
-            'mautic.install.fixture.grape_js' => [
-                'class'     => Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
         ],
         'other' => [
             'mautic.install.configurator.step.check' => [
@@ -95,11 +91,6 @@ return [
                     'security.password_hasher',
                     'mautic.doctrine.loader.mautic_fixtures_loader',
                 ],
-            ],
-            'mautic.install.leadcolumns' => [
-                'class'     => Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
-                'tag'       => 'doctrine.event_subscriber',
-                'arguments' => [],
             ],
         ],
     ],

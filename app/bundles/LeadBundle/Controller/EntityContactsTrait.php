@@ -19,7 +19,6 @@ trait EntityContactsTrait
      * @param array|null              $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
      * @param array|null              $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      * @param string|null             $contactColumnName  Column of the contact in the join table
-     * @param array|null              $routeParameters
      * @param string|null             $paginationTarget   DOM selector for injecting new content when pagination is used
      * @param string|null             $orderBy            optional OrderBy column, to be used to increase performance with joins
      * @param string|null             $orderByDir         optional $orderBy direction, to be used to increase performance with joins
@@ -39,19 +38,38 @@ trait EntityContactsTrait
         $entityJoinTable,
         $dncChannel = null,
         $entityIdColumnName = 'id',
-        array $contactFilter = null,
-        array $additionalJoins = null,
+        ?array $contactFilter = null,
+        ?array $additionalJoins = null,
         $contactColumnName = null,
-        array $routeParameters = [],
+        ?array $routeParameters = [],
         $paginationTarget = null,
         $orderBy = null,
         $orderByDir = null,
         $count = null,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ) {
         if ($permission && !$this->security->isGranted($permission)) {
-            return $this->accessDenied();
+            return $this->delegateView(
+                [
+                    'viewParameters' => [
+                        'page'            => $page,
+                        'items'           => [], // return 0 contacts if user has no permissions
+                        'totalItems'      => 0,
+                        'tmpl'            => $sessionVar.'Contacts',
+                        'indexMode'       => 'grid',
+                        'routeParameters' => $routeParameters,
+                        'sessionVar'      => $sessionVar.'.contact',
+                        'objectId'        => $entityId,
+                        'target'          => $paginationTarget,
+                    ],
+                    'contentTemplate' => '@MauticLead/Lead/grid.html.twig',
+                    'passthroughVars' => [
+                        'mauticContent' => $sessionVar.'Contacts',
+                        'route'         => false,
+                    ],
+                ]
+            );
         }
 
         // Set the route if not standardized

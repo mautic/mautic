@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private WebhookModel $webhookModel
+        private WebhookModel $webhookModel,
     ) {
     }
 

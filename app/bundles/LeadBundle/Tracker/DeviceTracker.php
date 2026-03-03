@@ -22,7 +22,7 @@ class DeviceTracker
         private DeviceCreatorServiceInterface $deviceCreatorService,
         private DeviceDetectorFactoryInterface $deviceDetectorFactory,
         private DeviceTrackingServiceInterface $deviceTrackingService,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -82,5 +82,14 @@ class DeviceTracker
     public function clearTrackingCookies(): void
     {
         $this->deviceTrackingService->clearTrackingCookies();
+    }
+
+    /**
+     * Resets cache.
+     */
+    public function reset(): void
+    {
+        $this->trackedDevice = [];
+        $this->deviceTrackingService->reset();
     }
 }

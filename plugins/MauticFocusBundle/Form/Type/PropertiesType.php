@@ -166,7 +166,7 @@ class PropertiesType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.stop_after_close',
-                'data'  => (isset($options['data']['stop_after_close'])) ? $options['data']['stop_after_close'] : false,
+                'data'  => $options['data']['stop_after_close'] ?? false,
                 'attr'  => [
                     'tooltip' => 'mautic.focus.form.stop_after_close.tooltip',
                 ],
@@ -174,10 +174,7 @@ class PropertiesType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'focus_entity_properties';
     }

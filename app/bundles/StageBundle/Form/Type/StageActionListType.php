@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class StageActionListType extends AbstractType
 {
     public function __construct(
-        private StageModel $model
+        private StageModel $model,
     ) {
     }
 
@@ -35,15 +35,12 @@ class StageActionListType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'stageaction_list';
     }

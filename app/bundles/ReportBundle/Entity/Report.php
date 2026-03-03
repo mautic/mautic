@@ -2,104 +2,153 @@
 
 namespace Mautic\ReportBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\EmailBundle\Validator as EmailAssert;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Report extends FormEntity implements SchedulerInterface
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('report:reports:viewown')"),
+        new Post(security: "is_granted('report:reports:create')"),
+        new Get(security: "is_granted('report:reports:viewown')"),
+        new Put(security: "is_granted('report:reports:editown')"),
+        new Patch(security: "is_granted('report:reports:editother')"),
+        new Delete(security: "is_granted('report:reports:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['report:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['report:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Report extends FormEntity implements SchedulerInterface, UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
+    #[Groups(['report:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['report:read', 'report:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['report:read', 'report:write'])]
     private $description;
 
     /**
      * @var bool
      */
+    #[Groups(['report:read', 'report:write'])]
     private $system = false;
 
     /**
      * @var string
      */
+    #[Groups(['report:read', 'report:write'])]
     private $source;
 
     /**
      * @var array
      */
+    #[Groups(['report:read', 'report:write'])]
     private $columns = [];
 
     /**
      * @var array
      */
+    #[Groups(['report:read', 'report:write'])]
     private $filters = [];
 
     /**
      * @var array
      */
+    #[Groups(['report:read', 'report:write'])]
     private $tableOrder = [];
 
     /**
      * @var array
      */
+    #[Groups(['report:read', 'report:write'])]
     private $graphs = [];
 
     /**
      * @var array
      */
+    #[Groups(['report:read', 'report:write'])]
     private $groupBy = [];
 
     /**
      * @var array
      */
+    #[Groups(['report:read', 'report:write'])]
     private $aggregators = [];
 
     /**
      * @var array|null
      */
+    #[Groups(['report:read', 'report:write'])]
     private $settings = [];
 
     /**
      * @var bool
+     *
+     * @ApiProperty(readable=true)
      */
+    #[Groups(['report:read', 'report:write'])]
     private $isScheduled = false;
 
     /**
      * @var string|null
      */
+    #[Groups(['report:read', 'report:write'])]
     private $toAddress;
 
     /**
      * @var string|null
      */
+    #[Groups(['report:read', 'report:write'])]
     private $scheduleUnit;
 
     /**
      * @var string|null
      */
+    #[Groups(['report:read', 'report:write'])]
     private $scheduleDay;
 
     /**
      * @var string|null
      */
+    #[Groups(['report:read', 'report:write'])]
     private $scheduleMonthFrequency;
     private bool $hasScheduleChanged = false;
 
@@ -163,6 +212,8 @@ class Report extends FormEntity implements SchedulerInterface
         $builder->addNullableField('toAddress', Types::STRING, 'to_address');
         $builder->addNullableField('scheduleDay', Types::STRING, 'schedule_day');
         $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

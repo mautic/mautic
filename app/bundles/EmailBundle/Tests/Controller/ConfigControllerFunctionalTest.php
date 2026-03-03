@@ -70,10 +70,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider dataInvalidDsn
-     *
      * @param array<string, string> $data
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidDsn')]
     public function testInvalidDsn(array $data, string $expectedMessage): void
     {
         // request config edit page
@@ -93,9 +92,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, mixed[]>
+     * @return iterable<string, mixed[]>
      */
-    public function dataInvalidDsn(): iterable
+    public static function dataInvalidDsn(): iterable
     {
         yield 'Unsupported scheme' => [
             [

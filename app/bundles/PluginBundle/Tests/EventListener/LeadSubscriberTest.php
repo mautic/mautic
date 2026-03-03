@@ -19,11 +19,6 @@ class LeadSubscriberTest extends TestCase
     private LeadSubscriber $subscriber;
 
     /**
-     * @var LeadEvent|MockObject
-     */
-    private $leadEvent;
-
-    /**
      * @var IntegrationEntityRepository|MockObject
      */
     private $integrationEntityRepository;
@@ -37,7 +32,6 @@ class LeadSubscriberTest extends TestCase
     {
         $pluginModel                       = $this->createMock(PluginModel::class);
         $this->integrationRepository       = $this->createMock(IntegrationRepository::class);
-        $this->leadEvent                   = $this->createMock(LeadEvent::class);
         $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
         $this->subscriber                  = new LeadSubscriber(
             $pluginModel,
@@ -47,10 +41,6 @@ class LeadSubscriberTest extends TestCase
         $pluginModel->expects($this->once())
             ->method('getIntegrationEntityRepository')
             ->willReturn($this->integrationEntityRepository);
-
-        $this->leadEvent->expects($this->once())
-            ->method('getLead')
-            ->willReturn(new Lead());
     }
 
     public function testOnLeadSaveWithoutActiveIntegration(): void
@@ -62,7 +52,7 @@ class LeadSubscriberTest extends TestCase
         $this->integrationEntityRepository->expects($this->never())
             ->method('updateErrorLeads');
 
-        $this->subscriber->onLeadSave($this->leadEvent);
+        $this->subscriber->onLeadSave(new LeadEvent(new Lead()));
     }
 
     public function testOnLeadSaveWithActiveIntegration(): void
@@ -79,6 +69,6 @@ class LeadSubscriberTest extends TestCase
         $this->integrationEntityRepository->expects($this->once())
             ->method('updateErrorLeads');
 
-        $this->subscriber->onLeadSave($this->leadEvent);
+        $this->subscriber->onLeadSave(new LeadEvent(new Lead()));
     }
 }

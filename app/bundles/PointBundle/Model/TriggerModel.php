@@ -3,12 +3,12 @@
 namespace Mautic\PointBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,6 +20,7 @@ use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
@@ -32,23 +33,19 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Trigger>
  */
-class TriggerModel extends CommonFormModel
+class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
     protected $triggers = [];
 
     /**
-     * @var array<string,array<string,mixed>>
+     * @var array<string, mixed[]>
      */
-    private static array $events;
+    private $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        /**
-         * @deprecated https://github.com/mautic/mautic/issues/8229
-         */
-        protected MauticFactory $mauticFactory,
         private ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -57,7 +54,7 @@ class TriggerModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -203,7 +200,7 @@ class TriggerModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -280,15 +277,13 @@ class TriggerModel extends CommonFormModel
      */
     public function getEvents()
     {
-        if (empty(self::$events)) {
-            // build them
-            self::$events = [];
-            $event        = new Events\TriggerBuilderEvent($this->translator);
+        if (empty($this->cachedEvents)) {
+            $event = new TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
-            self::$events = $event->getEvents();
+            $this->cachedEvents = $event->getEvents();
         }
 
-        return self::$events;
+        return $this->cachedEvents;
     }
 
     /**
@@ -315,7 +310,7 @@ class TriggerModel extends CommonFormModel
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, Lead $lead = null, $force = false)
+    public function triggerEvent($event, ?Lead $lead = null, $force = false)
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -360,16 +355,12 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function invokeCallback($event, Lead $lead, array $settings)
+    private function invokeCallback($event, Lead $lead, array $settings): mixed
     {
         $args = [
-            'event'   => $event,
-            'lead'    => $lead,
-            'factory' => $this->mauticFactory,
-            'config'  => $event['properties'],
+            'event'  => $event,
+            'lead'   => $lead,
+            'config' => $event['properties'],
         ];
 
         if (is_array($settings['callback'])) {
@@ -432,9 +423,6 @@ class TriggerModel extends CommonFormModel
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
                 $this->getEventRepository()->detachEntities($persist);
-                if (isset($triggerEvent)) {
-                    $this->getEventRepository()->deleteEntity($triggerEvent);
-                }
             }
         }
     }

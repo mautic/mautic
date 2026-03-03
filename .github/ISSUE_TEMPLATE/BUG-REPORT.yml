@@ -24,8 +24,11 @@ body:
       label: Mautic Series
       description: What series of Mautic you are using? Please test to reproduce your bug with the [latest stable version of Mautic](https://www.mautic.org/mautic-releases) which might contain new fixes.  If you are able, please also check the latest development release.
       options:
-        - 5.1.x series
-        - 5.0.x series
+        - 7.0.x series
+        - 6.0.x series
+        - 5.2.x series
+        - 5.1.x series (not supported)
+        - 5.0.x series (not supported)
         - 4.4.x series (not supported)
         - 4.3.x series (not supported)
         - 4.2.x series (not supported)
@@ -39,7 +42,7 @@ body:
     attributes:
       label: Mautic installed version
       description: What is the specific version of Mautic you're using? You can find this in the bottom right corner of your Mautic instance, or in the file ``app/release_metadata.json``.
-      placeholder: ex. 5.1.0
+      placeholder: ex. 6.0.0
     validations:
       required: true
   - type: dropdown
@@ -60,7 +63,7 @@ body:
     attributes:
       label: PHP version
       description: What PHP version are you using in your environment?
-      placeholder: ex. 8.1.0
+      placeholder: ex. 8.2.0
     validations:
       required: true
   - type: dropdown

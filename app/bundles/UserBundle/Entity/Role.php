@@ -2,51 +2,86 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Role extends FormEntity implements CacheInvalidateInterface
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('user:roles:viewown')"),
+        new Post(security: "is_granted('user:roles:create')"),
+        new Get(security: "is_granted('user:roles:viewown')"),
+        new Put(security: "is_granted('user:roles:editown')"),
+        new Patch(security: "is_granted('user:roles:editother')"),
+        new Delete(security: "is_granted('user:roles:deleteown')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['role:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['permissions'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['role:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
+    use UuidTrait;
     public const CACHE_NAMESPACE = 'Role';
-
     /**
      * @var int
      */
+    #[Groups(['role:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['role:read', 'role:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['role:read', 'role:write'])]
     private $description;
 
     /**
      * @var bool
      */
+    #[Groups(['role:read', 'role:write'])]
     private $isAdmin = false;
 
     /**
-     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\Permission>
+     * @var ArrayCollection<int, Permission>
      */
+    #[Groups(['role:read', 'role:write'])]
     private $permissions;
 
     /**
      * @var array
      */
+    #[Groups(['role:read', 'role:write'])]
     private $rawPermissions;
 
     /**
-     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
+     * @var ArrayCollection<int, User>
      */
     private $users;
 
@@ -85,6 +120,8 @@ class Role extends FormEntity implements CacheInvalidateInterface
             ->mappedBy('role')
             ->fetchExtraLazy()
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

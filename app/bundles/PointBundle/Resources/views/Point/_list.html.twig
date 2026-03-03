@@ -4,12 +4,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#pointTable',
-                        'routeBase': 'point',
-                        'templateButtons': {
-                            'delete': permissions['point:points:delete'],
-                        },
+                    'checkall': 'true',
+                    'target': '#pointTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -75,18 +71,14 @@
                             {% else %}
                                 {{ item.name }}
                             {% endif %}
+                            {{ customContent('point.name', _context) }}
                         </div>
-                        {% if item.description is not empty %}
-                            <div class="text-muted mt-4">
-                                <small>{{ item.description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': item.description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {% set group = item.group %}
@@ -112,5 +104,38 @@
         }) }}
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.action.noresults.tip'}) }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.action.noresults.tip'}) }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+            <div class="mb-md">
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
+                    'pictogram': 'user--insights',
+                    'size': '80'
+                } %}
+            </div>
+
+            {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                type: 'default',
+                eyebrow: 'mautic.point.action.empty.understand',
+                heading: 'mautic.point.action.empty.what_are_point_actions',
+                copy: 'mautic.point.action.empty.what_are_point_actions_desc',
+            }) }}
+
+            {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                type: 'default',
+                eyebrow: 'mautic.point.action.empty.purpose',
+                heading: 'mautic.point.action.empty.score_contacts_heading',
+                copy: 'mautic.point.action.empty.score_contacts_desc',
+            }) }}
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.point.action.empty.heading',
+                subheading: 'mautic.point.action.empty.subheading',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

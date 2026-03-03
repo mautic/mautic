@@ -11,9 +11,34 @@
         'entity': report,
         'status': 'available'
     }) -}}
+    {% if report.source is defined and report.source is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: 'mautic.report.source.'~report.source,
+                icon: 'ri-database-2-line',
+                color: 'high-contrast',
+                attributes: {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'title': 'mautic.report.report.form.source'|trans
+                }
+            }]
+        } %}
+    {% endif %}
+    
+    {% if report.system is defined and report.system == 1 %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: 'mautic.report.report.form.issystem',
+                icon: 'ri-group-2-fill',
+                color: 'blue',
+                icon_only: true
+            }]
+        } %}
+    {% endif %}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : report,

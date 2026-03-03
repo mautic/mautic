@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -12,14 +13,14 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -33,7 +34,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected array $clientOptions = [];
 
-    protected array $clientServer  = [
+    /**
+     * Credentials for API authentication.
+     *
+     * @var array<string,string>
+     */
+    protected array $clientServer = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'Maut1cR0cks!',
     ];
@@ -49,38 +55,36 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'messenger_dsn_failed'              => 'in-memory://default',
     ];
 
+    protected bool $authenticateApi = false;
+
     protected AbstractDatabaseTool $databaseTool;
 
     /**
      * Overloading the method from MailerAssertionsTrait to get better typehint.
-     *
-     * @return MauticMessage[]
      */
-    public static function getMailerMessages(string $transport = null): array
-    {
-        $messages = parent::getMailerMessages($transport);
-
-        return array_map(function (RawMessage $message): MauticMessage {
-            \assert($message instanceof MauticMessage);
-
-            return $message;
-        }, $messages);
-    }
-
-    /**
-     * Overloading the method from MailerAssertionsTrait to get better typehint.
-     */
-    public static function getMailerMessage(int $index = 0, string $transport = null): ?MauticMessage
+    public static function getMailerMessage(int $index = 0, ?string $transport = null): RawMessage|MauticMessage|null
     {
         return self::getMailerMessages($transport)[$index] ?? null;
     }
 
     /**
-     * @return MauticMessage[]
+     * @return RawMessage[]
      */
-    public static function getMailerMessagesByToAddress(string $toAddress, string $transport = null): array
+    public static function getMailerMessagesByToAddress(string $toAddress, ?string $transport = null): array
     {
-        return array_values(array_filter(self::getMailerMessages($transport), fn (MauticMessage $mauticMessage) => $mauticMessage->getTo()[0]->getAddress() === $toAddress));
+        return array_values(
+            array_filter(
+                self::getMailerMessages($transport),
+                function (RawMessage $message) use ($toAddress): bool {
+                    // Messages are actually Message objects (which extend RawMessage) and have getHeaders()
+                    if ($message instanceof Message) {
+                        return $toAddress === $message->getHeaders()->get('To')->getBodyAsString();
+                    }
+
+                    return false;
+                }
+            )
+        );
     }
 
     protected function setUp(): void
@@ -95,18 +99,29 @@ abstract class AbstractMauticTestCase extends WebTestCase
         EnvLoader::load();
 
         self::ensureKernelShutdown();
-        $this->client = static::createClient($this->clientOptions, $this->clientServer);
+        $this->client = static::createClient($this->clientOptions, $this->authenticateApi ? $this->clientServer : []);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em         = static::getContainer()->get('doctrine')->getManager();
+        $this->em = static::getContainer()->get('doctrine')->getManager();
+        \assert($this->em instanceof EntityManagerInterface);
         $this->connection = $this->em->getConnection();
-
-        $this->router = static::getContainer()->get('router');
-        $scheme       = $this->router->getContext()->getScheme();
-        $secure       = 0 === strcasecmp($scheme, 'https');
+        $this->router     = static::getContainer()->get('router');
+        $scheme           = $this->router->getContext()->getScheme();
+        $secure           = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', (string) $secure);
+    }
+
+    public function loginUser(User $user): void
+    {
+        $this->client->loginUser($user, 'mautic');
+    }
+
+    protected function logoutUser(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->client->getCookieJar()->clear();
     }
 
     /**
@@ -140,14 +155,15 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->loadFixtures($classNames);
     }
 
+    public function setCsrfHeader(string $intention = 'mautic_ajax_post'): void
+    {
+        $this->client->setServerParameter('HTTP_X-CSRF-Token', $this->getCsrfToken($intention));
+    }
+
     /**
      * Use when POSTing directly to forms.
-     *
-     * @param string $intention
-     *
-     * @return string
      */
-    protected function getCsrfToken($intention)
+    protected function getCsrfToken(string $intention): string
     {
         return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
     }
@@ -164,38 +180,25 @@ abstract class AbstractMauticTestCase extends WebTestCase
         ];
     }
 
-    protected function loginUser(string $username): User
-    {
-        /** @var User|null $user */
-        $user = $this->em->getRepository(User::class)
-            ->findOneBy(['username' => $username]);
-
-        if (!$user) {
-            throw new \InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
-        }
-
-        $firewall = 'mautic';
-        $session  = static::getContainer()->get('session');
-        $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
-        $session->set('_security_'.$firewall, serialize($token));
-        $session->save();
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
-
-        return $user;
-    }
-
     /**
      * @param array<mixed,mixed> $params
      */
-    protected function testSymfonyCommand(string $name, array $params = [], Command $command = null): CommandTester
+    protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester
     {
         $kernel      = static::getContainer()->get('kernel');
         $application = new Application($kernel);
 
         if ($command) {
             // Register the command
-            $application->add($command);
+            $application->addCommand($command);
+        } else {
+            $command = $application->find($name);
+        }
+
+        $bypassLockingOption = 'bypass-locking';
+
+        if ($command->getDefinition()->hasOption($bypassLockingOption)) {
+            $params["--$bypassLockingOption"] = true;
         }
 
         $command       = $application->find($name);

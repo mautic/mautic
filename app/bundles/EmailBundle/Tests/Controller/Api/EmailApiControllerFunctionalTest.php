@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -14,9 +16,11 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -51,7 +55,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function beforeBeginTransaction(): void
     {
-        $this->resetAutoincrement(['categories']);
+        $this->resetAutoincrement(['categories', 'emails']);
     }
 
     public function testCreateWithDynamicContent(): void
@@ -292,6 +296,158 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
     }
 
+    /**
+     * @param string[] $permissions
+     */
+    #[DataProvider('publishNewPermissionProvider')]
+    public function testCreateEmailWithoutPublishPermissionWillBeIgnored(array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
+    {
+        $user = $this->getUser('sales');
+        Assert::assertNotNull($user);
+
+        $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $payload = [
+            'name'        => 'API email',
+            'subject'     => 'Email created via API test',
+            'customHtml'  => '<h1>Email content created by an API test</h1>',
+            'isPublished' => true,
+            'publishUp'   => '2024-11-21 15:45',
+            'publishDown' => '2024-12-21 15:45',
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+
+        Assert::assertSame(
+            Response::HTTP_CREATED,
+            $this->client->getResponse()->getStatusCode(),
+            $this->client->getResponse()->getContent()
+        );
+
+        $createdEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
+        Assert::assertSame($expectedIsPublished, $createdEmail['isPublished']);
+        Assert::assertSame($expectedPublishUp, $createdEmail['publishUp']);
+        Assert::assertSame($expectedPublishDown, $createdEmail['publishDown']);
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public static function publishNewPermissionProvider(): iterable
+    {
+        yield 'User without the publish permission cannot publish' => [
+            'permissions'         => ['create'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+        yield 'User with the publish permission can publish other ownly' => [
+            'permissions'         => ['create', 'publishother'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+        yield 'User with the publish permission can publish own only' => [
+            'permissions'         => ['create', 'publishown'],
+            'expectedIsPublished' => true,
+            'expectedPublishUp'   => '2024-11-21T15:45:00+00:00',
+            'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
+        ];
+    }
+
+    /**
+     * @param string[] $permissions
+     */
+    #[DataProvider('publishExistingPermissionProvider')]
+    public function testEditEmailWithoutPublishPermissionWillBeIgnored(string $creatorUsername, array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
+    {
+        $owner = $this->getUser($creatorUsername);
+        $email = $this->createEmail('Email C', 'Email C Subject', 'template', 'empty', 'Test html');
+        $email->setIsPublished(false);
+        $email->setCreatedBy($owner->getId());
+        $this->em->flush();
+
+        $emailId = $email->getId();
+
+        $user = $this->getUser('sales');
+        $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $payload = [
+            'isPublished' => true,
+            'publishUp'   => '2024-11-21 15:45',
+            'publishDown' => '2024-12-21 15:45',
+        ];
+
+        $this->client->request(Request::METHOD_PATCH, "/api/emails/{$emailId}/edit", $payload);
+
+        $this->assertResponseIsSuccessful();
+
+        $editedEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
+        Assert::assertSame($expectedIsPublished, $editedEmail['isPublished']);
+        Assert::assertSame($expectedPublishUp, $editedEmail['publishUp']);
+        Assert::assertSame($expectedPublishDown, $editedEmail['publishDown']);
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public static function publishExistingPermissionProvider(): iterable
+    {
+        yield 'Sales user without the publish permission cannot publish own email' => [
+            'creatorUsername'     => 'sales',
+            'permissions'         => ['editown'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+
+        yield 'Sales user without the publish permission cannot publish admin\'s email' => [
+            'creatorUsername'     => 'admin',
+            'permissions'         => ['editother'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+
+        yield 'Sales user with the publish other permission cannot publish own email' => [
+            'creatorUsername'     => 'sales',
+            'permissions'         => ['editown', 'publishother'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+
+        yield 'Sales user with the publish other permission can publish admin\'s email' => [
+            'creatorUsername'     => 'admin',
+            'permissions'         => ['editother', 'publishother'],
+            'expectedIsPublished' => true,
+            'expectedPublishUp'   => '2024-11-21T15:45:00+00:00',
+            'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
+        ];
+
+        yield 'Sales user with the publish own permission can publish own email' => [
+            'creatorUsername'     => 'sales',
+            'permissions'         => ['editown', 'publishown'],
+            'expectedIsPublished' => true,
+            'expectedPublishUp'   => '2024-11-21T15:45:00+00:00',
+            'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
+        ];
+
+        yield 'Sales user with the publish own permission cannot publish admin\'s email' => [
+            'creatorUsername'     => 'admin',
+            'permissions'         => ['editother', 'publishown'],
+            'expectedIsPublished' => false,
+            'expectedPublishUp'   => null,
+            'expectedPublishDown' => null,
+        ];
+    }
+
     public function testReplyAction(): void
     {
         $trackingHash = 'tracking_hash_123';
@@ -317,11 +473,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get the email reply that was just created from the stat API.
         $statReplyQuery = ['where' => [['col' => 'stat_id', 'expr' => 'eq', 'val' => $stat->getId()]]];
         $this->client->request('GET', '/api/stats/email_stat_replies', $statReplyQuery);
+        $this->assertResponseIsSuccessful();
         $fetchedReplyData = json_decode($this->client->getResponse()->getContent(), true);
 
         // Check that the email reply was created correctly.
         $this->assertSame('1', $fetchedReplyData['total']);
-        $this->assertSame($stat->getId(), (int) $fetchedReplyData['stats'][0]['stat_id']);
+        $this->assertSame($stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
         $this->assertMatchesRegularExpression('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
 
         // Get the email stat that was just updated from the stat API.
@@ -331,7 +488,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check that the email stat was updated correctly/
         $this->assertSame('1', $fetchedStatData['total']);
-        $this->assertSame($stat->getId(), (int) $fetchedStatData['stats'][0]['id']);
+        $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
@@ -351,9 +508,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
 
-        $user->setPassword($encoder->hash('password'));
+        $user->setPassword($hasher->hash('password'));
         $this->em->persist($user);
 
         // Create a contact:
@@ -428,6 +586,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmail('{custom-token}');
 
         // Send to contact:
+        $email = $createEmail();
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
 
         $clientResponse = $this->client->getResponse();
@@ -446,7 +608,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
         $emailId = $email->getId();
-
         // Send to segment:
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
@@ -468,6 +629,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Send to contact:
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
+        $email->setReplyToAddress(null);
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
@@ -479,9 +646,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Test Custom Reply-To Address
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
         $email->setReplyToAddress('reply@email.domain');
         $this->em->persist($email);
         $this->em->flush();
+        $emailId = $email->getId();
 
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
@@ -575,5 +745,82 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
+    }
+
+    /**
+     * @param array<string, int|string> $payload
+     *
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    #[DataProvider('getDataForUpdatingTranslatedEmailDoesNotRemoveParentRelation')]
+    public function testUpdatingTranslatedEmailDoesNotRemoveParentRelation(array $payload): void
+    {
+        $parentEmail = $this->createEmail('Parent Email', 'Parent Email Subject', 'template', 'blank', 'Parent Email');
+        $childEmail  = $this->createEmail('Child Email', 'Child Email Subject', 'template', 'blank', 'Child Email');
+        $childEmail->setTranslationParent($parentEmail);
+        $this->em->persist($childEmail);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_PATCH,
+            sprintf('/api/emails/%s/edit', $childEmail->getId()),
+            $payload
+        );
+        $this->assertResponseIsSuccessful();
+
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $emailData = $responseData['email'];
+        $this->assertArrayHasKey('translationParent', $emailData);
+        $this->assertNotEmpty($emailData['translationParent']);
+
+        $this->assertEquals(
+            $parentEmail->getId(),
+            $emailData['translationParent']['id'],
+            'The translation parent ID should remain unchanged after updating the child email.'
+        );
+    }
+
+    /**
+     * @return iterable<string, array{0: array<string, int|string>}>
+     */
+    public static function getDataForUpdatingTranslatedEmailDoesNotRemoveParentRelation(): iterable
+    {
+        yield 'When children set to unpublished, parent relation should remain' => [
+            [
+                'isPublished' => 0,
+            ],
+        ];
+
+        yield 'When children updated for name, parent relation should remain' => [
+            [
+                'name' => 'Updated Child Email',
+            ],
+        ];
+    }
+
+    private function getUser(string $userName): ?User
+    {
+        $repository = $this->em->getRepository(User::class);
+        $user       = $repository->findOneBy(['username' => $userName]);
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
+     * @param array<string, string[]> $permissions
+     */
+    private function setPermission(Role $role, array $permissions): void
+    {
+        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+        $this->em->flush();
     }
 }

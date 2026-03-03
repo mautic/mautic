@@ -6,6 +6,7 @@ return [
             'mautic.user_management' => [
                 'id'        => 'mautic_user_management_root',
                 'priority'  => 17,
+                'access'    => ['user:users:view', 'user:roles:view'],
             ],
             'mautic.user.users' => [
                 'access'    => 'user:users:view',
@@ -116,6 +117,10 @@ return [
                 'path'       => '/saml/discovery',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::discoveryAction',
             ],
+            'mautic_saml_login_retry' => [
+                'path'       => '/saml/login_retry',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::samlLoginRetryAction',
+            ],
         ],
     ],
 
@@ -131,53 +136,6 @@ return [
                 'class'     => Doctrine\ORM\EntityManager::class,
                 'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.user.form_guard_authenticator' => [
-                'class'     => Mautic\UserBundle\Security\Authenticator\FormAuthenticator::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'security.password_hasher',
-                    'event_dispatcher',
-                    'request_stack',
-                    'security.csrf.token_manager',
-                    'router',
-                    'mautic.user.model.password_strength_estimator',
-                ],
-            ],
-            'mautic.user.preauth_authenticator' => [
-                'class'     => Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'event_dispatcher',
-                    'request_stack',
-                    '', // providerKey
-                    '', // User provider
-                ],
-                'public' => false,
-            ],
-            'mautic.user.provider' => [
-                'class'     => Mautic\UserBundle\Security\Provider\UserProvider::class,
-                'arguments' => [
-                    'mautic.user.repository',
-                    'mautic.permission.repository',
-                    'session',
-                    'event_dispatcher',
-                    'security.password_hasher',
-                ],
-            ],
-            'mautic.security.authentication_listener' => [
-                'class'     => Mautic\UserBundle\Security\Firewall\AuthenticationListener::class,
-                'arguments' => [
-                    'mautic.security.authentication_handler',
-                    'security.token_storage',
-                    'security.authentication.manager',
-                    'monolog.logger',
-                    'event_dispatcher',
-                    '', // providerKey
-                    'mautic.permission.repository',
-                    'doctrine.orm.default_entity_manager',
-                ],
-                'public' => false,
             ],
             'mautic.security.authentication_handler' => [
                 'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
@@ -215,6 +173,17 @@ return [
                     '%mautic.saml_idp_entity_id%',
                 ],
                 'tag'       => 'lightsaml.trust_options_store',
+            ],
+
+            'mautic.security.saml.entity_descriptor_provider' => [
+                'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
+                'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
+                'arguments' => [
+                    '%lightsaml.own.entity_id%',
+                    'router',
+                    '%lightsaml.route.login_check%',
+                    'lightsaml.own.credential_store',
+                ],
             ],
 
             'mautic.security.saml.entity_descriptor_store' => [
@@ -257,7 +226,7 @@ return [
             ],
             'mautic.security.user_token_setter' => [
                 'class'     => Mautic\UserBundle\Security\UserTokenSetter::class,
-                'arguments' => ['mautic.user.repository', 'security.token_storage'],
+                'arguments' => ['mautic.user.model.user', 'security.token_storage'],
             ],
             'mautic.user.model.user_token_service' => [
                 'class'     => Mautic\UserBundle\Model\UserToken\UserTokenService::class,

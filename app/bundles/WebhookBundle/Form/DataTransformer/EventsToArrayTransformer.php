@@ -13,7 +13,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class EventsToArrayTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private Webhook $webhook
+        private Webhook $webhook,
     ) {
     }
 
@@ -24,7 +24,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
      *
      * @return array<int, string>
      */
-    public function transform($events)
+    public function transform(mixed $events): mixed
     {
         $eventArray = [];
         foreach ($events as $event) {
@@ -41,7 +41,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
      *
      * @return Collection<int, Event>
      */
-    public function reverseTransform($submittedArray)
+    public function reverseTransform(mixed $submittedArray): mixed
     {
         // Get a list of existing events and types
 

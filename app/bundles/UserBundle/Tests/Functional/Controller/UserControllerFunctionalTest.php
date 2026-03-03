@@ -12,6 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->configParams += [
+            'saml_idp_own_private_key' => 'any_string',
+        ];
+        parent::setUp();
+    }
+
     public function testEditGetPage(): void
     {
         $this->client->request('GET', '/s/users/edit/1');
@@ -28,10 +36,10 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionValid(): void
     {
-        $crawler                = $this->client->request('GET', '/s/users/edit/1');
-        $buttonCrawlerNode      = $crawler->selectButton('Save & Close');
-        $form                   = $buttonCrawlerNode->form();
-        $form['user[username]'] = 'test';
+        $crawler                 = $this->client->request('GET', '/s/users/edit/1');
+        $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
+        $form                    = $buttonCrawlerNode->form();
+        $form['user[firstName]'] = 'test';
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
@@ -58,9 +66,8 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, string> $data
-     *
-     * @dataProvider dataNewUserForPasswordField
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
@@ -82,7 +89,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
-    public function dataNewUserForPasswordField(): iterable
+    public static function dataNewUserForPasswordField(): iterable
     {
         yield 'Blank' => [
             [
@@ -118,9 +125,8 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, string> $data
-     *
-     * @dataProvider dataForEditUserForPasswordField
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
@@ -136,7 +142,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
-    public function dataForEditUserForPasswordField(): iterable
+    public static function dataForEditUserForPasswordField(): iterable
     {
         yield 'Do not match with confirm' => [
             [
@@ -172,7 +178,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         string $object,
         int $objectId,
         string $action,
-        array $details
+        array $details,
     ): AuditLog {
         $auditLog = new AuditLog();
         $auditLog->setUserId($userId);

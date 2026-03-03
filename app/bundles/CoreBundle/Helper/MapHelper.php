@@ -9,7 +9,7 @@ use Symfony\Component\Intl\Countries;
 class MapHelper
 {
     /**
-     * @param array<string, int> $legendValues
+     * @param array<string, string> $legendValues
      */
     public static function getOptionLegendText(string $legendText, array $legendValues): string
     {
@@ -33,8 +33,8 @@ class MapHelper
                 'legendText' => MapHelper::getOptionLegendText(
                     $legendText,
                     [
-                        '%total'       => $mappedData['total'] ?? 0,
-                        '%withCountry' => $mappedData['totalWithCountry'] ?? 0,
+                        '%total'       => (string) ($mappedData['total'] ?? 0),
+                        '%withCountry' => (string) ($mappedData['totalWithCountry'] ?? 0),
                     ]
                 ),
                 'unit'       => $value['unit'],

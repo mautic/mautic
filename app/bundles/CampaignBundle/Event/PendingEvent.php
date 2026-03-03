@@ -51,7 +51,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $reason
      */
-    public function fail(LeadEventLog $log, $reason, \DateInterval $rescheduleInterval = null): void
+    public function fail(LeadEventLog $log, $reason, ?\DateInterval $rescheduleInterval = null): void
     {
         if (!$failedLog = $log->getFailedLog()) {
             $failedLog = new FailedLeadEventLog();
@@ -98,6 +98,20 @@ class PendingEvent extends AbstractLogCollectionEvent
     {
         foreach ($this->logs as $log) {
             if (!$this->successful->contains($log)) {
+                $this->fail($log, $reason);
+            }
+        }
+    }
+
+    /**
+     * Fail all that have not passed or failed yet.
+     *
+     * @param string $reason
+     */
+    public function failRemainingPending($reason): void
+    {
+        foreach ($this->logs as $log) {
+            if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
                 $this->fail($log, $reason);
             }
         }

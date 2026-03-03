@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\Query\Expr\Func;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -64,9 +67,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    /**
-     * @dataProvider dataOnEmptyOperatorIfEmpty
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataOnEmptyOperatorIfEmpty')]
     public function testOnEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -121,7 +122,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @return iterable<array<bool|string>>
      */
-    public function dataOnEmptyOperatorIfEmpty(): iterable
+    public static function dataOnEmptyOperatorIfEmpty(): iterable
     {
         yield [false, 'l.email IS NULL'];
         yield [true, "(l.email IS NULL) OR (l.email = '')"];
@@ -146,9 +147,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    /**
-     * @dataProvider dataOnNotEmptyOperatorIfEmpty
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataOnNotEmptyOperatorIfEmpty')]
     public function testOnNotEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -203,7 +202,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @return iterable<array<bool|string>>
      */
-    public function dataOnNotEmptyOperatorIfEmpty(): iterable
+    public static function dataOnNotEmptyOperatorIfEmpty(): iterable
     {
         yield [false, 'l.email IS NOT NULL'];
         yield [true, "(l.email IS NOT NULL) AND (l.email <> '')"];
@@ -270,6 +269,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
 
     public function testOnMultiselectOperatorsIfNotMultiselectOperator(): void
     {
+        // todo this test triggers field check. But first need to see how the heck multiselect contact fields are being processed.
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
             $this->contactSegmentFilter,
@@ -284,8 +284,11 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    public function testOnMultiselectOperatorsIfMultiselectOperator(): void
+    public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAll(): void
     {
+        $regexpQuery = 'regexp query';
+        $eventQuery  = $this->createMock(CompositeExpression::class);
+
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
             $this->contactSegmentFilter,
@@ -304,16 +307,209 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->anything(),
+                $eventQuery,
                 CompositeExpression::TYPE_AND
             );
 
         $this->expressionBuilder->expects($this->once())
-            ->method('and');
+            ->method('and')
+            ->with($regexpQuery)
+            ->willReturn($eventQuery);
 
         $this->expressionBuilder->expects($this->once())
             ->method('regexp')
-            ->with('l.email', 'paramenter_holder_1');
+            ->with('l.email', 'paramenter_holder_1')
+            ->willReturn($regexpQuery);
+
+        $contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
+        $contactSegmentFilterCrate->method('getArray')
+            ->willReturn(['operator' => OperatorOptions::INCLUDING_ALL]);
+
+        $this->contactSegmentFilter->contactSegmentFilterCrate = $contactSegmentFilterCrate;
+
+        $this->subscriber->onMultiselectOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnMultiselectOperatorsIfMultiselectOperatorExcludingAll(): void
+    {
+        $regexpQuery         = 'regexp query';
+        $isNullCondition     = 'is null (field)';
+        $filterField         = 'l.email';
+        $regexpQueriesString = 'all regexp queries';
+        $regexpQueries       = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createMock(CompositeExpression::class);
+        $eventQuery          = $this->createMock(CompositeExpression::class);
+
+        $regexpQueries->method('__toString')
+            ->willReturn($regexpQueriesString);
+
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['paramenter_holder_1']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('email');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('multiselect');
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with(
+                $eventQuery,
+                CompositeExpression::TYPE_AND
+            );
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('isNull')
+            ->with($filterField)
+            ->willReturn($isNullCondition);
+
+        $this->expressionBuilder->expects($this->exactly(2))
+            ->method('and')
+            ->willReturnMap([
+                [$regexpQuery, $regexpQueries],
+                [$combinedQuery, $eventQuery],
+            ]);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('or')
+            ->with(new Func('NOT', $regexpQueriesString), $isNullCondition)
+            ->willReturn($combinedQuery);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('regexp')
+            ->with($filterField, 'paramenter_holder_1')
+            ->willReturn($regexpQuery);
+
+        $contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
+        $contactSegmentFilterCrate->method('getArray')
+            ->willReturn(['operator' => OperatorOptions::EXCLUDING_ALL]);
+
+        $this->contactSegmentFilter->contactSegmentFilterCrate = $contactSegmentFilterCrate;
+
+        $this->subscriber->onMultiselectOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAny(): void
+    {
+        $regexpQuery = 'regexp query';
+        $eventQuery  = $this->createMock(CompositeExpression::class);
+
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['paramenter_holder_1']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('email');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('multiselect');
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with(
+                $eventQuery,
+                CompositeExpression::TYPE_AND
+            );
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('or')
+            ->with($regexpQuery)
+            ->willReturn($eventQuery);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('regexp')
+            ->with('l.email', 'paramenter_holder_1')
+            ->willReturn($regexpQuery);
+
+        $contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
+        $contactSegmentFilterCrate->method('getArray')
+            ->willReturn(['operator' => OperatorOptions::INCLUDING_ANY]);
+
+        $this->contactSegmentFilter->contactSegmentFilterCrate = $contactSegmentFilterCrate;
+
+        $this->subscriber->onMultiselectOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnMultiselectOperatorsIfMultiselectOperatorExcludingAny(): void
+    {
+        $regexpQuery         = 'regexp query';
+        $isNullCondition     = 'is null (field)';
+        $filterField         = 'l.email';
+        $regexpQueriesString = 'all regexp queries';
+        $regexpQueries       = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createMock(CompositeExpression::class);
+        $eventQuery          = $this->createMock(CompositeExpression::class);
+
+        $regexpQueries->method('__toString')
+            ->willReturn($regexpQueriesString);
+
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['paramenter_holder_1']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('email');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn('multiselect');
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with(
+                $eventQuery,
+                CompositeExpression::TYPE_AND
+            );
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('isNull')
+            ->with($filterField)
+            ->willReturn($isNullCondition);
+
+        $this->expressionBuilder->expects($this->exactly(2))
+            ->method('and')
+            ->willReturnMap([
+                [$regexpQuery, $regexpQueries],
+                [$combinedQuery, $eventQuery],
+            ]);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('or')
+            ->with($regexpQueries, $isNullCondition)
+            ->willReturn($combinedQuery);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('notRegexp')
+            ->with($filterField, 'paramenter_holder_1')
+            ->willReturn($regexpQuery);
+
+        $contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
+        $contactSegmentFilterCrate->method('getArray')
+            ->willReturn(['operator' => OperatorOptions::EXCLUDING_ANY]);
+
+        $this->contactSegmentFilter->contactSegmentFilterCrate = $contactSegmentFilterCrate;
 
         $this->subscriber->onMultiselectOperators($event);
 

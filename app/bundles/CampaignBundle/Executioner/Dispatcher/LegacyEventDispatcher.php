@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -31,8 +30,7 @@ class LegacyEventDispatcher
         private EventDispatcherInterface $dispatcher,
         private EventScheduler $scheduler,
         private LoggerInterface $logger,
-        private MauticFactory $factory,
-        private ContactTracker $contactTracker
+        private ContactTracker $contactTracker,
     ) {
     }
 
@@ -40,7 +38,7 @@ class LegacyEventDispatcher
         AbstractEventAccessor $config,
         ArrayCollection $logs,
         $wasBatchProcessed,
-        PendingEvent $pendingEvent
+        PendingEvent $pendingEvent,
     ): void {
         $settings = $config->getConfig();
 
@@ -185,7 +183,6 @@ class LegacyEventDispatcher
             'eventDetails'    => null, // @todo fix when procesing decisions,
             'event'           => $eventArray,
             'lead'            => $log->getLead(),
-            'factory'         => $this->factory,
             'systemTriggered' => $log->getSystemTriggered(),
             'config'          => $eventArray['properties'],
         ];

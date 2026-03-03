@@ -14,14 +14,6 @@ class ConfigTrackingPageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [
-            'label' => 'mautic.page.config.form.track.by.tracking.url',
-            'data'  => isset($options['data']['track_by_tracking_url']) ? (bool) $options['data']['track_by_tracking_url'] : true,
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.tracking.url.tooltip',
-            ],
-        ]);
-
         $builder->add(
             'anonymize_ip',
             YesNoButtonGroupType::class,
@@ -30,7 +22,7 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['anonymize_ip']) && (bool) $options['data']['anonymize_ip'],
                 'attr'  => [
                     'tooltip'  => 'mautic.page.config.form.anonymize_ip.tooltip',
-                    'onchange' => 'Mautic.showAnonymizeWarningMessage(this.value)',
+                    'onchange' => 'Mautic.showAnonymizeWarningMessage(this)',
                 ],
             ]
         );
@@ -42,8 +34,8 @@ class ConfigTrackingPageType extends AbstractType
                 'label' => 'mautic.page.config.form.track_contact_by_ip',
                 'data'  => isset($options['data']['track_contact_by_ip']) && (bool) $options['data']['track_contact_by_ip'],
                 'attr'  => [
-                    'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
+                    'tooltip'        => 'mautic.page.config.form.track_contact_by_ip.tooltip',
+                    'data-enable-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
                 ],
             ]
         );
@@ -56,6 +48,18 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['do_not_track_404_anonymous']) && (bool) $options['data']['do_not_track_404_anonymous'],
                 'attr'  => [
                     'tooltip'      => 'mautic.page.config.form.do_not_track_404_anonymous.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'append_segment_id_tracking_url',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.append_segment_id_tracking_url',
+                'data'  => isset($options['data']['append_segment_id_tracking_url']) && (bool) $options['data']['append_segment_id_tracking_url'],
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.append_segment_id_tracking_url.tooltip',
                 ],
             ]
         );
@@ -133,7 +137,7 @@ class ConfigTrackingPageType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'trackingconfig';
     }

@@ -15,7 +15,7 @@
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'routeBase': 'import',
             'langVar': 'lead.import',
@@ -125,7 +125,7 @@
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
                        data-target="#asset-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
             </div>
@@ -145,7 +145,7 @@
                                     </h5>
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': item.getRowStatusesPieChart(translatorGetHelper()),
                                       'chartType': 'pie',
@@ -164,7 +164,7 @@
                                     </h5>
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
+                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': importedRowsChart,
                                       'chartType': 'line',

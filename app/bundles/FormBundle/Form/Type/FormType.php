@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -85,10 +86,13 @@ class FormType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add('template', ThemeListType::class, [
-            'feature'     => 'form',
-            'placeholder' => ' ',
-            'attr'        => [
+            'include_code_mode' => false,
+            'feature'           => 'form',
+            'placeholder'       => ' ',
+            'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.form.template.help',
             ],
@@ -132,7 +136,7 @@ class FormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
-                'data'  => $options['data']->getNoIndex() ?: false,
+                'data'  => $options['data']->getNoIndex(),
             ]
         );
 
@@ -172,6 +176,7 @@ class FormType extends AbstractType
                 'mautic.form.form.postaction.message'  => 'message',
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.return'   => 'return',
+                'mautic.form.form.postaction.hideform' => 'hideform',
             ],
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],
@@ -184,7 +189,7 @@ class FormType extends AbstractType
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
-        $required   = (in_array($postAction, ['redirect', 'message'])) ? true : false;
+        $required   = (in_array($postAction, ['redirect', 'message', 'hideform'])) ? true : false;
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],
@@ -201,7 +206,6 @@ class FormType extends AbstractType
         ]);
 
         $builder->add('buttons', FormButtonsType::class);
-        $builder->add('formType', HiddenType::class, ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -219,7 +223,7 @@ class FormType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'mauticform';
     }

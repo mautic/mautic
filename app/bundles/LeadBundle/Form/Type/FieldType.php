@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -14,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 use Mautic\LeadBundle\Field\IdentifierFields;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -37,19 +39,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 class FieldType extends AbstractType
 {
-    /**
-     * For which types will be character limits applicable.
-     *
-     * @var array<string>
-     */
-    private array $indexableFieldsWithLimits = [
-        'text',
-        'select',
-        'phone',
-        'url',
-        'email',
-    ];
-
     /**
      * @var string[]
      */
@@ -209,8 +198,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
                 'mapped'      => false,
-                'data'        => '',
-                'placeholder' => ' x ',
+                'data'        => 0,
             ]
         );
 
@@ -247,7 +235,7 @@ class FieldType extends AbstractType
          * @see FormEvents::PRE_SET_DATA
          * Used as as form modifier before trying to set data
          */
-        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue, $new): array {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
@@ -439,14 +427,14 @@ class FieldType extends AbstractType
                     break;
             }
 
-            if (in_array($type, $this->indexableFieldsWithLimits)) {
-                $this->addLengthValidationField($form, $new);
+            if (in_array($type, LeadField::TYPES_SUPPORTING_LENGTH)) {
+                $this->addLengthValidationField($form);
             }
 
             return $cleaningRules;
         };
 
-        $setupOrderField = function (FormInterface $form, string $object = null, string $group = null) use ($builder, $disabled): void {
+        $setupOrderField = function (FormInterface $form, ?string $object = null, ?string $group = null) use ($builder, $disabled): void {
             /** @var LeadFieldRepository $leadFieldRepository */
             $leadFieldRepository = $this->em->getRepository(LeadField::class);
 
@@ -466,7 +454,7 @@ class FieldType extends AbstractType
             // There's no need to filter list during FormEvents::PRE_SUBMIT.
             if ($object && $group) {
                 $options['query_builder'] = fn (EntityRepository $er) => $er->createQueryBuilder('f')
-                    ->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC)
+                    ->orderBy('f.order', Order::Ascending->value)
                     ->where('f.object = :object')
                     ->setParameter('object', $object)
                     ->andWhere('f.group = :group')
@@ -509,7 +497,7 @@ class FieldType extends AbstractType
                     $data['defaultValue'] = null;
                 }
 
-                if (isset($data['type']) && !in_array($data['type'], $this->indexableFieldsWithLimits)) {
+                if (isset($data['type']) && !in_array($data['type'], LeadField::TYPES_SUPPORTING_LENGTH)) {
                     $data['charLengthLimit'] = null;
                 }
 
@@ -539,6 +527,14 @@ class FieldType extends AbstractType
             $attr = [
                 'tooltip' => 'mautic.lead.field.being_created_in_background',
             ];
+        }
+
+        if ($options['data']->getColumnIsNotRemoved()) {
+            if (array_key_exists('tooltip', $attr)) {
+                $attr['tooltip'] = $attr['tooltip'].' mautic.lead.field.being_removed_in_background';
+            } else {
+                $attr['tooltip'] = 'mautic.lead.field.being_removed_in_background';
+            }
         }
 
         $builder->add(
@@ -621,7 +617,6 @@ class FieldType extends AbstractType
                 'attr'  => [
                     'tooltip'         => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
                     'onchange'        => 'Mautic.displayUniqueIdentifierWarning(this);',
-                    'data-disable-on' => '{"leadfield_object":"company"}',
                 ],
                 'data' => (!empty($data)),
             ]
@@ -673,10 +668,11 @@ class FieldType extends AbstractType
                 'data_class'        => LeadField::class,
                 'validation_groups' => function (FormInterface $form): array {
                     $data = $form->getData();
+                    \assert($data instanceof LeadField);
 
                     $groups = ['Default'];
 
-                    if (in_array($data->getType(), $this->indexableFieldsWithLimits)) {
+                    if ($data->supportsLength()) {
                         $groups[] = 'indexableFieldWithLimits';
                     }
 
@@ -686,10 +682,7 @@ class FieldType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadfield';
     }
@@ -724,20 +717,9 @@ class FieldType extends AbstractType
             ->addViolation();
     }
 
-    private function addLengthValidationField(FormInterface $form, bool $new = true): void
+    private function addLengthValidationField(FormInterface $form): void
     {
-        $typesWithMaxLength = implode('","', $this->indexableFieldsWithLimits);
-
-        $attr = [
-            'class'        => 'form-control',
-            'data-show-on' => '{
-                "leadfield_type":["'.$typesWithMaxLength.'"]
-             }',
-        ];
-
-        if (false === $new) {
-            $attr['readonly'] = 'readonly';
-        }
+        $typesWithMaxLength = implode('","', LeadField::TYPES_SUPPORTING_LENGTH);
 
         $form->add(
             'charLengthLimit',
@@ -745,10 +727,15 @@ class FieldType extends AbstractType
             [
                 'label'       => 'mautic.lead.field.form.maximum.character.length',
                 'label_attr'  => ['class' => 'control-label'],
-                'attr'        => $attr,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{
+                        "leadfield_type":["'.$typesWithMaxLength.'"]
+                     }',
+                ],
                 'constraints' => [
                     new Assert\NotBlank(['groups' => 'indexableFieldWithLimits']),
-                    new Assert\Range(['min' => 1, 'max' => 255, 'groups' => 'indexableFieldWithLimits']),
+                    new Assert\Range(['min' => 1, 'max' => SchemaDefinition::MAX_VARCHAR_LENGTH, 'groups' => 'indexableFieldWithLimits']),
                 ],
             ]
         );

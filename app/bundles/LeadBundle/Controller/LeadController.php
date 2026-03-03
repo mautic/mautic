@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -52,6 +54,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class LeadController extends FormController
 {
@@ -67,7 +70,7 @@ class LeadController extends FormController
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
-        $page = 1
+        $page = 1,
     ) {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -238,7 +241,7 @@ class LeadController extends FormController
         );
     }
 
-    public function quickAddAction(Request $request): Response
+    public function quickAddAction(Request $request, TokenStorageInterface $tokenStorage): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -306,7 +309,7 @@ class LeadController extends FormController
         $quickForm = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
-        $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+        $currentUser = $tokenStorage->getToken()->getUser();
         $quickForm->get('owner')->setData($currentUser);
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -483,7 +486,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -507,7 +510,7 @@ class LeadController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // get custom field values
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -593,7 +596,7 @@ class LeadController extends FormController
                     }
                 } else {
                     if ($request->get('qf', false)) {
-                        return $this->quickAddAction($request);
+                        return $this->quickAddAction($request, $tokenStorage);
                     }
 
                     $formErrors = $this->getFormErrorMessages($form);
@@ -625,7 +628,7 @@ class LeadController extends FormController
             }
         } else {
             // set the default owner to the currently logged in user
-            $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+            $currentUser = $tokenStorage->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
         }
 
@@ -718,7 +721,7 @@ class LeadController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -1008,6 +1011,12 @@ class LeadController extends FormController
                         'passthroughVars' => [
                             'closeModal' => 1,
                         ],
+                        'flashes' => [
+                            [
+                                'type' => 'notice',
+                                'msg'  => 'mautic.lead.lead.notice.merged',
+                            ],
+                        ],
                     ]
                 );
             }
@@ -1186,10 +1195,8 @@ class LeadController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1378,10 +1385,8 @@ class LeadController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0)
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, LeadModel $leadModel, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -1431,6 +1436,9 @@ class LeadController extends FormController
             }
         }
 
+        // Hydrate contacts with company profile fields
+        $leadFields = $emailModel->enrichedContactWithCompanies($leadFields);
+
         // Check if lead has a bounce status
         $dnc    = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
@@ -1449,6 +1457,15 @@ class LeadController extends FormController
                         $emailEntity = null;
                         $subject     = $email['subject'];
 
+                        // Set default settings for email.
+                        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
+                        $mailer->setReplyTo($email['from']);
+                        $mailer->setBody($email['body']);
+                        $mailer->parsePlainText($email['body']);
+                        $mailer->setLead($leadFields);
+                        $mailer->setIdHash();
+                        $mailer->setSubject($subject);
+
                         // Set the email entity template so the email configuration like preheader would apply.
                         if ($email['templates']) {
                             $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
@@ -1458,32 +1475,25 @@ class LeadController extends FormController
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity ??= new Email();
                             $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
                         }
 
                         if (!empty($email['from'])) {
-                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity ??= new Email();
                             $emailEntity->setFromAddress($email['from']);
                         }
 
                         if (!empty($email['fromname'])) {
-                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity ??= new Email();
                             $emailEntity->setFromName($email['fromname']);
                         }
 
                         if ($emailEntity) {
                             $emailEntity->setSubject($subject);
+                            $emailEntity->setCustomHtml($email['body']);
                             $mailer->setEmail($emailEntity);
                         }
-
-                        // Set Content
-                        $mailer->setReplyTo($email['from']);
-                        $mailer->setBody($email['body']);
-                        $mailer->parsePlainText($email['body']);
-                        $mailer->setLead($leadFields);
-                        $mailer->setIdHash();
-                        $mailer->setSubject($subject);
 
                         // Ensure safe emoji for notification
                         if ($mailer->send(true, false)) {
@@ -1667,7 +1677,7 @@ class LeadController extends FormController
             $campaigns = $campaignModel->getPublishedCampaigns(true);
             $items     = [];
             foreach ($campaigns as $campaign) {
-                $items[$campaign['name']] = $campaign['id'];
+                $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];
             }
 
             $route = $this->generateUrl(
@@ -1849,7 +1859,7 @@ class LeadController extends FormController
             $stages = $model->getUserStages();
             $items  = [];
             foreach ($stages as $stage) {
-                $items[$stage['name']] = $stage['id'];
+                $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
             }
 
             $route = $this->generateUrl(
@@ -1951,7 +1961,7 @@ class LeadController extends FormController
             $users = $userModel->getRepository()->getUserList('', 0);
             $items = [];
             foreach ($users as $user) {
-                $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
+                $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
             }
 
             $route = $this->generateUrl(
@@ -2013,10 +2023,6 @@ class LeadController extends FormController
 
         $fileType = $request->get('filetype', 'csv');
 
-        if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
-            return $this->contactExportCSVScheduler($dispatcher, $permissions);
-        }
-
         /** @var LeadModel $model */
         $model      = $this->getModel('lead');
         $session    = $request->getSession();
@@ -2062,9 +2068,32 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
+        // First, get the total count without creating the iterator
+        $totalContacts      = $model->getEntities($args)['count'];
+        $contactExportLimit = $this->coreParametersHelper->get('contact_export_limit', 0);
+        // Check if export limit is exceeded
+        if ($contactExportLimit > 0 && $totalContacts > $contactExportLimit) {
+            $messageVars = [
+                '%limit%' => number_format($contactExportLimit),
+                '%total%' => number_format($totalContacts),
+            ];
+            $this->addFlashMessage('mautic.lead.export.limit.exceeded', $messageVars, FlashBag::LEVEL_ERROR);
+            $response['message'] = $this->translator->trans('mautic.lead.export.limit.exceeded', $messageVars, 'flashes');
+            $response['flashes'] = $this->getFlashContent();
 
-        $response              = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+            return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
+        }
+
+        if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
+            return $this->contactExportCSVScheduler($dispatcher, $permissions);
+        }
+
+        $iterator = new IteratorExportDataModel(
+            $model,
+            $args,
+            fn ($contact) => $exportHelper->parseLeadToExport($contact)
+        );
+        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();

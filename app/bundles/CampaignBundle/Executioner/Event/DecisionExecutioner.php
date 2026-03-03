@@ -20,7 +20,7 @@ class DecisionExecutioner implements EventInterface
 
     public function __construct(
         private EventLogger $eventLogger,
-        private DecisionDispatcher $dispatcher
+        private DecisionDispatcher $dispatcher,
     ) {
     }
 

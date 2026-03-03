@@ -14,7 +14,7 @@ class IpLookupFactory
         protected ?LoggerInterface $logger = null,
         protected ?Client $client = null,
         protected ?string $cacheDir = null,
-        protected ?CoreParametersHelper $coreParametersHelper = null
+        protected ?CoreParametersHelper $coreParametersHelper = null,
     ) {
     }
 
@@ -29,7 +29,7 @@ class IpLookupFactory
             return null;
         }
 
-        if (!isset($services[$service]) || (null !== $auth || null !== $ipLookupConfig)) {
+        if (!isset($services[$service]) || null !== $auth) {
             if (!isset($this->lookupServices[$service])) {
                 throw new \InvalidArgumentException($service.' not registered.');
             }

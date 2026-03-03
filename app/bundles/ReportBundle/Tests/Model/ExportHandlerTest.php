@@ -14,18 +14,14 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $tmpDir = sys_get_temp_dir();
 
-        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock->expects($this->any())
             ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
 
-        $filePathResolver = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolver = $this->createMock(FilePathResolver::class);
 
         $filePathResolver->expects($this->once())
             ->method('createDirectory');
@@ -46,18 +42,14 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(FileIOException::class);
         $this->expectExceptionMessage('Could not create directory '.$tmpDir);
 
-        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock->expects($this->any())
             ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
 
-        $filePathResolver = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolver = $this->createMock(FilePathResolver::class);
 
         $filePathResolver->expects($this->once())
             ->method('createDirectory')
@@ -75,18 +67,14 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(FileIOException::class);
         $this->expectExceptionMessage('Could not open file xxx/myFile.csv');
 
-        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock->expects($this->any())
             ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
 
-        $filePathResolver = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolver = $this->createMock(FilePathResolver::class);
 
         $filePathResolver->expects($this->once())
             ->method('createDirectory');

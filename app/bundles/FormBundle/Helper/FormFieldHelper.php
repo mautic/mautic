@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ?ValidatorInterface $validator;
+    private ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -30,7 +30,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Blank::class => ['message' => 'mautic.form.submission.captcha.invalid'],
             ],
         ],
-        'checkboxgrp' => [],
+        'checkboxgrp' => [
+            'filter' => 'raw',
+        ],
         'country'     => [],
         'date'        => [],
         'datetime'    => [],
@@ -47,10 +49,17 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'number'        => [
             'filter' => 'float',
         ],
+        'slider'        => [
+            'filter' => 'float',
+        ],
         'pagebreak' => [],
         'password'  => [],
-        'radiogrp'  => [],
-        'select'    => [],
+        'radiogrp'  => [
+            'filter' => 'raw',
+        ],
+        'select'    => [
+            'filter' => 'raw',
+        ],
         'tel'       => [],
         'text'      => [],
         'textarea'  => [],
@@ -63,7 +72,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'file' => [],
     ];
 
-    public function __construct(Translator $translator, ValidatorInterface $validator = null)
+    public function __construct(Translator $translator, ?ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
 
@@ -83,38 +92,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
 
-    /**
-     * @param array $customFields
-     *
-     * @deprecated  to be removed in 3.0; use getChoiceList($customFields = []) instead
-     *
-     * @return array
-     */
-    public function getList($customFields = [])
-    {
-        return $this->getChoiceList($customFields);
-    }
-
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }
 
-    /**
-     * Get fields input filter.
-     *
-     * @return string
-     */
-    public function getFieldFilter($type)
+    public function getFieldFilter(string $type): string
     {
-        if (array_key_exists($type, $this->types)) {
-            return $this->types[$type]['filter'] ?? 'clean';
-        }
-
-        return 'alphanum';
+        return $this->types[$type]['filter'] ?? 'string';
     }
 
     /**
@@ -172,6 +157,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $alias = $field->getAlias();
 
+        // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
+        $fieldAttributeReadOnly = fn ($field, $sanitizedValue) => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
+
         switch ($field->getType()) {
             case 'text':
             case 'number':
@@ -188,18 +176,20 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
-                        .$match[4].'/>';
+                        .$match[4].$fieldAttributeReadOnly($field, $sanitizedValue).'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
                 if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.$this->sanitizeValue($value).'</textarea>';
+                    $value    = $this->sanitizeValue($value);
+                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].$fieldAttributeReadOnly($field, $value).'>'.$value.'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'checkboxgrp':
-                $separator = urlencode('|');
+                $isUrlEncoded = is_string($value) && str_contains($value, '%7C');
+                $separator    = $isUrlEncoded ? urlencode('|') : '|';
                 if (is_string($value) && strrpos($value, $separator) > 0) {
                     $value = explode($separator, $value);
                 } elseif (!is_array($value)) {

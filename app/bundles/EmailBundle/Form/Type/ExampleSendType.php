@@ -47,9 +47,9 @@ class ExampleSendType extends AbstractType
                 [
                     'attr' => [
                         'class'                => 'form-control',
-                        'data-callback'        => 'activateContactLookupField',
+                        'data-callback'        => 'activateExampleContactLookupField',
                         'data-toggle'          => 'field-lookup',
-                        'data-lookup-callback' => 'updateContactLookupListFilter',
+                        'data-lookup-callback' => 'updateExampleContactLookupListFilter',
                         'data-chosen-lookup'   => 'lead:contactList',
                         'placeholder'          => $this->translator->trans(
                             'mautic.lead.list.form.startTyping'
@@ -58,6 +58,7 @@ class ExampleSendType extends AbstractType
                             'mautic.core.form.nomatches'
                         ),
                     ],
+                    'required' => false,
                 ]
             );
 

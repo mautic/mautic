@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -44,7 +45,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel
+class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public const CHANNEL_FEATURE = 'reporting';
 
@@ -73,7 +74,7 @@ class ReportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
@@ -141,7 +142,7 @@ class ReportModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -309,12 +310,9 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @property filterList
-     * @property definitions
-     *
      * @param string $context
      *
-     * @return \stdClass[filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
+     * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
     public function getFilterList($context = 'all'): \stdClass
     {
@@ -445,24 +443,26 @@ class ReportModel extends FormModel
      *
      * @return mixed[]
      */
-    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = []): array
+    public function getReportData(Report $entity, ?FormFactoryInterface $formFactory = null, array $options = []): array
     {
         // Clone dateFrom/dateTo because they handled separately in charts
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));
         $chartDateTo   = isset($options['dateTo']) ? clone $options['dateTo'] : (new \DateTime());
+        $debugData     = [];
 
-        $debugData = [];
+        // UI doesn't set time so reset it to midnight. API can set time so do not reset it. Using DateTimeImmutable to distinguish.
+        $resetTime = !(isset($options['dateFrom']) && $options['dateFrom'] instanceof \DateTimeImmutable);
 
-        if (isset($options['dateFrom'])) {
-            // Fix date ranges if applicable
+        if ($resetTime && isset($options['dateFrom'])) {
+            $now = new \DateTime();
+
             if (!isset($options['dateTo'])) {
-                $options['dateTo'] = new \DateTime();
+                $options['dateTo'] = $now;
             }
 
-            // Adjust dateTo to be end of day or to current hour if today
-            $now = new \DateTime();
-            if ($now->format('Y-m-d') == $options['dateTo']->format('Y-m-d')) {
-                $options['dateTo'] = $now;
+            // Set time to the last second of the "to date" date
+            if ($now->format('Y-m-d') === $options['dateTo']->format('Y-m-d')) {
+                $options['dateTo'] = $now->setTime(23, 59, 59);
             } else {
                 $options['dateTo']->setTime(23, 59, 59);
             }
@@ -496,8 +496,15 @@ class ReportModel extends FormModel
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
-        $orderBy    = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderby', '');
-        $orderByDir = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
+        $session    = $this->getSession();
+        $orderBy    = '';
+        $orderByDir = 'ASC';
+        // make sure to use the session if it's started. Otherwise this is impossible to test:
+        // Failed to start the session because headers have already been sent by "/var/www/html/vendor/phpunit/phpunit/src/Util/Printer.php" at line 104.
+        if ($session->isStarted()) {
+            $orderBy    = $session->get('mautic.report.'.$entity->getId().'.orderby', $orderBy);
+            $orderByDir = $session->get('mautic.report.'.$entity->getId().'.orderbydir', $orderByDir);
+        }
 
         $dataOptions = [
             'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
@@ -515,7 +522,10 @@ class ReportModel extends FormModel
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         // set what page currently on so that we can return here after form submission/cancellation
-        $this->getSession()->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        $session = $this->getSession();
+        if ($session->isStarted()) {
+            $session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        }
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
@@ -572,7 +582,9 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->getSession()->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                if ($session->isStarted()) {
+                    $limit = $session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                }
                 if (!empty($options['limit'])) {
                     $limit      = $options['limit'];
                     $reportPage = $options['page'];
@@ -613,7 +625,8 @@ class ReportModel extends FormModel
             // Allow plugin to manipulate the data
             $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
             $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_DISPLAY);
-            $data = $event->getData();
+            $data        = $event->getData();
+            $dataOptions = $event->getOptions();
         }
 
         if ($this->isDebugMode()) {
@@ -642,7 +655,7 @@ class ReportModel extends FormModel
             'dataColumns'       => $dataColumns,
             'graphs'            => $graphs,
             'contentTemplate'   => $contentTemplate,
-            'columns'           => $tableDetails['columns'],
+            'columns'           => $dataOptions['columns'],
             'limit'             => ($paginate) ? $limit : 0,
             'page'              => ($paginate) ? $reportPage : 1,
             'dateFrom'          => $dataOptions['dateFrom'],
@@ -834,7 +847,7 @@ class ReportModel extends FormModel
         $dependents = [];
         foreach ($entities as $entity) {
             foreach ($entity->getFilters() as $entityFilter) {
-                if ($entityFilter['column'] == $search && in_array($tagId, $entityFilter['value'])) {
+                if ($entityFilter['column'] == $search && (is_array($entityFilter['value']) && in_array($tagId, $entityFilter['value']))) {
                     $dependents[] = $entity->getId();
                 }
             }

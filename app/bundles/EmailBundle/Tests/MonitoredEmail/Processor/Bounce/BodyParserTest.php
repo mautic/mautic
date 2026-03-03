@@ -5,18 +5,13 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(BodyParser::class)]
 class BodyParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that a BouncedEmail is returned from a bounce detected in the body
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::getBounce
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a BouncedEmail is returned from a bounce detected in the body')]
     public function testBouncedEmailIsReturnedFromParsedBody(): void
     {
         $message            = new Message();
@@ -40,18 +35,13 @@ BODY;
         $parser = new BodyParser();
         $bounce = $parser->getBounce($message);
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
         $this->assertEquals('recipient@example.net', $bounce->getContactEmail());
         $this->assertEquals(Category::UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());
         $this->assertTrue($bounce->isFinal());
     }
 
-    /**
-     * @testdox Test that an exception is thrown if a bounce cannot be found in the body
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::getBounce
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exception is thrown if a bounce cannot be found in the body')]
     public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);

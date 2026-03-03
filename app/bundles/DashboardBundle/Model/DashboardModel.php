@@ -3,7 +3,7 @@
 namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
@@ -45,7 +45,7 @@ class DashboardModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private CacheProviderInterface $cacheProvider,
+        private CacheProviderTagAwareInterface $cacheProvider,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -210,8 +210,15 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetContent(Widget $widget, $filter = []): void
     {
+        $defaultTimeout = $this->coreParametersHelper->get('cached_data_timeout');
+
+        // Timeout 0 will be interpreted as endless cache, so we set it to -1 which will be interpreted as no cache
+        if (0 === $defaultTimeout) {
+            $defaultTimeout = -1;
+        }
+
         if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
-            $widget->setCacheTimeout($this->coreParametersHelper->get('cached_data_timeout'));
+            $widget->setCacheTimeout($defaultTimeout);
         }
 
         // Merge global filter with widget params

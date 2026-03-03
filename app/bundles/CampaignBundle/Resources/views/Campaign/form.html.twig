@@ -36,19 +36,23 @@
     <div class="col-md-3 height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
+            {{ form_row(form.projects) }}
             {{ form_row(form.allowRestart) }}
             {{ form_row(form.isPublished) }}
             {{ form_row(form.publishUp) }}
             {{ form_row(form.publishDown) }}
+            {{ form_row(form.republishBehavior) }}
         </div>
     </div>
 </div>
 
+<input type="hidden" name="submit" value="1">
 {{ form_end(form) }}
 {{- include('@MauticCampaign/Campaign/_builder.html.twig', {
     'campaignId': form.sessionId.vars['data'],
     'campaignEvents': campaignEvents,
     'campaignSources': campaignSources,
+    'campaignElements': campaignElements,
     'eventSettings': eventSettings,
     'canvasSettings': entity.canvasSettings,
 }) -}}

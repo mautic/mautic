@@ -8,8 +8,9 @@ use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Event\FieldCollectEvent;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class FieldCollector implements FieldCollectorInterface
+final class FieldCollector implements FieldCollectorInterface, ResetInterface
 {
     /**
      * @var FieldCollection[]
@@ -17,7 +18,7 @@ final class FieldCollector implements FieldCollectorInterface
     private array $fieldCollections = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -28,6 +29,11 @@ final class FieldCollector implements FieldCollectorInterface
         }
 
         return $this->fieldCollections[$object];
+    }
+
+    public function reset(): void
+    {
+        $this->fieldCollections = [];
     }
 
     private function collect(string $object): void

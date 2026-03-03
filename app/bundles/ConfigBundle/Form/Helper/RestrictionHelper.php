@@ -20,7 +20,7 @@ class RestrictionHelper
     public function __construct(
         private TranslatorInterface $translator,
         array $restrictedFields,
-        private string $displayMode
+        private string $displayMode,
     ) {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
     }
@@ -29,7 +29,7 @@ class RestrictionHelper
      * @param FormInterface<mixed> $childType
      * @param FormInterface<mixed> $parentType
      */
-    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null): void
+    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, ?array $restrictedFields = null): void
     {
         if (null === $restrictedFields) {
             $restrictedFields = $this->restrictedFields;

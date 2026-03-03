@@ -13,7 +13,7 @@ abstract class AbstractPermissions
     protected $permissions = [];
 
     public function __construct(
-        protected array $params
+        protected array $params,
     ) {
     }
 
@@ -220,15 +220,13 @@ abstract class AbstractPermissions
                 switch ($perm) {
                     case 'editother':
                     case 'edit':
+                    case 'publishother':
+                    case 'publish':
                         $required = ['viewother', 'viewown'];
                         break;
                     case 'deleteother':
                     case 'delete':
                         $required = ['editother', 'viewother', 'viewown'];
-                        break;
-                    case 'publishother':
-                    case 'publish':
-                        $required = ['viewother', 'viewown'];
                         break;
                     case 'viewother':
                     case 'editown':

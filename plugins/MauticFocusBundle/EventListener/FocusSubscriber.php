@@ -34,7 +34,7 @@ class FocusSubscriber implements EventSubscriberInterface
         private PageTokenHelper $pageTokenHelper,
         private AssetTokenHelper $assetTokenHelper,
         private FocusModel $focusModel,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -155,6 +155,8 @@ class FocusSubscriber implements EventSubscriberInterface
             foreach ($trackables as $token => $trackable) {
                 $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $focus->getUtmTags());
             }
+
+            $tokens = array_merge($tokens, $event->getTokens());
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);
 

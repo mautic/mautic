@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
+use PHPUnit\Framework\MockObject\MockBuilder;
 
 class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
@@ -22,7 +23,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        /** @var \PHPUnit_Framework_MockObject_MockBuilder $mockBuilder */
+        /** @var MockBuilder $mockBuilder */
         $mockBuilder = $this->getMockBuilder(StubIntegration::class);
         $mockBuilder->disableOriginalConstructor();
 
@@ -59,9 +60,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             'some_custom_field'   => 'some value',
         ];
 
-        $emailValidator = $this->getMockBuilder(EmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailValidator = $this->createMock(EmailValidator::class);
 
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
@@ -100,7 +99,6 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->dispatcher,
                 $this->cache,
                 $this->em,
-                $this->session,
                 $this->request,
                 $this->router,
                 $this->translator,
@@ -113,6 +111,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->fieldModel,
                 $this->integrationEntityModel,
                 $this->doNotContact,
+                $this->fieldsWithUniqueIdentifier,
             ])
             ->onlyMethods(['populateMauticLeadData', 'mergeConfigToFeatureSettings'])
             ->getMock();
@@ -130,9 +129,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
     public function testLimitString(): void
     {
-        $integration = $this->getMockBuilder(StubIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(StubIntegration::class);
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
         $methodLimitString->setAccessible(true);

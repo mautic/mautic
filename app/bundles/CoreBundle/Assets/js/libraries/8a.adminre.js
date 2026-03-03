@@ -251,6 +251,26 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 $("[data-toggle~=popover]").popover({
                     sanitize: false
                 });
+                
+                var hideAllPopovers = function() {
+                    $("[data-toggle~=popover]").each(function() {
+                        var popover = $(this).data('bs.popover');
+                        if (popover && popover.tip().hasClass('in')) {
+                            $(this).popover('hide');
+                        }
+                    });
+                };
+                
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.popover').length && 
+                        !$(e.target).closest('[data-toggle="popover"]').length) {
+                        hideAllPopovers();
+                    }
+                });
+                
+                $(document).on('mouseenter', '[data-toggle="popover"][data-trigger="hover"]', function() {
+                    hideAllPopovers();
+                });
             },
 
             // @MISC: IE9 input placeholder support
@@ -356,12 +376,16 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     toggler     = "[data-toggle~=selectrow]",
                     target      = $(toggler).data("target");
 
+                // Track the last clicked checkbox for shift-click functionality
+                var lastCheckedBox = null;
+
                 // check on DOM ready
                 $(toggler).each(function () {
                     if($(this).is(":checked")) {
                         selectrow(this, "checked");
                     }
                 });
+                updateToolbarState();
 
                 // clicker
                 $(document).on("change", toggler, function () {
@@ -372,6 +396,34 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     } else {
                         selectrow(this, "unchecked");
                     }
+                    updateToolbarState();
+                });
+
+                // Add shift-click functionality for range selection
+                $(document).on("click", toggler, function(e) {
+                    if (e.shiftKey && lastCheckedBox !== null) {
+                        var checkboxes = $(toggler);
+                        var startIndex = checkboxes.index(lastCheckedBox);
+                        var endIndex = checkboxes.index(this);
+
+                        // Determine the range of checkboxes to check/uncheck
+                        var start = Math.min(startIndex, endIndex);
+                        var end = Math.max(startIndex, endIndex);
+
+                        // Get the checked state from the clicked checkbox
+                        var isChecked = $(this).is(":checked");
+
+                        // Apply the same state to all checkboxes in range
+                        checkboxes.slice(start, end + 1).each(function() {
+                            // Only change if the current state is different
+                            if ($(this).prop("checked") !== isChecked) {
+                                $(this).prop("checked", isChecked).trigger("change");
+                            }
+                        });
+                    }
+
+                    // Update the last checked box reference
+                    lastCheckedBox = this;
                 });
 
                 // Core SelectRow function
@@ -394,6 +446,28 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         $(element).trigger(settings.eventPrefix+".selectrow.unselected", { "element": $($this).parentsUntil(target) });
                     }
                 }
+
+                // Check if any checkbox is selected and update toolbar state
+                function updateToolbarState() {
+                    var checkedBoxes = $(toggler + ":checked").length;
+                    $(".toolbar--batch-actions").toggleClass("toolbar--batch-actions--active", checkedBoxes > 0);
+
+                    var $summaryCount = $(".toolbar--batch-summary__count");
+                    var singularText = $summaryCount.data('singular');
+                    var pluralText = $summaryCount.data('plural');
+
+                    var itemText = checkedBoxes === 1 ? singularText : pluralText;
+                    $summaryCount.text(checkedBoxes + " " + itemText);
+                }
+
+                $(document).on("click", ".pagination a[data-toggle='ajax']", function() {
+                    // Reset toolbar state
+                    $(".toolbar--batch-actions").removeClass("toolbar--batch-actions--active");
+                    $(".toolbar--batch-summary__count").text("0");
+
+                    // Uncheck main toggle checkbox if it exists
+                    $("[data-toggle=checkall]").prop("checked", false);
+                });
 
                 // Event console
                 MAIN.prototype.HELPER.Console(settings.eventPrefix+".selectrow.selected");
@@ -424,6 +498,19 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     } else {
                         unchecked(target);
                     }
+                });
+
+                // Add this new handler right here
+                $(document).on("click", "[data-toggle=cancel-checkall]", function() {
+                    // Uncheck the main toggle checkbox
+                    $(toggler).prop("checked", false);
+
+                    // Uncheck all row checkboxes
+                    $("input[data-toggle=selectrow]").each(function() {
+                        $(this)
+                            .prop("checked", false)
+                            .trigger("change");
+                    });
                 });
 
                 // Core CheckAll function

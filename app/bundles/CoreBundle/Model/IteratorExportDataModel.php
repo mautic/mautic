@@ -12,9 +12,12 @@ class IteratorExportDataModel implements \Iterator
 
     private int $total;
 
-    private $data;
+    /**
+     * @var ?mixed[]
+     */
+    private ?array $data;
 
-    private $totalResult;
+    private int $totalResult;
 
     /**
      * @param AbstractCommonModel<T> $model
@@ -26,13 +29,13 @@ class IteratorExportDataModel implements \Iterator
         private AbstractCommonModel $model,
         private array $args,
         callable $callback,
-        private bool $skipOrdering = false
+        private bool $skipOrdering = false,
     ) {
         $this->callback     = $callback;
         $this->position     = 0;
         $this->total        = 0;
         $this->totalResult  = 0;
-        $this->data         = 0;
+        $this->data         = [];
     }
 
     /**

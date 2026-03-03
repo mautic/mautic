@@ -18,8 +18,8 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         protected $choices,
         protected $operators,
         protected TranslatorInterface $translator,
-        Request $request = null,
-        private string $search = ''
+        ?Request $request = null,
+        private string $search = '',
     ) {
         parent::__construct($request);
     }

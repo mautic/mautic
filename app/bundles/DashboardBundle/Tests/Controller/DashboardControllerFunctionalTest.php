@@ -6,11 +6,14 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -36,12 +39,11 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($widget);
 
-        $this->client->request('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()), [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-        ]);
+        $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
+        $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);
@@ -58,6 +60,42 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
         Assert::assertArrayHasKey('widgetHtml', $data);
         Assert::assertStringContainsString('View Full Report', $data['widgetHtml']);
+    }
+
+    public function testWidgetWithBestHours(): void
+    {
+        $user    = $this->em->getRepository(User::class)->findOneBy([]);
+        $segment = $this->createSegment('A', 'a');
+        $widget  = new Widget();
+        $widget->setName('Best email read hours');
+        $widget->setType('emails.best.hours');
+        $widget->setParams(['timeFormat' => 24, 'segmentId' => $segment->getId()]);
+        $widget->setWidth(100);
+        $widget->setHeight(200);
+        $widget->setCreatedBy($user);
+        $this->em->persist($widget);
+
+        $this->em->flush();
+        $this->em->detach($widget);
+
+        $this->client->xmlHttpRequest('GET', "/s/dashboard/widget/{$widget->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $content = $this->client->getResponse()->getContent();
+        Assert::assertJson($content);
+
+        $data = json_decode($content, true);
+        Assert::assertIsArray($data);
+        Assert::assertArrayHasKey('success', $data);
+        Assert::assertSame(1, $data['success']);
+        Assert::assertArrayHasKey('widgetId', $data);
+        Assert::assertSame((string) $widget->getId(), $data['widgetId']);
+        Assert::assertArrayHasKey('widgetWidth', $data);
+        Assert::assertSame($widget->getWidth(), $data['widgetWidth']);
+        Assert::assertArrayHasKey('widgetHeight', $data);
+        Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
+        Assert::assertArrayHasKey('widgetHtml', $data);
+        Assert::assertStringContainsString('Best email read hours', $data['widgetHtml']);
     }
 
     public function testWidgetWithSegmentBuildTime(): void
@@ -80,12 +118,11 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($widget);
 
-        $this->client->request('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()), [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-        ]);
+        $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
+        $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);
@@ -103,6 +140,31 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             ['A', 'Admin User', '3 seconds'],
             ['D', 'Admin User', 'Less than 1 second'],
         ], $tableArray);
+    }
+
+    public function testAuditLogWidgetWithDeletedContact(): void
+    {
+        $user   = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $widget = new Widget();
+        $widget->setName('Recent activity');
+        $widget->setType('recent.activity');
+        $widget->setWidth(100);
+        $widget->setHeight(300);
+        $widget->setCreatedBy($user);
+        $this->em->persist($widget);
+        $this->em->flush();
+        $contact = new Lead();
+        $contact->setFirstName('John');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
+        $contactModel->deleteEntity($contact);
+        $this->em->clear();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}");
+        $this->assertResponseIsSuccessful();
+        $printResponse = fn () => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
+        Assert::assertStringContainsString('created', $printResponse());
+        Assert::assertStringContainsString('deleted', $printResponse());
     }
 
     private function createSegment(string $name, string $alias, float $lastBuildTime = 0, ?User $user = null): LeadList

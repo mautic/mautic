@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,17 +14,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to install Mautic sample data.
  */
+#[AsCommand(
+    name: 'mautic:install:data',
+    description: 'Installs Mautic with sample data'
+)]
 class InstallDataCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
         parent::__construct();
     }
 
     protected function configure()
     {
-        $this->setName('mautic:install:data')
+        $this
             ->setDefinition([
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
@@ -112,6 +117,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Installs Mautic with sample data';
 }

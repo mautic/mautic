@@ -19,7 +19,7 @@ class GroupListType extends AbstractType
 {
     public function __construct(
         private EntityManager $em,
-        private GroupRepository $repo
+        private GroupRepository $repo,
     ) {
     }
 
@@ -38,7 +38,7 @@ class GroupListType extends AbstractType
                 $groups  = $this->repo->getEntities();
                 $choices = [];
                 foreach ($groups as $l) {
-                    $choices[$l->getName()] = $l->getId();
+                    $choices[$l->getName().' ('.$l->getId().')'] = $l->getId();
                 }
 
                 return $choices;

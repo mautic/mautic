@@ -1,0 +1,65 @@
+{% extends '@MauticForm/Action/base_form_action.html.twig' %}
+
+{% set footerContent %}
+    {% if action.properties.email is defined and securityIsGranted('email:emails:view') %}
+        <!-- Email to send to contact -->
+        {% set email = getEntity('Mautic\\EmailBundle\\Entity\\Email', action.properties.email) %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': email.name,
+                'icon': 'ri-mail-line',
+                'attributes': {
+                    'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.email }),
+                    'target': '_blank'
+                }
+            }]
+        } %}
+    {% endif %}
+
+    {% if action.properties.useremail is defined and action.properties.useremail.email is defined and securityIsGranted('email:emails:view') %}
+        <!-- Email to send to user -->
+        {% set email = getEntity('Mautic\\EmailBundle\\Entity\\Email', action.properties.useremail.email) %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': email.name,
+                'icon': 'ri-mail-line',
+                'attributes': {
+                    'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.useremail.email }),
+                    'target': '_blank'
+                }
+            }]
+        } %}
+    {% endif %}
+
+    {% if action.properties.user_id is defined and action.properties.user_id is not empty %}
+        <!-- Send email to users -->
+        {% set users = getEntities('Mautic\\UserBundle\\Entity\\User', action.properties.user_id) %}
+        {% for user in users %}
+            {% if user.firstName is defined %}
+                {% if securityIsGranted('user:users:edit') %}
+                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                        'tags': [{
+                            'label': user.firstName,
+                            'icon': 'ri-account-circle-line',
+                            'attributes': {
+                                'href': path('mautic_user_action', {'objectAction': 'edit', 'objectId': user.id }),
+                                'target': '_blank'
+                            }
+                        }]
+                    } %}
+                {% else %}
+                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                        'tags': [{
+                            'label': user.firstName,
+                            'icon': 'ri-account-circle-line',
+                        }]
+                    } %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endset %}
+
+{% block action_label %}
+    {{ footerContent|raw }}
+{% endblock %}

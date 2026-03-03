@@ -22,31 +22,32 @@ class InactiveContactFinder
     public function __construct(
         private LeadRepository $leadRepository,
         private CampaignLeadRepository $campaignLeadRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
     /**
-     * @param int $campaignId
-     *
-     * @return ArrayCollection
-     *
      * @throws NoContactsFoundException
      */
-    public function getContacts($campaignId, Event $decisionEvent, ContactLimiter $limiter)
-    {
+    public function getContacts(
+        int $campaignId,
+        Event $decisionEvent,
+        ContactLimiter $limiter,
+        bool $ignoreParentEvent = false,
+    ): ArrayCollection {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             // Limit was reached but do not trigger the NoContactsFoundException
             return new ArrayCollection();
         }
 
         // Get list of all campaign leads
-        $decisionParentEvent            = $decisionEvent->getParent();
+        $decisionParentEvent            = $ignoreParentEvent ? null : $decisionEvent->getParent();
         $this->campaignMemberDatesAdded = $this->campaignLeadRepository->getInactiveContacts(
             $campaignId,
             $decisionEvent->getId(),
             ($decisionParentEvent) ? $decisionParentEvent->getId() : null,
-            $limiter
+            $limiter,
+            $ignoreParentEvent
         );
 
         if (empty($this->campaignMemberDatesAdded)) {

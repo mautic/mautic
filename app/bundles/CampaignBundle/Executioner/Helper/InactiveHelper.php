@@ -21,7 +21,7 @@ class InactiveHelper
         private LeadEventLogRepository $eventLogRepository,
         private EventRepository $eventRepository,
         private LoggerInterface $logger,
-        private DecisionHelper $decisionHelper
+        private DecisionHelper $decisionHelper,
     ) {
     }
 
@@ -36,7 +36,7 @@ class InactiveHelper
          */
         foreach ($decisions as $key => $decision) {
             $negativeChildren = $decision->getNegativeChildren();
-            if (!$negativeChildren->count()) {
+            if (!$negativeChildren->count() && !$decision->shouldBeRedirected()) {
                 $decisions->remove($key);
             }
         }
@@ -52,7 +52,7 @@ class InactiveHelper
         ArrayCollection $contacts,
         $lastActiveEventId,
         ArrayCollection $negativeChildren,
-        Event $event
+        Event $event,
     ): void {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
@@ -113,7 +113,7 @@ class InactiveHelper
 
         /** @var Event|null $decision */
         $decision = $this->eventRepository->find($decisionId);
-        if ($decision && !$decision->isDeleted()) {
+        if ($decision && (!$decision->isDeleted() || $decision->shouldBeRedirected())) {
             $collection->set($decision->getId(), $decision);
         }
 

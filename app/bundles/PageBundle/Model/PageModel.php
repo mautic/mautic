@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -15,10 +16,14 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -52,11 +57,23 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Page>
  */
-class PageModel extends FormModel
+class PageModel extends FormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
     use VariantModelTrait;
     use BuilderModelTrait;
+
+    /**
+     * We have to limit length of some fields
+     * to store them in the database.
+     */
+    private const MAX_FIELD_LENGTH = 191;
+
+    /**
+     * An encoding to use to calculate
+     * length of a field.
+     */
+    private const STRING_ENCODING = 'UTF-8';
 
     /**
      * @var bool
@@ -84,7 +101,9 @@ class PageModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
+        private StatRepository $statRepository,
+        private BotRatioHelper $botRatioHelper,
     ) {
         $this->dateTimeHelper       = new DateTimeHelper();
 
@@ -188,9 +207,6 @@ class PageModel extends FormModel
         parent::deleteEntity($entity);
     }
 
-    /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Page) {
@@ -228,7 +244,7 @@ class PageModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -369,18 +385,36 @@ class PageModel extends FormModel
      * @param string|int $code
      * @param array      $query
      *
+     * @return bool If hit is tracked or not
+     *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = []): void
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
-        if (!$this->security->isAnonymous()) {
-            return;
+        if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
+            return false;
         }
+
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
+            return false;
+        }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
         if (empty($query) || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
+        }
+
+        $dateTime  = $dateTime ?: new \DateTime();
+        $userAgent = $request->server->get('HTTP_USER_AGENT');
+        if (array_key_exists('ct', $query) && is_array($query['ct']) && array_key_exists('email', $query['ct']) && array_key_exists('stat', $query['ct'])) {
+            /** @var Stat $stat */
+            $stat = $this->statRepository->findOneBy(['trackingHash' => $query['ct']['stat']]);
+            if (null !== $stat && $this->botRatioHelper->isHitByBot($stat, $dateTime, $ipAddress, (string) $userAgent)) {
+                return false;
+            }
         }
 
         // Get lead if required
@@ -410,20 +444,20 @@ class PageModel extends FormModel
 
         if (!$lead || !$lead->getId()) {
             // Lead came from a non-trackable IP so ignore
-            return;
+            return false;
         }
 
         $hit = new Hit();
-        $hit->setDateHit(new \DateTime());
-        $hit->setIpAddress($this->ipLookupHelper->getIpAddress());
+        $hit->setDateHit($dateTime);
+        $hit->setIpAddress($ipAddress);
 
         // Set info from request
         $hit->setQuery($query);
         $hit->setCode($code);
 
-        $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
+        $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $userAgent);
 
-        $hit->setTrackingId($trackedDevice->getTrackingId());
+        $hit->setTrackingId($this->limitString($trackedDevice->getTrackingId()));
         $hit->setDeviceStat($trackedDevice);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
@@ -431,7 +465,7 @@ class PageModel extends FormModel
             $this->em->persist($hit);
             $this->em->flush();
         } catch (\Exception $exception) {
-            if (MAUTIC_ENV === 'dev') {
+            if (MAUTIC_ENV !== 'prod') {
                 throw $exception;
             } else {
                 $this->logger->error(
@@ -439,8 +473,6 @@ class PageModel extends FormModel
                     ['exception' => $exception]
                 );
             }
-
-            return;
         }
 
         // save hit to the cookie to use to update the exit time
@@ -468,6 +500,8 @@ class PageModel extends FormModel
             // Fallback measure
             $this->processPageHit($hit, $page, $request, $lead, $this->deviceTracker->wasDeviceChanged());
         }
+
+        return true;
     }
 
     /**
@@ -482,7 +516,7 @@ class PageModel extends FormModel
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null
+        ?\DateTimeInterface $hitDate = null,
     ): void {
         // Store Page/Redirect association
         if ($page) {
@@ -504,10 +538,10 @@ class PageModel extends FormModel
                     $channel   = $clickthrough['channel'][0];
                     $channelId = (int) $clickthrough['channel'][1];
                 }
-                $hit->setSource($channel);
+                $hit->setSource($this->limitString($channel));
                 $hit->setSourceId($channelId);
             } elseif (!empty($clickthrough['source'])) {
-                $hit->setSource($clickthrough['source'][0]);
+                $hit->setSource($this->limitString($clickthrough['source'][0]));
                 $hit->setSourceId($clickthrough['source'][1]);
             }
 
@@ -538,7 +572,7 @@ class PageModel extends FormModel
             $hit->setReferer($query['page_referrer']);
         }
         if (isset($query['page_language'])) {
-            $hit->setPageLanguage($query['page_language']);
+            $hit->setPageLanguage($this->limitString($query['page_language']));
         }
 
         if ($pageTitle = $query['page_title'] ?? ($page instanceof Page ? $page->getTitle() : false)) {
@@ -548,7 +582,7 @@ class PageModel extends FormModel
             }
 
             $query['page_title'] = $pageTitle;
-            $hit->setUrlTitle($pageTitle);
+            $hit->setUrlTitle($this->limitString($pageTitle));
         }
 
         $hit->setQuery($query);
@@ -567,50 +601,52 @@ class PageModel extends FormModel
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
-            if (!empty($lastHit)) {
+            if (!empty($lastHit) && is_numeric($lastHit)) {
                 // this is not a new session so update the last hit if applicable with the date/time the user left
-                $this->getHitRepository()->updateHitDateLeft($lastHit);
+                $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
             }
         }
 
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
-        if ($page instanceof Page) {
-            $hit->setPageLanguage($page->getLanguage());
+        if (!empty($page)) {
+            if ($page instanceof Page) {
+                $hit->setPageLanguage($this->limitString($page->getLanguage()));
 
-            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-            try {
-                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-            } catch (\Exception $exception) {
-                $this->logger->error(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
-            }
-        } elseif ($page instanceof Redirect) {
-            try {
-                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                // If this is a trackable, up the trackable counts as well
-                if ($hit->getSource() && $hit->getSourceId()) {
-                    $this->pageTrackableModel->getRepository()->upHitCount(
-                        $page->getId(),
-                        $hit->getSource(),
-                        $hit->getSourceId(),
-                        1,
-                        $isUnique
-                    );
-                }
-            } catch (\Exception $exception) {
-                if (MAUTIC_ENV === 'dev') {
-                    throw $exception;
-                } else {
+                try {
+                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+                } catch (\Exception $exception) {
                     $this->logger->error(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
+                }
+            } elseif ($page instanceof Redirect) {
+                try {
+                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                    // If this is a trackable, up the trackable counts as well
+                    if ($hit->getSource() && $hit->getSourceId()) {
+                        $this->pageTrackableModel->getRepository()->upHitCount(
+                            $page->getId(),
+                            $hit->getSource(),
+                            $hit->getSourceId(),
+                            1,
+                            $isUnique
+                        );
+                    }
+                } catch (\Exception $exception) {
+                    if (MAUTIC_ENV !== 'prod') {
+                        throw $exception;
+                    } else {
+                        $this->logger->error(
+                            $exception->getMessage(),
+                            ['exception' => $exception]
+                        );
+                    }
                 }
             }
         }
@@ -618,11 +654,11 @@ class PageModel extends FormModel
         // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
         if ($ipAddress && $details = $ipAddress->getIpDetails()) {
-            $hit->setCountry($details['country']);
-            $hit->setRegion($details['region']);
-            $hit->setCity($details['city']);
-            $hit->setIsp($details['isp']);
-            $hit->setOrganization($details['organization']);
+            $hit->setCountry($this->limitString($details['country']));
+            $hit->setRegion($this->limitString($details['region']));
+            $hit->setCity($this->limitString($details['city']));
+            $hit->setIsp($this->limitString($details['isp']));
+            $hit->setOrganization($this->limitString($details['organization']));
         }
 
         if (!$hit->getReferer()) {
@@ -630,7 +666,7 @@ class PageModel extends FormModel
         }
 
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-        $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
+        $hit->setRemoteHost($this->limitString($request->server->get('REMOTE_HOST')));
 
         $this->setUtmTags($hit, $lead);
 
@@ -724,7 +760,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -737,7 +773,7 @@ class PageModel extends FormModel
      *
      * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null): array
+    public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -800,41 +836,6 @@ class PageModel extends FormModel
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.page.show.unique.visits'), $data);
         }
-
-        return $chart->render();
-    }
-
-    /**
-     * @deprecated Use getUniqueVsReturningPieChartData() instead.
-     *
-     * Get data for pie chart showing new vs returning leads.
-     * Returning leads are even leads who visit 2 different page once.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
-     */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
-    {
-        $chart              = new PieChart();
-        $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-        $filters['lead_id'] = [
-            'expression' => 'isNull',
-        ];
-        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-
-        if (!$canViewOthers) {
-            $this->limitQueryToCreator($allQ);
-            $this->limitQueryToCreator($returnQ);
-        }
-
-        $all       = $query->fetchCount($allQ);
-        $returning = $query->fetchCount($returnQ);
-        $unique    = $all - $returning;
-        $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
-        $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
 
         return $chart->render();
     }
@@ -969,10 +970,8 @@ class PageModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -1000,10 +999,8 @@ class PageModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
@@ -1027,11 +1024,15 @@ class PageModel extends FormModel
      */
     private function getQueryFromUrl(string $pageUrl): array
     {
-        $query             = [];
-        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+        $query    = [];
+        $urlQuery = parse_url($pageUrl, PHP_URL_QUERY);
+
+        if (empty($urlQuery)) {
+            return $query;
+        }
 
         if (is_string($urlQuery)) {
-            parse_str($urlQuery, $urlQueryArray);
+            $urlQueryArray = Query::parse($urlQuery);
 
             foreach ($urlQueryArray as $key => $value) {
                 if (is_string($value)) {
@@ -1224,5 +1225,25 @@ class PageModel extends FormModel
         }
 
         return $query;
+    }
+
+    /**
+     * This function limits $value to desired length.
+     *
+     * @param mixed $value The string to limit or other value to return as-is
+     *
+     * @return mixed The limited string or the original value if not a string
+     */
+    private function limitString($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        if (self::MAX_FIELD_LENGTH >= mb_strwidth($value, self::STRING_ENCODING)) {
+            return $value;
+        }
+
+        return rtrim(mb_strimwidth($value, 0, self::MAX_FIELD_LENGTH, '', self::STRING_ENCODING));
     }
 }

@@ -6,28 +6,24 @@ use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileUploader;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(FileUploader::class)]
 class FileUploaderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Uploader uploads files correctly
-     *
-     * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUpload(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
 
-        $filePathResolverMock = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translatorMock = $this->createMock(Translator::class);
+
+        $fileMock = $this->createMock(UploadedFile::class);
 
         $fileMock->expects($this->once())
             ->method('move')
@@ -42,28 +38,22 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
             ->method('createDirectory')
             ->with($uploadDir);
 
-        $fileUploader = new FileUploader($filePathResolverMock);
+        $fileUploader = new FileUploader($filePathResolverMock, $translatorMock);
 
         $fileUploader->upload($uploadDir, $fileMock);
     }
 
-    /**
-     * @testdox Throw an Exception if Uploader could not create directory
-     *
-     * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Throw an Exception if Uploader could not create directory')]
     public function testCouldNotCreateDirectory(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
 
-        $filePathResolverMock = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translatorMock = $this->createMock(Translator::class);
+
+        $fileMock = $this->createMock(UploadedFile::class);
 
         $fileMock->expects($this->never())
             ->method('move');
@@ -78,7 +68,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
             ->with($uploadDir)
             ->willThrowException(new FilePathException('Could not create directory'));
 
-        $fileUploader = new FileUploader($filePathResolverMock);
+        $fileUploader = new FileUploader($filePathResolverMock, $translatorMock);
 
         $this->expectException(FileUploadException::class);
         $this->expectExceptionMessage('Could not create directory');
@@ -86,23 +76,20 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploader->upload($uploadDir, $fileMock);
     }
 
-    /**
-     * @testdox Throw an Exception if Uploader could not move file to givven directory
-     *
-     * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Throw an Exception if Uploader could not move file to givven directory')]
     public function testCouldNotMoveFile(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
 
-        $filePathResolverMock = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translatorMock = $this->createMock(Translator::class);
+
+        $translatorMock->method('trans')
+            ->willReturn('Could not upload filed');
+
+        $fileMock = $this->createMock(UploadedFile::class);
 
         $fileMock->expects($this->once())
             ->method('move')
@@ -118,7 +105,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
             ->method('createDirectory')
             ->with($uploadDir);
 
-        $fileUploader = new FileUploader($filePathResolverMock);
+        $fileUploader = new FileUploader($filePathResolverMock, $translatorMock);
 
         $this->expectException(FileUploadException::class);
         $this->expectExceptionMessage('Could not upload file');
@@ -126,24 +113,20 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploader->upload($uploadDir, $fileMock);
     }
 
-    /**
-     * @testdox Test for file delete
-     *
-     * @covers \Mautic\CoreBundle\Helper\FileUploader::delete
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test for file delete')]
     public function testDeleteFile(): void
     {
         $file = 'MyfileName';
 
-        $filePathResolverMock = $this->getMockBuilder(FilePathResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filePathResolverMock = $this->createMock(FilePathResolver::class);
+
+        $translatorMock = $this->createMock(Translator::class);
 
         $filePathResolverMock->expects($this->once())
             ->method('delete')
             ->with($file);
 
-        $fileUploader = new FileUploader($filePathResolverMock);
+        $fileUploader = new FileUploader($filePathResolverMock, $translatorMock);
 
         $fileUploader->delete($file);
     }

@@ -24,7 +24,7 @@ class ActionDispatcher
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private EventScheduler $scheduler,
-        private LegacyEventDispatcher $legacyDispatcher
+        private LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 
@@ -32,7 +32,7 @@ class ActionDispatcher
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null): PendingEvent
+    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, ?PendingEvent $pendingEvent = null): PendingEvent
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);
