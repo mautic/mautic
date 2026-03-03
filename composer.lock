@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "15f20116176c6d012758ef6618ca7ab8",
+    "content-hash": "994e2fa3daebf04fd41c57b658268ebc",
     "packages": [
         {
             "name": "api-platform/core",
@@ -3374,56 +3374,17 @@
         },
         {
             "name": "gaufrette/extras",
-            "version": "v0.1.0",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Gaufrette/extras.git",
-                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23"
+                "url": "https://github.com/wieslawgolec/gaufrette-extras.git",
+                "reference": "0.1.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gaufrette/extras/zipball/a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
-                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
-                "shasum": ""
+                "url": "https://github.com/wieslawgolec/gaufrette-extras/archive/refs/tags/0.1.0.zip"
             },
-            "require": {
-                "knplabs/gaufrette": "~0.4"
-            },
-            "require-dev": {
-                "aws/aws-sdk-php": "~2.4|~3",
-                "phpspec/phpspec": "^3.4",
-                "phpunit/phpunit": "~5.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Gaufrette\\Extras\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "KnpLabs Team",
-                    "homepage": "http://knplabs.com"
-                },
-                {
-                    "name": "Albin Kerouanton",
-                    "email": "albin.kerouanton@knplabs.com"
-                },
-                {
-                    "name": "The contributors",
-                    "homepage": "http://github.com/Gaufrette/extras/contributors"
-                }
-            ],
-            "description": "Provides extra features (prefixed fs, resolvable fs) to Gaufrette",
-            "support": {
-                "issues": "https://github.com/Gaufrette/extras/issues",
-                "source": "https://github.com/Gaufrette/extras/tree/master"
-            },
-            "time": "2017-06-17T15:28:53+00:00"
+            "type": "library"
         },
         {
             "name": "geoip2/geoip2",

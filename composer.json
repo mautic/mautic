@@ -4,22 +4,22 @@
   "type": "project",
   "description": "Mautic Open Source Distribution",
   "funding": [
-        {
-            "type": "opencollective",
-            "url": "https://www.opencollective.com/mautic"
-        },
-        {
-            "type": "github",
-            "url": "https://github.com/sponsors/mautic"
-        }
-    ],
-  "support": {
-        "forum": "https://forum.mautic.org/c/support",
-        "docs": "https://docs.mautic.org",
-        "chat": "https://mautic.org/slack",
-        "issues": "https://github.com/mautic/mautic/issues",
-        "source": "https://github.com/mautic/mautic"
+    {
+      "type": "opencollective",
+      "url": "https://www.opencollective.com/mautic"
     },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/mautic"
+    }
+  ],
+  "support": {
+    "forum": "https://forum.mautic.org/c/support",
+    "docs": "https://docs.mautic.org",
+    "chat": "https://mautic.org/slack",
+    "issues": "https://github.com/mautic/mautic/issues",
+    "source": "https://github.com/mautic/mautic"
+  },
   "require": {
     "composer/installers": "^2.3",
     "mautic/core-lib": "^7.0"
@@ -109,12 +109,24 @@
       "MauticPlugin\\": "plugins/"
     }
   },
-  "repositories": {
-    "gaufrette-extras": {
-      "type": "vcs",
-      "url": "https://github.com/wieslawgolec/gaufrette-extras.git"
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "gaufrette/extras",
+        "version": "0.1.0",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/wieslawgolec/gaufrette-extras.git",
+          "reference": "0.1.0"
+        },
+        "dist": {
+          "type": "zip",
+          "url": "https://github.com/wieslawgolec/gaufrette-extras/archive/refs/tags/0.1.0.zip"
+        }
+      }
     },
-    "app-core-lib": {
+    {
       "type": "path",
       "url": "app",
       "options": {
@@ -123,15 +135,15 @@
         }
       }
     },
-    "symfony-bridge-bundle": {
+    {
       "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
     },
-    "oauth2-php": {
+    {
       "type": "git",
       "url": "https://github.com/mautic/oauth2-php"
     }
-  },
+  ],
   "conflict": {
     "mautic/core": "*"
   },
