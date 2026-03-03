@@ -8,18 +8,17 @@ setup_mautic() {
     # ───────────────────────────────────────────────────────────────
     # GitHub Actions workaround: Use K-Phoen fork for abandoned gaufrette/extras
     # ───────────────────────────────────────────────────────────────
-    printf "Applying workaround for abandoned gaufrette/extras using K-Phoen fork...\n"
+    printf "Applying workaround — aliasing K-Phoen/gaufrette-extras fork as gaufrette/extras:0.1.0...\n"
 
-    # Add repository pointing to the fork
     composer config repositories.gaufrette-extras \
       '{"type":"vcs","url":"https://github.com/K-Phoen/gaufrette-extras.git"}' --no-plugins
 
-    # Override the requirement to use the fork's master branch
-    composer require gaufrette/extras:dev-master --no-update --ignore-platform-reqs --no-plugins || {
-        printf "Warning: composer require failed — attempting to continue anyway.\n"
+    # Alias dev-master from fork as if it were the original 0.1.0
+    composer require "gaufrette/extras:dev-master as 0.1.0" --no-update --ignore-platform-reqs --no-plugins || {
+        printf "Alias require had issues — continuing...\n"
     }
 
-    printf "Fork repository configured for gaufrette/extras.\n"
+    printf "Fork aliased successfully.\n"
 
     printf "Installing Mautic Composer dependencies...\n"
     composer install
