@@ -205,6 +205,8 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     var valueId = 'report_filters_' + idParts[2] + '_value';
     var valueName = 'report[filters][' + idParts[2] + '][value]';
 
+    valueEl.data('filter-type', filterType);
+
     // Replace the condition list with operators
     var currentOperator = mQuery('#report_filters_' + idParts[2] + '_condition').val();
     mQuery('#report_filters_' + idParts[2] + '_condition').html(operators[newValue]);
@@ -290,11 +292,43 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
         Mautic.activateChosenSelect(newSelect);
     }
 
-    // Activate datetime
-    if (filterType == 'datetime' || filterType == 'date' || filterType == 'time') {
+    const dateTypes = ['datetime', 'date', 'time'];
+    const stringComparisonOperators = ['like', 'notLike', 'startsWith', 'endsWith', 'contains'];
+
+    if (dateTypes.includes(filterType)) {
         Mautic.activateDateTimeInputs('#' + valueId, filterType);
     } else if (mQuery('#' + valueId).hasClass('calendar-activated')) {
         mQuery('#' + valueId).datetimepicker('destroy');
+    }
+
+    if (dateTypes.includes(filterType)) {
+        const inputElement = mQuery('#' + valueId);
+        if (inputElement.data('utc-tooltip-initialized')) {
+            return;
+        }
+
+        inputElement.attr('data-bs-toggle', 'tooltip')
+            .attr('data-bs-placement', 'bottom')
+            .attr('title', '...') // Set a placeholder title, to be replaced later
+            .tooltip({ trigger: 'manual' });
+
+        inputElement.on('focus', function () {
+            const currentOperator = mQuery('#report_filters_' + idParts[2] + '_condition').val();
+            const currentFilterType = mQuery(this).data('filter-type');
+            let message = null;
+            if (dateTypes.includes(currentFilterType)) {
+                if (stringComparisonOperators.includes(currentOperator)) {
+                    message = Mautic.translate('mautic.report.filter.string_comparison_utc_tooltip');
+                } else {
+                    message = Mautic.translate('mautic.report.filter.date_comparison_timezone_tooltip');
+                }
+                mQuery(this).attr('title', message).tooltip('fixTitle').tooltip('show');
+            }
+        }).on('blur', function () {
+            mQuery(this).tooltip('hide');
+        });
+
+        inputElement.data('utc-tooltip-initialized', true);
     }
 };
 

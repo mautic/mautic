@@ -27,7 +27,7 @@ trait VariantEntityTrait
     private $variantParent;
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = [];
@@ -141,7 +141,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettings(): array
     {
-        return $this->variantSettings;
+        return $this->variantSettings ?? [];
     }
 
     public function getVariantStartDate(): mixed

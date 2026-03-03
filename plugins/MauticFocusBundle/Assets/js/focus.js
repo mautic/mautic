@@ -242,15 +242,22 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         mQuery('.preview-body').html('');
 
         Mautic.ajaxActionRequest('plugin:focus:checkIframeAvailability', data, function (response) {
-            if (response.errorMessage.length) {
+            if (response.errorMessage && response.errorMessage.length) {
                 mQuery('.website-placeholder')
                     .addClass('has-error')
                     .find('.help-block')
                     .html(response.errorMessage)
+                    .removeClass('hide');
                 mQuery('#builder-overlay').hide();
                 mQuery('#websiteCanvas').html('');
                 mQuery('.builder-panel-top p button').prop('disabled', false);
                 return;
+            } else {
+                mQuery('.website-placeholder')
+                    .removeClass('has-error')
+                    .find('.help-block')
+                    .html('')
+                    .removeClass('hide');
             }
 
             mQuery('#builder-overlay').addClass('hide');
