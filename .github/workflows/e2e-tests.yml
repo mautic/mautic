@@ -36,6 +36,20 @@ jobs:
       - name: Setup DDEV
         uses: ddev/github-action-setup-ddev@v1
 
+      - name: Workaround abandoned gaufrette/extras (use K-Phoen fork)
+        run: |
+          ddev composer config repositories.gaufrette-extras \
+            '{"type":"vcs","url":"https://github.com/K-Phoen/gaufrette-extras.git"}'
+          ddev composer require gaufrette/extras:dev-master --no-update --ignore-platform-reqs
+
+      - name: Install Composer dependencies (Workaround for abandoned gaufrette/extras)
+        run: |
+          ddev composer install \
+            --no-interaction \
+            --prefer-dist \
+            --optimize-autoloader \
+            --ignore-platform-reqs
+
       - name: Set up environment variables for test mode
         run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
 
