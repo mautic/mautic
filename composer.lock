@@ -3357,59 +3357,6 @@
             "time": "2017-06-08T11:37:42+00:00"
         },
         {
-            "name": "gaufrette/extras",
-            "version": "v0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Gaufrette/extras.git",
-                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Gaufrette/extras/zipball/a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
-                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
-                "shasum": ""
-            },
-            "require": {
-                "knplabs/gaufrette": "~0.4"
-            },
-            "require-dev": {
-                "aws/aws-sdk-php": "~2.4|~3",
-                "phpspec/phpspec": "^3.4",
-                "phpunit/phpunit": "~5.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Gaufrette\\Extras\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "KnpLabs Team",
-                    "homepage": "http://knplabs.com"
-                },
-                {
-                    "name": "Albin Kerouanton",
-                    "email": "albin.kerouanton@knplabs.com"
-                },
-                {
-                    "name": "The contributors",
-                    "homepage": "http://github.com/Gaufrette/extras/contributors"
-                }
-            ],
-            "description": "Provides extra features (prefixed fs, resolvable fs) to Gaufrette",
-            "support": {
-                "issues": "https://github.com/Gaufrette/extras/issues",
-                "source": "https://github.com/Gaufrette/extras/tree/master"
-            },
-            "time": "2017-06-17T15:28:53+00:00"
-        },
-        {
             "name": "geoip2/geoip2",
             "version": "v2.13.0",
             "source": {
@@ -6220,7 +6167,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "2fabbc300101103f225472902d287b15e3af8c3a"
+                "reference": "69988457383e2aa5a09aa1ff313aba2c3e76ea9b"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6246,7 +6193,6 @@
                 "ezyang/htmlpurifier": "^4.16",
                 "friendsofsymfony/rest-bundle": "^3.8",
                 "gaufrette/aws-s3-adapter": "^0.4.0",
-                "gaufrette/extras": "^0.1.0",
                 "geoip2/geoip2": "~2.0",
                 "giggsey/libphonenumber-for-php": "^8.12",
                 "guzzlehttp/guzzle": "~7.10.0",
@@ -19047,5 +18993,5 @@
     "platform-overrides": {
         "php": "8.2.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
