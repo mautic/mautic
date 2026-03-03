@@ -35,39 +35,6 @@ jobs:
 
       - name: Setup DDEV
         uses: ddev/github-action-setup-ddev@v1
-        with:
-          install-ddev: true
-          start-ddev: true     # Starts DDEV + runs install hooks
-
-      - name: Create dummy gaufrette/extras package for CI
-        run: |
-          mkdir -p dummy-gaufrette-extras/src/Gaufrette/Extras
-          cat <<EOF > dummy-gaufrette-extras/composer.json
-          {
-            "name": "gaufrette/extras",
-            "description": "Dummy replacement for abandoned gaufrette/extras in CI",
-            "version": "0.1.0",
-            "type": "library",
-            "autoload": {
-              "psr-4": { "Gaufrette\\\\Extras\\\\": "src/Gaufrette/Extras/" }
-            },
-            "require": {}
-          }
-          EOF
-          touch dummy-gaufrette-extras/src/Gaufrette/Extras/Dummy.php
-
-          ddev composer config repositories.dummy-extras \
-            '{"type":"path","url":"./dummy-gaufrette-extras","options":{"symlink":false}}'
-
-          ddev composer require gaufrette/extras:0.1.0 --no-update --ignore-platform-reqs
-
-      - name: Install Composer dependencies (Workaround for abandoned gaufrette/extras)
-        run: |
-          ddev composer install \
-            --no-interaction \
-            --prefer-dist \
-            --optimize-autoloader \
-            --ignore-platform-reqs || true   # continue even if warnings
 
       - name: Set up environment variables for test mode
         run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
