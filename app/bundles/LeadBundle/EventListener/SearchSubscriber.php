@@ -206,6 +206,10 @@ class SearchSubscriber implements EventSubscriberInterface
             case $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent', [], null, 'en_US'):
                 $this->buildMobileSentQuery($event);
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.campaign_membership'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.campaign_membership', [], null, 'en_US'):
+                $this->buildCampaignMembershipQuery($event);
+                break;
         }
     }
 
@@ -473,6 +477,24 @@ class SearchSubscriber implements EventSubscriberInterface
             'params' => [
                 'pn.mobile' => (int) $isMobile,
             ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    private function buildCampaignMembershipQuery(LeadBuildSearchEvent $event): void
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'campaign_leads',
+                'alias'      => 'lc',
+                'condition'  => 'l.id = lc.lead_id and lc.manually_removed = 0',
+            ],
+        ];
+
+        $config = [
+            'column' => 'lc.campaign_id',
         ];
 
         $this->buildJoinQuery($event, $tables, $config);

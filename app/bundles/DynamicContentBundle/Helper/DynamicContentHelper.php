@@ -102,7 +102,7 @@ class DynamicContentHelper
     public function replaceTokensInContent($content, $lead)
     {
         // Find all dynamic content tags
-        preg_match_all('/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is', $content, $matches, PREG_SET_ORDER);
+        preg_match_all(self::DYNAMIC_CONTENT_REGEX, $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
             $slot           = $match[2];
@@ -126,7 +126,7 @@ class DynamicContentHelper
      */
     public function findDwcTokens($content, $lead): array
     {
-        preg_match_all('/{dwc=(.*?)}/', $content, $matches);
+        preg_match_all(self::DYNAMIC_WEB_CONTENT_REGEX, $content, $matches);
 
         $tokens = [];
         if (!empty($matches[1])) {
@@ -166,7 +166,7 @@ class DynamicContentHelper
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
-        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        [$ignore, $translation] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
             $dwc     = $translation;

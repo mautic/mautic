@@ -117,6 +117,10 @@ return [
                 'path'       => '/saml/discovery',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::discoveryAction',
             ],
+            'mautic_saml_login_retry' => [
+                'path'       => '/saml/login_retry',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::samlLoginRetryAction',
+            ],
         ],
     ],
 
@@ -132,15 +136,6 @@ return [
                 'class'     => Doctrine\ORM\EntityManager::class,
                 'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.user.provider' => [
-                'class'     => Mautic\UserBundle\Security\Provider\UserProvider::class,
-                'arguments' => [
-                    'mautic.user.repository',
-                    'mautic.permission.repository',
-                    'event_dispatcher',
-                    'security.password_hasher',
-                ],
             ],
             'mautic.security.authentication_handler' => [
                 'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
@@ -178,6 +173,17 @@ return [
                     '%mautic.saml_idp_entity_id%',
                 ],
                 'tag'       => 'lightsaml.trust_options_store',
+            ],
+
+            'mautic.security.saml.entity_descriptor_provider' => [
+                'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
+                'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
+                'arguments' => [
+                    '%lightsaml.own.entity_id%',
+                    'router',
+                    '%lightsaml.route.login_check%',
+                    'lightsaml.own.credential_store',
+                ],
             ],
 
             'mautic.security.saml.entity_descriptor_store' => [

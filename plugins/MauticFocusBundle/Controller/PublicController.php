@@ -30,7 +30,7 @@ class PublicController extends CommonController
                 return new Response('', Response::HTTP_NOT_FOUND);
             }
 
-            $content  = $model->generateJavascript($focus, false, MAUTIC_ENV == 'dev');
+            $content = $model->generateJavascript($focus);
 
             return new Response($content, 200, ['Content-Type' => 'application/javascript']);
         } else {
@@ -38,10 +38,7 @@ class PublicController extends CommonController
         }
     }
 
-    /**
-     * @return Response
-     */
-    public function viewPixelAction(Request $request, ContactTracker $contactTracker)
+    public function viewPixelAction(Request $request, ContactTracker $contactTracker): Response
     {
         $id = $request->get('id', false);
         if ($id) {

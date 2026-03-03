@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use GuzzleHttp\Psr7\Query;
 use Joomla\Filter\InputFilter;
 
 class InputHelper
@@ -47,7 +48,7 @@ class InputHelper
         if (empty(self::$htmlFilter)) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
-            self::$htmlFilter->tagBlacklist = [
+            self::$htmlFilter->blockedTags  = [
                 'applet',
                 'bgsound',
                 'base',
@@ -60,7 +61,7 @@ class InputHelper
                 'object',
             ];
 
-            self::$htmlFilter->attrBlacklist = [
+            self::$htmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -78,7 +79,7 @@ class InputHelper
                     'span',
                 ], [], 0, 1);
 
-            self::$strictHtmlFilter->attrBlacklist = [
+            self::$strictHtmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -294,7 +295,7 @@ class InputHelper
         }
 
         if (!empty($parts['query'])) {
-            parse_str($parts['query'], $query);
+            $query = Query::parse($parts['query']);
 
             // remove specified keys from the query
             foreach ($removeQuery as $q) {
@@ -303,9 +304,9 @@ class InputHelper
                 }
             }
 
-            // http_build_query urlencodes to RFC 1738 by default
-            // We change the encoding_type to RFC 3986 so that spaces are encoded as %20 instead of +
-            $parts['query'] = http_build_query($query, '', null, PHP_QUERY_RFC3986);
+            // http_build_query urlencodes to RFC 1738 by default.
+            // We change the encoding_type to RFC3986 so that spaces aren't encoded as +.
+            $parts['query'] = Query::build($query, PHP_QUERY_RFC3986);
         }
 
         return

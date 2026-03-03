@@ -58,7 +58,7 @@ index dbc3a25..3a1e473 100644
 +            var newTag = $(evt.target).val();
 +
 +            if ($(this.form_field).find('option').filter(function(){ return $(this).text() === newTag}).length === 0) {
-+              $(this.form_field).append('<option>' + newTag + '</option>');
++              $(this.form_field).append($('<option></option>').text(newTag));
 +              $(this.form_field).trigger('chosen:updated');
 +              this.result_highlight = this.search_results.find('li.active-result').last();
 +

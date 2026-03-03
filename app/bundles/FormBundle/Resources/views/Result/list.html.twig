@@ -89,6 +89,31 @@
 
 {% block content %}
   <div class="page-list">
+    {% set bulkActionsCustom = [
+        {
+            'attr': {
+                'class': 'btn btn-ghost btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_form_results_add_segment', {'objectId': form.id}),
+                'data-header': 'mautic.form.result.add_to_segment'|trans,
+            },
+            'btnText': 'mautic.form.result.add_to_segment'|trans,
+            'iconClass': 'ri-pie-chart-line',
+        }
+      ] %}
+          {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'bulk_actions': {
+            'target': '#formResultTable',
+            'templateButtons': {
+                'delete': canDelete
+            },
+            'customButtons': bulkActionsCustom|default([]),
+            'routeBase': 'form_results',
+            'langVar': 'mautic.form.result',
+            'query': {'formId': form.id},
+        }
+    }) -}}
     {{ include('@MauticForm/Result/_list.html.twig') }}
   </div>
 {% endblock %}

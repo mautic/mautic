@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -42,19 +43,22 @@ class Tag implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['leadfield:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $tag;
 
     /**
      * @var string|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $description;
 
-    public ?int $deletedId;
+    public ?int $deletedId = null;
 
     public function __construct(?string $tag = null, bool $clean = true)
     {

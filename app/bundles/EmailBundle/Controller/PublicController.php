@@ -268,25 +268,11 @@ class PublicController extends CommonFormController
                         );
 
                         $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
-
                         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
 
                         $html = $event->getContent();
+                        $session->remove($successSessionName);
 
-                        if (!$session->has($successSessionName)) {
-                            $successMessageData       = ['class="pref-successmessage"'];
-                            $successMessageDataHidden = [];
-                            foreach ($successMessageData as $successMessageData) {
-                                $successMessageDataHidden[] = $successMessageData.' style=display:none';
-                            }
-                            $html = str_replace(
-                                $successMessageData,
-                                $successMessageDataHidden,
-                                $html
-                            );
-                        } else {
-                            $session->remove($successSessionName);
-                        }
                         $html = preg_replace(
                             '/'.BuilderSubscriber::identifierToken.'/',
                             $lead->getPrimaryIdentifier(),
@@ -685,10 +671,7 @@ class PublicController extends CommonFormController
         }
     }
 
-    /**
-     * @return Response
-     */
-    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration)
+    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): Response
     {
         $this->doTracking($request, $integrationHelper, $mailer, $mauticLogger, $integration);
 

@@ -269,6 +269,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $groupScores;
 
+    private int $previousId = 0;
+
     private $primaryCompany;
 
     /**
@@ -2016,6 +2018,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
 
         return $rules;
+    }
+
+    public function setPreviousId(int $id): void
+    {
+        $this->previousId = $id;
+    }
+
+    public function getPreviousId(): int
+    {
+        return $this->previousId;
     }
 
     /**

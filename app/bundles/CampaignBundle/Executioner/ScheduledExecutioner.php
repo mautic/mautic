@@ -3,20 +3,34 @@
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\QueryException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
+use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -30,7 +44,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
     private ?OutputInterface $output = null;
 
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
     private ?array $scheduledEvents = null;
 
@@ -46,17 +60,20 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         private EventScheduler $scheduler,
         private ScheduledContactFinder $scheduledContactFinder,
         private ProcessSignalService $processSignalService,
+        private EntityManagerInterface $entityManager,
+        private EventRedirectionHelper $eventRedirectionHelper,
+        private LeadRepository $leadRepository,
     ) {
     }
 
     /**
      * @return Counter|mixed
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
+     * @throws QueryException
      */
     public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
     {
@@ -84,15 +101,15 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     /**
      * @return Counter
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
+     * @throws QueryException
      */
     public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null)
     {
-        $now           = $now ?? $this->now ?? new \DateTime();
+        $now ??= $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
@@ -131,11 +148,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             /** @var Event $event */
             $event = $organizedLogs->first()->getEvent();
 
+            $event = $this->handlePossibleEventRedirection($event, $organizedLogs);
+
             // Validate that the schedule is still appropriate
             $this->validateSchedule($organizedLogs, $now, true);
 
             // Check that the campaign is published with up/down dates
-            if ($event->getCampaign()->isPublished()) {
+            if ($event->getCampaign()->isPublished() && !$organizedLogs->isEmpty()) {
                 try {
                     // Hydrate contacts with custom field data
                     $this->scheduledContactFinder->hydrateContacts($organizedLogs);
@@ -191,11 +210,11 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
+     * @throws QueryException
      */
     private function executeOrRescheduleEvent(): void
     {
@@ -206,18 +225,21 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $this->counter->advanceEventCount();
 
             // Loop over contacts until the entire campaign is executed
-            $this->executeScheduled($eventId, $now);
+            $this->executeOrRescheduleScheduledEvents($eventId, $now);
         }
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @param int       $eventId The ID of the event to execute
+     * @param \DateTime $now     The current timestamp
+     *
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
+     * @throws QueryException|SignalCaughtException
      */
-    private function executeScheduled($eventId, \DateTime $now): void
+    private function executeOrRescheduleScheduledEvents(int $eventId, \DateTime $now): void
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
@@ -231,11 +253,15 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $this->progressBar->advance($logs->count());
             $this->counter->advanceEvaluated($logs->count());
 
+            $event = $this->handlePossibleEventRedirection($event, $logs);
+
             // Validate that the schedule is still appropriate
             $this->validateSchedule($logs, $now);
 
             // Execute if there are any that did not get rescheduled
-            $this->executioner->executeLogs($event, $logs, $this->counter);
+            if (!$logs->isEmpty() && $event->getCampaign()->isPublished()) {
+                $this->executioner->executeLogs($event, $logs, $this->counter);
+            }
 
             $this->processSignalService->throwExceptionIfSignalIsCaught();
 
@@ -246,18 +272,37 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     }
 
     /**
-     * @param bool $scheduleTogether
+     * Validates and potentially reschedules events based on execution timing.
      *
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @param ArrayCollection $logs             Collection of event logs
+     * @param \DateTime       $now              Current timestamp for comparison
+     * @param bool            $scheduleTogether Whether to reschedule all logs together
+     *
+     * @throws NotSchedulableException
      */
-    private function validateSchedule(ArrayCollection $logs, \DateTime $now, $scheduleTogether = false): void
+    private function validateSchedule(ArrayCollection $logs, \DateTime $now, bool $scheduleTogether = false): void
     {
         $toBeRescheduled     = new ArrayCollection();
+        $toReschedule        = [];
         $latestExecutionDate = $now;
 
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
+            $triggerDateExtended = $this->scheduler->extendTriggerDateWhenCampaignUnpublished($log);
+            if ($triggerDateExtended) {
+                // If the extended trigger date is in the past, execute/validate it anyway,
+                // If it is in the future then remove from the collection to be processed later.
+                if ($log->getTriggerDate() > $now) {
+                    $logs->remove($key);
+                    $toReschedule = $this->addForReschedule($toReschedule, $log, $log->getTriggerDate());
+
+                    continue;
+                } else {
+                    $this->repo->saveEntity($log);
+                }
+            }
+
             $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);
             $this->logger->debug(
                 'CAMPAIGN: Log ID #'.$log->getID().
@@ -275,7 +320,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                         $latestExecutionDate = $executionDate;
                     }
                 } else {
-                    $this->scheduler->reschedule($log, $executionDate);
+                    $toReschedule = $this->addForReschedule($toReschedule, $log, $latestExecutionDate);
                 }
 
                 $logs->remove($key);
@@ -286,13 +331,130 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
         if ($toBeRescheduled->count()) {
             $this->scheduler->rescheduleLogs($toBeRescheduled, $latestExecutionDate);
+            $this->counter->advanceRescheduled($toBeRescheduled->count());
+        }
+
+        foreach ($toReschedule as $eventLogTimeGroups) {
+            foreach ($eventLogTimeGroups as $timestamp => $eventLogs) {
+                $this->scheduler->rescheduleLogs($eventLogs, \DateTime::createFromFormat('U', $timestamp));
+                $this->counter->advanceRescheduled($eventLogs->count());
+            }
         }
     }
 
     /**
-     * @return ArrayCollection[]
+     * @param array<int,array<ArrayCollection<int,LeadEventLog>>> $toReschedule
+     *
+     * @return array<int,array<ArrayCollection<int,LeadEventLog>>>
      */
-    private function organizeByEvent(ArrayCollection $logs): array
+    private function addForReschedule(array $toReschedule, LeadEventLog $log, \DateTimeInterface $newTriggerDate): array
+    {
+        $toReschedule[$log->getEvent()->getId()] ??= [];
+        $toReschedule[$log->getEvent()->getId()][$newTriggerDate->getTimestamp()] ??= new ArrayCollection();
+        $toReschedule[$log->getEvent()->getId()][$newTriggerDate->getTimestamp()]->set($log->getId(), $log);
+
+        return $toReschedule;
+    }
+
+    /**
+     * Handles possible redirection of a deleted event to its redirectEvent.
+     * Returns the original event if no redirection occurred, otherwise returns the redirected event.
+     *
+     * @param Event           $event The event to check for redirection
+     * @param ArrayCollection $logs  Collection of event logs
+     *
+     * @return Event The original event or redirected event
+     */
+    private function handlePossibleEventRedirection(Event $event, ArrayCollection $logs): Event
+    {
+        $redirectedEvent = $this->eventRedirectionHelper->handleEventRedirection($event, null, null);
+
+        if ($redirectedEvent === $event) {
+            return $event;
+        }
+
+        $this->updateLogsForRedirectedEvent($redirectedEvent, $logs, $event);
+
+        return $redirectedEvent;
+    }
+
+    /**
+     * @param Event                         $redirectEvent The redirected event to update logs for
+     * @param Collection<int, LeadEventLog> $logs          Collection of event logs to update
+     * @param Event                         $originalEvent The original event before redirection
+     *
+     * @throws NoResultException|NonUniqueResultException
+     */
+    private function updateLogsForRedirectedEvent(Event $redirectEvent, Collection $logs,
+        Event $originalEvent): void
+    {
+        if ($logs->isEmpty()) {
+            return;
+        }
+
+        $contactIds = [];
+
+        foreach ($logs as $log) {
+            $contactId    = $log->getLead()->getId();
+            $contactIds[] = $contactId;
+            $metadata     = $log->getMetadata() ?? [];
+
+            // Store original event information for tracking
+            if (!isset($metadata['redirection_history'])) {
+                $metadata['redirection_history'] = [];
+            }
+
+            // Add to redirection history
+            $metadata['redirection_history'][] = [
+                'original_event_id' => $originalEvent->getId(),
+                'original_rotation' => $log->getRotation(),
+                'redirect_time'     => (new \DateTime())->format(DateTimeHelper::FORMAT_DB),
+            ];
+
+            $metadata['redirect_applied']     = true;
+            $metadata['last_redirected_from'] = $originalEvent->getId();
+            $metadata['originalEventName']    = $originalEvent->getName(); // Store the name for display in timeline
+
+            // 1. Find the rotation for this contact/campaign combination.
+            $rotation = $this->leadRepository->getContactRotations(
+                [$contactId], $redirectEvent->getCampaign()->getId());
+            $rotationValue = $rotation[$contactId]['rotation'] ?? 0;
+            $newRotation   = $rotationValue + 1;
+
+            // 2. Update the log entity with new event, campaign, rotation, and metadata
+            $log->setEvent($redirectEvent);
+            $log->setCampaign($redirectEvent->getCampaign());
+            $log->setRotation($newRotation);
+            $log->setMetadata($metadata);
+
+            $this->entityManager->persist($log);
+        }
+
+        $this->entityManager->flush();
+
+        $this->leadRepository->incrementCampaignRotationForContacts(
+            array_unique($contactIds),
+            $redirectEvent->getCampaign()->getId()
+        );
+
+        $this->logger->debug(
+            sprintf(
+                'CAMPAIGN: Updated %d logs to reference redirected event ID %d',
+                count($logs),
+                $redirectEvent->getId()
+            )
+        );
+    }
+
+    /**
+     * Organizes logs by event ID, separating jump events from other events.
+     * Jump to events need to be processed after all other events.
+     *
+     * @param Collection<int, LeadEventLog> $logs Collection of logs to organize
+     *
+     * @return Collection<int, ArrayCollection> Organized logs with event IDs as keys
+     */
+    private function organizeByEvent(Collection $logs): Collection
     {
         $jumpTo = [];
         $other  = [];
@@ -317,6 +479,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             }
         }
 
-        return array_merge($other, $jumpTo);
+        return new ArrayCollection(array_merge($other, $jumpTo));
     }
 }

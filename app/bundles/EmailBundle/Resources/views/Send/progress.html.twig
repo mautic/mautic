@@ -59,7 +59,7 @@
                     {% else %}
                         <div>
                             <a class="text-success mt-md"
-                               href="{{ path('mautic_email_action', {'objectAction': 'send', 'objectId': email.id}) }}"
+                               href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': email.id}) }}"
                                data-toggle="ajax">{{ 'mautic.core.form.done'|trans }}</a>
                         </div>
                     {% endif %}

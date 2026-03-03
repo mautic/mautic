@@ -46,6 +46,14 @@ class PageTestAbstract extends TestCase
      */
     protected $router;
 
+    protected CorePermissions&MockObject $security;
+
+    protected IpLookupHelper&MockObject $ipLookupHelper;
+
+    protected ContactRequestHelper&MockObject $contactRequestHelper;
+
+    protected CompanyModel&MockObject $companyModel;
+
     protected function setUp(): void
     {
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
@@ -60,7 +68,8 @@ class PageTestAbstract extends TestCase
 
         $this->router = $this->createMock(Router::class);
 
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
 
         $leadModel = $this->createMock(LeadModel::class);
 
@@ -68,7 +77,7 @@ class PageTestAbstract extends TestCase
 
         $redirectModel = $this->getRedirectModel();
 
-        $companyModel = $this->createMock(CompanyModel::class);
+        $this->companyModel = $this->createMock(CompanyModel::class);
 
         $trackableModel = $this->createMock(TrackableModel::class);
 
@@ -89,8 +98,7 @@ class PageTestAbstract extends TestCase
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
-        /** @var ContactRequestHelper&MockObject $contactRequestHelper */
-        $contactRequestHelper = $this->createMock(ContactRequestHelper::class);
+        $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
 
         $contactTracker->expects($this
             ->any())
@@ -118,19 +126,19 @@ class PageTestAbstract extends TestCase
 
         $pageModel = new PageModel(
             $cookieHelper,
-            $ipLookupHelper,
+            $this->ipLookupHelper,
             $leadModel,
             $leadFieldModel,
             $redirectModel,
             $trackableModel,
             $messageBus,
-            $companyModel,
+            $this->companyModel,
             $deviceTrackerMock,
             $contactTracker,
             $coreParametersHelper,
-            $contactRequestHelper,
+            $this->contactRequestHelper,
             $entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->security = $this->createMock(CorePermissions::class),
             $dispatcher,
             $this->router,
             $translator,
