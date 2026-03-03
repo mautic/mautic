@@ -203,12 +203,13 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
-        if ($event->isInternalSend() || $this->coreParametersHelper->get('disable_trackable_urls')) {
-            // Don't convert urls
+        if ($event->isInternalSend()) {
             return;
         }
 
-        $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
+        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls');
+        $shortenEnabled       = $this->coreParametersHelper->get('shortener_email_enable', false);
+
         $email          = $event->getEmail();
         $emailId        = $email instanceof Email ? $email->getId() : null;
         $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
@@ -217,11 +218,27 @@ class BuilderSubscriber implements EventSubscriberInterface
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
         foreach ($trackables as $token => $trackable) {
-            $url = ($trackable instanceof Trackable)
-                ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled, $utmTags)
-                :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shortenEnabled, $utmTags);
+            if ($disableTrackableUrls) {
+                $url = ($trackable instanceof Trackable)
+                    ?
+                    $trackable->getRedirect()->getUrl()
+                    :
+                    $trackable->getUrl();
+            } else {
+                $url = ($trackable instanceof Trackable)
+                    ?
+                    $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough)
+                    :
+                    $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough);
+            }
+
+            if ($utmTags) {
+                $url = $this->pageRedirectModel->applyUtmTags($url, $utmTags);
+            }
+
+            if ($shortenEnabled) {
+                $url = $this->pageRedirectModel->shortenUrl($url);
+            }
 
             $event->addToken($token, $url);
         }

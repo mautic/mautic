@@ -219,6 +219,16 @@ final class LeadEvents
     public const LIST_PRE_DELETE = 'mautic.lead_list_pre_delete';
 
     /**
+     * The mautic.lead_list_delete event is dispatched before a lead_list is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListEvent instance.
+     *
+     * @var string
+     */
+    public const ON_LIST_DELETE = 'mautic.lead_list_delete';
+
+    /**
      * The mautic.lead_list_post_delete event is dispatched after a lead_list is deleted.
      *
      * The event listener receives a

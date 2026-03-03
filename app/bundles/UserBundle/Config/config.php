@@ -137,15 +137,6 @@ return [
                 'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
-            'mautic.user.provider' => [
-                'class'     => Mautic\UserBundle\Security\Provider\UserProvider::class,
-                'arguments' => [
-                    'mautic.user.repository',
-                    'mautic.permission.repository',
-                    'event_dispatcher',
-                    'security.password_hasher',
-                ],
-            ],
             'mautic.security.authentication_handler' => [
                 'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
                 'arguments' => [

@@ -136,7 +136,7 @@ class PrivateAddressCheckerTest extends TestCase
     public function testUnresolvableHostname(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('URL validation failed: Could not resolve hostname');
+        $this->expectExceptionMessage('Could not resolve hostname unresolvable.example.com');
         $this->checkerWithMockedDns->isPrivateUrl('http://unresolvable.example.com');
     }
 

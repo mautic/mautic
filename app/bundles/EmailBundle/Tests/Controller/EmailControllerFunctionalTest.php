@@ -228,40 +228,64 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($emailChild);
         $this->em->flush();
 
-        $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
-        $htmlLine1    = $crawler->filter('.email-list > tbody > tr:nth-child(1)')->html();
-        $htmlLine2    = $crawler->filter('.email-list > tbody > tr:nth-child(2)')->html();
-        $htmlLine3    = $crawler->filter('.email-list > tbody > tr:nth-child(3)')->html();
+        $crawler   = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $emailRows = $crawler->filter('.email-list > tbody > tr');
 
-        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine3);
-        Assert::assertStringContainsString('Is A/B variant', $htmlLine3);
-        Assert::assertStringContainsString('Email C', $htmlLine3);
-        Assert::assertStringContainsString('Email B', $htmlLine2);
-        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine2);
-        Assert::assertStringContainsString('Is A/B variant', $htmlLine2);
-        Assert::assertStringContainsString('ri-organization-chart', $htmlLine2);
-        Assert::assertStringContainsString('Has A/B tests', $htmlLine2);
-        Assert::assertStringContainsString('Has A/B tests', $htmlLine1);
-        Assert::assertStringContainsString('ri-organization-chart', $htmlLine1);
-        Assert::assertStringContainsString('Email A', $htmlLine1);
+        // Find rows by email name to avoid relying on table order
+        $emailARow = null;
+        $emailBRow = null;
+        $emailCRow = null;
+
+        foreach ($emailRows as $row) {
+            $rowCrawler = new \Symfony\Component\DomCrawler\Crawler($row);
+            $html       = $rowCrawler->html();
+
+            if (str_contains($html, 'Email A')) {
+                $emailARow = $html;
+            } elseif (str_contains($html, 'Email B')) {
+                $emailBRow = $html;
+            } elseif (str_contains($html, 'Email C')) {
+                $emailCRow = $html;
+            }
+        }
+
+        Assert::assertNotNull($emailARow, 'Could not find Email A row');
+        Assert::assertNotNull($emailBRow, 'Could not find Email B row');
+        Assert::assertNotNull($emailCRow, 'Could not find Email C row');
+
+        // Email C (child) - should have A/B variant icon only
+        Assert::assertStringContainsString('ri-a-b fs-14', $emailCRow);
+        Assert::assertStringContainsString('Is A/B variant', $emailCRow);
+
+        // Email B (parent) - should have both A/B variant icon AND organization chart icon
+        Assert::assertStringContainsString('ri-a-b fs-14', $emailBRow);
+        Assert::assertStringContainsString('Is A/B variant', $emailBRow);
+        Assert::assertStringContainsString('ri-organization-chart', $emailBRow);
+        Assert::assertStringContainsString('Has A/B tests', $emailBRow);
+
+        // Email A (grandparent) - should have organization chart icon only
+        Assert::assertStringContainsString('Has A/B tests', $emailARow);
+        Assert::assertStringContainsString('ri-organization-chart', $emailARow);
     }
 
-    public function testSegmentEmailSend(): void
+    #[DataProvider('provideHtmlForEmailTracking')]
+    public function testSegmentEmailSend(string $htmlContent, bool $singleOrDoubleQuotes): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', $htmlContent, $segment);
 
         $this->addContactsToSegment($segment, ['contact@one.email', 'contact@two.email']);
         $this->em->flush();
 
         $this->sendBatchEmail($email);
 
-        $email = $this->getMailerMessage();
+        $email = self::getMailerMessage();
         \assert($email instanceof MauticMessage);
 
+        $quote = $singleOrDoubleQuotes ? '\'' : '"';
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());
         Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
@@ -301,6 +325,28 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $iconNodes2 = $crawler->filter('.email-list .ri-translate-2');
         Assert::assertGreaterThanOrEqual(1, $iconNodes2->count(), 'Translate icon not found in the email list rows.');
+    }
+
+    public static function provideHtmlForEmailTracking(): \Generator
+    {
+        $variantQuotes   = ['single quote' => "'", 'double quote' => '"'];
+        $variantSpaces   = ['no space' => '$', 'start space' => ' $', 'end space' => '$ ', 'both spaces' => ' $ '];
+        $variantNewlines = ['no newlines' => '$', 'start \r\n' => "\r\n$", 'end \r\n' => "$\r\n", 'both \r\n' => "\r\n$\r\n", 'start \n' => "\n$", 'end \n' => "$\n", 'both \n' => "\n$\n"];
+
+        foreach ($variantQuotes as $quotesName => $variantQuote) {
+            foreach ($variantSpaces as $spaceName => $variantSpace) {
+                foreach ($variantNewlines as $newLineName => $variantNewline) {
+                    $href = $variantQuote
+                        .str_replace('$', str_replace('$', 'https://mautic.org', $variantSpace), $variantNewline)
+                        .$variantQuote;
+
+                    yield $quotesName.', '.$spaceName.', '.$newLineName => [
+                        'Ahoy <i>{contactfield=email}</i><a href='.$href.'>Mautic</a>',
+                        'single quote' === $quotesName,
+                    ];
+                }
+            }
+        }
     }
 
     public function testSegmentEmailSendWithAdvancedOptions(): void
@@ -565,6 +611,29 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
     }
 
+    public function testOptimisticLock(): void
+    {
+        $version = 1;
+        $email   = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
+        $this->em->flush();
+        $this->assertEmailVersion($email->getId(), $version);
+
+        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailVersion($email->getId(), ++$version, 'The version should be incremented after submitting the form.');
+
+        $form    = $crawler->selectButton('Save')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailVersion($email->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
+        Assert::assertStringContainsString(
+            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
+            $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.',
+        );
+    }
+
     /**
      * @param array<mixed> $emails
      *
@@ -637,10 +706,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider createPermissionDataProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('createPermissionDataProvider')]
     public function testPublishPermissionOnCreate(array $permissions, bool $expectDisabled, bool $publishedByDefault, bool $publishAfterSave): void
     {
         // Set user to be able to create emails, but not publish them.
@@ -724,10 +792,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider editPermissionDataProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('editPermissionDataProvider')]
     public function testPublishPermissionOnEdit(string $owner, string $user, array $permissions, bool $expectDisabled, bool $publishAfterSave): void
     {
         $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
@@ -1179,5 +1246,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+    }
+
+    private function assertEmailVersion(int $id, int $expectedVersion, string $message = ''): void
+    {
+        $this->em->clear();
+        $email = $this->em->find(Email::class, $id);
+        Assert::assertSame($expectedVersion, $email->getVersion(), $message);
     }
 }

@@ -161,9 +161,11 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @var string|null
+     *
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private $formType;
+    private $formType = 'standalone';
 
     /**
      * @var bool|null
@@ -311,10 +313,6 @@ class Form extends FormEntity implements UuidInterface
         $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
             'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
             'groups'  => ['hideformRequired'],
-        ]));
-
-        $metadata->addPropertyConstraint('formType', new Assert\Choice([
-            'choices' => ['standalone', 'campaign'],
         ]));
 
         $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
@@ -799,20 +797,27 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
+     *
      * @return mixed
      */
     public function getFormType()
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::getFormType() is deprecated and will be removed in 8.0.');
+
         return $this->formType;
     }
 
     /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
+     *
      * @param mixed $formType
      *
      * @return Form
      */
     public function setFormType($formType)
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
         $this->formType = $formType;
 
         return $this;
@@ -870,17 +875,35 @@ class Form extends FormEntity implements UuidInterface
         return $this->language;
     }
 
+    /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. All forms can now be used in campaigns.
+     */
     public function isStandalone(): bool
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::isStandalone() is deprecated and will be removed in 8.0.');
+
         return 'campaign' != $this->formType;
     }
 
     /**
      * Generate a form name for HTML attributes.
+     *
+     * @param string[] $allowedCharacters
      */
-    public function generateFormName(): string
+    public function generateFormName(?string $name = null, array $allowedCharacters = []): string
     {
-        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
+        $name = strtolower(
+            InputHelper::alphanum(
+                InputHelper::transliterate(
+                    $name ?? $this->name
+                ),
+                false,
+                null,
+                $allowedCharacters
+            )
+        );
+
+        return (empty($name)) ? 'form-'.$this->id : $name;
     }
 
     /**

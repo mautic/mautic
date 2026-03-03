@@ -88,6 +88,9 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->securityMock->method('isAnonymous')
             ->willReturn(true);
 
+        $this->ipLookupHelperMock->method('isRequestTrackable')
+            ->willReturn(true);
+
         $this->requestStack->push(new Request());
     }
 
@@ -163,7 +166,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->ipLookupHelperMock->expects($this->exactly(2))
+        $this->ipLookupHelperMock->expects($this->once())
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
@@ -198,7 +201,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldValues')
             ->willReturn([]);
 
-        $this->ipLookupHelperMock->expects($this->exactly(2))
+        $this->ipLookupHelperMock->expects($this->once())
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
