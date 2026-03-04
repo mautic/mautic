@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ['8.4']
-        db-types: ['mariadb:11.4']
+        db-types: ['mysql:9.2', 'mariadb:11.4']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -160,12 +160,12 @@ jobs:
             ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}
             ${{ runner.os }}-phpunit-
 
-      # Add this step to resolve the Node v18 vs v20 mismatch
+      # Add this step to resolve the Node v18 vs v24 mismatch
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Or '22' to match your requirements
-          cache: 'npm'       # Optional: enables faster local caching
+          node-version: '24'
+          cache: 'npm'       # enables faster local caching
 
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
