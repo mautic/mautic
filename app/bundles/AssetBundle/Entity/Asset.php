@@ -953,7 +953,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Returns some file info.
      *
-     * @return array
+     * @return array<string, float|string|false|null>|string
      */
     public function getFileInfo()
     {

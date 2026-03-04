@@ -534,7 +534,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+        if ($isNew || !$this->tableSchemaHelper->checkTableExists($name)) {
             $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
