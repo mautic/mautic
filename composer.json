@@ -4,22 +4,22 @@
   "type": "project",
   "description": "Mautic Open Source Distribution",
   "funding": [
-    {
-      "type": "opencollective",
-      "url": "https://www.opencollective.com/mautic"
-    },
-    {
-      "type": "github",
-      "url": "https://github.com/sponsors/mautic"
-    }
-  ],
+        {
+            "type": "opencollective",
+            "url": "https://www.opencollective.com/mautic"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/mautic"
+        }
+    ],
   "support": {
-    "forum": "https://forum.mautic.org/c/support",
-    "docs": "https://docs.mautic.org",
-    "chat": "https://mautic.org/slack",
-    "issues": "https://github.com/mautic/mautic/issues",
-    "source": "https://github.com/mautic/mautic"
-  },
+        "forum": "https://forum.mautic.org/c/support",
+        "docs": "https://docs.mautic.org",
+        "chat": "https://mautic.org/slack",
+        "issues": "https://github.com/mautic/mautic/issues",
+        "source": "https://github.com/mautic/mautic"
+    },
   "require": {
     "composer/installers": "^2.3",
     "mautic/core-lib": "^7.0"
@@ -115,7 +115,7 @@
       "url": "app",
       "options": {
         "versions": {
-          "mautic/core-lib": "7.0.0-dev"
+            "mautic/core-lib": "7.0.0-dev"
         }
       }
     },
@@ -126,13 +126,6 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/oauth2-php"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/gaufrette-extras.git",
-      "only": [
-        "gaufrette/extras"
-      ]
     }
   ],
   "conflict": {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "50ee7521afc0ffb910b05837c5fdb0a6",
+    "content-hash": "c217dc4fbd7922ee58ce1f21d2b4dbb2",
     "packages": [
         {
             "name": "api-platform/core",
@@ -3361,8 +3361,14 @@
             "version": "v0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mautic/gaufrette-extras.git",
-                "reference": "07e10eb879c83ca2f7be8e9b7020f3ca93d165c9"
+                "url": "https://github.com/Gaufrette/extras.git",
+                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gaufrette/extras/zipball/a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
+                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
+                "shasum": ""
             },
             "require": {
                 "knplabs/gaufrette": "~0.4"
@@ -3378,22 +3384,18 @@
                     "Gaufrette\\Extras\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Gaufrette\\Extras\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Albin Kerouanton",
-                    "email": "albin.kerouanton@knplabs.com"
-                },
-                {
                     "name": "KnpLabs Team",
                     "homepage": "http://knplabs.com"
+                },
+                {
+                    "name": "Albin Kerouanton",
+                    "email": "albin.kerouanton@knplabs.com"
                 },
                 {
                     "name": "The contributors",
@@ -3401,7 +3403,11 @@
                 }
             ],
             "description": "Provides extra features (prefixed fs, resolvable fs) to Gaufrette",
-            "time": "2026-03-03T13:22:33+00:00"
+            "support": {
+                "issues": "https://github.com/Gaufrette/extras/issues",
+                "source": "https://github.com/Gaufrette/extras/tree/master"
+            },
+            "time": "2017-06-17T15:28:53+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -6210,17 +6216,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "7.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mautic/core-lib.git",
-                "reference": "9e902bac29c2eaa28cf14ba546b1c82444b3e8e2"
-            },
+            "version": "7.0.0-dev",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core-lib/zipball/9e902bac29c2eaa28cf14ba546b1c82444b3e8e2",
-                "reference": "9e902bac29c2eaa28cf14ba546b1c82444b3e8e2",
-                "shasum": ""
+                "type": "path",
+                "url": "app",
+                "reference": "2fabbc300101103f225472902d287b15e3af8c3a"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6320,50 +6320,53 @@
                 "mautic-scaffold": {
                     "file-mapping": {
                         "[project-root]/.env": "assets/scaffold/files/.env",
+                        "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
+                        "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
+                        "[project-root]/tsconfig.json": "assets/scaffold/files/tsconfig.json",
+                        "[project-root]/package.json": "assets/scaffold/files/package.json",
+                        "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
+                        "[project-root]/bin/console": "assets/scaffold/files/console",
+                        "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
+                        "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
+                        "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
+                        "[web-root]/translations/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/favicon.ico": "assets/scaffold/files/favicon.ico",
-                        "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
-                        "[project-root]/bin/console": "assets/scaffold/files/console",
-                        "[project-root]/package.json": "assets/scaffold/files/package.json",
-                        "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
-                        "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
-                        "[project-root]/tsconfig.json": "assets/scaffold/files/tsconfig.json",
-                        "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
-                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png",
-                        "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
-                        "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
-                        "[web-root]/translations/.htaccess": "assets/scaffold/files/deny.htaccess",
-                        "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
-                        "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch"
+                        "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
+                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
                     }
                 }
             },
             "autoload": {
-                "files": [
-                    "AppKernel.php",
-                    "AppTestKernel.php"
-                ],
                 "psr-4": {
                     "Mautic\\": "bundles/",
                     "MauticPlugin\\": "plugins/",
                     "Mautic\\Middleware\\": "middlewares/",
                     "Mautic\\Migrations\\": "migrations/",
                     "Mautic\\CodingStandards\\": "codingstandards/"
-                }
+                },
+                "files": [
+                    "AppKernel.php",
+                    "AppTestKernel.php"
+                ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "pre-autoload-dump": [
+                    "Mautic\\ComposerBundle\\ComposerBundle::preAutoloadDump"
+                ]
+            },
             "license": [
                 "GPL-3.0"
             ],
             "description": "Mautic Open Source Distribution",
-            "support": {
-                "source": "https://github.com/mautic/core-lib/tree/7.x"
-            },
-            "time": "2026-03-02T14:47:59+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "maxmind-db/reader",
@@ -19036,11 +19039,11 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.2.0"
     },

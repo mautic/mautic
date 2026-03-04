@@ -134,9 +134,10 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (!empty($options['search'])) {
-            if ($connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+            if ($connection instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
                 // ILIKE is PostgreSQL's built-in case-insensitive LIKE — much faster and cleaner than LOWER()
                 $qb->andWhere($qb->expr()->comparison('CAST('.$alias.'.properties as text)', 'ILIKE', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
+            // $qb->andWhere($qb->expr()->like('LOWER(' . $alias . '.properties::text)', $qb->expr()->literal('%' . strtolower($options['search']) . '%')));
             } else {
                 $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
             }
