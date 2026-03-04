@@ -7,9 +7,19 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 
 class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
+    private GeneratedColumnsProviderInterface $generatedColumnsProvider;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->generatedColumnsProvider = $this->getContainer()->get(GeneratedColumnsProviderInterface::class);
+    }
+
     public function testLeadReportWithDncListColumn(): void
     {
         $leads[] = $this->createContact('test1@example.com');
@@ -184,6 +194,10 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 
     public function testLeadReportWithEmailDomainColumn(): void
     {
+        if (!$this->generatedColumnsProvider->generatedColumnsAreSupported()) {
+            $this->markTestSkipped('Generated columns are not supported on this platform');
+        }
+
         $leads[] = $this->createContact('test1@d1.example.com');
         $leads[] = $this->createContact('test2@d2.example.com');
         $leads[] = $this->createContact('test3@d3.example.com');
