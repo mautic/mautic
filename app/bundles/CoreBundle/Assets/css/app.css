@@ -11753,6 +11753,9 @@ code:hover > .copy-icon {
   border-radius: unset;
   margin: 0;
 }
+.toolbar--toolbar-content > .dropdown > .btn {
+  width: auto;
+}
 .toolbar--toolbar-content .input-group .twitter-typeahead:last-child .tt-input,
 .toolbar--toolbar-content .input-group .twitter-typeahead:last-child .tt-hint,
 .toolbar--toolbar-content .form-control.search,
