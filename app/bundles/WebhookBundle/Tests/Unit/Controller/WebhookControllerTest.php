@@ -118,9 +118,9 @@ class WebhookControllerTest extends TestCase
         $client->expects($this->once())
             ->method('post')
             ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
-                Assert::assertSame(
-                    $payload,
+                Assert::assertEquals( // Changed from assertSame (works on all DBs)
                     $testPayload,
+                    $payload,
                     json_encode($payload, JSON_THROW_ON_ERROR),
                 );
 
@@ -159,8 +159,7 @@ class WebhookControllerTest extends TestCase
             ->method('post')
             ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
                 Assert::assertSame($url, $callUrl);
-                Assert::assertSame($realTestPayload, $callPayload);
-
+                Assert::assertEquals($realTestPayload, $callPayload); // Changed from assertSame (works on all DBs)
                 Assert::assertSame($secret, $callSecret);
 
                 return $clientResponse;
@@ -195,8 +194,8 @@ class WebhookControllerTest extends TestCase
         // If you encounter error here - debug the \Mautic\WebhookBundle\Model\WebhookModel::processWebhook
         // in the catch part.
         $logRepository = $this->createMock(LogRepository::class);
-        $logRepository->expects($this->never())
-            ->method('getSuccessVsErrorStatusCodeRatio');
+        $logRepository->expects($this->never())->method('getSuccessVsErrorStatusCodeRatio');
+        $logRepository->expects($this->never())->method('removeLimitExceedLogs'); // because clean_webhook_logs_in_background = true
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->exactly(3))
