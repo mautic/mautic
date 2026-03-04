@@ -5988,7 +5988,6 @@ ul.dropdown-menu-form {
   overflow-y: auto;
 }
 .dropdown-toggle {
-  aspect-ratio: 1 / 1;
   justify-content: center;
   align-items: center;
   outline: 2px var(--outline-style) transparent;
@@ -6001,6 +6000,9 @@ ul.dropdown-menu-form {
 .dropdown-toggle.focus,
 .dropdown-toggle:focus-visible {
   outline: 2px var(--outline-style) var(--focus);
+}
+.dropdown-toggle.btn--icon-only {
+  aspect-ratio: 1 / 1;
 }
 .dropdown-header {
   margin: 32px 16px 8px 16px;
@@ -11752,9 +11754,6 @@ code:hover > .copy-icon {
   height: 48px;
   border-radius: unset;
   margin: 0;
-}
-.toolbar--toolbar-content > .dropdown > .btn {
-  width: auto;
 }
 .toolbar--toolbar-content .input-group .twitter-typeahead:last-child .tt-input,
 .toolbar--toolbar-content .input-group .twitter-typeahead:last-child .tt-hint,
