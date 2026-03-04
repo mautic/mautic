@@ -111,22 +111,6 @@
   },
   "repositories": [
     {
-      "type": "package",
-      "package": {
-        "name": "gaufrette/extras",
-        "version": "0.1.0",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/wieslawgolec/gaufrette-extras.git",
-          "reference": "0.1.0"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://github.com/wieslawgolec/gaufrette-extras/archive/refs/tags/0.1.0.zip"
-        }
-      }
-    },
-    {
       "type": "path",
       "url": "app",
       "options": {
@@ -142,6 +126,13 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/oauth2-php"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/gaufrette-extras.git",
+      "only": [
+        "gaufrette/extras"
+      ]
     }
   ],
   "conflict": {
