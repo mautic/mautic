@@ -29,9 +29,9 @@ class LeadTimelineEvent extends Event
      *  includeEvents => (array) event types to include
      *  excludeEvents => (array) event types to exclude.
      *
-     * @var array
+     * @var mixed[]
      */
-    protected $filters = [];
+    protected array $filters;
 
     /**
      * @var array<string, int>

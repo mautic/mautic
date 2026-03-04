@@ -801,7 +801,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
-                $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
+                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
@@ -955,7 +955,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
                     $returnParameter = true;
                 }
-                $expr           = $q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL());
+                $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
                 $filter->strict = true;
                 break;
             default:

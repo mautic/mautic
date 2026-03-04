@@ -579,6 +579,10 @@ class EmailType extends AbstractType
 
         $this->addDynamicContentField($builder);
 
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }

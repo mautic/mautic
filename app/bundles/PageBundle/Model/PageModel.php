@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -395,10 +396,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
             return false;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return false;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
         if (empty($query) || !is_array($query)) {
@@ -1018,12 +1020,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private function getQueryFromUrl(string $pageUrl): array
     {
-        $query             = [];
-        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+        $query    = [];
+        $urlQuery = parse_url($pageUrl, PHP_URL_QUERY);
+
+        if (empty($urlQuery)) {
+            return $query;
+        }
 
         if (is_string($urlQuery)) {
-            $urlQueryArray = [];
-            parse_str($urlQuery, $urlQueryArray);
+            $urlQueryArray = Query::parse($urlQuery);
 
             foreach ($urlQueryArray as $key => $value) {
                 if (is_string($value)) {

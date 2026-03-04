@@ -109,7 +109,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null)
     {
-        $now           = $now ?? $this->now ?? new \DateTime();
+        $now ??= $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 

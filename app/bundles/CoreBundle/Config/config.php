@@ -305,6 +305,7 @@ return [
                     'request_stack',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
                 ],
             ],
@@ -899,6 +900,8 @@ return [
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
+        'validate_remote_domains'         => false, // whether to validate remote domains in remote URLs
+        'allowed_remote_domains'          => [],
         'rememberme_key'                  => '%mautic.secret_key%',
         'rememberme_lifetime'             => 7_776_000, // 90 days in seconds
         'rememberme_path'                 => '/',

@@ -315,28 +315,24 @@ class CategoryController extends AbstractFormController
         $cancelled = $valid = false;
         $method    = $request->getMethod();
         $inForm    = $this->getInFormValue($request, $method);
+        $response  = null;
         // not found
         if (null === $entity) {
             $closeModal = true;
-        } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':view')) {
-            return $this->modalAccessDenied();
+        } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':edit')) {
+            $response = $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
-            $viewParams = [
-                'page'   => $session->get('mautic.category.page', 1),
-                'bundle' => $bundle,
-            ];
-            $postActionVars = [
-                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
-                'viewParameters'  => $viewParams,
-                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
-                'passthroughVars' => [
-                    'activeLink'    => 'mautic_'.$bundle.'category_index',
-                    'mauticContent' => 'category',
-                    'closeModal'    => 1,
-                ],
-            ];
+            $flashMsg = $this->isLocked([], $entity, 'category', true);
+            $this->addFlashMessage($flashMsg['msg'], $flashMsg['msgVars'], FlashBag::LEVEL_ERROR);
 
-            return $this->isLocked($postActionVars, $entity, 'category.category');
+            $response = new JsonResponse([
+                'closeModal' => true,
+                'flashes'    => $this->getFlashContent(),
+            ]);
+        }
+
+        if (null !== $response) {
+            return $response;
         }
 
         // Create the form
@@ -398,7 +394,7 @@ class CategoryController extends AbstractFormController
 
         if ($closeModal) {
             if ($inForm) {
-                return new JsonResponse(
+                $response = new JsonResponse(
                     [
                         'mauticContent' => 'category',
                         'closeModal'    => 1,
@@ -407,27 +403,27 @@ class CategoryController extends AbstractFormController
                         'categoryId'    => $entity->getId(),
                     ]
                 );
+            } else {
+                $viewParameters = [
+                    'page'   => $session->get('mautic.category.page'),
+                    'bundle' => $bundle,
+                ];
+
+                $response = $this->postActionRedirect(
+                    [
+                        'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
+                        'passthroughVars' => [
+                            'activeLink'    => '#mautic_'.$bundle.'category_index',
+                            'mauticContent' => 'category',
+                            'closeModal'    => 1,
+                        ],
+                    ]
+                );
             }
-
-            $viewParameters = [
-                'page'   => $session->get('mautic.category.page'),
-                'bundle' => $bundle,
-            ];
-
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_'.$bundle.'category_index',
-                        'mauticContent' => 'category',
-                        'closeModal'    => 1,
-                    ],
-                ]
-            );
         } else {
-            return $this->ajaxAction(
+            $response = $this->ajaxAction(
                 $request,
                 [
                     'contentTemplate' => '@MauticCategory/Category/form.html.twig',
@@ -444,6 +440,8 @@ class CategoryController extends AbstractFormController
                 ]
             );
         }
+
+        return $response;
     }
 
     /**

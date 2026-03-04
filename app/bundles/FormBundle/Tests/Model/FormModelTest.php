@@ -125,6 +125,10 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = sys_get_temp_dir();
+        }
+
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->twigMock              = $this->createMock(Environment::class);
         $this->themeHelper           = $this->createMock(ThemeHelper::class);
@@ -704,6 +708,44 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelper->expects($this->once())
             ->method('populateField')
             ->with($companyname, 'Mautic', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadNormalizesBooleanField(): void
+    {
+        $formHtml = '<html>';
+        $form     = new Form();
+        $field    = new Field();
+        $contact  = new Lead();
+
+        $field->setMappedField('is_active');
+        $field->setMappedObject('contact');
+        $field->setIsAutoFill(true);
+        $form->addField(123, $field);
+
+        $contactCompanyData = [
+            'is_active' => '1',
+        ];
+
+        $leadField = new LeadField();
+        $leadField->setType('boolean');
+        $leadField->setProperties(['yes' => 'Yes', 'no' => 'No']);
+
+        $this->contactTracker->method('getContact')
+            ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
+
+        $this->leadFieldModel->expects($this->once())
+            ->method('getEntityByAlias')
+            ->with('is_active')
+            ->willReturn($leadField);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($field, 'Yes', 'form-', $formHtml);
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }

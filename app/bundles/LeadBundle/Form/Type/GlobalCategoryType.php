@@ -29,18 +29,16 @@ final class GlobalCategoryType extends AbstractType
                     return 'lead:getLookupChoiceList&'.http_build_query($query);
                 },
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
-                    return [
-                        'type'    => 'global',
-                        'filter'  => '$data',
-                        'limit'   => 10,
-                        'start'   => 0,
-                        'options' => [
-                            'is_published' => $options['is_published'],
-                            'for_lookup'   => 1,
-                        ],
-                    ];
-                },
+                'lookup_arguments'    => fn (Options $options) => [
+                    'type'    => 'global',
+                    'filter'  => '$data',
+                    'limit'   => 10,
+                    'start'   => 0,
+                    'options' => [
+                        'is_published' => $options['is_published'],
+                        'for_lookup'   => 1,
+                    ],
+                ],
                 'is_published' => true,
             ]
         );

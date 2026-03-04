@@ -291,7 +291,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         continue;
                     }
 
-                    list($ignore, $sms) = $this->getTranslatedEntity($sms, $lead);
+                    [$ignore, $sms] = $this->getTranslatedEntity($sms, $lead);
                     \assert($sms instanceof Sms);
 
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);

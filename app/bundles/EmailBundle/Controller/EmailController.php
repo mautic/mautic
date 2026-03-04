@@ -711,6 +711,7 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $this->setOptimisticLockVersion($entity, $form);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
@@ -718,7 +719,7 @@ class EmailController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $existingEmail = clone $entity;
                 $this->restoreNullifiedFieldsDuringClone($existingEmail, $entity);
-                if ($valid = $this->isFormValid($form)) {
+                if ($valid = ($this->isFormValid($form) && $this->checkOptimisticLockVersion($entity, $form, false))) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
@@ -809,9 +810,10 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
+            } elseif ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+                $this->setOptimisticLockVersion($entity, $form);
             }
         } else {
             // lock the entity
@@ -858,6 +860,14 @@ class EmailController extends FormController
             );
         }
 
+        $route = $this->generateUrl('mautic_email_action', $routeParams);
+        $error = $this->getFormErrorForBuilder($form);
+        $data  = ['version' => $error ? $form['version']->getData() : $entity->getVersion()];
+
+        if ($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_email_index', 'email', $route, $data)) {
+            return $optimizedResponse;
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -882,7 +892,7 @@ class EmailController extends FormController
                     'mauticContent'   => 'email',
                     'updateSelect'    => InputHelper::clean($request->query->get('updateSelect')),
                     'route'           => $this->generateUrl('mautic_email_action', $routeParams),
-                    'validationError' => $this->getFormErrorForBuilder($form),
+                    'validationError' => $error,
                 ],
             ]
         );
