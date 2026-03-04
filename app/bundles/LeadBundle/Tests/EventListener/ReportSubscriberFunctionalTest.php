@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 
 class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
