@@ -21,8 +21,8 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.4']
-        db-types: ['mysql:9.2', 'mariadb:11.4']
+        php-versions: ['8.2', '8.3', '8.4']
+        db-types: ['mysql:8.4', 'mysql:9.2', 'mariadb:10.11', 'mariadb:11.4']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -116,8 +116,8 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.4']
-        postgres-versions: ['18']
+        php-versions: ['8.2', '8.3', '8.4']
+        postgres-versions: ['16', '18']
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
 
