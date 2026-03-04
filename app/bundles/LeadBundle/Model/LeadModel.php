@@ -680,14 +680,18 @@ class LeadModel extends FormModel
                         $newValue = implode('|', $newValue);
                     }
 
-                    $isEmpty = (null == $newValue || '' == $newValue);
+                    // Use strict comparison to correctly handle value 0 (integer/string).
+                    // Loose comparison `null == 0` and `'' == 0` both return true in PHP,
+                    // causing numeric value 0 to be incorrectly treated as empty/blank.
+                    $isEmpty = (null === $newValue || '' === $newValue);
                     if ($curValue !== $newValue && (!$isEmpty || ($isEmpty && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
                     }
 
                     // if empty, check for social media data to plug the hole
-                    if (empty($newValue) && !empty($socialCache)) {
+                    // Use strict null/empty-string check to avoid treating 0 as empty
+                    if ((null === $newValue || '' === $newValue) && !empty($socialCache)) {
                         foreach ($socialCache as $service => $details) {
                             // check to see if a field has been assigned
 
