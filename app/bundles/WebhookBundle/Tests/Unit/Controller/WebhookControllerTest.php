@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Controller\AjaxController;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
+use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
@@ -204,7 +205,7 @@ class WebhookControllerTest extends TestCase
                 [Event::class, $webhookEventRepository],
                 [WebhookQueue::class, $webhookQueueRepository],
                 [Webhook::class, $webhookRepository],
-                [Log::class, $logRepository]
+                [Log::class, $logRepository],
             ]);
 
         $serializer = $this->createMock(SerializerInterface::class);
