@@ -204,6 +204,7 @@ class WebhookControllerTest extends TestCase
                 [Event::class, $webhookEventRepository],
                 [WebhookQueue::class, $webhookQueueRepository],
                 [Webhook::class, $webhookRepository],
+                [Log::class, $logRepository]
             ]);
 
         $serializer = $this->createMock(SerializerInterface::class);
