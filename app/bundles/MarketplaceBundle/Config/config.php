@@ -77,5 +77,6 @@ return [
     // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
         Config::MARKETPLACE_ENABLED                => true,
+        Config::MARKETPLACE_WEBSITE_URL            => 'https://marketplace.mautic.org',
     ],
 ];

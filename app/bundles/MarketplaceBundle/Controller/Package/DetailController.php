@@ -66,10 +66,11 @@ class DetailController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'packageDetail'     => $packageDetail,
-                    'isInstalled'       => $isInstalled,
-                    'isComposerEnabled' => $this->config->isComposerEnabled(),
-                    'security'          => $security,
+                    'packageDetail'         => $packageDetail,
+                    'isInstalled'           => $isInstalled,
+                    'isComposerEnabled'     => $this->config->isComposerEnabled(),
+                    'marketplaceWebsiteUrl' => $this->config->getMarketplaceWebsiteUrl(),
+                    'security'              => $security,
                 ],
                 'contentTemplate' => '@Marketplace/Package/detail.html.twig',
                 'passthroughVars' => [

@@ -36,7 +36,7 @@ final class PackageBase
             (int) $array['downloads'],
             (int) $array['favers'],
             (float) ($array['average_rating'] ?? 0),
-            (int) ($array['total_review'] ?? 0),
+            (int) ($array['total_review'] ?? $array['total_reviews'] ?? $array['reviewCount'] ?? 0),
             $array['type'] ?? null,
             $array['display_name'] ?? null
         );
