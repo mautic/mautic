@@ -82,7 +82,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 self::pageTokenRegex,
                 TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
-                'alias',
+                'title',
                 'id'
             );
             if ($tokens) {
@@ -132,7 +132,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 self::pageTokenRegex,
                 TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
                 $labelFilter,
-                'alias'
+                'title'
             );
             if ($tokens) {
                 $event->addTokens($tokens);
