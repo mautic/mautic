@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -1206,6 +1208,10 @@ class Asset extends FormEntity implements UuidInterface
     {
         // Add a constraint to manage the file upload data
         $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
+        $metadata->addPropertyConstraint('remotePath', new Sequentially([
+            new Assert\Url(message: 'mautic.asset.validation.error.url'),
+            new SafeRemoteUrl(),
+        ]));
     }
 
     /**

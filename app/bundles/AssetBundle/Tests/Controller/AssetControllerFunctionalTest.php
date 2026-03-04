@@ -13,6 +13,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,22 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private const SALES_USER = 'sales';
     private const ADMIN_USER = 'admin';
+
+    protected function setUp(): void
+    {
+        $this->configParams['validate_remote_domains'] = false;
+        $this->configParams['site_url']                = 'https://site.tld';
+
+        if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
+            $this->configParams['validate_remote_domains'] = true;
+            $this->configParams['allowed_remote_domains']  = [
+                'first-allowed.tld',
+                'second-allowed.tld',
+            ];
+        }
+
+        parent::setUp();
+    }
 
     /**
      * Index action should return status code 200.
@@ -118,7 +135,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
     /**
      * @param array<string, string[]> $permission
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getValuesProvider')]
+    #[DataProvider('getValuesProvider')]
     public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
     {
         $userCreator = $this->getUser($userCreatorUN);
@@ -384,5 +401,38 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $savedAsset = $this->em->find(Asset::class, $asset->getId());
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
+    }
+
+    /**
+     * @return iterable<array{string, bool}>
+     */
+    public static function dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(): iterable
+    {
+        yield 'Not in allowed domains' => ['https://some-domain.com/foo.jpg', false];
+        yield 'Is in allowed domains' => ['https://second-allowed.tld/foo.jpg', true];
+        yield 'Using site URL' => ['https://site.tld/foo.jpg', true];
+    }
+
+    #[DataProvider('dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled')]
+    public function testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(string $file, bool $isAllowed): void
+    {
+        $message = 'The remote domain in the URL is not allowed due to security reasons.';
+        $crawler = $this->client->request('GET', '/s/assets/new');
+        $form    = $crawler->selectButton('Save')->form();
+        $form->setValues([
+            'asset[title]'           => 'Title',
+            'asset[storageLocation]' => 'remote',
+            'asset[remotePath]'      => $file,
+        ]);
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+
+        if ($isAllowed) {
+            Assert::assertStringNotContainsString($message, $content);
+        } else {
+            Assert::assertStringContainsString($message, $content);
+        }
     }
 }
