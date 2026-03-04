@@ -305,6 +305,7 @@ return [
                     'request_stack',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
                 ],
             ],
