@@ -15,8 +15,8 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
     private const TABLE_NAME    = 'campaign_leads';
     private const DATE_COLUMN   = 'date_added';
     private const INDEX_COLUMN  = 'campaign_id';
-    
-    private const FORMAT_DATE_MYSQL = 'DATE_FORMAT';
+
+    private const FORMAT_DATE_MYSQL      = 'DATE_FORMAT';
     private const FORMAT_DATE_POSTGRESQL = 'TO_CHAR';
 
     private const DEFINITIONS = [
