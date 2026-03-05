@@ -636,16 +636,16 @@ class ChartQuery extends AbstractChart
             // MySQL %U = Sunday-based week 00–53
             // We approximate with ISO week (Monday-based, 01–53) – common compromise in ports
             // Padded with space like "2026 03" for identical grouping/label behavior
-            if ('IYYY IW' === $dbUnit) {
-                return "TO_CHAR({$tzAdjusted}, 'YYYY') || ' ' || LPAD(TO_CHAR({$tzAdjusted}, 'IW')::text, 2, '0')";
-            }
-
-            return "TO_CHAR({$tzAdjusted}, '{$dbUnit}')";
+            $sql = ('IYYY IW' === $dbUnit) ?
+                "TO_CHAR({$tzAdjusted}, 'YYYY') || ' ' || LPAD(TO_CHAR({$tzAdjusted}, 'IW')::text, 2, '0')" :
+                "TO_CHAR({$tzAdjusted}, '{$dbUnit}')";
         } else {
             $columnName = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
 
-            return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
+            $sql = 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
         }
+
+        return $sql;
     }
 
     private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix): ?GeneratedColumn

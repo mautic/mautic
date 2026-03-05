@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
 {
+    public const MAX_AVAILABLE_VERSION = '999.99.99';
+
     public function testDatabaseDriverAndVersionOk(): void
     {
         $releaseMetadata = [
@@ -41,9 +43,9 @@ class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
             'show_php_version_warning_if_under' => '7.4.0',
             'minimum_mautic_version'            => '3.2.0',
             'announcement_url'                  => '',
-            'minimum_postgresql_version'        => '999.99.99', // Hopefully this version will never exist
-            'minimum_mysql_version'             => '999.99.99', // Hopefully this version will never exist
-            'minimum_mariadb_version'           => '999.99.99', // Hopefully this version will never exist
+            'minimum_postgresql_version'        => self::MAX_AVAILABLE_VERSION, // Hopefully this version will never exist
+            'minimum_mysql_version'             => self::MAX_AVAILABLE_VERSION, // Hopefully this version will never exist
+            'minimum_mariadb_version'           => self::MAX_AVAILABLE_VERSION, // Hopefully this version will never exist
         ];
 
         $check = new CheckDatabaseDriverAndVersion($this->em);

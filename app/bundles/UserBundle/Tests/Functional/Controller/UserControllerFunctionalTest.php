@@ -14,6 +14,8 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
 
+    public const USER_EDIT_PATH = '/s/users/edit/';
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -26,7 +28,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $user = $this->getUser(self::ADMIN_USER);
 
-        $this->client->request('GET', '/s/users/edit/'.$user->getId());
+        $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
@@ -42,7 +44,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $user = $this->getUser(self::ADMIN_USER);
 
-        $crawler                 = $this->client->request('GET', '/s/users/edit/'.$user->getId());
+        $crawler                 = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
         $form                    = $buttonCrawlerNode->form();
         $form['user[firstName]'] = 'test';
@@ -57,7 +59,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $user = $this->getUser(self::ADMIN_USER);
 
-        $crawler = $this->client->request('GET', '/s/users/edit/'.$user->getId());
+        $crawler = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
 
         $form = $crawler->selectButton('Save')->form([
             'user[firstName]'               => '',
@@ -139,7 +141,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $user = $this->getUser(self::ADMIN_USER);
 
-        $crawler = $this->client->request('GET', '/s/users/edit/'.$user->getId());
+        $crawler = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
 
         $form = $crawler->selectButton('Save')->form($data);
 

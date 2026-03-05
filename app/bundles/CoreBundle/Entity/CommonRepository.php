@@ -1192,10 +1192,10 @@ class CommonRepository extends ServiceEntityRepository
             $ormQb = false;
             if ($filter->not) {
                 $xFunc    = 'andX';
-                $exprFunc = $isPg ? 'NOT ILIKE' : 'NOT LIKE'; // 'notLike';
+                $exprFunc = $isPg ? 'NOT ILIKE' : 'NOT LIKE';
             } else {
                 $xFunc    = 'orX';
-                $exprFunc = $isPg ? 'ILIKE' : 'LIKE'; // 'like';
+                $exprFunc = $isPg ? 'ILIKE' : 'LIKE';
             }
 
             $expr = $q->expr()->$xFunc();

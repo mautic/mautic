@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
+    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+
     /**
      * @var array
      */
@@ -689,10 +691,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Extract potential qualified columns with their positions
-        // Improved pattern: identifiers must start with letter or _, to avoid invalid matches
-        $pattern          = '/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i';
         $potentialMatches = [];
-        if (preg_match_all($pattern, $expr, $matches, PREG_OFFSET_CAPTURE)) {
+        if (preg_match_all(self::IDENTIFIER_PATTERN, $expr, $matches, PREG_OFFSET_CAPTURE)) {
             $potentialMatches = $matches[1]; // [[column_string, offset], ...]
         }
 
@@ -739,7 +739,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
         if (!$this->isComplexExpression($trimmed)) {
-            if (preg_match('/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i', $trimmed)) {
+            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
                 return $this->sanitizeColumnName($trimmed); // if its simple column, we sanitize it, otherwise its inner query
             }
 
@@ -748,7 +748,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Recursively sanitize all column references inside the expression
         return preg_replace_callback(
-            '/([`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?\.[`"]?[a-zA-Z_][a-zA-Z0-9_]*[`"]?)/i',
+            self::IDENTIFIER_PATTERN,
             fn ($matches) => $this->sanitizeColumnName($matches[1]),
             $trimmed
         );

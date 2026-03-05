@@ -38,6 +38,9 @@ final class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
+        /**
+         * @SuppressWarnings("php:S1192")
+         */
         $commonColumns = [
             self::PREFIX_FOCUS.'.id' => [
                 'label'   => 'mautic.report.focus.id',

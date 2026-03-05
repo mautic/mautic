@@ -15,6 +15,8 @@ use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
+    private const TRUNCATE_TABLE_SQL = 'TRUNCATE TABLE';
+
     private bool $databaseInstalled = false;
 
     private bool $setUpInvoked      = false;
@@ -189,7 +191,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $fullTable    = $prefix.$table;
             $quotedTable  = $this->connection->quoteIdentifier($fullTable);
 
-            $sql = 'TRUNCATE TABLE '.$quotedTable;
+            $sql = self::TRUNCATE_TABLE_SQL.' '.$quotedTable;
 
             if ($this->isPostgresqlPlatform()) {
                 // Reset sequences (equivalent to MySQL AUTO_INCREMENT reset)
@@ -315,7 +317,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 if (!empty($prefixedTables)) {
                     $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
                     $this->connection->executeStatement(
-                        'TRUNCATE TABLE '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
+                        self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
                     );
                 }
 
@@ -404,7 +406,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
 
         $content = "-- PostgreSQL reset script for prefixed tables\n";
-        $content .= 'TRUNCATE TABLE '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
+        $content .= self::TRUNCATE_TABLE_SQL.' TABLE '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
 
         file_put_contents($file, $content);
     }

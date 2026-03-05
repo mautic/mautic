@@ -87,15 +87,13 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
                 );
 
                 // Step 2: Fallback - set common sequence name as doctrine do
-                if (!$sequence) {
-                    // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-                    // without linking a named sequence in a way visible to pg_get_serial_sequence()
-                    // Test DB uses a different config that doesn't register the sequence properly
-                    if ($connection->fetchOne(
-                        "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                        [$formTableName.'_id_seq'])) {
-                        $sequence = $formTableName.'_id_seq';
-                    }
+                // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
+                // without linking a named sequence in a way visible to pg_get_serial_sequence()
+                // Test DB uses a different config that doesn't register the sequence properly
+                if (!$sequence && $connection->fetchOne(
+                    "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
+                    [$formTableName.'_id_seq'])) {
+                    $sequence = $formTableName.'_id_seq';
                 }
 
                 if ($sequence) {

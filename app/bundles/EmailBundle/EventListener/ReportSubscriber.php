@@ -52,26 +52,26 @@ class ReportSubscriber implements EventSubscriberInterface
             'alias'   => 'unsubscribed',
             'label'   => 'mautic.email.report.unsubscribed',
             'type'    => 'int',
-            'formula' => 'COALESCE(SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END), 0)',
+            'formula' => 'COALESCE(SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END), 0)', // NOSONAR
         ],
         'unsubscribed_ratio' => [
             'alias'   => 'unsubscribed_ratio',
             'label'   => 'mautic.email.report.unsubscribed_ratio',
             'type'    => 'string',
-            'formula' => 'COALESCE(ROUND((SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND((SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')', // NOSONAR
             'suffix'  => '%',
         ],
         'bounced' => [
             'alias'   => 'bounced',
             'label'   => 'mautic.email.report.bounced',
             'type'    => 'int',
-            'formula' => 'COALESCE(SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END), 0)',
+            'formula' => 'COALESCE(SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END), 0)', // NOSONAR
         ],
         'bounced_ratio' => [
             'alias'   => 'bounced_ratio',
             'label'   => 'mautic.email.report.bounced_ratio',
             'type'    => 'string',
-            'formula' => 'COALESCE(ROUND((SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND((SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')', // NOSONAR
             'suffix'  => '%',
         ],
     ];

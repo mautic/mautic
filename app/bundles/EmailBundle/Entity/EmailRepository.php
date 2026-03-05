@@ -392,20 +392,21 @@ class EmailRepository extends CommonRepository
         $q->select('partial e.{id, subject, name, language}');
 
         if (!empty($search)) {
+            $param = 'search';
             if (is_array($search)) {
                 $search = array_map('intval', $search);
-                $q->andWhere($q->expr()->in('e.id', ':search'))
-                    ->setParameter('search', $search);
+                $q->andWhere($q->expr()->in('e.id', ':'.$param))
+                    ->setParameter($param, $search);
             } else {
                 $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
                 $isPg     = $platform instanceof PostgreSQLPlatform;
 
                 if ($isPg) {
-                    $q->andWhere($q->expr()->like($q->expr()->lower('e.name'), ':search'));
-                    $q->setParameter('search', '%'.mb_strtolower($search).'%');
+                    $q->andWhere($q->expr()->like($q->expr()->lower('e.name'), ':'.$param));
+                    $q->setParameter($param, '%'.mb_strtolower($search).'%');
                 } else {
-                    $q->andWhere($q->expr()->like('e.name', ':search'));
-                    $q->setParameter('search', "%{$search}%");
+                    $q->andWhere($q->expr()->like('e.name', ':'.$param));
+                    $q->setParameter($param, "%{$search}%");
                 }
             }
         }

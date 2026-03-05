@@ -23,6 +23,17 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 
     public const DATE_TIME_ZONE = 'UTC';
 
+    // Make sonar Qube happy
+    public const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
+    public const CAMPAIGN_NAME = 'Campaign Test';
+
+    public const ADMIN_USER = 'Admin User';
+
+    public const IS_US = 'Is US';
+
+    public const UNITED_STATES = 'United States';
+
     /**
      * @var array
      */
@@ -368,7 +379,7 @@ HTML;
 
         $this->em->getConnection()->insert($table, array_merge($commonFields, [
             'id'          => 1,
-            'date_added'  => $dateAdded1->format('Y-m-d H:i:s'),
+            'date_added'  => $dateAdded1->format(self::DATE_TIME_FORMAT),
             'name'        => 'Campaign Test Email 1',
             'subject'     => 'Campaign Test Email 1',
             'custom_html' => $customHtml1,
@@ -376,7 +387,7 @@ HTML;
 
         $this->em->getConnection()->insert($table, array_merge($commonFields, [
             'id'          => 2,
-            'date_added'  => $dateAdded2->format('Y-m-d H:i:s'),
+            'date_added'  => $dateAdded2->format(self::DATE_TIME_FORMAT),
             'name'        => 'Campaign Test Email 2',
             'subject'     => 'Campaign Test Email 2',
             'custom_html' => $customHtml2,
@@ -398,7 +409,7 @@ HTML;
             5  => 'NonUK:NotOpen',
             6  => 'US:Action',
             7  => 'NonUS:Action',
-            8  => 'Campaign Test',
+            8  => self::CAMPAIGN_NAME,
             9  => 'EmailNotOpen',
             10 => 'ChainedAction',
         ];
@@ -464,16 +475,16 @@ HTML;
             'id'                  => 1,
             'category_id'         => null,
             'is_published'        => true,
-            'date_added'          => $dateAdded->format('Y-m-d H:i:s'),
+            'date_added'          => $dateAdded->format(self::DATE_TIME_FORMAT),
             'created_by'          => 1,
             'created_by_user'     => 'Admin',
-            'date_modified'       => $dateModified->format('Y-m-d H:i:s'),
+            'date_modified'       => $dateModified->format(self::DATE_TIME_FORMAT),
             'modified_by'         => 1,
-            'modified_by_user'    => 'Admin User',
+            'modified_by_user'    => self::ADMIN_USER,
             'checked_out'         => null,
             'checked_out_by'      => null,
-            'checked_out_by_user' => 'Admin User',
-            'name'                => 'Campaign Test',
+            'checked_out_by_user' => self::ADMIN_USER,
+            'name'                => self::CAMPAIGN_NAME,
             'description'         => null,
             'publish_up'          => null,
             'publish_down'        => null,
@@ -541,7 +552,7 @@ HTML;
             'anchorEventType'     => 'source',
             'buttons'             => $buttons,
             'settings'            => $tagSettings,
-            'add_tags'            => ['Campaign Test'],
+            'add_tags'            => [self::CAMPAIGN_NAME],
             'remove_tags'         => [],
         ];
         $connection->insert($table, [
@@ -600,7 +611,7 @@ HTML;
             'event_type'            => 'action',
             'event_order'           => 1,
             'properties'            => serialize($properties2),
-            'trigger_date'          => $sendEmailTimestamp->format('Y-m-d H:i:s'),
+            'trigger_date'          => $sendEmailTimestamp->format(self::DATE_TIME_FORMAT),
             'trigger_interval'      => 1,
             'trigger_interval_unit' => 'd',
             'trigger_mode'          => 'date',
@@ -666,7 +677,7 @@ HTML;
             'event_type'            => 'condition',
             'event_order'           => 3,
             'properties'            => serialize($properties4),
-            'trigger_date'          => $conditionTimestamp->format('Y-m-d H:i:s'),
+            'trigger_date'          => $conditionTimestamp->format(self::DATE_TIME_FORMAT),
             'trigger_interval'      => 1,
             'trigger_interval_unit' => 'd',
             'trigger_mode'          => 'date',
@@ -680,7 +691,7 @@ HTML;
         // Event 5: Is US (condition - duplicate structure)
         $properties5 = [
             'canvasSettings'      => ['droppedX' => '942', 'droppedY' => '374'],
-            'name'                => 'Is US',
+            'name'                => self::IS_US,
             'triggerMode'         => 'immediate',
             'triggerDate'         => null,
             'triggerInterval'     => '1',
@@ -689,7 +700,7 @@ HTML;
             'properties'          => [
                 'field'    => 'country',
                 'operator' => '=',
-                'value'    => 'United States',
+                'value'    => self::UNITED_STATES,
             ],
             'type'            => 'lead.field_value',
             'eventType'       => 'condition',
@@ -697,20 +708,20 @@ HTML;
             'buttons'         => $buttons,
             'field'           => 'country',
             'operator'        => '=',
-            'value'           => 'United States',
+            'value'           => self::UNITED_STATES,
         ];
 
         $connection->insert($table, [
             'id'                    => 5,
             'campaign_id'           => 1,
             'parent_id'             => 3,
-            'name'                  => 'Is US',
+            'name'                  => self::IS_US,
             'description'           => null,
             'type'                  => 'lead.field_value',
             'event_type'            => 'condition',
             'event_order'           => 3,
             'properties'            => serialize($properties5),
-            'trigger_date'          => $conditionTimestamp->format('Y-m-d H:i:s'),
+            'trigger_date'          => $conditionTimestamp->format(self::DATE_TIME_FORMAT),
             'trigger_interval'      => 1,
             'trigger_interval_unit' => 'd',
             'trigger_mode'          => 'date',
@@ -926,7 +937,7 @@ HTML;
         // Event 11: Is US (condition off first tag action)
         $properties11 = [
             'canvasSettings'      => ['droppedX' => '577', 'droppedY' => '260'],
-            'name'                => 'Is US',
+            'name'                => self::IS_US,
             'triggerMode'         => 'immediate',
             'triggerDate'         => null,
             'triggerInterval'     => '1',
@@ -935,7 +946,7 @@ HTML;
             'properties'          => [
                 'field'    => 'country',
                 'operator' => '=',
-                'value'    => 'United States',
+                'value'    => self::UNITED_STATES,
             ],
             'type'            => 'lead.field_value',
             'eventType'       => 'condition',
@@ -943,13 +954,13 @@ HTML;
             'buttons'         => $buttons,
             'field'           => 'country',
             'operator'        => '=',
-            'value'           => 'United States',
+            'value'           => self::UNITED_STATES,
         ];
         $connection->insert($table, [
             'id'                    => 11,
             'campaign_id'           => 1,
             'parent_id'             => 1,
-            'name'                  => 'Is US',
+            'name'                  => self::IS_US,
             'description'           => null,
             'type'                  => 'lead.field_value',
             'event_type'            => 'condition',
@@ -1177,14 +1188,14 @@ HTML;
             'is_published'         => true,
             'date_added'           => $dateAdded,
             'created_by'           => 1,
-            'created_by_user'      => 'Admin User',
+            'created_by_user'      => self::ADMIN_USER,
             'date_modified'        => null,
             'modified_by'          => null,
             'modified_by_user'     => null,
             'checked_out'          => null,
             'checked_out_by'       => null,
             'checked_out_by_user'  => null,
-            'name'                 => 'Campaign Test',
+            'name'                 => self::CAMPAIGN_NAME,
             'description'          => null,
             'alias'                => 'campaign-test',
             'filters'              => serialize([]), // a:0:{}
@@ -1224,7 +1235,7 @@ HTML;
             $connection->insert($table, [
                 'leadlist_id'      => 1,
                 'lead_id'          => $leadId,
-                'date_added'       => $dateAdded->format('Y-m-d H:i:s'),
+                'date_added'       => $dateAdded->format(self::DATE_TIME_FORMAT),
                 'manually_removed' => false,
                 'manually_added'   => true,
             ], [
@@ -1246,7 +1257,7 @@ HTML;
             $connection->insert($table, [
                 'campaign_id'      => 1,
                 'lead_id'          => $leadId,
-                'date_added'       => $dateAdded->format('Y-m-d H:i:s'),
+                'date_added'       => $dateAdded->format(self::DATE_TIME_FORMAT),
                 'manually_removed' => false,
                 'manually_added'   => true,
                 'date_last_exited' => null,

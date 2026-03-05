@@ -211,7 +211,7 @@ class SchemaHelper
         } elseif (str_contains($platform, 'postgresql')) {
             $minSupported = $metadata->getMinSupportedPostgreSqlVersion();
         } else {
-            throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL, MariaDB and PostgreSQL.');
+            throw new DBALException('Invalid database platform '.$platform.'. Mautic only supports MySQL, MariaDB and PostgreSQL.');
         }
 
         if (version_compare($version, $minSupported, '<')) {

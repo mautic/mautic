@@ -651,10 +651,10 @@ class LeadRepository extends CommonRepository
 
             // 2. PostgreSQL requires the "AS" keyword and specific JOIN syntax for table creation
             $conn->executeStatement(sprintf(
-                'CREATE TEMPORARY TABLE %s AS 
-         SELECT DISTINCT lll.lead_id 
-         FROM %s lll 
-         JOIN %s l ON l.id = lll.lead_id 
+                'CREATE TEMPORARY TABLE %s AS
+         SELECT DISTINCT lll.lead_id
+         FROM %s lll
+         JOIN %s l ON l.id = lll.lead_id
          WHERE l.date_identified IS NULL',
                 $tempTableName,
                 $tableName,
@@ -664,8 +664,8 @@ class LeadRepository extends CommonRepository
             // 3. PostgreSQL DELETE syntax uses "USING" and explicit join in WHERE
             // Note: executeStatement() is used to get the count of affected rows directly
             $deleteQuery = sprintf(
-                'DELETE FROM %s lll 
-         USING (SELECT lead_id FROM %s LIMIT %d) d 
+                'DELETE FROM %s lll
+         USING (SELECT lead_id FROM %s LIMIT %d) d
          WHERE lll.lead_id = d.lead_id',
                 $tableName,
                 $tempTableName,

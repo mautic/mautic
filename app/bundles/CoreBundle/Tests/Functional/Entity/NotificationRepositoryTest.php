@@ -12,6 +12,7 @@ use PHPUnit\Framework\Assert;
 
 class NotificationRepositoryTest extends MauticMysqlTestCase
 {
+    private const MINUS_DAY_DATE_TIME = '-1 day';
     private int $userId1;
     private int $userId2;
 
@@ -32,15 +33,15 @@ class NotificationRepositoryTest extends MauticMysqlTestCase
 
     public function testIsDuplicate(): void
     {
-        $this->createNotification($this->userId2, 'dup1', new \DateTime('-1 day +5 seconds'));
-        $this->createNotification($this->userId1, 'dup2', new \DateTime('-1 day +5 seconds'));
+        $this->createNotification($this->userId2, 'dup1', new \DateTime(self::MINUS_DAY_DATE_TIME.' +5 seconds'));
+        $this->createNotification($this->userId1, 'dup2', new \DateTime(self::MINUS_DAY_DATE_TIME.' +5 seconds'));
         $this->em->flush();
 
-        $this->assertDuplicate(true, $this->userId2, 'dup1', new \DateTime('-1 day'));
+        $this->assertDuplicate(true, $this->userId2, 'dup1', new \DateTime(self::MINUS_DAY_DATE_TIME));
         $this->assertDuplicate(true, $this->userId2, 'dup1', new \DateTime('-25 hour'));
         $this->assertDuplicate(false, $this->userId2, 'dup1', new \DateTime('-12 hour'));
-        $this->assertDuplicate(true, $this->userId1, 'dup2', new \DateTime('-1 day'));
-        $this->assertDuplicate(false, $this->userId1, 'dup1', new \DateTime('-1 day'));
+        $this->assertDuplicate(true, $this->userId1, 'dup2', new \DateTime(self::MINUS_DAY_DATE_TIME));
+        $this->assertDuplicate(false, $this->userId1, 'dup1', new \DateTime(self::MINUS_DAY_DATE_TIME));
     }
 
     private function assertDuplicate(bool $expectedIsDuplicate, int $userId, string $deduplicate, \DateTime $from): void

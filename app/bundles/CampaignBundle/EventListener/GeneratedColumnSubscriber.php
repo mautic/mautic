@@ -15,20 +15,23 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
     private const TABLE_NAME    = 'campaign_leads';
     private const DATE_COLUMN   = 'date_added';
     private const INDEX_COLUMN  = 'campaign_id';
+    
+    private const FORMAT_DATE_MYSQL = 'DATE_FORMAT';
+    private const FORMAT_DATE_POSTGRESQL = 'TO_CHAR';
 
     private const DEFINITIONS = [
         'hour' => [
             'column'      => 'generated_date_added_hour',
             'type'        => 'varchar(16)',
-            'mysql'       => 'DATE_FORMAT('.self::DATE_COLUMN.', "%Y-%m-%d %H:00")',
-            'postgres'    => 'to_char('.self::DATE_COLUMN.', \'YYYY-MM-DD HH24:00\')',
+            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y-%m-%d %H:00")',
+            'postgres'    => self::FORMAT_DATE_POSTGRESQL.'('.self::DATE_COLUMN.', \'YYYY-MM-DD HH24:00\')',
             'granularity' => 'H',
             'filter'      => false,
         ],
         'day' => [
             'column'      => 'generated_date_added_day',
             'type'        => 'date',
-            'mysql'       => 'DATE_FORMAT('.self::DATE_COLUMN.', "%Y-%m-%d")',
+            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y-%m-%d")',
             'postgres'    => self::DATE_COLUMN.'::date',
             'granularity' => 'd',
             'filter'      => true,
@@ -36,23 +39,23 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
         'week' => [
             'column'      => 'generated_date_added_week',
             'type'        => 'char(8)',
-            'mysql'       => 'DATE_FORMAT('.self::DATE_COLUMN.', "%Y %U")',
-            'postgres'    => 'to_char('.self::DATE_COLUMN.', \'IYYY IW\')',
+            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y %U")',
+            'postgres'    => self::FORMAT_DATE_POSTGRESQL.'('.self::DATE_COLUMN.', \'IYYY IW\')',
             'granularity' => 'W',
             'filter'      => false,
         ],
         'month' => [
             'column'      => 'generated_date_added_month',
             'type'        => 'char(7)',
-            'mysql'       => 'DATE_FORMAT('.self::DATE_COLUMN.', "%Y-%m")',
-            'postgres'    => 'to_char('.self::DATE_COLUMN.', \'YYYY-MM\')',
+            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y-%m")',
+            'postgres'    => self::FORMAT_DATE_POSTGRESQL.'('.self::DATE_COLUMN.', \'YYYY-MM\')',
             'granularity' => 'm',
             'filter'      => false,
         ],
         'year' => [
             'column'      => 'generated_date_added_year',
             'type'        => 'smallint',
-            'mysql'       => 'DATE_FORMAT('.self::DATE_COLUMN.', "%Y")',
+            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y")',
             'postgres'    => 'EXTRACT(YEAR FROM '.self::DATE_COLUMN.')::smallint',
             'granularity' => 'Y',
             'filter'      => false,
