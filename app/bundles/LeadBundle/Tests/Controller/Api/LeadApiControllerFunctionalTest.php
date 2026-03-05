@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -1209,6 +1210,12 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testGetAllActivityDownload(): void
     {
+        $asset = new Asset();
+        $asset->setTitle('Initial Title');
+        $asset->setAlias('initial-alias');
+        $asset->setIsPublished(true);
+        $this->em->persist($asset);
+
         $expectedActivites = 0;
 
         $ipAddress = new IpAddress();
@@ -1223,6 +1230,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             $expectedActivites += 3;
             for ($iAsset = 0; $iAsset < 3; ++$iAsset) {
                 $assetDownload = new Download();
+                $assetDownload->setAsset($asset);
                 $assetDownload->setLead($contact);
                 $assetDownload->setDateDownload(date_create('2013-03-15'));
                 $assetDownload->setCode(13);

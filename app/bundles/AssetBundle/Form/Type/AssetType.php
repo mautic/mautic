@@ -112,20 +112,6 @@ class AssetType extends AbstractType
         );
 
         $builder->add(
-            'alias',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.alias',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.asset.asset.help.alias',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'description',
             TextareaType::class,
             [

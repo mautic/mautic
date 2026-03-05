@@ -22,8 +22,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CampaignTestAbstract extends TestCase
 {
-    protected static int $mockId      = 232;
-    protected static string $mockName = 'Mock name';
+    protected static int $mockId       = 232;
+    protected static string $mockName  = 'Mock name';
+    protected static string $mockAlias = 'Mock alias';
 
     protected function initCampaignModel(): CampaignModel
     {
@@ -50,7 +51,7 @@ class CampaignTestAbstract extends TestCase
 
         $leadListModel->expects($this->any())
             ->method('getUserLists')
-            ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
+            ->willReturn([['id' => self::$mockId, 'name' => self::$mockName, 'alias' => self::$mockAlias]]);
 
         $formModel = $this->getMockBuilder(FormModel::class)
             ->disableOriginalConstructor()
