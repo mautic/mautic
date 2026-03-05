@@ -9,6 +9,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @extends CommonRepository<Asset>
@@ -244,6 +245,12 @@ class AssetRepository extends CommonRepository
      */
     public function findOneByUuid(string $slug): Asset
     {
+        // Throw not found execption on invalid UUIDs (e.g. legacy "74:" format)
+        // This prevents the PostgreSQL exception and lets the legacy fallback run.
+        if (empty($uuid) || !Uuid::isValid($uuid)) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(Asset::class, ['uuid' => $slug]);
+        }
+
         $asset = $this->createQueryBuilder('a')
             ->where('a.uuid = :uuid')
             ->setParameter('uuid', $slug)
