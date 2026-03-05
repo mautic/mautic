@@ -74,7 +74,7 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
     {
         $isMySQL = $this->versionProvider->isMySql();
 
-        if (!$isMySQL && !$this->versionProvider->isPostgreSQL()) {
+        if (!$isMySQL && !$this->versionProvider->isPostgreSql()) {
             return;
         }
 
