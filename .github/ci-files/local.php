@@ -10,7 +10,7 @@ $parameters = [
     'db_port'               => getenv('DB_PORT') ?: 3306,
     'db_name'               => getenv('DB_NAME') ?: 'mautictest',
     'db_user'               => getenv('DB_USER') ?: 'root',
-    'db_password'           => getenv('DB_PASSWWD') ?: '',
+    'db_password'           => getenv('DB_PASSWD') ?: '',
     'admin_email'           => 'github-actions@mautic.org',
     'admin_password'        => 'GitHubActionsIsAwesome',
 ];

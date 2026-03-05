@@ -710,17 +710,17 @@ class StatRepository extends CommonRepository
             ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
-        $leadIdCol    = $connection->quoteIdentifier('lead_id');
-        $sentCountCol = $connection->quoteIdentifier('sent_count');
-        $readCountCol = $connection->quoteIdentifier('read_count');
-        $readCountCol = $connection->quoteIdentifier('clicked_through_count');
+        $leadIdCol              = $connection->quoteIdentifier('lead_id');
+        $sentCountCol           = $connection->quoteIdentifier('sent_count');
+        $readCountCol           = $connection->quoteIdentifier('read_count');
+        $clickedThroughCountCol = $connection->quoteIdentifier('clicked_through_count');
 
         // main query
         $queryBuilder->select(
             "{$leadAlias}.id AS $leadIdCol",
             "COUNT({$statsAlias}.id) AS $sentCountCol",
             "SUM(CASE WHEN {$statsAlias}.is_read = TRUE THEN 1 ELSE 0 END) AS $readCountCol",
-            "SUM(COALESCE({$subQueryAlias}.hits, 0)) AS $readCountCol",
+            "SUM(COALESCE({$subQueryAlias}.hits, 0)) AS $clickedThroughCountCol",
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,
