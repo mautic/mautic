@@ -247,7 +247,7 @@ class AssetRepository extends CommonRepository
     {
         // Throw not found execption on invalid UUIDs (e.g. legacy "74:" format)
         // This prevents the PostgreSQL exception and lets the legacy fallback run.
-        if (empty($uuid) || !Uuid::isValid($uuid)) {
+        if (empty($slug) || !Uuid::isValid($slug)) {
             throw EntityNotFoundException::fromClassNameAndIdentifier(Asset::class, ['uuid' => $slug]);
         }
 

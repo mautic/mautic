@@ -49,12 +49,12 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Order-independent assertion (safe for PostgreSQL + MySQL)
         $this->assertEqualsCanonicalizing([
-            ['FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', 'http://example1.com'],
-            ['FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', 'http://example1.com'],
-            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '0', '0', 'http://example2.com'],
-            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', 'http://example2.com'],
-            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
-            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'http://example2.com'],
+            ['FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', 'https://example1.com'],
+            ['FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', 'https://example1.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '0', '0', 'https://example2.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', 'https://example2.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'https://example2.com'],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', 'https://example2.com'],
         ], $table);
     }
 
@@ -91,11 +91,11 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         array_pop($table);
 
         $this->assertSame([
-            ['1', 'lead.1@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', 'http://example1.com'],
-            ['2', 'lead.1@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '2', 'http://example1.com'],
-            ['3', 'lead.2@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '1', 'http://example1.com'],
-            ['4', 'lead.2@example.com', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', 'http://example2.com'],
-            ['5', 'lead.2@example.com', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', 'http://example2.com'],
+            ['1', 'lead.1@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', 'https://example1.com'],
+            ['2', 'lead.1@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '2', 'https://example1.com'],
+            ['3', 'lead.2@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '1', 'https://example1.com'],
+            ['4', 'lead.2@example.com', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', 'https://example2.com'],
+            ['5', 'lead.2@example.com', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', 'https://example2.com'],
         ], $table);
     }
 
@@ -121,9 +121,9 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $focusId1 = $focus1->getId();
         /** @var int $focusId2 */
         $focusId2 = $focus2->getId();
-        $this->createTrackableAndRedirects('http://example1.com', $focusId1, 1, 1);
-        $this->createTrackableAndRedirects('http://example2.com', $focusId2, 1, 1);
-        $this->createTrackableAndRedirects('http://example2.com', $focusId2);
+        $this->createTrackableAndRedirects('https://example1.com', $focusId1, 1, 1);
+        $this->createTrackableAndRedirects('https://example2.com', $focusId2, 1, 1);
+        $this->createTrackableAndRedirects('https://example2.com', $focusId2);
         $this->em->flush();
         $this->em->clear();
     }

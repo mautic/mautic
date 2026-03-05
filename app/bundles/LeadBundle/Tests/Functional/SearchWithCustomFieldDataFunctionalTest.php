@@ -100,13 +100,13 @@ class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
     public function testSearchCompaniesWithCustomFields(): void
     {
         // Create a custom field for Company
-        $this->createSearchableField(self::CONTACT_CUSTOM_FIELD, 'company');
+        $this->createSearchableField(self::COMPANY_CUSTOM_FIELD, 'company');
 
         // Create companies
         $this->createCompany([
             'name'          => 'ABC',
             'email'         => 'hello@abcexample.com',
-            'customFields'  => [self::CONTACT_CUSTOM_FIELD => 'client_3'],
+            'customFields'  => [self::COMPANY_CUSTOM_FIELD => 'client_3'],
         ]);
 
         $this->createCompany([
