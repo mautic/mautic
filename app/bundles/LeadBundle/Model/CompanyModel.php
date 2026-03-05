@@ -592,9 +592,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     }
                 }
 
+                $param        = 'filterVar';
                 $expr         = new ExpressionBuilder($this->em->getConnection());
                 $isPostgreSql = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
-                $composite    = $expr->and($isPostgreSql ? $expr->comparison("comp.$column", 'ILIKE', ':filterVar') : $expr->like("comp.$column", ':filterVar'));
+                $composite    = $expr->and($isPostgreSql ? $expr->comparison("comp.$column", 'ILIKE', ':'.$param) : $expr->like("comp.$column", ':'.$param));
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
@@ -611,7 +612,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 $results = $this->getRepository()->getAjaxSimpleList(
                     $composite,
-                    ['filterVar' => $filterVal.'%'],
+                    [$param => $filterVal.'%'],
                     $column,
                     'id',
                     $limit,

@@ -189,11 +189,11 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $qb         = $event->getQueryBuilder();
         $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
-        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
-
-        if ($isPg && in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
-            $fieldExpr .= '::text';
+        if (in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+            $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+            $fieldExpr  = $this->normalizeType($leadsTableAlias.'.'.$event->getFilter()->getField(), $isPg);
+        } else {
+            $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
         }
 
         $event->addExpression(
@@ -204,5 +204,10 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         );
 
         $event->stopPropagation();
+    }
+
+    private function normalizeType(string $field, bool $cast = false, string $type='text'): string
+    {
+        return $cast ? "$field::$type" : $field;
     }
 }

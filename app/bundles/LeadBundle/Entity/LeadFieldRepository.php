@@ -263,7 +263,17 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            $property     = $this->getPropertyByField($field, $q);
+            $property      = $this->getPropertyByField($field, $q);
+            $normalizeType = function (string $field, bool $cast = false, string $type='TEXT'): string {
+                return $cast ? "CAST($field AS $type)" : $field;
+            };
+            $normalizeRegex = function (bool $not = false, bool $cast = false): string {
+                if ($cast) {
+                    return $not ? '!~*' : '~*';
+                }
+
+                return $not ? 'NOT REGEXP' : 'REGEXP';
+            };
 
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
                 $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
@@ -287,10 +297,7 @@ class LeadFieldRepository extends CommonRepository
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
                 $regexOp = $isPg ? ('regexp' === $operatorExpr ? '~*' : '!~*') : ('regexp' === $operatorExpr ? 'REGEXP' : 'NOT REGEXP');
 
-                // PostgreSQL Fix: Append ::text to the property name
-                $propertyExpr = ($isPg) ? 'CAST('.$property.' AS text)' : $property;
-
-                $where = $propertyExpr.' '.$regexOp.' :value';
+                $where = $normalizeType($property, $isPg).' '.$regexOp.' :value';
 
                 $q->where(
                     $q->expr()->and(
@@ -302,8 +309,8 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $values     = (!is_array($value)) ? [$value] : $value;
-                $regexOp    = $isPg ? '~*' : 'REGEXP';
-                $notRegexOp = $isPg ? '!~*' : 'NOT REGEXP';
+                $regexOp    = $normalizeRegex(false, $isPg);
+                $notRegexOp = $normalizeRegex(true, $isPg);
 
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
@@ -316,10 +323,7 @@ class LeadFieldRepository extends CommonRepository
                     $v           = trim((string) $v, "'");
                     $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
 
-                    // PostgreSQL Fix: Append ::text to the property name
-                    $propertyExpr = ($isPg) ? 'CAST('.$property.' AS text)' : $property;
-
-                    $innerExpr[] = $propertyExpr.' '.('in' === $operatorExpr ? $regexOp : $notRegexOp).' :'.$paramName;
+                    $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ? $regexOp : $notRegexOp).' :'.$paramName;
                     $q->setParameter($paramName, $pattern);
                 }
 
@@ -400,11 +404,8 @@ class LeadFieldRepository extends CommonRepository
                             }
                     }
 
-                    // PostgreSQL Fix: Append ::text to the property name
-                    $propertyExpr = ($isPg) ? 'CAST('.$property.' AS text)' : $property;
-
                     $expr = $expr->with(
-                        $q->expr()->$operatorExpr($propertyExpr, ':value')
+                        $q->expr()->$operatorExpr($normalizeType($property, $isPg), ':value')
                     );
                 }
 

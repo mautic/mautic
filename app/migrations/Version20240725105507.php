@@ -9,6 +9,9 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20240725105507 extends PreUpAssertionMigration
 {
+    private const COUNTRY_TURKEY  = 'Turkey';
+    private const COUNTRY_TURKIYE = 'Türkiye';
+
     protected function preUpAssertions(): void
     {
     }
@@ -17,14 +20,14 @@ final class Version20240725105507 extends PreUpAssertionMigration
     {
         $this->connection->update(
             $this->prefix.'leads',
-            ['country' => 'Türkiye'],
-            ['country' => 'Turkey']
+            ['country' => self::COUNTRY_TURKIYE],
+            ['country' => self::COUNTRY_TURKEY]
         );
 
         $this->connection->update(
             $this->prefix.'companies',
-            ['companycountry' => 'Türkiye'],
-            ['companycountry' => 'Turkey']
+            ['companycountry' => self::COUNTRY_TURKIYE],
+            ['companycountry' => self::COUNTRY_TURKEY]
         );
     }
 
@@ -32,14 +35,14 @@ final class Version20240725105507 extends PreUpAssertionMigration
     {
         $this->connection->update(
             $this->prefix.'leads',
-            ['country' => 'Turkey'],
-            ['country' => 'Türkiye']
+            ['country' => self::COUNTRY_TURKEY],
+            ['country' => self::COUNTRY_TURKIYE]
         );
 
         $this->connection->update(
             $this->prefix.'companies',
-            ['companycountry' => 'Turkey'],
-            ['companycountry' => 'Türkiye']
+            ['companycountry' => self::COUNTRY_TURKEY],
+            ['companycountry' => self::COUNTRY_TURKIYE]
         );
     }
 }

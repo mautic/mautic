@@ -28,16 +28,13 @@ final class Version20241212090146 extends PreUpAssertionMigration
 
         $schemaManager = $this->connection->createSchemaManager();
 
-        if (!$schemaManager->tablesExist([$tableName])) {
-            return false;
-        }
+        if ($schemaManager->tablesExist([$tableName])) {
+            $indexName = $this->getIndexName();
 
-        $indexName = $this->getIndexName();
+            $platform = $this->connection->getDatabasePlatform();
 
-        $platform = $this->connection->getDatabasePlatform();
-
-        if ($platform instanceof PostgreSQLPlatform) {
-            $sql = '
+            if ($platform instanceof PostgreSQLPlatform) {
+                $sql = '
                 SELECT 1
                 FROM pg_indexes
                 WHERE schemaname = current_schema()
@@ -45,16 +42,17 @@ final class Version20241212090146 extends PreUpAssertionMigration
                   AND lower(indexname) = lower(?)
             ';
 
-            return (bool) $this->connection->fetchOne($sql, [$tableName, $indexName]);
-        }
+                return (bool) $this->connection->fetchOne($sql, [$tableName, $indexName]);
+            }
 
-        // MySQL/MariaDB fallback
-        $indexes        = $schemaManager->listTableIndexes($tableName);
-        $lowerIndexName = strtolower($indexName);
+            // MySQL/MariaDB fallback
+            $indexes        = $schemaManager->listTableIndexes($tableName);
+            $lowerIndexName = strtolower($indexName);
 
-        foreach ($indexes as $index) {
-            if (strtolower($index->getName()) === $lowerIndexName) {
-                return true;
+            foreach ($indexes as $index) {
+                if (strtolower($index->getName()) === $lowerIndexName) {
+                    return true;
+                }
             }
         }
 

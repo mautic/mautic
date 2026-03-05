@@ -10,14 +10,19 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20230321133733 extends PreUpAssertionMigration
 {
+    // Make sonar qube happy
+    private const ALTER_TABLE_SQL = 'ALTER TABLE';
+    // Make sonar qube happy
+    private const VARCHAR_DEF_SQL = 'VARCHAR(191) DEFAULT NULL';
+
     protected const TABLE_NAME = 'asset_downloads';
 
     private const COLUMNS = [
-        'utm_campaign' => 'VARCHAR(191) DEFAULT NULL',
-        'utm_content'  => 'VARCHAR(191) DEFAULT NULL',
-        'utm_medium'   => 'VARCHAR(191) DEFAULT NULL',
-        'utm_source'   => 'VARCHAR(191) DEFAULT NULL',
-        'utm_term'     => 'VARCHAR(191) DEFAULT NULL',
+        'utm_campaign' => self::VARCHAR_DEF_SQL,
+        'utm_content'  => self::VARCHAR_DEF_SQL,
+        'utm_medium'   => self::VARCHAR_DEF_SQL,
+        'utm_source'   => self::VARCHAR_DEF_SQL,
+        'utm_term'     => self::VARCHAR_DEF_SQL,
     ];
 
     protected function preUpAssertions(): void
@@ -63,7 +68,7 @@ final class Version20230321133733 extends PreUpAssertionMigration
             // PostgreSQL: one ALTER per column is safer (avoids long syntax issues)
             foreach ($alterStatements as $stmt) {
                 $this->addSql(sprintf(
-                    'ALTER TABLE %s %s',
+                    self::ALTER_TABLE_SQL.' %s %s',
                     $tableName,
                     $stmt
                 ));
@@ -71,7 +76,7 @@ final class Version20230321133733 extends PreUpAssertionMigration
         } else {
             // MySQL: one ALTER TABLE with multiple ADD
             $this->addSql(sprintf(
-                'ALTER TABLE %s %s',
+                self::ALTER_TABLE_SQL.' %s %s',
                 $tableName,
                 implode(', ', $alterStatements)
             ));
@@ -88,7 +93,7 @@ final class Version20230321133733 extends PreUpAssertionMigration
         if ($platform instanceof PostgreSQLPlatform) {
             foreach ($columns as $column) {
                 $this->addSql(sprintf(
-                    'ALTER TABLE %s DROP COLUMN IF EXISTS %s',
+                    self::ALTER_TABLE_SQL.' %s DROP COLUMN IF EXISTS %s',
                     $tableName,
                     $this->connection->quoteIdentifier($column)
                 ));
@@ -99,7 +104,7 @@ final class Version20230321133733 extends PreUpAssertionMigration
                 $dropParts[] = sprintf('DROP %s', $this->connection->quoteIdentifier($column));
             }
             $this->addSql(sprintf(
-                'ALTER TABLE %s %s',
+                self::ALTER_TABLE_SQL.' %s %s',
                 $tableName,
                 implode(', ', $dropParts)
             ));

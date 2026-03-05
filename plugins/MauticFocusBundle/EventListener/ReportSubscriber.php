@@ -203,6 +203,9 @@ final class ReportSubscriber implements EventSubscriberInterface
      */
     private function addFocusLeadsTable(ReportBuilderEvent $event, array $columns): void
     {
+        /**
+         * @SuppressWarnings("php:S1192")
+         */
         $columnsLeads = [
             self::PREFIX_TRACKABLES.'.hits' => [
                 'label'   => 'mautic.report.focus.hits',

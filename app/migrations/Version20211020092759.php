@@ -16,7 +16,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            function (Schema $schema) {
+            function () {
                 $tableName = $this->getPrefixedTableName(self::TABLE);
 
                 // Check index limit
@@ -38,24 +38,14 @@ final class Version20211020092759 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE);
         $indexName = $this->getIndexName();
 
-        // CREATE INDEX works on both platforms, but we branch for future flexibility
-        if ($platform instanceof PostgreSQLPlatform) {
-            $this->addSql(sprintf(
-                'CREATE INDEX %s ON %s (date_modified)',
-                $indexName,
-                $tableName
-            ));
-        } else {
-            $this->addSql(sprintf(
-                'CREATE INDEX %s ON %s (date_modified)',
-                $indexName,
-                $tableName
-            ));
-        }
+        $this->addSql(sprintf(
+            'CREATE INDEX %s ON %s (date_modified)',
+            $indexName,
+            $tableName
+        ));
     }
 
     public function down(Schema $schema): void

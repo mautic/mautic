@@ -112,10 +112,11 @@ final class Version20211209022550 extends AbstractMauticMigration
         return $bit;
     }
 
-    private function debugMessage(string $string): void
+    private function debugMessage(string $string, bool $print = false): void
     {
-        // uncomment me for debug
-        // echo $string.PHP_EOL;
+        if ($print) {
+            echo $string.PHP_EOL;
+        }
     }
 
     /**

@@ -17,8 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    public const EXAMPLE_URL_1 = 'https://example1.com';
-    public const EXAMPLE_URL_2 = 'https://example2.com';
+    public const EXAMPLE_URL_1   = 'https://example1.com';
+    public const EXAMPLE_EMAIL_1 = 'lead.1@example.com';
+    public const EXAMPLE_URL_2   = 'https://example2.com';
+    public const EXAMPLE_EMAIL_2 = 'lead.2@example.com';
 
     protected function setUp(): void
     {
@@ -94,18 +96,18 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         array_pop($table);
 
         $this->assertSame([
-            ['1', 'lead.1@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', self::EXAMPLE_URL_1],
-            ['2', 'lead.1@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '2', self::EXAMPLE_URL_1],
-            ['3', 'lead.2@example.com', 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '1', self::EXAMPLE_URL_1],
-            ['4', 'lead.2@example.com', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', self::EXAMPLE_URL_2],
-            ['5', 'lead.2@example.com', 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', self::EXAMPLE_URL_2],
+            ['1', self::EXAMPLE_EMAIL_1, 'FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', self::EXAMPLE_URL_1],
+            ['2', self::EXAMPLE_EMAIL_1, 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '2', self::EXAMPLE_URL_1],
+            ['3', self::EXAMPLE_EMAIL_2, 'FocusItem1', 'doesAbc', 'link', 'modal', 'view', '1', self::EXAMPLE_URL_1],
+            ['4', self::EXAMPLE_EMAIL_2, 'FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', self::EXAMPLE_URL_2],
+            ['5', self::EXAMPLE_EMAIL_2, 'FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', self::EXAMPLE_URL_2],
         ], $table);
     }
 
     private function fillDatabase(): void
     {
-        $lead1= $this->createContact('lead.1@example.com');
-        $lead2= $this->createContact('lead.2@example.com');
+        $lead1= $this->createContact(self::EXAMPLE_EMAIL_1);
+        $lead2= $this->createContact(self::EXAMPLE_EMAIL_2);
 
         $focus1 = $this->createFocusItem('FocusItem1', 'doesAbc', 'link', 'modal');
         $focus2 = $this->createFocusItem('FocusItem2', 'doesAbcd', 'link', 'modal');
