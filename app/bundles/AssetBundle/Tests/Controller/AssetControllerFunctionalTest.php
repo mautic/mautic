@@ -39,6 +39,15 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
             ];
         }
 
+        if ('testCreateNewLocalZipAssetCanBeSaved' === $this->name()) {
+            $allowedExtensions = $this->configParams['allowed_extensions'] ?? [];
+            if (!in_array('zip', $allowedExtensions, true)) {
+                $allowedExtensions[] = 'zip';
+            }
+
+            $this->configParams['allowed_extensions'] = $allowedExtensions;
+        }
+
         parent::setUp();
     }
 
