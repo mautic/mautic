@@ -126,11 +126,6 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/oauth2-php"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/gaufrette-extras.git",
-      "only": ["gaufrette/extras"]
     }
   ],
   "conflict": {

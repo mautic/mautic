@@ -107,4 +107,32 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('txt', $response['asset']['extension']);
         unlink($assetsPath.'/file.txt');
     }
+
+    public function testDeleteAssetReturnsSuccessAndEntityIsRemoved(): void
+    {
+        $payload = [
+            'file'            => 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+            'storageLocation' => 'remote',
+            'title'           => 'asset for delete regression test',
+        ];
+
+        // Create asset first
+        $this->client->request('POST', 'api/assets/new', $payload);
+        $createResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(201, $createResponse->getContent());
+
+        $createdAsset = json_decode($createResponse->getContent(), true);
+        $assetId      = $createdAsset['asset']['id'];
+        $this->assertNotEmpty($assetId);
+
+        // Delete must not fail with 500 due to post-delete serialization
+        $this->client->request('DELETE', sprintf('/api/assets/%d/delete', $assetId));
+        $deleteResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(200, $deleteResponse->getContent());
+
+        // Verify the asset is actually removed
+        $this->client->request('GET', sprintf('/api/assets/%d', $assetId));
+        $getDeletedResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(404, $getDeletedResponse->getContent());
+    }
 }
