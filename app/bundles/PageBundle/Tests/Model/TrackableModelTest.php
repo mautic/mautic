@@ -329,7 +329,7 @@ class TrackableModelTest extends TestCase
 
     public function testOwnerFieldTokenizedHostWithoutTokenValue(): void
     {
-        $url   = 'http://{ownerfield=firstname}.com';
+        $url   = 'https://{ownerfield=firstname}.com';
         $model = $this->getModel();
 
         [$content, $trackables] = $model->parseContentForTrackables(
