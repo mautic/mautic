@@ -45,10 +45,8 @@ class DateOptionFactory
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
-            case $timeframe && (
-                str_contains($timeframe, 'anniversary')
-                || str_contains($timeframe, 'birthday')
-            ):
+            case str_contains($timeframe, 'anniversary')
+            || str_contains($timeframe, 'birthday'):
                 return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);
@@ -74,11 +72,9 @@ class DateOptionFactory
                 return new DateYearNext($this->dateDecorator, $dateOptionParameters);
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
-            case $timeframe && (
-                str_contains($timeframe[0], '-') // -5 days
-                || str_contains($timeframe[0], '+') // +5 days
-                || false !== $this->isRelativeFormatsPresent($timeframe)
-            ):
+            case str_contains($timeframe[0], '-') // -5 days
+            || str_contains($timeframe[0], '+') // +5 days
+            || false !== $this->isRelativeFormatsPresent($timeframe):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);

@@ -7,9 +7,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -32,12 +36,14 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -66,7 +72,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\CampaignRepository
+     * @return CampaignRepository
      */
     public function getRepository()
     {
@@ -77,7 +83,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\EventRepository
+     * @return EventRepository
      */
     public function getEventRepository()
     {
@@ -85,7 +91,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\LeadRepository
+     * @return LeadRepository
      */
     public function getCampaignLeadRepository()
     {
@@ -97,7 +103,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCampaignLeadEventLogRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     public function getPermissionBase(): string
@@ -110,7 +116,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -456,7 +462,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
+                        $entity->addList($this->em->getReference(LeadList::class, $id));
                         break;
                     case 'forms':
                         $entity->addForm($this->em->getReference(Form::class, $id));
@@ -471,7 +477,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
+                        $entity->removeList($this->em->getReference(LeadList::class, $id));
                         break;
                     case 'forms':
                         $entity->removeForm($this->em->getReference(Form::class, $id));
@@ -500,7 +506,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 if ($lists) {
                     foreach ($lists as $list) {
-                        $choices['lists'][$list['id']] = $list['name'];
+                        $choices['lists'][$list['alias']] = $list['name'];
                     }
                 }
 

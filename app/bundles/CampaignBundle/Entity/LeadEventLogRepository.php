@@ -687,7 +687,7 @@ SQL;
     public function getEventLogStats(int $eventId): EventLogStatsDto
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
-        $qb->select([
+        $qb->select(
             'COUNT(log.id) as total_logs',
             'COUNT(DISTINCT log.lead_id) as unique_executions',
             'SUM(log.is_scheduled) as pending_executions',
@@ -696,7 +696,7 @@ SQL;
             'MIN(log.date_triggered) as first_execution_date',
             'MAX(log.date_triggered) as last_execution_date',
             'MAX(log.rotation) as max_rotations',
-        ])
+        )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
                 $qb->expr()->and(
