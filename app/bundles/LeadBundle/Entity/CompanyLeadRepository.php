@@ -219,8 +219,8 @@ class CompanyLeadRepository extends CommonRepository
 
         do {
             if ($conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads 
-                WHERE (company_id, lead_id) IN (SELECT company_id, lead_id 
+                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads
+                WHERE (company_id, lead_id) IN (SELECT company_id, lead_id
                     FROM '.MAUTIC_TABLE_PREFIX.'companies_leads
                     WHERE is_primary = FALSE LIMIT '.self::DELETE_BATCH_SIZE.')';
             } else {

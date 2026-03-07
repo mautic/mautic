@@ -10,11 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testPointsAreAdded(): void
     {
         $model = static::getContainer()->get('mautic.lead.model.lead');

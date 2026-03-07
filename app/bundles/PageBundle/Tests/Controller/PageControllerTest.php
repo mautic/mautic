@@ -108,7 +108,7 @@ class PageControllerTest extends MauticMysqlTestCase
             SELECT id, $actionCol
             FROM $eventLogsTable
             WHERE $leadIdCol = :leadId
-            AND $bundleCol = 'page' 
+            AND $bundleCol = 'page'
             AND $objectCol = 'page'",
             ['leadId' => $leadId]
         );

@@ -375,17 +375,17 @@ class FieldModelTest extends MauticMysqlTestCase
         $dbName   = $this->connection->getDatabase();
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-            $sql = "SELECT * FROM information_schema.columns 
-                WHERE table_catalog = :db 
-                  AND table_schema = 'public' 
-                  AND table_name = :table 
+            $sql = "SELECT * FROM information_schema.columns
+                WHERE table_catalog = :db
+                  AND table_schema = 'public'
+                  AND table_name = :table
                   AND column_name = :column";
             $params = ['db' => $dbName, 'table' => MAUTIC_TABLE_PREFIX.$table, 'column' => $column];
             $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
         } else {
-            $sql = 'SELECT * FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = :db 
-                  AND TABLE_NAME = :table 
+            $sql = 'SELECT * FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = :db
+                  AND TABLE_NAME = :table
                   AND COLUMN_NAME = :column';
             $params = ['db' => $dbName, 'table' => MAUTIC_TABLE_PREFIX.$table, 'column' => $column];
             $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
@@ -407,9 +407,9 @@ class FieldModelTest extends MauticMysqlTestCase
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
             $sql = sprintf(
-                "SELECT * FROM information_schema.statistics 
-             WHERE table_schema = '%s' 
-               AND table_name = '%s' 
+                "SELECT * FROM information_schema.statistics
+             WHERE table_schema = '%s'
+               AND table_name = '%s'
                AND index_name = '%s'",
                 $this->connection->getDatabase(),
                 $fullTable,
@@ -420,22 +420,22 @@ class FieldModelTest extends MauticMysqlTestCase
         }
 
         if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-            $sql = 'SELECT 
+            $sql = 'SELECT
                     t.relname          AS "TABLE_NAME",
                     i.relname          AS "INDEX_NAME",
                     a.attname          AS "COLUMN_NAME",
                     ix.indisunique     AS "IS_UNIQUE",
                     ix.indisprimary    AS "IS_PRIMARY"
-                FROM 
+                FROM
                     pg_index ix
-                JOIN 
+                JOIN
                     pg_class t ON t.oid = ix.indrelid
-                JOIN 
+                JOIN
                     pg_class i ON i.oid = ix.indexrelid
-                JOIN 
+                JOIN
                     pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
-                WHERE 
-                    t.relname = :table 
+                WHERE
+                    t.relname = :table
                     AND i.relname = :index
                 ORDER BY a.attnum';
 

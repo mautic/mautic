@@ -31,17 +31,17 @@ final class Version20260120130000 extends AbstractMigration
              DECLARE
                  f text := fmt;
              BEGIN
-                 f := REPLACE(f, '%T', 'HH24:MI:SS');         
+                 f := REPLACE(f, '%T', 'HH24:MI:SS');
                  f := REPLACE(f, '%Y', 'YYYY');
                  f := REPLACE(f, '%y', 'YY');
                  f := REPLACE(f, '%m', 'MM');
                  f := REPLACE(f, '%c', 'FMMonth');
                  f := REPLACE(f, '%M', 'Month');
                  f := REPLACE(f, '%b', 'Mon');
-                 f := REPLACE(f, '%e', 'FMDD');                 
+                 f := REPLACE(f, '%e', 'FMDD');
                  f := REPLACE(f, '%d', 'DD');
                  f := REPLACE(f, '%k', 'FMHH24');
-                 f := REPLACE(f, '%l', 'FMHH12');    
+                 f := REPLACE(f, '%l', 'FMHH12');
                  f := REPLACE(f, '%H', 'HH24');
                  f := REPLACE(f, '%h', 'HH12');
                  f := REPLACE(f, '%i', 'MI');

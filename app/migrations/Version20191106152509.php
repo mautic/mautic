@@ -37,8 +37,8 @@ class Version20191106152509 extends AbstractMauticMigration
     private function isAlreadyApplied(): bool
     {
         $sql = "
-            SELECT COUNT(*) 
-            FROM {$this->prefix}lead_fields 
+            SELECT COUNT(*)
+            FROM {$this->prefix}lead_fields
             WHERE type NOT IN ('text', 'select', 'multiselect', 'phone', 'url', 'email')
               AND char_length_limit IS NOT NULL
         ";

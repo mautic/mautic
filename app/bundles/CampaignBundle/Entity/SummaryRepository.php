@@ -139,9 +139,9 @@ class SummaryRepository extends CommonRepository
                     SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 1 ELSE 0 END) AS scheduled_count,
                     SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 0
                              ELSE CASE WHEN mclel.non_action_path_taken = TRUE THEN 1 ELSE 0 END END) AS non_action_path_taken_count,
-                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE THEN 0 
+                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE THEN 0
                              ELSE CASE WHEN mclefl.log_id IS NOT NULL THEN 1 ELSE 0 END END) AS failed_count,
-                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE OR mclefl.log_id IS NOT NULL THEN 0 
+                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE OR mclefl.log_id IS NOT NULL THEN 0
                              ELSE 1 END) AS triggered_count,
                     SUM(CASE WHEN EXISTS (
                         SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl

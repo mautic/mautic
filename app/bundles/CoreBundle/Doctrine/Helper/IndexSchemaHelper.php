@@ -98,13 +98,13 @@ class IndexSchemaHelper
         $index     = new Index($indexName, $textColumns, false, false, $options);
 
         // Check if index already exists with the same columns
-        if ($this->_hasIndex($this->table->getName(), $indexName, $textColumns)) {
+        if ($this->tableHasIndex($this->table->getName(), $indexName, $textColumns)) {
             // Exact match → nothing to do
             return $this;
         }
 
         // Index either doesn't exist, or exists but has different columns
-        if ($this->_hasIndex($this->table->getName(), $indexName)) {
+        if ($this->tableHasIndex($this->table->getName(), $indexName)) {
             // Index exists but has different columns
             $this->changedIndexes[] = $index;
         } else {
@@ -135,7 +135,7 @@ class IndexSchemaHelper
         $indexName = $this->prefix.$name;
         $index     = new Index($indexName, $textColumns, false, false, $options);
 
-        if ($this->_hasIndex($this->table->getName(), $indexName)) {
+        if ($this->tableHasIndex($this->table->getName(), $indexName)) {
             $this->dropIndexes[] = $index;
         }
 
@@ -178,7 +178,7 @@ class IndexSchemaHelper
      */
     public function hasIndex(LeadField $leadField): bool
     {
-        return $this->_hasIndex(
+        return $this->tableHasIndex(
             $this->prefix.$leadField->getCustomFieldObject(),
             $this->prefix.$leadField->getAlias().'_search'
         );
@@ -189,7 +189,7 @@ class IndexSchemaHelper
      */
     public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns): bool
     {
-        return $this->_hasIndex(
+        return $this->tableHasIndex(
             $this->prefix.$leadField->getCustomFieldObject(),
             $this->prefix.$leadField->getObject().'_unique_identifier_search',
             $uniqueIdentifierColumns
@@ -201,7 +201,7 @@ class IndexSchemaHelper
      */
     public function hasUniqueIdentifierIndex(LeadField $leadField): bool
     {
-        return $this->_hasIndex(
+        return $this->tableHasIndex(
             $this->prefix.$leadField->getCustomFieldObject(),
             $this->prefix.$leadField->getObject().'_unique_identifier_search'
         );
@@ -278,7 +278,7 @@ class IndexSchemaHelper
     /**
      * @param array<mixed> $indexColumns
      */
-    private function _hasIndex(string $tableName, string $indexName, array $indexColumns = []): bool
+    private function tableHasIndex(string $tableName, string $indexName, array $indexColumns = []): bool
     {
         foreach ($this->getTableIndexes($tableName) as $idx) {
             if (strtolower($idx->getName()) === strtolower($indexName)) {

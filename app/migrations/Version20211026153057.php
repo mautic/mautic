@@ -23,7 +23,6 @@ final class Version20211026153057 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();
 

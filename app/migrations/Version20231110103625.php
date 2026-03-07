@@ -89,10 +89,10 @@ final class Version20231110103625 extends AbstractMauticMigration
 
         // Insert missing permissions (idempotent)
         foreach ($toInsert as $data) {
-            $checkSql = "SELECT 1 FROM {$permissionsTable} 
-                         WHERE role_id = :role_id 
-                           AND bundle = :bundle 
-                           AND name = :name 
+            $checkSql = "SELECT 1 FROM {$permissionsTable}
+                         WHERE role_id = :role_id
+                           AND bundle = :bundle
+                           AND name = :name
                          LIMIT 1";
 
             $exists = (bool) $this->connection->fetchOne(

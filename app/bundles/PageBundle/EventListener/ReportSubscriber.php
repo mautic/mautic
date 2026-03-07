@@ -140,7 +140,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $hitPrefix.'time_spent' => [
                     'label'   => 'mautic.page.report.hits.time_spent',
                     'type'    => 'string',
-                    'formula' => $this->versionProvider->isPostgreSql() ? "CASE WHEN {$hitPrefix}date_left IS NOT NULL 
+                    'formula' => $this->versionProvider->isPostgreSql() ? "CASE WHEN {$hitPrefix}date_left IS NOT NULL
                            THEN TO_CHAR(({$hitPrefix}date_left - {$hitPrefix}date_hit), 'HH24:MI:SS')
                            ELSE '' END" : 'IF('.$hitPrefix.'date_left IS NOT NULL, SEC_TO_TIME(TIMESTAMPDIFF(SECOND, '.$hitPrefix.'date_hit, '.$hitPrefix.'date_left)), \'\')',
                 ],

@@ -333,13 +333,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 // Recursively sanitize inner column references
                 $innerExpression = $this->sanitizeExpression($columnSelect);
 
-                switch ($aggregator['function']) {
-                    case 'AVG': // PostgreSQL and MySQL default AVG precision is different
-                        $appendix   = $isPostgreSql ? '::numeric(10, 4)' : '';
-                        $selectText = sprintf('%s(%s)%s', $aggregator['function'], $innerExpression, $appendix);
-                        break;
-                    default:
-                        $selectText = sprintf('%s(%s)', $aggregator['function'], $innerExpression);
+                if ('AVG' == $aggregator['function']) {
+                    // PostgreSQL and MySQL default AVG precision is different
+                    $appendix   = $isPostgreSql ? '::numeric(10, 4)' : '';
+                    $selectText = sprintf('%s(%s)%s', $aggregator['function'], $innerExpression, $appendix);
+                } else {
+                    $selectText = sprintf('%s(%s)', $aggregator['function'], $innerExpression);
                 }
                 $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
                 $quotedAlias         = $this->sanitizeColumnName($alias, true);

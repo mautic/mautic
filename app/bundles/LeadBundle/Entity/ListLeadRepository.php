@@ -87,10 +87,10 @@ class ListLeadRepository extends CommonRepository
             // 2. PostgreSQL requires the "AS" keyword for CREATE TABLE AS SELECT
             // and standard join syntax.
             $conn->executeStatement(sprintf(
-                'CREATE TEMPORARY TABLE %s AS 
-         SELECT lll.leadlist_id, lll.lead_id 
-         FROM %s lll 
-         JOIN %s l ON l.id = lll.lead_id 
+                'CREATE TEMPORARY TABLE %s AS
+         SELECT lll.leadlist_id, lll.lead_id
+         FROM %s lll
+         JOIN %s l ON l.id = lll.lead_id
          WHERE l.date_identified IS NULL',
                 $tempTableName,
                 $tableName,
@@ -101,8 +101,8 @@ class ListLeadRepository extends CommonRepository
             // PostgreSQL does not support the "USING(col1, col2)" shorthand in DELETE;
             // you must use a standard WHERE clause for the join conditions.
             $deleteQuery = sprintf(
-                'DELETE FROM %s lll 
-         USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d 
+                'DELETE FROM %s lll
+         USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d
          WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
                 $tableName,
                 $tempTableName,
