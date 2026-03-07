@@ -406,7 +406,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
 
         $content = "-- PostgreSQL reset script for prefixed tables\n";
-        $content .= self::TRUNCATE_TABLE_SQL.' TABLE '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
+        $content .= self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
 
         file_put_contents($file, $content);
     }
