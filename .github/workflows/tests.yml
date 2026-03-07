@@ -168,7 +168,7 @@ jobs:
           cache: 'npm'       # enables faster local caching
 
       - name: Setup PHP, with composer and extensions
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@v2 # NOSONAR – matches official Mautic workflows, low risk
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
@@ -184,13 +184,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-${{ matrix.postgres-versions }}
 
-      - name: add PostgreSQL config file
+      - name: Prepare PostgreSQL environment
         run: |
           export PATH="/usr/lib/postgresql/${{ matrix.postgres-versions }}/bin:$PATH"
           echo "PATH=$PATH" >> $GITHUB_ENV
           pg_dump --version
-          # No user config file equivalent to .my.cnf for pg_dump (options are passed via command-line or env vars).
-          # No need to disable column-statistics, as pg_dump does not export them by default.
           DB_LOG_NAME="${{ matrix.db-types }}"
           echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
 
@@ -200,7 +198,8 @@ jobs:
           echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
       - name: Install dependencies
-        uses: "ramsey/composer-install@v3"
+        # composer install cache - https://github.com/ramsey/composer-install
+        uses: "ramsey/composer-install@v3" # NOSONAR – matches official Mautic workflows, low risk
 
       - name: Configure env for postgress
         run: |
