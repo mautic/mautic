@@ -263,12 +263,13 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            $property      = $this->getPropertyByField($field, $q);
-            $normalizeType = (fn(string $field, bool $cast = false, string $type='TEXT'): string => $cast ? "CAST($field AS $type)" : $field);
+            $property       = $this->getPropertyByField($field, $q);
+            $normalizeType  = (fn (string $field, bool $cast = false, string $type='TEXT'): string => $cast ? "CAST($field AS $type)" : $field);
             $normalizeRegex = function (bool $not = false, bool $cast = false): string {
                 if ($cast) {
                     return $not ? '!~*' : '~*';
                 }
+
                 return $not ? 'NOT REGEXP' : 'REGEXP';
             };
 
@@ -316,7 +317,7 @@ class LeadFieldRepository extends CommonRepository
                     $v           = trim((string) $v, "'");
                     $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
 
-                    $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ?  $normalizeRegex(false, $isPg) : $notRegexOp = $normalizeRegex(true, $isPg)).' :'.$paramName;
+                    $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ? $normalizeRegex(false, $isPg) : $normalizeRegex(true, $isPg)).' :'.$paramName;
                     $q->setParameter($paramName, $pattern);
                 }
 

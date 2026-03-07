@@ -60,13 +60,13 @@ $container->loadFromExtension('web_profiler', [
 ]);
 
 $connectionSettings = [
-    'driver'   => '%env(default:mautic.db_driver:DB_DRIVER)%',
-    'host'     => '%env(default:mautic.db_host:DB_HOST)%',
-    'port'     => '%env(default:mautic.db_port:DB_PORT)%',
-    'dbname'   => '%env(default:mautic.db_name:DB_NAME)%',
-    'user'     => '%env(default:mautic.db_user:DB_USER)%',
-    'password' => '%env(default:mautic.db_password:DB_PASSWD)%',
-    'charset'  => '%env(default:mautic.db_charset:DB_CHARSET)%',
+    'driver'   => '%env(DB_DRIVER)%',
+    'host'     => '%env(DB_HOST)%',
+    'port'     => '%env(DB_PORT)%',
+    'dbname'   => '%env(DB_NAME)%',
+    'user'     => '%env(DB_USER)%',
+    'password' => '%env(DB_PASSWD)%',
+    'charset'  => '%env(DB_CHARSET)%',
     'options'  => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 $container->loadFromExtension('doctrine', [
