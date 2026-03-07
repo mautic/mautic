@@ -23,22 +23,13 @@ final class Version20210420113309 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
-        if ($platform instanceof PostgreSQLPlatform) {
-            $this->addSql(sprintf(
-                'CREATE INDEX %s ON %s (alias)',
-                self::INDEX_NAME,
-                $tableName
-            ));
-        } else {
-            $this->addSql(sprintf(
-                'CREATE INDEX %s ON %s (alias)',
-                self::INDEX_NAME,
-                $tableName
-            ));
-        }
+        $this->addSql(sprintf(
+            'CREATE INDEX %s ON %s (alias)',
+            self::INDEX_NAME,
+            $tableName
+        ));
     }
 
     public function down(Schema $schema): void

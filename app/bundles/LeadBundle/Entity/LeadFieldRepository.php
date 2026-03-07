@@ -264,14 +264,11 @@ class LeadFieldRepository extends CommonRepository
             }
         } else {
             $property      = $this->getPropertyByField($field, $q);
-            $normalizeType = function (string $field, bool $cast = false, string $type='TEXT'): string {
-                return $cast ? "CAST($field AS $type)" : $field;
-            };
+            $normalizeType = (fn(string $field, bool $cast = false, string $type='TEXT'): string => $cast ? "CAST($field AS $type)" : $field);
             $normalizeRegex = function (bool $not = false, bool $cast = false): string {
                 if ($cast) {
                     return $not ? '!~*' : '~*';
                 }
-
                 return $not ? 'NOT REGEXP' : 'REGEXP';
             };
 
@@ -295,9 +292,7 @@ class LeadFieldRepository extends CommonRepository
                 )
                   ->setParameter('lead', (int) $lead);
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-                $regexOp = $isPg ? ('regexp' === $operatorExpr ? '~*' : '!~*') : ('regexp' === $operatorExpr ? 'REGEXP' : 'NOT REGEXP');
-
-                $where = $normalizeType($property, $isPg).' '.$regexOp.' :value';
+                $where = $normalizeType($property, $isPg).' '.$normalizeRegex('regexp' !== $operatorExpr, $isPg).' :value';
 
                 $q->where(
                     $q->expr()->and(
@@ -309,8 +304,6 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $values     = (!is_array($value)) ? [$value] : $value;
-                $regexOp    = $normalizeRegex(false, $isPg);
-                $notRegexOp = $normalizeRegex(true, $isPg);
 
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
@@ -323,7 +316,7 @@ class LeadFieldRepository extends CommonRepository
                     $v           = trim((string) $v, "'");
                     $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
 
-                    $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ? $regexOp : $notRegexOp).' :'.$paramName;
+                    $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ?  $normalizeRegex(false, $isPg) : $notRegexOp = $normalizeRegex(true, $isPg)).' :'.$paramName;
                     $q->setParameter($paramName, $pattern);
                 }
 
