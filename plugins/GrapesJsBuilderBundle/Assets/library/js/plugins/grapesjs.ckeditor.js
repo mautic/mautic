@@ -1,3 +1,5 @@
+import { preventModalCloseOnDrag } from './preventModalCloseOnDrag';
+
 export default (editor, opts = {}) => {
     let ckEditorInstance = null;
 
@@ -18,8 +20,17 @@ export default (editor, opts = {}) => {
         const ckEditorElementId = `ckeditor-${Date.now()}`;
         const modal = editor.Modal;
 
-        modal.onceOpen(() => initCKEditor(ckEditorElementId));
-        modal.onceClose(() => destroyCKEditor());
+        let dragProtectionCleanup = null;
+        modal.onceOpen(() => {
+            initCKEditor(ckEditorElementId);
+            const dialog = document.querySelector('.gjs-mdl-dialog');
+            const container = document.querySelector('.gjs-mdl-container');
+            dragProtectionCleanup = preventModalCloseOnDrag(dialog, container);
+        });
+        modal.onceClose(() => {
+            destroyCKEditor();
+            if (dragProtectionCleanup) dragProtectionCleanup();
+        });
 
         modal.open({
             title: 'Edit',
