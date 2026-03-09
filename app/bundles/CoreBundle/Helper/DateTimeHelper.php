@@ -209,7 +209,7 @@ class DateTimeHelper
 
         if ($resetTime) {
             $compare = $compare->setTime(0, 0, 0);
-            $with = $with->setTime(0, 0, 0);
+            $with    = $with->setTime(0, 0, 0);
         }
 
         $interval = $compare->diff($with);
