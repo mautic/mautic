@@ -258,31 +258,9 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $connection = $this->em->getConnection();
         $table1     = $this->prefix.'campaigns';
 
-        $dateAdded    = new \DateTime('2018-01-04 21:41:05', new \DateTimeZone(self::DATE_TIME_ZONE));
-        $dateModified = new \DateTime('2018-03-08 23:27:28', new \DateTimeZone(self::DATE_TIME_ZONE));
+        $campaign = $this->loadJson('campaign');
 
-        $canvasSettings = $this->loadJson('campaign_settings');
-
-        $connection->insert($table1, [
-            'allow_restart'       => false,
-            'id'                  => 1,
-            'category_id'         => null,
-            'is_published'        => true,
-            'date_added'          => $dateAdded->format(self::DATE_TIME_FORMAT),
-            'created_by'          => 1,
-            'created_by_user'     => 'Admin',
-            'date_modified'       => $dateModified->format(self::DATE_TIME_FORMAT),
-            'modified_by'         => 1,
-            'modified_by_user'    => self::ADMIN_USER,
-            'checked_out'         => null,
-            'checked_out_by'      => null,
-            'checked_out_by_user' => self::ADMIN_USER,
-            'name'                => self::CAMPAIGN_NAME,
-            'description'         => null,
-            'publish_up'          => null,
-            'publish_down'        => null,
-            'canvas_settings'     => serialize($canvasSettings),
-        ], [
+        $connection->insert($table1, $campaign, [
             'allow_restart'       => Types::BOOLEAN,
             'is_published'        => Types::BOOLEAN,
             'date_added'          => Types::DATETIME_MUTABLE,
