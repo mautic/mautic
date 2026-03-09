@@ -32,16 +32,19 @@
         }
     </style>
 </head>
-<body>
-<div class="email-container">
-    <div class="content">
-        <br>
-        <h2>Hello there!</h2>
-        <br>
-        We haven't heard from you for a while...
-        <br><br>
-        {unsubscribe_text} | {webview_text}
-        <br>
+<body class="ui-sortable">
+<div data-section-wrapper="1" class="email-container">
+    <div data-slot-container="1" class="content ui-sortable" >
+        <div data-slot="text">
+            <br />
+            <h2>Hello there!</h2>
+            <br />
+            We haven't heard from you for a while...
+            <br />
+            <br />
+            {unsubscribe_text} | {webview_text}
+            <br />
+        </div>
     </div>
 </div>
 </body>
