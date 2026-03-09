@@ -16,6 +16,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class MauticReportBuilder implements ReportBuilderInterface
 {
     public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+    /**
+     * @SuppressWarnings("php:S5843")
+     * Reason: This regex is intentionally complex to handle most basic cases
+     */
+    public const LITERAL_AGGREGATE_PATTERN = '/^\s*((\d+\.?\d*)|(COUNT|SUM|AVG|MIN|MAX|SELECT)\s*\(\s*(\*|\d+)\s*\))\s*$/ix';
 
     /**
      * @var array
@@ -649,7 +654,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $expr = preg_replace('/\s+AS\s+.*$/i', '', trim($selectExpression));
 
         // Quick skip for pure constants/literals/simple aggregates with no columns
-        if (preg_match('/^\s*((\d+\.?\d*)|(COUNT|SUM|AVG|MIN|MAX|SELECT)\s*\(\s*(\*|\d+)\s*\))\s*$/ix', $expr)) {
+        if (preg_match(self::LITERAL_AGGREGATE_PATTERN, $expr)) {
             return [];
         }
 

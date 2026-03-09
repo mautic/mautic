@@ -11,6 +11,7 @@ use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\User;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
@@ -217,7 +218,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws \InvalidArgumentException
+     * @throws ProcessFailedException
      */
     private function applySqlFromFile($file): void
     {
@@ -248,14 +250,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 escapeshellarg($file)
             );
         } else {
-            throw new \RuntimeException('Unsupported database platform');
+            throw new \InvalidArgumentException('Unsupported database platform: '.$this->connection->getDatabasePlatform()::class);
         }
 
         $process = Process::fromShellCommandline($command);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \Exception($command.' failed with status code '.$process->getExitCode().': '.$process->getErrorOutput());
+            throw new ProcessFailedException($command.' failed with status code '.$process->getExitCode().': '.$process->getErrorOutput());
         }
     }
 
@@ -477,23 +479,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 } catch (DBALException) {
                     // Ignore if table doesn't exist
                 }
+                // Drop dynamic search/unique index table if the field required it
+                // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
+                if ($this->isPostgresqlPlatform() && ($data['is_unique_identifer'] || $data['is_index'])) {
+                    $indexName = $prefix.$data['alias'].'_search';
 
-                if ($this->isPostgresqlPlatform()) {
-                    // Drop dynamic search/unique index table if the field required it
-                    // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
-                    if ($data['is_unique_identifer'] || $data['is_index']) {
-                        $indexName = $prefix.$data['alias'].'_search';
+                    $this->connection->executeStatement(sprintf(
+                        'DROP INDEX IF EXISTS %s CASCADE',
+                        $indexName
+                    ));
 
-                        $this->connection->executeStatement(sprintf(
-                            'DROP INDEX IF EXISTS %s CASCADE',
+                    $this->connection->executeStatement(
+                        sprintf('DROP TABLE IF EXISTS %s CASCADE',
                             $indexName
                         ));
-
-                        $this->connection->executeStatement(
-                            sprintf('DROP TABLE IF EXISTS %s CASCADE',
-                                $indexName
-                            ));
-                    }
                 }
             }
         } catch (DBALException) {

@@ -748,6 +748,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $eqExpr   = $operators['='][$exprType];
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
+        /**
+         * @SuppressWarnings("php:S1479")
+         *
+         * Reduce the number of switch cases from 31 to at most 30.
+         */
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -1453,7 +1458,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // Get current select parts to append to
         $selectParts   = $q->getQueryPart('select');
-        $currentSelect = is_array($selectParts) ? implode(', ', $selectParts) : ($selectParts ?: $this->getTableAlias().'.*');
+        $currentSelect = is_array($selectParts) ?
+            implode(', ', $selectParts) :
+            ($selectParts ?: $this->getTableAlias().'.*');
 
         $additionalSelects = [];
         $hasCustomFields   = false;
