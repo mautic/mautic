@@ -11,6 +11,8 @@
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
     failOnRisky="true"
     failOnWarning="true"
+    failOnDeprecation="false"
+    failOnPhpunitDeprecation="false"
     displayDetailsOnTestsThatTriggerDeprecations="true"
     displayDetailsOnPhpunitDeprecations="true"
     displayDetailsOnTestsThatTriggerErrors="true"
