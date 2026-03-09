@@ -148,6 +148,11 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
     ];
 }
 
+// PHP 8.5+ deprecated PDO::MYSQL_ATTR_* in favor of Pdo\Mysql::*
+$mysqlAttrBufferedQuery = defined('Pdo\Mysql::ATTR_USE_BUFFERED_QUERY')
+    ? constant('Pdo\Mysql::ATTR_USE_BUFFERED_QUERY')
+    : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+
 $container->loadFromExtension('doctrine', [
     'dbal' => [
         'default_connection' => 'default',
@@ -155,7 +160,7 @@ $container->loadFromExtension('doctrine', [
             'default'    => $connectionSettings,
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
-                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
+                    $mysqlAttrBufferedQuery => false,
                     PDO::ATTR_STRINGIFY_FETCHES        => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),

@@ -163,7 +163,7 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
+    "generate-assets": "php -d memory_limit=512M bin/console mautic:assets:generate && php -d memory_limit=512M bin/console assets:install --symlink --relative ./"
   },
   "config": {
     "platform": {
