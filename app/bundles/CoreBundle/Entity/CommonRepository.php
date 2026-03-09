@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Exception\RuntimeException as DBALRuntimeException;
+use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
@@ -938,7 +938,7 @@ class CommonRepository extends ServiceEntityRepository
 
             if (false === $result) {
                 // Should never happen in upsert
-                throw new DBALRuntimeException('Upsert failed - no row returned');
+                throw new DatabaseObjectNotFoundException('Upsert failed - no row returned');
             }
 
             $generatedOrExistingId = (int) $result['id'];

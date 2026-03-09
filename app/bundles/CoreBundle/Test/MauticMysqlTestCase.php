@@ -257,7 +257,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($command.' failed with status code '.$process->getExitCode().': '.$process->getErrorOutput());
+            throw new ProcessFailedException($process);
         }
     }
 

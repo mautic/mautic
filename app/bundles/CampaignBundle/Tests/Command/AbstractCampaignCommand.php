@@ -202,7 +202,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     private function insertEmails(): void
     {
         $table        = $this->prefix.'emails';
-        $commonFields = $this->loadJson('common_fields.json');
+        $commonFields = $this->loadJson('common_fields');
 
         $fieldTypes = [
             'date_added'            => Types::DATETIME_MUTABLE,
@@ -241,7 +241,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $connection = $this->em->getConnection();
         $table      = $this->prefix.'lead_tags';
 
-        $tags = $this->loadJson('lead_tags.json');
+        $tags = $this->loadJson('lead_tags');
 
         foreach ($tags as $id => $tag) {
             $connection->insert($table, [
@@ -425,6 +425,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return true;
     }
 
+    /** @return array<string, mixed> */
     private function loadJson(string $name): array
     {
         $path = __DIR__.'/../Fixtures/'.$name.'.json';

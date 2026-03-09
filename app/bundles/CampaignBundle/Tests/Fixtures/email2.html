@@ -1,38 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{subject}</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <style type="text/css" media="only screen and (max-width: 480px)">
+    <style type="text/css">
+        body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; text-align: center; }
+        .content { min-height: 30px; padding: 20px; }
         @media only screen and (max-width: 480px) {
-            [class="w320"] { width: 320px !important; }
-            [class="mobile-block"] { width: 100% !important; display: block !important; }
+            .container { width: 100% !important; }
+            .mobile-block { width: 100% !important; display: block !important; }
         }
     </style>
 </head>
-<body style="margin:0">
-<div data-section-wrapper="1">
-    <center>
-        <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0">
-            <tbody>
-            <tr>
-                <td>
-                    <div data-slot-container="1" style="min-height: 30px">
-                        <div data-slot="text">
-                            <br />
-                            <h2>Hello there!</h2>
-                            <br />
-                            We haven't heard from you for a while...
-                            <br /><br />
-                            {unsubscribe_text} | {webview_text}
-                            <br />
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </center>
+<body>
+<div class="container">
+    <table style="width: 100%; max-width: 600px; border-collapse: collapse;" role="presentation">
+        <thead>
+        <tr>
+            <th scope="col" style="text-align: center;">Email Content</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="content">
+                <br>
+                <h2>Hello there!</h2>
+                <br>
+                We haven't heard from you for a while...
+                <br><br>
+                {unsubscribe_text} | {webview_text}
+                <br>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
