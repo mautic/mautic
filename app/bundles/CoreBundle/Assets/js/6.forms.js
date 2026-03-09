@@ -129,6 +129,16 @@ Mautic.ajaxifyForm = function (formName) {
         if (MauticVars.formSubmitInProgress) {
             return false;
         } else {
+            // Sync CKEditor 5 content back to the underlying textarea before serialization.
+            // CKEditor stores content in its own contenteditable element; the textarea is only
+            // updated via updateSourceElement(). Without this, ajaxSubmit() serializes an empty
+            // textarea and the server returns a "text cannot be empty" validation error.
+            if (typeof ckEditors !== 'undefined' && ckEditors.size > 0) {
+                ckEditors.forEach(function(editor) {
+                    editor.updateSourceElement();
+                });
+            }
+
             var callbackAsync = form.data('submit-callback-async');
             if (callbackAsync && typeof Mautic[callbackAsync] == 'function') {
                 Mautic[callbackAsync].apply(this, [form, function() {
