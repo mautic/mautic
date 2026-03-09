@@ -199,6 +199,7 @@ export default class BuilderService {
 
     this.storageService = new StorageService(this.editor, object);
     this.setListeners();
+    this.patchVideoComponent();
   }
 
   static getMauticConf(mode) {
@@ -484,6 +485,25 @@ export default class BuilderService {
       Mautic.removeButtonLoadingIndicator(saveButton);
       Mautic.removeButtonLoadingIndicator(applyButton);
     }
+  }
+
+  /**
+   * Patch the GrapesJS video component to include referrerpolicy on YouTube iframes.
+   * YouTube now requires referrerpolicy="strict-origin-when-cross-origin" or it throws
+   * Error 153 (video player configuration error).
+   * @see https://github.com/mautic/mautic/issues/15742
+   */
+  patchVideoComponent() {
+    this.editor.DomComponents.addType('video', {
+      model: {
+        defaults: {
+          attributes: {
+            allowfullscreen: 'allowfullscreen',
+            referrerpolicy: 'strict-origin-when-cross-origin',
+          },
+        },
+      },
+    });
   }
 
   /**
