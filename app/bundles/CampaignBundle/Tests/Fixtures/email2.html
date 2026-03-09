@@ -4,38 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{subject}</title>
-    <style type="text/css">
-        body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
-        .container { max-width: 600px; margin: 0 auto; text-align: center; }
-        .content { min-height: 30px; padding: 20px; }
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            min-height: 30px;
+            padding: 20px 0;
+        }
         @media only screen and (max-width: 480px) {
-            .container { width: 100% !important; }
-            .mobile-block { width: 100% !important; display: block !important; }
+            .email-container {
+                padding: 10px;
+            }
+            .mobile-block {
+                display: block !important;
+                width: 100% !important;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <table style="width: 100%; max-width: 600px; border-collapse: collapse;" role="presentation">
-        <thead>
-        <tr>
-            <th scope="col" style="text-align: center;">Email Content</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td class="content">
-                <br>
-                <h2>Hello there!</h2>
-                <br>
-                We haven't heard from you for a while...
-                <br><br>
-                {unsubscribe_text} | {webview_text}
-                <br>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<div class="email-container">
+    <div class="content">
+        <br>
+        <h2>Hello there!</h2>
+        <br>
+        We haven't heard from you for a while...
+        <br><br>
+        {unsubscribe_text} | {webview_text}
+        <br>
+    </div>
 </div>
 </body>
 </html>

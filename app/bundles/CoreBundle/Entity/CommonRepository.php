@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
@@ -23,6 +22,7 @@ use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -938,7 +938,7 @@ class CommonRepository extends ServiceEntityRepository
 
             if (false === $result) {
                 // Should never happen in upsert
-                throw new DatabaseObjectNotFoundException('Upsert failed - no row returned');
+                throw new RecordNotFoundException('Upsert failed - no row returned');
             }
 
             $generatedOrExistingId = (int) $result['id'];
