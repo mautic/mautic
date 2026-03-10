@@ -400,9 +400,9 @@ class MailHelperTest extends TestCase
 
         $this->assertEmpty($mailer->getErrors()['failures']);
 
-        $fromAddresses = $transport->getFromAddresses();
+        $fromAddresses    = $transport->getFromAddresses();
         $replyToAddresses = $transport->getReplyToAddresses();
-        $metadatas     = $transport->getMetadatas();
+        $metadatas        = $transport->getMetadatas();
 
         $this->assertCount(3, $fromAddresses);
         $this->assertCount(3, $replyToAddresses);

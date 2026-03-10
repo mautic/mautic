@@ -69,10 +69,10 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
             }
         }
 
-        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
+        $this->fromAddresses[]    = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]        = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
         $this->replyToAddresses[] = !empty($message->getReplyTo()) ? $message->getReplyTo()[0]->getAddress() : null;
-        $this->message         = $message;
+        $this->message            = $message;
     }
 
     public function getMaxBatchLimit(): int
