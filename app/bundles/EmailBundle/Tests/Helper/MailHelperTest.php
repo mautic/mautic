@@ -101,8 +101,6 @@ class MailHelperTest extends TestCase
 
     private EntityManagerInterface&MockObject $entityManager;
 
-    private ModelFactory&MockObject $mockFactory;
-
     private SMimeHelper&MockObject $sMimeHelper;
 
     /**
@@ -154,7 +152,6 @@ class MailHelperTest extends TestCase
         $this->entityManager        = $this->createMock(EntityManagerInterface::class);
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->requestStack         = new RequestStack();
-        $this->mockFactory          = $this->createMock(ModelFactory::class);
         $this->sMimeHelper          = $this->createMock(SMimeHelper::class);
 
         // Configure SMimeHelper to return false for signing by default
@@ -281,7 +278,7 @@ class MailHelperTest extends TestCase
                 ['email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
             );
         $transport = new BatchTransport();
-        $mailer = $this->createMailHelperWithTransport($transport);
+        $mailer    = $this->createMailHelperWithTransport($transport);
 
         $email = new Email();
         $email->setUseOwnerAsMailer(true);
@@ -350,7 +347,7 @@ class MailHelperTest extends TestCase
                 ['email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
             );
         $transport = new BatchTransport();
-        $mailer = $this->createMailHelperWithTransport($transport);
+        $mailer    = $this->createMailHelperWithTransport($transport);
 
         $email = new Email();
         $email->setUseOwnerAsMailer(true);
@@ -464,7 +461,7 @@ class MailHelperTest extends TestCase
             );
 
         $transport = new BcInterfaceTokenTransport();
-        $mailer = $this->createMailHelperWithTransport($transport);
+        $mailer    = $this->createMailHelperWithTransport($transport);
         $mailer->enableQueue();
         $mailer->setSubject('Hello');
         $mailer->setFrom('override@owner.com');
@@ -485,8 +482,8 @@ class MailHelperTest extends TestCase
     public function testStandardEmailFrom(): void
     {
         $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
-        $email = new Email();
 
+        $email = new Email();
         $email->setUseOwnerAsMailer(false);
         $email->setFromAddress('override@nowhere.com');
         $email->setFromName('Test');
@@ -509,8 +506,8 @@ class MailHelperTest extends TestCase
         $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
 
         $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
-        $email = new Email();
 
+        $email = new Email();
         $email->setSubject('Subject');
         $email->setCustomHtml('content');
 
@@ -530,8 +527,8 @@ class MailHelperTest extends TestCase
     {
         $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
         $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
-        $email = new Email();
 
+        $email = new Email();
         // From address is set
         $email->setFromAddress('from@nowhere.com');
         $email->setSubject('Subject');
@@ -553,8 +550,8 @@ class MailHelperTest extends TestCase
         $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
-        $email = new Email();
 
+        $email = new Email();
         // From address is set
         $email->setFromAddress('from@nowhere.com');
         $email->setSubject('Subject');
@@ -1066,8 +1063,8 @@ class MailHelperTest extends TestCase
 
         $this->router->method('generate')->willReturn('http://tracking.url');
         $transport = new BatchTransport();
-        $mailer = $this->createMailHelperWithTransport($transport);
-        $email = new Email();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $email     = new Email();
 
         // We should use a local image to avoid network requests.
         $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
@@ -1112,9 +1109,9 @@ class MailHelperTest extends TestCase
         $this->router->method('generate')->willReturn('http://tracking.url');
 
         $transport = new BatchTransport();
-        $mailer = $this->createMailHelperWithTransport($transport);
-        $email = new Email();
+        $mailer    = $this->createMailHelperWithTransport($transport);
 
+        $email = new Email();
         $email->setUseOwnerAsMailer(false);
         $email->setFromName('Test');
         $email->setSubject('Test');
