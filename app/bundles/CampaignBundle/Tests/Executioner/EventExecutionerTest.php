@@ -24,10 +24,12 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Form\Type\PointActionType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
@@ -62,6 +64,11 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&EventRepository
      */
     private MockObject $eventRepository;
+
+    /**
+     * @var OptimisticLockServiceInterface&MockObject
+     */
+    private $optimisticLockService;
 
     protected function setUp(): void
     {
@@ -184,6 +191,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LoggerInterface::class),
             $this->eventScheduler,
             $this->createStub(RemovedContactTracker::class),
+            $this->optimisticLockService
         );
     }
 
@@ -252,5 +260,52 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
         $this->assertCount(0, $pendingEvent->getFailures());
+    }
+
+    public function testActionExecutionHandlesExceptionAndResetsVersionForFailedLogs(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')->willReturn(123);
+        $event->method('getEventType')->willReturn(Event::TYPE_ACTION);
+
+        $config = new ActionAccessor(
+            [
+                'label'                => 'mautic.lead.lead.events.changepoints',
+                'description'          => 'mautic.lead.lead.events.changepoints_descr',
+                'formType'             => PointActionType::class,
+            ]
+        );
+
+        $this->eventCollector->method('getEventConfig')
+            ->with($event)
+            ->willReturn($config);
+
+        $executedLog = $this->createMock(LeadEventLog::class);
+        $executedLog->method('isExecuted')->willReturn(true);
+
+        $failedLog = $this->createMock(LeadEventLog::class);
+        $failedLog->method('isExecuted')->willReturn(false);
+
+        $logs = new ArrayCollection([$executedLog, $failedLog]);
+
+        $exception = new \Exception('Test exception');
+
+        $this->actionExecutioner->expects($this->once())
+            ->method('execute')
+            ->with($config, $logs)
+            ->willThrowException($exception);
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('CAMPAIGN: Error executing action ID 123 - Test exception');
+
+        $this->optimisticLockService->expects($this->once())
+            ->method('resetVersion')
+            ->with($failedLog);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->getEventExecutioner()->executeLogs($event, $logs);
     }
 }
