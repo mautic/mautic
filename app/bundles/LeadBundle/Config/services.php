@@ -43,6 +43,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.note', Mautic\LeadBundle\Model\NoteModel::class);
     $services->alias('mautic.lead.model.device', Mautic\LeadBundle\Model\DeviceModel::class);
     $services->alias('mautic.lead.model.company', Mautic\LeadBundle\Model\CompanyModel::class);
+    $services->alias('mautic.lead.model.company_segment', Mautic\LeadBundle\Model\CompanySegmentModel::class);
     $services->alias('mautic.lead.model.import', Mautic\LeadBundle\Model\ImportModel::class);
     $services->alias('mautic.lead.model.tag', Mautic\LeadBundle\Model\TagModel::class);
     $services->alias('mautic.lead.model.company_report_data', Mautic\LeadBundle\Model\CompanyReportData::class);
