@@ -7,6 +7,6 @@ namespace Mautic\LeadBundle\Event;
 /**
  * The event is dispatched right before a company segment is persisted.
  */
-class CompanySegmentPreSave extends CompanySegmentPreSavedEvent
+class CompanySegmentPreSave extends CompanySegmentSaveEvent
 {
 }

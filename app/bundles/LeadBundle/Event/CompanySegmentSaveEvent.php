@@ -7,7 +7,10 @@ namespace Mautic\LeadBundle\Event;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\CompanySegment;
 
-abstract class CompanySegmentPreSavedEvent extends CompanySegmentEvent
+/**
+ * Base event for CompanySegment save operations (both pre and post save).
+ */
+abstract class CompanySegmentSaveEvent extends CompanySegmentEvent
 {
     public function __construct(CompanySegment $companySegment, EntityManagerInterface $entityManager, private bool $isNew)
     {

@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 /**
  * The event is dispatched right after a company segment is persisted.
  */
-class CompanySegmentPostSave extends CompanySegmentPreSavedEvent
+class CompanySegmentPostSave extends CompanySegmentSaveEvent
 {
     /**
      * @return array<mixed>

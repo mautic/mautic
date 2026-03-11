@@ -651,6 +651,26 @@ final class LeadEvents
     public const COMPANY_POST_MERGE = 'mautic.company_post_merge';
 
     /**
+     * The mautic.company_segment_pre_save event is dispatched right before a company segment is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentPreSave instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_PRE_SAVE = 'mautic.company_segment_pre_save';
+
+    /**
+     * The mautic.company_segment_post_save event is dispatched right after a company segment is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentPostSave instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_POST_SAVE = 'mautic.company_segment_post_save';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
