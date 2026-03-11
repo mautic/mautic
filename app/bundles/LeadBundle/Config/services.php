@@ -63,6 +63,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.repository.points_change_log', Mautic\LeadBundle\Entity\PointsChangeLogRepository::class);
     $services->alias('mautic.lead.repository.merged_records', Mautic\LeadBundle\Entity\MergeRecordRepository::class);
     $services->alias('mautic.lead.repository.field', Mautic\LeadBundle\Entity\LeadFieldRepository::class);
+    $services->alias('mautic.lead.repository.company_segment', Mautic\LeadBundle\Entity\CompanySegmentRepository::class);
+    $services->alias('mautic.lead.repository.companies_segments', Mautic\LeadBundle\Entity\CompaniesSegmentsRepository::class);
     $services->alias('mautic.company.deduper', Mautic\LeadBundle\Deduplicate\CompanyDeduper::class);
     $services->alias('mautic.lead.helper.contact_request_helper', Mautic\LeadBundle\Helper\ContactRequestHelper::class);
     $services->alias('mautic.lead.helper.dnc_formatter_helper', Mautic\LeadBundle\Helper\DncFormatterHelper::class);
