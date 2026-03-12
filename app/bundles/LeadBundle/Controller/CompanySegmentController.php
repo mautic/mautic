@@ -472,6 +472,186 @@ class CompanySegmentController extends AbstractStandardFormController
     /**
      * @return Response|array<string, mixed>
      */
+    public function deleteAction(Request $request, int $objectId): Response|array
+    {
+        \assert(null !== $this->security);
+        $model = $this->getModel(CompanySegmentModel::class);
+        \assert($model instanceof CompanySegmentModel);
+
+        $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+        $returnUrl = $this->generateUrl('mautic_company_segments_index', ['page' => $page]);
+        $flashes   = [];
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => [
+                'page'            => $page,
+                'translationBase' => $this->getTranslationBase(),
+                'permissionBase'  => $this->getPermissionBase(),
+            ],
+            'contentTemplate' => self::class.'::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_segments_index',
+                'mauticContent' => $this->getJsLoadMethodPrefix(),
+            ],
+        ];
+
+        if ('POST' === $request->getMethod()) {
+            $segment = $model->getEntity($objectId);
+
+            if (!$segment instanceof CompanySegment || null === $segment->getId()) {
+                return $this->notFoundRedirect($page, $objectId);
+            }
+
+            if (!$this->security->hasEntityAccess(
+                true, $this->getPermissionBase().':deleteother', $segment->getCreatedBy()
+            )
+            ) {
+                return $this->accessDenied();
+            }
+
+            if ($model->isLocked($segment)) {
+                return $this->isLocked($postActionVars, $segment, CompanySegmentModel::class);
+            }
+
+            $model->deleteEntity($segment);
+
+            $flashes[] = [
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.notice.deleted',
+                'msgVars' => [
+                    '%name%' => $segment->getName(),
+                    '%id%'   => $objectId,
+                ],
+            ];
+        }
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, [
+                'flashes' => $flashes,
+            ])
+        );
+    }
+
+    public function batchDeleteAction(Request $request): Response
+    {
+        \assert(null !== $this->security);
+        $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+        $returnUrl = $this->generateUrl('mautic_company_segments_index', ['page' => $page]);
+        $flashes   = [];
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => [
+                'page'            => $page,
+                'translationBase' => $this->getTranslationBase(),
+                'permissionBase'  => $this->getPermissionBase(),
+            ],
+            'contentTemplate' => self::class.'::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_segments_index',
+                'mauticContent' => $this->getJsLoadMethodPrefix(),
+            ],
+        ];
+
+        if ('POST' === $request->getMethod()) {
+            $model = $this->getModel(CompanySegmentModel::class);
+            \assert($model instanceof CompanySegmentModel);
+
+            $json = $request->query->get('ids', '{}');
+            \assert(is_string($json));
+            $ids = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+            if (!is_array($ids)) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid ids parameter.');
+            }
+            $ids = array_values(array_map('intval', array_filter(
+                $ids,
+                static fn ($v): bool => is_int($v) || (is_string($v) && ctype_digit($v))
+            )));
+
+            $deleteIds = [];
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $segment = $model->getEntity($objectId);
+
+                if (!$segment instanceof CompanySegment || null === $segment->getId()) {
+                    $flashes[] = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.company_segments.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ];
+                } elseif (!$this->security->hasEntityAccess(
+                    true, $this->getPermissionBase().':deleteother', $segment->getCreatedBy()
+                )) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($segment)) {
+                    $flashes[] = $this->isLocked($postActionVars, $segment, CompanySegmentModel::class, true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (0 !== count($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.company_segments.notice.batch_deleted',
+                    'msgVars' => [
+                        '%count%' => count($entities),
+                    ],
+                ];
+            }
+        }
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, [
+                'flashes' => $flashes,
+            ])
+        );
+    }
+
+    /**
+     * @return Response|array<string, mixed>
+     */
+    public function cloneAction(Request $request, int $objectId, bool $ignorePost = false): Response|array
+    {
+        $model = $this->getModel(CompanySegmentModel::class);
+        \assert($model instanceof CompanySegmentModel);
+        \assert(null !== $this->security);
+
+        $segment = $model->getEntity($objectId);
+
+        // set the page we came from
+        $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+
+        if (!$segment instanceof CompanySegment || null === $segment->getId()) {
+            return $this->notFoundRedirect($page, $objectId);
+        }
+
+        if (!$this->security->hasEntityAccess(
+            true, $this->getPermissionBase().':editother', $segment->getCreatedBy()
+        )) {
+            return $this->accessDenied();
+        }
+
+        $postActionVars = $this->getPostActionVars($request, $objectId);
+
+        return $this->createSegmentModifyResponse(
+            $request,
+            clone $segment,
+            $postActionVars,
+            $this->generateUrl('mautic_company_segments_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
+            $ignorePost
+        );
+    }
+
+    /**
+     * @return Response|array<string, mixed>
+     */
     private function notFoundRedirect(int $page, int $objectId): Response|array
     {
         $returnUrl = $this->generateUrl('mautic_company_segments_index', ['page' => $page]);

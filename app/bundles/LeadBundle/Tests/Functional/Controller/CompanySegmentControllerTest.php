@@ -239,6 +239,123 @@ class CompanySegmentControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testDeleteActionRemovesSegment(): void
+    {
+        $segment = $this->createCompanySegment('Delete Test Segment', 'delete-test');
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $segmentId = $segment->getId();
+        \assert(null !== $segmentId);
+
+        // Send POST request to delete
+        $this->client->request(Request::METHOD_POST, '/s/company-segments/delete/'.$segmentId);
+
+        // Should redirect to index
+        $this->assertTrue(
+            $this->client->getResponse()->isRedirect() || $this->client->getResponse()->isSuccessful(),
+            'Delete action should redirect or show success page'
+        );
+
+        // Verify segment was deleted from database
+        $this->em->clear();
+        $deletedSegment = $this->em->getRepository(CompanySegment::class)->find($segmentId);
+        $this->assertNull($deletedSegment, 'Segment should be deleted from database');
+    }
+
+    public function testDeleteActionReturnsErrorForNonExistentSegment(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/s/company-segments/delete/99999');
+
+        $this->assertTrue(
+            $this->client->getResponse()->isRedirect() || $this->client->getResponse()->isSuccessful(),
+            'Delete non-existent segment should redirect or show error'
+        );
+    }
+
+    public function testBatchDeleteActionRemovesMultipleSegments(): void
+    {
+        $segment1 = $this->createCompanySegment('Batch Delete 1', 'batch-delete-1');
+        $segment2 = $this->createCompanySegment('Batch Delete 2', 'batch-delete-2');
+        $segment3 = $this->createCompanySegment('Batch Delete 3', 'batch-delete-3');
+
+        $this->em->persist($segment1);
+        $this->em->persist($segment2);
+        $this->em->persist($segment3);
+        $this->em->flush();
+
+        $id1 = $segment1->getId();
+        $id2 = $segment2->getId();
+        $id3 = $segment3->getId();
+
+        \assert(null !== $id1 && null !== $id2 && null !== $id3);
+
+        // Send POST request with JSON ids in query string
+        $ids = json_encode([$id1, $id2, $id3]);
+        $this->client->request(Request::METHOD_POST, '/s/company-segments/batchDelete?ids='.$ids);
+
+        $this->assertTrue(
+            $this->client->getResponse()->isRedirect() || $this->client->getResponse()->isSuccessful(),
+            'Batch delete action should redirect or show success page'
+        );
+
+        // Verify all segments were deleted
+        $this->em->clear();
+        $this->assertNull($this->em->getRepository(CompanySegment::class)->find($id1));
+        $this->assertNull($this->em->getRepository(CompanySegment::class)->find($id2));
+        $this->assertNull($this->em->getRepository(CompanySegment::class)->find($id3));
+    }
+
+    public function testCloneActionCreatesNewSegment(): void
+    {
+        $original = $this->createCompanySegment('Original Segment', 'original-segment');
+        $original->setDescription('Original description');
+        $this->em->persist($original);
+        $this->em->flush();
+
+        $originalId = $original->getId();
+        \assert(null !== $originalId);
+
+        // Request the clone form
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/company-segments/clone/'.$originalId);
+
+        // Form should be displayed with original data
+        $this->assertResponseIsSuccessful('Clone form should return 200.');
+        $this->assertStringContainsString('Original Segment', $crawler->filter('[name="company_segments"]')->html());
+
+        // Submit the form with a new name
+        $form = $crawler->filter('[name="company_segments"]')->form([
+            'company_segments' => [
+                'name'  => 'Cloned Segment',
+                'alias' => 'cloned-segment',
+            ],
+        ]);
+
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful('Clone form submission should succeed.');
+
+        // Verify new segment was created in database
+        $this->em->clear();
+        $cloned = $this->em->getRepository(CompanySegment::class)->findOneBy(['alias' => 'cloned-segment']);
+        $this->assertInstanceOf(CompanySegment::class, $cloned);
+        $this->assertSame('Cloned Segment', $cloned->getName());
+        $this->assertSame('Original description', $cloned->getDescription());
+
+        // Original should still exist
+        $originalStillExists = $this->em->getRepository(CompanySegment::class)->find($originalId);
+        $this->assertInstanceOf(CompanySegment::class, $originalStillExists);
+    }
+
+    public function testCloneActionReturnsErrorForNonExistentSegment(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/company-segments/clone/99999');
+
+        $this->assertTrue(
+            $this->client->getResponse()->isRedirect() || $this->client->getResponse()->isSuccessful(),
+            'Clone non-existent segment should redirect or show error'
+        );
+    }
+
     private function loginAdminUser(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
