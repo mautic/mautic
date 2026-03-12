@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
 use Mautic\LeadBundle\Event\CompanySegmentEvent;
+use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
+use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Tests\Fixtures\CompanySegmentModelStub;
@@ -160,12 +162,22 @@ class CompanySegmentModelTest extends TestCase
             'post_save',
             CompanySegmentPostSave::class,
         ];
+
+        yield 'pre delete' => [
+            'pre_delete',
+            CompanySegmentPreDelete::class,
+        ];
+
+        yield 'post delete' => [
+            'post_delete',
+            CompanySegmentPostDelete::class,
+        ];
     }
 
     /**
      * @dataProvider provideExistingEvents
      */
-    public function testEventsCallsEventFromAction(string $action, string $eventClass, bool $isNew, bool $expectedIsNew): void
+    public function testEventsCallsEventFromAction(string $action, string $eventClass, ?bool $isNew, ?bool $expectedIsNew): void
     {
         $model = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
@@ -179,8 +191,14 @@ class CompanySegmentModelTest extends TestCase
 
         $companySegment = $this->createMock(CompanySegment::class);
 
-        $providedEvent = new $eventClass($companySegment, $em, $isNew);
-        $expectedEvent = new $eventClass($companySegment, $em, $expectedIsNew);
+        if (null !== $isNew) {
+            $providedEvent = new $eventClass($companySegment, $em, $isNew);
+            $expectedEvent = new $eventClass($companySegment, $em, $expectedIsNew);
+        } else {
+            $providedEvent = new $eventClass($companySegment, $em);
+            $expectedEvent = new $eventClass($companySegment, $em);
+            $isNew         = false; // To prevent type error. The class is anyway tested.
+        }
 
         \assert($providedEvent instanceof CompanySegmentEvent);
         \assert($expectedEvent instanceof CompanySegmentEvent);
@@ -209,6 +227,8 @@ class CompanySegmentModelTest extends TestCase
         yield 'pre_save_not_new' => ['pre_save', CompanySegmentPreSave::class, false, false];
         yield 'post_save_is_new' => ['post_save', CompanySegmentPostSave::class, true, true];
         yield 'post_save_not_new' => ['post_save', CompanySegmentPostSave::class, false, false];
+        yield 'pre_delete' => ['pre_delete', CompanySegmentPreDelete::class, null, null];
+        yield 'post_delete' => ['post_delete', CompanySegmentPostDelete::class, null, null];
     }
 
     public function testEventsCallsEventNotProvidedAndClassDoesNotExist(): void

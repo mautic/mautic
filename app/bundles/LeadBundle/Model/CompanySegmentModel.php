@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
+use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
+use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -75,6 +77,8 @@ class CompanySegmentModel extends FormModel
         $eventClass = match ($action) {
             'pre_save'      => CompanySegmentPreSave::class,
             'post_save'     => CompanySegmentPostSave::class,
+            'pre_delete'    => CompanySegmentPreDelete::class,
+            'post_delete'   => CompanySegmentPostDelete::class,
             default         => null,
         };
 

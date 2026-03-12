@@ -63,4 +63,64 @@ class CompanySegmentTest extends TestCase
         yield 'null value' => [null];
         yield 'empty string' => [''];
     }
+
+    public function testCloneResetsId(): void
+    {
+        $entity = new CompanySegment();
+        $entity->setName('Test Segment');
+        // Simulate a persisted entity by using reflection to set ID
+        $reflection = new \ReflectionClass($entity);
+        $property   = $reflection->getProperty('id');
+        $property->setAccessible(true);
+        $property->setValue($entity, 123);
+
+        $clonedEntity = clone $entity;
+
+        self::assertNull($clonedEntity->getId());
+        self::assertSame('Test Segment', $clonedEntity->getName());
+    }
+
+    public function testCloneResetsIsPublished(): void
+    {
+        $entity = new CompanySegment();
+        $entity->setIsPublished(true);
+
+        $clonedEntity = clone $entity;
+
+        self::assertFalse($clonedEntity->isPublished());
+    }
+
+    public function testCloneResetsAlias(): void
+    {
+        $entity = new CompanySegment();
+        $entity->setName('Test');
+        $entity->setAlias('test-alias');
+
+        $clonedEntity = clone $entity;
+
+        // After cloning, setAlias('') is called which falls back to the name
+        self::assertSame('Test', $clonedEntity->getAlias());
+        self::assertNotSame('test-alias', $clonedEntity->getAlias());
+    }
+
+    public function testCloneResetsLastBuiltDate(): void
+    {
+        $entity = new CompanySegment();
+        $entity->setLastBuiltDate(new \DateTime());
+
+        $clonedEntity = clone $entity;
+
+        self::assertNull($clonedEntity->getLastBuiltDate());
+    }
+
+    public function testCloneResetsCompaniesSegments(): void
+    {
+        $entity = new CompanySegment();
+        // companiesSegments should be a new empty collection after cloning
+
+        $clonedEntity = clone $entity;
+
+        self::assertCount(0, $clonedEntity->getCompaniesSegments());
+        self::assertNotSame($entity->getCompaniesSegments(), $clonedEntity->getCompaniesSegments());
+    }
 }

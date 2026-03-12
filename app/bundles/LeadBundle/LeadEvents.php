@@ -671,6 +671,26 @@ final class LeadEvents
     public const COMPANY_SEGMENT_POST_SAVE = 'mautic.company_segment_post_save';
 
     /**
+     * The mautic.company_segment_pre_delete event is dispatched right before a company segment is removed.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentPreDelete instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_PRE_DELETE = 'mautic.company_segment_pre_delete';
+
+    /**
+     * The mautic.company_segment_post_delete event is dispatched right after a company segment is removed.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentPostDelete instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_POST_DELETE = 'mautic.company_segment_post_delete';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
