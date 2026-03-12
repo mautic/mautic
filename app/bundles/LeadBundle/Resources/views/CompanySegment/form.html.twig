@@ -1,0 +1,53 @@
+{#
+  Variables
+    - form
+#}
+
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}leadlist{% endblock %}
+
+{% block headerTitle %}
+  {% if form.vars.data.id is not empty %}
+      {{- 'mautic.company_segments.header.edit'|trans({'%name%': form.vars.data.name}) -}}
+  {% else %}
+      {{- 'mautic.company_segments.header.new'|trans -}}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{{ form_start(form) }}
+<div class="box-layout">
+    <div class="col-md-9 bg-white height-auto">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="pa-md">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(form.name) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.alias) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.publicName) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(form.description) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 bg-white height-auto bdr-l">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_row(form.category) }}
+            {{ form_row(form.isPublished) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+{% endblock %}

@@ -18,9 +18,12 @@ use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
+use Mautic\LeadBundle\Form\Type\CompanySegmentType;
 use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -190,5 +193,21 @@ class CompanySegmentModel extends FormModel
             $count = $companySegment->getCompaniesSegments()->count();
             $this->companySegmentCountCacheHelper->setSegmentCompanyCount($segmentId, $count);
         }
+    }
+
+    /**
+     * @param array<mixed> $options
+     */
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    {
+        if (!$entity instanceof CompanySegment) {
+            throw new MethodNotAllowedHttpException(['CompanySegment'], 'Entity must be of class CompanySegment()');
+        }
+
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create(CompanySegmentType::class, $entity, $options);
     }
 }
