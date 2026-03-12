@@ -136,6 +136,14 @@ return [
                     'companyId' => '\d+',
                 ],
             ],
+            'mautic_company_segments_index' => [
+                'path'       => '/company-segments/{page}',
+                'controller' => 'Mautic\LeadBundle\Controller\CompanySegmentController::indexAction',
+            ],
+            'mautic_company_segments_action' => [
+                'path'       => '/company-segments/{objectAction}/{objectId}',
+                'controller' => 'Mautic\LeadBundle\Controller\CompanySegmentController::executeAction',
+            ],
             'mautic_segment_contacts' => [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\LeadBundle\Controller\ListController::contactsAction',
@@ -294,11 +302,23 @@ return [
                     'route'     => 'mautic_contact_index',
                     'priority'  => 80,
                 ],
-                'mautic.companies.menu.index' => [
-                    'route'     => 'mautic_company_index',
+                'mautic.companies.menu.root' => [
+                    'id'        => 'mautic_companies_root',
                     'iconClass' => 'ri-building-2-fill',
                     'access'    => ['lead:leads:viewother'],
                     'priority'  => 75,
+                ],
+                'mautic.companies.menu.index' => [
+                    'route'     => 'mautic_company_index',
+                    'parent'    => 'mautic.companies.menu.root',
+                    'access'    => ['lead:leads:viewother'],
+                    'priority'  => 100,
+                ],
+                'mautic.company_segments.menu.index' => [
+                    'route'     => 'mautic_company_segments_index',
+                    'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
+                    'parent'    => 'mautic.companies.menu.root',
+                    'priority'  => 90,
                 ],
                 'mautic.lead.list.menu.index' => [
                     'iconClass' => 'ri-pie-chart-fill',

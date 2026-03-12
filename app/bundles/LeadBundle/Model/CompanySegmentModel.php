@@ -4,14 +4,25 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\CompaniesSegments;
+use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
 use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
+use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -19,10 +30,35 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CompanySegmentModel extends FormModel
 {
+    public const PROPERTIES_FIELD = CompanySegment::TABLE_NAME;
+    public const SEARCH_COMMAND   = 'mautic.company_segments.searchcommand.list';
+
+    public function __construct(
+        private CompanySegmentCountCacheHelper $companySegmentCountCacheHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    }
+
     public function getRepository(): CompanySegmentRepository
     {
         $repository = $this->em->getRepository(CompanySegment::class);
         \assert($repository instanceof CompanySegmentRepository);
+
+        return $repository;
+    }
+
+    public function getCompaniesSegmentsRepository(): CompaniesSegmentsRepository
+    {
+        $repository = $this->em->getRepository(CompaniesSegments::class);
+        \assert($repository instanceof CompaniesSegmentsRepository);
 
         return $repository;
     }
@@ -121,5 +157,38 @@ class CompanySegmentModel extends FormModel
         }
 
         return parent::getEntity($id);
+    }
+
+    /**
+     * @param array<int> $segmentIds
+     *
+     * @return array<int, int>
+     */
+    public function getSegmentCompanyCountFromCache(array $segmentIds): array
+    {
+        $companyCounts = [];
+        foreach ($segmentIds as $segmentId) {
+            $companyCounts[$segmentId] = $this->companySegmentCountCacheHelper->getSegmentCompanyCount($segmentId);
+        }
+
+        return $companyCounts;
+    }
+
+    public function hasSegmentCompanyCountInCache(int $segmentId): bool
+    {
+        return $this->companySegmentCountCacheHelper->hasSegmentCompanyCount($segmentId);
+    }
+
+    /**
+     * @param array<int> $segmentIds
+     */
+    public function setSegmentCompanyCountInCache(array $segmentIds): void
+    {
+        foreach ($segmentIds as $segmentId) {
+            $companySegment = $this->getRepository()->find($segmentId);
+            \assert($companySegment instanceof CompanySegment);
+            $count = $companySegment->getCompaniesSegments()->count();
+            $this->companySegmentCountCacheHelper->setSegmentCompanyCount($segmentId, $count);
+        }
     }
 }

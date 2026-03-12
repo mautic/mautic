@@ -1,0 +1,57 @@
+{#
+Variables
+  - item
+#}
+{% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
+{% set listCommand = constant('Mautic\\LeadBundle\\Model\\CompanySegmentModel::SEARCH_COMMAND')|default('mautic.company_segments.searchcommand.list')|trans %}
+<tr>
+    <td>
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+            'item': item,
+            'templateButtons': {
+                'edit': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
+                'clone': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
+                'delete': securityHasEntityAccess(true, permissions['lead:lists:deleteother'], item.createdBy),
+            },
+            'routeBase': constant('Mautic\\LeadBundle\\Model\\CompanySegmentModel::PROPERTIES_FIELD'),
+            'langVar': 'company_segments',
+        }) }}
+    </td>
+    <td>
+        <div>
+            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'company_segments.company_segment'}) }}
+            {% if securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy) %}
+                <a href="{{ path('mautic_company_segments_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                    {{ item.name }} ({{ item.alias }})
+                </a>
+            {% else %}
+                {{ item.name }} ({{ item.alias }})
+            {% endif %}
+            {% if app.user.id != item.createdBy %}
+                <br/>
+                <span class="small">({{ item.createdByUser }})</span>
+            {% endif %}
+            {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="fa fa-fw fa-filter"></i>{% endif %}
+            {{ customContent('segment.name', mauticTemplateVars|default([])) }}
+        </div>
+        {% if item.description %}
+            <div class="text-muted mt-4">
+                <small>{{ item.description|purify }}</small>
+            </div>
+        {% endif %}
+    </td>
+    <td class="visible-md visible-lg">
+        <a class="label label-primary col-count"
+           data-id="{{ item.id }}"
+           href="{{ path('mautic_company_index', {'search': listCommand ~ ':' ~ item.alias}) }}"
+           data-toggle="ajax">{{ 'mautic.company_segments.companies_count'|trans({'%count%': companyCounts[item.id]}) }}</a>
+    </td>
+    <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
+        {% if item.getDateAdded %}{{ dateToDate(item.dateAdded) }}{% endif %}
+    </td>
+    <td class="visible-md visible-lg" title="{% if item.dateModified %}{{ dateToFullConcat(item.dateModified) }}{% endif %}">
+        {% if item.getDateModified %}{{ dateToDate(item.dateModified) }}{% endif %}
+    </td>
+    <td class="visible-md visible-lg">{{ item.createdByUser|purify }}</td>
+    <td class="visible-md visible-lg">{{ item.id }}</td>
+</tr>
