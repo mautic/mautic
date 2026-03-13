@@ -691,6 +691,16 @@ final class LeadEvents
     public const COMPANY_SEGMENT_POST_DELETE = 'mautic.company_segment_post_delete';
 
     /**
+     * The mautic.company_segment_change event is dispatched when a company is added to or removed from a company segment.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentChangeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_CHANGE = 'mautic.company_segment_change';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
