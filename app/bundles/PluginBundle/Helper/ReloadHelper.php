@@ -76,7 +76,7 @@ class ReloadHelper
 
                 // compare versions to see if an update is necessary
                 if ((empty($oldVersion) && !empty($plugin->getVersion())) || (!empty($oldVersion) && -1 === version_compare($oldVersion, $plugin->getVersion()))) {
-                    $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? [];
+                    $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? null;
                     $installedSchema = isset($installedPluginsSchemas[$pluginConfig['namespace']])
                         ? $installedPluginsSchemas[$allPlugins[$bundle]['namespace']] : null;
 
