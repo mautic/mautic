@@ -35,9 +35,23 @@ class ContactSegmentFilterFactory
      */
     public function getSegmentFilters(LeadList $leadList, array $batchLimiters = []): ContactSegmentFilters
     {
+        return $this->getFiltersFromArray($leadList->getFilters(), $batchLimiters);
+    }
+
+    /**
+     * Create ContactSegmentFilters from a raw filter array.
+     * Useful for Company Segments or other segment types that don't use LeadList entity.
+     *
+     * @param array<mixed>         $filters
+     * @param array<string, mixed> $batchLimiters
+     *
+     * @throws \Exception
+     */
+    public function getFiltersFromArray(array $filters, array $batchLimiters = []): ContactSegmentFilters
+    {
         $contactSegmentFilters = new ContactSegmentFilters();
 
-        $filters = $this->mergeFilters($leadList->getFilters());
+        $filters = $this->mergeFilters($filters);
         $event   = new LeadListMergeFiltersEvent($filters);
         $this->eventDispatcher->dispatch($event, LeadEvents::LIST_FILTERS_MERGE);
         $filters = $event->getFilters();

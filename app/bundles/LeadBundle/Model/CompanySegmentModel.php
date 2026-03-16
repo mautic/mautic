@@ -379,4 +379,16 @@ class CompanySegmentModel extends FormModel
 
         // do not detach company, as it may be used in the subsequent requests.
     }
+
+    /**
+     * Get list of company segments for use in filter choices.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getCompanySegments(string $alias = ''): array
+    {
+        $user = false === $this->security->isGranted($this->getPermissionBase().':viewother') ? $this->userHelper->getUser() : null;
+
+        return $this->getRepository()->getSegments($user, $alias);
+    }
 }

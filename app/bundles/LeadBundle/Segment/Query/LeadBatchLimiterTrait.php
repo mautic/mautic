@@ -7,26 +7,14 @@ namespace Mautic\LeadBundle\Segment\Query;
  */
 trait LeadBatchLimiterTrait
 {
+    use BaseBatchLimiterTrait;
+
     /**
      * @param array<string, mixed> $batchLimiters
      */
     private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
-
-        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->comparison($leadsTableAlias.'.'.$columnName, 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
-            );
-        } elseif (!empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->lte($leadsTableAlias.'.'.$columnName, (int) $batchLimiters['maxId'])
-            );
-        } elseif (!empty($batchLimiters['minId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->gte($leadsTableAlias.'.'.$columnName, (int) $batchLimiters['minId'])
-            );
-        }
+        $this->addMinMaxLimitersGeneric($queryBuilder, $batchLimiters, $tableName, $columnName);
     }
 
     /**
@@ -34,14 +22,7 @@ trait LeadBatchLimiterTrait
      */
     private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
     {
-        if (empty($batchLimiters['lead_id'])) {
-            return;
-        }
-
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
-        $queryBuilder->andWhere(
-            $queryBuilder->expr()->eq($leadsTableAlias.'.'.$columnName, (int) $batchLimiters['lead_id'])
-        );
+        $this->addEntityIdLimiterGeneric($queryBuilder, $batchLimiters, $tableName, $columnName, 'lead_id');
     }
 
     /**
@@ -49,20 +30,7 @@ trait LeadBatchLimiterTrait
      */
     private function addLeadListLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
     {
-        if (empty($batchLimiters['ids'])) {
-            return;
-        }
-
-        $ids = array_unique(array_filter(array_map(fn ($id): string => (string) (int) $id, (array) $batchLimiters['ids'])));
-
-        if (!$ids) {
-            return;
-        }
-
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
-        $queryBuilder->andWhere(
-            $queryBuilder->expr()->in($leadsTableAlias.'.'.$columnName, $ids)
-        );
+        $this->addEntityListLimiterGeneric($queryBuilder, $batchLimiters, $tableName, $columnName);
     }
 
     /**

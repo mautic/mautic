@@ -701,6 +701,36 @@ final class LeadEvents
     public const COMPANY_SEGMENT_CHANGE = 'mautic.company_segment_change';
 
     /**
+     * The mautic.company_segment_on_filtering event is dispatched when a company segment is being filtered.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentFilteringEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_ON_FILTERING = 'mautic.company_segment_on_filtering';
+
+    /**
+     * The mautic.company_segment_querybuilder_generated event is dispatched when a query builder for a company segment is generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentQueryBuilderGeneratedEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_QUERYBUILDER_GENERATED = 'mautic.company_segment_querybuilder_generated';
+
+    /**
+     * The mautic.company_segment_filters_choices_on_generate event is dispatched when the choices for company segment filters are generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE = 'mautic.company_segment_filters_choices_on_generate';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
