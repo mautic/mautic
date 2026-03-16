@@ -8,12 +8,16 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\EventListener\TypeOperatorSubscriber;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Model\StageModel;
@@ -73,6 +77,26 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $translator;
 
     /**
+     * @var MockObject&CompanySegmentModel
+     */
+    private MockObject $companySegmentModel;
+
+    /**
+     * @var MockObject&LeadFieldRepository
+     */
+    private MockObject $leadFieldRepository;
+
+    /**
+     * @var MockObject&FieldChoicesProviderInterface
+     */
+    private MockObject $fieldChoicesProvider;
+
+    /**
+     * @var MockObject&TypeOperatorProviderInterface
+     */
+    private MockObject $typeOperatorProvider;
+
+    /**
      * @var MockObject&FormInterface<FormInterface<mixed>>
      */
     private MockObject $form;
@@ -83,17 +107,21 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->listModel       = $this->createMock(ListModel::class);
-        $this->campaignModel   = $this->createMock(CampaignModel::class);
-        $this->emailModel      = $this->createMock(EmailModel::class);
-        $this->stageModel      = $this->createMock(StageModel::class);
-        $this->stageRepository = $this->createMock(StageRepository::class);
-        $this->categoryModel   = $this->createMock(CategoryModel::class);
-        $this->assetModel      = $this->createMock(AssetModel::class);
-        $this->translator      = $this->createMock(TranslatorInterface::class);
-        $this->form            = $this->createMock(FormInterface::class);
-        $this->subscriber      = new TypeOperatorSubscriber(
+        $this->leadModel             = $this->createMock(LeadModel::class);
+        $this->listModel             = $this->createMock(ListModel::class);
+        $this->campaignModel         = $this->createMock(CampaignModel::class);
+        $this->emailModel            = $this->createMock(EmailModel::class);
+        $this->stageModel            = $this->createMock(StageModel::class);
+        $this->stageRepository       = $this->createMock(StageRepository::class);
+        $this->categoryModel         = $this->createMock(CategoryModel::class);
+        $this->assetModel            = $this->createMock(AssetModel::class);
+        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $this->companySegmentModel   = $this->createMock(CompanySegmentModel::class);
+        $this->leadFieldRepository   = $this->createMock(LeadFieldRepository::class);
+        $this->fieldChoicesProvider  = $this->createMock(FieldChoicesProviderInterface::class);
+        $this->typeOperatorProvider  = $this->createMock(TypeOperatorProviderInterface::class);
+        $this->form                  = $this->createMock(FormInterface::class);
+        $this->subscriber            = new TypeOperatorSubscriber(
             $this->leadModel,
             $this->listModel,
             $this->campaignModel,
@@ -101,7 +129,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->stageModel,
             $this->categoryModel,
             $this->assetModel,
-            $this->translator
+            $this->translator,
+            $this->companySegmentModel,
+            $this->leadFieldRepository,
+            $this->fieldChoicesProvider,
+            $this->typeOperatorProvider
         );
 
         $this->stageModel->method('getRepository')->willReturn($this->stageRepository);
