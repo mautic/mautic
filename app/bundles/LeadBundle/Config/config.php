@@ -576,6 +576,17 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.repository.company_segment_query_builder' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\CompanySegmentQueryBuilder::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.repository.company',
+                    'mautic.lead.repository.company_segment',
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                    'monolog.logger.mautic',
+                ],
+            ],
             'mautic.lead.model.lead_segment_service' => [
                 'class'     => Mautic\LeadBundle\Segment\ContactSegmentService::class,
                 'arguments' => [
@@ -825,6 +836,23 @@ return [
             ],
             'mautic.lead.query.builder.channel_click.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.query.builder.company_segment_membership' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\CompanySegmentMembershipFilterQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'mautic.lead.repository.company_segment_query_builder',
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.query.builder.company_lead_segment_membership' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\CompanyLeadSegmentMembershipFilterQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
