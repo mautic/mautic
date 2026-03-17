@@ -163,6 +163,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.email.columns.dictionary' => [
+                'class'     => Mautic\EmailBundle\Services\EmailColumnsDictionary::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.email.helper.stats_collection' => [
                 'class'     => Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
                 'arguments' => [
@@ -323,6 +330,16 @@ return [
         'show_contact_preferred_channels'                                   => false,
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
+        'email_columns'                                                     => [
+            '0' => 'name',
+            '1' => 'category',
+            '2' => 'template',
+            '3' => 'stats',
+            '4' => 'dateAdded',
+            '5' => 'dateModified',
+            '6' => 'createdByUser',
+            '7' => 'id',
+        ],
         'disable_trackable_urls'                                            => false,
         'email_draft_enabled'                                               => false,
         'theme_email_default'                                               => 'blank',

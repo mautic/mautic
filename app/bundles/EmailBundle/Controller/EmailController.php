@@ -23,6 +23,7 @@ use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Services\EmailColumnsDictionary;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -47,7 +48,7 @@ class EmailController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailColumnsDictionary $emailColumnsDictionary, $page = 1)
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -235,6 +236,7 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'searchValue'    => $search,
                     'filters'        => $listFilters,
+                    'columns'        => $emailColumnsDictionary->getColumns(),
                     'items'          => $emails,
                     'totalItems'     => $count,
                     'page'           => $page,
