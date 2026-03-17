@@ -672,21 +672,24 @@ final class MauticReportBuilder implements ReportBuilderInterface
      *
      * @param string $expr The SQL expression to scan
      *
-     * @return array<array{int, int}> A list of [start, end] offsets
+     * @return array<int, array{int, int}> A list of [start, end] offsets
      */
     private function getSubqueryRanges(string $expr): array
     {
         $ranges = [];
         $length = strlen($expr);
+        $offset = 0;
 
-        for ($i = 0; $i < $length; ++$i) {
-            if ('(' === $expr[$i] && $this->isSubqueryStart($expr, $i + 1)) {
-                $end = $this->findClosingParenthesis($expr, $i);
-                if (null !== $end) {
-                    $ranges[] = [$i, $end];
-                    $i        = $end;
+        while ($offset < $length) {
+            if ('(' === $expr[$offset] && $this->isSubqueryStart($expr, $offset + 1)) {
+                $closingPos = $this->findMatchingParenthesis($expr, $offset);
+                if (null !== $closingPos) {
+                    $ranges[] = [$offset, $closingPos];
+                    $offset   = $closingPos + 1;
+                    continue;
                 }
             }
+            ++$offset;
         }
 
         return $ranges;
@@ -709,24 +712,25 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * Finds the offset of the matching closing parenthesis for an opening one,
      * accounting for nested parentheses.
      *
-     * @param string $expr The SQL expression
+     * @param string $expr    The SQL expression
+     * @param int    $openPos The position of the opening parenthesis
      *
      * @return int|null The position of the matching parenthesis, or null if unbalanced
      */
-    private function findClosingParenthesis(string $expr, int $startPos): ?int
+    private function findMatchingParenthesis(string $expr, int $openPos): ?int
     {
         $level  = 0;
         $length = strlen($expr);
 
-        for ($k = $startPos; $k < $length; ++$k) {
-            if ('(' === $expr[$k]) {
+        for ($i = $openPos; $i < $length; ++$i) {
+            if ('(' === $expr[$i]) {
                 ++$level;
-            } elseif (')' === $expr[$k]) {
+            } elseif (')' === $expr[$i]) {
                 --$level;
             }
 
             if (0 === $level) {
-                return $k;
+                return $i;
             }
         }
 
@@ -736,10 +740,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Filters out identifiers that are located within identified subquery ranges.
      *
-     * @param array $matches Matches from PREG_OFFSET_CAPTURE
-     * @param array $ranges  List of [start, end] subquery offsets
+     * @param array<int, array{0: string, 1: int}> $matches Matches from PREG_OFFSET_CAPTURE
+     * @param array<int, array{0: int, 1: int}>    $ranges  List of [start, end] subquery offsets
      *
-     * @return array<string> Columns outside of subqueries
+     * @return array<int, string> Columns outside of subqueries
      */
     private function filterTopLevelIdentifiers(array $matches, array $ranges): array
     {
@@ -753,6 +757,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return $filtered;
     }
 
+    /**
+     * @param int                               $pos    The position to check
+     * @param array<int, array{0: int, 1: int}> $ranges List of [start, end] subquery offsets
+     */
     private function isPositionInsideRanges(int $pos, array $ranges): bool
     {
         foreach ($ranges as [$start, $end]) {
