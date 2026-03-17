@@ -60,6 +60,12 @@ class AssetApiController extends CommonApiController
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
+        // During delete responses Doctrine may already de-reference the entity ID.
+        // In that case, generating a public slug is not possible and should be skipped.
+        if (null === $entity->getId()) {
+            return;
+        }
+
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
         );

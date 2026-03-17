@@ -3,6 +3,7 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -233,5 +234,26 @@ class AssetRepository extends CommonRepository
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();
+    }
+
+    /**
+     * Finds a single Asset entity by its canonical UUID slug.
+     *
+     * @throws NonUniqueResultException
+     * @throws EntityNotFoundException
+     */
+    public function findOneByUuid(string $slug): Asset
+    {
+        $asset = $this->createQueryBuilder('a')
+            ->where('a.uuid = :uuid')
+            ->setParameter('uuid', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$asset) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(Asset::class, ['uuid' => $slug]);
+        }
+
+        return $asset;
     }
 }

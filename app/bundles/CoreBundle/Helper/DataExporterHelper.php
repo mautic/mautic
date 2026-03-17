@@ -16,7 +16,7 @@ class DataExporterHelper
      *
      * @template T of object
      *
-     * @return array
+     * @return mixed[]|null
      */
     public function getDataForExport(
         $start,

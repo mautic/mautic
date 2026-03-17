@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -132,7 +134,7 @@ class Asset extends FormEntity implements UuidInterface
     private $tempName;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $alias;
@@ -224,7 +226,10 @@ class Asset extends FormEntity implements UuidInterface
 
         $builder->addIdColumns('title');
 
-        $builder->addField('alias', 'string');
+        $builder->createField('alias', 'string')
+            ->columnName('alias')
+            ->nullable()
+            ->build();
 
         $builder->createField('storageLocation', 'string')
             ->columnName('storage_location')
@@ -332,7 +337,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -536,12 +541,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Set alias.
-     *
-     * @param string $alias
-     *
-     * @return Asset
      */
-    public function setAlias($alias)
+    public function setAlias(?string $alias): self
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -551,10 +552,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Get alias.
-     *
-     * @return string
      */
-    public function getAlias()
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -951,7 +950,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Returns some file info.
      *
-     * @return array
+     * @return array<string, float|string|false|null>|string
      */
     public function getFileInfo()
     {
@@ -1164,11 +1163,14 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Load content of the file from it's path.
+     * Load the content of the file from its path.
      */
     public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
+        if (!file_exists($path)) {
+            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', $path));
+        }
 
         return file_get_contents($path);
     }
@@ -1203,6 +1205,10 @@ class Asset extends FormEntity implements UuidInterface
     {
         // Add a constraint to manage the file upload data
         $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
+        $metadata->addPropertyConstraint('remotePath', new Sequentially([
+            new Assert\Url(message: 'mautic.asset.validation.error.url'),
+            new SafeRemoteUrl(),
+        ]));
     }
 
     /**
@@ -1472,5 +1478,22 @@ class Asset extends FormEntity implements UuidInterface
     public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;
+    }
+
+    /**
+     * Returns the public slug for this asset.
+     *
+     * Uses `{uuid}` as the canonical slug.
+     * Falls back to `{id}:{alias}` for backward compatibility.
+     *
+     * @throws \LogicException if the asset has not been saved yet and has no ID
+     */
+    public function getSlug(): string
+    {
+        if (null === $this->id) {
+            throw new \LogicException('This asset must be saved before it can be used in a URL.');
+        }
+
+        return $this->uuid ?: $this->id.':'.$this->alias;
     }
 }

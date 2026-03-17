@@ -446,18 +446,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
         }
 
-        if (!(isset($parameters['onlyNames']) && $parameters['onlyNames'])) {
-            $labelExpression = '
-            case
-            when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
-            when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
-            when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
-            else comp.companyname
-            end
-            as label';
-        } else {
-            $labelExpression = $prefix.' companyname as label';
-        }
+        $labelExpression = $prefix.' companyname as label';
 
         $q->select($prefix.$valueColumn.' as value, '.$labelExpression)
             ->from($tableName, $alias)

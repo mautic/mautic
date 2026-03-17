@@ -132,6 +132,7 @@ class CampaignController extends AbstractStandardFormController
                 'campaign:campaigns:deleteother',
                 'campaign:campaigns:publishown',
                 'campaign:campaigns:publishother',
+                'campaign:imports:create',
             ],
             'RETURN_ARRAY'
         );
@@ -350,6 +351,7 @@ class CampaignController extends AbstractStandardFormController
         $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
         $this->processCampaignEvents($events, $hasCampaignLeads, $campaignLogCounts, $campaignLogCountsProcessed);
+        $this->addSchedulingLabels($events);
         $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
 
         $sourcesList     = $this->getCampaignModel()->getSourceLists();
@@ -419,125 +421,20 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, $page = null)
+    public function indexAction(Request $request, $page = null): Response
     {
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'campaign:campaigns:view',
-                'campaign:campaigns:viewown',
-                'campaign:campaigns:viewother',
-                'campaign:campaigns:create',
-                'campaign:campaigns:edit',
-                'campaign:campaigns:editown',
-                'campaign:campaigns:editother',
-                'campaign:campaigns:delete',
-                'campaign:campaigns:deleteown',
-                'campaign:campaigns:deleteother',
-                'campaign:campaigns:publish',
-                'campaign:campaigns:publishown',
-                'campaign:campaigns:publishother',
-                'campaign:imports:view',
-                'campaign:imports:create',
-            ],
-            'RETURN_ARRAY',
-            null,
-            true
-        );
+        return $this->indexStandard($request, $page);
+    }
 
-        if (!$permissions['campaign:campaigns:view']) {
-            return $this->accessDenied();
-        }
+    protected function getDefaultOrderColumn()
+    {
+        return 'dateModified';
+    }
 
-        $this->setListFilters();
-
-        $session = $request->getSession();
-        if (empty($page)) {
-            $page = $session->get('mautic.campaign.page', 1);
-        }
-
-        $limit = $session->get('mautic.campaign.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $request->get('search', $session->get('mautic.campaign.filter', ''));
-        $session->set('mautic.campaign.filter', $search);
-
-        $filter = ['string' => $search, 'force' => []];
-
-        $model = $this->getModel('campaign');
-
-        if (!$permissions[$this->getPermissionBase().':viewother']) {
-            $filter['force'][] = ['column' => 'c.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
-
-        $orderBy    = $session->get('mautic.campaign.orderby', 'c.dateModified');
-        $orderByDir = $session->get('mautic.campaign.orderbydir', $this->getDefaultOrderDirection());
-
-        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
-
-        if ($count && $count < ($start + 1)) {
-            // the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
-
-            $session->set('mautic.campaign.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_campaign_index', ['page' => $lastPage]);
-
-            return $this->postActionRedirect(
-                $this->getPostActionRedirectArguments(
-                    [
-                        'returnUrl'       => $returnUrl,
-                        'viewParameters'  => ['page' => $lastPage],
-                        'contentTemplate' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
-                        'passthroughVars' => [
-                            'mauticContent' => 'campaign',
-                        ],
-                    ],
-                    'index'
-                )
-            );
-        }
-
-        // set what page currently on so that we can return here after form submission/cancellation
-        $session->set('mautic.campaign.page', $page);
-
-        $viewParameters = [
-            'permissionBase'        => $this->getPermissionBase(),
-            'mauticContent'         => $this->getJsLoadMethodPrefix(),
-            'sessionVar'            => $this->getSessionBase(),
-            'actionRoute'           => $this->getActionRoute(),
-            'indexRoute'            => $this->getIndexRoute(),
-            'tablePrefix'           => $model->getRepository()->getTableAlias(),
-            'modelName'             => $this->getModelName(),
-            'translationBase'       => $this->getTranslationBase(),
-            'searchValue'           => $search,
-            'items'                 => $items,
-            'totalItems'            => $count,
-            'page'                  => $page,
-            'limit'                 => $limit,
-            'permissions'           => $permissions,
-            'tmpl'                  => $request->get('tmpl', 'index'),
-            'enableExportPermission'=> $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE'),
-        ];
-
-        return $this->delegateView(
-            $this->getViewArguments(
-                [
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => '@MauticCampaign/Campaign/list.html.twig',
-                    'passthroughVars' => [
-                        'mauticContent' => $this->getJsLoadMethodPrefix(),
-                        'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
-                    ],
-                ],
-                'index'
-            )
-        );
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 
     /**
@@ -1100,7 +997,12 @@ class CampaignController extends AbstractStandardFormController
     {
         switch ($action) {
             case 'index':
-                $args['viewParameters']['filters'] = $this->listFilters;
+                $args['viewParameters']['filters']     = $this->listFilters;
+                $args['viewParameters']['permissions'] = array_merge($args['viewParameters']['permissions'],
+                    $this->security->isGranted('campaign:imports:create', 'RETURN_ARRAY',
+                        null,
+                        true));
+                $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
                 break;
             case 'view':
                 /** @var Campaign $entity */
@@ -1156,7 +1058,6 @@ class CampaignController extends AbstractStandardFormController
         $campaignEvents = [];
 
         $existingEvents = $entity->getEvents()->toArray();
-        $translator     = $this->translator;
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events
             if (!empty($e->getDeleted())) {
@@ -1175,32 +1076,8 @@ class CampaignController extends AbstractStandardFormController
             unset($event['parent']);
             unset($event['log']);
 
-            $label = false;
-            switch ($event['triggerMode']) {
-                case 'interval':
-                    $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
-                        [
-                            '%number%' => $event['triggerInterval'],
-                            '%unit%'   => $translator->trans(
-                                'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                ['%count%' => $event['triggerInterval']]
-                            ),
-                        ]
-                    );
-                    break;
-                case 'date':
-                    $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.date.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
-                        [
-                            '%full%' => $this->dateHelper->toFull($event['triggerDate']),
-                            '%time%' => $this->dateHelper->toTime($event['triggerDate']),
-                            '%date%' => $this->dateHelper->toShort($event['triggerDate']),
-                        ]
-                    );
-                    break;
-            }
-            if ($label) {
+            $label = $this->getSchedulingLabel($event);
+            if (null !== $label) {
                 $event['label'] = $label;
             }
 
@@ -1336,6 +1213,56 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * @param array<int, array<string, mixed>> $events
+     */
+    private function addSchedulingLabels(array &$events): void
+    {
+        foreach ($events as &$event) {
+            $label = $this->getSchedulingLabel($event);
+            if (null !== $label) {
+                $event['label'] = $label;
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $event
+     */
+    private function getSchedulingLabel(array $event): ?string
+    {
+        switch ($event['triggerMode'] ?? null) {
+            case 'interval':
+                if (!empty($event['triggerInterval']) && !empty($event['triggerIntervalUnit'])) {
+                    return $this->translator->trans(
+                        'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
+                        [
+                            '%number%' => $event['triggerInterval'],
+                            '%unit%'   => $this->translator->trans(
+                                'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
+                                ['%count%' => $event['triggerInterval']]
+                            ),
+                        ]
+                    );
+                }
+                break;
+            case 'date':
+                if (!empty($event['triggerDate'])) {
+                    return $this->translator->trans(
+                        'mautic.campaign.connection.trigger.date.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
+                        [
+                            '%full%' => $this->dateHelper->toFull($event['triggerDate']),
+                            '%time%' => $this->dateHelper->toTime($event['triggerDate']),
+                            '%date%' => $this->dateHelper->toShort($event['triggerDate']),
+                        ]
+                    );
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    /**
      * @param array<int, array<int, string>> $campaignLogCounts
      *
      * @return array<int, array<int, string>>
@@ -1350,10 +1277,5 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $campaignLogCountsProcessed;
-    }
-
-    protected function getDefaultOrderDirection(): string
-    {
-        return 'DESC';
     }
 }

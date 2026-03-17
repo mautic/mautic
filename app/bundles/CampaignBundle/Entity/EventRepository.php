@@ -4,8 +4,10 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * @extends CommonRepository<Event>
@@ -142,6 +144,37 @@ class EventRepository extends CommonRepository
         }
 
         return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Fetch Email entities assigned to a campaign via email events.
+     *
+     * @return Email[]
+     */
+    public function getCampaignEmailEvents(int $campaignId): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+
+        return $qb
+            ->select('DISTINCT em')
+            ->from(Event::class, 'e')
+            ->innerJoin(
+                Email::class,
+                'em',
+                Expr\Join::WITH,
+                $qb->expr()->eq('em.id', 'e.channelId')
+            )
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('e.campaign', ':campaignId'),
+                    $qb->expr()->eq('e.channel', ':channel'),
+                    $qb->expr()->isNull('e.deleted')
+                )
+            )
+            ->setParameter('campaignId', $campaignId)
+            ->setParameter('channel', Event::CHANNEL_EMAIL)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

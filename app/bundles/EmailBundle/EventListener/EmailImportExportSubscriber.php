@@ -59,8 +59,8 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
         $emailData = [
             'id'                   => $email->getId(),
-            'translation_parent_id'=> $email->getTranslationParent(),
-            'variant_parent_id'    => $email->getVariantParent(),
+            'translation_parent_id'=> $email->getTranslationParent()?->getId(),
+            'variant_parent_id'    => $email->getVariantParent()?->getId(),
             'unsubscribeform_id'   => $email->getUnsubscribeForm()?->getId(),
             'preference_center_id' => $email->getPreferenceCenter()?->getId(),
             'is_published'         => $email->getIsPublished(),
