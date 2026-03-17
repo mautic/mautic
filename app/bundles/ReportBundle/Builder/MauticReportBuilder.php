@@ -653,82 +653,115 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $expr = preg_replace('/\s+AS\s+.*$/i', '', trim($selectExpression));
 
-        // Quick skip for pure constants/literals/simple aggregates with no columns
         if (preg_match(self::LITERAL_AGGREGATE_PATTERN, $expr)) {
             return [];
         }
 
-        // Find all top-level subquery ranges: (SELECT ... ) – including nested ones inside
+        $subqueryRanges = $this->getSubqueryRanges($expr);
+
+        $columns = [];
+        if (preg_match_all(self::IDENTIFIER_PATTERN, $expr, $matches, PREG_OFFSET_CAPTURE)) {
+            $columns = $this->filterTopLevelIdentifiers($matches[1], $subqueryRanges);
+        }
+
+        return array_values(array_unique($columns));
+    }
+
+    /**
+     * Scans the expression to find the start and end positions of all top-level subqueries.
+     *
+     * @param string $expr The SQL expression to scan
+     *
+     * @return array<array{int, int}> A list of [start, end] offsets
+     */
+    private function getSubqueryRanges(string $expr): array
+    {
         $ranges = [];
         $length = strlen($expr);
-        $i      = 0;
-        while ($i < $length) {
-            if ('(' === $expr[$i]) {
-                $j = $i + 1;
-                // Skip whitespace (spaces, tabs, newlines, etc.)
-                while ($j < $length && ctype_space($expr[$j])) {
-                    ++$j;
-                }
-                // Check for "SELECT" (case-insensitive)
-                if ($j + 6 <= $length && 'SELECT' === strtoupper(substr($expr, $j, 6))) {
-                    // This is a subquery – find the matching closing parenthesis
-                    $level = 1;
-                    $k     = $i + 1;
-                    while ($k < $length && $level > 0) {
-                        if ('(' === $expr[$k]) {
-                            ++$level;
-                        } elseif (')' === $expr[$k]) {
-                            --$level;
-                        }
-                        ++$k;
-                    }
-                    if (0 === $level) {
-                        // Valid subquery range: from opening ( to closing )
-                        $ranges[] = [$i, $k - 1];
-                        $i        = $k; // Skip past the closing parenthesis
-                        continue;
-                    }
-                    // Unbalanced – ignore and continue searching
+
+        for ($i = 0; $i < $length; ++$i) {
+            if ('(' === $expr[$i] && $this->isSubqueryStart($expr, $i + 1)) {
+                $end = $this->findClosingParenthesis($expr, $i);
+                if (null !== $end) {
+                    $ranges[] = [$i, $end];
+                    $i        = $end;
                 }
             }
-            ++$i;
         }
 
-        // Extract potential qualified columns with their positions
-        $potentialMatches = [];
-        if (preg_match_all(self::IDENTIFIER_PATTERN, $expr, $matches, PREG_OFFSET_CAPTURE)) {
-            $potentialMatches = $matches[1]; // [[column_string, offset], ...]
-        }
+        return $ranges;
+    }
 
-        // Filter out any matches that fall inside a subquery range
-        $columns = [];
-        foreach ($potentialMatches as $match) {
-            $col = $match[0];
-            $pos = $match[1];
+    /**
+     * Determines if the content following an opening parenthesis is a SELECT statement.
+     *
+     * @param string $expr   The SQL expression
+     * @param int    $offset The position immediately after the opening parenthesis
+     */
+    private function isSubqueryStart(string $expr, int $offset): bool
+    {
+        $remaining = substr($expr, $offset);
 
-            $isInsideSubquery = false;
-            foreach ($ranges as $range) {
-                // If the start of the match is inside any subquery range → skip it
-                if ($pos >= $range[0] && $pos <= $range[1]) {
-                    $isInsideSubquery = true;
-                    break;
-                }
+        return (bool) preg_match('/^\s*SELECT/i', $remaining);
+    }
+
+    /**
+     * Finds the offset of the matching closing parenthesis for an opening one,
+     * accounting for nested parentheses.
+     *
+     * @param string $expr The SQL expression
+     *
+     * @return int|null The position of the matching parenthesis, or null if unbalanced
+     */
+    private function findClosingParenthesis(string $expr, int $startPos): ?int
+    {
+        $level  = 0;
+        $length = strlen($expr);
+
+        for ($k = $startPos; $k < $length; ++$k) {
+            if ('(' === $expr[$k]) {
+                ++$level;
+            } elseif (')' === $expr[$k]) {
+                --$level;
             }
 
-            if (!$isInsideSubquery) {
-                $columns[] = $col;
+            if (0 === $level) {
+                return $k;
             }
         }
 
-        // Unique while preserving first-occurrence order
-        $uniqueColumns = [];
-        foreach ($columns as $col) {
-            if (!in_array($col, $uniqueColumns, true)) {
-                $uniqueColumns[] = $col;
+        return null;
+    }
+
+    /**
+     * Filters out identifiers that are located within identified subquery ranges.
+     *
+     * @param array $matches Matches from PREG_OFFSET_CAPTURE
+     * @param array $ranges  List of [start, end] subquery offsets
+     *
+     * @return array<string> Columns outside of subqueries
+     */
+    private function filterTopLevelIdentifiers(array $matches, array $ranges): array
+    {
+        $filtered = [];
+        foreach ($matches as [$col, $pos]) {
+            if (!$this->isPositionInsideRanges($pos, $ranges)) {
+                $filtered[] = $col;
             }
         }
 
-        return $uniqueColumns;
+        return $filtered;
+    }
+
+    private function isPositionInsideRanges(int $pos, array $ranges): bool
+    {
+        foreach ($ranges as [$start, $end]) {
+            if ($pos >= $start && $pos <= $end) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
