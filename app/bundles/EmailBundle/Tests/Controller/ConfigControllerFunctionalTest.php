@@ -10,6 +10,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testEmailColumnsArePreselectedByDefault(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $form = $crawler->selectButton('config[buttons][save]')->form();
+
+        Assert::assertSame(
+            ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
+            $form['config[emailconfig][email_columns]']->getValue()
+        );
+    }
+
     public function testValuesAreEscapedProperly(): void
     {
         $data = [

@@ -27,7 +27,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigType extends AbstractType
 {
-    public const MINIFY_EMAIL_HTML = 'minify_email_html';
+    public const MINIFY_EMAIL_HTML      = 'minify_email_html';
+    private const DEFAULT_EMAIL_COLUMNS = ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
 
     public function __construct(
         private TranslatorInterface $translator,
@@ -355,7 +356,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $formModifier = static function (FormInterface $form, $currentColumns): void {
+        $buildEmailColumnsField = static function (FormInterface $form, array $currentColumns, array $extraOptions = []): void {
             $order        = [];
             $orderColumns = [];
             if (!empty($currentColumns)) {
@@ -363,45 +364,46 @@ class ConfigType extends AbstractType
                 $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
             }
 
+            $options = [
+                'label'       => 'mautic.config.tab.columns',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'         => 'form-control multiselect',
+                    'data-sortable' => 'true',
+                    'data-order'    => $order,
+                ],
+                'multiple'    => true,
+                'required'    => true,
+                'expanded'    => false,
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.core.value.required']
+                    ),
+                ],
+            ] + $extraOptions;
+
             $form->add(
                 'email_columns',
                 EmailColumnsType::class,
-                [
-                    'label'       => 'mautic.config.tab.columns',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => [
-                        'class'         => 'form-control multiselect',
-                        'data-sortable' => 'true',
-                        'data-order'    => $order,
-                    ],
-                    'multiple'    => true,
-                    'required'    => true,
-                    'expanded'    => false,
-                    'constraints' => [
-                        new NotBlank(
-                            ['message' => 'mautic.core.value.required']
-                        ),
-                    ],
-                    'data' => array_flip($orderColumns),
-                ]
+                $options
             );
         };
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            static function (FormEvent $event) use ($formModifier): void {
+            static function (FormEvent $event) use ($buildEmailColumnsField): void {
                 $data    = $event->getData();
-                $columns = $data['email_columns'] ?? [];
-                $formModifier($event->getForm(), $columns);
+                $columns = $data['email_columns'] ?? self::DEFAULT_EMAIL_COLUMNS;
+                $buildEmailColumnsField($event->getForm(), $columns, ['data' => $columns]);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            static function (FormEvent $event) use ($formModifier): void {
+            static function (FormEvent $event) use ($buildEmailColumnsField): void {
                 $data    = $event->getData();
                 $columns = $data['email_columns'] ?? [];
-                $formModifier($event->getForm(), $columns);
+                $buildEmailColumnsField($event->getForm(), $columns);
             }
         );
 
