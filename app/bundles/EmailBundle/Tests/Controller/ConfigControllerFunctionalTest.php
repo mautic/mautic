@@ -31,6 +31,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $values = $form->getPhpValues();
 
         $values['config']['leadconfig']['contact_columns']                              = ['name', 'email', 'id']; // required
+        $values['config']['emailconfig']['email_columns']                               = ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
         $values['config']['emailconfig']['mailer_dsn']['scheme']                        = $data['scheme'];
         $values['config']['emailconfig']['mailer_dsn']['host']                          = $data['host'];
         $values['config']['emailconfig']['mailer_dsn']['port']                          = $data['port'];
@@ -83,6 +84,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $form->setValues($data + [
             'config[leadconfig][contact_columns]' => ['name', 'email', 'id'], // required
+            'config[emailconfig][email_columns]'  => ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
         ]);
 
         // check if there is the given validation error
