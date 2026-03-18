@@ -55,4 +55,18 @@
         {% endif %}
       {% endif %}
     </div>
+    {% if item.isFailed == 0 and item.isRead == 0 %}
+
+    <div class="mt-sm">
+        <a href="{{ path('mautic_email_test_open', {'objectId': item.id}) }}"
+           class="btn btn-xs btn-default"
+           data-toggle="confirmation"
+           data-message="{{ 'mautic.email.timeline.test_open.confirm'|trans }}"
+           data-confirm-text="{{ 'mautic.core.yes'|trans|e }}" data-confirm-callback="executeAction"
+           data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
+            <i class="ri-eye-line"></i>
+            {{ 'mautic.email.timeline.test_open'|trans }}
+        </a>
+    </div>
+    {% endif %}
 {% endif %}

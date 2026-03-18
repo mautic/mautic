@@ -23,6 +23,14 @@ return [
                 'path'       => '/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailMapStatsController::viewAction',
             ],
+            'mautic_email_test_open' => [
+                'path'         => '/emails/testopen/{objectId}',
+                'controller'   => 'Mautic\EmailBundle\Controller\EmailController::testOpenAction',
+                'methods'      => ['GET'],
+                'requirements' => [
+                    'objectId' => '\d+',
+                ],
+            ],
             'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::executeAction',
