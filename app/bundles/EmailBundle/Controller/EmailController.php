@@ -1717,3 +1717,60 @@ class EmailController extends FormController
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 }
+    /**
+     * Simulates an email open for the given Stat row.
+     *
+     * Calls EmailModel::hitEmail() with the Stat entity directly (same as
+     * the tracking pixel), so all downstream events fire: campaigns, points,
+     * webhooks, open_details logging.
+     *
+     * Route:      GET /emails/testopen/{objectId}
+     * Permission: email:emails:edit
+     */
+    public function testOpenAction(int $objectId): \Symfony\Component\HttpFoundation\Response
+    {
+        if (!$this->security->isGranted('email:emails:edit')) {
+            return $this->accessDenied();
+        }
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model = $this->getModel('email');
+
+        /** @var \Mautic\EmailBundle\Entity\Stat|null $stat */
+        $stat = $model->getStatRepository()->getEntity($objectId);
+
+        if (!$stat || !$stat->getLead()) {
+            return $this->notFound();
+        }
+
+        $leadId    = $stat->getLead()->getId();
+        $returnUrl = $this->generateUrl('mautic_contact_action', [
+            'objectAction' => 'view',
+            'objectId'     => $leadId,
+        ]);
+
+        if ($stat->getIsRead()) {
+            return $this->postActionRedirect([
+                'returnUrl' => $returnUrl,
+                'flashes'   => [[
+                    'type' => 'notice',
+                    'msg'  => 'mautic.email.timeline.test_open.already_read',
+                ]],
+            ]);
+        }
+
+        $fakeRequest = new \Symfony\Component\HttpFoundation\Request();
+        $fakeRequest->server->set('REMOTE_ADDR', '127.0.0.1');
+        $fakeRequest->server->set('HTTP_USER_AGENT', 'Mautic/TestOpen');
+
+        $model->hitEmail($stat, $fakeRequest, false, false);
+
+        return $this->postActionRedirect([
+            'returnUrl' => $returnUrl,
+            'flashes'   => [[
+                'type' => 'notice',
+                'msg'  => 'mautic.email.timeline.test_open.success',
+            ]],
+        ]);
+    }
+}
