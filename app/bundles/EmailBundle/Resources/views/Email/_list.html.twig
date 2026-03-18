@@ -1,8 +1,88 @@
+{% set columnHeaderMeta = {
+    'name': {
+        'orderBy': 'e.name',
+        'class': 'col-email-name'
+    },
+    'subject': {
+        'orderBy': 'e.subject',
+        'class': 'visible-md visible-lg col-email-subject'
+    },
+    'description': {
+        'orderBy': 'e.description',
+        'class': 'visible-lg col-email-description'
+    },
+    'emailType': {
+        'orderBy': 'e.emailType',
+        'class': 'visible-md visible-lg col-email-type'
+    },
+    'language': {
+        'orderBy': 'e.language',
+        'class': 'visible-md visible-lg col-email-language'
+    },
+    'category': {
+        'orderBy': 'c.title',
+        'class': 'visible-md visible-lg col-email-category'
+    },
+    'template': {
+        'orderBy': 'e.template',
+        'class': 'visible-md visible-lg col-email-template'
+    },
+    'isPublished': {
+        'orderBy': 'e.isPublished',
+        'class': 'visible-md visible-lg col-email-published'
+    },
+    'dateAdded': {
+        'orderBy': 'e.dateAdded',
+        'class': 'visible-lg col-email-dateAdded'
+    },
+    'dateModified': {
+        'orderBy': 'e.dateModified',
+        'defaultDir': 'DESC',
+        'default': true,
+        'class': 'visible-lg col-email-dateModified'
+    },
+    'publishUp': {
+        'orderBy': 'e.publishUp',
+        'class': 'visible-lg col-email-publishUp'
+    },
+    'publishDown': {
+        'orderBy': 'e.publishDown',
+        'class': 'visible-lg col-email-publishDown'
+    },
+    'createdByUser': {
+        'orderBy': 'e.createdByUser',
+        'class': 'visible-lg col-email-createdByUser'
+    },
+    'id': {
+        'orderBy': 'e.id',
+        'class': 'visible-md visible-lg col-email-id'
+    }
+} %}
+
 {% if items|length > 0 %}
     <div class="table-responsive">
         <table class="table table-hover email-list">
             <thead>
-                {{ include('@MauticEmail/Email/_list_header.html.twig', {'columns': columns}) }}
+                <tr>
+                    {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true'
+                    }) -}}
+
+                    {% for column, label in columns %}
+                        {% if 'stats' == column %}
+                            <th class="visible-sm visible-md visible-lg col-email-stats">{{ label }}</th>
+                        {% elseif columnHeaderMeta[column] is defined %}
+                            {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                                'sessionVar': 'email',
+                                'orderBy': columnHeaderMeta[column].orderBy,
+                                'defaultDir': columnHeaderMeta[column].defaultDir|default(null),
+                                'default': columnHeaderMeta[column].default|default(false),
+                                'text': label,
+                                'class': columnHeaderMeta[column].class,
+                            }) -}}
+                        {% endif %}
+                    {% endfor %}
+                </tr>
             </thead>
             <tbody>
                 {% for item in items %}
