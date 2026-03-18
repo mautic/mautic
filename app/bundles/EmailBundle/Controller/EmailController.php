@@ -1721,7 +1721,7 @@ class EmailController extends FormController
 
         $newFilters = [];
         foreach ($decodedFilters as $updatedFilter) {
-            [$column, $filter] = explode(':', $updatedFilter);
+            [$column, $filter]     = explode(':', $updatedFilter);
             $newFilters[$column][] = $filter;
         }
 
@@ -1729,9 +1729,9 @@ class EmailController extends FormController
     }
 
     /**
-     * @param array<string, list<string>> $currentFilters
+     * @param array<string, list<string>>                                                                             $currentFilters
      * @param array{filters: array{placeholder: string, multiple: bool, groups: array<string, array<string, mixed>>}} $listFilters
-     * @param array{string: string, force: array<int, array<string, mixed>>} $filter
+     * @param array{string: string, force: array<int, array<string, mixed>>}                                          $filter
      */
     private function applyCurrentFilters(array $currentFilters, array &$listFilters, array &$filter): bool
     {
