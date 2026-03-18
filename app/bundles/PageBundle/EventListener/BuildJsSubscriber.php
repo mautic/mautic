@@ -185,6 +185,22 @@ class BuildJsSubscriber implements EventSubscriberInterface
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
+
+        $ghostJs = <<<'GHOSTJS'
+(function() {
+    document.addEventListener('mauticPageEventDelivered', function(e) {
+        var response = e.detail && e.detail.response;
+        if (!response || !response.isAdmin) return;
+        if (document.getElementById('mautic-admin-ghost')) return;
+        var el = document.createElement('div');
+        el.id = 'mautic-admin-ghost';
+        el.style.cssText = 'position:fixed;bottom:20px;left:20px;z-index:99999;background:rgba(0,0,0,0.7);color:#fff;padding:8px 14px;border-radius:8px;font-family:sans-serif;font-size:13px;display:flex;align-items:center;gap:8px;pointer-events:none;';
+        el.innerHTML = '<span style="font-size:20px">👻</span><span>Tracking events disabled</span>';
+        document.body.appendChild(el);
+    });
+})();
+GHOSTJS;
+        $event->appendJs($ghostJs, 'Mautic Admin Ghost Indicator');
     }
 
     public function onBuildJsForVideo(BuildJsEvent $event): void

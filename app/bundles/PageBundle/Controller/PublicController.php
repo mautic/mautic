@@ -424,7 +424,7 @@ class PublicController extends AbstractFormController
             ]
         );
         if (!$this->security->isAnonymous()) {
-            return $notSuccessResponse;
+            return new \Symfony\Component\HttpFoundation\JsonResponse(['success' => 0, 'isAdmin' => true]);
         }
 
         /** @var PageModel $model */
