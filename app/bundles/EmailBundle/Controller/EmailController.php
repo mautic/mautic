@@ -32,6 +32,7 @@ use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
@@ -43,29 +44,16 @@ class EmailController extends FormController
 
     private bool $invalidHtmlError = false;
 
-    /**
-     * @param int $page
-     *
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailColumnsDictionary $emailColumnsDictionary, $page = 1)
-    {
+    public function indexAction(
+        Request $request,
+        EmailModel $model,
+        EmailConfig $emailConfig,
+        ThemeHelper $themeHelper,
+        EmailColumnsDictionary $emailColumnsDictionary,
+        int $page = 1,
+    ): JsonResponse|Response {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'email:emails:viewown',
-                'email:emails:viewother',
-                'email:emails:create',
-                'email:emails:editown',
-                'email:emails:editother',
-                'email:emails:deleteown',
-                'email:emails:deleteother',
-                'email:emails:publishown',
-                'email:emails:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissions    = $this->getEmailPermissions();
 
         if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
             return $this->accessDenied();
@@ -73,24 +61,12 @@ class EmailController extends FormController
 
         $this->setListFilters();
 
-        $session = $request->getSession();
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
-                'multiple'    => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
+        $session     = $request->getSession();
+        $listFilters = $this->getListFilters($themeHelper);
 
         // set limits
         $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        $start = $this->getStart($page, $limit);
 
         $search = $request->get('search', $session->get('mautic.email.filter', ''));
         $session->set('mautic.email.filter', $search);
@@ -106,90 +82,16 @@ class EmailController extends FormController
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        // retrieve a list of Lead Lists
-        $leadListModel = $this->getModel('lead.list');
-        \assert($leadListModel instanceof ListModel);
-        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $leadListModel->getUserLists(),
-            'prefix'  => 'list',
-        ];
-
-        // retrieve a list of themes
-        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $themeHelper->getInstalledThemes('email'),
-            'prefix'  => 'theme',
-        ];
-
         $currentFilters = $session->get('mautic.email.list_filters', []);
         $updatedFilters = $request->get('filters', false);
-        $ignoreListJoin = true;
 
         if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filter] = explode(':', $updatedFilter);
-
-                    $newFilters[$column][] = $filter;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
+            $currentFilters = $this->getUpdatedFilters($updatedFilters);
         }
+
         $session->set('mautic.email.list_filters', $currentFilters);
 
-        if (!empty($currentFilters)) {
-            $listIds = $catIds = $templates = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                    case 'theme':
-                        $key = 'themes';
-                        break;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $listIds[] = (int) $fltr;
-                            break;
-                        case 'category':
-                            $catIds[] = (int) $fltr;
-                            break;
-                        case 'theme':
-                            $templates[] = $fltr;
-                            break;
-                    }
-                }
-            }
-
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
-                $ignoreListJoin    = false;
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-
-            if (!empty($templates)) {
-                $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
-            }
-        }
+        $ignoreListJoin = $this->applyCurrentFilters($currentFilters, $listFilters, $filter);
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
@@ -205,29 +107,10 @@ class EmailController extends FormController
             ]
         );
 
-        $count = count($emails);
-        if ($count && $count < ($start + 1)) {
-            // the number of entities are now less then the current page so redirect to the last page
-            if (1 === $count) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($count / $limit)) ?: 1;
-            }
-
-            $session->set('mautic.email.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $lastPage]);
-
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_email_index',
-                        'mauticContent' => 'email',
-                    ],
-                ]
-            );
+        $count    = count($emails);
+        $lastPage = $this->getLastPageIfCurrentPageIsOutOfBounds($count, $start, $limit);
+        if (null !== $lastPage) {
+            return $this->getIndexRedirectResponse($session, $lastPage);
         }
         $session->set('mautic.email.page', $page);
 
@@ -1769,6 +1652,175 @@ class EmailController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function getEmailPermissions(): array
+    {
+        return $this->security->isGranted(
+            [
+                'email:emails:viewown',
+                'email:emails:viewother',
+                'email:emails:create',
+                'email:emails:editown',
+                'email:emails:editother',
+                'email:emails:deleteown',
+                'email:emails:deleteother',
+                'email:emails:publishown',
+                'email:emails:publishother',
+            ],
+            'RETURN_ARRAY'
+        );
+    }
+
+    /**
+     * @return array{filters: array{placeholder: string, multiple: bool, groups: array<string, array<string, mixed>>}}
+     */
+    private function getListFilters(ThemeHelper $themeHelper): array
+    {
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [],
+            ],
+        ];
+
+        $leadListModel = $this->getModel('lead.list');
+        \assert($leadListModel instanceof ListModel);
+
+        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
+            'options' => $leadListModel->getUserLists(),
+            'prefix'  => 'list',
+        ];
+
+        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
+            'options' => $themeHelper->getInstalledThemes('email'),
+            'prefix'  => 'theme',
+        ];
+
+        return $listFilters;
+    }
+
+    private function getStart(int $page, int $limit): int
+    {
+        return max(0, (1 === $page) ? 0 : (($page - 1) * $limit));
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    private function getUpdatedFilters(string $updatedFilters): array
+    {
+        $decodedFilters = json_decode($updatedFilters, true);
+        if (empty($decodedFilters)) {
+            return [];
+        }
+
+        $newFilters = [];
+        foreach ($decodedFilters as $updatedFilter) {
+            [$column, $filter] = explode(':', $updatedFilter);
+            $newFilters[$column][] = $filter;
+        }
+
+        return $newFilters;
+    }
+
+    /**
+     * @param array<string, list<string>> $currentFilters
+     * @param array{filters: array{placeholder: string, multiple: bool, groups: array<string, array<string, mixed>>}} $listFilters
+     * @param array{string: string, force: array<int, array<string, mixed>>} $filter
+     */
+    private function applyCurrentFilters(array $currentFilters, array &$listFilters, array &$filter): bool
+    {
+        $ignoreListJoin = true;
+
+        if (empty($currentFilters)) {
+            return $ignoreListJoin;
+        }
+
+        $listIds   = [];
+        $catIds    = [];
+        $templates = [];
+
+        foreach ($currentFilters as $type => $typeFilters) {
+            $groupKey = $this->getListFilterGroupKey($type);
+            if (null !== $groupKey) {
+                $listFilters['filters']['groups'][$groupKey]['values'] = $typeFilters;
+            }
+
+            foreach ($typeFilters as $currentFilter) {
+                switch ($type) {
+                    case 'list':
+                        $listIds[] = (int) $currentFilter;
+                        break;
+                    case 'category':
+                        $catIds[] = (int) $currentFilter;
+                        break;
+                    case 'theme':
+                        $templates[] = $currentFilter;
+                        break;
+                }
+            }
+        }
+
+        if (!empty($listIds)) {
+            $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+            $ignoreListJoin    = false;
+        }
+
+        if (!empty($catIds)) {
+            $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
+        }
+
+        if (!empty($templates)) {
+            $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
+        }
+
+        return $ignoreListJoin;
+    }
+
+    private function getListFilterGroupKey(string $type): ?string
+    {
+        return match ($type) {
+            'list'     => 'mautic.core.filter.lists',
+            'category' => 'mautic.core.filter.categories',
+            'theme'    => 'mautic.core.filter.themes',
+            default    => null,
+        };
+    }
+
+    private function getLastPageIfCurrentPageIsOutOfBounds(int $count, int $start, int $limit): ?int
+    {
+        if (!$count || $count >= ($start + 1)) {
+            return null;
+        }
+
+        if (1 === $count) {
+            return 1;
+        }
+
+        return (int) ((floor($count / $limit)) ?: 1);
+    }
+
+    private function getIndexRedirectResponse(SessionInterface $session, int $lastPage): JsonResponse|Response
+    {
+        $session->set('mautic.email.page', $lastPage);
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $lastPage]);
+
+        return $this->postActionRedirect(
+            [
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $lastPage],
+                'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_email_index',
+                    'mauticContent' => 'email',
+                ],
+            ]
+        );
     }
 
     private function restoreNullifiedFieldsDuringClone(Email $clonedEmail, Email $cloningEmail): void
