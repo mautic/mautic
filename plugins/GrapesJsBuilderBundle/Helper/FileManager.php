@@ -220,33 +220,36 @@ class FileManager
      */
     private function getFileInfo(SplFileInfo $file): ?array
     {
-        $filePath = $this->getCompleteFilePath($file->getRelativePathname());
-        $size     = @getimagesize($filePath);
+        $filePath  = $this->getCompleteFilePath($file->getRelativePathname());
+        $size      = @getimagesize($filePath);
+        $extension = strtolower($file->getExtension());
 
         if ($size) {
-            return [
+            $info = [
                 'src'    => $this->getFullUrl($file->getRelativePathname()),
                 'width'  => $size[0],
                 'height' => $size[1],
                 'type'   => 'image',
             ];
-        } elseif (strtolower($file->getExtension()) === 'svg') {
+        } elseif ($extension === 'svg') {
             // Handle SVG files by extracting dimensions from the XML
             $svgDimensions = $this->getSvgDimensions($filePath);
-            return [
+            $info = [
                 'src'    => $this->getFullUrl($file->getRelativePathname()),
                 'width'  => $svgDimensions['width'] ?? 0,
                 'height' => $svgDimensions['height'] ?? 0,
                 'type'   => 'image',
             ];
-        } elseif (in_array($file->getExtension(), ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
-            return [
+        } elseif (in_array($extension, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
+            $info = [
                 'src'  => $this->getFullUrl($file->getRelativePathname()),
                 'type' => 'document',
             ];
+        } else {
+            $info = null;
         }
 
-        return null;
+        return $info;
     }
 
     /**
@@ -286,7 +289,8 @@ class FileManager
                     }
                 }
             }
-        } catch (\Exception) {
+        } catch (\Exception $e) {
+            // Return default dimensions if SVG content cannot be parsed
         }
 
         return $dimensions;
