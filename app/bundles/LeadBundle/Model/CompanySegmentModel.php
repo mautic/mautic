@@ -15,17 +15,21 @@ use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\CompanySegmentChangeEvent;
+use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
 use Mautic\LeadBundle\Form\Type\CompanySegmentType;
 use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
+use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -35,11 +39,19 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CompanySegmentModel extends FormModel
 {
+    use OperatorListTrait;
+
     public const PROPERTIES_FIELD = CompanySegment::TABLE_NAME;
     public const SEARCH_COMMAND   = 'mautic.company_segments.searchcommand.list';
 
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $choiceFieldsCache = [];
+
     public function __construct(
         private CompanySegmentCountCacheHelper $companySegmentCountCacheHelper,
+        private RequestStack $requestStack,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -390,5 +402,71 @@ class CompanySegmentModel extends FormModel
         $user = false === $this->security->isGranted($this->getPermissionBase().':viewother') ? $this->userHelper->getUser() : null;
 
         return $this->getRepository()->getSegments($user, $alias);
+    }
+
+    /**
+     * Get field choices for company segment filters.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function getChoiceFields(): array
+    {
+        if ([] !== $this->choiceFieldsCache) {
+            return $this->choiceFieldsCache;
+        }
+
+        $choices = [];
+
+        // Add custom choices via event
+        if ($this->dispatcher->hasListeners(LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE)) {
+            $operatorsForFieldType = $this->getOperatorsForFieldType();
+
+            $event = new CompanySegmentFiltersChoicesEvent([], $operatorsForFieldType, $this->translator, $this->requestStack->getCurrentRequest());
+            $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE);
+            $choices = $event->getChoices();
+        }
+
+        // Order choices by label
+        /** @var array<string, array<string, mixed>> $choices */
+        foreach ($choices as $key => $choice) {
+            if (!is_array($choice)) {
+                // skip invalid choice set
+                continue;
+            }
+
+            $getLabel = static function ($item): string {
+                if (is_array($item) && array_key_exists('label', $item)) {
+                    $label = $item['label'];
+                    if (is_string($label)) {
+                        return $label;
+                    }
+                    if (is_numeric($label) || is_bool($label)) {
+                        return (string) $label;
+                    }
+
+                    return '';
+                }
+
+                if (is_string($item)) {
+                    return $item;
+                }
+
+                if (is_numeric($item) || is_bool($item)) {
+                    return (string) $item;
+                }
+
+                return '';
+            };
+            $cmp = static function ($a, $b) use ($getLabel): int {
+                return strcmp($getLabel($a), $getLabel($b));
+            };
+
+            uasort($choice, $cmp);
+            $choices[$key] = $choice;
+        }
+
+        $this->choiceFieldsCache = $choices;
+
+        return $choices;
     }
 }

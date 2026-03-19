@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -841,5 +842,84 @@ class AjaxController extends CommonAjaxController
                 'form' => $form->createView(),
             ]
         );
+    }
+
+    /**
+     * Load filter properties form for company segments.
+     */
+    public function loadCompanySegmentFilterFormAction(
+        Request $request,
+        FormFactoryInterface $formFactory,
+        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        CompanySegmentModel $companySegmentModel,
+    ): JsonResponse {
+        $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
+        $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
+        $operator    = InputHelper::clean($request->request->get('operator'));
+        $filterNum   = $request->request->getInt('filterNum');
+
+        if (!is_string($fieldAlias) || !is_string($fieldObject) || !is_string($operator)) {
+            return $this->sendJsonResponse(['success' => 0], Response::HTTP_BAD_REQUEST);
+        }
+
+        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+
+        if ('' !== $fieldAlias && '' !== $operator) {
+            $formAdjustmentsProvider->adjustForm(
+                $form,
+                $fieldAlias,
+                $fieldObject,
+                $operator,
+                $companySegmentModel->getChoiceFields()[$fieldObject][$fieldAlias]
+            );
+        }
+
+        $formHtml = $this->renderView(
+            '@MauticLead/List/filterpropform.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
+
+        $formHtml = str_replace('id="RENAME', "id=\"company_segments_filters_{$filterNum}_properties", $formHtml);
+        $formHtml = str_replace('name="RENAME', "name=\"company_segments[filters][{$filterNum}][properties]", $formHtml);
+
+        return $this->sendJsonResponse(
+            [
+                'viewParameters' => [
+                    'form' => $formHtml,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Get company count for a company segment.
+     */
+    public function getCompaniesCountAction(Request $request, CompanySegmentModel $companySegmentModel): JsonResponse
+    {
+        $id = InputHelper::clean($request->query->get('id'));
+        $id = is_numeric($id) ? (int) $id : 0;
+
+        $companyExists = 1 === $companySegmentModel->getRepository()->count(['id' => $id]);
+
+        if (!$companyExists) {
+            return $this->sendJsonResponse(['html' => '0', 'companyCount' => 0], Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$companySegmentModel->hasSegmentCompanyCountInCache($id)) {
+            $companySegmentModel->setSegmentCompanyCountInCache([$id]);
+        }
+
+        $companyCounts = $companySegmentModel->getSegmentCompanyCountFromCache([$id]);
+        $companyCount  = $companyCounts[$id];
+
+        return $this->sendJsonResponse([
+            'html' => $this->translator->trans(
+                'mautic.company_segments.companies_count',
+                ['%count%' => $companyCount]
+            ),
+            'companyCount' => $companyCount,
+        ]);
     }
 }

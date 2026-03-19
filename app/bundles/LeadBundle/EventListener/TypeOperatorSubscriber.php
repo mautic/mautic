@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
@@ -19,7 +18,6 @@ use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
-use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -30,6 +28,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -41,6 +40,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
+    use SegmentFilterIconTrait;
 
     private const EMAIL_ALIAS = 'email';
 
@@ -472,6 +472,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($staticFields as $alias => $fieldOptions) {
+            $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
             $event->addChoice('company', $alias, $fieldOptions);
         }
 
@@ -485,6 +486,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
             'object'     => 'company',
         ];
+        $companySegmentFieldOptions['iconClass'] = $this->getSegmentFilterIcon('leadlist');
         $event->addChoice(CompanySegmentModel::PROPERTIES_FIELD, CompanySegmentModel::PROPERTIES_FIELD, $companySegmentFieldOptions);
 
         // Contact Segment Membership filter (any contact of company in lead list)
@@ -496,15 +498,19 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             ],
             'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
         ];
+        $leadSegmentMembership['iconClass'] = $this->getSegmentFilterIcon('leadlist');
         $event->addChoice('any_companycontact', 'contactsegmentmembership', $leadSegmentMembership);
     }
 
     /**
      * Add custom company fields to company segment filter choices.
+     * Note: Custom fields are now handled by FilterOperatorSubscriber.
+     * This method is kept for backward compatibility and special handling if needed.
      */
     public function onCompanySegmentFiltersAddCustomFields(CompanySegmentFiltersChoicesEvent $event): void
     {
-        $this->addCompanyFieldsToEvent($event);
+        // Custom company fields are now added by FilterOperatorSubscriber::onCompanySegmentFiltersAddCustomFields()
+        // This method can be used for additional company-segment-specific field processing if needed
     }
 
     /**
@@ -522,50 +528,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             ],
             'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
             'object'     => 'company',
+            'iconClass'  => $this->getSegmentFilterIcon('leadlist'),
         ];
         $event->addChoice(CompanySegmentModel::PROPERTIES_FIELD, CompanySegmentModel::PROPERTIES_FIELD, $companySegmentFieldOptions);
-    }
-
-    /**
-     * Add company custom fields to an event.
-     *
-     * @param CompanySegmentFiltersChoicesEvent|LeadListFiltersChoicesEvent $event
-     */
-    private function addCompanyFieldsToEvent(object $event): void
-    {
-        $this->leadFieldRepository->getListablePublishedFields()->filter(static function (LeadField $leadField): bool {
-            return 'company' === $leadField->getObject();
-        })->map(function (LeadField $field) use ($event): void {
-            $type               = $field->getType();
-            $properties         = $field->getProperties();
-            $properties['type'] = $type;
-
-            if ('boolean' === $type) {
-                $properties['list'] = [
-                    $properties['no'] ?? 'no'   => 0,
-                    $properties['yes'] ?? 'yes' => 1,
-                ];
-            } elseif (in_array($type, ['select', 'multiselect'], true)) {
-                $properties['list'] = FormFieldHelper::parseListForChoices($properties['list'] ?? []);
-            } else {
-                try {
-                    $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
-                } catch (ChoicesNotFoundException) {
-                    // That's fine. Not all fields should have choices.
-                }
-            }
-
-            $event->addChoice(
-                $field->getObject(),
-                $field->getAlias(),
-                [
-                    'label'      => $field->getLabel(),
-                    'properties' => $properties,
-                    'object'     => $field->getObject(),
-                    'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
-                ]
-            );
-        });
     }
 
     /**

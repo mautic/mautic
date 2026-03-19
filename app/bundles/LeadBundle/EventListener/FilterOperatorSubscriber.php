@@ -41,6 +41,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ['onGenerateSegmentFiltersAddBehaviors', 0],
                 ['onGenerateSegmentFiltersNormalizeOperatorLabels', -1000],
             ],
+            LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE => [
+                ['onCompanySegmentFiltersAddCustomFields', 0],
+            ],
         ];
     }
 
@@ -661,5 +664,43 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         return $operators;
+    }
+
+    public function onCompanySegmentFiltersAddCustomFields(\Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent $event): void
+    {
+        $this->leadFieldRepository->getListablePublishedFields()->filter(static function (LeadField $leadField): bool {
+            return 'company' === $leadField->getObject();
+        })->map(function (LeadField $field) use ($event): void {
+            $type               = $field->getType();
+            $properties         = $field->getProperties();
+            $properties['type'] = $type;
+
+            if ('boolean' === $type) {
+                $properties['list'] = [
+                    $properties['no']  => 0,
+                    $properties['yes'] => 1,
+                ];
+            } elseif (in_array($type, ['select', 'multiselect'], true)) {
+                $properties['list'] = FormFieldHelper::parseListForChoices($properties['list'] ?? []);
+            } else {
+                try {
+                    $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
+                } catch (ChoicesNotFoundException) {
+                    // That's fine. Not all fields should have choices.
+                }
+            }
+
+            $event->addChoice(
+                $field->getObject(),
+                $field->getAlias(),
+                [
+                    'label'      => $field->getLabel(),
+                    'properties' => $properties,
+                    'object'     => $field->getObject(),
+                    'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
+                    'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
+                ]
+            );
+        });
     }
 }

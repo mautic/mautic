@@ -10,7 +10,7 @@ Variables
 {% set tmpl = 'list' %}
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
-{% block mauticContent %}companySegments{% endblock %}{# used in the javascript file, most likely the methods like companySegments+'OnLoad' #}
+{% block mauticContent %}company_segments{% endblock %}{# used in the javascript file, most likely the methods like company_segments+'OnLoad' #}
 
 {% block headerTitle %}{{ 'mautic.company_segments.header.index'|trans }}{% endblock %}
 
