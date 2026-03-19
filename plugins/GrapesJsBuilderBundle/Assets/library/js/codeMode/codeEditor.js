@@ -78,18 +78,46 @@ class CodeEditor {
   }
 
   /**
+   * Extract body content from full HTML document
+   * This handles the case where the code editor contains full HTML with <html>, <head>, and <body> tags
+   * @param {string} code - The HTML code from the editor
+   * @returns {string} - The body content only
+   */
+  extractBodyContent(code) {
+    const trimmedCode = code.trim();
+    
+    // Check if it's a full HTML document (contains <html> tag)
+    if (trimmedCode.toLowerCase().includes('<html')) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(trimmedCode, 'text/html');
+      
+      if (doc.body && doc.body.innerHTML) {
+        return doc.body.innerHTML;
+      }
+    }
+    
+    // Return original code if it's not a full HTML document
+    return trimmedCode;
+  }
+
+  /**
    * Update the main editors canvas content with the
    * content from modals editor.
    * @todo show validation results in UI
    */
   updateCode() {
-    const code = this.codeEditor.editor.getValue();
+    let code = this.codeEditor.editor.getValue();
+    
     // validate MJML code
     if (ContentService.isMjmlMode(this.editor)) {
       MjmlService.mjmlToHtml(code);
     }
 
     try {
+      // Extract body content only to prevent head content from being duplicated into body
+      // This fixes the issue where code edit mode duplicates <head> content into <body>
+      code = this.extractBodyContent(code);
+      
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
       this.editor.setComponents(code.trim())
