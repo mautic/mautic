@@ -21,8 +21,15 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.2', '8.3', '8.4', '8.5']
-        db-types: ['mysql:8.4', 'mysql:9.2', 'mariadb:10.11', 'mariadb:11.4']
+        include:
+          - php-versions: '8.2'
+            db-types: 'mysql:8.4'
+          - php-versions: '8.2'
+            db-types: 'mariadb:10.11'
+          - php-versions: '8.5'
+            db-types: 'mysql:9.2'
+          - php-versions: '8.5'
+            db-types: 'mariadb:11.4'
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -109,6 +116,54 @@ jobs:
           php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
+    - name: Upload coverage report
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
+      uses: codecov/codecov-action@v5
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Save test results for future steps
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          ./junit.xml
+          ./coverage.xml
+
+    - name: Slack Notification if tests fail
+      uses: rtCamp/action-slack-notify@v2
+      if: ${{ failure() && github.event_name == 'schedule' }}
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: 'The dail
+
+    - name: Save test results for future steps
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          ./junit.xml
+          ./coverage.xml
+
+    - name: Slack Notification if tests fail
+      uses: rtCamp/action-slack-notify@v2
+      if: ${{ failure() && github.event_name == 'schedule' }}
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
+
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
+        path: ./var/logs/*
+
   phpunit-postgres:
     # Same gating as the main phpunit job
     if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
@@ -116,8 +171,15 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.2', '8.3', '8.4', '8.5']
-        postgres-versions: ['16', '18']
+        include:
+          - php-versions: '8.2'
+            postgres-versions: '16'
+          - php-versions: '8.2'
+            postgres-versions: '18'    
+          - php-versions: '8.5'
+            postgres-versions: '16'              
+          - php-versions: '8.5'
+            postgres-versions: '18'       
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
 
@@ -189,7 +251,7 @@ jobs:
           export PATH="/usr/lib/postgresql/${{ matrix.postgres-versions }}/bin:$PATH"
           echo "PATH=$PATH" >> $GITHUB_ENV
           pg_dump --version
-          DB_LOG_NAME="${{ matrix.db-types }}"
+          DB_LOG_NAME="${{ matrix.postgres-versions }}"
           echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
 
       - name: Set SYMFONY_ENV to test
@@ -413,3 +475,10 @@ jobs:
           echo "Invalid command"
           exit 1
         fi
+
+    - name: Slack Notification if tests fail
+      uses: rtCamp/action-slack-notify@v2
+      if: ${{ failure() && github.event_name == 'schedule' }}
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
