@@ -901,11 +901,11 @@ class Field implements UuidInterface
             return true;
         }
 
-        if (!isset($data[$parentField->getAlias()])) {
+        if (!isset($data[$parentField->getAlias() ?? ''])) {
             return false;
         }
 
-        $sendValues = $data[$parentField->getAlias()];
+        $sendValues = $data[$parentField->getAlias() ?? ''];
         if (!is_array($sendValues)) {
             $sendValues = [$sendValues];
         }

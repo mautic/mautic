@@ -297,7 +297,6 @@ class EmailRepositoryTest extends TestCase
         $filter = (object) ['command' => 'is:expired', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
@@ -314,7 +313,6 @@ class EmailRepositoryTest extends TestCase
         $filter = (object) ['command' => 'is:pending', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
