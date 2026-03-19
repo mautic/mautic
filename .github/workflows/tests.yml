@@ -139,22 +139,6 @@ jobs:
       if: ${{ failure() && github.event_name == 'schedule' }}
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: 'The dail
-
-    - name: Save test results for future steps
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          ./junit.xml
-          ./coverage.xml
-
-    - name: Slack Notification if tests fail
-      uses: rtCamp/action-slack-notify@v2
-      if: ${{ failure() && github.event_name == 'schedule' }}
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
 
     - name: Store log artifacts
