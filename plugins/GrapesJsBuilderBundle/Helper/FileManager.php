@@ -262,39 +262,34 @@ class FileManager
 
         try {
             $svgContent = @file_get_contents($filePath);
-            if (!$svgContent) {
-                return $dimensions;
-            }
+            if ($svgContent) {
+                // Suppress XML warnings
+                $previousErrors = libxml_use_internal_errors(true);
 
-            // Suppress XML warnings
-            $previousErrors = libxml_use_internal_errors(true);
+                $svg = simplexml_load_string($svgContent);
+                libxml_use_internal_errors($previousErrors);
 
-            $svg = simplexml_load_string($svgContent);
-            libxml_use_internal_errors($previousErrors);
+                if ($svg) {
+                    $svgAttributes = $svg->attributes();
 
-            if (!$svg) {
-                return $dimensions;
-            }
-
-            $svgAttributes = $svg->attributes();
-
-            // Try to get width and height directly
-            if (isset($svgAttributes->width) && isset($svgAttributes->height)) {
-                $dimensions['width']  = (int) $svgAttributes->width;
-                $dimensions['height'] = (int) $svgAttributes->height;
-            } elseif (isset($svgAttributes->viewBox)) {
-                // Parse the viewBox attribute (format: "x y width height")
-                $viewBox = explode(' ', (string) $svgAttributes->viewBox);
-                if (count($viewBox) === 4) {
-                    $dimensions['width']  = (int) $viewBox[2];
-                    $dimensions['height'] = (int) $viewBox[3];
+                    // Try to get width and height directly
+                    if (isset($svgAttributes->width) && isset($svgAttributes->height)) {
+                        $dimensions['width']  = (int) $svgAttributes->width;
+                        $dimensions['height'] = (int) $svgAttributes->height;
+                    } elseif (isset($svgAttributes->viewBox)) {
+                        // Parse the viewBox attribute (format: "x y width height")
+                        $viewBox = explode(' ', (string) $svgAttributes->viewBox);
+                        if (count($viewBox) === 4) {
+                            $dimensions['width']  = (int) $viewBox[2];
+                            $dimensions['height'] = (int) $viewBox[3];
+                        }
+                    }
                 }
             }
-
-            return $dimensions;
         } catch (\Exception) {
-            return $dimensions;
         }
+
+        return $dimensions;
     }
 }
 
