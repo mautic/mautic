@@ -274,7 +274,8 @@ class LeadListRepository extends CommonRepository
             ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':preferenceCenter'))
             ->setParameter('published', true)
             ->setParameter('preferenceCenter', true)
-            ->orderBy('l.publicName');
+            ->orderBy('l.publicName')
+            ->addOrderBy('l.id', 'ASC');
 
         return $q->getQuery()->getArrayResult();
     }
