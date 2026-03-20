@@ -140,7 +140,7 @@ class BuilderTokenHelper
         string $valueColumn = 'id',
         ?CompositeExpression $expr = null,
     ): array {
-        $tokens = $this->getTokens($tokenRegex, $filter, $labelColumn, $valueColumn, $expr) ?? []; // @phpstan-ignore nullCoalesce.left
+        $tokens = $this->getTokens($tokenRegex, $filter, $labelColumn, $valueColumn, $expr) ?? []; // @phpstan-ignore-line
 
         if (empty($tokens)) {
             return [];
