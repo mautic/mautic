@@ -63,13 +63,13 @@ class CustomFieldHelper
                 $dtHelper = new DateTimeHelper($value, null, 'local');
                 switch ($type) {
                     case 'datetime':
-                        $value = $dtHelper->toLocalString('Y-m-d H:i:s');
+                        $value = $dtHelper->toUtcString('Y-m-d H:i:s');
                         break;
                     case 'date':
-                        $value = $dtHelper->toLocalString('Y-m-d');
+                        $value = $dtHelper->toUtcString('Y-m-d');
                         break;
                     case 'time':
-                        $value = $dtHelper->toLocalString('H:i:s');
+                        $value = $dtHelper->toUtcString('H:i:s');
                         break;
                 }
                 break;

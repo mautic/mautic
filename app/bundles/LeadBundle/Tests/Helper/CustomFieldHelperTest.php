@@ -92,9 +92,9 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'customdate'         => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d'),
-            'customdatetime'     => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d H:i:s'),
-            'customtime'         => (new DateTimeHelper('-20 minutes'))->toLocalString('H:i:s'),
+            'customdate'         => (new DateTimeHelper('-1 day'))->toUtcString('Y-m-d'),
+            'customdatetime'     => (new DateTimeHelper('-1 day'))->toUtcString('Y-m-d H:i:s'),
+            'customtime'         => (new DateTimeHelper('-20 minutes'))->toUtcString('H:i:s'),
             'customnulldatetime' => null,
         ];
 
