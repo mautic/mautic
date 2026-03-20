@@ -458,6 +458,8 @@ class CampaignRepository extends CommonRepository
      * @param array $pendingEvents List of specific events to rule out
      *
      * @throws \Doctrine\DBAL\Cache\CacheException
+     *
+     * @deprecated
      */
     public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], ?\DateTimeInterface $dateFrom = null, ?\DateTimeInterface $dateTo = null): int
     {
@@ -519,6 +521,38 @@ class CampaignRepository extends CommonRepository
         }
 
         return (int) $results[0]['lead_count'];
+    }
+
+    /**
+     * Returns true if the campaign has at least one lead.
+     */
+    public function hasCampaignLeads(int $campaignId): bool
+    {
+        $q = $this->getReplicaConnection()->createQueryBuilder();
+
+        $q->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('cl.campaign_id', ':campaignId'),
+                    $q->expr()->eq('cl.manually_removed', '0')
+                )
+            )
+            ->setParameter('campaignId', $campaignId)
+            ->setMaxResults(1);
+
+        if ($this->getReplicaConnection()->getConfiguration()->getResultCache()) {
+            $results = $this->getReplicaConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600)
+            )->fetchAllAssociative();
+        } else {
+            $results = $q->executeQuery()->fetchAllAssociative();
+        }
+
+        return (bool) $results;
     }
 
     /**
@@ -607,7 +641,12 @@ class CampaignRepository extends CommonRepository
      * or empty array if nothing found.
      *
      * @param int $id
+     *
+     * @deprecated The method is deprecated and will be removed in Mautic 8.x.
+     * Use the `\Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` method instead.
+     * @see EventRepository::getCampaignEmailEvents
      */
+    #[\Deprecated('The method is deprecated and will be removed in Mautic 8.x. Use the `\Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` method instead.')]
     public function fetchEmailIdsById($id): array
     {
         $emails = $this->getEntityManager()

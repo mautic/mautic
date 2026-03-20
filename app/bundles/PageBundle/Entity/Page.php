@@ -15,6 +15,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -23,7 +25,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -53,12 +55,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use TranslationEntityTrait<Page>
  * @use VariantEntityTrait<Page>
  */
-class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
+class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    use OptimisticLockTrait;
+
     public const ENTITY_NAME = 'page';
 
     public const TABLE_NAME = 'pages';
@@ -66,101 +70,121 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @var int
      */
+    #[Groups(['page:read', 'download:read', 'email:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $title;
 
     /**
      * @var string
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $alias;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $template;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $customHtml;
 
     /**
      * @var array
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $content = [];
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $publishUp;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $publishDown;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $hits = 0;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $uniqueHits = 0;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $variantHits = 0;
 
     /**
      * @var int
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $revision = 1;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $metaDescription;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $headScript;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $footerScript;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $redirectType;
 
     /**
      * @var string|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $redirectUrl;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $category;
 
     /**
      * @var bool|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $isPreferenceCenter;
 
     /**
      * @var bool|null
      */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $noIndex;
 
     /**
@@ -172,16 +196,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     private bool $isCloned = false;
 
-    private int $cloneObjectId;
+    private ?int $cloneObjectId = null;
 
-    /**
-     * @Groups({"page:read", "page:write", "download:read", "email:read"})
-     */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private ?bool $publicPreview = true;
 
-    /**
-     * @Groups({"page:read", "page:write", "download:read", "email:read"})
-     */
+    #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private bool $isDuplicate = false;
 
     public function __clone()
@@ -293,6 +313,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         self::addVariantMetadata($builder, self::class);
         static::addUuidField($builder);
         self::addProjectsField($builder, 'page_projects_xref', 'page_id');
+        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

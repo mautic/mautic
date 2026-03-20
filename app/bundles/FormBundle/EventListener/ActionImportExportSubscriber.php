@@ -6,13 +6,13 @@ namespace Mautic\FormBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
@@ -183,7 +183,7 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $item) {
-            if (!empty($item['uuid']) && !UuidTrait::isValidUuid($item['uuid'])) {
+            if (!empty($item['uuid']) && !UuidHelper::isValidUuid($item['uuid'])) {
                 $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
                 break;
             }

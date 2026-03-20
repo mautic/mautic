@@ -532,15 +532,16 @@ class PageController extends FormController
         }
 
         // Create the form
-        $action       = $this->generateUrl('mautic_page_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form         = $model->createForm($entity, $this->formFactory, $action);
+        $action = $this->generateUrl('mautic_page_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $this->setOptimisticLockVersion($entity, $form);
         $existingPage = clone $entity;
         $this->restoreNullifiedFieldsDuringClone($existingPage, $entity);
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($valid = ($this->isFormValid($form) && $this->checkOptimisticLockVersion($entity, $form, false))) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
@@ -593,9 +594,10 @@ class PageController extends FormController
                         'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
-            } elseif ($valid && $this->isButtonClicked($form, 'apply')) {
+            } elseif ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action);
+                $this->setOptimisticLockVersion($entity, $form);
             }
         } else {
             // lock the entity
@@ -629,6 +631,17 @@ class PageController extends FormController
             );
         }
 
+        $route = $this->generateUrl('mautic_page_action', [
+            'objectAction' => 'edit',
+            'objectId'     => $entity->getId(),
+        ]);
+        $error = $this->getFormErrorForBuilder($form);
+        $data  = ['version' => $error ? $form['version']->getData() : $entity->getVersion()];
+
+        if ($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_page_index', 'page', $route, $data)) {
+            return $optimizedResponse;
+        }
+
         return $this->delegateView([
             'viewParameters' => [
                 'form'            => $form->createView(),
@@ -655,7 +668,7 @@ class PageController extends FormController
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId(),
                 ]),
-                'validationError' => $this->getFormErrorForBuilder($form),
+                'validationError' => $error,
             ],
         ]);
     }

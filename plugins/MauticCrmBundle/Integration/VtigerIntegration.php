@@ -3,6 +3,8 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 class VtigerIntegration extends CrmAbstractIntegration
 {
@@ -218,9 +220,9 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {

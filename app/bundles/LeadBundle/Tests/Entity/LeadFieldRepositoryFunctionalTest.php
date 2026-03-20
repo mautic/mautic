@@ -10,7 +10,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected $useCleanupRollback     = false;
+    private const ADMINISTRATOR_VALUE = "administrator's";
 
     public function testCompareValueEqualsOperator(): void
     {
@@ -170,6 +171,52 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'colors', ['green', 'blue'], 'in'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'yellow'], 'in'));
+    }
+
+    public function testCompareValueInOperatorWithSpecialCharacters(): void
+    {
+        $field = new LeadField();
+        $field->setType('select');
+        $field->setObject('lead');
+        $field->setAlias('job_title');
+        $field->setName('Job Title');
+        $field->setProperties(
+            [
+                'list' => [
+                    [
+                        'label' => "Administrator's Role",
+                        'value' => self::ADMINISTRATOR_VALUE,
+                    ], [
+                        'label' => 'User Role',
+                        'value' => 'user',
+                    ], [
+                        'label' => 'Manager & Supervisor',
+                        'value' => 'manager&supervisor',
+                    ],
+                ],
+            ]
+        );
+
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        \assert($fieldModel instanceof FieldModel);
+        $fieldModel->saveEntity($field);
+
+        $lead = new Lead();
+        $lead->addUpdatedField('job_title', self::ADMINISTRATOR_VALUE);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+
+        $contactModel->saveEntity($lead);
+        $repository = $fieldModel->getRepository();
+
+        $this->assertTrue($repository->compareValue($lead->getId(), 'job_title', [self::ADMINISTRATOR_VALUE], 'in'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'job_title', ['user'], 'in'));
+
+        $lead2 = new Lead();
+        $lead2->addUpdatedField('job_title', 'manager&supervisor');
+        $contactModel->saveEntity($lead2);
+
+        $this->assertTrue($repository->compareValue($lead2->getId(), 'job_title', ['manager&supervisor'], 'in'));
     }
 
     public function testExcludeUnpublishedField(): void

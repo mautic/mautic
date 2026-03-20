@@ -28,9 +28,9 @@ class ContactTracker
 
     private ?Lead $trackedContact = null;
 
-    private FieldModel $leadFieldModel;
-
     private ?bool $useSystemContact = null;
+
+    private bool $contactLastActiveLogged = false;
 
     public function __construct(
         private LeadRepository $leadRepository,
@@ -42,9 +42,8 @@ class ContactTracker
         private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private EventDispatcherInterface $dispatcher,
-        FieldModel $leadFieldModel,
+        private FieldModel $leadFieldModel,
     ) {
-        $this->leadFieldModel         = $leadFieldModel;
     }
 
     /**
@@ -72,9 +71,9 @@ class ContactTracker
         }
 
         // Log last active for the tracked contact
-        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
+        if (!$this->contactLastActiveLogged) {
             $this->leadRepository->updateLastActive($this->trackedContact->getId());
-            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
+            $this->contactLastActiveLogged = true;
         }
 
         return $this->trackedContact;
@@ -163,6 +162,17 @@ class ContactTracker
     }
 
     /**
+     * Resets cache.
+     */
+    public function reset(): void
+    {
+        $this->trackedContact          = null;
+        $this->contactLastActiveLogged = false;
+        $this->deviceTracker->reset();
+        $this->ipLookupHelper->reset();
+    }
+
+    /**
      * @return Lead|null
      */
     private function getSystemContact()
@@ -206,9 +216,8 @@ class ContactTracker
     {
         $lead = null;
 
-        // Return null for leads that are from a non-trackable IP, prevent anonymous lead with a non-trackable IP to be tracked
-        $ip = $this->ipLookupHelper->getIpAddress();
-        if ($ip && !$ip->isTrackable()) {
+        // Return null for leads that are from a non-trackable request (IP, bot, privacy signal, prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return $lead;
         }
 
@@ -239,8 +248,8 @@ class ContactTracker
     {
         $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
-        if ($ip && !$ip->isTrackable()) {
-            // Don't save leads that are from a non-trackable IP by default
+        // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return $this->createNewContact($ip, false);
         }
 

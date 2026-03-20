@@ -22,9 +22,9 @@ class FullContact_Location extends FullContact_Base
     /**
      * This takes a name and breaks it into its individual parts.
      *
-     * @param type $casing -> valid values are uppercase, lowercase, titlecase
+     * @param string $casing -> valid values are uppercase, lowercase, titlecase
      *
-     * @return type
+     * @return mixed
      */
     public function normalizer($place, $includeZeroPopulation = false, $casing = 'titlecase')
     {

@@ -52,7 +52,8 @@ class RoleListType extends AbstractType
             ]
         );
 
-        foreach ($roles as $role) {
+        foreach ($roles as $result) {
+            $role                          = is_array($result) ? $result[0] : $result;
             $choices[$role->getName(true)] = $role->getId();
         }
 

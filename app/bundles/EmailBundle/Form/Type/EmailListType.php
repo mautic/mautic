@@ -47,7 +47,7 @@ class EmailListType extends AbstractType
                 ],
                 // 'modal_route_parameters' => 'template'
                 'email_type'     => 'template',
-                'top_level'      => 'variant',
+                'top_level'      => ['variant', 'translation'],
                 'variant_parent' => null,
                 'ignore_ids'     => [],
 

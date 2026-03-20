@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -266,22 +267,14 @@ class AjaxController extends CommonController
                     if (!empty($refresh)) {
                         $dataArray['reload'] = 1;
                     } else {
-                        $onclickMethod  = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
-                        $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
-                        $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
-
                         // get updated icon HTML
                         $html = $this->renderView(
                             '@MauticCore/Helper/publishstatus_icon.html.twig',
                             [
-                                'item'          => $entity,
-                                'model'         => $name,
-                                'query'         => $extra,
-                                'size'          => $post['size'] ?? '',
-                                'onclick'       => $onclickMethod,
-                                'attributes'    => $dataAttr,
-                                'transKeys'     => $attrTransKeys,
-                                'status'        => method_exists($entity, 'getPublishStatus') ? $entity->getPublishStatus() : null,
+                                'item'  => $entity,
+                                'model' => $name,
+                                'query' => $extra,
+                                'size'  => $post['size'] ?? '',
                             ]
                         );
                         $dataArray['statusHtml'] = $html;
@@ -428,5 +421,18 @@ class AjaxController extends CommonController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param mixed[] $parameters
+     */
+    protected function renderView(string $view, array $parameters = []): string
+    {
+        $event = $this->dispatcher->dispatch(
+            new CustomTemplateEvent($this->getCurrentRequest(), $view, $parameters),
+            CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+        );
+
+        return parent::renderView($event->getTemplate(), $event->getVars());
     }
 }

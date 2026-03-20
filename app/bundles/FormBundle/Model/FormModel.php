@@ -28,6 +28,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -226,11 +227,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (!isset($existingFields[$fieldId])) {
+            if (!isset($existingFields[$fieldId ?? ''])) {
                 continue;
             }
-            $this->handleFilesDelete($existingFields[$fieldId]);
-            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $this->handleFilesDelete($existingFields[$fieldId ?? '']);
+            $entity->removeField($fieldId, $existingFields[$fieldId ?? '']);
             $deleteFields[] = $fieldId;
         }
 
@@ -420,9 +421,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
 
-        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
-            $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+        foreach (['_style', 'style'] as $styleFile) {
+            $stylePath = "@themes/{$theme}/html/MauticFormBundle/Builder/{$styleFile}.html.twig";
+            if ($this->twig->getLoader()->exists($stylePath)) {
+                $styleToRender = $stylePath;
+            }
         }
+
         if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
             $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
         }
@@ -529,7 +534,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+        if ($isNew || !$this->tableSchemaHelper->checkTableExists($name)) {
             $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
@@ -735,9 +740,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml): void
+    public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
-        $formName          = $form->generateFormName();
+        $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
         $objectsToAutoFill = ['contact', 'company'];
@@ -774,6 +779,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $value = $leadArray[$field->getMappedField()] ?? '';
             // just skip string empty field
             if ('' !== $value) {
+                $mappedFieldAlias = $field->getMappedField();
+                $mappedField      = $this->leadFieldModel->getEntityByAlias($mappedFieldAlias);
+                if ($mappedField && 'boolean' === $mappedField->getType()) {
+                    $properties = $mappedField->getProperties();
+                    $value      = CustomFieldValueHelper::normalize($value, 'boolean', $properties);
+                }
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }

@@ -220,6 +220,22 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
 
+                    const theForm = forms[i];
+                    const hasPageBreak = theForm.querySelectorAll('[data-mautic-form-page]').length > 1;
+                    if (hasPageBreak) {
+                        const inputs = theForm.querySelectorAll('input, select, button');
+                        Array.prototype.forEach.call(inputs, function(input) {
+                            if (input.tagName.toLowerCase() !== 'textarea') {
+                                input.addEventListener('keydown', function(e) {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        return false;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
                     Form.populateValuesWithGetParameters();
                 }
             }
@@ -703,6 +719,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                             }
 
                             elErrorSpan.style.display = (valid) ? 'none' : '';
+                            elErrorSpan.setAttribute('aria-hidden', valid ? 'true' : 'false');
                             elContainer.className = elContainer.className + " mauticform-has-error";
                         }
                     }
@@ -725,6 +742,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                             var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
                             if (elErrorSpan) {
                                 elErrorSpan.style.display = 'none';
+                                elErrorSpan.setAttribute('aria-hidden', 'true');
                                 elContainer.className = elContainer.className.replace(" mauticform-has-error", "");
                             }
                         }

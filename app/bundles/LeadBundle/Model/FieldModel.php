@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -663,12 +665,20 @@ class FieldModel extends FormModel
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws SchemaException
+     * @throws DeleteEntityDependencyException
      */
     public function deleteEntity($entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
+
+        $event = $this->dispatchEvent('pre_delete', $entity);
+
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
+        }
+
         $this->customFieldColumn->deleteLeadColumn($entity);
         $this->leadFieldDeleter->deleteLeadFieldEntity($entity);
     }
@@ -827,6 +837,21 @@ class FieldModel extends FormModel
 
         // validate properties
         $type   = $entity->getType();
+
+        // Trim select field option values BEFORE validation + save
+        if (('select' === $type || 'multiselect' === $type)
+            && isset($properties['list']) && is_array($properties['list'])
+        ) {
+            foreach ($properties['list'] as &$item) {
+                if (isset($item['label'])) {
+                    $item['label'] = trim($item['label']);
+                }
+                if (isset($item['value'])) {
+                    $item['value'] = trim($item['value']);
+                }
+            }
+        }
+
         $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
             $entity->setProperties($properties);
@@ -1010,6 +1035,47 @@ class FieldModel extends FormModel
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    /**
+     * Get the owner and stage fields.
+     *
+     * @return array<string, mixed>
+     */
+    public function getSpecialLeadFields(): array
+    {
+        return [
+            'ownerbyemail' => [
+                'label'        => $this->translator->trans('mautic.lead.field.ownerbyemail'),
+                'alias'        => 'ownerbyemail',
+                'type'         => 'email',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'ownerbyid' => [
+                'label'        => $this->translator->trans('mautic.lead.field.ownerbyid'),
+                'alias'        => 'ownerbyid',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'stagebyname' => [
+                'label'        => $this->translator->trans('mautic.lead.field.stagebyname'),
+                'alias'        => 'stagebyname',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+        ];
     }
 
     public function generateUniqueFieldAlias(string $alias): string

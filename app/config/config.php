@@ -148,6 +148,9 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
     ];
 }
 
+// Use the new Pdo\Mysql namespace for PHP 8.4+, fallback to legacy constant for older versions
+$unbufferedQueryConstant = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+
 $container->loadFromExtension('doctrine', [
     'dbal' => [
         'default_connection' => 'default',
@@ -155,8 +158,8 @@ $container->loadFromExtension('doctrine', [
             'default'    => $connectionSettings,
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
-                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
-                    PDO::ATTR_STRINGIFY_FETCHES        => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+                    $unbufferedQueryConstant    => false,
+                    PDO::ATTR_STRINGIFY_FETCHES => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
@@ -260,11 +263,6 @@ $container->loadFromExtension('jms_serializer', [
             'options' => JSON_PRETTY_PRINT,
         ],
     ],
-]);
-
-// Twig Configuration
-$container->loadFromExtension('twig', [
-    'exception_controller' => null,
 ]);
 
 $container->loadFromExtension('framework', [
@@ -396,10 +394,37 @@ $container->loadFromExtension('api_platform', [
         'json'    => ['application/merge-patch+json'],
         'jsonapi' => ['application/vnd.api+json'],
     ],
+    'formats' => [
+        'jsonld'  => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+        'json'    => [
+            'mime_types' => [
+                'application/json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
+            ],
+        ],
+        'html' => [
+            'mime_types' => [
+                'text/html',
+            ],
+        ],
+    ],
     'error_formats' => [
         'jsonproblem' => [
             'mime_types' => [
                 'application/problem+json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
             ],
         ],
         'jsonld' => [
@@ -414,16 +439,5 @@ $container->loadFromExtension('api_platform', [
         'ApiPlatform\Validator\Exception\ValidationException'             => 400,
         'Doctrine\ORM\OptimisticLockException'                            => 409,
         'Symfony\Component\Security\Core\Exception\AccessDeniedException' => 403,
-    ],
-    'formats' => [
-        'jsonld' => [
-            'mime_types' => ['application/ld+json'],
-        ],
-        'json' => [
-            'mime_types' => ['application/json'],
-        ],
-        'html' => [
-            'mime_types' => ['text/html'],
-        ],
     ],
 ]);

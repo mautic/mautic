@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Http;
+namespace Mautic\WebhookBundle\Tests\Unit\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Request;
@@ -50,6 +50,7 @@ final class ClientTest extends TestCase
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $siteUrl,
             'Webhook-Signature' => $expectedSignature,
+            'User-Agent'        => 'Webhook',
         ];
 
         $response = new Response();

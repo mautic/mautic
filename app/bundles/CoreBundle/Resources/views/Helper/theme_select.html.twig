@@ -37,22 +37,22 @@
                                 {
                                     href: '#',
                                     label: 'mautic.core.select',
-                                    variant: 'ghost',
+                                    variant: 'tertiary',
                                     attributes: {
                                         'type': 'button',
                                         'data-theme': themeKey,
-                                        'class': 'select-theme-link' ~ (isSelected ? ' hide' : ''),
+                                        'class': 'btn-wide mt-md select-theme-link' ~ (isSelected ? ' hide' : ''),
                                         'onclick': "mQuery('#dynamic-content-tab').addClass('hidden')"
-                                    }
+                                    },
                                 },
                                 {
                                     label: 'mautic.core.form.filters.selected',
-                                    variant: 'ghost',
+                                    variant: 'tertiary',
                                     attributes: {
                                         'type': 'button',
-                                        'class': 'select-theme-selected' ~ (not isSelected ? ' hide' : ''),
+                                        'class': 'btn-wide mt-md select-theme-selected' ~ (not isSelected ? ' hide' : ''),
                                         'disabled': ''
-                                    }
+                                    },
                                 }
                             ]
                         } %}
@@ -89,22 +89,22 @@
                       {
                           href: '#',
                           label: 'mautic.core.select',
-                          variant: 'ghost',
+                          variant: 'tertiary',
                           attributes: {
                               'type': 'button',
                               'data-theme': codeMode,
-                              'class': 'select-theme-link' ~ (isCodeMode ? ' hide' : ''),
+                              'class': 'btn-wide mt-md select-theme-link' ~ (isCodeMode ? ' hide' : ''),
                               'onclick': "mQuery('#dynamic-content-tab').removeClass('hidden')"
-                          }
+                          },
                       },
                       {
                           label: 'mautic.core.form.filters.selected',
-                          variant: 'ghost',
+                          variant: 'tertiary',
                           attributes: {
                               'type': 'button',
-                              'class': 'select-theme-selected' ~ (not isCodeMode ? ' hide' : ''),
+                              'class': 'btn-wide mt-md select-theme-selected' ~ (not isCodeMode ? ' hide' : ''),
                               'disabled': 'disabled'
-                          }
+                          },
                       }
                   ]
               } %}

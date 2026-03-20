@@ -83,7 +83,6 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
     public function testValidateDefaultParameters(): void
     {
         $method = new \ReflectionMethod(FrequencyRuleRepository::class, 'validateDefaultParameters');
-        $method->setAccessible(true);
 
         $this->assertFalse($method->invoke($this->frequencyRuleRepository, false, false));
         $this->assertFalse($method->invoke($this->frequencyRuleRepository, false, true));

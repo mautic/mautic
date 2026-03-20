@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
@@ -17,6 +18,8 @@ use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,6 +35,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         private CampaignModel $campaignModel,
         private LeadEventLogRepository $leadEventLogRepository,
         private EventDispatcherInterface $eventDispatcher,
+        private DateHelper $dateHelper,
     ) {
     }
 
@@ -43,9 +47,10 @@ class CampaignEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_PRE_SAVE => ['onCampaignPreSave', 0],
-            CampaignEvents::ON_EVENT_FAILED   => ['onEventFailed', 0],
-            CampaignEvents::ON_EVENT_EXECUTED => ['onEventExecuted', 0],
+            CampaignEvents::CAMPAIGN_PRE_SAVE        => ['onCampaignPreSave', 0],
+            CampaignEvents::ON_EVENT_FAILED          => ['onEventFailed', 0],
+            CampaignEvents::ON_EVENT_EXECUTED        => ['onEventExecuted', 0],
+            EventPreview::class                      => ['onEventPreviewRequest', 0],
         ];
     }
 
@@ -59,7 +64,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         $changes  = $campaign->getChanges();
 
         if (array_key_exists('isPublished', $changes)) {
-            list($actual, $inMemory) = $changes['isPublished'];
+            [$actual, $inMemory] = $changes['isPublished'];
 
             // If we're publishing the campaign
             if (false === $actual && true === $inMemory) {
@@ -145,5 +150,37 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         }
         // Decrease if last failed and over the LOOPS_TO_FAIL
         $this->eventRepository->decreaseFailedCount($executedEvent);
+    }
+
+    public function onEventPreviewRequest(EventPreview $eventPreview): void
+    {
+        $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());
+
+        if ($logStats->firstExecutionDate && $logStats->lastExecutionDate) {
+            $firstExecutionDate = new DateTimeHelper($logStats->firstExecutionDate);
+            $lastExecutionDate  = new DateTimeHelper($logStats->lastExecutionDate);
+
+            $eventPreview->addEventStat(
+                key: 'first_execution_date',
+                value: $this->dateHelper->toText($firstExecutionDate->toLocalString()),
+                tooltip: $firstExecutionDate->toLocalString()
+            );
+            $eventPreview->addEventStat(
+                key: 'last_execution_date',
+                value: $this->dateHelper->toText($lastExecutionDate->toLocalString()),
+                tooltip: $lastExecutionDate->toLocalString()
+            );
+        }
+        $eventPreview->addEventStat('total_executions', $logStats->totalExecutions);
+        if ($eventPreview->isCampaignRestartAllowed()) {
+            $eventPreview->addEventStat('unique_executions', $logStats->uniqueExecutions);
+            $eventPreview->addEventStat('max_rotations', $logStats->maxRotations);
+        }
+        $eventPreview->addEventStat('pending_executions', $logStats->pendingExecutions);
+
+        if (in_array($eventPreview->event->getEventType(), ['condition', 'decision'])) {
+            $eventPreview->addEventStat('negative_path_count', $logStats->negativePathCount);
+            $eventPreview->addEventStat('positive_path_count', $logStats->positivePathCount);
+        }
     }
 }

@@ -189,14 +189,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
             static::titleRegex,
             static::brandName,
             static::descriptionRegex,
-            static::successmessage,
         ], [
             str_contains($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
             str_contains($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
             str_contains($content, static::titleRegex) ? $page->getTitle() : '',
             str_contains($content, static::brandName) ? $this->coreParametersHelper->get('brand_name') : '',
             str_contains($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
-            str_contains($content, static::successmessage) ? $this->renderSuccessMessage() : '',
         ], $content);
     }
 
@@ -223,12 +221,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
             static::preferredchannel,
             static::channelfrequency,
             static::saveprefsRegex,
+            static::successmessage,
         ], [
             str_contains($content, static::segmentListRegex) ? $this->renderSegmentList($params) : '',
             str_contains($content, static::categoryListRegex) ? $this->renderCategoryList($params) : '',
             str_contains($content, static::preferredchannel) ? $this->renderPreferredChannel($params) : '',
             str_contains($content, static::channelfrequency) ? $this->renderChannelFrequency($params) : '',
             str_contains($content, static::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
+            str_contains($content, static::successmessage) ? $this->renderSuccessMessage($params) : '',
         ], $content);
     }
 
@@ -314,12 +314,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function renderSuccessMessage(): string
+    /**
+     * @param array<string,mixed> $params
+     */
+    private function renderSuccessMessage(array $params): string
     {
         return $this->renderTemplate(
             '@MauticCore/Slots/successmessage.html.twig',
-            [],
-            '<div class="pref-successmessage">{templateContent}</div>'
+            $params
         );
     }
 

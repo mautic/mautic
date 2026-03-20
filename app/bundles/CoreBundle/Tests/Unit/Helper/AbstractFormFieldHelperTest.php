@@ -141,7 +141,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         yield [
-            [null => null],
+            ['' => null],
             [],
         ];
 

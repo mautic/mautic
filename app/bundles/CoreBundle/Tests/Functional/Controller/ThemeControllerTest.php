@@ -80,7 +80,6 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         // Clear the private property 'themes' to reload themes.
         $reflectionClass = new \ReflectionClass(ThemeHelper::class);
         $themesProperty  = $reflectionClass->getProperty('themes');
-        $themesProperty->setAccessible(true);
         $themesProperty->setValue($themeHelper, []);
 
         $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22,%22auroratest%22]');

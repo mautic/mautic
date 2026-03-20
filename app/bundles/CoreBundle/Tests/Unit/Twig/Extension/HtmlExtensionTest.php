@@ -24,7 +24,7 @@ final class HtmlExtensionTest extends TestCase
     }
 
     /**
-     * @return array<int, mixed>
+     * @return iterable<int, mixed>
      */
     public static function convertStringToArrayProvider(): iterable
     {

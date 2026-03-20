@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Types;
+use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -82,9 +83,10 @@ class LeadEventLogRepository extends CommonRepository
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
-                    fl.reason as fail_reason
-                    '
-                      )
+                    fl.reason as fail_reason,
+                    e.deleted AS event_deleted_timestamp,
+                    e.redirect_event_id,
+                    ll.metadata')
                         ->add('from', [
                             'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                             'alias' => 'll',
@@ -457,8 +459,7 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->in('o.id', $ids),
                     $q->expr()->eq('o.isScheduled', 1),
                     $q->expr()->eq('c.isPublished', 1),
-                    $q->expr()->isNull('c.deleted'),
-                    $q->expr()->isNull('e.deleted')
+                    $q->expr()->isNull('c.deleted')
                 )
             );
 
@@ -631,20 +632,6 @@ SQL;
     }
 
     /**
-     * @param string[] $eventIds
-     */
-    public function removeEventLogs(array $eventIds): void
-    {
-        $table_name    = $this->getTableName();
-        $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
-        $conn          = $this->getEntityManager()->getConnection();
-        $deleteEntries = true;
-        while ($deleteEntries) {
-            $deleteEntries = $conn->executeStatement($sql, [$eventIds], [ArrayParameterType::INTEGER]);
-        }
-    }
-
-    /**
      * Check if last lead/event failed.
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -695,5 +682,50 @@ SQL;
             ->where('id IN (:ids)')
             ->setParameter('ids', $ids, ArrayParameterType::STRING)
             ->executeStatement();
+    }
+
+    public function getEventLogStats(int $eventId): EventLogStatsDto
+    {
+        $qb = $this->getReplicaConnection()->createQueryBuilder();
+        $qb->select(
+            'COUNT(log.id) as total_logs',
+            'COUNT(DISTINCT log.lead_id) as unique_executions',
+            'SUM(log.is_scheduled) as pending_executions',
+            'SUM(CASE WHEN log.non_action_path_taken = 1 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as negative_path_count',
+            'SUM(CASE WHEN log.non_action_path_taken = 0 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as positive_path_count',
+            'MIN(log.date_triggered) as first_execution_date',
+            'MAX(log.date_triggered) as last_execution_date',
+            'MAX(log.rotation) as max_rotations',
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $qb->expr()->and(
+                    $qb->expr()->eq('log.event_id', ':eventId')
+                )
+            )
+            ->setParameter('eventId', $eventId)
+            ->groupBy('log.event_id');
+
+        $result = $qb->executeQuery()->fetchAssociative();
+
+        if (false === $result) {
+            return new EventLogStatsDto();
+        }
+
+        $totalLogs         = (int) ($result['total_logs'] ?? 0);
+        $pendingExecutions = (int) ($result['pending_executions'] ?? 0);
+        $uniqueExecutions  = (int) ($result['unique_executions'] ?? 0);
+        $maxRotations      = (int) ($result['max_rotations'] ?? 0);
+
+        return new EventLogStatsDto(
+            totalExecutions: $totalLogs - $pendingExecutions,
+            uniqueExecutions: $uniqueExecutions,
+            pendingExecutions: $pendingExecutions,
+            maxRotations: $maxRotations,
+            negativePathCount: (int) ($result['negative_path_count'] ?? 0),
+            positivePathCount: (int) ($result['positive_path_count'] ?? 0),
+            firstExecutionDate: $result['first_execution_date'] ? new \DateTimeImmutable($result['first_execution_date']) : null,
+            lastExecutionDate: $result['last_execution_date'] ? new \DateTimeImmutable($result['last_execution_date']) : null
+        );
     }
 }
