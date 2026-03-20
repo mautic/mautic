@@ -222,11 +222,9 @@ class EmailSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $property->setAccessible(true);
             $name                = $property->getName();
             $value               = $property->getValue($liveEmail);
             $editedEmailProperty = $editedEmailReflection->getProperty($name);
-            $editedEmailProperty->setAccessible(true);
             $editedEmailProperty->setValue($editedEmail, $value);
         }
     }

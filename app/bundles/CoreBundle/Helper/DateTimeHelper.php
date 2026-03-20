@@ -208,8 +208,8 @@ class DateTimeHelper
         $with = clone $this->datetime;
 
         if ($resetTime) {
-            $compare->setTime(0, 0, 0);
-            $with->setTime(0, 0, 0);
+            $compare = $compare->setTime(0, 0, 0);
+            $with    = $with->setTime(0, 0, 0);
         }
 
         $interval = $compare->diff($with);

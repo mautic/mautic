@@ -153,7 +153,7 @@ trait OperatorListTrait
 
         if (is_array($type)) {
             return $this->getOperatorChoiceList($type, $overrideHiddenTypes);
-        } elseif (array_key_exists($type, $processedTypes)) {
+        } elseif (array_key_exists($type ?? '', $processedTypes)) {
             return $processedTypes[$type];
         }
 

@@ -31,7 +31,7 @@ trait MatchFilterForLeadTrait
                     continue;
                 }
             } else {
-                if (!array_key_exists($data['field'], $lead)) {
+                if (!array_key_exists($data['field'] ?? '', $lead)) {
                     continue;
                 }
             }

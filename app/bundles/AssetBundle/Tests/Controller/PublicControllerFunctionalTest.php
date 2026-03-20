@@ -13,9 +13,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionStreamByDefault(): void
     {
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
-
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug());
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -33,9 +31,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionStreamIsZero(): void
     {
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
-
-        $this->client->request('GET', '/asset/'.$assetSlug.'?stream=0');
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug().'?stream=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -61,8 +57,9 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
-        $this->assertStringContainsString('404 Not Found', $content);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertEquals($this->expectedPngContent, $content);
     }
 
     /**
@@ -71,7 +68,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
     public function testDownloadActionWithUTM(): void
     {
         $this->logoutUser();
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias().'?utm_source=test2&utm_medium=test3&utm_campaign=test6&utm_term=test4&utm_content=test5';
+        $assetSlug = $this->asset->getSlug().'?utm_source=test2&utm_medium=test3&utm_campaign=test6&utm_term=test4&utm_content=test5';
 
         $this->client->request('GET', '/asset/'.$assetSlug);
         ob_start();
@@ -108,8 +105,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $asset = $this->createAsset(['title' => 'Unpublished Asset', 'isPublished' => false]);
         $this->em->flush();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$asset->getSlug());
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
@@ -126,11 +122,9 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->em->clear();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-
         // Don't follow redirects automatically
         $this->client->followRedirects(false);
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$asset->getSlug());
 
         $response = $this->client->getResponse();
 
@@ -152,8 +146,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertFileExists($assetPath, 'Expected asset file to exist before deletion');
         unlink($assetPath);
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
@@ -165,8 +158,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $asset->setDisallow(true);
         $this->em->flush();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug());
 
         $this->assertResponseIsSuccessful();
         $this->assertSame('noindex, nofollow, noarchive', $this->client->getResponse()->headers->get('X-Robots-Tag'));

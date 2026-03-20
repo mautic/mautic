@@ -853,7 +853,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass($contactDevice);
         $prop       = $reflection->getProperty('id');
-        $prop->setAccessible(true);
         $prop->setValue($contactDevice, 1);
 
         $stat->setLead($contact);

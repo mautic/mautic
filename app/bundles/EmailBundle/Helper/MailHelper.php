@@ -1559,13 +1559,10 @@ class MailHelper
     {
         $reflectedMailer     = new \ReflectionClass($this->mailer);
         $reflectedTransports = $reflectedMailer->getProperty('transport');
-        $reflectedTransports->setAccessible(true);
-        $allTransports = $reflectedTransports->getValue($this->mailer);
+        $allTransports       = $reflectedTransports->getValue($this->mailer);
 
         $reflectedTransports = new \ReflectionClass($allTransports);
         $reflectedTransport  = $reflectedTransports->getProperty('transports');
-
-        $reflectedTransport->setAccessible(true);
 
         $currentTransport = $reflectedTransport->getValue($allTransports);
 

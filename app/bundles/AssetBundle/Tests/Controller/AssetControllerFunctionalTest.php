@@ -124,9 +124,8 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertNotEquals($this->expectedPngContent, $content);
         PageControllerTest::assertTrue($response->isOk());
 
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
         PageControllerTest::assertStringContainsString(
-            '/asset/'.$assetSlug,
+            '/asset/'.$this->asset->getSlug(),
             $content,
             'The return must contain the assert slug'
         );

@@ -372,7 +372,6 @@ class AssetController extends FormController
             'viewParameters' => [
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
-                'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
                 'startOnLocal'     => $entity->isLocal(),
                 'uploadEndpoint'   => $uploadEndpoint,

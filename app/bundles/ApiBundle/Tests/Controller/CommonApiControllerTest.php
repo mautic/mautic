@@ -99,7 +99,6 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
         $method               = $controllerReflection->getMethod($method);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($controller, $args);
     }

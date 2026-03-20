@@ -83,7 +83,6 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 
         $reflectedMockTrait = new \ReflectionObject($mockWithTrait);
         $method             = $reflectedMockTrait->getMethod('formatFieldValues');
-        $method->setAccessible(true);
 
         $expected = [
             'core' => [
@@ -150,7 +149,6 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 
         $reflectedMockTrait = new \ReflectionObject($mockWithTrait);
         $method             = $reflectedMockTrait->getMethod('formatFieldValues');
-        $method->setAccessible(true);
 
         $expected = [
             'core' => [
