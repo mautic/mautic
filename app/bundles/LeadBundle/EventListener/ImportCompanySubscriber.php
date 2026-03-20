@@ -93,7 +93,6 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
             return;
         }
 
-
         $matchedFields = $event->getForm()->getData();
         $skipIfExists  = ArrayHelper::pickValue('skip_if_exists', $matchedFields, false);
         $event->setSkipIfExists((bool) $skipIfExists);
