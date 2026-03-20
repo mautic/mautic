@@ -18,9 +18,6 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, string> $clickthrough
-     *
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     #[DataProvider('generateUrlDataProvider')]
     public function testGenerateUrl(
@@ -28,7 +25,7 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
         bool $absolute,
         array $clickthrough,
         ?string $stream,
-        string $expectedUrl,
+        string $expectedQuery,
     ): void {
         $asset = new Asset();
         $asset->setTitle($assetAlias);
@@ -43,6 +40,11 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
 
         $this->em->persist($asset);
         $this->em->flush();
+
+        $this->assertNotNull($asset->getUuid());
+        $slug = $asset->getSlug();
+
+        $expectedUrl = 'https://localhost/asset/'.$slug.$expectedQuery;
 
         $assetModel = static::getContainer()->get('mautic.asset.model.asset');
         assert($assetModel instanceof AssetModel);
@@ -64,7 +66,7 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
             true,
             [],
             null,
-            'https://localhost/asset/1:asset-to-download',
+            '',
         ];
 
         yield 'Absolute URL with clickthrough' => [
@@ -72,7 +74,7 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
             true,
             ['ct' => 'encoded-string'],
             null,
-            'https://localhost/asset/1:asset-with-ct?ct='.$clickThroughEncoded,
+            '?ct='.$clickThroughEncoded,
         ];
 
         yield 'Absolute URL with stream' => [
@@ -80,7 +82,7 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
             true,
             [],
             '1',
-            'https://localhost/asset/1:stream-asset?stream=1',
+            '?stream=1',
         ];
 
         yield 'Absolute URL with stream and clickthrough' => [
@@ -88,7 +90,35 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
             true,
             $clickThrough,
             '0',
-            'https://localhost/asset/1:stream-ct-asset?stream=0&ct='.$clickThroughEncoded,
+            '?stream=0&ct='.$clickThroughEncoded,
         ];
+    }
+
+    public function testGenerateUrlWithAliasFallback(): void
+    {
+        $asset = new Asset();
+        $asset->setTitle('asset-alias-fallback');
+        $asset->setAlias('the-alias');
+        $asset->setDateAdded(new \DateTime());
+        $asset->setDateModified(new \DateTime());
+        $asset->setCreatedByUser('User');
+        $asset->setStorageLocation('remote');
+        $asset->setRemotePath('https://example.com/remote/asset/the-alias');
+        $asset->setSize(0);
+        $asset->setIsPublished(true);
+
+        $this->em->persist($asset);
+        $this->em->flush();
+
+        // Set UUID to null in memory to test the fallback.
+        $asset->setUuid(null);
+
+        $this->assertNull($asset->getUuid());
+        $this->assertSame('1:the-alias', $asset->getSlug());
+
+        $assetModel = static::getContainer()->get('mautic.asset.model.asset');
+        assert($assetModel instanceof AssetModel);
+        $generatedUrl = $assetModel->generateUrl($asset, true, [], null);
+        $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
     }
 }

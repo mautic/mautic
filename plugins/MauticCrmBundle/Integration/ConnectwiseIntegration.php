@@ -10,6 +10,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 use MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -230,9 +231,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {

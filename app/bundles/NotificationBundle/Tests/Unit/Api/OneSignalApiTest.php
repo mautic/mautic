@@ -15,7 +15,6 @@ class OneSignalApiTest extends TestCase
 
         $controllerReflection = (new \ReflectionClass(OneSignalApi::class));
         $method               = $controllerReflection->getMethod('addMobileData');
-        $method->setAccessible(true);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_subtitle' => 'test']]);

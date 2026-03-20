@@ -38,19 +38,13 @@ class TweetStat
     private $handle;
 
     /**
-     * @var DateTime
+     * @var \DateTime|null
      */
     private $dateSent;
 
-    /**
-     * @var bool|null
-     */
-    private $isFailed = false;
+    private ?bool $isFailed = false;
 
-    /**
-     * @var int|null
-     */
-    private $retryCount = 0;
+    private ?int $retryCount = 0;
 
     /**
      * @var string|null
@@ -62,20 +56,14 @@ class TweetStat
      */
     private $sourceId;
 
-    /**
-     * @var int|null
-     */
-    private $favoriteCount = 0;
+    private ?int $favoriteCount = 0;
+
+    private ?int $retweetCount = 0;
 
     /**
-     * @var int|null
+     * @var ?mixed[]
      */
-    private $retweetCount = 0;
-
-    /**
-     * @var array|null
-     */
-    private $responseDetails = [];
+    private ?array $responseDetails = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -193,7 +181,7 @@ class TweetStat
     }
 
     /**
-     * @return mixed
+     * @return \DateTime|null
      */
     public function getDateSent()
     {
@@ -201,7 +189,7 @@ class TweetStat
     }
 
     /**
-     * @param mixed $dateSent
+     * @param \DateTime|null $dateSent
      */
     public function setDateSent($dateSent): void
     {
@@ -241,7 +229,7 @@ class TweetStat
     }
 
     /**
-     * @return mixed
+     * @return ?int
      */
     public function getRetryCount()
     {
@@ -249,7 +237,7 @@ class TweetStat
     }
 
     /**
-     * @param mixed $retryCount
+     * @param ?int $retryCount
      */
     public function setRetryCount($retryCount): void
     {
@@ -262,7 +250,7 @@ class TweetStat
     }
 
     /**
-     * @return int
+     * @return ?int
      */
     public function getFavoriteCount()
     {
@@ -270,7 +258,7 @@ class TweetStat
     }
 
     /**
-     * @param int $favoriteCount
+     * @param ?int $favoriteCount
      *
      * @return $this
      */
@@ -282,7 +270,7 @@ class TweetStat
     }
 
     /**
-     * @return int
+     * @return ?int
      */
     public function getRetweetCount()
     {
@@ -290,7 +278,7 @@ class TweetStat
     }
 
     /**
-     * @param int $retweetCount
+     * @param ?int $retweetCount
      *
      * @return $this
      */
@@ -302,7 +290,7 @@ class TweetStat
     }
 
     /**
-     * @return mixed
+     * @return ?bool
      */
     public function getIsFailed()
     {
@@ -310,7 +298,7 @@ class TweetStat
     }
 
     /**
-     * @param mixed $isFailed
+     * @param ?bool $isFailed
      */
     public function setIsFailed($isFailed): void
     {
@@ -318,7 +306,7 @@ class TweetStat
     }
 
     /**
-     * @return mixed
+     * @return ?bool
      */
     public function isFailed()
     {
@@ -374,7 +362,7 @@ class TweetStat
     }
 
     /**
-     * @return mixed
+     * @return ?mixed[]
      */
     public function getResponseDetails()
     {
@@ -382,9 +370,9 @@ class TweetStat
     }
 
     /**
-     * @param mixed $responseDetails
+     * @param ?mixed[] $responseDetails
      *
-     * @return Stat
+     * @return self
      */
     public function setResponseDetails($responseDetails)
     {

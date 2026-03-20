@@ -73,30 +73,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        if (empty($this->inConversion)) {
-            $alias = $entity->getAlias();
-            if (empty($alias)) {
-                $alias = $entity->getTitle();
-            }
-            $alias = $this->cleanAlias($alias, '', 0, '-');
-
-            // make sure alias is not already taken
-            $repo      = $this->getRepository();
-            $testAlias = $alias;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias.$aliasTag;
-                $count     = $repo->checkUniqueAlias($testAlias, $entity);
-                ++$aliasTag;
-            }
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
-            $entity->setAlias($alias);
-        }
-
         if (!$entity->isNew()) {
             // increase the revision
             $revision = $entity->getRevision();
@@ -438,11 +414,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      */
     public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
-        $entityId  = $entity->getId();
-        $alias     = $entity->getAlias();
-        $assetSlug = $entityId.':'.$alias;
-
-        $routeParams = ['slug' => $assetSlug];
+        $routeParams = ['slug' => $entity->getSlug()];
         if (!is_null($stream)) {
             $routeParams['stream'] = $stream;
         }
@@ -635,5 +607,37 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $chartQuery->applyDateFilters($q, 'date_added');
 
         return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Asset-specific override for legacy public asset URLs.
+     *
+     * Backward compatibility rules:
+     * - Supports `{id}:{alias}` without validating the alias value
+     * - Allows `{id}:` and `{id}:<any>` only for assets that already have a
+     *   non-null alias, for BC
+     *
+     * @note The alias portion of the slug is no longer used for matching or validation.
+     */
+    public function getEntityBySlugs($slug): Asset|bool
+    {
+        if (!is_string($slug) || !str_contains($slug, ':')) {
+            return false;
+        }
+
+        [$id] = array_pad(explode(':', $slug, 2), 1, null);
+
+        if (empty($id) || !ctype_digit((string) $id)) {
+            return false;
+        }
+
+        $entity = $this->getEntity((int) $id);
+        if ($entity && null !== $entity->getAlias()) {
+            return $entity;
+        }
+
+        return false;
     }
 }
