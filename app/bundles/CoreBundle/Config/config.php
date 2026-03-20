@@ -382,6 +382,7 @@ return [
                     'mautic.model.factory',
                     'database_connection',
                     'mautic.helper.user',
+                    'translator',
                 ],
             ],
             'mautic.helper.maxmind_do_not_sell_download' => [

@@ -69,8 +69,6 @@ Mautic.configureAtWho = function(element, method, froala) {
     Mautic.getTokens(method, function(tokens) {
         element.atwho('destroy');
 
-        Mautic.configureDynamicContentAtWhoTokens();
-
         // Add the dynamic content tokens
         mQuery.extend(tokens, Mautic.dynamicContentTokens);
 
@@ -133,29 +131,6 @@ Mautic.getTokens = function(method, callback) {
             Mautic.builderTokensRequestInProgress = false;
         }
     });
-};
-
-/**
- * Append dynamic content tokens to at who
- */
-Mautic.configureDynamicContentAtWhoTokens = function() {
-    Mautic.dynamicContentTokens = {};
-
-    var dynamicContentTabs = mQuery('#dynamicContentTabs');
-
-    if (dynamicContentTabs.length === 0 && window.parent) {
-        dynamicContentTabs = mQuery(window.parent.document.getElementById('dynamicContentTabs'));
-    }
-
-    if (dynamicContentTabs.length) {
-        dynamicContentTabs.find('a[data-toggle="tab"]').each(function () {
-            var tokenText = mQuery(this).text();
-            var prototype = '{dynamiccontent="__tokenName__"}';
-            var newOption = prototype.replace(/__tokenName__/g, tokenText);
-
-            Mautic.dynamicContentTokens[newOption] = tokenText;
-        });
-    }
 };
 
 Mautic.insertTextInEditor = function (obj, text) {
@@ -262,7 +237,6 @@ Mautic.getTokensForPlugIn = function(method) {
         success: function (response) {
             if (typeof response.tokens === 'object') {
                 Mautic.builderTokens = response.tokens;
-                Mautic.configureDynamicContentAtWhoTokens();
                 mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
                     return {'id':i, 'name':value};

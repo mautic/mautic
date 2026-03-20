@@ -82,11 +82,12 @@ class BuilderSubscriber implements EventSubscriberInterface
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }
 
-        $tokens = [
-            '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
-            '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
-            '{subject}'          => $this->translator->trans('mautic.email.subject'),
+        $emailPrefix = $this->translator->trans('mautic.email.email').': ';
+        $tokens      = [
+            '{unsubscribe_text}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_text'),
+            '{webview_text}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_text'),
+            '{signature}'        => $emailPrefix.$this->translator->trans('mautic.email.token.signature'),
+            '{subject}'          => $emailPrefix.$this->translator->trans('mautic.email.subject'),
         ];
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -97,10 +98,10 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         // these should not allow visual tokens
         $tokens = [
-            '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{dnc_url}'         => $this->translator->trans('mautic.email.token.unsubscribe_all_url'),
-            '{resubscribe_url}' => $this->translator->trans('mautic.email.token.resubscribe_url'),
-            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
+            '{unsubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{dnc_url}'         => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_all_url'),
+            '{resubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.resubscribe_url'),
+            '{webview_url}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(

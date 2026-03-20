@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriberTest extends TestCase
 {
@@ -23,11 +24,12 @@ class EmailSubscriberTest extends TestCase
 
         $event           = new TokenReplacementEvent($value, $contact);
         $emailSubscriber = new EmailSubscriber(
-            new class() extends BuilderTokenHelperFactory {
+            new class extends BuilderTokenHelperFactory {
                 public function __construct()
                 {
                 }
-            }
+            },
+            self::createStub(TranslatorInterface::class),
         );
 
         $emailSubscriber->onEmailAddressReplacement($event);

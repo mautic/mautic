@@ -22,7 +22,7 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private LeadModel $leadModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -127,14 +127,14 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Creates translation ready label Owner Firstname etc.
+     * Creates translation ready label Owner: Firstname etc.
      *
      * @param string $field
      */
     private function buildLabel($field): string
     {
         return sprintf(
-            '%s %s',
+            '%s: %s',
             $this->translator->trans('mautic.lead.list.filter.owner'),
             $this->translator->trans('mautic.core.'.$field)
         );
