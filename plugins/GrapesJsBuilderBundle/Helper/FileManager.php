@@ -259,7 +259,7 @@ class FileManager
      *
      * @return array<string, int>
      */
-    private function getSvgDimensions($filePath): array
+    private function getSvgDimensions(string $filePath): array
     {
         $dimensions = ['width' => 0, 'height' => 0];
 
