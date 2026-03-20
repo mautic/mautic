@@ -22,10 +22,10 @@ class FullContact_Name extends FullContact_Base
     /**
      * This takes a name and breaks it into its individual parts.
      *
-     * @param type $name
-     * @param type $casing -> valid values are uppercase, lowercase, titlecase
+     * @param string $name
+     * @param string $casing -> valid values are uppercase, lowercase, titlecase
      *
-     * @return type
+     * @return mixed
      */
     public function normalizer($name, $casing = 'titlecase')
     {
@@ -39,10 +39,10 @@ class FullContact_Name extends FullContact_Base
      * This resolves a person's name from either their email address or a
      *   username. This is basically a wrapper for the Person lookup methods.
      *
-     * @param type $type   -> valid values are email and username
-     * @param type $casing -> valid values are uppercase, lowercase, titlecase
+     * @param string $type   -> valid values are email and username
+     * @param string $casing -> valid values are uppercase, lowercase, titlecase
      *
-     * @return type
+     * @return mixed
      */
     public function deducer($value, $type = 'email', $casing = 'titlecase')
     {
@@ -55,11 +55,11 @@ class FullContact_Name extends FullContact_Base
     /**
      * These are two names to compare.
      *
-     * @param type $name1
-     * @param type $name2
-     * @param type $casing
+     * @param string $name1
+     * @param string $name2
+     * @param string $casing
      *
-     * @return type
+     * @return mixed
      */
     public function similarity($name1, $name2, $casing = 'titlecase')
     {

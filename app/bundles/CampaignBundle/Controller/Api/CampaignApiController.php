@@ -7,6 +7,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Helper\CampaignContactCountHelper;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -58,6 +59,7 @@ class CampaignApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private ValidatorInterface $validator,
         private EventModel $eventModel,
+        private CampaignContactCountHelper $contactCountHelper,
     ) {
         $campaignModel = $modelFactory->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
@@ -77,6 +79,36 @@ class CampaignApiController extends CommonApiController
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+    }
+
+    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    {
+        $response = parent::getEntitiesAction($request, $userHelper);
+
+        $withCounts = $request->query->has('withContactCounts')
+            && 'false' !== strtolower((string) $request->query->get('withContactCounts', 'true'));
+        if (!$withCounts) {
+            return $response;
+        }
+
+        $content = json_decode($response->getContent(), true);
+
+        if (!isset($content[$this->entityNameMulti]) || empty($content[$this->entityNameMulti])) {
+            return $response;
+        }
+
+        $campaignIds = array_keys($content[$this->entityNameMulti]);
+
+        $contactCounts = $this->contactCountHelper->getContactCounts($campaignIds);
+
+        foreach ($content[$this->entityNameMulti] as $id => &$campaign) {
+            $campaign['contactCount']          = $contactCounts[$id]['contactCount'] ?? 0;
+            $campaign['contactCountFetchedAt'] = $contactCounts[$id]['countFetchedAt'] ?? null;
+        }
+
+        $response->setContent(json_encode($content));
+
+        return $response;
     }
 
     /**

@@ -227,11 +227,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (!isset($existingFields[$fieldId])) {
+            if (!isset($existingFields[$fieldId ?? ''])) {
                 continue;
             }
-            $this->handleFilesDelete($existingFields[$fieldId]);
-            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $this->handleFilesDelete($existingFields[$fieldId ?? '']);
+            $entity->removeField($fieldId, $existingFields[$fieldId ?? '']);
             $deleteFields[] = $fieldId;
         }
 
@@ -534,7 +534,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+        if ($isNew || !$this->tableSchemaHelper->checkTableExists($name)) {
             $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
@@ -740,9 +740,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml): void
+    public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
-        $formName          = $form->generateFormName();
+        $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
         $objectsToAutoFill = ['contact', 'company'];

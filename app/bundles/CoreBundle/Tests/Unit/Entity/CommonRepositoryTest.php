@@ -198,7 +198,6 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $reflection = new \ReflectionClass(CommonRepository::class);
         $method     = $reflection->getMethod($method);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($this->repo, $args);
     }
@@ -355,7 +354,6 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $reflection = new \ReflectionClass(CommonRepository::class);
         $method     = $reflection->getMethod('buildWhereClauseFromArray');
-        $method->setAccessible(true);
 
         return $method->invokeArgs($this->repo, [$qb, $args]);
     }

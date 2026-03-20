@@ -32,8 +32,8 @@ class DateTimeHelper
 
     /**
      * @param \DateTimeInterface|string $string
-     * @param string                    $fromFormat Format the string is in
-     * @param string                    $timezone   Timezone the string is in
+     * @param string|null               $fromFormat Format the string is in
+     * @param string|null               $timezone   Timezone the string is in
      */
     public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
     {
@@ -61,10 +61,10 @@ class DateTimeHelper
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
             $this->timezone = $datetime->getTimezone()->getName();
-            $this->string   = $fromFormat ? $this->datetime->format($fromFormat) : $datetime;
+            $this->string   = $this->datetime->format($this->format);
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
-            $this->string   = $fromFormat ? $this->datetime->format($fromFormat) : $datetime;
+            $this->string   = $this->datetime->format($this->format);
         } elseif (null === $fromFormat) {
             $this->string   = $datetime;
             $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
@@ -208,8 +208,8 @@ class DateTimeHelper
         $with = clone $this->datetime;
 
         if ($resetTime) {
-            $compare->setTime(0, 0, 0);
-            $with->setTime(0, 0, 0);
+            $compare = $compare->setTime(0, 0, 0);
+            $with    = $with->setTime(0, 0, 0);
         }
 
         $interval = $compare->diff($with);

@@ -213,7 +213,7 @@ class TagController extends FormController
                         'mauticContent' => 'tagmanager',
                     ],
                 ]);
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $tagDependencies, $tag->getId(), true);
             }
         }

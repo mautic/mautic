@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldDeleteDispatcher;
-use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
+use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 
 class LeadFieldDeleter
 {
@@ -18,6 +18,7 @@ class LeadFieldDeleter
         private LeadFieldRepository $leadFieldRepository,
         private FieldDeleteDispatcher $fieldDeleteDispatcher,
         private UserHelper $userHelper,
+        private BackgroundSettings $backgroundSettings,
     ) {
     }
 
@@ -26,15 +27,10 @@ class LeadFieldDeleter
      */
     public function deleteLeadFieldEntity(LeadField $leadField, bool $isBackground = false): void
     {
-        try {
-            $this->fieldDeleteDispatcher->dispatchPreDeleteEvent($leadField);
-        } catch (NoListenerException) {
-        } catch (AbortColumnUpdateException) { // if processing in background is ON
-            if (!$isBackground) {
-                $this->deleteLeadFieldEntityWithoutColumnRemoved($leadField);
+        $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
 
-                return;
-            }
+        if ($shouldProcessInBackground && !$isBackground) {
+            return;
         }
 
         $leadField->deletedId = $leadField->getId();
@@ -53,7 +49,7 @@ class LeadFieldDeleter
      *
      * Note: The LeadModel would set most of this for us, but cannot be used due to circular dependency.
      */
-    private function deleteLeadFieldEntityWithoutColumnRemoved(LeadField $leadField): void
+    public function deleteLeadFieldEntityWithoutColumnRemoved(LeadField $leadField): void
     {
         $currentUser = $this->userHelper->getUser();
         $leadField->setColumnIsNotRemoved();

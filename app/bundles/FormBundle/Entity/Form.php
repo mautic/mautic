@@ -386,7 +386,7 @@ class Form extends FormEntity implements UuidInterface
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
+            $this->changes[$prop][$val[0] ?? ''] = $val[1];
         } else {
             parent::isChanged($prop, $val);
         }
@@ -887,10 +887,23 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * Generate a form name for HTML attributes.
+     *
+     * @param string[] $allowedCharacters
      */
-    public function generateFormName(): string
+    public function generateFormName(?string $name = null, array $allowedCharacters = []): string
     {
-        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
+        $name = strtolower(
+            InputHelper::alphanum(
+                InputHelper::transliterate(
+                    $name ?? $this->name
+                ),
+                false,
+                null,
+                $allowedCharacters
+            )
+        );
+
+        return (empty($name)) ? 'form-'.$this->id : $name;
     }
 
     /**

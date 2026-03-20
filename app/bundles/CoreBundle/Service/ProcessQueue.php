@@ -46,8 +46,8 @@ final class ProcessQueue
             if ($process->isRunning()) {
                 continue;
             }
-            $this->processing->detach($process);
-            $this->processed->attach($process);
+            $this->processing->offsetUnset($process);
+            $this->processed->offsetSet($process);
         }
 
         // Add new processes to the processing queue
@@ -57,7 +57,7 @@ final class ProcessQueue
             }
             $process = $this->pending->dequeue();
             $process->start();
-            $this->processing->attach($process);
+            $this->processing->offsetSet($process);
         }
     }
 

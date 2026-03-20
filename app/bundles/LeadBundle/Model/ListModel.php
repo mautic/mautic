@@ -1342,7 +1342,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $choices['categories'] = [];
                 $categories            = $this->categoryModel->getLookupResults('segment');
                 foreach ($categories as $category) {
-                    $choices['categories'][$category['id']] = $category['title'];
+                    $choices['categories'][$category['alias']] = $category['title'];
                 }
         }
 

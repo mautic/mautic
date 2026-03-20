@@ -194,11 +194,9 @@ class PageSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $property->setAccessible(true);
             $name                = $property->getName();
             $value               = $property->getValue($livePage);
             $editedPageProperty  = $editedPageReflection->getProperty($name);
-            $editedPageProperty->setAccessible(true);
             $editedPageProperty->setValue($editedPage, $value);
         }
     }
