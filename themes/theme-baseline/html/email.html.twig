@@ -1,0 +1,92 @@
+<mjml>
+    <mj-head>
+        <mj-attributes>
+            <!-- Global defaults -->
+            <mj-all font-family="Arial, sans-serif" color="#111827"></mj-all>
+            <mj-text font-size="16px" line-height="24px" padding="0"></mj-text>
+            <mj-button font-weight="600" border-radius="6px" padding="0"></mj-button>
+            <mj-section padding="24px 0"></mj-section>
+            <mj-column padding="0"></mj-column>
+
+            <!-- Typography tokens -->
+            <mj-class name="t-body" font-size="16px" line-height="24px"></mj-class>
+            <mj-class name="t-lead" font-size="18px" line-height="28px"></mj-class>
+            <mj-class name="t-h1" font-size="32px" line-height="38px" font-weight="700"></mj-class>
+            <mj-class name="t-h2" font-size="24px" line-height="30px" font-weight="700"></mj-class>
+            <mj-class name="t-h3" font-size="18px" line-height="24px" font-weight="700"></mj-class>
+            <mj-class name="t-h4" font-size="16px" line-height="22px" font-weight="700"></mj-class>
+
+            <!-- Button tokens -->
+            <mj-class name="t-btn" inner-padding="12px 18px"></mj-class>
+            <mj-class name="t-btn-primary" background-color="#2563EB" color="#FFFFFF"></mj-class>
+            <mj-class name="t-btn-secondary" background-color="#E5E7EB" color="#111827"></mj-class>
+
+            <!-- Surface tokens -->
+            <mj-class name="t-section" padding="32px 24px"></mj-class>
+            <mj-class name="t-surface-1" background-color="#FFFFFF"></mj-class>
+            <mj-class name="t-surface-2" background-color="#F3F4F6"></mj-class>
+        </mj-attributes>
+        <!--
+          Note: mj-style has limited email client support (Outlook, Gmail strip it).
+          Use only for non-critical enhancements. All essential styling must be in mj-attributes.
+        -->
+        <mj-style inline="inline">
+            p, li { margin: 0; padding: 0; }
+        </mj-style>
+    </mj-head>
+
+    <mj-body background-color="#F3F4F6">
+        <!-- Header -->
+        <mj-section>
+            <mj-column>
+                <mj-text align="center" font-size="11px" color="#6B7280">
+                    <a href="{webview_url}" style="color: #6B7280;">View in browser</a>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <!-- Main Content Area -->
+        <mj-section mj-class="t-section t-surface-1">
+            <mj-column>
+                <mj-text mj-class="t-h1" padding-bottom="16px">
+                    Welcome to Theme Baseline
+                </mj-text>
+                <mj-text mj-class="t-body" padding-bottom="24px">
+                    This theme demonstrates the token-based styling system using mj-class attributes. Blocks dropped
+                    from GrapesJS will inherit styles from the theme's mj-attributes definitions.
+                </mj-text>
+                <mj-button mj-class="t-btn t-btn-primary" href="https://">
+                    Primary Button
+                </mj-button>
+            </mj-column>
+        </mj-section>
+
+        <!-- Secondary Section -->
+        <mj-section mj-class="t-section t-surface-2">
+            <mj-column>
+                <mj-text mj-class="t-h2" padding-bottom="12px">
+                    Secondary Section
+                </mj-text>
+                <mj-text mj-class="t-body" padding-bottom="24px">
+                    This section uses the t-surface-2 token for a subtle gray background. The button below uses the
+                    secondary button styling.
+                </mj-text>
+                <mj-button mj-class="t-btn t-btn-secondary" href="https://">
+                    Secondary Button
+                </mj-button>
+            </mj-column>
+        </mj-section>
+
+        <!-- Footer -->
+        <mj-section>
+            <mj-column>
+                <mj-text align="center" font-size="11px" color="#6B7280" padding-bottom="8px">
+                    Your Company Name | 123 Street, City
+                </mj-text>
+                <mj-text align="center" font-size="11px" color="#6B7280">
+                    {unsubscribe_text}
+                </mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
