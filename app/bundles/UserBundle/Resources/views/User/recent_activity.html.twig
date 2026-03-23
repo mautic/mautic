@@ -135,7 +135,7 @@
 								{% endif %}
 							</div>
 							<div class="media-body">
-								{% if log.object == 'user' %}
+								{% if log.object == 'user' and userPath is defined and userPath is not empty %}
 									{% if log.action == 'update' %}
 										{{ 'mautic.user.user.form.user'|trans }}
 										<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: userPath[0]}) }}" data-toggle="ajax">
@@ -148,7 +148,7 @@
 										{{ 'mautic.user.user.form.created_by'|trans }}
 									{% endif %}
 
-								{% elseif log.object == 'role' %}
+								{% elseif log.object == 'role' and rolePath is defined and rolePath is not empty %}
 									{% if log.action == 'create' %}
 										{{ 'mautic.role.role'|trans }}
 										<a href="{{ path('mautic_role_action', {objectAction: 'edit', objectId: rolePath[0]}) }}" data-toggle="ajax">
