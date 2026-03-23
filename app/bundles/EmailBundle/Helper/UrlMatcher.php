@@ -4,16 +4,16 @@ namespace Mautic\EmailBundle\Helper;
 
 class UrlMatcher
 {
-    /**
-     * @param string[] $urlsToCheckAgainst
-     * @param string   $urlToFind
-     */
     public static function hasMatch(array $urlsToCheckAgainst, $urlToFind): bool
     {
-        $urlToFind = self::sanitizeUrl($urlToFind);
+        $urlToFind = self::sanitizeUrl((string) $urlToFind);
 
         foreach ($urlsToCheckAgainst as $url) {
-            $url = self::sanitizeUrl($url);
+            $url = self::sanitizeUrl((string) $url);
+
+            if (self::isLegacyWildcardPattern($url) && fnmatch($url, $urlToFind, FNM_CASEFOLD)) {
+                return true;
+            }
 
             if (preg_match('/'.preg_quote($url, '/').'/i', $urlToFind)) {
                 return true;
@@ -47,5 +47,10 @@ class UrlMatcher
         }
 
         return $url;
+    }
+
+    private static function isLegacyWildcardPattern(string $url): bool
+    {
+        return false !== strpbrk($url, '*?[');
     }
 }
