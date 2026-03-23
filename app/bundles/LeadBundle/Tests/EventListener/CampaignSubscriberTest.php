@@ -125,6 +125,28 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
+     * @var array<string, string>
+     */
+    private $configUrlPageHitPlainText = [
+        'startDate'         => '',
+        'endDate'           => '',
+        'page'              => '',
+        'page_url'          => 'example.com',
+        'accumulative_time' => '',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    private $configUrlPageHitLegacyWildcard = [
+        'startDate'         => '',
+        'endDate'           => '',
+        'page'              => '',
+        'page_url'          => '*example.com*',
+        'accumulative_time' => '',
+    ];
+
+    /**
      * @var LeadModel|MockObject
      */
     private $mockLeadModel;
@@ -399,6 +421,94 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'event' => [
                 'type'       => 'lead.pageHit',
                 'properties' => $this->configUrlPageHitWithoutSpentTime,
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+        $event = new CampaignExecutionEvent($args, true);
+        $this->subscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+    }
+
+    public function testOnCampaignTriggerConditionLeadPageUrlHitWithPlainTextFilter(): void
+    {
+        $lead = new Lead();
+        $lead->setId(99);
+        $leadTimeline = [
+            0 => [
+                'events' => [
+                    0 => [
+                        'event'     => 'page.hit',
+                        'eventId'   => '5',
+                        'eventType' => 'Page hit',
+                        'timestamp' => new \DateTime('2022-06-08 12:45:22.0'),
+                        'contactId' => '1',
+                        'details'   => [
+                            'hit' => [
+                                'hitId'    => '5',
+                                'page_id'  => '',
+                                'dateHit'  => new \DateTime('2022-06-08 12:45:22.0'),
+                                'dateLeft' => new \DateTime('2022-06-08 12:50:42.0'),
+                                'url'      => 'https://example.com/hello',
+                            ],
+                        ],
+                    ],
+                ],
+            ], ];
+
+        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
+
+        $args = [
+            'lead'  => $lead,
+            'event' => [
+                'type'       => 'lead.pageHit',
+                'properties' => $this->configUrlPageHitPlainText,
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+        $event = new CampaignExecutionEvent($args, true);
+        $this->subscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+    }
+
+    public function testOnCampaignTriggerConditionLeadPageUrlHitWithLegacyWildcardFilter(): void
+    {
+        $lead = new Lead();
+        $lead->setId(99);
+        $leadTimeline = [
+            0 => [
+                'events' => [
+                    0 => [
+                        'event'     => 'page.hit',
+                        'eventId'   => '5',
+                        'eventType' => 'Page hit',
+                        'timestamp' => new \DateTime('2022-06-08 12:45:22.0'),
+                        'contactId' => '1',
+                        'details'   => [
+                            'hit' => [
+                                'hitId'    => '5',
+                                'page_id'  => '',
+                                'dateHit'  => new \DateTime('2022-06-08 12:45:22.0'),
+                                'dateLeft' => new \DateTime('2022-06-08 12:50:42.0'),
+                                'url'      => 'https://example.com/hello',
+                            ],
+                        ],
+                    ],
+                ],
+            ], ];
+
+        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
+
+        $args = [
+            'lead'  => $lead,
+            'event' => [
+                'type'       => 'lead.pageHit',
+                'properties' => $this->configUrlPageHitLegacyWildcard,
             ],
             'eventDetails'    => [],
             'systemTriggered' => true,
