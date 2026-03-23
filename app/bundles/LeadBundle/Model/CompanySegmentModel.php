@@ -6,6 +6,8 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -13,6 +15,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\CompaniesSegments;
 use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -22,10 +25,15 @@ use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
+use Mautic\LeadBundle\Event\CompanySegmentRebuildAddEvent;
+use Mautic\LeadBundle\Event\CompanySegmentRebuildRemoveEvent;
+use Mautic\LeadBundle\Event\SegmentPreRebuildSegmentEvent;
 use Mautic\LeadBundle\Form\Type\CompanySegmentType;
 use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Service\CompanySegmentService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -52,6 +60,7 @@ class CompanySegmentModel extends FormModel
     public function __construct(
         private CompanySegmentCountCacheHelper $companySegmentCountCacheHelper,
         private RequestStack $requestStack,
+        private CompanySegmentService $companySegmentService,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -468,5 +477,243 @@ class CompanySegmentModel extends FormModel
         $this->choiceFieldsCache = $choices;
 
         return $choices;
+    }
+
+    public function getCompanyRepository(): CompanyRepository
+    {
+        $repository = $this->em->getRepository(Company::class);
+        \assert($repository instanceof CompanyRepository);
+
+        return $repository;
+    }
+
+    public function rebuildCompanySegment(CompanySegment $companySegment, int $limit = 100, ?int $max = null, ?OutputInterface $output = null): int
+    {
+        $segmentId = $companySegment->getId();
+        \assert(null !== $segmentId);
+
+        $dtHelper = new DateTimeHelper();
+
+        $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
+        $list          = ['id' => $segmentId, 'filters' => $companySegment->getFilters()];
+
+        $this->dispatcher->dispatch(new SegmentPreRebuildSegmentEvent($list, false));
+
+        try {
+            $newCompaniesCount = $this->companySegmentService->getNewCompanySegmentsCompanyCount($companySegment, $batchLimiters);
+        } catch (\Mautic\LeadBundle\Segment\Exception\FieldNotFoundException) {
+            return 0;
+        } catch (\Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException) {
+            return 0;
+        } catch (\Mautic\LeadBundle\Segment\Exception\TableNotFoundException $e) {
+            $this->logger->error($e->getMessage());
+
+            return 0;
+        }
+
+        \assert(is_numeric($newCompaniesCount[$segmentId]['maxId']));
+        $batchLimiters['maxId'] = (int) $newCompaniesCount[$segmentId]['maxId'];
+
+        \assert(is_numeric($newCompaniesCount[$segmentId]['count']));
+        $companiesCount = (int) $newCompaniesCount[$segmentId]['count'];
+
+        if (0 === $companiesCount) {
+            $this->logger->info('Company Segment QB - No new companies for segment found.');
+        }
+
+        if (null !== $output) {
+            $output->writeln($this->translator->trans('mautic.company_segments.rebuild.to_be_added', ['%companies%' => $companiesCount, '%batch%' => $limit]));
+        }
+
+        $start = $companiesProcessed = 0;
+
+        gc_enable();
+
+        if ($companiesCount > 0) {
+            $maxCount = $max > 0 ? $max : $companiesCount;
+
+            if (null !== $output) {
+                $progress = ProgressBarHelper::init($output, $maxCount);
+                $progress->start();
+            }
+
+            while ($start < $companiesCount) {
+                $this->batchSleep();
+
+                $this->logger->debug(sprintf('Company Segment QB - Fetching new companies for segment [%d] %s', $segmentId, $companySegment->getName()));
+                $newCompaniesSegments = $this->companySegmentService->getNewCompanySegmentCompanies($companySegment, $batchLimiters, $limit);
+
+                if ([] === $newCompaniesSegments[$segmentId]) {
+                    break;
+                }
+
+                $processedCompanies = [];
+                $this->logger->debug(sprintf('Company Segment QB - Adding %d new companies to segment [%d] %s', count($newCompaniesSegments[$segmentId]), $segmentId, $companySegment->getName()));
+                foreach ($newCompaniesSegments[$segmentId] as $companyProperties) {
+                    \assert(is_array($companyProperties));
+                    $companyId = $companyProperties['id'];
+                    \assert(is_numeric($companyId));
+                    $companyId = (int) $companyId;
+
+                    $this->logger->debug(sprintf('Company Segment QB - Adding company #%s to segment [%d] %s', $companyId, $segmentId, $companySegment->getName()));
+
+                    $company = $this->getCompanyRepository()->getEntity($companyId);
+                    if (null === $company) {
+                        $this->logger->info(sprintf('Company Segment QB - Can not find a company #%s to add to segment [%d] %s', $companyId, $segmentId, $companySegment->getName()));
+                        continue;
+                    }
+
+                    $this->addCompany($company, [$companySegment], false, $dtHelper->getLocalDateTime());
+                    $processedCompanies[] = $company;
+
+                    ++$companiesProcessed;
+                    if (null !== $output && $companiesProcessed < $maxCount && isset($progress)) {
+                        $progress->setProgress($companiesProcessed);
+                    }
+
+                    if ($max > 0 && $companiesProcessed >= $max) {
+                        break;
+                    }
+                }
+
+                $this->logger->info(sprintf('Company Segment QB - Added %d new companies to segment [%d] %s', count($newCompaniesSegments[$segmentId]), $segmentId, $companySegment->getName()));
+
+                $start += $limit;
+
+                if (count($processedCompanies) > 0 && $this->dispatcher->hasListeners(CompanySegmentRebuildAddEvent::class)) {
+                    $this->dispatcher->dispatch(
+                        new CompanySegmentRebuildAddEvent($processedCompanies, $companySegment),
+                    );
+                }
+
+                unset($newCompaniesSegments);
+
+                gc_collect_cycles();
+
+                if ($max > 0 && $companiesProcessed >= $max) {
+                    if (null !== $output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
+                    return $companiesProcessed;
+                }
+            }
+
+            if (null !== $output) {
+                $progress->finish();
+                $output->writeln('');
+            }
+        }
+
+        unset($batchLimiters['maxId']);
+
+        $orphanCompaniesCount = $this->companySegmentService->getOrphanedCompanySegmentCompaniesCount($companySegment);
+
+        \assert(is_numeric($orphanCompaniesCount[$segmentId]['maxId']));
+        $batchLimiters['maxId'] = (int) $orphanCompaniesCount[$segmentId]['maxId'];
+
+        $start = 0;
+        \assert(is_numeric($orphanCompaniesCount[$segmentId]['count']));
+        $companiesCount = (int) $orphanCompaniesCount[$segmentId]['count'];
+
+        if (null !== $output) {
+            $output->writeln($this->translator->trans('mautic.company_segments.rebuild.to_be_removed', ['%companies%' => $companiesCount, '%batch%' => $limit]));
+        }
+
+        if ($companiesCount > 0) {
+            $maxCount = $max > 0 ? $max : $companiesCount;
+
+            if (null !== $output) {
+                $progress = ProgressBarHelper::init($output, $maxCount);
+                $progress->start();
+            }
+
+            while ($start < $companiesCount) {
+                $this->batchSleep();
+
+                $removeCompanySegment = $this->companySegmentService->getOrphanedCompanySegmentCompanies($companySegment, $batchLimiters, $limit);
+
+                if ([] === $removeCompanySegment[$segmentId]) {
+                    break;
+                }
+
+                $processedCompanies = [];
+                foreach ($removeCompanySegment[$segmentId] as $companyProperties) {
+                    \assert(is_array($companyProperties));
+                    $companyId = $companyProperties['id'];
+                    \assert(is_numeric($companyId));
+                    $companyId = (int) $companyId;
+
+                    $company = $this->getCompanyRepository()->getEntity($companyId);
+                    if (null === $company) {
+                        $this->logger->info(sprintf('Company Segment QB - Can not find a company #%s to add to segment [%d] %s', $companyId, $segmentId, $companySegment->getName()));
+                        continue;
+                    }
+
+                    $this->removeCompany($company, [$companySegment]);
+                    $processedCompanies[] = $company;
+                    ++$companiesProcessed;
+                    if (null !== $output && isset($progress) && $companiesProcessed < $maxCount) {
+                        $progress->setProgress($companiesProcessed);
+                    }
+
+                    if ($max > 0 && $companiesProcessed >= $max) {
+                        break;
+                    }
+                }
+
+                if (count($processedCompanies) > 0 && $this->dispatcher->hasListeners(CompanySegmentRebuildRemoveEvent::class)) {
+                    $this->dispatcher->dispatch(
+                        new CompanySegmentRebuildRemoveEvent($processedCompanies, $companySegment),
+                    );
+                }
+
+                $start += $limit;
+
+                unset($removeCompanySegment);
+
+                gc_collect_cycles();
+
+                if ($max > 0 && $companiesProcessed >= $max) {
+                    if (null !== $output && isset($progress)) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
+                    return $companiesProcessed;
+                }
+            }
+
+            if (null !== $output && isset($progress)) {
+                $progress->finish();
+                $output->writeln('');
+            }
+        }
+
+        $totalCompaniesCount = $this->getCompaniesSegmentsRepository()->getCompanyCount([$segmentId]);
+        $this->companySegmentCountCacheHelper->setSegmentCompanyCount($segmentId, $totalCompaniesCount[$segmentId] ?? 0);
+
+        return $companiesProcessed;
+    }
+
+    private function batchSleep(): void
+    {
+        $leadSleepTime = $this->coreParametersHelper->get('batch_lead_sleep_time', false);
+        if (false === $leadSleepTime) {
+            $leadSleepTime = $this->coreParametersHelper->get('batch_sleep_time', 1);
+        }
+
+        if (false === $leadSleepTime || '' === $leadSleepTime || !is_numeric($leadSleepTime)) {
+            return;
+        }
+
+        $leadSleepTime = (int) $leadSleepTime;
+
+        if ($leadSleepTime < 1) {
+            usleep($leadSleepTime * 1_000_000);
+        } else {
+            sleep($leadSleepTime);
+        }
     }
 }

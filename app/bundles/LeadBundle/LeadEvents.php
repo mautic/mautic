@@ -731,6 +731,36 @@ final class LeadEvents
     public const COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE = 'mautic.company_segment_filters_choices_on_generate';
 
     /**
+     * The mautic.company_segment_pre_rebuild_segment event is dispatched before a company segment is rebuilt.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\SegmentPreRebuildSegmentEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_PRE_REBUILD_SEGMENT = 'mautic.company_segment_pre_rebuild_segment';
+
+    /**
+     * The mautic.company_segment_rebuild_add event is dispatched when companies are added to a segment during rebuild.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentRebuildAddEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_REBUILD_ADD = 'mautic.company_segment_rebuild_add';
+
+    /**
+     * The mautic.company_segment_rebuild_remove event is dispatched when companies are removed from a segment during rebuild.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentRebuildRemoveEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_REBUILD_REMOVE = 'mautic.company_segment_rebuild_remove';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
