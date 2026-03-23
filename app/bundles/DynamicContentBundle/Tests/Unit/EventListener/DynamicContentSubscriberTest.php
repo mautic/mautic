@@ -258,6 +258,76 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    /**
+     * Test that DWC tokens inside href attributes are replaced correctly.
+     * DOMDocument URL-encodes curly braces in attributes ({->%7B, }->%7D),
+     * and the replacement must use strip_tags() to avoid injecting HTML into attributes.
+     */
+    public function testDecodeTokensWithDwcTokenInHrefAttribute(): void
+    {
+        $content = <<<HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="{dwc=link-token}">Click here</a>
+    </body>
+</html>
+
+HTML;
+
+        $expected = <<<HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="https://example.com/path">Click here</a>
+    </body>
+</html>
+
+HTML;
+        // DWC content contains HTML tags that should be stripped when used in href
+        $dwcContent = '<p>https://example.com/path</p>';
+        $event      = $this->createMock(PageDisplayEvent::class);
+        $contact    = new Lead();
+
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content);
+
+        $event->method('getLead')
+            ->willReturn(null);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($contact);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => $dwcContent,
+                    'filters' => [],
+                ],
+            ]);
+
+        $this->dynamicContentHelper->expects($this->never())
+            ->method('getDynamicContentForLead');
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->with($expected);
+
+        $this->subscriber->decodeTokens($event);
+    }
+
     public function testOnTokenReplacement(): void
     {
         $content = <<< HTML
