@@ -156,6 +156,80 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($resultAfter, 'Should return false when no previous hit is present and returns_after is set');
     }
 
+    public function testValidateUrlHitMatchesPlainTextSubstringForRepositoryQueries(): void
+    {
+        $lead = $this->createLead();
+        $now  = new \DateTimeImmutable();
+
+        $this->createHit(
+            $lead,
+            'https://example.com/product/1234',
+            $now->modify('-30 seconds'),
+            200,
+            'test-tracking-id-1',
+            $now->modify('-20 seconds')
+        );
+
+        $currentHit = $this->createHit(
+            $lead,
+            'https://example.com/product/1234',
+            $now,
+            200,
+            'test-tracking-id-2'
+        );
+
+        $action = [
+            'properties' => [
+                'page_url'          => 'product/123',
+                'returns_within'    => 40,
+                'returns_after'     => null,
+                'first_time'        => false,
+                'accumulative_time' => null,
+                'page_hits'         => 2,
+            ],
+        ];
+
+        $result = $this->pointActionHelper->validateUrlHit($currentHit, $action);
+        $this->assertTrue($result, 'Plain text URL filters should match persisted hits via repository lookups.');
+    }
+
+    public function testValidateUrlHitMatchesLegacyWildcardForRepositoryQueries(): void
+    {
+        $lead = $this->createLead();
+        $now  = new \DateTimeImmutable();
+
+        $this->createHit(
+            $lead,
+            'https://example.com/product/1234',
+            $now->modify('-30 seconds'),
+            200,
+            'test-tracking-id-1',
+            $now->modify('-20 seconds')
+        );
+
+        $currentHit = $this->createHit(
+            $lead,
+            'https://example.com/product/1234',
+            $now,
+            200,
+            'test-tracking-id-2'
+        );
+
+        $action = [
+            'properties' => [
+                'page_url'          => '*product/123*',
+                'returns_within'    => 40,
+                'returns_after'     => null,
+                'first_time'        => false,
+                'accumulative_time' => null,
+                'page_hits'         => 2,
+            ],
+        ];
+
+        $result = $this->pointActionHelper->validateUrlHit($currentHit, $action);
+        $this->assertTrue($result, 'Legacy wildcard URL filters should still match persisted hits via repository lookups.');
+    }
+
     private function createLead(): Lead
     {
         $lead = new Lead();
@@ -167,12 +241,15 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createHit(Lead $lead, string $url, \DateTimeImmutable $dateHit, int $code, string $trackingId): Hit
+    private function createHit(Lead $lead, string $url, \DateTimeImmutable $dateHit, int $code, string $trackingId, ?\DateTimeImmutable $dateLeft = null): Hit
     {
         $hit = new Hit();
         $hit->setLead($lead);
         $hit->setUrl($url);
         $hit->setDateHit(\DateTime::createFromImmutable($dateHit));
+        if (null !== $dateLeft) {
+            $hit->setDateLeft(\DateTime::createFromImmutable($dateLeft));
+        }
         $hit->setCode($code);
         $hit->setTrackingId($trackingId);
         $this->em->persist($hit);

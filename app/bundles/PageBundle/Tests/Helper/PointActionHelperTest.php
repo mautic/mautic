@@ -92,6 +92,44 @@ class PointActionHelperTest extends TestCase
                 ],
                 true,
             ],
+            'plain_text_matches_substring' => [
+                [
+                    'id'         => 5,
+                    'type'       => 'url.hit',
+                    'name'       => 'Plain text URL match',
+                    'properties' => [
+                        'page_url'               => 'example.com/pp',
+                        'page_hits'              => 1,
+                        'accumulative_time_unit' => 'H',
+                        'accumulative_time'      => 0,
+                        'returns_within_unit'    => 'H',
+                        'returns_within'         => 0,
+                        'returns_after_unit'     => 'H',
+                        'returns_after'          => 0,
+                    ],
+                    'points' => 5,
+                ],
+                true,
+            ],
+            'legacy_wildcard_still_matches' => [
+                [
+                    'id'         => 6,
+                    'type'       => 'url.hit',
+                    'name'       => 'Legacy wildcard URL match',
+                    'properties' => [
+                        'page_url'               => '*example.com/ppk*',
+                        'page_hits'              => 1,
+                        'accumulative_time_unit' => 'H',
+                        'accumulative_time'      => 0,
+                        'returns_within_unit'    => 'H',
+                        'returns_within'         => 0,
+                        'returns_after_unit'     => 'H',
+                        'returns_after'          => 0,
+                    ],
+                    'points' => 5,
+                ],
+                true,
+            ],
             'url_does_not_match' => [
                 [
                     'id'         => 3,
