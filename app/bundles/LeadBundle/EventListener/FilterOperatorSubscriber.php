@@ -89,28 +89,17 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
-        $event->addChoice(
-            'lead',
-            'leadlist',
-            [
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
+        $staticFields = [
+            'leadlist' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'leadlist',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
-                'iconClass'  => $this->getSegmentFilterIcon('leadlist'),
-            ]
-        );
-
-        // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (!$event->isForSegmentation()) {
-            return;
-        }
-
-        $this->setIncludeExcludeOperatorsToTextFilters($event);
-        $staticFields = [
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'datetime'],
@@ -321,11 +310,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {
-        // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (!$event->isForSegmentation()) {
-            return;
-        }
-
         $this->setIncludeExcludeOperatorsToTextFilters($event);
         $choices = [
             'lead_asset_download' => [
