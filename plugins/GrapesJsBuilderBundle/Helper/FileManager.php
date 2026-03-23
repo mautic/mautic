@@ -255,10 +255,14 @@ class FileManager
         try {
             $svgContent = @file_get_contents($filePath);
             if ($svgContent) {
-                // Suppress XML warnings
+                // Suppress XML warnings and enable internal error handling
                 $previousErrors = libxml_use_internal_errors(true);
 
-                $svg = simplexml_load_string($svgContent);
+                // Parse SVG with network access disabled to mitigate XXE/SSRF risks
+                $svg = simplexml_load_string($svgContent, 'SimpleXMLElement', LIBXML_NONET);
+
+                // Clear any accumulated libxml errors and restore previous setting
+                libxml_clear_errors();
                 libxml_use_internal_errors($previousErrors);
 
                 if ($svg) {
