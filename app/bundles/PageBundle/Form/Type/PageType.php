@@ -330,6 +330,10 @@ class PageType extends AbstractType
             ],
         ]);
 
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
