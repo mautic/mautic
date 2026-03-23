@@ -26,7 +26,6 @@ class PieChartTest extends TestCase
 
         $reflection         = new \ReflectionClass($this->pieChart);
         $totalCountProperty = $reflection->getProperty('totalCount');
-        $totalCountProperty->setAccessible(true);
 
         $totalCount = $totalCountProperty->getValue($this->pieChart);
 

@@ -1,0 +1,13 @@
+diff --git a/php/elFinder.class.php b/php/elFinder.class.php
+index 763b9a9bd..234ff0cf2 100644
+--- a/php/elFinder.class.php
++++ b/php/elFinder.class.php
+@@ -4394,7 +4394,7 @@ class elFinder
+     protected function utime()
+     {
+         $time = explode(" ", microtime());
+-        return (double)$time[1] + (double)$time[0];
++        return (float)$time[1] + (float)$time[0];
+     }
+
+     /**

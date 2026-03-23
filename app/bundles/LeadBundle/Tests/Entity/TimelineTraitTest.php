@@ -30,7 +30,6 @@ class TimelineTraitTest extends TestCase
         $this->repository->method('getTableAlias')->willReturn('ut');
 
         $this->getTimelineResults = new \ReflectionMethod($this->repository, 'getTimelineResults');
-        $this->getTimelineResults->setAccessible(true);
     }
 
     /**

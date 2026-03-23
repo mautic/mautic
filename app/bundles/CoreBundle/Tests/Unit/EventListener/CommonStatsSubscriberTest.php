@@ -244,7 +244,6 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $reflection         = new \ReflectionClass($object);
         $reflectionProperty = $reflection->getProperty($property);
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($object, $value);
     }
 }

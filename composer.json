@@ -22,6 +22,7 @@
     },
   "require": {
     "composer/installers": "^2.3",
+    "cweagans/composer-patches": "^1.7.3",
     "mautic/core-lib": "^7.0"
   },
   "require-dev": {
@@ -202,6 +203,11 @@
     "symfony-assets-install": "relative",
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
+    },
+    "patches": {
+      "studio-42/elfinder": {
+        "Fix PHP 8.5 deprecated scalar casts": "patches/studio-42-elfinder-php85-float-cast.patch"
+      }
     }
   }
 }

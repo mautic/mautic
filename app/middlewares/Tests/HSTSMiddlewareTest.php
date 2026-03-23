@@ -35,13 +35,10 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
         $this->middlewareReflection = new \ReflectionClass($this->middleware);
 
         $this->addHSTS = $this->middlewareReflection->getProperty('enableHSTS');
-        $this->addHSTS->setAccessible(true);
 
         $this->includeDubDomains = $this->middlewareReflection->getProperty('includeDubDomains');
-        $this->includeDubDomains->setAccessible(true);
 
         $this->preload = $this->middlewareReflection->getProperty('preload');
-        $this->preload->setAccessible(true);
     }
 
     protected function testResponseHeaders(): void
@@ -140,7 +137,6 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
         $this->setHSTS(true);
         $expireTimeValue = 12345;
         $expireTime      = $this->middlewareReflection->getProperty('expireTime');
-        $expireTime->setAccessible(true);
         $expireTime->setValue($this->middleware, $expireTimeValue);
 
         $response = $this->getMiddlewareResponse();
