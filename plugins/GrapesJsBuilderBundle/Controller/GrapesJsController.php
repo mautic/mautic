@@ -149,7 +149,7 @@ class GrapesJsController extends CommonController
             }
         }
 
-        $slots        = [];
+        $slots            = [];
         $type             = 'html';
         $template         = InputHelper::clean($request->query->get('template'));
         $resetEditorState = $request->query->getBoolean('resetEditorState', false);
