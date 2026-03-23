@@ -339,6 +339,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -383,6 +384,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());

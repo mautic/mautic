@@ -30,6 +30,7 @@ final class CampaignSubscriberTest extends TestCase
     {
         $hit = $this->createHitMock('https://example.com/product/1234', null);
 
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent([
             'lead'            => null,
             'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['url' => 'product/123']],
@@ -47,6 +48,7 @@ final class CampaignSubscriberTest extends TestCase
     {
         $hit = $this->createHitMock('https://example.com/page', 'https://ref.example.com/source/123');
 
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent([
             'lead'            => null,
             'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['referer' => '*source/123*']],
@@ -64,6 +66,7 @@ final class CampaignSubscriberTest extends TestCase
     {
         $hit = $this->createHitMock('https://example.com/product/1234', null);
 
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent([
             'lead'            => null,
             'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['url' => 'does-not-match']],
@@ -81,6 +84,7 @@ final class CampaignSubscriberTest extends TestCase
     {
         $hit = $this->createHitMock('https://example.com/product/1234', null);
 
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent([
             'lead'            => null,
             'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['url' => 'alpha,product/123,omega']],
