@@ -252,38 +252,34 @@ class FileManager
             'type'   => 'image',
         ];
 
-        try {
-            $svgContent = @file_get_contents($filePath);
-            if ($svgContent) {
-                // Suppress XML warnings and enable internal error handling
-                $previousErrors = libxml_use_internal_errors(true);
+        $svgContent = @file_get_contents($filePath);
+        if ($svgContent) {
+            // Suppress XML warnings and enable internal error handling
+            $previousErrors = libxml_use_internal_errors(true);
 
-                // Parse SVG with network access disabled to mitigate XXE/SSRF risks
-                $svg = simplexml_load_string($svgContent, 'SimpleXMLElement', LIBXML_NONET);
+            // Parse SVG with network access disabled to mitigate XXE/SSRF risks
+            $svg = simplexml_load_string($svgContent, 'SimpleXMLElement', LIBXML_NONET);
 
-                // Clear any accumulated libxml errors and restore previous setting
-                libxml_clear_errors();
-                libxml_use_internal_errors($previousErrors);
+            // Clear any accumulated libxml errors and restore previous setting
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrors);
 
-                if ($svg) {
-                    $svgAttributes = $svg->attributes();
+            if ($svg) {
+                $svgAttributes = $svg->attributes();
 
-                    // Try to get width and height directly
-                    if (isset($svgAttributes->width) && isset($svgAttributes->height)) {
-                        $info['width']  = (int) $svgAttributes->width;
-                        $info['height'] = (int) $svgAttributes->height;
-                    } elseif (isset($svgAttributes->viewBox)) {
-                        // Parse the viewBox attribute (format: "x y width height")
-                        $viewBox = explode(' ', (string) $svgAttributes->viewBox);
-                        if (count($viewBox) === 4) {
-                            $info['width']  = (int) $viewBox[2];
-                            $info['height'] = (int) $viewBox[3];
-                        }
+                // Try to get width and height directly
+                if (isset($svgAttributes->width) && isset($svgAttributes->height)) {
+                    $info['width']  = (int) $svgAttributes->width;
+                    $info['height'] = (int) $svgAttributes->height;
+                } elseif (isset($svgAttributes->viewBox)) {
+                    // Parse the viewBox attribute (format: "x y width height")
+                    $viewBox = explode(' ', (string) $svgAttributes->viewBox);
+                    if (count($viewBox) === 4) {
+                        $info['width']  = (int) $viewBox[2];
+                        $info['height'] = (int) $viewBox[3];
                     }
                 }
             }
-        } catch (\Exception $e) {
-            // Return default dimensions if SVG content cannot be parsed
         }
 
         return $info;
