@@ -727,4 +727,183 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
             $leadListRepository->getLeadCount([$segmentD->getId()])
         );
     }
+
+    public function testLeadSegmentWithCompanySegmentMembershipFilter(): void
+    {
+        $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
+        $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
+        $companyRecord = $this->createCompany('Record', 'contact@record.com');
+
+        $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
+        $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
+        $leadThree = $this->createLead('Mat Doe', emailId: 'leadthree@mautic.com');
+        $leadFour  = $this->createLead('Braw Doe', emailId: 'leadfour@mautic.com');
+
+        $this->createCompanyLead($companyGlobo, $leadOne, true);
+        $this->createCompanyLead($companyGlobo, $leadTwo, true);
+        $this->createCompanyLead($companySbt, $leadThree, true);
+        $this->createCompanyLead($companySbt, $leadFour, true);
+
+        $companySegmentOne = $this->createCompanySegment('Test Company Segment 1', 'test_comp_segment');
+
+        // globo added in Company Segment 1
+        $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
+
+        $filtersToCompanySegment  = [
+            'filters' => [
+                'glue'       => 'and',
+                'operator'   => 'in',
+                'properties' => [
+                    'filter' => [$companySegmentOne->getId()],
+                ],
+                'field'  => 'company_segments',
+                'type'   => 'company_segments',
+                'object' => 'company_segments',
+            ],
+        ];
+
+        // globo will be added in cs2 after company segment command
+        $companySegmentTwo = $this->createCompanySegment('Test Company Segment 2', 'test_comp_segment2', true, $filtersToCompanySegment);
+
+        $filtersToLeadSegment = [
+            [
+                'glue'       => 'and',
+                'operator'   => '!=',
+                'properties' => [
+                    'filter' => 'asdasdaadasd',
+                ],
+                'field'  => 'address1',
+                'type'   => 'text',
+                'object' => 'lead',
+            ],
+            [
+                'glue'       => 'and',
+                'operator'   => '!in',
+                'properties' => [
+                    'filter' => [$companySegmentTwo->getId()],
+                ],
+                'field'  => 'company_segments',
+                'type'   => 'company_segments',
+                'object' => 'company_segments',
+            ],
+        ];
+
+        $leadSegmentTwo = $this->createSegment('Test Segment 2', $filtersToLeadSegment);
+
+        $this->em->flush();
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        // Before company segment update, no leads should be in the segment
+        Assert::assertSame(0, $leadListRepository->getLeadCount([$leadSegmentTwo->getId()]));
+
+        // Run company segment update command to add Globo to Company Segment 2
+        $this->testSymfonyCommand('mautic:company-segments:update', ['--bypass-locking' => true]);
+
+        // Run lead segment update command
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
+
+        Assert::assertStringContainsString('2 total contact(s) to be added', $output->getDisplay());
+
+        // After update, 2 leads should be in the segment (leadThree and leadFour from SBT which is NOT in Company Segment 2)
+        Assert::assertSame(2, $leadListRepository->getLeadCount([$leadSegmentTwo->getId()]));
+    }
+
+    public function testLeadSegmentWithCompanySegmentEmptyFilter(): void
+    {
+        $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
+        $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
+        $companyRecord = $this->createCompany('Record', 'contact@record.com');
+
+        $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
+        $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
+        $leadThree = $this->createLead('Mat Doe', emailId: 'leadthree@mautic.com');
+        $leadFour  = $this->createLead('Braw Doe', emailId: 'leadfour@mautic.com');
+
+        $this->createCompanyLead($companyGlobo, $leadOne, true);
+        $this->createCompanyLead($companyGlobo, $leadTwo, true);
+        $this->createCompanyLead($companySbt, $leadThree, true);
+        $this->createCompanyLead($companySbt, $leadFour, true);
+
+        $companySegmentOne = $this->createCompanySegment('Test Company Segment 1', 'test_comp_segment');
+
+        // globo added in Company Segment 1
+        $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
+
+        $filtersToLeadSegment = [
+            [
+                'glue'       => 'and',
+                'operator'   => 'empty',
+                'field'      => 'company_segments',
+                'type'       => 'company_segments',
+                'object'     => 'company_segments',
+            ],
+        ];
+
+        $leadSegmentOne = $this->createSegment('Test Segment 1', $filtersToLeadSegment);
+
+        $this->em->flush();
+
+        // Run lead segment update command
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
+
+        Assert::assertStringContainsString('2 total contact(s) to be added', $output->getDisplay());
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        // 2 leads should be in the segment (leadThree and leadFour from SBT which has no company segment)
+        Assert::assertSame(2, $leadListRepository->getLeadCount([$leadSegmentOne->getId()]));
+    }
+
+    public function testLeadSegmentWithCompanySegmentNotEmptyFilter(): void
+    {
+        $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
+        $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
+        $companyRecord = $this->createCompany('Record', 'contact@record.com');
+
+        $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
+        $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
+        $leadThree = $this->createLead('Mat Doe', emailId: 'leadthree@mautic.com');
+        $leadFour  = $this->createLead('Braw Doe', emailId: 'leadfour@mautic.com');
+
+        $this->createCompanyLead($companyGlobo, $leadOne, true);
+        $this->createCompanyLead($companySbt, $leadThree, true);
+        $this->createCompanyLead($companySbt, $leadFour, true);
+
+        $companySegmentGlobo  = $this->createCompanySegment('Test Company Segment globo', 'test_comp_segment_globo');
+        $companySegmentSbt    = $this->createCompanySegment('Test Company Segment Sbt', 'test_comp_segment_sbt');
+        $companySegmentRecord = $this->createCompanySegment('Test Company Segment Record', 'test_comp_segment_record');
+
+        // Add companies to segments
+        $this->addCompanyToCompanySegment($companyGlobo, $companySegmentGlobo);
+        $this->addCompanyToCompanySegment($companySbt, $companySegmentSbt);
+        $this->addCompanyToCompanySegment($companyRecord, $companySegmentRecord);
+
+        $filtersToLeadSegment = [
+            [
+                'glue'       => 'and',
+                'operator'   => '!empty',
+                'field'      => 'company_segments',
+                'type'       => 'company_segments',
+                'object'     => 'company_segments',
+            ],
+        ];
+
+        $leadSegmentTwo = $this->createSegment('Test Segment all not empty', $filtersToLeadSegment);
+
+        $this->em->flush();
+
+        // Run lead segment update command
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
+
+        Assert::assertStringContainsString('3 total contact(s) to be added', $output->getDisplay());
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        // All 3 leads should be in the segment (they all belong to companies that are in company segments)
+        Assert::assertSame(3, $leadListRepository->getLeadCount([$leadSegmentTwo->getId()]));
+    }
 }

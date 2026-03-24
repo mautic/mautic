@@ -145,6 +145,12 @@ class ContactSegmentFilterDictionary
             'field'         => 'leadlist_id',
             'where'         => 'lead_lists_leads.manually_removed = 0',
         ];
+        $this->filters['company_segments']              = [
+            'type' => \Mautic\LeadBundle\Segment\Query\Filter\CompanySegmentMembershipFilterQueryBuilder::getServiceId(),
+        ];
+        $this->filters['contactsegmentmembership']      = [
+            'type' => \Mautic\LeadBundle\Segment\Query\Filter\CompanyLeadSegmentMembershipFilterQueryBuilder::getServiceId(),
+        ];
         $this->filters['globalcategory']                = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_categories',

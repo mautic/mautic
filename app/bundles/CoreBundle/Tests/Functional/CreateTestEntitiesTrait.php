@@ -10,8 +10,10 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog as CampaignLeadEventLog;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\CompaniesSegments;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -197,6 +199,49 @@ trait CreateTestEntitiesTrait
         $this->em->persist($project);
 
         return $project;
+    }
+
+    private function createCompanyLead(Company $company, Lead $lead, bool $isPrimary = true): CompanyLead
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setPrimary($isPrimary);
+        $companyLead->setDateAdded(new \DateTime());
+
+        $this->em->persist($companyLead);
+        $this->em->flush();
+
+        return $companyLead;
+    }
+
+    private function createCompanySegment(string $name, string $alias, bool $isPublished = true, array $filters = []): CompanySegment
+    {
+        $companySegment = new CompanySegment();
+        $companySegment->setName($name);
+        $companySegment->setAlias($alias);
+        $companySegment->setIsPublished($isPublished);
+        if ([] !== $filters) {
+            $companySegment->setFilters($filters);
+        }
+
+        $this->em->persist($companySegment);
+        $this->em->flush();
+
+        return $companySegment;
+    }
+
+    private function addCompanyToCompanySegment(Company $company, CompanySegment $companySegment): CompaniesSegments
+    {
+        $companiesSegments = new CompaniesSegments();
+        $companiesSegments->setCompany($company);
+        $companiesSegments->setCompanySegment($companySegment);
+        $companiesSegments->setDateAdded(new \DateTime());
+
+        $this->em->persist($companiesSegments);
+        $this->em->flush();
+
+        return $companiesSegments;
     }
 
     private function createCampaignLeadEventLog(Lead $lead, Event $event, ?Campaign $campaign, int $rotation = 1, bool $isScheduled =  false): CampaignLeadEventLog
