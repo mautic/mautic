@@ -128,7 +128,7 @@ class FileManager
                     'type'   => 'image',
                     'height' => $size[1],
                 ];
-            } elseif (strtolower($file->getExtension()) === 'svg') {
+            } elseif ('svg' === strtolower($file->getExtension())) {
                 $files[] = $this->getSvgFileInfo($filePath, $file->getRelativePathname());
             } else {
                 $files[] = $this->getFullUrl($file->getRelativePathname());
@@ -224,7 +224,7 @@ class FileManager
                 'height' => $size[1],
                 'type'   => 'image',
             ];
-        } elseif ($extension === 'svg') {
+        } elseif ('svg' === $extension) {
             $info = $this->getSvgFileInfo($filePath, $file->getRelativePathname());
         } elseif (in_array($extension, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
             $info = [
@@ -274,7 +274,7 @@ class FileManager
                 } elseif (isset($svgAttributes->viewBox)) {
                     // Parse the viewBox attribute (format: "x y width height")
                     $viewBox = explode(' ', (string) $svgAttributes->viewBox);
-                    if (count($viewBox) === 4) {
+                    if (4 === count($viewBox)) {
                         $info['width']  = (int) $viewBox[2];
                         $info['height'] = (int) $viewBox[3];
                     }
