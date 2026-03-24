@@ -65,7 +65,17 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(self::SVG_WIDTH, (int) $asset['width']);
         $this->assertSame(self::SVG_HEIGHT, (int) $asset['height']);
 
+        // Attempt to delete via the API endpoint first.
         $this->deleteUploadedFiles($uploadedFiles);
+
+        // Ensure the uploaded SVG is also removed from the filesystem in case the
+        // delete endpoint refuses SVGs (for example, due to exif_imagetype).
+        $projectRoot = \dirname(__DIR__, 5);
+        $svgPath     = $projectRoot.'/media/images/'.$uploadedName;
+
+        if (\is_file($svgPath)) {
+            @\unlink($svgPath);
+        }
     }
 
     private function getAssetCount(): int
