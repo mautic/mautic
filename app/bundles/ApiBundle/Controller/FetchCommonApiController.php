@@ -487,11 +487,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             ? $this->prepareEntitiesForView($entities)
             : $this->prepareEntityResultsToArray($entities);
 
-        // Set errors for invalid or not-found IDs
-        $foundIds = [];
-        foreach ($entities as $entity) {
-            $foundIds[$entity->getId()] = true;
-        }
+        // Todo: Implement error management for invalid or not-found IDs
 
         // Return the response with matching keys from the request
         if ($returnWithOriginalKeys) {
