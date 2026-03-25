@@ -178,11 +178,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             && !$this->security->isGranted($this->permissionBase.':viewother')
             && null !== $user = $userHelper->getUser()
         ) {
-            $this->listFilters[] = [
-                'column' => $tableAlias.'.createdBy',
-                'expr'   => 'eq',
-                'value'  => $user->getId(),
-            ];
+            $this->listFilters = array_merge($this->listFilters, $this->getOwnEntityListFilters($tableAlias, $user));
         }
 
         if ($publishedOnly) {
@@ -762,5 +758,21 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     protected function getTotalCountTtl(): ?int
     {
         return null;
+    }
+
+    /**
+     * Returns filters for users who may only view their own entities.
+     *
+     * Child controllers can override this when "own" is not equivalent to "created by".
+     *
+     * @return array<array<string, mixed>>
+     */
+    protected function getOwnEntityListFilters(string $tableAlias, User $user): array
+    {
+        return [[
+            'column' => $tableAlias.'.createdBy',
+            'expr'   => 'eq',
+            'value'  => $user->getId(),
+        ]];
     }
 }

@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -110,6 +111,20 @@ class LeadApiController extends CommonApiController
     protected function getTotalCountTtl(): ?int
     {
         return $this->coreParametersHelper->get('contact_api_count_cache_ttl', 5);
+    }
+
+    /**
+     * For contacts, "own" means the current user owns the contact.
+     *
+     * @return array<array<string, mixed>>
+     */
+    protected function getOwnEntityListFilters(string $tableAlias, User $user): array
+    {
+        return [[
+            'column' => $tableAlias.'.owner_id',
+            'expr'   => 'eq',
+            'value'  => $user->getId(),
+        ]];
     }
 
     /**

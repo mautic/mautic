@@ -19,10 +19,14 @@ use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -507,6 +511,75 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
+    }
+
+    public function testGetEntitiesReturnsOwnedContactsForViewOwnUser(): void
+    {
+        /** @var User $adminUser */
+        $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+
+        $role = new Role();
+        $role->setName('View own contacts');
+        $role->setIsAdmin(false);
+        $this->em->persist($role);
+
+        $permission = new Permission();
+        $permission->setBundle('lead');
+        $permission->setName('leads');
+        $permission->setRole($role);
+        $permission->setBitwise(2);
+        $this->em->persist($permission);
+
+        $user = new User();
+        $user->setFirstName('API');
+        $user->setLastName('Owner');
+        $user->setEmail('api-owner@test.com');
+        $user->setUsername('api-owner');
+        $user->setRole($role);
+
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $password = 'Maut1cR0cks!';
+        $user->setPassword($hasher->hash($password));
+        $this->em->persist($user);
+
+        $ownedLead = new Lead();
+        $ownedLead->setEmail('api-view-own-owner-match@test.com');
+        $ownedLead->setFirstname('Owned');
+        $ownedLead->setOwner($user);
+        $ownedLead->setCreatedBy($adminUser);
+        $this->em->persist($ownedLead);
+
+        $otherLead = new Lead();
+        $otherLead->setEmail('api-view-own-owner-other@test.com');
+        $otherLead->setFirstname('Other');
+        $otherLead->setCreatedBy($adminUser);
+        $this->em->persist($otherLead);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var User $apiUser */
+        $apiUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'api-owner']);
+
+        $this->loginUser($apiUser);
+        $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', $password);
+
+        $this->client->request('GET', '/api/contacts?search=api-view-own-owner-');
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseIsSuccessful($clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        self::assertSame('1', $response['total']);
+
+        $emails = array_map(
+            static fn (array $contact): string => $contact['fields']['all']['email'],
+            array_values($response['contacts'])
+        );
+
+        self::assertContains('api-view-own-owner-match@test.com', $emails);
+        self::assertNotContains('api-view-own-owner-other@test.com', $emails);
     }
 
     public function testBatchEditEndpoint(): void
