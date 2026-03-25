@@ -12,6 +12,7 @@ class CustomFieldHelperTest extends TestCase
     {
         parent::setUp();
     }
+
     public function testFixValueTypeForBooleans(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, null));
