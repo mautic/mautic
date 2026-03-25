@@ -301,6 +301,46 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, $contactCGroupScores->first()->getScore());
     }
 
+    public function testUpdateLeadActionWithTokensInTextCustomField(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+
+        $contactIds = $this->createContacts();
+
+        $contact = $this->contactRepository->getEntity($contactIds[0]);
+        $contact->setAddress1('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadddd');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $campaign = $this->createCampaignWithTokens($contactIds);
+        $this->em->clear();
+
+        $exitCode = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        Assert::assertSame(0, $exitCode->getStatusCode());
+
+        $this->em->clear();
+
+        $today = new \DateTime('today');
+
+        /** @var Lead $contact */
+        $contact = $this->contactRepository->getEntity($contactIds[0]);
+
+        $address1Value = $contact->getAddress1();
+        $positionValue = $contact->getFieldValue('position');
+        $cityValue     = $contact->getFieldValue('city');
+
+        $this->assertNotNull($positionValue, 'Position value should not be null');
+        $this->assertNotNull($cityValue, 'City value should not be null');
+
+        $this->assertEquals($today->format('Y-m-d H:i:s'), $positionValue);
+
+        $expectedCityValue = 'Hello '.$today->format('Y-m-d H:i:s').' '.$this->contacts[0]['firstname'];
+        $this->assertEquals($expectedCityValue, $cityValue);
+        $this->assertEquals('abcdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $address1Value, 'Shortening too long messages did not work properly');
+    }
+
     public function testUpdatesContactCampaignActionWithBooleanFields(): void
     {
         $this->createField([
@@ -1030,6 +1070,52 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertInstanceOf(LeadManipulator::class, $leadManipulator);
         Assert::assertSame('campaign', $leadManipulator->getBundleName());
         Assert::assertSame('trigger-action', $leadManipulator->getObjectName());
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     */
+    private function createCampaignWithTokens(array $contactIds): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Update contact');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        foreach ($contactIds as $key => $contactId) {
+            $campaignLead = new CampaignLead();
+            $campaignLead->setCampaign($campaign);
+            /** @var Lead $lead */
+            $lead = $this->em->getReference(Lead::class, $contactId);
+            $campaignLead->setLead($lead);
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($key, $campaignLead);
+        }
+
+        $this->em->flush();
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Update contact with tokens');
+        $event->setType('lead.updatelead');
+        $event->setEventType('action');
+        $event->setTriggerMode('immediate');
+        $event->setProperties(
+            [
+                'position'                   => '{datetime=today}',
+                'city'                       => 'Hello {datetime=today} {contactfield=firstname}',
+                'address1'                   => 'abcd{contactfield=address1}',
+            ]
+        );
+
+        $campaign->addEvent(1, $event);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
     }
 
     private function createContact(string $email): Lead

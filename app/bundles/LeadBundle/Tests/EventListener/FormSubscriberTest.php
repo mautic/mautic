@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
@@ -57,6 +58,8 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private MockObject $submissionEvent;
 
+    private MockObject $fieldModel;
+
     protected function setUp(): void
     {
         $this->leadModel          = $this->createMock(LeadModel::class);
@@ -66,13 +69,15 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
         $this->doNotContact       = $this->createMock(DoNotContact::class);
         $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
+        $this->fieldModel         = $this->createMock(FieldModel::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,
             $this->contactTracker,
             $this->ipLookupHelper,
             $this->leadFieldRepostory,
             $this->pointGroupModel,
-            $this->doNotContact
+            $this->doNotContact,
+            $this->fieldModel
         );
     }
 

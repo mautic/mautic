@@ -32,6 +32,7 @@ use Mautic\LeadBundle\Form\Type\UpdateCompanyActionType;
 use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -322,14 +323,25 @@ class CampaignSubscriber implements EventSubscriberInterface
         $values = $event->getConfig();
         $fields = $lead->getFields(true);
 
-        foreach ($values as $alias => &$value) {
-            if (isset($fields[$alias]) && 'boolean' === $fields[$alias]['type'] && 0 === $value) {
+        $tokenizedValues = [];
+        foreach ($values as $field => $value) {
+            if (isset($fields[$field]) && 'boolean' === $fields[$field]['type'] && 0 === $value) {
                 // 0 is interpreted as 'don't change the bool field' instead of setting it to false, so we change the field manually in this step
-                $lead->addUpdatedField($alias, 0);
+                $lead->addUpdatedField($field, 0);
+            }
+            if (is_string($value)) {
+                $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
+                if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($tokenizedValue) > $charLimit) {
+                    $tokenizedValue = mb_substr($tokenizedValue, 0, $charLimit);
+                }
+                $tokenizedValues[$field] = $tokenizedValue;
+            } else {
+                $tokenizedValues[$field] = $value;
             }
         }
 
-        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $values), false);
+        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
         $this->leadModel->saveEntity($lead);
 
         return $event->setResult(true);
