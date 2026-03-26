@@ -100,7 +100,17 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested([static::pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
-            $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
+            $tokenFilter = $event->getTokenFilter();
+            $tokens      = $tokenHelper->getFormattedTokens(
+                self::pageTokenRegex,
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
+                'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
+                'title',
+                'id'
+            );
+            if ($tokens) {
+                $event->addTokens($tokens);
+            }
         }
     }
 
