@@ -761,6 +761,16 @@ final class LeadEvents
     public const COMPANY_SEGMENT_REBUILD_REMOVE = 'mautic.company_segment_rebuild_remove';
 
     /**
+     * The mautic.company_segment_pre_unpublish event is dispatched before a company segment is unpublished.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanySegmentPreUnpublish instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SEGMENT_PRE_UNPUBLISH = 'mautic.company_segment_pre_unpublish';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a

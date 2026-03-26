@@ -791,6 +791,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadSegmentTwo = $this->createSegment('Test Segment 2', $filtersToLeadSegment);
 
         $this->em->flush();
+        $this->em->clear();
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
@@ -844,6 +845,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadSegmentOne = $this->createSegment('Test Segment 1', $filtersToLeadSegment);
 
         $this->em->flush();
+        $this->em->clear();
 
         // Run lead segment update command
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
@@ -894,6 +896,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadSegmentTwo = $this->createSegment('Test Segment all not empty', $filtersToLeadSegment);
 
         $this->em->flush();
+        $this->em->clear();
 
         // Run lead segment update command
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);

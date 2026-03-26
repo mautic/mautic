@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
+use Mautic\LeadBundle\Event\CompanySegmentPreUnpublish;
 use Mautic\LeadBundle\Event\CompanySegmentRebuildAddEvent;
 use Mautic\LeadBundle\Event\CompanySegmentRebuildRemoveEvent;
 use Mautic\LeadBundle\Event\SegmentPreRebuildSegmentEvent;
@@ -146,6 +147,7 @@ class CompanySegmentModel extends FormModel
             'post_save'     => CompanySegmentPostSave::class,
             'pre_delete'    => CompanySegmentPreDelete::class,
             'post_delete'   => CompanySegmentPostDelete::class,
+            'pre_unpublish' => CompanySegmentPreUnpublish::class,
             default         => null,
         };
 

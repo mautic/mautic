@@ -21,7 +21,7 @@ Mautic.company_segmentsOnLoad = function(container, response) {
     }
 
     if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'company_segments.company_segment');
+        Mautic.activateSearchAutocomplete('list-search', 'lead.company_segment');
     }
 
     var prefix = 'company_segments';

@@ -19,7 +19,7 @@ Variables
     </td>
     <td>
         <div>
-            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'company_segments.company_segment'}) }}
+            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.company_segment'}) }}
             {% if securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy) %}
                 <a href="{{ path('mautic_company_segments_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                     {{ item.name }} ({{ item.alias }})
