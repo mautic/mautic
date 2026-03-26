@@ -248,6 +248,12 @@ return [
                 'controller' => 'Mautic\LeadBundle\Controller\Api\ListApiController::removeLeadAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_companysegmentsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'companysegments',
+                'path'            => '/companysegments',
+                'controller'      => Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::class,
+            ],
             'mautic_api_companiesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'companies',

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -18,6 +20,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\CompanySegmentChangeEvent;
 use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
@@ -40,6 +43,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -62,6 +66,8 @@ class CompanySegmentModel extends FormModel
         private CompanySegmentCountCacheHelper $companySegmentCountCacheHelper,
         private RequestStack $requestStack,
         private CompanySegmentService $companySegmentService,
+        private ListModel $listModel,
+        private Connection $connection,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -717,5 +723,171 @@ class CompanySegmentModel extends FormModel
         } else {
             sleep($leadSleepTime);
         }
+    }
+
+    /**
+     * Get segments that have dependencies on the specified segment.
+     *
+     * @return array<int, mixed>
+     */
+    public function getSegmentsWithDependenciesOnSegment(int $segmentId, string $returnProperty = 'name', bool $isContactSegment = false): array
+    {
+        $tableAlias = $isContactSegment
+            ? $this->listModel->getRepository()->getTableAlias()
+            : $this->getRepository()->getTableAlias();
+
+        $filter = [
+            'force' => [
+                [
+                    'column' => $tableAlias.'.filters',
+                    'expr'   => 'LIKE',
+                    'value'  => $isContactSegment
+                        ? '%"type";s:16:"company_segments"%'
+                        : $this->getLikeQueryCompanySegment(),
+                ],
+                [
+                    'column' => $tableAlias.'.id',
+                    'expr'   => 'neq',
+                    'value'  => $segmentId,
+                ],
+            ],
+        ];
+
+        $entities = $isContactSegment
+            ? $this->listModel->getEntities(['filter' => $filter])
+            : $this->getEntities(['filter' => $filter]);
+        $dependents = [];
+        $accessor   = PropertyAccess::createPropertyAccessor();
+        foreach ($entities as $entity) {
+            assert($entity instanceof CompanySegment || $entity instanceof LeadList);
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if (!is_array($eachFilter) || !array_key_exists('properties', $eachFilter) || !is_array($eachFilter['properties']) || !array_key_exists('filter', $eachFilter['properties'])) {
+                    continue;
+                }
+                $filter = $eachFilter['properties']['filter'];
+                if (is_array($filter) && self::PROPERTIES_FIELD === $eachFilter['type'] && in_array($segmentId, $filter, true)) {
+                    $value = $accessor->getValue($entity, $returnProperty);
+                    if (('id' !== $returnProperty && !is_string($value)) || ('id' === $returnProperty && !is_numeric($value))) {
+                        continue;
+                    }
+                    $dependents[] = $value;
+                    break;
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
+     * Check which segments cannot be deleted due to dependencies.
+     *
+     * @param array<int> $segmentIds
+     *
+     * @return array<string>
+     */
+    public function canNotBeDeleted(array $segmentIds): array
+    {
+        $tableAlias = $this->getRepository()->getTableAlias();
+        $segmentIds = array_map('intval', $segmentIds);
+
+        $entities = $this->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        ['column' => $tableAlias.'.filters', 'expr' => 'LIKE', 'value' => $this->getLikeQueryCompanySegment()],
+                    ],
+                ],
+            ]
+        );
+
+        $idsNotToBeDeleted   = [];
+        $namesNotToBeDeleted = [];
+        $filterRegistered    = [];
+
+        foreach ($entities as $entity) {
+            assert($entity instanceof CompanySegment);
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if (
+                    !is_array($eachFilter)
+                    || !array_key_exists('type', $eachFilter)
+                    || self::PROPERTIES_FIELD !== $eachFilter['type']
+                    || !is_array($eachFilter['properties'])
+                    || !array_key_exists('filter', $eachFilter['properties'])
+                ) {
+                    continue;
+                }
+
+                /** @var array<int> $filterValue */
+                $filterValue       = $eachFilter['properties']['filter'];
+                $idsNotToBeDeleted = $this->addIdsNotToBeDeleted($idsNotToBeDeleted, $filterValue);
+                foreach ($filterValue as $valFilter) {
+                    if (!isset($filterRegistered[$valFilter])) {
+                        $filterRegistered[$valFilter][] = (int) $entity->getId();
+                        continue;
+                    }
+                    if (in_array($entity->getId(), $filterRegistered[$valFilter], true)) {
+                        continue;
+                    }
+                    $filterRegistered[$valFilter][] = (int) $entity->getId();
+                }
+            }
+        }
+
+        foreach ($filterRegistered as $keyValueFilter => $value) {
+            if (array_intersect($value, $segmentIds) === $value) {
+                $idsNotToBeDeleted = array_unique(array_diff($idsNotToBeDeleted, [$keyValueFilter]));
+            }
+        }
+
+        $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
+
+        foreach ($idsNotToBeDeleted as $val) {
+            $notToBeDeletedEntity = $this->getEntity($val);
+            assert($notToBeDeletedEntity instanceof CompanySegment);
+
+            $name = $notToBeDeletedEntity->getName();
+
+            if (null === $name) {
+                $name = 'N/A';
+            }
+
+            $namesNotToBeDeleted[$val] = $name;
+        }
+
+        return $namesNotToBeDeleted;
+    }
+
+    /**
+     * Get LIKE query pattern for company segment type based on database platform.
+     */
+    private function getLikeQueryCompanySegment(): string
+    {
+        $platform  = $this->connection->getDatabasePlatform();
+        $isMariaDb = $platform instanceof MariaDBPlatform;
+
+        return $isMariaDb ? '%"type":"company_segments"%' : '%"type": "company_segments"%';
+    }
+
+    /**
+     * Add IDs to the list of IDs that cannot be deleted.
+     *
+     * @param array<int> $idsNotToBeDeleted
+     * @param array<int> $newIds
+     *
+     * @return array<int>
+     */
+    private function addIdsNotToBeDeleted(array $idsNotToBeDeleted, array $newIds): array
+    {
+        foreach ($newIds as $id) {
+            if (!is_numeric($id)) {
+                continue;
+            }
+            $idsNotToBeDeleted[] = (int) $id;
+        }
+
+        return $idsNotToBeDeleted;
     }
 }
