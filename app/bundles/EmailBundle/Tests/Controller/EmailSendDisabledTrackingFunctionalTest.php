@@ -89,7 +89,9 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
             Assert::assertSame($utmParameters['utmMedium'], $queryParams['utm_medium']);
             Assert::assertSame($utmParameters['utmCampaign'], $queryParams['utm_campaign']);
             Assert::assertSame($utmParameters['utmContent'], $queryParams['utm_content']);
-            Assert::assertArrayHasKey($message->getTo()[0]->toString(), $leads);
+            $toList = array_values($message->getTo());
+            Assert::assertNotEmpty($toList);
+            Assert::assertArrayHasKey($toList[0]->toString(), $leads);
         }
     }
 

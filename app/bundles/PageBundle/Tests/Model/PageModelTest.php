@@ -100,8 +100,7 @@ class PageModelTest extends PageTestAbstract
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
-        $cleanQueryMethod->setAccessible(true);
-        $res = $cleanQueryMethod->invokeArgs($pageModel, [
+        $res                 = $cleanQueryMethod->invokeArgs($pageModel, [
             [
                 'page_title'    => 'Mautic & PHP',
                 'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',

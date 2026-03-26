@@ -84,11 +84,9 @@ class InstallSchemaTest extends TestCase
         // Make the backupExistingSchema method public so we can test that functionality without mocking all the SchemaHelper's functionality.
         $controllerReflection = new \ReflectionClass(SchemaHelper::class);
         $method               = $controllerReflection->getMethod('backupExistingSchema');
-        $method->setAccessible(true);
 
         // Set the platform property, as that one is only set in the installSchema method, which we want to avoid.
-        $property = $controllerReflection->getProperty('platform');
-        $property->setAccessible(true);
+        $property   = $controllerReflection->getProperty('platform');
         $connection = DriverManager::getConnection($this->dbParams);
         $property->setValue($schemaHelper, $connection->getDatabasePlatform());
 

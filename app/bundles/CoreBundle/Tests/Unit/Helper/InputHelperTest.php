@@ -123,7 +123,7 @@ class InputHelperTest extends TestCase
         $tests = [
             'custom test' => 'custom test',
             'čusťom test' => 'custom test',
-            null          => '',
+            ''            => '',
         ];
         foreach ($tests as $input=>$expected) {
             $this->assertEquals(InputHelper::transliterate($input), $expected);

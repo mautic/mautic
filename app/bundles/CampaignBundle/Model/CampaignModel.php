@@ -380,9 +380,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($events as $e) {
             if ($e instanceof Event) {
-                $tempIds[$e->getTempId()] = $e->getId();
+                $tempIds[$e->getTempId() ?? ''] = $e->getId();
             } else {
-                $tempIds[$e['tempId']] = $e['id'];
+                $tempIds[$e['tempId'] ?? ''] = $e['id'] ?? '';
             }
         }
 
@@ -393,7 +393,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         foreach ($settings['nodes'] as &$node) {
             if (str_contains($node['id'], 'new')) {
                 // Find the real one and update the node
-                $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
+                $node['id'] = str_replace($node['id'], $tempIds[$node['id'] ?? ''] ?? '', $node['id']);
             }
         }
 

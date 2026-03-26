@@ -6,7 +6,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
+use Mautic\ApiBundle\Model\ApiEntityLockTrait;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -76,12 +77,13 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface, ApiLockAwareInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
     use FilterTrait;
+    use ApiEntityLockTrait;
 
     /**
      * @var bool

@@ -48,7 +48,7 @@ class FilterType extends AbstractType
         $formModifier = function (FormEvent $event) use ($fieldChoices): void {
             $data        = (array) $event->getData();
             $form        = $event->getForm();
-            $fieldAlias  = $data['field'] ?? null;
+            $fieldAlias  = $data['field'] ?? '';
             $fieldObject = $data['object'] ?? 'behaviors';
             // Looking for behaviors for BC reasons as some filters were moved from 'lead' to 'behaviors'.
             $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? $fieldChoices['behaviors'][$fieldAlias] ?? null;
