@@ -761,7 +761,8 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     public static function dateFieldProvider(): array
     {
         return [
-            ['Today', true],
+            ['Today', false],
+            ['Not-a-date', true],
             ['birthday', false],
             ['2023-01-01 11:00', false],
             ['2023-01-01 11:00:00', false],
