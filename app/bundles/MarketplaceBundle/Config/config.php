@@ -52,6 +52,7 @@ return [
                 'arguments' => [
                     'mautic.http.client',
                     'monolog.logger.mautic',
+                    'marketplace.service.config',
                 ],
             ],
         ],
@@ -78,5 +79,7 @@ return [
     'parameters' => [
         Config::MARKETPLACE_ENABLED                => true,
         Config::MARKETPLACE_WEBSITE_URL            => 'https://marketplace.mautic.org',
+        Config::MARKETPLACE_API_BASE               => '',
+        Config::MARKETPLACE_API_KEY                => '',
     ],
 ];

@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MarketplaceBundle\Command;
 
 use Mautic\CoreBundle\Helper\ComposerHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
+use Mautic\MarketplaceBundle\Service\ResourceInstaller;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: InstallCommand::NAME,
-    description: 'Installs a plugin that is available at Packagist.org'
+    description: 'Installs a plugin or resource from the Marketplace'
 )]
 class InstallCommand extends Command
 {
@@ -22,6 +26,8 @@ class InstallCommand extends Command
     public function __construct(
         private ComposerHelper $composer,
         private PackageModel $packageModel,
+        private ResourceInstaller $resourceInstaller,
+        private UserHelper $userHelper,
     ) {
         parent::__construct();
     }
@@ -49,8 +55,14 @@ class InstallCommand extends Command
             }
         }
 
-        if (empty($package->packageBase->type) || 'mautic-plugin' !== $package->packageBase->type) {
-            throw new \Exception('Package type is not mautic-plugin. Cannot install this plugin.');
+        $type = $package->packageBase->type ?? '';
+
+        if ('mautic-resource' === $type) {
+            return $this->installResource($packageName, $dryRun, $output);
+        }
+
+        if ('mautic-plugin' !== $type) {
+            throw new \Exception('Unsupported package type: '.$type);
         }
 
         if ($dryRun) {
@@ -66,7 +78,6 @@ class InstallCommand extends Command
             if ($result->output) {
                 $output->writeln($result->output);
             } else {
-                // If the output is empty then tell the user where to find more details.
                 $output->writeln('Check the logs for more details or run again with the -vvv parameter.');
             }
 
@@ -74,6 +85,33 @@ class InstallCommand extends Command
         }
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
+
+        return Command::SUCCESS;
+    }
+
+    private function installResource(string $packageName, bool $dryRun, OutputInterface $output): int
+    {
+        if ($dryRun) {
+            $output->writeln('Note: dry-run mode. Would install resource '.$packageName);
+
+            return Command::SUCCESS;
+        }
+
+        $output->writeln('Installing resource '.$packageName.', this might take a while...');
+
+        $userId = $this->userHelper->getUser()->getId() ?? 1;
+        $result = $this->resourceInstaller->install($packageName, $userId);
+
+        if (!$result['success']) {
+            $output->writeln('<error>Error while installing this resource.</error>');
+            foreach ($result['errors'] as $error) {
+                $output->writeln($error);
+            }
+
+            return Command::FAILURE;
+        }
+
+        $output->writeln('All done! '.$packageName.' has successfully been installed.');
 
         return Command::SUCCESS;
     }

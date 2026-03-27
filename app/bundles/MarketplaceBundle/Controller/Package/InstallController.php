@@ -45,8 +45,14 @@ class InstallController extends CommonController
             return $this->notFound();
         }
 
-        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
-            || !$this->config->isComposerEnabled()) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+            return $this->accessDenied();
+        }
+
+        $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
+        $isResource    = 'mautic-resource' === ($packageDetail->packageBase->type ?? '');
+
+        if (!$isResource && !$this->config->isComposerEnabled()) {
             return $this->accessDenied();
         }
 

@@ -10,7 +10,11 @@
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
     <p>{{ 'marketplace.package.install.html.success'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()})|purify }}</p>
-    <p><a class="btn btn-primary" href="{{ path('mautic_plugin_reload') }}">{% trans %}marketplace.package.install.html.success.continue{% endtrans %}</a></p>
+    {% if packageDetail.packageBase.type == 'mautic-resource' %}
+        <p><a class="btn btn-primary" href="{{ path('mautic_campaign_index') }}">{% trans %}marketplace.package.install.html.success.view_campaigns{% endtrans %}</a></p>
+    {% else %}
+        <p><a class="btn btn-primary" href="{{ path('mautic_plugin_reload') }}">{% trans %}marketplace.package.install.html.success.continue{% endtrans %}</a></p>
+    {% endif %}
 </div>
 
 <script>

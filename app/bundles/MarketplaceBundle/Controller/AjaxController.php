@@ -14,8 +14,10 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
+use Mautic\MarketplaceBundle\Service\ResourceInstaller;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -31,9 +33,11 @@ class AjaxController extends CommonAjaxController
         private CacheHelper $cacheHelper,
         private LoggerInterface $logger,
         private Config $config,
+        private ResourceInstaller $resourceInstaller,
+        private PackageModel $packageModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
-        UserHelper $userHelper,
+        private UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,
@@ -52,8 +56,7 @@ class AjaxController extends CommonAjaxController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
-            || !$this->config->isComposerEnabled()) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
             return $this->sendJsonResponse([
                 'error' => $this->translator->trans('marketplace.package.request.no_permissions'),
             ], Response::HTTP_FORBIDDEN);
@@ -68,6 +71,29 @@ class AjaxController extends CommonAjaxController
         }
 
         $packageName = $data['vendor'].'/'.$data['package'];
+
+        try {
+            $packageDetail = $this->packageModel->getPackageDetail($packageName);
+            $type          = $packageDetail->packageBase->type ?? '';
+        } catch (\Exception $e) {
+            return $this->installError($e);
+        }
+
+        if ('mautic-resource' === $type) {
+            if ($this->resourceInstaller->isInstalled($packageName)) {
+                return $this->sendJsonResponse([
+                    'error' => $this->translator->trans('marketplace.package.install.already.installed'),
+                ], 400);
+            }
+
+            return $this->installResource($packageName);
+        }
+
+        if (!$this->config->isComposerEnabled()) {
+            return $this->sendJsonResponse([
+                'error' => $this->translator->trans('marketplace.package.request.no_permissions'),
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         if ($this->composer->isInstalled($packageName)) {
             return $this->sendJsonResponse([
@@ -103,8 +129,7 @@ class AjaxController extends CommonAjaxController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        if (!$this->security->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)
-            || !$this->config->isComposerEnabled()) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)) {
             return $this->sendJsonResponse([
                 'error' => $this->translator->trans('marketplace.package.request.no_permissions'),
             ], Response::HTTP_FORBIDDEN);
@@ -119,6 +144,35 @@ class AjaxController extends CommonAjaxController
         }
 
         $packageName = $data['vendor'].'/'.$data['package'];
+
+        try {
+            $packageDetail = $this->packageModel->getPackageDetail($packageName);
+            $type          = $packageDetail->packageBase->type ?? '';
+        } catch (\Exception $e) {
+            return $this->removeError($e);
+        }
+
+        if ('mautic-resource' === $type) {
+            if (!$this->resourceInstaller->isInstalled($packageName)) {
+                return $this->sendJsonResponse([
+                    'error' => $this->translator->trans('marketplace.package.remove.not.installed'),
+                ], 400);
+            }
+
+            try {
+                $this->resourceInstaller->uninstall($packageName);
+            } catch (\Exception $e) {
+                return $this->removeError($e);
+            }
+
+            return new JsonResponse(['success' => true]);
+        }
+
+        if (!$this->config->isComposerEnabled()) {
+            return $this->sendJsonResponse([
+                'error' => $this->translator->trans('marketplace.package.request.no_permissions'),
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         if (!$this->composer->isInstalled($packageName)) {
             return $this->sendJsonResponse([
@@ -167,6 +221,28 @@ class AjaxController extends CommonAjaxController
         }
 
         return null;
+    }
+
+    private function installResource(string $packageName): JsonResponse
+    {
+        $userId = $this->userHelper->getUser()->getId() ?? 1;
+
+        try {
+            $result = $this->resourceInstaller->install($packageName, $userId);
+        } catch (\Exception $e) {
+            return $this->installError($e);
+        }
+
+        if (!$result['success']) {
+            $errorMessage = implode('; ', $result['errors']);
+            $this->logger->error('Resource installation failed: '.$errorMessage);
+
+            return $this->sendJsonResponse([
+                'error' => $errorMessage,
+            ], 500);
+        }
+
+        return new JsonResponse(['success' => true]);
     }
 
     private function installError(\Exception $e): JsonResponse

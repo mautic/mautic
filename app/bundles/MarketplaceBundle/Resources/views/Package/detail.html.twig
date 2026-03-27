@@ -72,7 +72,11 @@
  }}) %}
 {% endif %}
 
-{% if security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and not isInstalled and isComposerEnabled %}
+{% set isResource = packageDetail.packageBase.type == 'mautic-resource' %}
+{% set canInstall = security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) %}
+{% set canRemove = security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_REMOVE_PACKAGES')) %}
+
+{% if canInstall and not isInstalled and (isComposerEnabled or isResource) %}
     {% set installRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_INSTALL'),
         {
             'vendor' : packageDetail.packageBase.getVendorName(),
@@ -91,7 +95,7 @@
         'primary'   : true,
     }}) %}
 
-{% elseif security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and isComposerEnabled %}
+{% elseif canRemove and isInstalled and (isComposerEnabled or isResource) %}
     {% set removeRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_REMOVE'),
         {'vendor' : packageDetail.packageBase.getVendorName(),
         'package' : packageDetail.packageBase.getPackageName(),
@@ -150,12 +154,16 @@
                     {
                         type: 'read-only',
                         color: 'warm-gray',
-                        label: packageDetail.packageBase.type == 'theme'
+                        label: packageDetail.packageBase.type == 'mautic-theme'
                             ? 'marketplace.package.type.theme'|trans
-                            : 'marketplace.package.type.plugin'|trans,
-                        icon: packageDetail.packageBase.type == 'theme'
+                            : (packageDetail.packageBase.type == 'mautic-resource'
+                                ? 'marketplace.package.type.resource'|trans
+                                : 'marketplace.package.type.plugin'|trans),
+                        icon: packageDetail.packageBase.type == 'mautic-theme'
                             ? 'ri-paint-brush-line marketplace-icon'
-                            : 'ri-plug-line',
+                            : (packageDetail.packageBase.type == 'mautic-resource'
+                                ? 'ri-folder-download-line'
+                                : 'ri-plug-line'),
                         attributes: {
                             'title': 'marketplace.package.type'|trans,
                             'data-toggle': 'tooltip',

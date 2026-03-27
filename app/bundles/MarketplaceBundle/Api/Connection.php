@@ -8,6 +8,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Mautic\MarketplaceBundle\Exception\ApiException;
+use Mautic\MarketplaceBundle\Service\Config;
 use Psr\Log\LoggerInterface;
 
 class Connection
@@ -15,6 +16,7 @@ class Connection
     public function __construct(
         private ClientInterface $httpClient,
         private LoggerInterface $logger,
+        private Config $config,
     ) {
     }
 
@@ -31,7 +33,7 @@ class Connection
         if ('' !== $query) {
             $queryParams['_query'] = $query;
         }
-        $url = 'https://marketplace-api.mautic.org/functions/v1/api-marketplace-packages?'.http_build_query($queryParams);
+        $url = $this->config->getApiBase().'/rest/v1/rpc/get_view?'.http_build_query($queryParams);
 
         return $this->makeRequest($url);
     }
@@ -43,7 +45,9 @@ class Connection
      */
     public function getPackage(string $pluginName): array
     {
-        return $this->makeRequest("https://marketplace-api.mautic.org/functions/v1/api-marketplace-package?package={$pluginName}");
+        $url = $this->config->getApiBase().'/rest/v1/rpc/get_pack?'.http_build_query(['package_name' => $pluginName]);
+
+        return $this->makeRequest($url);
     }
 
     /**
@@ -87,6 +91,8 @@ class Connection
             'Accept-Encoding' => 'gzip, deflate, br',
             'Connection'      => 'keep-alive',
             'User-Agent'      => 'Mautic Marketplace',
+            'apikey'          => $this->config->getApiKey(),
+            'Authorization'   => 'Bearer '.$this->config->getApiKey(),
         ];
     }
 }

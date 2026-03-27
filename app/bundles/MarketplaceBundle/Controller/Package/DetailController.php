@@ -17,6 +17,7 @@ use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
+use Mautic\MarketplaceBundle\Service\ResourceInstaller;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,6 +30,7 @@ class DetailController extends CommonController
         private RouteProvider $routeProvider,
         private Config $config,
         private ComposerHelper $composer,
+        private ResourceInstaller $resourceInstaller,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -52,13 +54,17 @@ class DetailController extends CommonController
             return $this->accessDenied();
         }
 
-        $isInstalled = $this->composer->isInstalled("{$vendor}/{$package}");
-
         try {
             $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
         } catch (RecordNotFoundException $e) {
             return $this->notFound($e->getMessage());
         }
+
+        $packageFullName = "{$vendor}/{$package}";
+        $isResource      = 'mautic-resource' === ($packageDetail->packageBase->type ?? '');
+        $isInstalled     = $isResource
+            ? $this->resourceInstaller->isInstalled($packageFullName)
+            : $this->composer->isInstalled($packageFullName);
 
         $security = $this->security;
 
