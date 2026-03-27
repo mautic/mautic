@@ -263,7 +263,6 @@ class ResourceInstaller
 
         $campaigns = $group['campaign'] ?? [];
         $events    = $group['campaign_event'] ?? [];
-        $emails    = $group['email'] ?? [];
         $lists     = $group['lists'] ?? [];
 
         foreach ($campaigns as $campaign) {
@@ -342,7 +341,7 @@ class ResourceInstaller
             if (!is_array($statusGroup)) {
                 continue;
             }
-            foreach ($statusGroup as $statusType => $entities) {
+            foreach ($statusGroup as $entities) {
                 if (!is_array($entities)) {
                     continue;
                 }
