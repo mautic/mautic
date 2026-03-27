@@ -496,6 +496,38 @@ class CompanySegmentController extends AbstractStandardFormController
             ],
         ];
 
+        $dependentsCompanySegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'id');
+
+        if ([] !== $dependentsCompanySegments) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.company_segments.error.cannot.delete',
+                'msgVars' => ['%segments%' => implode(', ', $dependentsCompanySegments)],
+            ];
+
+            return $this->postActionRedirect(
+                array_merge($postActionVars, [
+                    'flashes' => $flashes,
+                ])
+            );
+        }
+
+        $dependentsContactSegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'id', true);
+
+        if ([] !== $dependentsContactSegments) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.company_segments.segment.error.cannot.delete',
+                'msgVars' => ['%segments%' => implode(', ', $dependentsContactSegments)],
+            ];
+
+            return $this->postActionRedirect(
+                array_merge($postActionVars, [
+                    'flashes' => $flashes,
+                ])
+            );
+        }
+
         if ('POST' === $request->getMethod()) {
             $segment = $model->getEntity($objectId);
 
@@ -570,10 +602,46 @@ class CompanySegmentController extends AbstractStandardFormController
                 static fn ($v): bool => is_int($v) || (is_string($v) && ctype_digit($v))
             )));
 
-            $deleteIds = [];
+            $canNotBeDeleted     = [];
+            $deleteIds           = [];
+
+            // Check each segment for dependencies individually
+            foreach ($ids as $objectId) {
+                // Check for company segment dependencies
+                $dependentsCompanySegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'name');
+
+                // Check for contact segment dependencies
+                $dependentsContactSegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'name', true);
+
+                if ([] !== $dependentsCompanySegments) {
+                    $canNotBeDeleted[$objectId] = $dependentsCompanySegments;
+                    $flashes[]                  = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.company_segments.error.cannot.delete',
+                        'msgVars' => [
+                            '%segments%' => implode(', ', $dependentsCompanySegments),
+                        ],
+                    ];
+                    continue;
+                }
+
+                if ([] !== $dependentsContactSegments) {
+                    $canNotBeDeleted[$objectId] = $dependentsContactSegments;
+                    $flashes[]                  = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.company_segments.segment.error.cannot.delete',
+                        'msgVars' => [
+                            '%segments%' => implode(', ', $dependentsContactSegments),
+                        ],
+                    ];
+                    continue;
+                }
+            }
+
+            $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
 
             // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
+            foreach ($toBeDeleted as $objectId) {
                 $segment = $model->getEntity($objectId);
 
                 if (!$segment instanceof CompanySegment || null === $segment->getId()) {

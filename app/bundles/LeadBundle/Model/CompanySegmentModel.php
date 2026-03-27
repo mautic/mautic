@@ -861,6 +861,90 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
+     * Check which company segments cannot be deleted due to dependencies in contact segments.
+     *
+     * @param array<int> $segmentIds
+     *
+     * @return array<int, string>
+     */
+    public function canNotBeDeletedByContactSegments(array $segmentIds): array
+    {
+        $tableAlias = $this->listModel->getRepository()->getTableAlias();
+        $segmentIds = array_map('intval', $segmentIds);
+
+        $entities = $this->listModel->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        ['column' => $tableAlias.'.filters', 'expr' => 'LIKE', 'value' => $this->getLikeQueryCompanySegment()],
+                    ],
+                ],
+            ]
+        );
+
+        if ([] === $entities) {
+            return [];
+        }
+
+        $idsNotToBeDeleted   = [];
+        $namesNotToBeDeleted = [];
+        $filterRegistered    = [];
+
+        foreach ($entities as $entity) {
+            assert($entity instanceof LeadList);
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if (
+                    !is_array($eachFilter)
+                    || !array_key_exists('type', $eachFilter)
+                    || self::PROPERTIES_FIELD !== $eachFilter['type']
+                    || !is_array($eachFilter['properties'])
+                    || !array_key_exists('filter', $eachFilter['properties'])
+                ) {
+                    continue;
+                }
+
+                /** @var array<int> $filterValue */
+                $filterValue       = $eachFilter['properties']['filter'];
+                $idsNotToBeDeleted = $this->addIdsNotToBeDeleted($idsNotToBeDeleted, $filterValue);
+                foreach ($filterValue as $valFilter) {
+                    if (!isset($filterRegistered[$valFilter])) {
+                        $filterRegistered[$valFilter][] = (int) $entity->getId();
+                        continue;
+                    }
+                    if (in_array($entity->getId(), $filterRegistered[$valFilter], true)) {
+                        continue;
+                    }
+                    $filterRegistered[$valFilter][] = (int) $entity->getId();
+                }
+            }
+        }
+
+        foreach ($filterRegistered as $keyValueFilter => $value) {
+            if (array_intersect($value, $segmentIds) === $value) {
+                $idsNotToBeDeleted = array_unique(array_diff($idsNotToBeDeleted, [$keyValueFilter]));
+            }
+        }
+
+        $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
+
+        foreach ($idsNotToBeDeleted as $val) {
+            $notToBeDeletedEntity = $this->getEntity($val);
+            assert($notToBeDeletedEntity instanceof CompanySegment);
+
+            $name = $notToBeDeletedEntity->getName();
+
+            if (null === $name) {
+                $name = 'N/A';
+            }
+
+            $namesNotToBeDeleted[$val] = $name;
+        }
+
+        return $namesNotToBeDeleted;
+    }
+
+    /**
      * Get LIKE query pattern for company segment type based on database platform.
      */
     private function getLikeQueryCompanySegment(): string

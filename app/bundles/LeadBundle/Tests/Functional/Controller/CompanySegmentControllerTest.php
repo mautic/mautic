@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CompanySegmentControllerTest extends MauticMysqlTestCase
 {
@@ -354,6 +355,110 @@ class CompanySegmentControllerTest extends MauticMysqlTestCase
             $this->client->getResponse()->isRedirect() || $this->client->getResponse()->isSuccessful(),
             'Clone non-existent segment should redirect or show error'
         );
+    }
+
+    public function testCannotDeleteSegmentWithDependencies(): void
+    {
+        $this->loginAdminUser();
+
+        // Create base segment
+        $baseSegment = new CompanySegment();
+        $baseSegment->setName('Base Segment');
+        $baseSegment->setAlias('base-segment');
+        $baseSegment->setPublicName('Base Segment');
+        $baseSegment->setIsPublished(true);
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+
+        // Create dependent segment that references the base segment
+        $dependentSegment = new CompanySegment();
+        $dependentSegment->setName('Dependent Segment');
+        $dependentSegment->setAlias('dependent-segment');
+        $dependentSegment->setPublicName('Dependent Segment');
+        $dependentSegment->setIsPublished(true);
+        $dependentSegment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'company_segments',
+                'object'     => 'company',
+                'type'       => 'company_segments',
+                'operator'   => 'in',
+                'properties' => ['filter' => [$baseSegment->getId()]],
+            ],
+        ]);
+        $this->em->persist($dependentSegment);
+        $this->em->flush();
+
+        // Try to delete the base segment (should fail)
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/company-segments/delete/'.$baseSegment->getId());
+        $this->assertStringContainsString('Company segment cannot be deleted, it is required by', $crawler->text());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // Check that segment still exists
+        $this->em->clear();
+        $segment = $this->em->getRepository(CompanySegment::class)->find($baseSegment->getId());
+        $this->assertInstanceOf(CompanySegment::class, $segment);
+    }
+
+    public function testCannotBatchDeleteSegmentsWithDependencies(): void
+    {
+        $this->loginAdminUser();
+
+        // Create base segment
+        $baseSegment = new CompanySegment();
+        $baseSegment->setName('Base Segment for Batch');
+        $baseSegment->setAlias('base-segment-batch');
+        $baseSegment->setPublicName('Base Segment');
+        $baseSegment->setIsPublished(true);
+        $this->em->persist($baseSegment);
+
+        // Create independent segment (can be deleted)
+        $independentSegment = new CompanySegment();
+        $independentSegment->setName('Independent Segment');
+        $independentSegment->setAlias('independent-segment');
+        $independentSegment->setPublicName('Independent Segment');
+        $independentSegment->setIsPublished(true);
+        $this->em->persist($independentSegment);
+
+        $this->em->flush();
+
+        // Create dependent segment
+        $dependentSegment = new CompanySegment();
+        $dependentSegment->setName('Dependent Segment Batch');
+        $dependentSegment->setAlias('dependent-segment-batch');
+        $dependentSegment->setPublicName('Dependent Segment');
+        $dependentSegment->setIsPublished(true);
+        $dependentSegment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'company_segments',
+                'object'     => 'company',
+                'type'       => 'company_segments',
+                'operator'   => 'in',
+                'properties' => ['filter' => [$baseSegment->getId()]],
+            ],
+        ]);
+        $this->em->persist($dependentSegment);
+        $this->em->flush();
+
+        $baseId        = $baseSegment->getId();
+        $independentId = $independentSegment->getId();
+
+        // Try to batch delete both segments
+        $ids     = json_encode([$baseId, $independentId]);
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/company-segments/batchDelete?ids='.$ids);
+        $this->assertStringContainsString('cannot be deleted', $crawler->text());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // Check results
+        $this->em->clear();
+        $base        = $this->em->getRepository(CompanySegment::class)->find($baseId);
+        $independent = $this->em->getRepository(CompanySegment::class)->find($independentId);
+
+        // Base segment should still exist (has dependency)
+        $this->assertInstanceOf(CompanySegment::class, $base);
+        // Independent segment should be deleted
+        $this->assertNull($independent);
     }
 
     private function loginAdminUser(): void
