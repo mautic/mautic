@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
 use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
+use Mautic\LeadBundle\Form\Type\CampaignEventCompanySegmentsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadAttachedType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
@@ -40,6 +41,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -61,6 +63,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private FieldModel $leadFieldModel,
         private ListModel $listModel,
         private CompanyModel $companyModel,
+        private CompanySegmentModel $companySegmentModel,
         private CampaignModel $campaignModel,
         private CoreParametersHelper $coreParametersHelper,
         private DoNotContact $doNotContact,
@@ -207,6 +210,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.segments', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.company_segments.campaign.condition.segments',
+            'description' => 'mautic.company_segments.campaign.condition.segments_descr',
+            'formType'    => CampaignEventCompanySegmentsType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.company_segments', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.stages',
@@ -514,6 +526,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.segments')) {
             $listRepo = $this->listModel->getRepository();
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+        } elseif ($event->checkContext('lead.company_segments')) {
+            $result = $this->checkCompanySegmentMembership($lead, $event->getConfig()['company_segment_ids'] ?? []);
         } elseif ($event->checkContext('lead.stages')) {
             $result   = $this->leadModel->getRepository()->isContactInOneOfStages($lead, $event->getConfig()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
@@ -805,5 +819,43 @@ class CampaignSubscriber implements EventSubscriberInterface
         $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];
 
         return !empty($leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
+    }
+
+    /**
+     * Check if the lead's primary company is in one of the specified company segments.
+     *
+     * @param array<int> $companySegmentIds
+     */
+    private function checkCompanySegmentMembership(Lead $lead, array $companySegmentIds): bool
+    {
+        if ([] === $companySegmentIds || !$lead->getId()) {
+            return false;
+        }
+
+        $primaryCompany = $lead->getPrimaryCompany();
+
+        if (
+            [] === $primaryCompany
+            || !is_array($primaryCompany)
+            || !array_key_exists('id', $primaryCompany)
+            || empty($primaryCompany['id'])
+        ) {
+            return false;
+        }
+
+        $company = $this->companyModel->getRepository()->find($primaryCompany['id']);
+
+        if (null === $company) {
+            return false;
+        }
+
+        $companySegments = $this->companySegmentModel->getCompaniesSegmentsRepository()->findBy(
+            [
+                'company'        => $company,
+                'companySegment' => $companySegmentIds,
+            ]
+        );
+
+        return is_array($companySegments) && count($companySegments) > 0;
     }
 }

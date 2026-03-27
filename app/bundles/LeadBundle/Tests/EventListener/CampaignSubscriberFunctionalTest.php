@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -31,6 +32,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
     use LeadFieldTestTrait;
 
     private LeadRepository $contactRepository;
@@ -1070,6 +1072,201 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $campaignLead->setDateAdded(new \DateTime());
         $this->em->persist($campaignLead);
         $campaign->addLead($lead->getId(), $campaignLead);
+    }
+
+    public function testCompanySegmentMembershipCampaignCondition(): void
+    {
+        $joe  = $this->createContact('joe@glibi.com');
+        $mary = $this->createContact('mary@glibi.com');
+        $john = $this->createContact('john@tbs.com');
+
+        self::assertNull($joe->getLastname());
+        self::assertNull($mary->getLastname());
+        self::assertNull($john->getLastname());
+
+        $companyGlibi = $this->createCompany('Glibi Inc', 'info@glibi.com');
+        $companyTBS   = $this->createCompany('TBS Corp', 'info@tbs.com');
+        $this->em->flush();
+
+        $this->createCompanyLead($companyGlibi, $joe, true);
+        $this->createCompanyLead($companyGlibi, $mary, true);
+        $this->createCompanyLead($companyTBS, $john, true);
+
+        $segmentGlibi = $this->createCompanySegment('Glibi Segment', 'glibi-segment', true);
+        $segmentTBS   = $this->createCompanySegment('TBS Segment', 'tbs-segment', true);
+
+        $this->addCompanyToCompanySegment($companyGlibi, $segmentGlibi);
+        $this->addCompanyToCompanySegment($companyTBS, $segmentTBS);
+
+        $campaign = new Campaign();
+        $campaign->setName('Company Segment Membership Test Campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->addContactToCampaign($campaign, $joe);
+        $this->addContactToCampaign($campaign, $mary);
+        $this->addContactToCampaign($campaign, $john);
+
+        $condition = $this->createCampaignCondition(
+            campaign: $campaign,
+            name: 'Check if company is in Glibi Segment',
+            type: 'lead.company_segments',
+            properties: ['company_segment_ids' => [$segmentGlibi->getId()]],
+            order: 1
+        );
+
+        $actionYes = $this->createCampaignAction(
+            campaign: $campaign,
+            name: 'Set lastname to PASS',
+            type: 'lead.updatelead',
+            properties: ['lastname' => 'PASS'],
+            order: 2,
+            decisionPath: 'yes',
+            parent: $condition
+        );
+
+        $actionNo = $this->createCampaignAction(
+            campaign: $campaign,
+            name: 'Set lastname to FAIL',
+            type: 'lead.updatelead',
+            properties: ['lastname' => 'FAIL'],
+            order: 3,
+            decisionPath: 'no',
+            parent: $condition
+        );
+
+        $campaign->setCanvasSettings([
+            'nodes' => [
+                ['id' => $condition->getId(), 'positionX' => '420', 'positionY' => '155'],
+                ['id' => $actionYes->getId(), 'positionX' => '176', 'positionY' => '250'],
+                ['id' => $actionNo->getId(), 'positionX' => '664', 'positionY' => '250'],
+                ['id' => 'lists', 'positionX' => '420', 'positionY' => '50'],
+            ],
+            'connections' => [
+                [
+                    'sourceId' => 'lists',
+                    'targetId' => $condition->getId(),
+                    'anchors'  => [
+                        ['endpoint' => 'leadsource', 'eventId' => 'lists'],
+                        ['endpoint' => 'top', 'eventId' => $condition->getId()],
+                    ],
+                ],
+                [
+                    'sourceId' => $condition->getId(),
+                    'targetId' => $actionYes->getId(),
+                    'anchors'  => [
+                        ['endpoint' => 'yes', 'eventId' => $condition->getId()],
+                        ['endpoint' => 'top', 'eventId' => $actionYes->getId()],
+                    ],
+                ],
+                [
+                    'sourceId' => $condition->getId(),
+                    'targetId' => $actionNo->getId(),
+                    'anchors'  => [
+                        ['endpoint' => 'no', 'eventId' => $condition->getId()],
+                        ['endpoint' => 'top', 'eventId' => $actionNo->getId()],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        $joeAfter  = $this->contactRepository->getEntity($joe->getId());
+        $maryAfter = $this->contactRepository->getEntity($mary->getId());
+        $johnAfter = $this->contactRepository->getEntity($john->getId());
+
+        self::assertNotNull($joeAfter);
+        self::assertSame('PASS', $joeAfter->getLastname(), 'Joe\'s company (Glibi) is in the segment, should take YES branch');
+
+        self::assertNotNull($maryAfter);
+        self::assertSame('PASS', $maryAfter->getLastname(), 'Mary\'s company (Glibi) is in the segment, should take YES branch');
+
+        self::assertNotNull($johnAfter);
+        self::assertSame('FAIL', $johnAfter->getLastname(), 'John\'s company (TBS) is NOT in the segment, should take NO branch');
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function createCampaignCondition(
+        Campaign $campaign,
+        string $name,
+        string $type,
+        array $properties,
+        int $order,
+    ): Event {
+        return $this->createCampaignEvent(
+            campaign: $campaign,
+            name: $name,
+            type: $type,
+            properties: $properties,
+            eventType: 'condition',
+            order: $order
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function createCampaignAction(
+        Campaign $campaign,
+        string $name,
+        string $type,
+        array $properties,
+        int $order,
+        string $decisionPath = '',
+        ?Event $parent = null,
+    ): Event {
+        return $this->createCampaignEvent(
+            campaign: $campaign,
+            name: $name,
+            type: $type,
+            properties: $properties,
+            eventType: 'action',
+            order: $order,
+            decisionPath: $decisionPath,
+            parent: $parent
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function createCampaignEvent(
+        Campaign $campaign,
+        string $name,
+        string $type,
+        array $properties,
+        string $eventType,
+        int $order,
+        string $decisionPath = '',
+        ?Event $parent = null,
+    ): Event {
+        $event = new Event();
+        $event->setName($name);
+        $event->setType($type);
+        $event->setEventType($eventType);
+        $event->setProperties($properties);
+        $event->setOrder($order);
+        $event->setCampaign($campaign);
+
+        if ('' !== $decisionPath) {
+            $event->setDecisionPath($decisionPath);
+        }
+
+        if (null !== $parent) {
+            $event->setParent($parent);
+        }
+
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return $event;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
