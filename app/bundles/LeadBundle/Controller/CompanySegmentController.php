@@ -496,38 +496,6 @@ class CompanySegmentController extends AbstractStandardFormController
             ],
         ];
 
-        $dependentsCompanySegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'id');
-
-        if ([] !== $dependentsCompanySegments) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.company_segments.error.cannot.delete',
-                'msgVars' => ['%segments%' => implode(', ', $dependentsCompanySegments)],
-            ];
-
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => $flashes,
-                ])
-            );
-        }
-
-        $dependentsContactSegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'id', true);
-
-        if ([] !== $dependentsContactSegments) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.company_segments.segment.error.cannot.delete',
-                'msgVars' => ['%segments%' => implode(', ', $dependentsContactSegments)],
-            ];
-
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => $flashes,
-                ])
-            );
-        }
-
         if ('POST' === $request->getMethod()) {
             $segment = $model->getEntity($objectId);
 

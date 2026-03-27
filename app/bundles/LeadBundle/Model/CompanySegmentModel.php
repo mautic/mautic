@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
@@ -140,6 +141,36 @@ class CompanySegmentModel extends FormModel
         $this->dispatchEvent('pre_save', $entity, $isNew);
         $repo->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, $isNew);
+    }
+
+    /**
+     * @throws DeleteEntityDependencyException
+     */
+    public function deleteEntity($entity): void
+    {
+        if (!$entity instanceof CompanySegment) {
+            throw new \InvalidArgumentException('Entity must be of class CompanySegment');
+        }
+
+        $id = $entity->getId();
+        if (null === $id) {
+            throw new \InvalidArgumentException('Entity must have an ID');
+        }
+
+        // Check for company segment dependencies
+        $dependentsCompanySegments = $this->getSegmentsWithDependenciesOnSegment($id, 'name');
+        if ([] !== $dependentsCompanySegments) {
+            throw new DeleteEntityDependencyException($dependentsCompanySegments, implode(', ', $dependentsCompanySegments));
+        }
+
+        // Check for contact segment dependencies
+        $dependentsContactSegments = $this->getSegmentsWithDependenciesOnSegment($id, 'name', true);
+        if ([] !== $dependentsContactSegments) {
+            throw new DeleteEntityDependencyException($dependentsContactSegments, implode(', ', $dependentsContactSegments));
+        }
+
+        // Proceed with deletion
+        parent::deleteEntity($entity);
     }
 
     protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event

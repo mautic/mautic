@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -79,18 +80,6 @@ class CompanySegmentApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $dependents = $model->getSegmentsWithDependenciesOnSegment((int) $id, 'id');
-            if ([] !== $dependents) {
-                $errorTranslator = $this->translator->trans('mautic.company_segments.api.error.delete_has_dependencies', ['%segments%' => implode(', ', $dependents)]);
-
-                $returnErrors = $this->returnError($errorTranslator);
-                if ($returnErrors instanceof Response) {
-                    return $returnErrors;
-                }
-
-                return $this->notFound();
-            }
-
             return parent::deleteEntityAction($id);
         }
 
@@ -115,34 +104,6 @@ class CompanySegmentApiController extends CommonApiController
         $errors            = [];
         /** @var array<int, CompanySegment|null> $entities */
         $entities          = $this->getBatchEntities($parameters, $errors, true);
-        $ids               =  [];
-        foreach ($entities as $entity) {
-            assert($entity instanceof CompanySegment || null === $entity);
-            if (null !== $entity && null !== $entity->getId()) {
-                $ids[] = $entity->getId();
-            }
-        }
-        if ([] !== $ids) {
-            $model = $this->getModel(CompanySegmentModel::class);
-            \assert($model instanceof CompanySegmentModel);
-            $canNotBeDeleted  = $model->canNotBeDeleted($ids);
-            $errorMessage     = $this->translator->trans('mautic.lead.list.error.cannot.delete.batch', ['%segments%' => implode(', ', $canNotBeDeleted)]);
-            $result           = [];
-            $result['errors'] = $errorMessage;
-
-            try {
-                $json = json_encode($result, JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
-                $json = json_encode(
-                    ['errors' => $this->translator->trans('mautic.core.error.json_encode_failed')]
-                );
-                if (false === $json) {
-                    $json = '{"errors":"unknown"}';
-                }
-            }
-
-            return $this->returnError($json, Response::HTTP_PRECONDITION_FAILED);
-        }
 
         $this->inBatchMode = true;
 
@@ -165,8 +126,17 @@ class CompanySegmentApiController extends CommonApiController
                 $this->setBatchError($key, 'mautic.core.error.accessdenied', Response::HTTP_FORBIDDEN, $errors, $entities, $entity);
                 continue;
             }
+
             assert($this->model instanceof CompanySegmentModel);
-            $this->model->deleteEntity($entity);
+
+            try {
+                $this->model->deleteEntity($entity);
+            } catch (DeleteEntityDependencyException $e) {
+                $errorMessage = $this->translator->trans('mautic.company_segments.api.error.delete_has_dependencies', ['%segments%' => $e->getMessage()]);
+                /** @var array<int, array<int|string>> $errors */
+                $this->setBatchError($key, $errorMessage, Response::HTTP_CONFLICT, $errors, $entities, $entity);
+                continue;
+            }
             $this->doctrine->getManager()->detach($entity);
         }
 
