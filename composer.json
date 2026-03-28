@@ -209,7 +209,7 @@
         "Fix PHP 8.5 deprecated scalar casts": "patches/studio-42-elfinder-php85-float-cast.patch"
       },
       "doctrine/dbal": {
-          "Fix PHP 8.5 PDO PgSQL deprecation": "patches/doctrine-dbal-php85-pgsql.patch"
+          "Fix PHP 8.5 PDO PgSQL deprecation": "patches/doctrine-dbal-pgsql-php85.patch"
       }
     }
   }
