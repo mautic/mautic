@@ -1,0 +1,21 @@
+--- a/vendor/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOPgSql/Driver.php
++++ b/vendor/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOPgSql/Driver.php
+@@ -34,11 +34,13 @@
+                 $driverOptions
+             );
+ 
++            $disablePreparesConst = defined('\Pdo\Pgsql::ATTR_DISABLE_PREPARES') 
++                ? \Pdo\Pgsql::ATTR_DISABLE_PREPARES 
++                : (defined('PDO::PGSQL_ATTR_DISABLE_PREPARES') ? \PDO::PGSQL_ATTR_DISABLE_PREPARES : null);
++
+             if (
+-                defined('PDO::PGSQL_ATTR_DISABLE_PREPARES')
+-                && (! isset($driverOptions[\PDO::PGSQL_ATTR_DISABLE_PREPARES])
+-                    || $driverOptions[\PDO::PGSQL_ATTR_DISABLE_PREPARES] === true
+-                )
++                $disablePreparesConst !== null
++                && (! isset($driverOptions[$disablePreparesConst]) || $driverOptions[$disablePreparesConst] === true)
+             ) {
+-                $pdo->setAttribute(\PDO::PGSQL_ATTR_DISABLE_PREPARES, true);
++                $pdo->setAttribute($disablePreparesConst, true);
+             }
