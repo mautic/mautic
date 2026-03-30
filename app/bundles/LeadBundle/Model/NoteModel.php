@@ -91,6 +91,8 @@ class NoteModel extends FormModel
 
         switch ($action) {
             case 'pre_save':
+                $dateTime = $entity->getDateTime() ?: new \DateTime();
+                $entity->setDateTime($dateTime);
                 $name = LeadEvents::NOTE_PRE_SAVE;
                 break;
             case 'post_save':

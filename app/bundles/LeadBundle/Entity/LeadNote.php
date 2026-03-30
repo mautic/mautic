@@ -167,11 +167,11 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateTime()
     {
-        return $this->dateTime;
+        return $this->dateTime ?? ($this->getDateAdded() ? clone $this->getDateAdded() : ($this->getDateModified() ? clone $this->getDateModified() : null));
     }
 
     /**
