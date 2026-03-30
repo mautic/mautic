@@ -13,6 +13,7 @@ Variables:
 {% set icon = 'ri-video-chat-line' %}
 {% endif %}
 <li class="note-single mb-lg" id="LeadNote{{ note.id }}">
+    {% set noteDateTime = note.dateTime ?? note.dateAdded ?? note.dateModified %}
     <div class="note-body d-flex np mb-md">
         <div class="height-auto icon text-right">
             <div class="icon-wrapper d-flex ai-center jc-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
@@ -22,7 +23,7 @@ Variables:
             <div class="d-flex jc-space-between ai-center mb-md fw-wrap fw-nowrap-lg">
                 <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
                 <div class="d-flex fg-1 ai-center jc-space-between jc-end-lg gap-sm">
-                    <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
+                    <span class="small text-secondary">{% if noteDateTime is not empty %}{{ dateToFullConcat(noteDateTime) }}{% endif %}</span>
                     <div class="pull-right btn-group">
                         {% if permissions['edit'] %}
                         {% include '@MauticCore/Helper/button.html.twig' with {
