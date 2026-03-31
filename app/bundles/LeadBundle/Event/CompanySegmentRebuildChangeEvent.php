@@ -8,9 +8,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Abstract base event for company segment rebuild operations.
- */
 abstract class CompanySegmentRebuildChangeEvent extends Event
 {
     /**

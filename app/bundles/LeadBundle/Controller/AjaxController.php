@@ -844,9 +844,6 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * Load filter properties form for company segments.
-     */
     public function loadCompanySegmentFilterFormAction(
         Request $request,
         FormFactoryInterface $formFactory,
@@ -893,9 +890,6 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * Get company count for a company segment.
-     */
     public function getCompaniesCountAction(Request $request, CompanySegmentModel $companySegmentModel): JsonResponse
     {
         $id = InputHelper::clean($request->query->get('id'));

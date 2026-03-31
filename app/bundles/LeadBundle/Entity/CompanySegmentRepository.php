@@ -14,8 +14,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class CompanySegmentRepository extends CommonRepository
 {
     /**
-     * The original method name is `getLists`.
-     *
      * @see LeadListRepository::getLists
      *
      * @return array<array{id: string, name: string, alias: string}>
@@ -63,9 +61,6 @@ class CompanySegmentRepository extends CommonRepository
     }
 
     /**
-     * The override as in \Mautic\LeadBundle\Entity\LeadListRepository::addSearchCommandWhereClause.
-     * Stripped conditions for search.
-     *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      *
      * @phpstan-param mixed $filter
@@ -120,8 +115,6 @@ class CompanySegmentRepository extends CommonRepository
     }
 
     /**
-     * This function is required for both generating reports by company segment and for the LeuchtfeuerCompanyListWidgetBundle.
-     *
      * @param array<int> $ids
      *
      * @return array<int, CompanySegment>

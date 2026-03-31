@@ -8,9 +8,6 @@ use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * The event is dispatched when the choices for campaign segment filters are generated.
- */
 class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
@@ -54,9 +51,6 @@ class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * Add a new choice for campaign segment filters
-     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
-     *
      * @param mixed[] $choiceConfig
      */
     public function addChoice(string $object, string $choiceKey, array $choiceConfig): void
@@ -90,9 +84,6 @@ class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * Add a new operator for list filters
-     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators.
-     *
      * @param array<mixed> $operatorConfig
      *
      * @see OperatorListTrait

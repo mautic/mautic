@@ -44,7 +44,6 @@ class CompanySegmentController extends AbstractStandardFormController
 
         $this->setListFilters();
 
-        // set limits
         $session = $request->getSession();
         $limit   = $session->get('mautic.'.$this->getSessionBase().'.limit', $this->coreParametersHelper->get('default_pagelimit'));
         /** @phpstan-ignore-next-line */
@@ -169,7 +168,6 @@ class CompanySegmentController extends AbstractStandardFormController
             return $this->accessDenied();
         }
 
-        // retrieve the entity
         $companySegment = new CompanySegment();
         $model          = $this->getModel(CompanySegmentModel::class);
         \assert($model instanceof CompanySegmentModel);
@@ -179,13 +177,11 @@ class CompanySegmentController extends AbstractStandardFormController
         $returnUrl = $this->generateUrl('mautic_company_segments_index', ['page' => $page]);
         $action    = $this->generateUrl('mautic_company_segments_action', ['objectAction' => 'new']);
 
-        // get the user form factory
         $form = $model->createForm($companySegment, $this->formFactory, $action);
 
         if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!($cancelled = $this->isFormCancelled($form)) && $valid = $this->isFormValid($form)) {
-                // form is valid so process the data
                 $companySegment->setDateModified(new \DateTime());
                 $model->saveEntity($companySegment);
 
@@ -326,7 +322,6 @@ class CompanySegmentController extends AbstractStandardFormController
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    // form is valid so process the data
                     $segmentModel->saveEntity($segment, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $segmentId = $segment->getId();
@@ -364,7 +359,6 @@ class CompanySegmentController extends AbstractStandardFormController
                     return $this->viewAction($request, $segmentId);
                 }
             } else {
-                // unlock the entity
                 $segmentModel->unlockEntity($segment);
             }
 
@@ -372,7 +366,6 @@ class CompanySegmentController extends AbstractStandardFormController
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
-            // lock the entity
             $segmentModel->lockEntity($segment);
         }
 
@@ -575,10 +568,7 @@ class CompanySegmentController extends AbstractStandardFormController
 
             // Check each segment for dependencies individually
             foreach ($ids as $objectId) {
-                // Check for company segment dependencies
                 $dependentsCompanySegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'name');
-
-                // Check for contact segment dependencies
                 $dependentsContactSegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'name', true);
 
                 if ([] !== $dependentsCompanySegments) {
@@ -608,7 +598,6 @@ class CompanySegmentController extends AbstractStandardFormController
 
             $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
 
-            // Loop over the IDs to perform access checks pre-delete
             foreach ($toBeDeleted as $objectId) {
                 $segment = $model->getEntity($objectId);
 
@@ -629,7 +618,6 @@ class CompanySegmentController extends AbstractStandardFormController
                 }
             }
 
-            // Delete everything we are able to
             if (0 !== count($deleteIds)) {
                 $entities = $model->deleteEntities($deleteIds);
 

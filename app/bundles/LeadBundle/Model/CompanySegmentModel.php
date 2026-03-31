@@ -36,7 +36,7 @@ use Mautic\LeadBundle\Event\SegmentPreRebuildSegmentEvent;
 use Mautic\LeadBundle\Form\Type\CompanySegmentType;
 use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Service\CompanySegmentService;
+use Mautic\LeadBundle\Services\CompanySegmentService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -157,13 +157,11 @@ class CompanySegmentModel extends FormModel
             throw new \InvalidArgumentException('Entity must have an ID');
         }
 
-        // Check for company segment dependencies
         $dependentsCompanySegments = $this->getSegmentsWithDependenciesOnSegment($id, 'name');
         if ([] !== $dependentsCompanySegments) {
             throw new DeleteEntityDependencyException($dependentsCompanySegments, implode(', ', $dependentsCompanySegments));
         }
 
-        // Check for contact segment dependencies
         $dependentsContactSegments = $this->getSegmentsWithDependenciesOnSegment($id, 'name', true);
         if ([] !== $dependentsContactSegments) {
             throw new DeleteEntityDependencyException($dependentsContactSegments, implode(', ', $dependentsContactSegments));
@@ -279,8 +277,6 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
-     * Add company to segments.
-     *
      * @param iterable<CompanySegment|int> $companySegments
      */
     public function addCompany(Company $company, iterable $companySegments, bool $manuallyAdded = false, ?\DateTimeInterface $dateTimeManipulated = null): void
@@ -295,7 +291,6 @@ class CompanySegmentModel extends FormModel
                 $companySegments[$index] = (int) $segmentId;
             }
 
-            // If there will be a memory issue: this could be cached as in the lead segment method.
             $companySegments = $this->getEntities([
                 'filter' => [
                     'force' => [
@@ -360,13 +355,9 @@ class CompanySegmentModel extends FormModel
         if ([] !== $companyAddSegment) {
             $this->getCompaniesSegmentsRepository()->saveEntities($companyAddSegment);
         }
-
-        // do not detach company, as it may be used in the subsequent requests.
     }
 
     /**
-     * Remove company from segments.
-     *
      * @param iterable<CompanySegment|int> $companySegments
      */
     public function removeCompany(Company $company, iterable $companySegments, bool $manuallyRemoved = false, bool $forceRemove = false): void
@@ -402,7 +393,6 @@ class CompanySegmentModel extends FormModel
             );
 
             if (null === $companiesSegments) {
-                // Company is not part of this segment
                 continue;
             }
             if ($forceRemove || ($manuallyRemoved && $companiesSegments->isManuallyAdded()) || (!$manuallyRemoved && !$companiesSegments->isManuallyAdded())) {
@@ -436,13 +426,9 @@ class CompanySegmentModel extends FormModel
 
             unset($event);
         }
-
-        // do not detach company, as it may be used in the subsequent requests.
     }
 
     /**
-     * Get list of company segments for use in filter choices.
-     *
      * @return array<int, array<string, mixed>>
      */
     public function getCompanySegments(string $alias = ''): array
@@ -453,8 +439,6 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
-     * Get field choices for company segment filters.
-     *
      * @return array<string, array<string, mixed>>
      */
     public function getChoiceFields(): array
@@ -465,7 +449,6 @@ class CompanySegmentModel extends FormModel
 
         $choices = [];
 
-        // Add custom choices via event
         if ($this->dispatcher->hasListeners(LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE)) {
             $operatorsForFieldType = $this->getOperatorsForFieldType();
 
@@ -757,8 +740,6 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
-     * Get segments that have dependencies on the specified segment.
-     *
      * @return array<int, mixed>
      */
     public function getSegmentsWithDependenciesOnSegment(int $segmentId, string $returnProperty = 'name', bool $isContactSegment = false): array
@@ -812,8 +793,6 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
-     * Check which segments cannot be deleted due to dependencies.
-     *
      * @param array<int> $segmentIds
      *
      * @return array<string>
@@ -892,8 +871,6 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
-     * Check which company segments cannot be deleted due to dependencies in contact segments.
-     *
      * @param array<int> $segmentIds
      *
      * @return array<int, string>
@@ -975,9 +952,6 @@ class CompanySegmentModel extends FormModel
         return $namesNotToBeDeleted;
     }
 
-    /**
-     * Get LIKE query pattern for company segment type based on database platform.
-     */
     private function getLikeQueryCompanySegment(): string
     {
         $platform  = $this->connection->getDatabasePlatform();
@@ -987,8 +961,6 @@ class CompanySegmentModel extends FormModel
     }
 
     /**
-     * Add IDs to the list of IDs that cannot be deleted.
-     *
      * @param array<int> $idsNotToBeDeleted
      * @param array<int> $newIds
      *

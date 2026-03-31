@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\LeadBundle\Service;
+namespace Mautic\LeadBundle\Services;
 
 use Doctrine\DBAL\ParameterType;
 use Mautic\LeadBundle\Entity\CompaniesSegments;
@@ -322,11 +322,6 @@ class CompanySegmentService
         return $qbO;
     }
 
-    /***** DEBUG *****/
-
-    /**
-     * Formatting helper.
-     */
     private function formatPeriod(float $inputSeconds): string
     {
         $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));

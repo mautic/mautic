@@ -448,9 +448,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         return $choices;
     }
 
-    /**
-     * Add static company fields and company segment filters to company segment filter choices.
-     */
     public function onCompanySegmentFiltersAddStaticFields(CompanySegmentFiltersChoicesEvent $event): void
     {
         $this->addIncludeExcludeOperatorsToTextFilters($event);
@@ -476,7 +473,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->addChoice('company', $alias, $fieldOptions);
         }
 
-        // Company Segment Membership filter (company_segments)
         $companySegmentFieldOptions = [
             'label'      => $this->translator->trans('mautic.company_segments.filter.lists'),
             'properties' => [
@@ -489,7 +485,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $companySegmentFieldOptions['iconClass'] = $this->getSegmentFilterIcon('leadlist');
         $event->addChoice(CompanySegmentModel::PROPERTIES_FIELD, CompanySegmentModel::PROPERTIES_FIELD, $companySegmentFieldOptions);
 
-        // Contact Segment Membership filter (any contact of company in lead list)
         $leadSegmentMembership = [
             'label'      => $this->translator->trans('mautic.company_segments.filter.lead_lists'),
             'properties' => [
@@ -504,19 +499,13 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     /**
      * Add custom company fields to company segment filter choices.
-     * Note: Custom fields are now handled by FilterOperatorSubscriber.
+     * Note: Custom fields are handled by FilterOperatorSubscriber.
      * This method is kept for backward compatibility and special handling if needed.
      */
     public function onCompanySegmentFiltersAddCustomFields(CompanySegmentFiltersChoicesEvent $event): void
     {
-        // Custom company fields are now added by FilterOperatorSubscriber::onCompanySegmentFiltersAddCustomFields()
-        // This method can be used for additional company-segment-specific field processing if needed
     }
 
-    /**
-     * Add company segment membership filter to lead segment filter choices.
-     * This allows filtering leads by their company's segment membership.
-     */
     public function onLeadSegmentFiltersAddCompanySegments(LeadListFiltersChoicesEvent $event): void
     {
         // Only add the company_segments filter - other company fields are already handled by Core
@@ -534,8 +523,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Add include/exclude operators to text filters.
-     *
      * @param CompanySegmentFiltersChoicesEvent|LeadListFiltersChoicesEvent $event
      * @param array<int,string>                                             $groupAllow
      */
@@ -547,7 +534,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $choices = [];
         }
 
-        // Normalize to array<string, array<string, array<string,mixed>>>
         $normalized = [];
 
         foreach ($choices as $group => $groups) {
@@ -564,7 +550,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             }
         }
 
-        // Add operators to text fields
         foreach ($normalized as $group => $groups) {
             if ([] !== $groupAllow && !in_array($group, $groupAllow, true)) {
                 continue;
@@ -601,8 +586,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get company segment choices for filter dropdowns.
-     *
      * @return mixed[]
      */
     private function getCompanySegmentChoices(): array

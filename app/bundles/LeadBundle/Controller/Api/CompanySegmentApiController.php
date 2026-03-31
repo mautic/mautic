@@ -62,8 +62,6 @@ class CompanySegmentApiController extends CommonApiController
     }
 
     /**
-     * Deletes an entity.
-     *
      * @param int $id Entity ID
      *
      * @return Response
@@ -87,8 +85,6 @@ class CompanySegmentApiController extends CommonApiController
     }
 
     /**
-     * Delete a batch of entities.
-     *
      * @return array<mixed>|Response
      */
     public function deleteEntitiesAction(Request $request)

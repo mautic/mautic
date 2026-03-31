@@ -1,4 +1,3 @@
-// Company Segments
 Mautic.company_segmentsOnLoad = function(container, response) {
     const segmentCountElem = mQuery('a.col-count');
 
@@ -58,16 +57,13 @@ Mautic.company_segmentsOnLoad = function(container, response) {
             });
         });
 
-        // Add copy filter functionality
         mQuery('#' + prefix + '_filters .copy-filter-group').each(function(index, el) {
             mQuery(el).on('click', function() {
                 var filterRow = mQuery(this).closest('.filter--row');
                 var clonedFilter = filterRow.clone(true);
 
-                // Insert after current filter
                 clonedFilter.insertAfter(filterRow);
 
-                // Reorder filters to update IDs and names
                 Mautic.reorderCompanySegmentFilters();
             });
         });
@@ -83,7 +79,6 @@ Mautic.company_segmentsOnLoad = function(container, response) {
                     }
                 });
 
-                // Fix body overflow that messes sortable up
                 bodyOverflow.overflowX = mQuery('body').css('overflow-x');
                 bodyOverflow.overflowY = mQuery('body').css('overflow-y');
                 mQuery('body').css({
@@ -96,10 +91,8 @@ Mautic.company_segmentsOnLoad = function(container, response) {
             scroll: true,
             axis: 'y',
             stop: function(e, ui) {
-                // Restore original overflow
                 mQuery('body').css(bodyOverflow);
 
-                // First in the list should be an "and"
                 ui.item.find('select.glue-select').first().val('and');
 
                 Mautic.reorderCompanySegmentFilters();
@@ -120,7 +113,6 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
     var filterOption = mQuery(filterId);
     var label = filterOption.text();
 
-    // Create a new filter
     var filterNum = parseInt(mQuery('.available-filters').data('index'));
     mQuery('.available-filters').data('index', filterNum + 1);
 
@@ -131,7 +123,6 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
 
-    // Convert to DOM
     var prototype = mQuery(prototypeStr);
 
     var prefix = 'company_segments';
@@ -144,7 +135,6 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
     var filterIdBase = prefix + "_filters_" + filterNum + "_";
 
     if (mQuery('#' + prefix + '_filters .filter--row').length === 0) {
-        // First filter so hide the "when" label
         prototype.find(".filter--condition-when").removeClass('hide');
         prototype.find(".filter--condition").addClass('hide');
     }
@@ -160,19 +150,15 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
         );
     });
 
-    // Add copy filter functionality
     prototype.find("a.copy-filter-group").on('click', function() {
         var filterRow = mQuery(this).closest('.filter--row');
         var clonedFilter = filterRow.clone(true);
 
-        // Insert after current filter
         clonedFilter.insertAfter(filterRow);
 
-        // Reorder filters to update IDs and names
         Mautic.reorderCompanySegmentFilters();
     });
 
-    // Set the field icon
     const filterTypeIcon = filterOption.data('field-icon');
     prototype.find('.object-icon').addClass(filterTypeIcon);
 
@@ -188,10 +174,7 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
         newOption.appendTo(mQuery('#' + filterIdBase + 'operator'));
     });
 
-    // Convert based on first option in list
     Mautic.convertCompanySegmentFilterInput('#' + filterIdBase + 'operator');
-
-    // Reposition if applicable
     Mautic.updateCompanySegmentFilterPositioning(mQuery('#' + filterIdBase + 'glue'));
 };
 
@@ -307,7 +290,6 @@ Mautic.attachJsUiOnCompanySegmentsFilterForms = function() {
 };
 
 Mautic.reorderCompanySegmentFilters = function() {
-    // Update the filter numbers so that they are ordered correctly when processed and grouped server side
     var counter = 0;
 
     var prefix = 'company_segments';

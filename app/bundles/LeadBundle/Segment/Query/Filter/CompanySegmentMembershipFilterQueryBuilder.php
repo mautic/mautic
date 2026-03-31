@@ -59,7 +59,6 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
         $from = $queryBuilder->getQueryPart('from');
         assert(is_array($from));
 
-        // Check if this is a Lead Segment query (filtering leads by company segment membership)
         if (
             array_key_exists(0, $from)
             && is_array($from[0])
@@ -69,20 +68,15 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
             return $this->applyQueryToLeadSegment($queryBuilder, $filter);
         }
 
-        // Otherwise it's a Company Segment query (filtering companies by company segment membership)
         return $this->applyQueryToCompanySegment($queryBuilder, $filter);
     }
 
-    /**
-     * Filter companies by their membership in company segments.
-     */
     private function applyQueryToCompanySegment(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $companiesTableAlias = $queryBuilder->getTableAlias($this->getPreTable().'companies');
         \assert(is_string($companiesTableAlias));
         $segmentIds = $filter->getParameterValue();
 
-        // Handle empty/notEmpty operators
         if (OperatorOptions::EMPTY === $filter->getOperator() || 'notEmpty' === $filter->getOperator()) {
             $dataArray        = $filter->contactSegmentFilterCrate->getArray();
             $currentSegmentId = null;
@@ -103,7 +97,6 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
                 ->from($this->getPreTable().'companies_segments', $t)
                 ->where($sub->expr()->eq($t.'.company_id', $companiesTableAlias.'.id'));
 
-            // Exclude current segment id to avoid circular dependencies
             if (null !== $currentSegmentId) {
                 $sub->andWhere($sub->expr()->neq($t.'.segment_id', ':current_segment_id'));
                 $queryBuilder->setParameter('current_segment_id', $currentSegmentId);
@@ -143,15 +136,11 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
             \assert(is_string($subSegmentCompaniesTableAlias));
             $segmentQueryBuilder->resetQueryParts(['select'])->select('null');
 
-            // If the segment contains no filters, it means it's for manually subscribed only
             if (count($filters) > 0) {
                 $segmentQueryBuilder = $this->companySegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $companySegment);
             }
 
             $segmentQueryBuilder = $this->companySegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $companySegment);
-
-            // This query looks a bit too complex, but if the segment(s) has more or less complex filter this is (probably)
-            // the way to go. Hours spent optimizing: 3. Increment if you spent yet more here.
             $segmentQueryBuilder = $this->companySegmentQueryBuilder->addCompanySegmentQuery($segmentQueryBuilder, $companySegment);
 
             $parameters = $segmentQueryBuilder->getParameters();
@@ -188,9 +177,6 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
         return $queryBuilder;
     }
 
-    /**
-     * Filter leads by their primary company's membership in company segments.
-     */
     private function applyQueryToLeadSegment(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadAlias               = $queryBuilder->getTableAlias($this->getPreTable().'leads');
@@ -226,7 +212,6 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
                 throw new SegmentNotFoundException(sprintf('Segment %s used in the filter does not exist anymore.', $this->stringify($segmentId)));
             }
 
-            // Use new getFiltersFromArray() method
             $filters               = $this->updateCurrentCompanySegmentId($companySegment);
             $contactSegmentFilters = $this->contactSegmentFilterFactory->getFiltersFromArray($filters, []);
 
@@ -242,14 +227,11 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
             \assert(is_string($subSegmentCompaniesTableAlias));
             $segmentQueryBuilder->resetQueryParts(['select'])->select('null');
 
-            // If the segment contains no filters, it means it's for manually subscribed only
             if (count($filters) > 0) {
                 $segmentQueryBuilder = $this->companySegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $companySegment);
             }
 
             $segmentQueryBuilder = $this->companySegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $companySegment);
-            // This query looks a bit too complex, but if the segment(s) has more or less complex filter this is (probably)
-            // the way to go. Hours spent optimizing: 3. Increment if you spent yet more here.
             $segmentQueryBuilder = $this->companySegmentQueryBuilder->addCompanySegmentQuery($segmentQueryBuilder, $companySegment);
 
             $parameters = $segmentQueryBuilder->getParameters();
@@ -286,8 +268,6 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
     }
 
     /**
-     * Update filter array with current company segment ID to avoid circular dependencies.
-     *
      * @return array<array<mixed>>
      */
     private function updateCurrentCompanySegmentId(CompanySegment $companySegment): array

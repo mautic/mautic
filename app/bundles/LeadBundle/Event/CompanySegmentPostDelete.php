@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-/**
- * The event is dispatched right after a company segment is removed.
- */
 class CompanySegmentPostDelete extends CompanySegmentEvent
 {
     /**

@@ -56,11 +56,6 @@ class CompanySegmentQueryBuilder
         $companyTableAlias        = $changeAlias ? $this->generateRandomParameterName() : $this->companyRepository->getTableAlias();
 
         $queryBuilder->select($companyTableAlias.'.id')->from($this->getBaseTableName().'companies', $companyTableAlias);
-        /*
-         * Validate the plan, check for circular dependencies.
-         *
-         * the bigger count($plan), the higher complexity of query
-         */
         $this->getResolutionPlan($companySegment);
 
         $params     = $queryBuilder->getParameters();
@@ -68,7 +63,6 @@ class CompanySegmentQueryBuilder
 
         /** @var ContactSegmentFilter $filter */
         foreach ($segmentFilters as $filter) {
-            // Handle datetime/date fields with empty/notEmpty operators
             if ($this->handleDateTimeEmptyOperator($filter, $queryBuilder, $companyTableAlias)) {
                 continue;
             }
@@ -79,19 +73,14 @@ class CompanySegmentQueryBuilder
 
             try {
                 $queryBuilder = $filter->applyQuery($queryBuilder);
-                // If we get here, the table is valid
             } catch (\Mautic\LeadBundle\Segment\Exception\TableNotFoundException $e) {
                 $this->logger->notice('Error in filter, table '.$filter->contactSegmentFilterCrate->getObject().' not found: '.$e->getMessage());
                 continue;
-                // Invalid table
             } catch (\Mautic\LeadBundle\Segment\Exception\FieldNotFoundException $e) {
                 $this->logger->notice('Error in filter, field '.$filter->contactSegmentFilterCrate->getField().' not found: '.$e->getMessage());
                 continue;
-                // Table exists but field does not
             }
 
-            // We need to collect params between union queries in this iteration,
-            // because they are overwritten by new union query build
             foreach ($queryBuilder->getParameters() as $k => $v) {
                 $params[$k] = $v;
             }
@@ -113,7 +102,6 @@ class CompanySegmentQueryBuilder
     {
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
-            // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
 
@@ -142,11 +130,6 @@ class CompanySegmentQueryBuilder
                 $companySegmentTableAlias.'.segment_id = '.$companySegment->getId().' and '.$companySegmentTableAlias.'.manually_removed = 0',
             );
 
-        /*
-         * Validate the plan, check for circular dependencies.
-         *
-         * the bigger count($plan), the higher complexity of query
-         */
         $this->getResolutionPlan($companySegment);
 
         $params     = $queryBuilder->getParameters();
@@ -159,10 +142,8 @@ class CompanySegmentQueryBuilder
             }
 
             $queryBuilder = $filter->applyQuery($queryBuilder);
-            // We need to collect params between union queries in this iteration,
-            // because they are overwritten by new union query build
-            $params     = array_merge($params, $queryBuilder->getParameters());
-            $paramTypes = array_merge($paramTypes, $queryBuilder->getParameterTypes());
+            $params       = array_merge($params, $queryBuilder->getParameters());
+            $paramTypes   = array_merge($paramTypes, $queryBuilder->getParameterTypes());
         }
 
         $queryBuilder->setParameters($params, $paramTypes);
@@ -178,15 +159,10 @@ class CompanySegmentQueryBuilder
     {
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
-            // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
-
-        // Add count functions to the query
         $queryBuilder = new QueryBuilder($connection);
-
-        //  If there is any right join in the query we need to select its it
-        $primary = $qb->guessPrimaryLeadContactIdColumn();
+        $primary      = $qb->guessPrimaryLeadContactIdColumn();
 
         if ('orp.lead_id' === $primary) {
             $primary = 'orp.company_id';
@@ -216,8 +192,6 @@ class CompanySegmentQueryBuilder
     }
 
     /**
-     * Restrict the query to NEW members of segment.
-     *
      * @param array<string, mixed> $batchLimiters
      *
      * @throws QueryException
@@ -470,23 +444,19 @@ class CompanySegmentQueryBuilder
     {
         $operator = $filter->getOperator();
 
-        // Only handle empty/notEmpty operators
         if (!in_array($operator, ['empty', '!empty'], true)) {
             return false;
         }
 
-        // Only for company type filters
         if (!$filter->contactSegmentFilterCrate->isCompanyType()) {
             return false;
         }
 
-        // Only for date/datetime fields
         $isDateTimeField = in_array($filter->contactSegmentFilterCrate->getType(), ['date', 'datetime'], true);
         if (!$isDateTimeField) {
             return false;
         }
 
-        // Build the IS NULL / IS NOT NULL expression
         $field = $tableAlias.'.'.$filter->getField();
         $expr  = $queryBuilder->expr();
 
@@ -496,7 +466,6 @@ class CompanySegmentQueryBuilder
             $expression = $expr->isNotNull($field);
         }
 
-        // Apply to query builder
         $queryBuilder->andWhere($expression);
 
         return true;

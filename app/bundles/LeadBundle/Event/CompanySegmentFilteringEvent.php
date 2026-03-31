@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Event is executed when the company segment is filtered.
- */
 class CompanySegmentFilteringEvent extends CommonEvent
 {
     private bool $isFilteringDone;
@@ -38,9 +35,6 @@ class CompanySegmentFilteringEvent extends CommonEvent
         $this->companiesTableAlias = $tableAlias;
     }
 
-    /**
-     * Call getDetails()->getArray() if you need an array.
-     */
     public function getDetails(): ContactSegmentFilterCrate
     {
         return $this->details;

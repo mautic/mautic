@@ -130,9 +130,6 @@ class CompanySegment extends FormEntity
         ]));
     }
 
-    /**
-     * Prepares the metadata for API usage.
-     */
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('companySegment')
@@ -278,8 +275,6 @@ class CompanySegment extends FormEntity
     }
 
     /**
-     * The getter is used in tests.
-     *
      * @return Collection<int, CompaniesSegments>
      */
     public function getCompaniesSegments(): Collection
@@ -354,9 +349,6 @@ class CompanySegment extends FormEntity
         $this->lastBuiltTime = $lastBuiltTime;
     }
 
-    /**
-     * Clone entity with empty companies list.
-     */
     public function __clone()
     {
         parent::__clone();

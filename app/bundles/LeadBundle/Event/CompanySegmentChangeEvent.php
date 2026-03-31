@@ -8,9 +8,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Event dispatched when a company is added to or removed from a company segment.
- */
 class CompanySegmentChangeEvent extends Event
 {
     public function __construct(
