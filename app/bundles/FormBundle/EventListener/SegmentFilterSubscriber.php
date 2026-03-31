@@ -52,6 +52,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             ],
             'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
             'object'    => 'lead',
+            'iconClass' => 'ri-survey-line',
         ]);
     }
 
