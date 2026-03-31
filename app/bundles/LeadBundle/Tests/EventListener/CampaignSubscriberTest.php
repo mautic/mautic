@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -164,12 +165,15 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCoreParametersHelper->method('getDefaultTimezone')
             ->willReturn('UTC');
 
+        $mockCompanySegmentModel = $this->createMock(CompanySegmentModel::class);
+
         $this->subscriber = new CampaignSubscriber(
             $mockIpLookupHelper,
             $this->mockLeadModel,
             $mockLeadFieldModel,
             $mockListModel,
             $this->mockCompanyModel,
+            $mockCompanySegmentModel,
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $this->doNotContact,

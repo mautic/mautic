@@ -355,7 +355,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->setResult($somethingHappened);
     }
 
-    public function onCampaignTriggerActionChangeCompanySegments(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionChangeCompanySegments(CampaignExecutionEvent $event): void
     {
         if (!$event->checkContext('lead.changecompanysegments')) {
             return;
@@ -369,12 +369,16 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $primaryCompany = $lead->getPrimaryCompany();
         if (empty($primaryCompany) || !is_array($primaryCompany) || empty($primaryCompany['id'])) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $companyEntity = $this->companyModel->getRepository()->find($primaryCompany['id']);
         if (!$companyEntity) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         if (!empty($addTo)) {
@@ -387,7 +391,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $somethingHappened = true;
         }
 
-        return $event->setResult($somethingHappened);
+        $event->setResult($somethingHappened);
     }
 
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void

@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
@@ -54,7 +53,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private AssetModel $assetModel,
         private TranslatorInterface $translator,
         private CompanySegmentModel $companySegmentModel,
-        private LeadFieldRepository $leadFieldRepository,
         private FieldChoicesProviderInterface $fieldChoicesProvider,
         private TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
@@ -571,8 +569,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                         OperatorOptions::NOT_LIKE,
                         OperatorOptions::REGEXP,
                         OperatorOptions::NOT_REGEXP,
-                        OperatorOptions::IN,
-                        OperatorOptions::NOT_IN,
+                        OperatorOptions::INCLUDING_ANY,
+                        OperatorOptions::EXCLUDING_ANY,
                         OperatorOptions::STARTS_WITH,
                         OperatorOptions::ENDS_WITH,
                         OperatorOptions::CONTAINS,

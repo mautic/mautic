@@ -21052,8 +21052,14 @@ parameters:
 				Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent$#
 			'''
 			identifier: classConstant.deprecated
-			count: 8
+			count: 9
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
+
+		-
+			message: '#^Call to deprecated method getFilterExpressionFunctions\(\) of class Mautic\\LeadBundle\\Model\\CompanySegmentModel\: to be removed in Mautic 3\. Use FilterOperatorProvider\:\:getAllOperators\(\) instead\.$#'
+			identifier: method.deprecated
+			count: 1
+			path: app/bundles/LeadBundle/Entity/OperatorListTrait.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:getFields\(\) return type has no value type specified in iterable type array\.$#'

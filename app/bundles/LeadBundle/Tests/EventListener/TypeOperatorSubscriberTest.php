@@ -8,7 +8,6 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
@@ -82,11 +81,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $companySegmentModel;
 
     /**
-     * @var MockObject&LeadFieldRepository
-     */
-    private MockObject $leadFieldRepository;
-
-    /**
      * @var MockObject&FieldChoicesProviderInterface
      */
     private MockObject $fieldChoicesProvider;
@@ -117,7 +111,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetModel            = $this->createMock(AssetModel::class);
         $this->translator            = $this->createMock(TranslatorInterface::class);
         $this->companySegmentModel   = $this->createMock(CompanySegmentModel::class);
-        $this->leadFieldRepository   = $this->createMock(LeadFieldRepository::class);
         $this->fieldChoicesProvider  = $this->createMock(FieldChoicesProviderInterface::class);
         $this->typeOperatorProvider  = $this->createMock(TypeOperatorProviderInterface::class);
         $this->form                  = $this->createMock(FormInterface::class);
@@ -131,7 +124,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->assetModel,
             $this->translator,
             $this->companySegmentModel,
-            $this->leadFieldRepository,
             $this->fieldChoicesProvider,
             $this->typeOperatorProvider
         );

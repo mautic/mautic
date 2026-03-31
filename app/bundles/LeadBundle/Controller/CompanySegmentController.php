@@ -507,16 +507,38 @@ class CompanySegmentController extends AbstractStandardFormController
                 return $this->isLocked($postActionVars, $segment, CompanySegmentModel::class);
             }
 
-            $model->deleteEntity($segment);
+            $dependentsCompanySegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'name');
+            if ([] !== $dependentsCompanySegments) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.company_segments.error.cannot.delete',
+                    'msgVars' => [
+                        '%segments%' => implode(', ', $dependentsCompanySegments),
+                    ],
+                ];
+            } else {
+                $dependentsContactSegments = $model->getSegmentsWithDependenciesOnSegment($objectId, 'name', true);
+                if ([] !== $dependentsContactSegments) {
+                    $flashes[] = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.company_segments.segment.error.cannot.delete',
+                        'msgVars' => [
+                            '%segments%' => implode(', ', $dependentsContactSegments),
+                        ],
+                    ];
+                } else {
+                    $model->deleteEntity($segment);
 
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $segment->getName(),
-                    '%id%'   => $objectId,
-                ],
-            ];
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.core.notice.deleted',
+                        'msgVars' => [
+                            '%name%' => $segment->getName(),
+                            '%id%'   => $objectId,
+                        ],
+                    ];
+                }
+            }
         }
 
         return $this->postActionRedirect(
@@ -673,10 +695,7 @@ class CompanySegmentController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @return Response|array<string, mixed>
-     */
-    private function notFoundRedirect(int $page, int $objectId): Response|array
+    private function notFoundRedirect(int $page, int $objectId): Response
     {
         $returnUrl = $this->generateUrl('mautic_company_segments_index', ['page' => $page]);
 
