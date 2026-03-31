@@ -1269,6 +1269,79 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         return $event;
     }
 
+    public function testModifyCompanySegmentsCampaignAction(): void
+    {
+        $joe  = $this->createContact('joe@glibi.com');
+        $mary = $this->createContact('mary@tbs.com');
+
+        $companyGlibi = $this->createCompany('Glibi Inc', 'info@glibi.com');
+        $companyTBS   = $this->createCompany('TBS Corp', 'info@tbs.com');
+        $this->em->flush();
+
+        $this->createCompanyLead($companyGlibi, $joe, true);
+        $this->createCompanyLead($companyTBS, $mary, true);
+
+        $segmentA = $this->createCompanySegment('Segment A', 'segment-a', true);
+        $segmentB = $this->createCompanySegment('Segment B', 'segment-b', true);
+        $segmentC = $this->createCompanySegment('Segment C', 'segment-c', true);
+
+        $this->addCompanyToCompanySegment($companyGlibi, $segmentA);
+        $this->addCompanyToCompanySegment($companyTBS, $segmentB);
+
+        $this->em->flush();
+
+        $campaign = new Campaign();
+        $campaign->setName('Modify Company Segments Test Campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->addContactToCampaign($campaign, $joe);
+        $this->addContactToCampaign($campaign, $mary);
+
+        $action = $this->createCampaignAction(
+            campaign: $campaign,
+            name: 'Modify Company Segments',
+            type: 'lead.changecompanysegments',
+            properties: [
+                'addToLists'      => [$segmentC->getId()],
+                'removeFromLists' => [$segmentA->getId()],
+            ],
+            order: 1
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        $companiesSegmentsRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\CompaniesSegments::class);
+
+        $glibiSegmentA = $companiesSegmentsRepo->findOneBy([
+            'company'        => $companyGlibi,
+            'companySegment' => $segmentA,
+        ]);
+        self::assertNull($glibiSegmentA, 'Glibi should be removed from Segment A');
+
+        $glibiSegmentC = $companiesSegmentsRepo->findOneBy([
+            'company'        => $companyGlibi,
+            'companySegment' => $segmentC,
+        ]);
+        self::assertNotNull($glibiSegmentC, 'Glibi should be added to Segment C');
+
+        $tbsSegmentB = $companiesSegmentsRepo->findOneBy([
+            'company'        => $companyTBS,
+            'companySegment' => $segmentB,
+        ]);
+        self::assertNotNull($tbsSegmentB, 'TBS should still be in Segment B');
+
+        $tbsSegmentC = $companiesSegmentsRepo->findOneBy([
+            'company'        => $companyTBS,
+            'companySegment' => $segmentC,
+        ]);
+        self::assertNotNull($tbsSegmentC, 'TBS should be added to Segment C');
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
