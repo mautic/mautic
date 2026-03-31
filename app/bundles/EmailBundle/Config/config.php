@@ -23,6 +23,15 @@ return [
                 'path'       => '/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailMapStatsController::viewAction',
             ],
+            'mautic_email_resend_nonopeners' => [
+                'path'       => '/emails/{objectId}/resend-nonopeners',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::resendNonOpenersAction',
+            ],
+            'mautic_email_resend_nonopeners_execute' => [
+                'path'       => '/emails/{objectId}/resend-nonopeners/execute',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::resendNonOpenersExecuteAction',
+                'method'     => 'POST',
+            ],
             'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::executeAction',
@@ -52,6 +61,11 @@ return [
             'mautic_api_reply' => [
                 'path'       => '/emails/reply/{trackingHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::replyAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_email_resend_nonopeners' => [
+                'path'       => '/emails/{id}/resend-nonopeners',
+                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::resendNonOpenersAction',
                 'method'     => 'POST',
             ],
         ],

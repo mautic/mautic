@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
+use Mautic\EmailBundle\Service\NonOpenersService;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -220,6 +221,37 @@ class EmailApiController extends CommonApiController
         return $this->handleView(
             $this->view(['success' => true], Response::HTTP_CREATED)
         );
+    }
+
+    public function resendNonOpenersAction(Request $request, NonOpenersService $nonOpenersService, int $id): Response
+    {
+        $entity = $this->model->getEntity($id);
+
+        if (null === $entity) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        if (!$nonOpenersService->canResend($entity)) {
+            return $this->returnError('This email cannot be resent to non-openers.', Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $result = $nonOpenersService->resend($id);
+        } catch (\LogicException|\InvalidArgumentException $e) {
+            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $view = $this->view([
+            'success'    => 1,
+            'emailId'    => $result['emailId'],
+            'segmentIds' => $result['segmentIds'],
+        ], Response::HTTP_OK);
+
+        return $this->handleView($view);
     }
 
     protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void

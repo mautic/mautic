@@ -115,6 +115,24 @@
         'btnText'   : 'mautic.email.heatmap.click_heatmap'
     } %}
     {% set customButtons = customButtons|merge([heatmapButton]) %}
+
+    {# Resend to Non-Openers Button #}
+    {% if 'list' == emailType and email.sendingStatus == 'sent' and email.resends is empty and not email.isResend %}
+        {% set resendNonOpenersButton = {
+            'attr': {
+                'class'       : 'btn btn-tertiary btn-nospin',
+                'data-toggle' : 'ajaxmodal',
+                'data-target' : '#MauticSharedModal',
+                'href'        : path('mautic_email_resend_nonopeners', {'objectId': email.getId()}),
+                'data-header' : 'mautic.email.resend_nonopeners'|trans,
+            },
+            'iconClass' : 'ri-mail-unread-line',
+            'btnText'   : 'mautic.email.resend_nonopeners',
+            'primary'   : false,
+            'priority'  : 200,
+        } %}
+        {% set customButtons = customButtons|merge([resendNonOpenersButton]) %}
+    {% endif %}
 {% endif %}
 
 {# Only show A/B test button if not already a translation of an a/b test #}
@@ -600,6 +618,44 @@
                   <i class="ri-loader-3-line ri-spin"></i>
               </div>
           </div>
+
+          {# Resends Section #}
+          {% if email.resends is not empty %}
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.email.resend_nonopeners.resends'|trans }}</div>
+              </div>
+              <div class="panel-body">
+                  <ul class="list-group">
+                      {% for resend in email.resends %}
+                          <li class="list-group-item">
+                              <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': resend.getId()}) }}">
+                                  {{ resend.getName() }}
+                              </a>
+                              <span class="text-muted small pull-right">
+                                  {{ 'mautic.email.sent'|trans }}: {{ resend.getSentCount() }} |
+                                  {{ 'mautic.email.read'|trans }}: {{ resend.getReadCount() }}
+                              </span>
+                          </li>
+                      {% endfor %}
+                  </ul>
+              </div>
+          </div>
+          {% endif %}
+
+          {# Original Email Link (if this is a resend) #}
+          {% if email.isResend %}
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.email.resend_nonopeners.original'|trans }}</div>
+              </div>
+              <div class="panel-body">
+                  <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': email.resendOf.getId()}) }}">
+                      {{ email.resendOf.getName() }}
+                  </a>
+              </div>
+          </div>
+          {% endif %}
 
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}

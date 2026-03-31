@@ -287,6 +287,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     private ?EmailDraft $draft = null;
 
+    private ?Email $resendOf = null;
+
+    /**
+     * @var Collection<int, Email>
+     */
+    private Collection $resends;
+
     private bool $isCloned = false;
 
     /**
@@ -323,6 +330,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->clearVariants();
         $this->clearStats();
         $this->setDraft(null);
+        $this->resendOf = null;
+        $this->resends  = new ArrayCollection();
 
         parent::__clone();
     }
@@ -335,6 +344,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->assetAttachments    = new ArrayCollection();
+        $this->resends             = new ArrayCollection();
         $this->setDateAdded(new \DateTime());
         $this->setDateModified(new \DateTime());
         $this->initializeProjects();
@@ -433,6 +443,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->mappedBy('email')
             ->fetchExtraLazy()
             ->cascadeAll()
+            ->build();
+
+        $builder->createManyToOne('resendOf', self::class)
+            ->addJoinColumn('resend_of_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createOneToMany('resends', self::class)
+            ->setIndexBy('id')
+            ->mappedBy('resendOf')
+            ->fetchExtraLazy()
             ->build();
 
         static::addUuidField($builder);
@@ -1378,6 +1398,32 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getClonedId(): ?int
     {
         return $this->clonedId;
+    }
+
+    public function getResendOf(): ?Email
+    {
+        return $this->resendOf;
+    }
+
+    public function setResendOf(?Email $resendOf): self
+    {
+        $this->isChanged('resendOf', $resendOf);
+        $this->resendOf = $resendOf;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Email>
+     */
+    public function getResends(): Collection
+    {
+        return $this->resends;
+    }
+
+    public function isResend(): bool
+    {
+        return null !== $this->resendOf;
     }
 
     public function isBackgroundSending(): bool
