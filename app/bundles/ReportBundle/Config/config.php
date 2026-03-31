@@ -47,7 +47,7 @@ return [
             ],
             'mautic_report_export_schedule' => [
                 'path'       => '/reports/schedule/{reportId}/export',
-                'controller' => 'MauticReportBundle:Schedule:export',
+                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::exportAction',
             ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
