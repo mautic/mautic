@@ -28,8 +28,6 @@ class CompanySegmentModelTest extends TestCase
         $model = $this->getMockBuilder(CompanySegmentModel::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods(['getRepository', 'setTimestamps', 'cleanAlias', 'dispatchEvent'])
             ->getMock();
 
@@ -72,8 +70,6 @@ class CompanySegmentModelTest extends TestCase
         $model = $this->getMockBuilder(CompanySegmentModel::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods(['getRepository', 'setTimestamps', 'cleanAlias', 'dispatchEvent'])
             ->getMock();
 
@@ -116,8 +112,6 @@ class CompanySegmentModelTest extends TestCase
         $model = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods([])
             ->getMock();
 
@@ -127,16 +121,12 @@ class CompanySegmentModelTest extends TestCase
         $model->testDispatchEvent('any', $this->createMock(FormEntity::class));
     }
 
-    /**
-     * @dataProvider provideActionAndClass
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideActionAndClass')]
     public function testDoesNotHaveAnEvent(string $action, string $eventClass): void
     {
         $model = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods([])
             ->getMock();
 
@@ -174,16 +164,12 @@ class CompanySegmentModelTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideExistingEvents
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideExistingEvents')]
     public function testEventsCallsEventFromAction(string $action, string $eventClass, ?bool $isNew, ?bool $expectedIsNew): void
     {
         $model = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods([])
             ->getMock();
 
@@ -237,8 +223,6 @@ class CompanySegmentModelTest extends TestCase
         $model  = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods([])
             ->getMock();
 
@@ -267,8 +251,6 @@ class CompanySegmentModelTest extends TestCase
         $model  = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods([])
             ->getMock();
 

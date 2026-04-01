@@ -57,9 +57,7 @@ class UniqueCompanySegmentAliasValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->createMock(CompanySegment::class), $constraint);
     }
 
-    /**
-     * @dataProvider provideNullOrEmpty
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideNullOrEmpty')]
     public function testAliasIsNullOrEmpty(?string $value): void
     {
         $this->assertNoActionsTaken();

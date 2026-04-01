@@ -18,9 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateCompanySegmentsCommandTest extends TestCase
 {
-    /**
-     * @dataProvider providePositiveIntegerOrNullOption
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providePositiveIntegerOrNullOption')]
     public function testIdRequiresNoneOrPositiveInteger(int|string|null $segmentId, bool $valid): void
     {
         $companySegmentModel  = $this->createMock(CompanySegmentModel::class);
@@ -51,9 +49,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
         self::assertSame(Command::FAILURE, $command->run(new ArrayInput($arguments), $output));
     }
 
-    /**
-     * @dataProvider providePositiveIntegerOption
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providePositiveIntegerOption')]
     public function testBatchLimitRequiresPositiveInteger(int|string $batchLimit, bool $valid): void
     {
         $companySegmentModel  = $this->createMock(CompanySegmentModel::class);
@@ -81,9 +77,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
         self::assertSame(Command::FAILURE, $command->run(new ArrayInput($arguments), $output));
     }
 
-    /**
-     * @dataProvider providePositiveIntegerOrNullOption
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providePositiveIntegerOrNullOption')]
     public function testMaxCompaniesRequiresNoneOrPositiveInteger(int|string|null $maxCompanies, bool $valid): void
     {
         $companySegmentModel  = $this->createMock(CompanySegmentModel::class);

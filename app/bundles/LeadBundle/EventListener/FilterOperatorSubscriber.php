@@ -668,9 +668,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onCompanySegmentFiltersAddCustomFields(\Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent $event): void
     {
-        $this->leadFieldRepository->getListablePublishedFields()->filter(static function (LeadField $leadField): bool {
-            return 'company' === $leadField->getObject();
-        })->map(function (LeadField $field) use ($event): void {
+        $this->leadFieldRepository->getListablePublishedFields()->filter(static fn (LeadField $leadField): bool => 'company' === $leadField->getObject())->map(function (LeadField $field) use ($event): void {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;

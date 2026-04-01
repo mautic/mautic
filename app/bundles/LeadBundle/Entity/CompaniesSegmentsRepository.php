@@ -31,9 +31,7 @@ class CompaniesSegmentsRepository extends CommonRepository
             $q          = $this->forceUseIndex($q, $this->getPreTable().'companies_segment_manually_removed');
             $expression = $q->expr()->eq(CompaniesSegments::RELATIONS_NAME.'.segment_id', (string) array_pop($segmentIds));
         } else {
-            $expression = $q->expr()->in(CompaniesSegments::RELATIONS_NAME.'.segment_id', array_map(static function ($segmentId): string {
-                return (string) $segmentId;
-            }, $segmentIds));
+            $expression = $q->expr()->in(CompaniesSegments::RELATIONS_NAME.'.segment_id', array_map(static fn ($segmentId): string => (string) $segmentId, $segmentIds));
         }
 
         $q->where($expression);

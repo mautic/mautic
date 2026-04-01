@@ -73,7 +73,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             ],
             LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE => [
                 ['onCompanySegmentFiltersAddStaticFields', 0],
-                ['onCompanySegmentFiltersAddCustomFields', 0],
             ],
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => [
                 ['onLeadSegmentFiltersAddCompanySegments', 0],
@@ -493,15 +492,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         ];
         $leadSegmentMembership['iconClass'] = $this->getSegmentFilterIcon('leadlist');
         $event->addChoice('any_companycontact', 'contactsegmentmembership', $leadSegmentMembership);
-    }
-
-    /**
-     * Add custom company fields to company segment filter choices.
-     * Note: Custom fields are handled by FilterOperatorSubscriber.
-     * This method is kept for backward compatibility and special handling if needed.
-     */
-    public function onCompanySegmentFiltersAddCustomFields(CompanySegmentFiltersChoicesEvent $event): void
-    {
     }
 
     public function onLeadSegmentFiltersAddCompanySegments(LeadListFiltersChoicesEvent $event): void

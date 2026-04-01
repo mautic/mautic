@@ -9,9 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class CompanySegmentTest extends TestCase
 {
-    /**
-     * @dataProvider provideEmptyFields
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptyFields')]
     public function testEntitySetsPublicNameAndAliasIfNameIsSet(?string $alias, ?string $publicName): void
     {
         $name   = 'The name';
@@ -32,9 +30,7 @@ class CompanySegmentTest extends TestCase
         yield 'empty string alias, empty string publicName' => ['', ''];
     }
 
-    /**
-     * @dataProvider provideNullOrEmptyString
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideNullOrEmptyString')]
     public function testSettingAliasNullOrEmptyStringFetchesFromName(?string $value): void
     {
         $name   = 'The name';
@@ -45,9 +41,7 @@ class CompanySegmentTest extends TestCase
         self::assertSame($name, $entity->getAlias());
     }
 
-    /**
-     * @dataProvider provideNullOrEmptyString
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideNullOrEmptyString')]
     public function testSettingPublicNullOrEmptyStringFetchesFromName(?string $value): void
     {
         $name   = 'The name';

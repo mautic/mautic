@@ -288,10 +288,8 @@ class CompanySegment extends FormEntity
             return;
         }
 
-        if ($this->companiesSegments->exists(static function (int $key, CompaniesSegments $companySegment) use ($companiesSegments): bool {
-            return $companySegment->getCompanySegment() === $companiesSegments->getCompanySegment()
-                && $companySegment->getCompany() === $companiesSegments->getCompany();
-        })) {
+        if ($this->companiesSegments->exists(static fn (int $key, CompaniesSegments $companySegment): bool => $companySegment->getCompanySegment() === $companiesSegments->getCompanySegment()
+            && $companySegment->getCompany() === $companiesSegments->getCompany())) {
             return;
         }
 
@@ -309,9 +307,7 @@ class CompanySegment extends FormEntity
 
     public function hasCompany(Company $company): bool
     {
-        return $this->companiesSegments->exists(static function (int $key, CompaniesSegments $companiesSegments) use ($company): bool {
-            return $companiesSegments->getCompany() === $company;
-        });
+        return $this->companiesSegments->exists(static fn (int $key, CompaniesSegments $companiesSegments): bool => $companiesSegments->getCompany() === $company);
     }
 
     public function getLastBuiltDate(): ?\DateTimeInterface

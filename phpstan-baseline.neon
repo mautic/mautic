@@ -20513,6 +20513,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method getFilterExpressionFunctions\(\) of class Mautic\\LeadBundle\\Model\\CompanySegmentModel\:
+				to be removed in Mautic 3\. Use FilterOperatorProvider\:\:getAllOperators\(\) instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: app/bundles/LeadBundle/Entity/OperatorListTrait.php
+
+		-
+			message: '''
 				#^Call to deprecated method addLead\(\) of class Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:
 				Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id$#
 			'''
@@ -21056,14 +21065,17 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^Call to deprecated method getFilterExpressionFunctions\(\) of class Mautic\\LeadBundle\\Model\\CompanySegmentModel\: to be removed in Mautic 3\. Use FilterOperatorProvider\:\:getAllOperators\(\) instead\.$#'
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/LeadBundle/Entity/OperatorListTrait.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:getFields\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
+
+		-
+			message: '''
+				#^Parameter \$event of method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerActionChangeCompanySegments\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
+				2\.13\.0; to be removed in 3\.0$#
+			'''
+			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
 

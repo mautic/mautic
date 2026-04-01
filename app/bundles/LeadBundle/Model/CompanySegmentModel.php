@@ -488,9 +488,7 @@ class CompanySegmentModel extends FormModel
 
                 return '';
             };
-            $cmp = static function ($a, $b) use ($getLabel): int {
-                return strcmp($getLabel($a), $getLabel($b));
-            };
+            $cmp = (static fn ($a, $b): int => strcmp($getLabel($a), $getLabel($b)));
 
             uasort($choice, $cmp);
             $choices[$key] = $choice;
@@ -523,9 +521,7 @@ class CompanySegmentModel extends FormModel
 
         try {
             $newCompaniesCount = $this->companySegmentService->getNewCompanySegmentsCompanyCount($companySegment, $batchLimiters);
-        } catch (\Mautic\LeadBundle\Segment\Exception\FieldNotFoundException) {
-            return 0;
-        } catch (\Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException) {
+        } catch (\Mautic\LeadBundle\Segment\Exception\FieldNotFoundException|\Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException) {
             return 0;
         } catch (\Mautic\LeadBundle\Segment\Exception\TableNotFoundException $e) {
             $this->logger->error($e->getMessage());
