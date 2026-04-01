@@ -89,7 +89,6 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.page.config.form.auto_asset_tracking.category.tooltip',
-                    'data-show-on' => '{"config_assetconfig_auto_asset_tracking_enabled_1":"checked"}',
                 ],
                 'bundle'     => 'asset',
                 'required'   => false,
