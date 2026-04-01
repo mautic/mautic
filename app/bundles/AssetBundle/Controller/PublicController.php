@@ -264,9 +264,9 @@ class PublicController extends AbstractFormController
         $asset->setFileNameFromRemote();
         $asset->setIsPublished(true);
 
-        if (!empty($customTitle)) {
-            $asset->setTitle($customTitle);
-        }
+        $title = !empty($customTitle) ? $customTitle : ($asset->getOriginalFileName() ?: basename((string) parse_url($url, PHP_URL_PATH)));
+        $asset->setTitle($title);
+        $asset->setAlias(mb_strtolower(preg_replace('/[^a-zA-Z0-9]/', '-', pathinfo($title, PATHINFO_FILENAME))));
 
         $categoryId = $this->coreParametersHelper->get('auto_asset_tracking_category');
         if (!empty($categoryId)) {

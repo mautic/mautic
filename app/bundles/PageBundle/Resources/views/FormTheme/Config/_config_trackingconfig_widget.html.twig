@@ -35,24 +35,6 @@
 </div>
 
 
-<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.tracking.auto_asset'|trans }}</h4>
-<div class="text-muted small pb-md">{{ 'mautic.config.tab.tracking.auto_asset.info'|trans|purify }}</div>
-<div class="row">
-    <div class="panel panel-default mb-md">
-        <div class="panel-body">
-            <div class="row">
-                {% for name, f in form.children %}
-                    {% if name in ['auto_asset_tracking_enabled', 'auto_asset_tracking_category'] %}
-                        <div class="col-xs-12">
-                            {{ form_row(f) }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-
 <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.tracking.facebook.pixel'|trans }}</h4>
 <div class="text-muted small pb-md">{{ 'mautic.core.config.header.tracking.facebook.pixel.description'|trans }}</div>
 <div class="row">
