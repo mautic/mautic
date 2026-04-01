@@ -27,8 +27,9 @@ class SegmentUsedInCampaignsValidator
             return false;
         }
 
-        $campaignNames      = array_map([$this, 'decorateCampaignName'], $segments);
-        $campaignNames      = implode(', ', $campaignNames);
+        $campaignNames = array_map(fn (string $campaignName): string => sprintf('"%s"', $campaignName), $segments);
+        $campaignNames = implode(', ', $campaignNames);
+
         $this->errorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.'.$action,
             [
@@ -40,11 +41,6 @@ class SegmentUsedInCampaignsValidator
         );
 
         return true;
-    }
-
-    private function decorateCampaignName(string $campaignName): string
-    {
-        return sprintf('"%s"', $campaignName);
     }
 
     public function getErrorMessage(): string

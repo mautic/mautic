@@ -606,7 +606,7 @@ class ListController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             $deletedExceptions = [];
             foreach ($toBeDeleted as $objectId) {
-                $entity              = $model->getEntity($objectId);
+                $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [

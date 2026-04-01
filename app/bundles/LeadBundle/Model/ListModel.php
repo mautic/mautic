@@ -202,8 +202,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     {
         try {
             $this->dispatchEvent('pre_delete', $entity);
-            // @phpstan-ignore-next-line
-        } catch (RecordCanNotBeDeletedException $deleteException) {
+        } catch (RecordCanNotBeDeletedException $deleteException) { // @phpstan-ignore catch.neverThrown
             return $deleteException;
         }
 

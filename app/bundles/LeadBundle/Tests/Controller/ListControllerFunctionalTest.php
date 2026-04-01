@@ -139,7 +139,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->segmentCountCacheHelper->deleteSegmentContactCount($segmentId);
 
         // Save manual segment without filters.
-        $manualSegment   = $this->saveSegment('Lead List 2', 'lead-list-2');
+        $manualSegment   = $this->saveSegment('Lead List 2', 'lead-list-2', []);
         $manualSegmentId = $manualSegment->getId();
 
         // Verify last built date is not set.
@@ -460,7 +460,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
         $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
-        $this->client->restart();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
@@ -579,10 +578,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage2, $clientResponseBody['flashes']);
     }
 
-    private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
+    private function saveSegment(string $name, string $alias, ?array $filters = null, ?LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
-        $filters = empty($filters) ? $this->defaultFilter() : $filters;
+        $segment ??= new LeadList();
+        $filters ??= $this->defaultFilter();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
@@ -678,7 +677,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
-        $this->saveSegment('Lead List 2', 'lead-list-2');
+        $this->saveSegment('Lead List 2', 'lead-list-2', []);
 
         // Check segment count UI for no contacts.
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');

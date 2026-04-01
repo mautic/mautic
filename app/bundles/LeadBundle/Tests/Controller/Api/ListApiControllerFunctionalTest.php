@@ -400,9 +400,9 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
         Assert::assertArrayHasKey('errors', $response);
         $errorMessage = $this->translator->trans(
-            'mautic.lead.lists.used_in_campaigns',
+            'mautic.lead.lists.used_in_campaigns.unpublish',
             [
-                '%count%'         => '1',
+                '%count%'         => 1,
                 '%campaignNames%' => '"'.$campaignName.'"',
                 '%segmentNames%'  => 'Segment1',
             ],
