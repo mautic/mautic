@@ -35,6 +35,23 @@ class ConfigFormType extends AbstractType
         );
 
         $builder->add(
+            $builder->create(
+                'blocked_free_email_providers',
+                TextareaType::class,
+                [
+                    'label'      => 'mautic.form.config.form.blocked_free_email_providers',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.config.form.blocked_free_email_providers.tooltip',
+                        'rows'    => 8,
+                    ],
+                    'required' => false,
+                ]
+            )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
             'form_results_data_sources',
             YesNoButtonGroupType::class,
             [

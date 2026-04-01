@@ -251,7 +251,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $class          = new \ReflectionClass(SalesforceIntegration::class);
         $lastSyncMethod = $class->getMethod('getLastSyncDate');
-        $lastSyncMethod->setAccessible(true);
 
         $sf = $this->getSalesforceIntegration();
 
@@ -272,7 +271,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lead          = new Lead();
         $reflectedLead = new \ReflectionObject($lead);
         $reflectedId   = $reflectedLead->getProperty('id');
-        $reflectedId->setAccessible(true);
         $reflectedId->setValue($lead, 1);
 
         $modified = new \DateTime('-15 minutes');
@@ -1426,7 +1424,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $parentProperties = [];
 
         foreach ($parentReflectionClass->getProperties() as $p) {
-            $p->setAccessible(true);
             $parentProperties[$p->getName()] = $p->getValue($instance);
         }
 

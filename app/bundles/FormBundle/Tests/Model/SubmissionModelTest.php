@@ -283,6 +283,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->companyModel->method('fetchCompanyFields')->willReturn([]);
 
+        $this->campaignModel->method('getCampaignsByForm')->willReturn([]);
+
         $userMock = $this->createMock(UserRepository::class);
 
         $this->entityManager->expects($this->any())
@@ -351,9 +353,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeValues(): void
     {
-        $reflection = new \ReflectionClass(SubmissionModel::class);
-        $method     = $reflection->getMethod('normalizeValue');
-        $method->setAccessible(true);
+        $reflection            = new \ReflectionClass(SubmissionModel::class);
+        $method                = $reflection->getMethod('normalizeValue');
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fields[$fieldSession] = [
             'label'        => 'Email',
@@ -487,7 +488,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     public function getAccessibleReflectionMethod(string $name): \ReflectionMethod
     {
         $method = $this->submissionModelReflection->getMethod($name);
-        $method->setAccessible(true);
 
         return $method;
     }

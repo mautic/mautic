@@ -64,7 +64,7 @@ class DoNotContactRepository extends CommonRepository
             if (!$combined) {
                 $q->innerJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
 
-                if (true === $listId && !$combined) {
+                if (true === $listId) {
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
                 } elseif (is_array($listId)) {

@@ -13,7 +13,7 @@ setup_mautic() {
     cp ./.ddev/.env.local.dist ./.env.local
 
     printf "Installing Mautic...\n"
-    php bin/console mautic:install "${MAUTIC_URL}"
+    php bin/console mautic:install "${MAUTIC_URL}" --force --no-interaction
     php bin/console cache:warmup --no-interaction --env=dev
 
     printf "Enabling plugins...\n"

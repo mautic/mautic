@@ -206,7 +206,7 @@ class Trigger extends FormEntity implements UuidInterface
     {
         if ('events' == $prop) {
             // changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
+            $this->changes[$prop][$val[0] ?? ''] = $val[1];
         } else {
             parent::isChanged($prop, $val);
         }

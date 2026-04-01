@@ -33,6 +33,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
+        $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
         $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
@@ -201,6 +202,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
         $segmentId = $segment->getId();
+        $this->segmentCountCacheHelper->deleteSegmentContactCount($segmentId);
 
         // Save manual segment without filters.
         $manualSegment   = $this->saveSegment('Lead List 2', 'lead-list-2');
@@ -590,10 +592,30 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(2, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
-        $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
-        $this->assertEquals(0, $secondColumnOfLine);
+
+        // Find rows by segment name to avoid relying on table order
+        $rowWithFilters    = null;
+        $rowWithoutFilters = null;
+        foreach ($leadListsTableRows as $row) {
+            $rowCrawler = new Crawler($row);
+            $nameText   = $rowCrawler->filterXPath('.//td[2]//a')->text();
+            if (str_contains($nameText, 'Lead List 1')) {
+                $rowWithFilters = $rowCrawler;
+            } elseif (str_contains($nameText, 'Lead List 2')) {
+                $rowWithoutFilters = $rowCrawler;
+            }
+        }
+
+        $this->assertNotNull($rowWithFilters, 'Could not find Lead List 1 row');
+        $this->assertNotNull($rowWithoutFilters, 'Could not find Lead List 2 row');
+
+        // Lead List 1 (with filters) should have the filter icon
+        $filterIconCount = $rowWithFilters->filterXPath('.//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
+        $this->assertEquals(1, $filterIconCount);
+
+        // Lead List 2 (without filters) should NOT have the filter icon
+        $filterIconCount = $rowWithoutFilters->filterXPath('.//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
+        $this->assertEquals(0, $filterIconCount);
     }
 
     public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
@@ -739,7 +761,8 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     public static function dateFieldProvider(): array
     {
         return [
-            ['Today', true],
+            ['Today', false],
+            ['Not-a-date', true],
             ['birthday', false],
             ['2023-01-01 11:00', false],
             ['2023-01-01 11:00:00', false],
