@@ -34,7 +34,7 @@ class SegmentUsedInCampaignsValidator
             [
                 '%campaignNames%' => $campaignNames,
                 '%segmentNames%'  => $segment->getName(),
-                '%count%' => count($segments),
+                '%count%'         => count($segments),
             ],
             'validators'
         );
@@ -42,7 +42,7 @@ class SegmentUsedInCampaignsValidator
         return true;
     }
 
-    private function decorateCampaignName($campaignName): string
+    private function decorateCampaignName(string $campaignName): string
     {
         return sprintf('"%s"', $campaignName);
     }

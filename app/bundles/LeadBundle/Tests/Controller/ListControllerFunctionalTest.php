@@ -564,7 +564,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
                 '%campaignNames%' => '"'.$campaignName.'"',
                 '%segmentNames%'  => $list2->getName(),
                 '%count%'         => 1,
-
             ],
             'validators'
         );
@@ -580,7 +579,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage2, $clientResponseBody['flashes']);
     }
 
-    private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
+    private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment = $segment ?? new LeadList();
         $filters = empty($filters) ? $this->defaultFilter() : $filters;
@@ -593,7 +592,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return Lead[]
      */
-    private function saveContacts($count = 4): array
+    private function saveContacts(int $count = 4): array
     {
         $contacts = [];
 

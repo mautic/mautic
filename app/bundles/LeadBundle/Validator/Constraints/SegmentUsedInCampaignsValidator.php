@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Validator\Constraints;
 
-use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator as InternalValidator;
 use Symfony\Component\HttpFoundation\Response;
