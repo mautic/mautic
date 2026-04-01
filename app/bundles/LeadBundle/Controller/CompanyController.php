@@ -55,6 +55,11 @@ class CompanyController extends FormController
         $start      = $pageHelper->getStart();
         $search     = $request->get('search', $request->getSession()->get('mautic.company.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
+
+        if (str_contains($search, 'segment:')) {
+            $filter = $this->filterByCompanySegment($search);
+        }
+
         $orderBy    = $request->getSession()->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $request->getSession()->get('mautic.company.orderbydir', 'ASC');
 
@@ -1195,5 +1200,45 @@ class CompanyController extends FormController
         }
 
         return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $exportHelper);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function filterByCompanySegment(string $search): array
+    {
+        $defaultFilter        = ['string' => 'Invalid company segment', 'force' => []];
+        $companySegmentSearch = str_replace('segment:', '', $search);
+        $companySegmentSearch = str_replace('"', '', $companySegmentSearch);
+
+        $companySegmentModel = $this->getModel('lead.company_segment');
+        if (!$companySegmentModel instanceof \Mautic\LeadBundle\Model\CompanySegmentModel) {
+            return $defaultFilter;
+        }
+
+        $companySegment = $companySegmentModel->getRepository()->findOneBy(['alias' => $companySegmentSearch]);
+
+        if (!$companySegment) {
+            return $defaultFilter;
+        }
+
+        $companiesIds = [];
+        foreach ($companySegment->getCompaniesSegments() as $companiesSegment) {
+            $companiesIds[] = $companiesSegment->getCompany()->getId();
+        }
+
+        if (empty($companiesIds)) {
+            return $defaultFilter;
+        }
+
+        return [
+            'force' => [
+                [
+                    'column' => 'comp.id',
+                    'expr'   => 'in',
+                    'value'  => $companiesIds,
+                ],
+            ],
+        ];
     }
 }
