@@ -361,3 +361,21 @@ Mautic.updateCompanySegmentFilterPositioning = function (el) {
         $parentEl.removeClass('in-group');
     }
 };
+
+Mautic.companyBatchSubmit = function() {
+    if (Mautic.batchActionPrecheck()) {
+        if (mQuery('#company_batch_remove').val() || mQuery('#company_batch_add').val()) {
+            const ids = Mautic.getCheckedListIds(false, true);
+
+            if (mQuery('#company_batch_ids').length) {
+                mQuery('#company_batch_ids').val(ids);
+            }
+
+            return true;
+        }
+    }
+
+    mQuery('#MauticSharedModal').modal('hide');
+
+    return false;
+};

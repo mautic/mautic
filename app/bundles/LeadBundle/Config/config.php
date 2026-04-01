@@ -144,6 +144,14 @@ return [
                 'path'       => '/company-segments/{objectAction}/{objectId}',
                 'controller' => 'Mautic\LeadBundle\Controller\CompanySegmentController::executeAction',
             ],
+            'mautic_company_segments_batch_company_set' => [
+                'path'       => '/company-segments/batch/company/set',
+                'controller' => 'Mautic\LeadBundle\Controller\BatchCompanySegmentController::setAction',
+            ],
+            'mautic_company_segments_batch_company_view' => [
+                'path'       => '/company-segments/batch/company/view',
+                'controller' => 'Mautic\LeadBundle\Controller\BatchCompanySegmentController::indexAction',
+            ],
             'mautic_segment_contacts' => [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\LeadBundle\Controller\ListController::contactsAction',
