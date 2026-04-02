@@ -285,4 +285,3 @@ class FileManager
         return $info;
     }
 }
-
