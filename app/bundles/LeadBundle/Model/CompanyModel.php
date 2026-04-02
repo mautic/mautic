@@ -793,9 +793,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false): bool
+    public function import($fields, $data, $owner = null, $skipIfExists = false, $createNew = true): bool
     {
-        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
+        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists, $createNew);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.lead.import.unique_field_not_exist', [], 'flashes'));
@@ -816,7 +816,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false, $createNew = true)
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -825,6 +825,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
+
+        if (!$createNew && $company->isNew()) {
+            return null;
+        }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);

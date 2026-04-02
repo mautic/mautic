@@ -1156,7 +1156,7 @@ class LeadModel extends FormModel
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, ?LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, ?LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false, $createNew = true): bool
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1183,6 +1183,10 @@ class LeadModel extends FormModel
 
         $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
+
+        if (!$createNew && !$merged) {
+            return false;
+        }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);

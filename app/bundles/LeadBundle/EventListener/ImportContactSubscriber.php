@@ -98,7 +98,8 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 true,
                 $event->eventLog,
                 (int) $event->import->getId(),
-                $event->import->getDefault('skip_if_exists')
+                $event->import->getDefault('skip_if_exists'),
+                $event->import->getDefaults()['create_new'] ?? true
             );
             $event->setWasMerged((bool) $merged);
             $event->stopPropagation();
@@ -115,6 +116,8 @@ final class ImportContactSubscriber implements EventSubscriberInterface
 
         $skipIfExists = ArrayHelper::pickValue('skip_if_exists', $matchedFields, false);
         $event->setSkipIfExists((bool) $skipIfExists);
+        $createNew = ArrayHelper::pickValue('create_new', $matchedFields, true);
+        $event->setCreateNew((bool) $createNew);
         $event->setOwnerId($this->handleValidateOwner($matchedFields));
         $event->setList($this->handleValidateList($matchedFields));
         $event->setTags($this->handleValidateTags($matchedFields));

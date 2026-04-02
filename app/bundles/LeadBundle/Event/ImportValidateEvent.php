@@ -11,7 +11,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ImportValidateEvent extends Event
 {
     private bool $skipIfExists;
-    private ?int $ownerId = null;
+    private bool $createNew = true;
+    private ?int $ownerId   = null;
 
     private ?int $list    = null;
 
@@ -81,6 +82,16 @@ class ImportValidateEvent extends Event
     public function setSkipIfExists(bool $skipIfExists): void
     {
         $this->skipIfExists = $skipIfExists;
+    }
+
+    public function getCreateNew(): bool
+    {
+        return $this->createNew;
+    }
+
+    public function setCreateNew(bool $createNew): void
+    {
+        $this->createNew = $createNew;
     }
 
     /**
