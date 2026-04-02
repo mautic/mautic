@@ -1156,7 +1156,7 @@ class LeadModel extends FormModel
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, ?LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false, $createNew = true): bool
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, ?LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false, bool $createNew = true): bool
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1185,7 +1185,7 @@ class LeadModel extends FormModel
         $merged = (bool) $lead->getId();
 
         if (!$createNew && !$merged) {
-            return false;
+            throw new \Exception($this->translator->trans('mautic.lead.import.creating_contacts_disabled'));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {

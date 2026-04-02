@@ -793,14 +793,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false, $createNew = true): bool
+    public function import($fields, $data, $owner = null, $skipIfExists = false, bool $createNew = true): bool
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists, $createNew);
-
-        if (false === $company) {
-            // create_new is disabled and no existing company was found — silently skip.
-            return false;
-        }
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.lead.import.unique_field_not_exist', [], 'flashes'));
@@ -817,11 +812,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $fields
      * @param array $data
      *
-     * @return Company|false|null false when skipped due to create_new=false, null when no unique fields exist
+     * @return Company|null
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false, $createNew = true)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false, bool $createNew = true)
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -832,7 +827,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
 
         if (!$createNew && $company->isNew()) {
-            return false;
+            throw new \Exception($this->translator->trans('mautic.lead.import.creating_companies_disabled'));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
