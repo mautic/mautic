@@ -118,6 +118,10 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $event->setSkipIfExists((bool) $skipIfExists);
         $createNew = ArrayHelper::pickValue('create_new', $matchedFields, true);
         $event->setCreateNew((bool) $createNew);
+
+        unset($matchedFields['skip_if_exists']);
+        unset($matchedFields['create_new']);
+
         $event->setOwnerId($this->handleValidateOwner($matchedFields));
         $event->setList($this->handleValidateList($matchedFields));
         $event->setTags($this->handleValidateTags($matchedFields));

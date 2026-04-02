@@ -100,6 +100,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         $createNew = ArrayHelper::pickValue('create_new', $matchedFields, true);
         $event->setCreateNew((bool) $createNew);
         unset($matchedFields['skip_if_exists']);
+        unset($matchedFields['create_new']);
         $event->setOwnerId($this->handleValidateOwner($matchedFields));
 
         $matchedFields = array_map(
