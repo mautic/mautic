@@ -208,109 +208,20 @@ class CampaignController extends AbstractStandardFormController
     public function shareAction(Request $request, CampaignModel $campaignModel, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
-            $this->logger->error('Access denied for campaign share', ['user' => $this->user->getId()]);
-
             return $this->accessDenied();
         }
 
         $campaign = $campaignModel->getEntity($objectId);
 
         if (empty($campaign)) {
-            $this->logger->error('Campaign not found for share', ['objectId' => $objectId]);
-
             return $this->notFound();
         }
 
-        $mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : '7.0';
-        if (preg_match('/^(\d+\.\d+)/', $mauticVersion, $matches)) {
-            $mauticVersion = $matches[1];
-        }
-
-        $campaignName = $campaign->getName() ?: '';
-        $campaignDesc = $campaign->getDescription() ?: '';
-
-        // Build a short headline from the campaign name (max 60 chars)
-        $headline = mb_strlen($campaignName) > 60
-            ? mb_substr($campaignName, 0, 57).'...'
-            : $campaignName;
-
-        $form = $this->createForm(CampaignShareType::class, [
-            'title'             => $campaignName,
-            'headline'          => $headline,
-            'description'       => $campaignDesc,
-            'version'           => '1.0.0',
-            'worksWithVersions' => [$mauticVersion],
-            'languages'         => ['en'],
-        ]);
-
+        $form = $this->createShareForm($campaign);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $formData = $form->getData();
-
-            $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
-            $event = $this->dispatcher->dispatch($event);
-            $data  = $event->getEntities();
-
-            $assetListEvent = new AssetExportListEvent([$data]);
-            $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
-            $assetList      = $assetListEvent->getList();
-
-            // Collect gallery images with ALT text
-            $gallery = [];
-            for ($i = 1; $i <= 8; ++$i) {
-                $image = $formData['galleryImage'.$i] ?? null;
-                if (null !== $image) {
-                    $gallery[] = [
-                        'image' => $image,
-                        'alt'   => $formData['galleryAlt'.$i] ?? '',
-                    ];
-                }
-            }
-
-            $metadata = [
-                'title'             => $formData['title'],
-                'headline'          => $formData['headline'] ?? '',
-                'description'       => $formData['description'] ?? '',
-                'keywords'          => $formData['keywords'] ?? '',
-                'version'           => $formData['version'],
-                'worksWithVersions' => $formData['worksWithVersions'] ?? [],
-                'languages'         => $formData['languages'] ?? [],
-                'bannerImage'       => $formData['bannerImage'] ?? null,
-                'gallery'           => $gallery,
-                'price'             => $formData['price'] ?? null,
-            ];
-
-            $publishButton = $form->get('publish');
-            \assert($publishButton instanceof \Symfony\Component\Form\SubmitButton);
-            $isPublish = $publishButton->isClicked();
-
-            if ($isPublish) {
-                $assetUrl        = $shareService->share($campaign, $data, $assetList, $metadata);
-                $marketplaceUrl  = $shareService->getMarketplaceUrl();
-                $redirectUrl     = $marketplaceUrl.'/publish?asset_url='.urlencode($assetUrl);
-
-                return $this->delegateView([
-                    'viewParameters' => [
-                        'redirectUrl'  => $redirectUrl,
-                        'campaignName' => $campaign->getName(),
-                        'campaignId'   => $campaign->getId(),
-                    ],
-                    'contentTemplate' => '@MauticCampaign/Campaign/share_redirect.html.twig',
-                    'passthroughVars' => [
-                        'mauticContent' => 'campaign',
-                    ],
-                ]);
-            }
-
-            // Download flow
-            $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
-            $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
-            $composerJson   = $shareService->buildComposerJson($campaign, $metadata);
-            $jsonOutput     = json_encode([$data], JSON_PRETTY_PRINT);
-            $filePath       = $exportHelper->writeToZipFile($jsonOutput, $assetList, '', $composerJson);
-
-            return $exportHelper->downloadAsZip($filePath, $exportFileName);
+            return $this->handleShareSubmission($form, $campaign, $shareService, $exportHelper, $objectId);
         }
 
         return $this->delegateView([
@@ -328,6 +239,101 @@ class CampaignController extends AbstractStandardFormController
                 ]),
             ],
         ]);
+    }
+
+    private function createShareForm(Campaign $campaign): FormInterface
+    {
+        $mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : '7.0';
+        if (preg_match('/^(\d+\.\d+)/', $mauticVersion, $matches)) {
+            $mauticVersion = $matches[1];
+        }
+
+        $campaignName = $campaign->getName() ?: '';
+        $headline     = mb_strlen($campaignName) > 60
+            ? mb_substr($campaignName, 0, 57).'...'
+            : $campaignName;
+
+        return $this->createForm(CampaignShareType::class, [
+            'title'             => $campaignName,
+            'headline'          => $headline,
+            'description'       => $campaign->getDescription() ?: '',
+            'version'           => '1.0.0',
+            'worksWithVersions' => [$mauticVersion],
+            'languages'         => ['en'],
+        ]);
+    }
+
+    private function handleShareSubmission(FormInterface $form, Campaign $campaign, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
+    {
+        $formData = $form->getData();
+
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
+        $event = $this->dispatcher->dispatch($event);
+        $data  = $event->getEntities();
+
+        $assetListEvent = new AssetExportListEvent([$data]);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
+        $metadata = $this->buildShareMetadata($formData);
+
+        $publishButton = $form->get('publish');
+        \assert($publishButton instanceof \Symfony\Component\Form\SubmitButton);
+
+        if ($publishButton->isClicked()) {
+            $assetUrl    = $shareService->share($campaign, $data, $assetList, $metadata);
+            $redirectUrl = $shareService->getMarketplaceUrl().'/publish?asset_url='.urlencode($assetUrl);
+
+            return $this->delegateView([
+                'viewParameters' => [
+                    'redirectUrl'  => $redirectUrl,
+                    'campaignName' => $campaign->getName(),
+                    'campaignId'   => $campaign->getId(),
+                ],
+                'contentTemplate' => '@MauticCampaign/Campaign/share_redirect.html.twig',
+                'passthroughVars' => ['mauticContent' => 'campaign'],
+            ]);
+        }
+
+        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+        $composerJson   = $shareService->buildComposerJson($campaign, $metadata);
+        $jsonOutput     = json_encode([$data], JSON_PRETTY_PRINT);
+        $filePath       = $exportHelper->writeToZipFile($jsonOutput, $assetList, '', $composerJson);
+
+        return $exportHelper->downloadAsZip($filePath, $exportFileName);
+    }
+
+    /**
+     * @param array<string, mixed> $formData
+     *
+     * @return array<string, mixed>
+     */
+    private function buildShareMetadata(array $formData): array
+    {
+        $gallery = [];
+        for ($i = 1; $i <= 8; ++$i) {
+            $image = $formData['galleryImage'.$i] ?? null;
+            if (null !== $image) {
+                $gallery[] = [
+                    'image' => $image,
+                    'alt'   => $formData['galleryAlt'.$i] ?? '',
+                ];
+            }
+        }
+
+        return [
+            'title'             => $formData['title'],
+            'headline'          => $formData['headline'] ?? '',
+            'description'       => $formData['description'] ?? '',
+            'keywords'          => $formData['keywords'] ?? '',
+            'version'           => $formData['version'],
+            'worksWithVersions' => $formData['worksWithVersions'] ?? [],
+            'languages'         => $formData['languages'] ?? [],
+            'bannerImage'       => $formData['bannerImage'] ?? null,
+            'gallery'           => $gallery,
+            'price'             => $formData['price'] ?? null,
+        ];
     }
 
     public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response

@@ -29,6 +29,28 @@ final class CampaignShareType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->addMetadataFields($builder);
+        $this->addCompatibilityFields($builder, $options);
+        $this->addGalleryFields($builder);
+        $this->addPricingFields($builder);
+        $this->addSubmitButtons($builder);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'mautic_versions' => [
+                '5.0' => '5.0',
+                '6.0' => '6.0',
+                '7.0' => '7.0',
+            ],
+        ]);
+
+        $resolver->setAllowedTypes('mautic_versions', 'array');
+    }
+
+    private function addMetadataFields(FormBuilderInterface $builder): void
+    {
         $builder->add(
             'title',
             TextType::class,
@@ -121,7 +143,13 @@ final class CampaignShareType extends AbstractType
                 ],
             ]
         );
+    }
 
+    /**
+     * @param array<string, mixed> $options
+     */
+    private function addCompatibilityFields(FormBuilderInterface $builder, array $options): void
+    {
         $builder->add(
             'worksWithVersions',
             ChoiceType::class,
@@ -149,7 +177,10 @@ final class CampaignShareType extends AbstractType
                 'attr'     => ['class' => 'form-control'],
             ]
         );
+    }
 
+    private function addGalleryFields(FormBuilderInterface $builder): void
+    {
         for ($i = 1; $i <= 8; ++$i) {
             $builder->add(
                 'galleryImage'.$i,
@@ -181,7 +212,10 @@ final class CampaignShareType extends AbstractType
                 ]
             );
         }
+    }
 
+    private function addPricingFields(FormBuilderInterface $builder): void
+    {
         $builder->add(
             'price',
             MoneyType::class,
@@ -192,7 +226,10 @@ final class CampaignShareType extends AbstractType
                 'attr'     => ['class' => 'form-control'],
             ]
         );
+    }
 
+    private function addSubmitButtons(FormBuilderInterface $builder): void
+    {
         $builder->add(
             'publish',
             SubmitType::class,
@@ -216,19 +253,6 @@ final class CampaignShareType extends AbstractType
                 ],
             ]
         );
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'mautic_versions' => [
-                '5.0' => '5.0',
-                '6.0' => '6.0',
-                '7.0' => '7.0',
-            ],
-        ]);
-
-        $resolver->setAllowedTypes('mautic_versions', 'array');
     }
 
     /**

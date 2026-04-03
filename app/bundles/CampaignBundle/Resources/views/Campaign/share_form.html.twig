@@ -81,14 +81,14 @@
                         <div class="row gallery-row" data-gallery-slot="{{ i }}" {% if i > 1 %}style="display: none; margin-top: 10px;"{% endif %}>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>{{ 'mautic.campaign.share.gallery_image'|trans }} {{ i }}</label>
-                                    {{ form_widget(attribute(form, 'galleryImage' ~ i)) }}
+                                    <label for="campaign_share_galleryImage{{ i }}">{{ 'mautic.campaign.share.gallery_image'|trans }} {{ i }}</label>
+                                    {{ form_widget(attribute(form, 'galleryImage' ~ i), {id: 'campaign_share_galleryImage' ~ i}) }}
                                     {{ form_errors(attribute(form, 'galleryImage' ~ i)) }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>{{ 'mautic.campaign.share.gallery_alt'|trans }} {{ i }}</label>
+                                    <label for="campaign_share_galleryAlt{{ i }}">{{ 'mautic.campaign.share.gallery_alt'|trans }} {{ i }}</label>
                                     {{ form_widget(attribute(form, 'galleryAlt' ~ i)) }}
                                 </div>
                             </div>
