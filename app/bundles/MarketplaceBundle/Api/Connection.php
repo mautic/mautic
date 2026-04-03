@@ -45,7 +45,7 @@ class Connection
      */
     public function getPackage(string $pluginName): array
     {
-        $url = $this->config->getApiBase().'/rest/v1/rpc/get_pack?'.http_build_query(['package_name' => $pluginName]);
+        $url = $this->config->getApiBase().'/rest/v1/rpc/get_pack?'.http_build_query(['packag_name' => $pluginName]);
 
         return $this->makeRequest($url);
     }

@@ -11,9 +11,9 @@ final class PackageBase
          * Original name in format "vendor/name".
          */
         public string $name,
-        public string $url,
-        public string $repository,
-        public string $description,
+        public ?string $url,
+        public ?string $repository,
+        public ?string $description,
         public int $downloads,
         public int $favers,
         public float $averageRating,
@@ -31,8 +31,8 @@ final class PackageBase
         return new self(
             $array['name'],
             $array['url'] ?? '',
-            $array['repository'],
-            $array['description'],
+            $array['repository'] ?? null,
+            $array['description'] ?? null,
             (int) $array['downloads'],
             (int) $array['favers'],
             (float) ($array['average_rating'] ?? 0),
