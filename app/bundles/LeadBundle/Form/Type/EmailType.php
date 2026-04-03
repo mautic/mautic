@@ -11,8 +11,10 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @extends AbstractType<mixed>
@@ -34,11 +36,12 @@ class EmailType extends AbstractType
             'subject',
             TextType::class,
             [
-                'label'      => 'mautic.email.subject',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
-                'empty_data' => '',
+                'label'       => 'mautic.email.subject',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'constraints' => [
+                    new NotBlank(message: 'mautic.core.subject.required'),
+                ],
             ]
         );
 
@@ -74,12 +77,8 @@ class EmailType extends AbstractType
                 'required'    => false,
                 'data'        => $default,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.email.required',
-                    ]),
-                    new Email([
-                        'message' => 'mautic.core.email.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.email.required'),
+                    new Email(message: 'mautic.core.email.required'),
                 ],
             ]
         );
@@ -110,6 +109,13 @@ class EmailType extends AbstractType
                     'data-token-callback'  => 'email:getBuilderTokens',
                     'data-token-activator' => '{',
                     'allow-full-html'      => true,
+                ],
+                'constraints' => [
+                    new Callback(callback: function ($value, ExecutionContextInterface $context) {
+                        if ('' === trim(strip_tags($value))) {
+                            $context->buildViolation('mautic.lead.email.body.required')->addViolation();
+                        }
+                    }),
                 ],
             ]
         );

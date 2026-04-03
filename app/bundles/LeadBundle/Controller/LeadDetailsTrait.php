@@ -224,7 +224,7 @@ trait LeadDetailsTrait
 
         $logEvents = array_map(fn ($l): array => [
             'eventType'       => $l['action'],
-            'eventLabel'      => $l['userName'],
+            'userName'        => $l['userName'],
             'timestamp'       => $l['dateAdded'],
             'details'         => $l['details'],
             'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
