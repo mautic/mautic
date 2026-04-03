@@ -140,7 +140,7 @@ class CampaignShareService
     private function createAssetFromZip(Campaign $campaign, string $zipFilePath, array $metadata = []): Asset
     {
         $uploadDir = $this->coreParametersHelper->get('upload_dir', 'media/files');
-        $fileName  = 'campaign_share_'.sha1(uniqid((string) mt_rand(), true)).'.zip';
+        $fileName  = 'campaign_share_'.bin2hex(random_bytes(20)).'.zip';
         $destPath  = $uploadDir.'/'.$fileName;
 
         copy($zipFilePath, $destPath);
