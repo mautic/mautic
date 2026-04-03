@@ -17,6 +17,10 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
 
+    private const SHARE_ROUTE       = '/s/campaigns/share/';
+    private const CAMPAIGN_NAME     = 'Share Test Campaign';
+    private const TEST_DESCRIPTION  = 'This is a test description for the campaign share form. This is a test description for the campaign share form. This is a test description for the campaign share form. ';
+
     private Campaign $campaign;
 
     private function setupShareTestData(int $exportPermission = 1024): User
@@ -37,7 +41,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         ]);
 
         $this->campaign = new Campaign();
-        $this->campaign->setName('Share Test Campaign');
+        $this->campaign->setName(self::CAMPAIGN_NAME);
         $this->campaign->setDescription('A test campaign for share functionality with enough description text to pass validation. Adding more text here to meet the minimum requirements.');
         $this->campaign->setIsPublished(true);
         $this->em->persist($this->campaign);
@@ -52,13 +56,13 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $nonAdminUser = $this->setupShareTestData(1024);
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request(Request::METHOD_GET, '/s/campaigns/share/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
 
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
         $content = $response->getContent();
-        $this->assertStringContainsString('Share Test Campaign', $content);
+        $this->assertStringContainsString(self::CAMPAIGN_NAME, $content);
     }
 
     public function testShareFormAccessDenied(): void
@@ -66,7 +70,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $nonAdminUser = $this->setupShareTestData(0);
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request(Request::METHOD_GET, '/s/campaigns/share/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
 
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
@@ -77,7 +81,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $nonAdminUser = $this->setupShareTestData(1024);
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request(Request::METHOD_GET, '/s/campaigns/share/999999');
+        $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.'999999');
 
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
@@ -88,15 +92,15 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $nonAdminUser = $this->setupShareTestData(1024);
         $this->loginOtherUser($nonAdminUser);
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/campaigns/share/'.$this->campaign->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $form = $crawler->selectButton('campaign_share[download]')->form();
         $form->setValues([
-            'campaign_share[title]'                => 'Share Test Campaign',
+            'campaign_share[title]'                => self::CAMPAIGN_NAME,
             'campaign_share[version]'              => '1.0.0',
             'campaign_share[headline]'             => 'Test Headline For Campaign',
-            'campaign_share[description]'          => str_repeat('This is a test description for the campaign share form. ', 3),
+            'campaign_share[description]'          => self::TEST_DESCRIPTION,
             'campaign_share[worksWithVersions]'    => ['5.0'],
         ]);
 
@@ -113,15 +117,15 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $nonAdminUser = $this->setupShareTestData(1024);
         $this->loginOtherUser($nonAdminUser);
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/campaigns/share/'.$this->campaign->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $form = $crawler->selectButton('campaign_share[publish]')->form();
         $form->setValues([
-            'campaign_share[title]'                => 'Share Test Campaign',
+            'campaign_share[title]'                => self::CAMPAIGN_NAME,
             'campaign_share[version]'              => '1.0.0',
             'campaign_share[headline]'             => 'Test Headline For Campaign',
-            'campaign_share[description]'          => str_repeat('This is a test description for the campaign share form. ', 3),
+            'campaign_share[description]'          => self::TEST_DESCRIPTION,
             'campaign_share[worksWithVersions]'    => ['5.0'],
         ]);
 
@@ -138,18 +142,18 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $nonAdminUser = $this->setupShareTestData(1024);
         $this->loginOtherUser($nonAdminUser);
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/campaigns/share/'.$this->campaign->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
 
         $form = $crawler->selectButton('campaign_share[download]')->form();
         $form->setValues([
-            'campaign_share[title]'                => 'Share Test Campaign',
+            'campaign_share[title]'                => self::CAMPAIGN_NAME,
             'campaign_share[version]'              => 'invalid-version',
             'campaign_share[headline]'             => 'Test Headline',
-            'campaign_share[description]'          => str_repeat('This is a test description for the campaign share form. ', 3),
+            'campaign_share[description]'          => self::TEST_DESCRIPTION,
             'campaign_share[worksWithVersions]'    => ['5.0'],
         ]);
 
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
 
         // Form should re-render with validation errors, not produce a ZIP
         $response = $this->client->getResponse();
