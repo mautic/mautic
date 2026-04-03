@@ -1451,87 +1451,77 @@ class LeadController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $email = $form->getData();
 
-                    $bodyCheck = trim(strip_tags($email['body']));
-                    if (!empty($bodyCheck)) {
-                        $mailer      = $mailHelper->getMailer();
-                        $emailEntity = null;
-                        $subject     = $email['subject'];
+                    $mailer      = $mailHelper->getMailer();
+                    $emailEntity = null;
+                    $subject     = $email['subject'];
 
-                        // Set default settings for email.
-                        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
-                        $mailer->setReplyTo($email['from']);
-                        $mailer->setBody($email['body']);
-                        $mailer->parsePlainText($email['body']);
-                        $mailer->setLead($leadFields);
-                        $mailer->setIdHash();
-                        $mailer->setSubject($subject);
+                    // Set default settings for email.
+                    $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
+                    $mailer->setReplyTo($email['from']);
+                    $mailer->setBody($email['body']);
+                    $mailer->parsePlainText($email['body']);
+                    $mailer->setLead($leadFields);
+                    $mailer->setIdHash();
+                    $mailer->setSubject($subject);
 
-                        // Set the email entity template so the email configuration like preheader would apply.
-                        if ($email['templates']) {
-                            $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
-                        }
+                    // Set the email entity template so the email configuration like preheader would apply.
+                    if ($email['templates']) {
+                        $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
+                    }
 
-                        // Overwrite the mailer with the values from the form.
-                        $mailer->addTo($leadEmail, $leadName);
+                    // Overwrite the mailer with the values from the form.
+                    $mailer->addTo($leadEmail, $leadName);
 
-                        if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            $emailEntity ??= new Email();
-                            $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
-                        }
+                    if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
+                        $emailEntity ??= new Email();
+                        $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                    }
 
-                        if (!empty($email['from'])) {
-                            $emailEntity ??= new Email();
-                            $emailEntity->setFromAddress($email['from']);
-                        }
+                    if (!empty($email['from'])) {
+                        $emailEntity ??= new Email();
+                        $emailEntity->setFromAddress($email['from']);
+                    }
 
-                        if (!empty($email['fromname'])) {
-                            $emailEntity ??= new Email();
-                            $emailEntity->setFromName($email['fromname']);
-                        }
+                    if (!empty($email['fromname'])) {
+                        $emailEntity ??= new Email();
+                        $emailEntity->setFromName($email['fromname']);
+                    }
 
-                        if ($emailEntity) {
-                            $emailEntity->setSubject($subject);
-                            $emailEntity->setCustomHtml($email['body']);
-                            $mailer->setEmail($emailEntity);
-                        }
+                    if ($emailEntity) {
+                        $emailEntity->setSubject($subject);
+                        $emailEntity->setCustomHtml($email['body']);
+                        $mailer->setEmail($emailEntity);
+                    }
 
-                        // Ensure safe emoji for notification
-                        if ($mailer->send(true, false)) {
-                            $mailer->createEmailStat();
-                            $this->addFlashMessage(
-                                'mautic.lead.email.notice.sent',
-                                [
-                                    '%subject%' => $subject,
-                                    '%email%'   => $leadEmail,
-                                ]
-                            );
-                        } else {
-                            $errors = $mailer->getErrors();
-
-                            // Unset the array of failed email addresses
-                            if (isset($errors['failures'])) {
-                                unset($errors['failures']);
-                            }
-
-                            $form->addError(
-                                new FormError(
-                                    $this->translator->trans(
-                                        'mautic.lead.email.error.failed',
-                                        [
-                                            '%subject%' => $subject,
-                                            '%email%'   => $leadEmail,
-                                            '%error%'   => implode('<br />', $errors),
-                                        ],
-                                        'flashes'
-                                    )
-                                )
-                            );
-                            $valid = false;
-                        }
+                    // Ensure safe emoji for notification
+                    if ($mailer->send(true, false)) {
+                        $mailer->createEmailStat();
+                        $this->addFlashMessage(
+                            'mautic.lead.email.notice.sent',
+                            [
+                                '%subject%' => $subject,
+                                '%email%'   => $leadEmail,
+                            ]
+                        );
                     } else {
-                        $form['body']->addError(
+                        $errors = $mailer->getErrors();
+
+                        // Unset the array of failed email addresses
+                        if (isset($errors['failures'])) {
+                            unset($errors['failures']);
+                        }
+
+                        $form->addError(
                             new FormError(
-                                $this->translator->trans('mautic.lead.email.body.required', [], 'validators')
+                                $this->translator->trans(
+                                    'mautic.lead.email.error.failed',
+                                    [
+                                        '%subject%' => $subject,
+                                        '%email%'   => $leadEmail,
+                                        '%error%'   => implode('<br />', $errors),
+                                    ],
+                                    'flashes'
+                                )
                             )
                         );
                         $valid = false;
