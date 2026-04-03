@@ -230,7 +230,7 @@ class MessageQueueModel extends FormModel
                 continue;
             }
 
-            $messageChannel   = $message->getChannel();
+            $messageChannel   = $message->getChannel() ?? '';
             $messageChannelId = $message->getChannelId();
             if (!$messageChannelId) {
                 $messageChannelId = 0;

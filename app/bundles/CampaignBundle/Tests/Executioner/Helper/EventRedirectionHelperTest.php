@@ -269,7 +269,6 @@ final class EventRedirectionHelperTest extends TestCase
     {
         $reflection = new \ReflectionClass($object);
         $prop       = $reflection->getProperty($property);
-        $prop->setAccessible(true);
         $prop->setValue($object, $value);
     }
 }

@@ -84,4 +84,16 @@ class ListLeadRepository extends CommonRepository
 
         return $deletedRecordCount;
     }
+
+    public function removeLeadsByListId(int $listId): void
+    {
+        $table_name = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+        $conn       = $this->getEntityManager()->getConnection();
+        do {
+            $deletedRows = $conn->executeStatement(
+                "DELETE FROM {$table_name} WHERE leadlist_id = :listId LIMIT ".self::DELETE_BATCH_SIZE,
+                ['listId' => $listId]
+            );
+        } while ($deletedRows > 0);
+    }
 }

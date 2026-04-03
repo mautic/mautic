@@ -24,6 +24,14 @@
                     children: [
                         {
                             HeaderGlobalAction: {
+                                ariaLabel: 'mautic.campaign.auto_organize',
+                                onClick: 'Mautic.autoOrganizeCampaign();',
+                                renderActionIcon: 'ri-layout-grid-2-line',
+                                className: 'btn-nospin'
+                            }
+                        },
+                        {
+                            HeaderGlobalAction: {
                                 ariaLabel: 'mautic.core.form.apply',
                                 onClick: 'Mautic.saveCampaignFromBuilder();',
                                 renderActionIcon: 'ri-save-line',

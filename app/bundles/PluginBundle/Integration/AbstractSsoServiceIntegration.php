@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Integration;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**

@@ -3,3 +3,30 @@ body,
 [data-gjs-type='wrapper'] {
   height: auto !important;
 }
+
+li::marker {
+  color: inherit !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+
+ol {
+  list-style-type: decimal !important;
+}
+
+ol ol {
+  list-style-type: lower-alpha !important;
+}
+
+ol ol ol {
+  list-style-type: lower-roman !important;
+}
+
+.ck-content {
+  color: inherit !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  word-break: normal !important;
+}
