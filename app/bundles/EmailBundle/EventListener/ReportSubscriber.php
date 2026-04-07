@@ -61,6 +61,13 @@ class ReportSubscriber implements EventSubscriberInterface
             'formula' => 'COALESCE(ROUND((SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')', // NOSONAR
             'suffix'  => '%',
         ],
+        'unsubscribed_to_open_ratio' => [
+            'alias'   => 'unsubscribed_to_open_ratio',
+            'label'   => 'mautic.email.report.unsubscribed_to_open_ratio',
+            'type'    => 'string',
+            'formula' => 'COALESCE(ROUND((SUM(CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.read_count, 0), 1), \'0.0\')', // NOSONAR
+            'suffix'  => '%',
+        ],
         'bounced' => [
             'alias'   => 'bounced',
             'label'   => 'mautic.email.report.bounced',
