@@ -82,10 +82,12 @@ class Ck5ForGrapesJs {
       inlineMode: true,
       editorContainer: null,
       latestContent: null,
+      originalContent: null,
       display: undefined,
       latestClickEvent: null,
       badgableInfo: null,
       toolbarVisibilityInfo: null,
+      editableClassObserver: null,
       parseContent: !!parse_content,
       contentPolicy: typeof content_policy === 'object' && content_policy !== null ? content_policy : {},
       reuseEditor: reuse_editor !== undefined ? !!reuse_editor : false,
@@ -209,6 +211,14 @@ class Ck5ForGrapesJs {
 
   set latestContent(value) {
     this._Ck5ForGrapesJsData.latestContent = value;
+  }
+
+  get originalContent() {
+    return this._Ck5ForGrapesJsData.originalContent;
+  }
+
+  set originalContent(value) {
+    this._Ck5ForGrapesJsData.originalContent = value;
   }
 
   get editorContainer() {
