@@ -114,16 +114,34 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * For contacts, "own" means the current user owns the contact.
+     * For contacts, "own" follows the permission user semantics:
+     * owner if set, otherwise the creator.
      *
      * @return array<array<string, mixed>>
      */
     protected function getOwnEntityListFilters(string $tableAlias, User $user): array
     {
         return [[
-            'column' => $tableAlias.'.owner_id',
-            'expr'   => 'eq',
-            'value'  => $user->getId(),
+            'group' => [
+                [
+                    [
+                        'column' => $tableAlias.'.owner_id',
+                        'expr'   => 'eq',
+                        'value'  => $user->getId(),
+                    ],
+                ],
+                [
+                    [
+                        'column' => $tableAlias.'.owner_id',
+                        'expr'   => 'isNull',
+                    ],
+                    [
+                        'column' => $tableAlias.'.created_by',
+                        'expr'   => 'eq',
+                        'value'  => $user->getId(),
+                    ],
+                ],
+            ],
         ]];
     }
 

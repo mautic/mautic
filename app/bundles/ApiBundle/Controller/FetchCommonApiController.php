@@ -166,7 +166,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $tableAlias    = $repo->getTableAlias();
         $publishedOnly = $request->get('published', 0);
         $minimal       = $request->get('minimal', 0);
-
         try {
             if (!$this->security->isGranted($this->permissionBase.':view')) {
                 return $this->accessDenied();
@@ -216,7 +215,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $this->customSelectRequested = true;
         }
 
-        if ($where = $this->getWhereFromRequest($request)) {
+        $where = $this->getWhereFromRequest($request);
+        if ($where) {
             $args['filter']['where'] = $where;
         }
 

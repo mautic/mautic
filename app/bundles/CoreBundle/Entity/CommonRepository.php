@@ -1777,6 +1777,25 @@ class CommonRepository extends ServiceEntityRepository
     private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
+            if (isset($f['group']) && is_array($f['group'])) {
+                foreach ($f['group'] as &$groupFilters) {
+                    if (is_array($groupFilters)) {
+                        $this->convertOrmPropertiesToColumns($groupFilters, $properties);
+                    }
+                }
+                unset($groupFilters);
+                continue;
+            }
+
+            if (isset($f['expr'], $f['val']) && in_array($f['expr'], ['andX', 'orX'], true) && is_array($f['val'])) {
+                $this->convertOrmPropertiesToColumns($f['val'], $properties);
+                continue;
+            }
+
+            if (!isset($f['col']) && !isset($f['column'])) {
+                continue;
+            }
+
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';

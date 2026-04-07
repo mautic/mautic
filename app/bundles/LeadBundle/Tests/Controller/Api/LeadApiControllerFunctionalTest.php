@@ -513,7 +513,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
     }
 
-    public function testGetEntitiesReturnsOwnedContactsForViewOwnUser(): void
+    public function testGetEntitiesReturnsContactsForViewOwnUserBasedOnPermissionUser(): void
     {
         /** @var User $adminUser */
         $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
@@ -530,31 +530,48 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $permission->setBitwise(2);
         $this->em->persist($permission);
 
-        $user = new User();
-        $user->setFirstName('API');
-        $user->setLastName('Owner');
-        $user->setEmail('api-owner@test.com');
-        $user->setUsername('api-owner');
-        $user->setRole($role);
+        [$user, $password] = $this->createApiUser(
+            $role,
+            'api-owner',
+            'api-owner@test.com',
+            'API',
+            'Owner'
+        );
+        [$otherOwner] = $this->createApiUser(
+            $role,
+            'api-other-owner',
+            'api-other-owner@test.com',
+            'Other',
+            'Owner'
+        );
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
-        $password = 'Maut1cR0cks!';
-        $user->setPassword($hasher->hash($password));
-        $this->em->persist($user);
+        $this->em->flush();
 
         $ownedLead = new Lead();
-        $ownedLead->setEmail('api-view-own-owner-match@test.com');
+        $ownedLead->setEmail('api-view-own-scope-owned@test.com');
         $ownedLead->setFirstname('Owned');
         $ownedLead->setOwner($user);
         $ownedLead->setCreatedBy($adminUser);
         $this->em->persist($ownedLead);
 
-        $otherLead = new Lead();
-        $otherLead->setEmail('api-view-own-owner-other@test.com');
-        $otherLead->setFirstname('Other');
-        $otherLead->setCreatedBy($adminUser);
-        $this->em->persist($otherLead);
+        $createdByLead = new Lead();
+        $createdByLead->setEmail('api-view-own-scope-created@test.com');
+        $createdByLead->setFirstname('Created');
+        $createdByLead->setCreatedBy($user);
+        $this->em->persist($createdByLead);
+
+        $ownedByOtherLead = new Lead();
+        $ownedByOtherLead->setEmail('api-view-own-scope-owned-by-other@test.com');
+        $ownedByOtherLead->setFirstname('Owned by other');
+        $ownedByOtherLead->setOwner($otherOwner);
+        $ownedByOtherLead->setCreatedBy($user);
+        $this->em->persist($ownedByOtherLead);
+
+        $unrelatedLead = new Lead();
+        $unrelatedLead->setEmail('api-view-own-scope-unrelated@test.com');
+        $unrelatedLead->setFirstname('Unrelated');
+        $unrelatedLead->setCreatedBy($adminUser);
+        $this->em->persist($unrelatedLead);
 
         $this->em->flush();
         $this->em->clear();
@@ -566,20 +583,22 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', $password);
 
-        $this->client->request('GET', '/api/contacts?search=api-view-own-owner-');
+        $this->client->request('GET', '/api/contacts?search=api-view-own-scope-');
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful($clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
-        self::assertSame('1', $response['total']);
+        self::assertSame('2', $response['total']);
 
         $emails = array_map(
             static fn (array $contact): string => $contact['fields']['all']['email'],
             array_values($response['contacts'])
         );
 
-        self::assertContains('api-view-own-owner-match@test.com', $emails);
-        self::assertNotContains('api-view-own-owner-other@test.com', $emails);
+        self::assertContains('api-view-own-scope-owned@test.com', $emails);
+        self::assertContains('api-view-own-scope-created@test.com', $emails);
+        self::assertNotContains('api-view-own-scope-owned-by-other@test.com', $emails);
+        self::assertNotContains('api-view-own-scope-unrelated@test.com', $emails);
     }
 
     public function testBatchEditEndpoint(): void
@@ -1456,5 +1475,26 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $campaignLead->setDateAdded(new \DateTime());
         $campaignLead->setManuallyRemoved($manuallyRemoved);
         $this->em->persist($campaignLead);
+    }
+
+    /**
+     * @return array{0: User, 1: string}
+     */
+    private function createApiUser(Role $role, string $username, string $email, string $firstName, string $lastName): array
+    {
+        $user = new User();
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
+        $user->setEmail($email);
+        $user->setUsername($username);
+        $user->setRole($role);
+
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $password = 'Maut1cR0cks!';
+        $user->setPassword($hasher->hash($password));
+        $this->em->persist($user);
+
+        return [$user, $password];
     }
 }
