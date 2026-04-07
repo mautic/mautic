@@ -530,14 +530,15 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $permission->setBitwise(2);
         $this->em->persist($permission);
 
-        [$user, $password] = $this->createApiUser(
+        $user = $this->createApiUser(
             $role,
             'api-owner',
             'api-owner@test.com',
             'API',
             'Owner'
         );
-        [$otherOwner] = $this->createApiUser(
+
+        $otherOwner = $this->createApiUser(
             $role,
             'api-other-owner',
             'api-other-owner@test.com',
@@ -581,7 +582,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->loginUser($apiUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());
-        $this->client->setServerParameter('PHP_AUTH_PW', $password);
+        $this->client->setServerParameter('PHP_AUTH_PW', $this->getUserPlainPassword());
 
         $this->client->request('GET', '/api/contacts?search=api-view-own-scope-');
         $clientResponse = $this->client->getResponse();
@@ -1477,10 +1478,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaignLead);
     }
 
-    /**
-     * @return array{0: User, 1: string}
-     */
-    private function createApiUser(Role $role, string $username, string $email, string $firstName, string $lastName): array
+    private function createApiUser(Role $role, string $username, string $email, string $firstName, string $lastName): User
     {
         $user = new User();
         $user->setFirstName($firstName);
@@ -1491,10 +1489,14 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
         \assert($hasher instanceof PasswordHasherInterface);
-        $password = 'Maut1cR0cks!';
-        $user->setPassword($hasher->hash($password));
+        $user->setPassword($hasher->hash($this->getUserPlainPassword()));
         $this->em->persist($user);
 
-        return [$user, $password];
+        return $user;
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'Maut1cR0cks!';
     }
 }
