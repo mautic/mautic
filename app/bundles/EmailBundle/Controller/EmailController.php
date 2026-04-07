@@ -994,9 +994,9 @@ class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
-                            return $this->redirectToRoute('mautic_email_action', [
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
+                            return $this->forward(static::class.'::editAction', [
+                                'objectId'   => $entity->getId(),
+                                'ignorePost' => true,
                             ]);
                         }
                     } catch (InvalidRenderedHtmlException $e) {
