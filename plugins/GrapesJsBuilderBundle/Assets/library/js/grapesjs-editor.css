@@ -30,3 +30,13 @@ ol ol ol {
   line-height: inherit !important;
   word-break: normal !important;
 }
+
+.ck-content h1,
+.ck-content h2,
+.ck-content h3,
+.ck-content h4,
+.ck-content h5,
+.ck-content h6,
+.ck-content p {
+  display: block !important;
+}
