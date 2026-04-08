@@ -167,7 +167,7 @@ class DashboardModel extends FormModel
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
-                if (!($widget instanceof Widget)) {
+                if (!$widget instanceof Widget) {
                     $widget = $this->populateWidgetEntity($widget);
                 }
                 $this->populateWidgetContent($widget, $filter);

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -259,165 +260,160 @@ class LeadFieldRepository extends CommonRepository
                 return !empty($result['id']);
             } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
                 return empty($result['id']);
-            } else {
-                return false;
-            }
-        } else {
-            $property       = $this->getPropertyByField($field, $q);
-            $normalizeType  = (fn (string $field, bool $cast = false, string $type='TEXT'): string => $cast ? "CAST($field AS $type)" : $field);
-            $normalizeRegex = function (bool $not = false, bool $cast = false): string {
-                if ($cast) {
-                    return $not ? '!~*' : '~*';
-                }
-
-                return $not ? 'NOT REGEXP' : 'REGEXP';
-            };
-
-            if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
-                $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
-                $compositeExpression   = ('empty' === $operatorExpr) ?
-                    $q->expr()->or(
-                        $q->expr()->isNull($property),
-                        $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
-                    ) :
-                    $q->expr()->and(
-                        $q->expr()->isNotNull($property),
-                        $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
-                    );
-
-                $q->where(
-                    $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead'),
-                        $compositeExpression
-                    )
-                )
-                  ->setParameter('lead', (int) $lead);
-            } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-                $where = $normalizeType($property, $isPg).' '.$normalizeRegex('regexp' !== $operatorExpr, $isPg).' :value';
-
-                $q->where(
-                    $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead'),
-                        $where
-                    )
-                )
-                  ->setParameter('lead', (int) $lead, ParameterType::INTEGER)
-                  ->setParameter('value', $value);
-            } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $values     = (!is_array($value)) ? [$value] : $value;
-
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('l.id', ':lead')
-                );
-
-                $innerExpr  = [];
-                $paramCount = 0;
-                foreach ($values as $v) {
-                    $paramName   = 'value'.$paramCount++;
-                    $v           = trim((string) $v, "'");
-                    $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
-
-                    $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ? $normalizeRegex(false, $isPg) : $normalizeRegex(true, $isPg)).' :'.$paramName;
-                    $q->setParameter($paramName, $pattern);
-                }
-
-                if (str_starts_with($operatorExpr, 'not')) {
-                    $expr = $expr->with(
-                        $q->expr()->or(
-                            $q->expr()->isNull($property),
-                            $q->expr()->and(...$innerExpr)
-                        )
-                    );
-                } else {
-                    $expr = $expr->with($q->expr()->or(...$innerExpr));
-                }
-
-                $q->where($expr)
-                    ->setParameter('lead', (int) $lead, ParameterType::INTEGER);
-            } else {
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('l.id', ':lead')
-                );
-
-                if ('neq' === $operatorExpr) {
-                    // include null
-                    $expr = $expr->with(
-                        $q->expr()->or(
-                            $q->expr()->neq($property, ':value'),
-                            $q->expr()->isNull($property)
-                        )
-                    );
-                } else {
-                    switch ($operatorExpr) {
-                        case 'startsWith':
-                            $operatorExpr = 'like';
-                            $value        = $value.'%';
-                            break;
-                        case 'endsWith':
-                            $operatorExpr = 'like';
-                            $value        = '%'.$value;
-                            break;
-                        case 'contains':
-                            $operatorExpr = 'like';
-                            $value        = '%'.$value.'%';
-                            break;
-                        default:
-                            if ($isPg) {
-                                // Determine if we should treat the comparison as numeric
-                                $isNumericComparison     = false;
-                                $isStringPatternOperator = in_array($operatorExpr, [
-                                    'like', 'notLike', 'regexp', 'notRegexp',
-                                    'startsWith', 'endsWith', 'contains',
-                                    'in', 'notIn',   // especially when used as delimited-string match
-                                ]);
-
-                                $fieldType ??= $this->getFieldType($field);
-
-                                if ($fieldType && !$isStringPatternOperator) {
-                                    $numericTypes        = ['number', 'int', 'integer', 'float'];
-                                    $isNumericComparison = in_array($fieldType, $numericTypes, true);
-                                }
-
-                                if (is_string($value)) {
-                                    $trimmed = trim($value);
-
-                                    if ($isNumericComparison) {
-                                        // Safe numeric coercion only when comparison is truly numeric
-                                        if (is_numeric($trimmed)) {
-                                            // Preserve decimals when present
-                                            $value = str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
-                                        } else {
-                                            $value = 0; // MySQL-style fallback
-                                        }
-                                    } elseif ('boolean' === $fieldType && !$isStringPatternOperator) {
-                                        // Convert common truthy/falsy strings → 1/0
-                                        $value = filter_var($trimmed, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-                                    }
-                                    // else → keep as string (text fields, pattern operators, dates, etc.)
-                                }
-                            }
-                    }
-
-                    $expr = $expr->with(
-                        $q->expr()->$operatorExpr($normalizeType($property, $isPg), ':value')
-                    );
-                }
-
-                $q->where($expr)
-                  ->setParameter('lead', (int) $lead, ParameterType::INTEGER)
-                  ->setParameter('value', $value);
             }
 
-            if (str_starts_with($property, 'u.')) {
-                // Match only against the latest UTM properties.
-                $q->orderBy('u.date_added', 'DESC');
-                $q->setMaxResults(1);
-            }
-
-            $result = $q->executeQuery()->fetchAssociative();
-
-            return !empty($result['id']);
+            return false;
         }
+        $property       = $this->getPropertyByField($field, $q);
+        $normalizeType  = (fn (string $field, bool $cast = false, string $type='TEXT'): string => $cast ? "CAST($field AS $type)" : $field);
+        $normalizeRegex = function (bool $not = false, bool $cast = false): string {
+            if ($cast) {
+                return $not ? '!~*' : '~*';
+            }
+
+            return $not ? 'NOT REGEXP' : 'REGEXP';
+        };
+
+        if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
+            $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
+            $compositeExpression              = ('empty' === $operatorExpr) ?
+                $q->expr()->or(
+                    $q->expr()->isNull($property),
+                    $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
+                )
+                :
+                $q->expr()->and(
+                    $q->expr()->isNotNull($property),
+                    $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
+                );
+            $q->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $compositeExpression
+                )
+            )
+              ->setParameter('lead', (int) $lead);
+        } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
+            $where = $normalizeType($property, $isPg).' '.$normalizeRegex('regexp' !== $operatorExpr, $isPg).' :value';
+
+            $q->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $q->expr()->and($where)
+                )
+            )
+              ->setParameter('lead', (int) $lead)
+              ->setParameter('value', $value);
+        } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
+            $values   = (!is_array($value)) ? [$value] : $value;
+            $expr     = $q->expr()->and(
+                $q->expr()->eq('l.id', ':lead')
+            );
+
+            $innerExpr  = [];
+            $paramCount = 0;
+            foreach ($values as $v) {
+                // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
+                $paramName   = 'value'.$paramCount++;
+                $v           = trim((string) $v, "'");
+                $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
+
+                $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ? $normalizeRegex(false, $isPg) : $normalizeRegex(true, $isPg)).' :'.$paramName;
+                $q->setParameter($paramName, $pattern);
+            }
+
+            if (str_starts_with($operatorExpr, 'not')) {
+                $expr = $expr->with($q->expr()->or(
+                    $q->expr()->isNull($property),
+                    $q->expr()->and(...$innerExpr)
+                ));
+            } else {
+                $expr = $expr->with($q->expr()->or(...$innerExpr));
+            }
+
+            $q->where($expr)
+                ->setParameter('lead', (int) $lead, ParameterType::INTEGER);
+        } else {
+            $expr = $q->expr()->and(
+                $q->expr()->eq('l.id', ':lead')
+            );
+
+            if ('neq' === $operatorExpr) {
+                // include null
+                $expr = $expr->with(
+                    $q->expr()->or(
+                        $q->expr()->$operatorExpr($property, ':value'),
+                        $q->expr()->isNull($property)
+                    )
+                );
+            } else {
+                switch ($operatorExpr) {
+                    case 'startsWith':
+                        $operatorExpr    = 'like';
+                        $value           = $value.'%';
+                        break;
+                    case 'endsWith':
+                        $operatorExpr   = 'like';
+                        $value          = '%'.$value;
+                        break;
+                    case 'contains':
+                        $operatorExpr   = 'like';
+                        $value          = '%'.$value.'%';
+                        break;
+                    default:
+                        if ($isPg) {
+                            // Determine if we should treat the comparison as numeric
+                            $isNumericComparison     = false;
+                            $isStringPatternOperator = in_array($operatorExpr, [
+                                'like', 'notLike', 'regexp', 'notRegexp',
+                                'startsWith', 'endsWith', 'contains',
+                                'in', 'notIn',   // especially when used as delimited-string match
+                            ]);
+
+                            $fieldType ??= $this->getFieldType($field);
+
+                            if ($fieldType && !$isStringPatternOperator) {
+                                $numericTypes        = ['number', 'int', 'integer', 'float'];
+                                $isNumericComparison = in_array($fieldType, $numericTypes, true);
+                            }
+
+                            if (is_string($value)) {
+                                $trimmed = trim($value);
+
+                                if ($isNumericComparison) {
+                                    // Safe numeric coercion only when comparison is truly numeric
+                                    if (is_numeric($trimmed)) {
+                                        // Preserve decimals when present
+                                        $value = str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
+                                    } else {
+                                        $value = 0; // MySQL-style fallback
+                                    }
+                                } elseif ('boolean' === $fieldType && !$isStringPatternOperator) {
+                                    // Convert common truthy/falsy strings → 1/0
+                                    $value = filter_var($trimmed, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                                }
+                                // else → keep as string (text fields, pattern operators, dates, etc.)
+                            }
+                        }
+                }
+
+                $expr = $expr->with(
+                    $q->expr()->$operatorExpr($normalizeType($property, $isPg), ':value')
+                );
+            }
+
+            $q->where($expr)
+              ->setParameter('lead', (int) $lead)
+              ->setParameter('value', $value);
+        }
+        if (str_starts_with($property, 'u.')) {
+            // Match only against the latest UTM properties.
+            $q->orderBy('u.date_added', 'DESC');
+            $q->setMaxResults(1);
+        }
+        $result = $q->executeQuery()->fetchAssociative();
+
+        return !empty($result['id']);
     }
 
     /**
@@ -607,15 +603,5 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return [$expr, $parameters];
-    }
-
-    private function getFieldType(string $alias, string $object = 'lead'): ?string
-    {
-        $fields = $this->getFields();  // cached array by alias
-        if (isset($fields[$alias]) && $fields[$alias]['object'] === $object) {
-            return $fields[$alias]['type'];
-        }
-
-        return null;
     }
 }

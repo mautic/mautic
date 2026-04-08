@@ -144,9 +144,8 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     Assert::assertSame($triggerEvent, $event->getTriggerEvent());
 
                     return $event;
-                } else {
-                    $this->fail("Unexpected event name: $eventName");
                 }
+                $this->fail("Unexpected event name: $eventName");
             });
 
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);

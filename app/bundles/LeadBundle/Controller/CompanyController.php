@@ -186,7 +186,7 @@ class CompanyController extends FormController
         $model = $this->getModel('lead.company');
         \assert($model instanceof CompanyModel);
 
-        if (!($entity instanceof Company)) {
+        if (!$entity instanceof Company) {
             /** @var Company $entity */
             $entity = $model->getEntity();
         }

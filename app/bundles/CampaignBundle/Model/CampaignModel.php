@@ -217,9 +217,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
@@ -750,14 +750,13 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             // no parents so leave order as is
 
             return;
-        } else {
-            foreach ($hierarchy as $eventId => $parent) {
-                if ($parent == $root || 1 === $count) {
-                    $events[$eventId]->setOrder($order);
-                    unset($hierarchy[$eventId]);
-                    if (count($hierarchy)) {
-                        $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
-                    }
+        }
+        foreach ($hierarchy as $eventId => $parent) {
+            if ($parent == $root || 1 === $count) {
+                $events[$eventId]->setOrder($order);
+                unset($hierarchy[$eventId]);
+                if (count($hierarchy)) {
+                    $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
                 }
             }
         }

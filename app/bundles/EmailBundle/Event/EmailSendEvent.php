@@ -153,9 +153,9 @@ class EmailSendEvent extends CommonEvent
     {
         if (null !== $this->helper) {
             return $this->helper->getPlainText();
-        } else {
-            return $this->plainText;
         }
+
+        return $this->plainText;
     }
 
     public function setPlainText($content): void
@@ -190,9 +190,9 @@ class EmailSendEvent extends CommonEvent
     {
         if (null !== $this->helper) {
             return $this->helper->getSubject();
-        } else {
-            return $this->subject;
         }
+
+        return $this->subject;
     }
 
     /**
@@ -319,9 +319,9 @@ class EmailSendEvent extends CommonEvent
     {
         if (null !== $this->helper) {
             return $this->helper->getContentHash();
-        } else {
-            return md5($this->getContent().$this->getPlainText());
         }
+
+        return md5($this->getContent().$this->getPlainText());
     }
 
     /**

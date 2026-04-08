@@ -112,21 +112,20 @@ class SourceController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            $viewParams = [
-                'sourceType' => $sourceType,
-                'form'       => $form->createView(),
-            ];
-
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+        $viewParams = [
+            'sourceType' => $sourceType,
+            'form'       => $form->createView(),
+        ];
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
@@ -222,21 +221,20 @@ class SourceController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            $viewParams = [
-                'sourceType' => $sourceType,
-                'form'       => $form->createView(),
-            ];
-
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+        $viewParams = [
+            'sourceType' => $sourceType,
+            'form'       => $form->createView(),
+        ];
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
