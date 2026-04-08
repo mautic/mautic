@@ -123,7 +123,7 @@ export const editorLifecycleMixin = {
     workingDocument.body.innerHTML = html;
 
     const variantsByKey = new Map();
-    const selector = 'h1[class], h2[class], h3[class], h4[class], h5[class], h6[class]';
+    const selector = 'h1[class], h2[class], h3[class], h4[class], h5[class], h6[class], span[class]';
 
     workingDocument.body.querySelectorAll(selector).forEach(element => {
       const name = `${element.tagName || ''}`.toLowerCase();
