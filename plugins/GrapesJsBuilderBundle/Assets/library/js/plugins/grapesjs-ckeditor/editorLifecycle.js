@@ -669,7 +669,22 @@ export const editorLifecycleMixin = {
         continue;
       }
 
-      if (`${originalElement.tagName || ''}`.toLowerCase() !== `${currentElement.tagName || ''}`.toLowerCase()) {
+      const originalTagName = `${originalElement.tagName || ''}`.toLowerCase();
+      const currentTagName = `${currentElement.tagName || ''}`.toLowerCase();
+
+      if (originalTagName !== currentTagName) {
+        // Handle the case where CKEditor flattened a gjs-heading-wrapper div:
+        // original: <div class="gjs-heading-wrapper"><span ...>text</span></div>
+        // current:  <span ...>text</span>
+        // Reconcile attributes from the inner element to the current element so
+        // data-gjs-type, id, draggable etc. are preserved after editing.
+        if (originalTagName === 'div' && originalElement.classList.contains('gjs-heading-wrapper')) {
+          const originalInner = originalElement.firstElementChild;
+          if (originalInner && `${originalInner.tagName || ''}`.toLowerCase() === currentTagName) {
+            this.reconcileSingleElementAttributes(originalInner, currentElement);
+            this.reconcileElementAttributes(originalInner, currentElement);
+          }
+        }
         continue;
       }
 
