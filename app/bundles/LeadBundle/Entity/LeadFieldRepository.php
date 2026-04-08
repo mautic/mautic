@@ -604,4 +604,13 @@ class LeadFieldRepository extends CommonRepository
 
         return [$expr, $parameters];
     }
+    
+    private function getFieldType(string $alias, string $object = 'lead'): ?string
+    {
+        $fields = $this->getFields();  // cached array by alias
+        if (isset($fields[$alias]) && $fields[$alias]['object'] === $object) {
+            return $fields[$alias]['type'];
+        }
+        return null;
+    }
 }
