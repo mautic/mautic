@@ -696,7 +696,7 @@ SQL;
                 $tempTableName,
                 $leadsTableName
             ));
-git 
+
             // 3. PostgreSQL DELETE logic using USING clause with a subquery LIMIT
             $deleteQuery = sprintf(
                 'DELETE FROM %s lll USING (SELECT lead_id FROM %s LIMIT %d) d WHERE lll.lead_id = d.lead_id',
