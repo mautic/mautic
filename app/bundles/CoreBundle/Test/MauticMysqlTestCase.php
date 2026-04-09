@@ -46,7 +46,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     protected function isMysqlPlatform(): bool
     {
-        return DatabasePlatform::isMySQL($this->connection->getDatabasePlatform());
+        // if its not PostgreSQL, we treat is as MySQL
+        return !$this->isPostgresqlPlatform();
     }
 
     protected function isPostgresqlPlatform(): bool

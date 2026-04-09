@@ -107,12 +107,12 @@ class DatabasePlatform
         throw new \RuntimeException('Unknown platform '.$platform::class);
     }
 
-    public static function isPostgreSQL(AbstractPlatform $platform): bool
+    public static function isPostgreSQL(?AbstractPlatform $platform): bool
     {
         return $platform instanceof PostgreSQLPlatform;
     }
 
-    public static function isMySQL(AbstractPlatform $platform): bool
+    public static function isMySQL(?AbstractPlatform $platform): bool
     {
         return $platform instanceof AbstractMySQLPlatform;
     }
@@ -127,7 +127,7 @@ class DatabasePlatform
      *                         (rare – most of the code already lowercases the parameter)
      */
     public static function getCaseInsensitiveLike(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $column,
         string $valueOrParameter,
         bool $ensureCast = false,
@@ -165,7 +165,7 @@ class DatabasePlatform
      * @param bool $negative true for NOT REGEXP / notRegexp
      */
     public static function getRegexpExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $column,
         string $pattern,
         bool $negative = false,
@@ -190,7 +190,7 @@ class DatabasePlatform
      * @param string $unit Time unit key ('d', 'H', 'W', 'm', 'Y', ...)
      */
     public static function getDateConstructExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $columnName,
         string $unit,
         string $defaultTimezoneOffset = '+00:00',
@@ -222,7 +222,7 @@ class DatabasePlatform
     /**
      * Returns the correct format string for the given unit.
      */
-    public static function getTimeUnitFormat(AbstractPlatform $platform, string $unit): string
+    public static function getTimeUnitFormat(?AbstractPlatform $platform, string $unit): string
     {
         $formats = self::isPostgreSQL($platform) ? self::$postgresqlTimeUnits : self::$mysqlTimeUnits;
 
@@ -239,7 +239,7 @@ class DatabasePlatform
      * Returns the full SELECT expression for "hour - next hour" string + COUNT.
      */
     public static function getBestHoursSelectExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $column,           // e.g. 't.date_read'
         int $timeFormat = 24,     // 12 or 24
         string $offset  = '+00:00',
@@ -277,7 +277,7 @@ class DatabasePlatform
      *
      * Returns '-' when date_read is NULL.
      */
-    public static function getReadDelayFormula(AbstractPlatform $platform, string $sentColumn = 'es.date_sent', string $readColumn = 'es.date_read'): string
+    public static function getReadDelayFormula(?AbstractPlatform $platform, string $sentColumn = 'es.date_sent', string $readColumn = 'es.date_read'): string
     {
         if (self::isPostgreSQL($platform)) {
             return "CASE WHEN {$readColumn} IS NOT NULL THEN TO_CHAR({$readColumn} - {$sentColumn}, 'HH24:MI:SS') ELSE '-' END";
@@ -293,7 +293,7 @@ class DatabasePlatform
      * MySQL:      TIMESTAMPDIFF(SECOND, date1, date2)
      */
     public static function getDateDiffInSeconds(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $dateColumn1,
         string $dateColumn2,
     ): string {
@@ -311,7 +311,7 @@ class DatabasePlatform
      * MySQL:      CHAR_LENGTH(col)
      */
     public static function getLength(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $column,
     ): string {
         if (self::isPostgreSQL($platform)) {
@@ -328,7 +328,7 @@ class DatabasePlatform
      * MySQL:      GROUP_CONCAT(..., ORDER BY ... SEPARATOR ',')
      */
     public static function getGroupConcat(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $expression,
         string $separator = ',',
         ?string $orderBy = null,
@@ -340,9 +340,7 @@ class DatabasePlatform
                 $sql .= " ORDER BY {$orderBy}";
             }
 
-            $sql .= ')';
-
-            return $sql;
+            return $sql.')';
         }
 
         // MySQL
@@ -352,9 +350,7 @@ class DatabasePlatform
             $sql .= " ORDER BY {$orderBy}";
         }
 
-        $sql .= " SEPARATOR '{$separator}')";
-
-        return $sql;
+        return $sql." SEPARATOR '{$separator}')";
     }
 
     /**
@@ -363,7 +359,7 @@ class DatabasePlatform
      * MySQL:      just the column (already numeric or implicitly cast)
      * PostgreSQL: explicit cast to int because status_code is often stored as varchar/text
      */
-    public static function applyTypeIfStrict(AbstractPlatform $platform, string $column, string $type='integer'): string
+    public static function applyTypeIfStrict(?AbstractPlatform $platform, string $column, string $type='integer'): string
     {
         if (self::isPostgreSQL($platform)) {
             return '('.$column.')::'.$type;
@@ -377,7 +373,7 @@ class DatabasePlatform
      *
      * Used for JSON, properties, array-type fields, etc.
      */
-    public static function castIfStrict(AbstractPlatform $platform, string $column, $type='text'): string
+    public static function castIfStrict(?AbstractPlatform $platform, string $column, string $type='text'): string
     {
         if (self::isPostgreSQL($platform)) {
             return "CAST({$column} AS {$type})";
@@ -391,7 +387,7 @@ class DatabasePlatform
      * PostgreSQL uses ~* (case-insensitive), MySQL uses REGEXP.
      */
     public static function getDelimitedRegexPattern(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $value,
     ): string {
         $escaped = preg_quote($value, '~');
@@ -409,7 +405,7 @@ class DatabasePlatform
      * On PostgreSQL we explicitly cast when field type is numeric or boolean.
      */
     public static function normalizeComparisonValue(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         mixed $value,
         ?string $fieldType = null,
         bool $isStringPatternOperator = false,
@@ -444,9 +440,11 @@ class DatabasePlatform
      *
      * MySQL:      no ID column in INSERT (auto_increment)
      * PostgreSQL: id = NEXTVAL('table_id_seq')
+     *
+     * @return array<string, string>
      */
     public static function getInsertIdValues(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $tableName,
         string $idColumn = 'id',
     ): array {
@@ -464,9 +462,11 @@ class DatabasePlatform
      *
      * PostgreSQL needs explicit nextval() because Doctrine does not auto-handle sequences in raw SQL.
      * MySQL uses auto_increment (no id column in INSERT).
+     *
+     * @return array<string, string>
      */
     public static function getInsertIdHandling(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $tableName,
         ?ClassMetadata $metadata = null,
         string $idColumn = 'id',
@@ -493,7 +493,7 @@ class DatabasePlatform
      * PostgreSQL:  FOR SHARE
      * MySQL:       LOCK IN SHARE MODE
      */
-    public static function getShareLockClause(AbstractPlatform $platform): string
+    public static function getShareLockClause(?AbstractPlatform $platform): string
     {
         if (self::isPostgreSQL($platform)) {
             return ' FOR SHARE';
@@ -556,14 +556,14 @@ class DatabasePlatform
     /**
      * Returns platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
      *
-     * @param string $tableName  Target table
-     * @param string $columns    Target columns
-     * @param string $innerSql   Subquery that provides the data
-     * @param string $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
-     * @param array  $updateSet  Columns to update on conflict (without table prefix)
+     * @param string        $tableName  Target table
+     * @param string        $columns    Target columns
+     * @param string        $innerSql   Subquery that provides the data
+     * @param string        $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
+     * @param array<string> $updateSet  Columns to update on conflict (without table prefix)
      */
     public static function getUpsertStatement(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $tableName,
         string $columns,
         string $innerSql,
@@ -605,7 +605,7 @@ class DatabasePlatform
      * MySQL:      ADD column_definition
      * PostgreSQL: ADD COLUMN column_definition
      */
-    public static function getAddColumnKeyword(AbstractPlatform $platform): string
+    public static function getAddColumnKeyword(?AbstractPlatform $platform): string
     {
         if (self::isPostgreSQL($platform)) {
             return 'ADD COLUMN';
@@ -620,7 +620,7 @@ class DatabasePlatform
      * Handles differences in GENERATED ALWAYS AS syntax, STORED/VIRTUAL, and comments.
      */
     public static function getGeneratedColumnDefinition(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $columnType,
         string $expression,
         bool $stored = true,
@@ -644,7 +644,7 @@ class DatabasePlatform
      * MySQL:      text columns cannot be part of indexes without length prefix (Doctrine already enforces this).
      * PostgreSQL: text columns are fully supported in indexes.
      */
-    public static function allowsTextInIndex(AbstractPlatform $platform): bool
+    public static function allowsTextInIndex(?AbstractPlatform $platform): bool
     {
         return self::isPostgreSQL($platform);
     }
@@ -729,7 +729,7 @@ class DatabasePlatform
      * PostgreSQL: DISTINCT (col1, col2, col3)   — required for multi-column DISTINCT
      */
     public static function getDistinctMultiColumnExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string ...$columns,
     ): string {
         $columnList = implode(', ', $columns);
@@ -747,7 +747,7 @@ class DatabasePlatform
      * MySQL:      `table`.`column`  or  `label`
      * PostgreSQL: "table"."column"  or  "label"
      */
-    public static function quoteIdentifier(AbstractPlatform $platform, string $identifier): string
+    public static function quoteIdentifier(?AbstractPlatform $platform, string $identifier): string
     {
         if (self::isPostgreSQL($platform)) {
             return '"'.$identifier.'"';
@@ -761,7 +761,7 @@ class DatabasePlatform
      *
      * Expects input in format "table_alias.column_name".
      */
-    public static function quoteColumn(AbstractPlatform $platform, string $fullColumnName, bool $isIdentifier = false): string
+    public static function quoteColumn(?AbstractPlatform $platform, string $fullColumnName, bool $isIdentifier = false): string
     {
         if (false === strpos($fullColumnName, '.') || $isIdentifier) {
             return self::quoteIdentifier($platform, $fullColumnName);
@@ -779,7 +779,7 @@ class DatabasePlatform
     /**
      * Removes platform-specific quoting from a column identifier (for normalization/comparison).
      */
-    public static function unquoteIdentifier(AbstractPlatform $platform, string $fullColumnName): string
+    public static function unquoteIdentifier(?AbstractPlatform $platform, string $fullColumnName): string
     {
         if (self::isPostgreSQL($platform)) {
             return preg_match('/^["a-zA-Z0-9_\.\$]+$/', $fullColumnName)
@@ -800,7 +800,7 @@ class DatabasePlatform
      * PostgreSQL: AVG(column)::numeric(10, 4)   — ensures consistent decimal precision
      */
     public static function getAggregatorExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $aggregator,
         string $expression,
     ): string {
@@ -818,9 +818,9 @@ class DatabasePlatform
      * MySQL:      text columns cannot be part of indexes without length prefix (Doctrine already enforces this).
      * PostgreSQL: text columns are fully supported in indexes.
      */
-    public static function allowsIndexHint(AbstractPlatform $platform): bool
+    public static function allowsIndexHint(?AbstractPlatform $platform): bool
     {
-        return self::isMySQL($platform);
+        return !self::isPostgreSQL($platform);
     }
 
     /**
@@ -830,7 +830,7 @@ class DatabasePlatform
      * PostgreSQL: INTERVAL '30 MINUTES'
      */
     public static function getIntervalExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         int $value,
         string $unit = 'MINUTE',
     ): string {
@@ -852,7 +852,7 @@ class DatabasePlatform
      * MySQL:      TIMESTAMPADD(SECOND, offset, column)
      */
     public static function getOffsetAdjustedDate(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $column,
         string $offsetParam = ':timezoneOffset',
     ): string {
@@ -866,7 +866,7 @@ class DatabasePlatform
     /**
      * Hour extraction.
      */
-    public static function getHourExpression(AbstractPlatform $platform, string $column): string
+    public static function getHourExpression(?AbstractPlatform $platform, string $column): string
     {
         if (self::isPostgreSQL($platform)) {
             return "TO_CHAR({$column}, 'HH24')";
@@ -882,7 +882,7 @@ class DatabasePlatform
      * MySQL:      DATE_SUB(NOW(), INTERVAL 1 DAY)
      */
     public static function getDateSubExpression(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         string $intervalUnit = 'DAY',   // 'DAY', 'WEEK', 'MONTH'
         int $value = 1,
     ): string {
@@ -898,7 +898,7 @@ class DatabasePlatform
     /**
      * Weekday calculation (0 = Monday ... 6 = Sunday).
      */
-    public static function getWeekdayExpression(AbstractPlatform $platform, string $column): string
+    public static function getWeekdayExpression(?AbstractPlatform $platform, string $column): string
     {
         if (self::isPostgreSQL($platform)) {
             return "FLOOR((EXTRACT(DOW FROM {$column}) + 6)::int % 7)";
@@ -918,7 +918,7 @@ class DatabasePlatform
      * In raw DBAL we can use native ILIKE on PostgreSQL.
      */
     public static function getLikeOperator(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         bool $isOrm = true,
     ): string {
         if (self::isPostgreSQL($platform) && !$isOrm) {
@@ -934,7 +934,7 @@ class DatabasePlatform
      * On PostgreSQL + ORM we lowercase the value because we use LOWER(column).
      */
     public static function shouldLowercaseSearchValue(
-        AbstractPlatform $platform,
+        ?AbstractPlatform $platform,
         bool $isOrm = true,
     ): bool {
         return self::isPostgreSQL($platform) && $isOrm;

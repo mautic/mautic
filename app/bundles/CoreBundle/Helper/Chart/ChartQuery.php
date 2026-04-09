@@ -148,10 +148,8 @@ class ChartQuery extends AbstractChart
      * Get the right unit for current database platform.
      *
      * @param string $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     *
-     * @return string
      */
-    public function translateTimeUnit($unit = null)
+    public function translateTimeUnit($unit = null): string
     {
         if (null === $unit) {
             $unit = $this->unit;

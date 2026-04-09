@@ -1816,7 +1816,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         // Use centralized best-hour expression (handles timezone + 12/24h format)
         $bestHoursSelect = DatabasePlatform::getBestHoursSelectExpression(
             $platform,
-            't.'.$column,
+            $columnWithTimezone,
             $timeFormat,
             $defaultTimezoneOffset
         );

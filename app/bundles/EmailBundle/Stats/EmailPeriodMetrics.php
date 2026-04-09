@@ -32,7 +32,6 @@ class EmailPeriodMetrics
         $queryBuilder = $this->connection->createQueryBuilder();
         $daysSubQuery = $this->createDaysSubQuery();
 
-        $platform = $this->connection->getDatabasePlatform();
         $queryBuilder
             ->select(
                 'd.day',
@@ -133,7 +132,7 @@ class EmailPeriodMetrics
         $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, 'ph.date_hit');
         $hourExpr     = DatabasePlatform::getHourExpression($platform, $adjustedDate);
 
-        $qb = $this->connection->createQueryBuilder()
+        return $this->connection->createQueryBuilder()
             ->select(
                 "$hourExpr AS hit_hour",
                 'COUNT(DISTINCT ph.id) AS hit_count'
@@ -148,8 +147,6 @@ class EmailPeriodMetrics
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy('hit_hour')
             ->orderBy('hit_hour', 'ASC');
-
-        return $qb;
     }
 
     private function createSentHourlySubQuery(): QueryBuilder

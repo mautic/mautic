@@ -65,10 +65,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *
      * @param mixed $x the left expression
      * @param mixed $y the right expression
-     *
-     * @return string
      */
-    public function regexp($x, $y)
+    public function regexp($x, $y): string
     {
         return DatabasePlatform::getRegexpExpression($this->platform, $x, $y);
     }
