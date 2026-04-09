@@ -374,7 +374,7 @@ class FieldModelTest extends MauticMysqlTestCase
         $platform = $this->connection->getDatabasePlatform();
         $dbName   = $this->connection->getDatabase();
 
-        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+        if ($this->isPostgresqlPlatform()) {
             $sql = "SELECT * FROM information_schema.columns
                 WHERE table_catalog = :db
                   AND table_schema = 'public'
@@ -419,7 +419,7 @@ class FieldModelTest extends MauticMysqlTestCase
             return $this->connection->executeQuery($sql)->fetchAllAssociative();
         }
 
-        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+        if ($this->isPostgresqlPlatform()) {
             $sql = 'SELECT
                     t.relname          AS "TABLE_NAME",
                     i.relname          AS "INDEX_NAME",

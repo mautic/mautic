@@ -3,8 +3,8 @@
 namespace Mautic\CoreBundle\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -17,62 +17,6 @@ class ChartQuery extends AbstractChart
     private DateTimeHelper $dateTimeHelper;
 
     private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
-
-    /**
-     * Match date/time unit to a SQL datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
-     *
-     * @var array<string, string>
-     */
-    protected $sqlFormats = [
-        's' => 'Y-m-d H:i:s',
-        'i' => 'Y-m-d H:i:00',
-        'H' => 'Y-m-d H:00:00',
-        'd' => 'Y-m-d 00:00:00',
-        'D' => 'Y-m-d 00:00:00', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'Y-m-d 00:00:00',
-        'm' => 'Y-m-01 00:00:00',
-        'M' => 'Y-m-00 00:00:00', // ('M' is BC. Can be removed when all charts use this class)
-        'Y' => 'Y-01-01 00:00:00',
-    ];
-
-    /**
-     * Match date/time unit to a MySql datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}.
-     *
-     * @var array<string, string>
-     */
-    protected $mysqlTimeUnits = [
-        's' => '%Y-%m-%d %H:%i:%s',
-        'i' => '%Y-%m-%d %H:%i',
-        'H' => '%Y-%m-%d %H:00',
-        'd' => '%Y-%m-%d',
-        'D' => '%Y-%m-%d', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => '%Y %U',
-        'm' => '%Y-%m',
-        'M' => '%Y-%m', // ('M' is BC. Can be removed when all charts use this class)
-        'Y' => '%Y',
-    ];
-
-    /**
-     * Match date/time unit to a PostgreSql datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * {@link www.postgresql.org/docs/current/functions-formatting.html}.
-     *
-     * @var array<string, string>
-     */
-    protected $postgresqlTimeUnits = [
-        's' => 'YYYY-MM-DD HH24:MI:SS',
-        'i' => 'YYYY-MM-DD HH24:MI',
-        'H' => 'YYYY-MM-DD HH24":00"',
-        'd' => 'YYYY-MM-DD',
-        'D' => 'YYYY-MM-DD', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'IYYY IW',
-        'm' => 'YYYY-MM',
-        'M' => 'YYYY-MM', // ('M' is BC. Can be removed when all charts use this class)
-        'Y' => 'YYYY',
-    ];
 
     /**
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
@@ -215,19 +159,7 @@ class ChartQuery extends AbstractChart
 
         $platform = $this->connection->getDatabasePlatform();
 
-        if ($platform instanceof PostgreSQLPlatform) {
-            if (!isset($this->postgresqlTimeUnits[$unit])) {
-                throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for PostgreSql.');
-            }
-
-            return $this->postgresqlTimeUnits[$unit];
-        } else {
-            if (!isset($this->mysqlTimeUnits[$unit])) {
-                throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for MySql.');
-            }
-
-            return $this->mysqlTimeUnits[$unit];
-        }
+        return DatabasePlatform::getTimeUnitFormat($platform, $unit);
     }
 
     /**
@@ -562,18 +494,19 @@ class ChartQuery extends AbstractChart
      */
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
-        $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
+        $platform = $this->getConnection()->getDatabasePlatform();
 
-        if ($this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-            $query->where('EXTRACT(EPOCH FROM ('.$tablePrefix.'.'.$dateColumn1.' - '.$tablePrefix.'.'.$dateColumn2.')) >= :startSecond');
-            $query->andWhere('EXTRACT(EPOCH FROM ('.$tablePrefix.'.'.$dateColumn1.' - '.$tablePrefix.'.'.$dateColumn2.')) < :endSecond');
-        } else {
-            $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
-            $query->andWhere('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') < :endSecond');
-        }
+        $diffExpr = DatabasePlatform::getDateDiffInSeconds(
+            $platform,
+            $tablePrefix.'.'.$dateColumn1,
+            $tablePrefix.'.'.$dateColumn2
+        );
 
-        $query->setParameter('startSecond', $startSecond);
-        $query->setParameter('endSecond', $endSecond);
+        $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count')
+            ->where($diffExpr.' >= :startSecond')
+            ->andWhere($diffExpr.' < :endSecond')
+            ->setParameter('startSecond', $startSecond)
+            ->setParameter('endSecond', $endSecond);
     }
 
     /**
@@ -622,30 +555,12 @@ class ChartQuery extends AbstractChart
             return $tablePrefix.'.'.$generatedColumn->getColumnName();
         }
 
-        $dbUnit                = $this->translateTimeUnit($this->unit);
-        $columnName            = $tablePrefix.'.'.$column;
-        $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset(); // e.g. '+08:00' or '-05:00'
-
-        $platform = $this->connection->getDatabasePlatform();
-        if ($platform instanceof PostgreSQLPlatform) {
-            // Shift the UTC-stored timestamp to the user's local offset
-            // Works whether the column is timestamp or timestamptz
-            // ::timestamp strips any timezone info to avoid session TimeZone influence
-            $tzAdjusted = "({$columnName} + '{$defaultTimezoneOffset}'::interval)::timestamp";
-            // Special handling for weekly grouping ('W' unit → '%Y %U')
-            // MySQL %U = Sunday-based week 00–53
-            // We approximate with ISO week (Monday-based, 01–53) – common compromise in ports
-            // Padded with space like "2026 03" for identical grouping/label behavior
-            $sql = ('IYYY IW' === $dbUnit) ?
-                "TO_CHAR({$tzAdjusted}, 'YYYY') || ' ' || LPAD(TO_CHAR({$tzAdjusted}, 'IW')::text, 2, '0')" :
-                "TO_CHAR({$tzAdjusted}, '{$dbUnit}')";
-        } else {
-            $columnName = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
-
-            $sql = 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
-        }
-
-        return $sql;
+        return DatabasePlatform::getDateConstructExpression(
+            $this->connection->getDatabasePlatform(),
+            $tablePrefix.'.'.$column,
+            $this->unit,
+            $this->dateTimeHelper->getLocalTimezoneOffset()
+        );
     }
 
     private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix): ?GeneratedColumn

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -134,12 +135,15 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (!empty($options['search'])) {
-            if ($connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-                // ILIKE is PostgreSQL's built-in case-insensitive LIKE — much faster and cleaner than LOWER()
-                $qb->andWhere($qb->expr()->comparison('CAST('.$alias.'.properties as text)', 'ILIKE', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
-            } else {
-                $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
-            }
+            $qb->andWhere(
+                DatabasePlatform::getCaseInsensitiveLike(
+                    $connection->getDatabasePlatform(),
+                    $alias.'.properties',
+                    '%'.strtolower($options['search']).'%',
+                    true,
+                    true
+                )
+            );
         }
 
         return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added'], null, $alias.'.id');

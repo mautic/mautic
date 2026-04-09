@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
@@ -19,6 +18,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
@@ -839,7 +839,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof PostgreSQLPlatform;
+        $isPg       = DatabasePlatform::isPostgreSQL($platform);
 
         $metadata   = $this->getClassMetadata();
         $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
@@ -1177,7 +1177,7 @@ class CommonRepository extends ServiceEntityRepository
 
         // PostgreSQL LIKE is case sensitive
         $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-        $isPg     = $platform instanceof PostgreSQLPlatform;
+        $isPg     = DatabasePlatform::isPostgreSQL($platform);
 
         $ormQb = true;
 
@@ -1192,14 +1192,9 @@ class CommonRepository extends ServiceEntityRepository
                 );
             }
         } else {
-            $ormQb = false;
-            if ($filter->not) {
-                $xFunc    = 'andX';
-                $exprFunc = $isPg ? 'NOT ILIKE' : 'NOT LIKE';
-            } else {
-                $xFunc    = 'orX';
-                $exprFunc = $isPg ? 'ILIKE' : 'LIKE';
-            }
+            $ormQb    = false;
+            $xFunc    = $filter->not ? 'andX' : 'orX';
+            $exprFunc = DatabasePlatform::getLikeOperator($platform, false);
 
             $expr = $q->expr()->$xFunc();
             foreach ($columns as $col) {
@@ -1213,9 +1208,13 @@ class CommonRepository extends ServiceEntityRepository
             $expr = $q->expr()->not($expr);
         }
 
+        $value = DatabasePlatform::shouldLowercaseSearchValue($platform, $ormQb)
+            ? mb_strtolower($string)
+            : $string;
+
         return [
             $expr,
-            ["$unique" => $isPg && $ormQb ? mb_strtolower($string) : $string],
+            ["$unique" => $value],
         ];
     }
 

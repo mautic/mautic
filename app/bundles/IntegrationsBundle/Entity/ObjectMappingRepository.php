@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -104,13 +105,14 @@ class ObjectMappingRepository extends CommonRepository
     {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
         $table      = MAUTIC_TABLE_PREFIX.'sync_object_mapping';
 
         $createdAt = $createdAt ?: new \DateTimeImmutable();
         $qb        = $connection->createQueryBuilder();
 
-        $values = [
+        $idValues = DatabasePlatform::getInsertIdValues($platform, $table);
+
+        $values = $idValues + [
             'integration'             => ':integration',
             'integration_object_name' => ':integrationObjectName',
             'integration_object_id'   => ':integrationObjectId',
@@ -121,11 +123,6 @@ class ObjectMappingRepository extends CommonRepository
             'is_deleted'              => ':isDeleted',
             'internal_storage'        => ':internalStorage',
         ];
-
-        if ($isPg) {
-            $sequence = $this->getSerialSequence($table);
-            $values   = ['id' => "NEXTVAL('{$sequence}')"] + $values;
-        }
 
         $qb->insert($table)
             ->values($values)
@@ -230,11 +227,11 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectName', $internalObjectName);
 
         if ($lock) {
-            $isPg       = $connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-            $lockClause = $isPg ? ' FOR SHARE' : ' LOCK IN SHARE MODE';
+            $lockClause = DatabasePlatform::getShareLockClause($connection->getDatabasePlatform());
         } else {
             $lockClause = '';
         }
+
         $result = $connection->executeQuery($qb->getSQL().$lockClause, $qb->getParameters(), $qb->getParameterTypes())->fetchAssociative();
 
         return $result ?: null;

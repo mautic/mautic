@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -126,7 +126,6 @@ class FrequencyRuleRepository extends CommonRepository
     ): array {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof PostgreSQLPlatform;
 
         $q = $connection->createQueryBuilder();
 
@@ -150,15 +149,13 @@ class FrequencyRuleRepository extends CommonRepository
         // Build time-based conditions (always at least one)
         $timeConditions = [];
         $intervals      = [
-            'DAY'   => '1 DAY',
-            'WEEK'  => '1 WEEK',
-            'MONTH' => '1 MONTH',
+            'DAY'   => 'DAY',
+            'WEEK'  => 'WEEK',
+            'MONTH' => 'MONTH',
         ];
 
         foreach ($intervals as $freq => $intervalUnit) {
-            $dateSubExpr = $isPg
-                ? "NOW() - INTERVAL '$intervalUnit'"
-                : "DATE_SUB(NOW(), INTERVAL 1 $freq)";
+            $dateSubExpr = DatabasePlatform::getDateSubExpression($platform, $intervalUnit);
 
             $timeConditions[] = $q->expr()->and(
                 $q->expr()->eq('fr.frequency_time', $connection->quote($freq)),

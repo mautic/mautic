@@ -4,8 +4,8 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -303,11 +303,9 @@ class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'CASE WHEN '.self::CLICK_PREFIX.'.hits IS NOT NULL THEN 1 ELSE 0 END',
             ];
 
-            // Platform-specific read delay (TIMEDIFF is MySQL-only)
-            $isPostgreSql    = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform;
-            $timeDiffFormula = $isPostgreSql
-                ? "CASE WHEN es.date_read IS NOT NULL THEN TO_CHAR(es.date_read - es.date_sent, 'HH24:MI:SS') ELSE '-' END"
-                : "CASE WHEN es.date_read IS NOT NULL THEN TIMEDIFF(es.date_read, es.date_sent) ELSE '-' END";
+            // Platform-specific read delay
+            $platform        = $this->db->getDatabasePlatform();
+            $timeDiffFormula = DatabasePlatform::getReadDelayFormula($platform);
 
             $columns['read_delay'] = [
                 'alias'   => 'read_delay',

@@ -10,6 +10,7 @@ use Mautic\ApiBundle\Model\ApiEntityLockTrait;
 use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -1805,33 +1806,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
 
         $connection = $this->em->getConnection();
-        $isPg       = $connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+        $platform   = $connection->getDatabasePlatform();
 
         $query                 = new ChartQuery($connection, $dateFrom, $dateTo);
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
         $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
 
-        if ($isPg) {
-            // PostgreSQL logic
-            $format = (12 == $timeFormat) ? 'HH12 AM' : 'HH24:00';
+        // Use centralized best-hour expression (handles timezone + 12/24h format)
+        $bestHoursSelect = DatabasePlatform::getBestHoursSelectExpression(
+            $platform,
+            't.'.$column,
+            $timeFormat,
+            $defaultTimezoneOffset
+        );
 
-            // Convert UTC timestamp to local offset
-            $columnName = "($columnWithTimezone AT TIME ZONE 'UTC' AT TIME ZONE '$defaultTimezoneOffset')";
-
-            // Build the "Hour - Next Hour" string
-            $q->select("TO_CHAR($columnName, '$format') || '-' || TO_CHAR($columnName + INTERVAL '1 hour', '$format') as hour, COUNT(t.id) AS count")
-                ->groupBy('hour');
-        } else {
-            // MySQL logic
-            $format     = (12 == $timeFormat) ? '%h %p' : '%H:00';
-            $columnName = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
-
-            $q->select("CONCAT(TIME_FORMAT($columnName, '$format'), '-', TIME_FORMAT($columnName + INTERVAL 1 HOUR, '$format')) as hour, COUNT(t.id) AS count")
-                ->groupBy('hour');
-        }
-
-        $q->orderBy('count', 'DESC')
+        $q->select($bestHoursSelect)
+            ->groupBy('hour')
+            ->orderBy('count', 'DESC')
             ->setMaxResults(24);
 
         if (!$canViewOthers) {

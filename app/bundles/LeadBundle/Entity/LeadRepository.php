@@ -10,6 +10,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -806,7 +807,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 // Fix: Only apply MySQL-specific index hints if on a MySQL/MariaDB platform
                 $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-                if (!$platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+
+                if (DatabasePlatform::allowsIndexHint($platform)) {
                     $from = $q->getQueryPart('from')[0];
                     $q->resetQueryPart('from');
                     $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);

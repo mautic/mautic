@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
@@ -19,7 +19,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $isPg             = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $platform         = $this->getConnection()->getDatabasePlatform();
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();
         $batchLimiters    = $filter->getBatchLimiters();
@@ -98,10 +98,8 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
 
-                $field = $tableAlias.'.'.$filter->getField();
-                if ($isPg) { // example: datetime cant use LIKE, we need to cast fields into TEXT
-                    $field = "CAST({$field} AS text)";
-                }
+                // Datetime cant use LIKE, we need to cast fields into TEXT
+                $field = DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField());
 
                 $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
@@ -119,17 +117,18 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
-                if ($isPg) {
-                    $not             = ('notRegexp' === $filterOperator) ? '!' : '';
-                    $operator        = '~*'; // case-insensitive regex match (matches MySQL REGEXP behavior)
-                    $fieldExpression = 'CAST('.$tableAlias.'.'.$filter->getField().' AS text)';
-                } else {
-                    $not             = ('notRegexp' === $filterOperator) ? ' NOT' : '';
-                    $operator        = ' REGEXP';
-                    $fieldExpression = $tableAlias.'.'.$filter->getField();
-                }
+                $fieldExpression = DatabasePlatform::castIfStrict(
+                    $platform,
+                    $tableAlias.'.'.$filter->getField()
+                );
 
-                $expression = $fieldExpression.$not.$operator.' '.$filterParametersHolder;
+                $expression = DatabasePlatform::getRegexpExpression(
+                    $platform,
+                    $fieldExpression,
+                    $filterParametersHolder,
+                    'notRegexp' === $filterOperator
+                );
+
                 $subQueryBuilder->andWhere($expression);
 
                 $queryBuilder->addLogic(
@@ -181,11 +180,12 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
-                // Fix: Apply ::text operator for 'like' and 'notLike' on PostgreSQL
-                $field = $tableAlias.'.'.$filter->getField();
-                if ($isPg && in_array($filterOperator, ['like', 'notLike'])) {
-                    $field = "CAST({$field} AS text)";
-                }
+                // Fix: Apply cast as text for 'like' and 'notLike' in PostgreSQL
+                $field = in_array($filterOperator, ['like', 'notLike']) ?
+                    DatabasePlatform::castIfStrict(
+                        $platform,
+                        $tableAlias.'.'.$filter->getField()
+                    ) : $tableAlias.'.'.$filter->getField();
 
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $field,

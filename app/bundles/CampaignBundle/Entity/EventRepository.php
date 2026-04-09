@@ -4,8 +4,8 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -176,9 +176,7 @@ class EventRepository extends CommonRepository
         // Build subquery using DBAL QueryBuilder
         $subQb = $connection->createQueryBuilder();
 
-        $channelIdWhere = $platform instanceof PostgreSQLPlatform
-            ? 'e.channel_id = CAST(em.id as TEXT)' // "CASE WHEN e.channel_id IS NOT NULL AND e.channel_id != '' AND e.channel_id ~ '^[0-9]+$' THEN CAST(e.channel_id AS INTEGER) ELSE 0 END = em.id"
-            : 'e.channel_id = em.id';
+        $channelIdWhere = 'e.channel_id = '.DatabasePlatform::castIfStrict($platform, 'em.id');
 
         $subQb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')

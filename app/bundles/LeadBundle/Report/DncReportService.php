@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Report;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Helper\DncFormatterHelper;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -32,11 +32,12 @@ class DncReportService
      */
     public function getDncColumns(): array
     {
-        $groupConcat = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform
-            // PostgreSQL: STRING_AGG is the native equivalent of GROUP_CONCAT
-            ? "STRING_AGG(CONCAT(dnc.reason, ':', dnc.channel), ',' ORDER BY dnc.date_added DESC, dnc.id DESC)"
-            // MySQL: keep original (with SEPARATOR for MySQL 8+ compatibility)
-            : "GROUP_CONCAT(CONCAT(dnc.reason, ':', dnc.channel) ORDER BY dnc.date_added DESC, dnc.id DESC SEPARATOR ',')";
+        $groupConcat = DatabasePlatform::getGroupConcat(
+            $this->connection->getDatabasePlatform(),
+            "CONCAT(dnc.reason, ':', dnc.channel)",
+            ',',
+            'dnc.date_added DESC, dnc.id DESC'
+        );
 
         return [
             'dnc_preferences' => [

@@ -3,8 +3,7 @@
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -47,12 +46,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     protected function isMysqlPlatform(): bool
     {
-        return $this->connection->getDatabasePlatform() instanceof MySQLPlatform;
+        return DatabasePlatform::isMySQL($this->connection->getDatabasePlatform());
     }
 
     protected function isPostgresqlPlatform(): bool
     {
-        return $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        return DatabasePlatform::isPostgreSQL($this->connection->getDatabasePlatform());
     }
 
     /**

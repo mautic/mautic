@@ -6,8 +6,8 @@ namespace Mautic\EmailBundle\Stats;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class EmailPeriodMetrics
@@ -33,26 +33,13 @@ class EmailPeriodMetrics
         $daysSubQuery = $this->createDaysSubQuery();
 
         $platform = $this->connection->getDatabasePlatform();
-        if ($platform instanceof PostgreSQLPlatform) {
-            $queryBuilder
-                ->select(
-                    'd.day',
-                    'COALESCE(s.sent_count, 0) AS sent_count',
-                    'COALESCE(r.read_count, 0) AS read_count',
-                    'COALESCE(c.hit_count, 0) AS hit_count'
-                );
-        } else {
-            $queryBuilder
-                ->select(
-                    'd.day',
-                    'IFNULL(s.sent_count, 0) AS sent_count',
-                    'IFNULL(r.read_count, 0) AS read_count',
-                    'IFNULL(c.hit_count, 0) AS hit_count'
-                );
-        }
-
         $queryBuilder
-            ->from("({$daysSubQuery->getSQL()})", 'd')
+            ->select(
+                'd.day',
+                'COALESCE(s.sent_count, 0) AS sent_count',
+                'COALESCE(r.read_count, 0) AS read_count',
+                'COALESCE(c.hit_count, 0) AS hit_count'
+            )->from("({$daysSubQuery->getSQL()})", 'd')
             ->leftJoin('d', "({$this->createClicksSubQuery()->getSQL()})", 'c', 'c.hit_day = d.day')
             ->leftJoin('d', "({$this->createSentSubQuery()->getSQL()})", 's', 's.sent_day = d.day')
             ->leftJoin('d', "({$this->createReadSubQuery()->getSQL()})", 'r', 'r.read_day = d.day')
@@ -78,30 +65,23 @@ class EmailPeriodMetrics
         $hoursSubQuery = $this->createHoursSubQuery();
 
         $platform = $this->connection->getDatabasePlatform();
-        if ($platform instanceof PostgreSQLPlatform) {
-            $queryBuilder
-                ->select(
-                    'h.hour',
-                    'COALESCE(s.sent_count, 0) AS sent_count',
-                    'COALESCE(r.read_count, 0) AS read_count',
-                    'COALESCE(c.hit_count, 0) AS hit_count'
-                );
-        } else {
-            $queryBuilder
-                ->select(
-                    'h.hour',
-                    'IFNULL(s.sent_count, 0) AS sent_count',
-                    'IFNULL(r.read_count, 0) AS read_count',
-                    'IFNULL(c.hit_count, 0) AS hit_count'
-                );
-        }
-        $hourCast = $platform instanceof PostgreSQLPlatform ? '::integer' : ' + 0';
+        $queryBuilder->select(
+            'h.hour',
+            'COALESCE(s.sent_count, 0) AS sent_count',
+            'COALESCE(r.read_count, 0) AS read_count',
+            'COALESCE(c.hit_count, 0) AS hit_count'
+        );
+
+        // make sure value is an integer
+        $hitHourCondition  = DatabasePlatform::applyTypeIfStrict($platform, 'c.hit_hour').' + 0 = h.hour';
+        $sentHourCondition = DatabasePlatform::applyTypeIfStrict($platform, 's.sent_hour').' + 0 = h.hour';
+        $readHourCondition = DatabasePlatform::applyTypeIfStrict($platform, 'r.read_hour').' + 0 = h.hour';
 
         $queryBuilder
             ->from("({$hoursSubQuery->getSQL()})", 'h')
-            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', "c.hit_hour{$hourCast} = h.hour")
-            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', "s.sent_hour{$hourCast} = h.hour")
-            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', "r.read_hour{$hourCast} = h.hour")
+            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', $hitHourCondition)
+            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', $sentHourCondition)
+            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', $readHourCondition)
             ->setParameter('source_ids', $eventsIds, ArrayParameterType::INTEGER)
             ->setParameter('timezoneOffset', $timezoneOffset)
             ->setParameter('format', '%H')
@@ -116,19 +96,9 @@ class EmailPeriodMetrics
 
     private function createClicksSubQuery(): QueryBuilder
     {
-        $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
-
-        // Handle Timezone Offset and Weekday calculation based on Platform
-        if ($isPostgres) {
-            // PostgreSQL: EXTRACT(DOW) returns 0 (Sun) - 6 (Sat).
-            // To match MySQL's WEEKDAY 0 (Mon) - 6 (Sun), we use a modulo calculation.
-            $dateWithOffset = "ph.date_hit + (:timezoneOffset || ' second')::interval";
-            $hitDay         = "FLOOR(EXTRACT(DOW FROM $dateWithOffset) + 6)::int % 7";
-        } else {
-            // MySQL/MariaDB
-            $hitDay = 'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, ph.date_hit))';
-        }
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, 'ph.date_hit');
+        $hitDay       = DatabasePlatform::getWeekdayExpression($platform, $adjustedDate);
 
         return $this->connection->createQueryBuilder()
             ->select(
@@ -159,16 +129,9 @@ class EmailPeriodMetrics
 
     private function createClicksHourlySubQuery(): QueryBuilder
     {
-        $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
-
-        $adjustedDate = $this->getOffsetAdjustedDate('ph.date_hit');
-
-        if ($isPostgres) {
-            $hourExpr = "TO_CHAR($adjustedDate, 'HH24')";
-        } else {
-            $hourExpr = 'TIME_FORMAT('.$adjustedDate.', :format)';
-        }
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, 'ph.date_hit');
+        $hourExpr     = DatabasePlatform::getHourExpression($platform, $adjustedDate);
 
         $qb = $this->connection->createQueryBuilder()
             ->select(
@@ -186,10 +149,6 @@ class EmailPeriodMetrics
             ->groupBy('hit_hour')
             ->orderBy('hit_hour', 'ASC');
 
-        if (!$isPostgres) {
-            $qb->setParameter('format', '%H');
-        }
-
         return $qb;
     }
 
@@ -206,19 +165,9 @@ class EmailPeriodMetrics
 
     private function createBasicStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
-        $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
-
-        $adjustedDate = $this->getOffsetAdjustedDate($dateColumn);
-
-        // Handle Timezone Offset and Weekday calculation based on Platform
-        if ($isPostgres) {
-            // EXTRACT(DOW) → 0=Sun ... 6=Sat
-            // Shift to MySQL WEEKDAY: 0=Mon ... 6=Sun → (dow + 6) % 7
-            $weekdayExpr = "FLOOR(EXTRACT(DOW FROM $adjustedDate) + 6)::int % 7";
-        } else {
-            $weekdayExpr = "WEEKDAY($adjustedDate)";
-        }
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, $dateColumn);
+        $weekdayExpr  = DatabasePlatform::getWeekdayExpression($platform, $adjustedDate);
 
         return $this->connection->createQueryBuilder()
             ->select(
@@ -236,16 +185,9 @@ class EmailPeriodMetrics
 
     private function createBasicHourlyStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
-        $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
-
-        $adjustedDate = $this->getOffsetAdjustedDate($dateColumn);
-
-        if ($isPostgres) {
-            $hourExpr = "TO_CHAR($adjustedDate, 'HH24')";
-        } else {
-            $hourExpr = "TIME_FORMAT($adjustedDate, :format)";
-        }
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, $dateColumn);
+        $hourExpr     = DatabasePlatform::getHourExpression($platform, $adjustedDate);
 
         $qb = $this->connection->createQueryBuilder()
             ->select(
@@ -260,23 +202,7 @@ class EmailPeriodMetrics
             ->groupBy($groupByAlias)
             ->orderBy($groupByAlias, 'ASC');
 
-        if (!$isPostgres) {
-            $qb->setParameter('format', '%H');
-        }
-
         return $qb->setMaxResults(24);
-    }
-
-    private function getOffsetAdjustedDate(string $column): string
-    {
-        $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
-
-        if ($isPostgres) {
-            return "$column + (:timezoneOffset || ' second')::interval";
-        }
-
-        return "TIMESTAMPADD(SECOND, :timezoneOffset, $column)";
     }
 
     private function createDaysSubQuery(): QueryBuilder

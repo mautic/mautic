@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Doctrine\Paginator;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -61,7 +61,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
         $platform = $this->em->getConnection()->getDatabasePlatform();
-        $isPg     = $platform instanceof PostgreSQLPlatform;
+        $isPg     = DatabasePlatform::isPostgreSQL($platform);
 
         $prefix          = static::getContainer()->getParameter('mautic.db_table_prefix');
         $queries         = $this->debugDataHolder->getData()['default'];

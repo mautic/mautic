@@ -5,9 +5,8 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -235,7 +234,6 @@ class LeadFieldRepository extends CommonRepository
     {
         $connection = $this->_em->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof PostgreSQLPlatform;
 
         $q = $connection->createQueryBuilder();
         $q->select('l.id')
@@ -265,14 +263,6 @@ class LeadFieldRepository extends CommonRepository
             return false;
         }
         $property       = $this->getPropertyByField($field, $q);
-        $normalizeType  = (fn (string $field, bool $cast = false, string $type='TEXT'): string => $cast ? "CAST($field AS $type)" : $field);
-        $normalizeRegex = function (bool $not = false, bool $cast = false): string {
-            if ($cast) {
-                return $not ? '!~*' : '~*';
-            }
-
-            return $not ? 'NOT REGEXP' : 'REGEXP';
-        };
 
         if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
             $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
@@ -294,12 +284,13 @@ class LeadFieldRepository extends CommonRepository
             )
               ->setParameter('lead', (int) $lead);
         } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-            $where = $normalizeType($property, $isPg).' '.$normalizeRegex('regexp' !== $operatorExpr, $isPg).' :value';
+            $fieldExpr = DatabasePlatform::castIfStrict($platform, $property);
+            $regexExpr = DatabasePlatform::getRegexpExpression($platform, $fieldExpr, ':value', 'notRegexp' === $operatorExpr);
 
             $q->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->and($where)
+                    $regexExpr
                 )
             )
               ->setParameter('lead', (int) $lead)
@@ -316,9 +307,15 @@ class LeadFieldRepository extends CommonRepository
                 // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
                 $paramName   = 'value'.$paramCount++;
                 $v           = trim((string) $v, "'");
-                $pattern     = $isPg ? ('\\|?'.preg_quote($v, '~').'\\|?') : ("\\|?$v\\|?");
 
-                $innerExpr[] = $normalizeType($property, $isPg).' '.('in' === $operatorExpr ? $normalizeRegex(false, $isPg) : $normalizeRegex(true, $isPg)).' :'.$paramName;
+                $pattern   = DatabasePlatform::getDelimitedRegexPattern($platform, $v);
+                $fieldExpr = DatabasePlatform::castIfStrict($platform, $property);
+
+                $regexExpr = ('in' === $operatorExpr)
+                    ? DatabasePlatform::getRegexpExpression($platform, $fieldExpr, ':'.$paramName, false)
+                    : DatabasePlatform::getRegexpExpression($platform, $fieldExpr, ':'.$paramName, true);
+
+                $innerExpr[] = $regexExpr;
                 $q->setParameter($paramName, $pattern);
             }
 
@@ -361,44 +358,22 @@ class LeadFieldRepository extends CommonRepository
                         $value          = '%'.$value.'%';
                         break;
                     default:
-                        if ($isPg) {
-                            // Determine if we should treat the comparison as numeric
-                            $isNumericComparison     = false;
-                            $isStringPatternOperator = in_array($operatorExpr, [
-                                'like', 'notLike', 'regexp', 'notRegexp',
-                                'startsWith', 'endsWith', 'contains',
-                                'in', 'notIn',   // especially when used as delimited-string match
-                            ]);
+                        $isStringPatternOperator = in_array($operatorExpr, [
+                            'like', 'notLike', 'regexp', 'notRegexp',
+                            'startsWith', 'endsWith', 'contains', 'in', 'notIn',
+                        ], true);
 
-                            $fieldType ??= $this->getFieldType($field);
-
-                            if ($fieldType && !$isStringPatternOperator) {
-                                $numericTypes        = ['number', 'int', 'integer', 'float'];
-                                $isNumericComparison = in_array($fieldType, $numericTypes, true);
-                            }
-
-                            if (is_string($value)) {
-                                $trimmed = trim($value);
-
-                                if ($isNumericComparison) {
-                                    // Safe numeric coercion only when comparison is truly numeric
-                                    if (is_numeric($trimmed)) {
-                                        // Preserve decimals when present
-                                        $value = str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
-                                    } else {
-                                        $value = 0; // MySQL-style fallback
-                                    }
-                                } elseif ('boolean' === $fieldType && !$isStringPatternOperator) {
-                                    // Convert common truthy/falsy strings → 1/0
-                                    $value = filter_var($trimmed, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-                                }
-                                // else → keep as string (text fields, pattern operators, dates, etc.)
-                            }
-                        }
+                        $value = DatabasePlatform::normalizeComparisonValue(
+                            $platform,
+                            $value,
+                            $fieldType ?? $this->getFieldType($field),
+                            $isStringPatternOperator
+                        );
                 }
 
-                $expr = $expr->with(
-                    $q->expr()->$operatorExpr($normalizeType($property, $isPg), ':value')
+                $fieldExpr = DatabasePlatform::castIfStrict($platform, $property);
+                $expr      = $expr->with(
+                    $q->expr()->$operatorExpr($fieldExpr, ':value')
                 );
             }
 
@@ -603,5 +578,15 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return [$expr, $parameters];
+    }
+
+    private function getFieldType(string $alias, string $object = 'lead'): ?string
+    {
+        $fields = $this->getFields();  // cached array by alias
+        if (isset($fields[$alias]) && $fields[$alias]['object'] === $object) {
+            return $fields[$alias]['type'];
+        }
+
+        return null;
     }
 }

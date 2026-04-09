@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class GeneratedColumn implements GeneratedColumnInterface
 {
@@ -83,10 +83,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     public function getAddColumnSql(?AbstractPlatform $platform = null): string
     {
-        $add = 'ADD';
-        if ($platform instanceof PostgreSQLPlatform) {
-            $add .= ' COLUMN';
-        }
+        $add = DatabasePlatform::getAddColumnKeyword($platform);
 
         return "{$add} {$this->getColumnName()} {$this->getColumnDefinition($platform)}";
     }
@@ -98,24 +95,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     public function getColumnDefinition(?AbstractPlatform $platform = null): string
     {
-        $stored  = $this->stored ? ' STORED' : '';
-        $as      = 'AS';
-        $comment = " COMMENT '(DC2Type:generated)'";
-
-        // Check if we are running on PostgreSQL
-        if ($platform instanceof PostgreSQLPlatform) {
-            $as = 'GENERATED ALWAYS '.$as;
-            // PostgreSQL does not support the COMMENT clause directly
-            // inside the ADD COLUMN statement when adding generated columns
-            $comment = '';
-            // PostgreSQL 12-17 requires 'STORED'
-            // PostgreSQL 18 supports 'VIRTUAL' (if $this->stored is false)
-            if (!$this->stored) {
-                $stored = ' VIRTUAL';
-            }
-        }
-
-        return "{$this->columnType} {$as} ({$this->as}){$stored}{$comment}";
+        return DatabasePlatform::getGeneratedColumnDefinition($platform, $this->columnType, $this->as, $this->stored);
     }
 
     public function getIndexColumns(): array

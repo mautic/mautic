@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
@@ -77,37 +78,9 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
             // because form table data will be deleted we must have same autoincrement as before the insertion
             // to have the form_results table to match the form id in table name e.g. form_results_69_kaleidosco
             $connection    = $event->getEntityManager()->getConnection();
-            $platform      = $connection->getDatabasePlatform();
             $formTableName = $this->formModel->getRepository()->getTableName();
 
-            if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-                // 1. Get the sequence name for the ID column
-                $sequence = $connection->fetchOne(
-                    "SELECT pg_get_serial_sequence('$formTableName', 'id')"
-                );
-
-                // Step 2: Fallback - set common sequence name as doctrine do
-                // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-                // without linking a named sequence in a way visible to pg_get_serial_sequence()
-                // Test DB uses a different config that doesn't register the sequence properly
-                if (!$sequence && $connection->fetchOne(
-                    "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                    [$formTableName.'_id_seq'])) {
-                    $sequence = $formTableName.'_id_seq';
-                }
-
-                if ($sequence) {
-                    // 3. Restart sequence at $firstId
-                    $connection->executeStatement(
-                        sprintf('ALTER SEQUENCE %s RESTART WITH %d', $connection->quoteIdentifier($sequence), $firstId)
-                    );
-                }
-            } else {
-                // MySQL/MariaDB logic
-                $connection->executeStatement(
-                    'ALTER TABLE '.$formTableName.' AUTO_INCREMENT='.$firstId
-                );
-            }
+            DatabasePlatform::resetAutoIncrement($connection, $formTableName, $firstId);
         });
     }
 

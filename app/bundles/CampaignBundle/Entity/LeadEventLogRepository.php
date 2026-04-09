@@ -91,14 +91,14 @@ class LeadEventLogRepository extends CommonRepository
                     e.redirect_event_id,
                     ll.metadata');
 
-        if ($connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-            $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll');
-        } else {
+        if (DatabasePlatform::allowsIndexHint($connection->getDatabasePlatform())) {
             $query->add('from', [
                 'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'alias' => 'll',
                 'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
             ], true);
+        } else {
+            $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll');
         }
 
         $query
@@ -696,7 +696,7 @@ SQL;
                 $tempTableName,
                 $leadsTableName
             ));
-
+git 
             // 3. PostgreSQL DELETE logic using USING clause with a subquery LIMIT
             $deleteQuery = sprintf(
                 'DELETE FROM %s lll USING (SELECT lead_id FROM %s LIMIT %d) d WHERE lll.lead_id = d.lead_id',

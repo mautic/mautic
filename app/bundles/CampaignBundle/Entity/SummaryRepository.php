@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -99,22 +99,13 @@ class SummaryRepository extends CommonRepository
 
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof PostgreSQLPlatform;
 
-        $pgIdColumn = '';
-        $pgIdSelect = '';
-
-        if ($isPg) { // Because we use direct SQL doctrine do not prepare ID columns
-            // SQLSTATE[23502]:
-            // Not null violation: 7 ERROR:
-            // null value in column "id" of relation "campaign_summary" violates not-null constraint
-            // Detect sequence - use metadata
-            $metadata     = $this->getEntityManager()->getClassMetadata(Summary::class);
-            $sequenceName = $metadata->getSequenceName($platform);
-
-            $pgIdColumn = 'id, ';
-            $pgIdSelect = "nextval('$sequenceName') AS id, ";
-        }
+        // Get ID handling for PostgreSQL (nextval) vs MySQL (auto_increment)
+        $idHandling = DatabasePlatform::getInsertIdHandling(
+            $platform,
+            MAUTIC_TABLE_PREFIX.'campaign_summary',
+            $this->getEntityManager()->getClassMetadata(Summary::class)
+        );
 
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
@@ -125,14 +116,14 @@ class SummaryRepository extends CommonRepository
             $quotedTo   = $connection->quote($dateToTs);
 
             // Platform-specific expressions to ensure correct type (timestamp/datetime)
-            $dateTriggeredExpr = $isPg ? $quotedFrom.'::timestamp' : $quotedFrom;
+            $dateTriggeredExpr = DatabasePlatform::applyTypeIfStrict($platform, $quotedFrom, 'timestamp');
             $dateFromExpr      = $dateTriggeredExpr;
-            $dateToExpr        = $isPg ? $quotedTo.'::timestamp' : $quotedTo;
+            $dateToExpr        = DatabasePlatform::applyTypeIfStrict($platform, $quotedTo, 'timestamp');
 
             // Build inner aggregation query with consistent integer types in CASE branches
             $innerSql = '
                 SELECT
-                    '.$pgIdSelect.'
+                    '.$idHandling['idSelect'].'
                     mclel.campaign_id AS campaign_id,
                     mclel.event_id AS event_id,
                     '.$dateTriggeredExpr.' AS date_triggered,
@@ -166,36 +157,38 @@ class SummaryRepository extends CommonRepository
 
             $innerSql .= ' GROUP BY mclel.campaign_id, mclel.event_id';
 
-            $columns = 'campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed';
+            // Columns for INSERT
+            $columns = [
+                'campaign_id',
+                'event_id',
+                'date_triggered',
+                'scheduled_count',
+                'non_action_path_taken_count',
+                'failed_count',
+                'triggered_count',
+                'log_counts_processed',
+            ];
 
-            if ($isPg) {
-                $insertSql = '
-                INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary ('.$pgIdColumn.$columns.')
-                SELECT '.$pgIdColumn.$columns.' FROM ('.$innerSql.') AS tmp
-                ';
-                $sql = $insertSql.'
-                    ON CONFLICT (campaign_id, event_id, date_triggered)
-                    DO UPDATE SET
-                        scheduled_count = EXCLUDED.scheduled_count,
-                        non_action_path_taken_count = EXCLUDED.non_action_path_taken_count,
-                        failed_count = EXCLUDED.failed_count,
-                        triggered_count = EXCLUDED.triggered_count,
-                        log_counts_processed = EXCLUDED.log_counts_processed
-                ';
-            } else {
-                $insertSql = '
-                INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary ('.$columns.')
-                SELECT '.$columns.' FROM ('.$innerSql.') AS tmp
-                ';
-                $sql = $insertSql.'
-                    ON DUPLICATE KEY UPDATE
-                        scheduled_count = VALUES(scheduled_count),
-                        non_action_path_taken_count = VALUES(non_action_path_taken_count),
-                        failed_count = VALUES(failed_count),
-                        triggered_count = VALUES(triggered_count),
-                        log_counts_processed = VALUES(log_counts_processed)
-                ';
+            // Add id column if exists
+            if (!empty($idHandling['idColumn'])) {
+                array_unshift($columns, $idHandling['idColumn']);
             }
+
+            // Build upsert using centralized helper
+            $sql = DatabasePlatform::getUpsertStatement(
+                $platform,
+                MAUTIC_TABLE_PREFIX.'campaign_summary',
+                implode(', ', $columns),
+                $innerSql,
+                'campaign_id, event_id, date_triggered',
+                [
+                    'scheduled_count'             => 'scheduled_count',
+                    'non_action_path_taken_count' => 'non_action_path_taken_count',
+                    'failed_count'                => 'failed_count',
+                    'triggered_count'             => 'triggered_count',
+                    'log_counts_processed'        => 'log_counts_processed',
+                ]
+            );
 
             $connection->executeStatement($sql);
         }

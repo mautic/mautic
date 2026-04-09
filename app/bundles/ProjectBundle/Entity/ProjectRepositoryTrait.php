@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ProjectBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 trait ProjectRepositoryTrait
 {
@@ -25,12 +26,9 @@ trait ProjectRepositoryTrait
         $connection = $queryBuilder->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
         $platform   = $connection->getDatabasePlatform();
 
-        if ($platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-            // case insensitive compare for Postgresql
-            $queryBuilder->where($queryBuilder->expr()->comparison('project.name', 'ILIKE', ':name'));
-        } else {
-            $queryBuilder->where($queryBuilder->expr()->eq('project.name', ':name'));
-        }
+        $queryBuilder->where(
+            DatabasePlatform::getCaseInsensitiveLike($platform, 'project.name', ':name')
+        );
 
         $queryBuilder->setParameter('name', $projectName);
         $ids = $queryBuilder->executeQuery()->fetchFirstColumn() ?: [0];

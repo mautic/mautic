@@ -3,6 +3,7 @@
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\ParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -112,12 +113,10 @@ class LogRepository extends CommonRepository
             return null;
         }
 
+        $platform = $this->_em->getConnection()->getDatabasePlatform();
+
         // ERROR:  operator does not exist: character varying >= integer at character 157
-        $statusCodeField = $this->getTableAlias().'.status_code';
-        if ($this->_em->getConnection()->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
-            // Shorthand for casting in PostgreSQL
-            $statusCodeField = '('.$statusCodeField.')::int';
-        }
+        $statusCodeField = DatabasePlatform::applyTypeIfStrict($platform, $this->getTableAlias().'.status_code');
 
         // Count successful responses
         $countSuccessQb = $this->_em->getConnection()->createQueryBuilder();

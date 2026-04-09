@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field\Helper;
 
 use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -60,9 +60,7 @@ class IndexHelper
 
     public function getMaxCount(): int
     {
-        $isPostgreSql = $this->entityManager->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
-
-        return $isPostgreSql ? self::POSTGRESQL_MAX_COUNT_ALLOWED : self::MAX_COUNT_ALLOWED;
+        return DatabasePlatform::isPostgreSQL($this->entityManager->getConnection()->getDatabasePlatform()) ? self::POSTGRESQL_MAX_COUNT_ALLOWED : self::MAX_COUNT_ALLOWED;
     }
 
     public function isNewIndexAllowed(): bool

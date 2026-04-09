@@ -6,8 +6,8 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -91,7 +91,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 
     private function getIndexHint(): string
     {
-        if ($this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        if (!DatabasePlatform::allowsIndexHint($this->em->getConnection()->getDatabasePlatform())) {
             return '';
         }
 

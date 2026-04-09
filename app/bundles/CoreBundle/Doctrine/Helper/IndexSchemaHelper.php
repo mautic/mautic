@@ -3,10 +3,10 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
@@ -216,63 +216,7 @@ class IndexSchemaHelper
      */
     public function getTableIndexes(string $fullTableName): array
     {
-        $platform = $this->db->getDatabasePlatform();
-
-        if (!$platform instanceof PostgreSQLPlatform) {
-            return $this->sm->listTableIndexes($fullTableName);
-        }
-
-        // Reliable custom query for PostgreSQL
-        $sql = "
-            SELECT
-                i.relname AS index_name,
-                array_agg(a.attname ORDER BY c.ordinality) AS columns,
-                ix.indisunique AS is_unique,
-                ix.indisprimary AS is_primary,
-                t.relkind AS relation_kind
-            
-            FROM
-                pg_class t
-                JOIN pg_namespace ns ON ns.oid = t.relnamespace
-                LEFT JOIN pg_index ix ON t.oid = ix.indrelid
-                LEFT JOIN pg_class i ON ix.indexrelid = i.oid
-                LEFT JOIN unnest(ix.indkey) WITH ORDINALITY AS c(attnum, ordinality) ON true
-                LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = c.attnum
-            WHERE
-                t.relkind IN ('r', 'i', 'm', 'p')
-                AND t.relname = :table
-                AND ns.nspname = CURRENT_SCHEMA()
-            GROUP BY
-                i.relname, t.relkind, ix.indisunique, ix.indisprimary, i.oid
-            ORDER BY
-                i.relname;
-        ";
-
-        $stmt    = $this->db->prepare($sql);
-        $stmt->bindValue('table', $fullTableName);
-        $results = $stmt->executeQuery()->fetchAllAssociative();
-
-        $indexes = [];
-        foreach ($results as $row) {
-            $columns = $row['columns'];
-
-            // Handle both native PHP array (newer drivers) and string representation {col1,col2}
-            if (is_string($columns)) {
-                $columnsStr = trim($columns, '{}');
-                $columns    = explode(',', $columnsStr);
-                $columns    = array_map(fn ($part) => trim($part, '"'), $columns);
-            }
-            // If already array (some drivers return native array), leave as-is
-
-            $indexes[] = new Index(
-                $row['index_name'],
-                $columns,
-                (bool) $row['is_unique'],
-                (bool) $row['is_primary']
-            );
-        }
-
-        return $indexes;
+        return DatabasePlatform::listTableIndexes($this->db, $fullTableName);
     }
 
     /**
@@ -284,13 +228,12 @@ class IndexSchemaHelper
             if (strtolower($idx->getName()) === strtolower($indexName)) {
                 if (empty($indexColumns)) {
                     return true;
-                } else {
-                    $columns = $idx->getColumns();
-                    asort($columns);
-                    asort($indexColumns);
-
-                    return $columns === $indexColumns;
                 }
+                $columns = $idx->getColumns();
+                asort($columns);
+                asort($indexColumns);
+
+                return $columns === $indexColumns;
             }
         }
 
@@ -305,7 +248,7 @@ class IndexSchemaHelper
     private function getTextColumns($columns): array
     {
         $platform  = $this->db->getDatabasePlatform();
-        $allowText = $platform instanceof PostgreSQLPlatform;
+        $allowText = DatabasePlatform::allowsTextInIndex($platform);
 
         foreach ($columns as $column) {
             if (!in_array($column, $this->allowedColumns, true)) {

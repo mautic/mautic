@@ -2,8 +2,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -57,7 +57,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 .$filter->getRelationJoinTableField());
         }
 
-        $isPg = $this->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $platform = $this->getConnection()->getDatabasePlatform();
 
         switch ($filterOperator) {
             case 'empty':
@@ -104,13 +104,16 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
             case 'like':
                 $expression = $queryBuilder->expr()->$filterOperator(
-                    $isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(),
+                    DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
                     $filterParametersHolder
                 );
                 break;
             case 'notLike':
                 $expression = $queryBuilder->expr()->or(
-                    $queryBuilder->expr()->$filterOperator($isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(), $filterParametersHolder),
+                    $queryBuilder->expr()->$filterOperator(
+                        DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
+                        $filterParametersHolder
+                    ),
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
                 break;
@@ -127,7 +130,8 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
                     $expressions[] = $queryBuilder->expr()->$operator(
-                        $isPg ? 'CAST('.$tableAlias.'.'.$filter->getField().' AS TEXT)' : $tableAlias.'.'.$filter->getField(), $parameter
+                        DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
+                        $parameter
                     );
                 }
 

@@ -13,6 +13,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -2028,16 +2029,12 @@ class LeadModel extends FormModel
     {
         $connection = $this->em->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-
-        // PostgreSQL uses LENGTH(), MySQL uses CHAR_LENGTH()
-        $lengthFunc = $isPg ? 'LENGTH' : 'CHAR_LENGTH';
 
         $columns = [];
         foreach ($aliases as $alias) {
-            // quoteIdentifier handles backticks for MySQL and double quotes for PostgreSQL
-            $quotedAlias = $platform->quoteIdentifier($alias);
-            $columns[]   = sprintf('MAX(%s(%s)) %s', $lengthFunc, $quotedAlias, $quotedAlias);
+            $quotedAlias      = $platform->quoteIdentifier($alias);
+            $lengthExpression = DatabasePlatform::getLength($platform, $quotedAlias);
+            $columns[]        = sprintf('MAX(%s) %s', $lengthExpression, $quotedAlias);
         }
 
         $query = $connection->createQueryBuilder();

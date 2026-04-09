@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -80,11 +80,12 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
-        $connection = $event->getQueryBuilder()->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
-        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
+        $platform   = $event->getQueryBuilder()->getConnection()->getDatabasePlatform(); /** @phpstan-ignore-line getConnection is deprecated */
+        $fieldExpr  = 'notLike' == $event->getFilter()->getOperator() ?
+            DatabasePlatform::applyTypeIfStrict($platform, $leadsTableAlias.'.'.$event->getFilter()->getField(), 'text') :
+            $leadsTableAlias.'.'.$event->getFilter()->getField();
 
-        if ($isPg && in_array($event->getFilter()->getOperator(), ['notLike'])) {
+        if (in_array($event->getFilter()->getOperator(), ['notLike'])) {
             $fieldExpr .= '::text';
         }
 
@@ -137,12 +138,11 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $connection = $event->getQueryBuilder()->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
-        $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
-
-        if ($isPg) {
-            $fieldExpr .= '::text';
-        }
+        $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
+            $connection->getDatabasePlatform(),
+            $leadsTableAlias.'.'.$event->getFilter()->getField(),
+            'text'
+        );
 
         foreach ($event->getParameterHolder() as $parameter) {
             $expressions[] = $queryBuilder->expr()->$operator($fieldExpr, $parameter);
@@ -190,8 +190,11 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         $qb         = $event->getQueryBuilder();
         $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
         if (in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
-            $isPg       = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
-            $fieldExpr  = $this->normalizeType($leadsTableAlias.'.'.$event->getFilter()->getField(), $isPg);
+            $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
+                $connection->getDatabasePlatform(),
+                $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                'text'
+            );
         } else {
             $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
         }
@@ -204,10 +207,5 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         );
 
         $event->stopPropagation();
-    }
-
-    private function normalizeType(string $field, bool $cast = false, string $type='text'): string
-    {
-        return $cast ? "$field::$type" : $field;
     }
 }

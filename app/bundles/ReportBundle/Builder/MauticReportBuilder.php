@@ -3,10 +3,10 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -139,6 +139,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();
+
+        // Get Platform
+        $platform = $this->db->getDatabasePlatform();
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
@@ -286,7 +289,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         } elseif (isset($fieldOptions['formula'])) {
                             $selectText = $fieldOptions['formula'];
                         } else {
-                            $selectText = $this->sanitizeColumnName($field);
+                            $selectText = DatabasePlatform::quoteColumn($platform, $field);
                         }
                     }
 
@@ -327,7 +330,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $aggregatedColumns = [];
 
         if ($aggregators && $groupByOptions) {
-            $isPostgreSql = $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform;
             foreach ($aggregators as $aggregator) {
                 if (isset($options['columns'][$aggregator['column']]) && isset($options['columns'][$aggregator['column']]['formula'])) {
                     $columnSelect = $options['columns'][$aggregator['column']]['formula'];
@@ -338,15 +340,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 // Recursively sanitize inner column references
                 $innerExpression = $this->sanitizeExpression($columnSelect);
 
-                if ('AVG' == $aggregator['function']) {
-                    // PostgreSQL and MySQL default AVG precision is different
-                    $appendix   = $isPostgreSql ? '::numeric(10, 4)' : '';
-                    $selectText = sprintf('%s(%s)%s', $aggregator['function'], $innerExpression, $appendix);
-                } else {
-                    $selectText = sprintf('%s(%s)', $aggregator['function'], $innerExpression);
-                }
+                $selectText = DatabasePlatform::getAggregatorExpression(
+                    $this->db->getDatabasePlatform(),
+                    $aggregator['function'],
+                    $innerExpression
+                );
+
                 $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
-                $quotedAlias         = $this->sanitizeColumnName($alias, true);
+                $quotedAlias         = DatabasePlatform::quoteIdentifier($platform, $alias);
                 $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedAlias);
                 $aggregatedColumns[] = $columnSelect; // Track aggregated columns
             }
@@ -360,10 +361,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $nonAggregatedColumns = [];
 
             // 1. Normalize GROUP BY columns
-            $normalizedGroupBy = array_map([$this, 'normalizeColumnName'], (array) $groupByColumns);
+            $normalizedGroupBy = array_map(['DatabasePlatform', 'unquoteIdentifier'], (array) $groupByColumns);
 
             // 2. Normalize aggregated columns
-            $normalizedAggregated = array_map([$this, 'normalizeColumnName'], $aggregatedColumns);
+            $normalizedAggregated = array_map(['DatabasePlatform', 'unquoteIdentifier'], $aggregatedColumns);
 
             // 3. Extract base column names from selectColumns
             foreach ($allSelectColumns as $select) {
@@ -371,7 +372,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 foreach ($columns as $column) {
                     // Normalize for comparison
-                    $normalizedColumn = $this->normalizeColumnName($column);
+                    $normalizedColumn = DatabasePlatform::unquoteIdentifier($platform, $column);
 
                     // Skip if already in GROUP BY or aggregated (using normalized comparison)
                     if (in_array($normalizedColumn, $normalizedGroupBy) || in_array($normalizedColumn, $normalizedAggregated)) {
@@ -780,12 +781,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private function sanitizeExpression(string $expression): string
     {
-        $trimmed = trim($expression);
+        $trimmed  = trim($expression);
+        $platform = $this->db->getDatabasePlatform();
 
         // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
         if (!$this->isComplexExpression($trimmed)) {
             if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
-                return $this->sanitizeColumnName($trimmed); // if its simple column, we sanitize it, otherwise its inner query
+                return DatabasePlatform::quoteColumn($platform, $trimmed); // if its simple column, we sanitize it, otherwise its inner query
             }
 
             return $trimmed;
@@ -794,7 +796,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Recursively sanitize all column references inside the expression
         return preg_replace_callback(
             self::IDENTIFIER_PATTERN,
-            fn ($matches) => $this->sanitizeColumnName($matches[1]),
+            fn ($matches) => DatabasePlatform::quoteColumn($platform, $matches[1]),
             $trimmed
         );
     }
@@ -808,43 +810,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Starts with a function name followed by '(' or contains SELECT
         return preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
-    }
-
-    /**
-     * We must sanitize the table aliases as they might be auto generated.
-     * Aliases like "8e296a06" makes MySql to think it is a number.
-     * Expects param in format "table_alias.column_name".
-     */
-    private function sanitizeColumnName(string $fullColumnName, bool $isLabel = false): string
-    {
-        if ($isLabel) {
-            return $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform
-                ? "\"$fullColumnName\""
-                : "`$fullColumnName`";
-        }
-
-        [$tableAlias, $columnName] = explode('.', $fullColumnName);
-
-        return $this->db->getDatabasePlatform() instanceof PostgreSQLPlatform
-            ? "\"$tableAlias\".\"$columnName\""
-            : "`$tableAlias`.`$columnName`";
-    }
-
-    /**
-     * Normalize a column identifier for comparison by removing platform-specific identifier quotes
-     * if it appears to be a simple (non-complex) column reference.
-     */
-    private function normalizeColumnName(string $fullColumnName): string
-    {
-        if ($this->db->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-            return preg_match('/^["a-zA-Z0-9_\.\$]+$/', $fullColumnName)
-                ? str_replace('"', '', $fullColumnName)
-                : $fullColumnName;
-        }
-
-        return preg_match('/^[`a-zA-Z0-9_\.\$]+$/', $fullColumnName)
-            ? str_replace('`', '', $fullColumnName)
-            : $fullColumnName;
     }
 
     /**

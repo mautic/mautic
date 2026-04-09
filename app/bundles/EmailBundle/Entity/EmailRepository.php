@@ -3,11 +3,11 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -398,9 +398,8 @@ class EmailRepository extends CommonRepository
                     ->setParameter($param, $search);
             } else {
                 $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-                $isPg     = $platform instanceof PostgreSQLPlatform;
 
-                if ($isPg) {
+                if (DatabasePlatform::isPostgreSQL($platform)) {
                     $q->andWhere($q->expr()->like($q->expr()->lower('e.name'), ':'.$param));
                     $q->setParameter($param, '%'.mb_strtolower($search).'%');
                 } else {

@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -24,11 +24,13 @@ final class DbRegexValidator extends ConstraintValidator
         }
 
         try {
-            if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-                $this->connection->executeQuery("SELECT '1' ~* ? AS is_valid", [$regex]);
-            } else {
-                $this->connection->executeQuery("SELECT '1' REGEXP ? AS is_valid", [$regex]);
-            }
+            $regexQuery = DatabasePlatform::getRegexpExpression(
+                $this->connection->getDatabasePlatform(),
+                "'1'",
+                '?'
+            );
+
+            $this->connection->executeQuery('SELECT '.$regexQuery.' AS is_valid', [$regex]);
         } catch (Exception $e) {
             $this->context->buildViolation(
                 $this->stripUglyPartOfTheErrorMessage($e->getPrevious()->getMessage())

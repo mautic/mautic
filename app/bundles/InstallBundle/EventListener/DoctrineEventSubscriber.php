@@ -4,9 +4,9 @@ namespace Mautic\InstallBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
 
@@ -56,7 +56,7 @@ class DoctrineEventSubscriber
 
     public function postgreSqlMySqlCompact(Connection $conn): void
     {
-        if (!$conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        if (!DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
             return;
         }
 

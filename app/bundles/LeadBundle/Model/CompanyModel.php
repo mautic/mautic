@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -593,8 +593,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 $param        = 'filterVar';
                 $expr         = new ExpressionBuilder($this->em->getConnection());
-                $isPostgreSql = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform;
-                $composite    = $expr->and($isPostgreSql ? $expr->comparison("comp.$column", 'ILIKE', ':'.$param) : $expr->like("comp.$column", ':'.$param));
+                $platform     = $this->em->getConnection()->getDatabasePlatform();
+                $composite    = $expr->and(
+                    DatabasePlatform::getCaseInsensitiveLike($platform, "comp.$column", ':'.$param)
+                );
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {

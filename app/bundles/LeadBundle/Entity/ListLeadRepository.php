@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -80,7 +80,7 @@ class ListLeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-        if ($conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
             // 1. PostgreSQL uses standard DROP TABLE for session-based temp tables
             $conn->executeStatement(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
 
@@ -125,10 +125,8 @@ class ListLeadRepository extends CommonRepository
     {
         $tableName  = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
         $conn       = $this->getEntityManager()->getConnection();
-        $platform   = $conn->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
-        if ($isPostgres) {
+        if (DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
             $deleteQuery = sprintf(
                 'DELETE FROM %s
              WHERE leadlist_id = :listId

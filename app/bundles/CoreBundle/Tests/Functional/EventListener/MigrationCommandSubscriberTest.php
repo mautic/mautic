@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Helper\ExitCode;
@@ -125,7 +125,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
     private function createTables(): void
     {
-        $isPostgreSQL = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $isPostgreSQL = DatabasePlatform::isPostgreSQL($this->connection->getDatabasePlatform());
 
         $idType   = $isPostgreSQL ? 'integer' : 'int unsigned';
         $dateType = $isPostgreSQL ? 'timestamp' : 'datetime';

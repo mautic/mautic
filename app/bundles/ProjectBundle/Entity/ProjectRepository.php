@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Entity;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 class ProjectRepository extends CommonRepository
@@ -26,11 +26,14 @@ class ProjectRepository extends CommonRepository
 
     public function getProjectByName(string $name, ?int $ignoredId = null): ?Project
     {
-        $connection   = $this->getEntityManager()->getConnection();
-        $isPostgreSql = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
-        $where        = ($isPostgreSql ?
-            'LOWER('.$this->getTableAlias().'.name) = LOWER(:name)' :
-            $this->getTableAlias().'.name = :name'
+        $where = DatabasePlatform::getCaseInsensitiveLike(
+            $this->getEntityManager()->getConnection()->getDatabasePlatform(),
+            $this->getTableAlias().'.name',
+            ':name',
+            false,
+            false,
+            false,
+            true
         );
 
         $q = $this->createQueryBuilder($this->getTableAlias());

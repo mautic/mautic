@@ -3,21 +3,22 @@
 namespace Mautic\LeadBundle\Segment\Query\Expression;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder as BaseExpressionBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
 class ExpressionBuilder extends BaseExpressionBuilder
 {
     public const REGEXP            = 'REGEXP';
-    public const POSTGRESQL_REGEXP = '~*';
+
     public const BETWEEN           = 'BETWEEN';
 
-    private bool $isPostgreSql     = false;
+    private AbstractPlatform $platform;
 
     public function __construct(Connection $connection)
     {
-        $this->isPostgreSql = $connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $this->platform = $connection->getDatabasePlatform();
         parent::__construct($connection);
     }
 
@@ -69,11 +70,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function regexp($x, $y)
     {
-        if ($this->isPostgreSql) {
-            return $this->comparison($x, self::POSTGRESQL_REGEXP, $y);
-        } else {
-            return $this->comparison($x, self::REGEXP, $y);
-        }
+        return DatabasePlatform::getRegexpExpression($this->platform, $x, $y);
     }
 
     /**
@@ -91,11 +88,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function notRegexp($x, $y): string
     {
-        if ($this->isPostgreSql) {
-            return $this->comparison($x, '!'.self::POSTGRESQL_REGEXP, $y);
-        } else {
-            return 'NOT '.$this->comparison($x, self::REGEXP, $y);
-        }
+        return DatabasePlatform::getRegexpExpression($this->platform, $x, $y, true);
     }
 
     /**
