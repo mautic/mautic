@@ -131,6 +131,10 @@ export default class BuilderService {
     return isPage ? 'page' : 'email';
   }
 
+  isPageContext() {
+    return this.context?.formName === 'page';
+  }
+
   normalizeSessionId(sessionValue) {
     return sessionValue || null;
   }
@@ -1049,6 +1053,7 @@ export default class BuilderService {
         grapesjstuiimageeditor,
         grapesjsstylebg,
         ...BuilderService.getPluginNames('page'), // grapesjs-custom-plugins: load custom plugins by their name
+        this.getDataSlotTextPlugin(),
       ],
       pluginsOpts: {
         [grapesjswebpage]: {
@@ -1160,6 +1165,23 @@ export default class BuilderService {
     this.removeSelectedElementsEmailMjml();
 
     return this.editor;
+  }
+
+  getDataSlotTextPlugin() {
+    return (editor) => {
+      const dc = editor.DomComponents;
+      const textType = dc.getType('text');
+      const originalIsComponent = textType?.model?.isComponent;
+
+      dc.addType('text', {
+        isComponent(el) {
+          if (el.tagName === 'DIV' && el.getAttribute && el.getAttribute('data-slot') === 'text') {
+            return { type: 'text' };
+          }
+          return originalIsComponent ? originalIsComponent(el) : undefined;
+        }
+      });
+    };
   }
 
   unsetComponentVoidTypes(editor) {
@@ -1602,6 +1624,10 @@ export default class BuilderService {
       return;
     }
 
+    if (this.isPageContext() && this.isInsideDataSlotText(component)) {
+      return;
+    }
+
     component.set('tagName', 'div');
   }
 
@@ -1628,6 +1654,10 @@ export default class BuilderService {
     }
 
     if (this.isHeadingWrapper(parent, headingTag)) {
+      return;
+    }
+
+    if (this.isPageContext() && this.isInsideDataSlotText(component)) {
       return;
     }
 
@@ -1677,6 +1707,38 @@ export default class BuilderService {
 
     return classes.includes('gjs-heading-wrapper')
       && classes.includes(`gjs-heading-wrapper-${headingTag}`);
+  }
+
+  isDataSlotTextContainer(component) {
+    if (!component || typeof component.get !== 'function') {
+      return false;
+    }
+
+    const tagName = `${component.get('tagName') || ''}`.toLowerCase();
+    if (tagName !== 'div') {
+      return false;
+    }
+
+    const attributes = typeof component.getAttributes === 'function'
+      ? component.getAttributes()
+      : (component.get('attributes') || {});
+
+    return attributes['data-slot'] === 'text';
+  }
+
+  isInsideDataSlotText(component) {
+    let current = component;
+    while (current && typeof current.parent === 'function') {
+      const parent = current.parent();
+      if (!parent) {
+        break;
+      }
+      if (this.isDataSlotTextContainer(parent)) {
+        return true;
+      }
+      current = parent;
+    }
+    return false;
   }
 
   walkComponentTree(component, visitor) {
