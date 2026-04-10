@@ -15,6 +15,7 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,10 +26,13 @@ class CampaignTestAbstract extends TestCase
     protected static int $mockId       = 232;
     protected static string $mockName  = 'Mock name';
     protected static string $mockAlias = 'Mock alias';
+    /** @var EntityManager&MockObject */
+    protected EntityManager $entityManager;
 
     protected function initCampaignModel(): CampaignModel
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager       = $this->createMock(EntityManager::class);
+        $this->entityManager = $entityManager;
 
         $security = $this->createMock(CorePermissions::class);
 
