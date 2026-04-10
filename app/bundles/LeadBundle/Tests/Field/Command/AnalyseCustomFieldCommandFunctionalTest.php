@@ -15,6 +15,26 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    /**
+     * @var array<LeadField>
+     */
+    private array $createdFields = [];
+
+    protected function beforeTearDown(): void
+    {
+        // Clean up created custom fields to avoid conflicts on subsequent runs
+        if (!empty($this->createdFields)) {
+            /** @var FieldModel $fieldModel */
+            $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+
+            foreach ($this->createdFields as $field) {
+                $fieldModel->deleteEntity($field);
+            }
+
+            $this->createdFields = [];
+        }
+    }
+
     public function testAnalyseWhenNoCustomFieldPresent(): void
     {
         $commandTester = $this->testSymfonyCommand('mautic:fields:analyse');
@@ -142,6 +162,8 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
+
+        $this->createdFields[] = $field;
     }
 
     /**
