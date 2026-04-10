@@ -763,7 +763,7 @@ class DatabasePlatform
      */
     public static function quoteColumn(?AbstractPlatform $platform, string $fullColumnName, bool $isIdentifier = false): string
     {
-        if (false === strpos($fullColumnName, '.') || $isIdentifier) {
+        if (!str_contains($fullColumnName, '.') || $isIdentifier) {
             return self::quoteIdentifier($platform, $fullColumnName);
         }
 
