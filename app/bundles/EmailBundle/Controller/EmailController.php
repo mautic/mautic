@@ -132,9 +132,9 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filter] = explode(':', $updatedFilter);
+                    [$column, $filterValue] = explode(':', $updatedFilter);
 
-                    $newFilters[$column][] = $filter;
+                    $newFilters[$column][] = $filterValue;
                 }
 
                 $currentFilters = $newFilters;

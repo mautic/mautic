@@ -6,6 +6,8 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -25,9 +27,11 @@ class EmailRepositoryTest extends TestCase
 
         $this->repo = $this->configureRepository(Email::class);
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+            'mautic.email.email.searchcommand.list'      => 'list',
             'mautic.email.email.searchcommand.isexpired' => 'is:expired',
             'mautic.email.email.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
@@ -299,6 +303,21 @@ class EmailRepositoryTest extends TestCase
         self::assertSame(['par1' => true], $params);
     }
 
+    public function testAddSearchCommandWhereClauseHandlesListAliasFilter(): void
+    {
+        $qb     = new OrmQueryBuilder($this->entityManager);
+        $qb->select('e')->from(Email::class, 'e');
+        $filter = (object) ['command' => 'list', 'string' => 'newsletter-alias', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        self::assertSame('l.alias = :par1', (string) $expr);
+        self::assertSame(['par1' => 'newsletter-alias'], $params);
+        self::assertArrayHasKey('e', $qb->getDQLPart('join'));
+    }
+
     public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
     {
         $qb     = $this->connection->createQueryBuilder();
@@ -318,6 +337,7 @@ class EmailRepositoryTest extends TestCase
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repo->getSearchCommands();
+        self::assertContains('mautic.email.email.searchcommand.list', $commands);
         self::assertContains('mautic.email.email.searchcommand.isexpired', $commands);
         self::assertContains('mautic.email.email.searchcommand.ispending', $commands);
     }
