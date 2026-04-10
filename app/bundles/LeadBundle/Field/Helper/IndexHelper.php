@@ -17,14 +17,6 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class IndexHelper
 {
-    public const MAX_COUNT_ALLOWED = 64;
-
-    /**
-     * In PostgreSQL there is basically no limitation.
-     * But for our purpose we set it to reasonable number which will probably be never reached.
-     */
-    public const POSTGRESQL_MAX_COUNT_ALLOWED = 1024;
-
     /**
      * @var bool|array<string>
      */
@@ -60,7 +52,7 @@ class IndexHelper
 
     public function getMaxCount(): int
     {
-        return DatabasePlatform::isPostgreSQL($this->entityManager->getConnection()->getDatabasePlatform()) ? self::POSTGRESQL_MAX_COUNT_ALLOWED : self::MAX_COUNT_ALLOWED;
+        return DatabasePlatform::getMaxIndexAllowed($this->entityManager->getConnection()->getDatabasePlatform());
     }
 
     public function isNewIndexAllowed(): bool

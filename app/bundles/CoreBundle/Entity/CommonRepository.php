@@ -10,7 +10,6 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -19,10 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
-use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -839,25 +836,11 @@ class CommonRepository extends ServiceEntityRepository
     {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();
-        $isPg       = DatabasePlatform::isPostgreSQL($platform);
 
         $metadata   = $this->getClassMetadata();
-        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
-        $idColumn   = $metadata->getColumnName($identifier);
-
-        if ($isPg) { // PG need special case
-            // Detect best conflict target (prefer non-PK unique constraint)
-            $conflictTarget = $this->getUpsertConflictTarget($metadata, $idColumn);
-            if (null === $conflictTarget) {
-                // Fallback – but log/warn in production that upsert may fail on PG for new entities
-                $conflictTarget = $idColumn;
-            }
-        }
 
         // Platform-specific "Update" expression
-        $makeUpdate = $isPg
-            ? fn (string $column) => "{$column} = EXCLUDED.{$column}" // Postgres uses EXCLUDED table
-            : fn (string $column) => "{$column} = VALUES({$column})"; // MySQL uses VALUES() function
+        $makeUpdate = fn (string $column) => DatabasePlatform::getUpsertUpdateExpression($platform, $column);
 
         $columns    = [];
         $values     = [];
@@ -873,41 +856,23 @@ class CommonRepository extends ServiceEntityRepository
 
         // 1. Process Fields
         foreach ($fieldNames as $fieldName) {
-            $value  = $metadata->getFieldValue($entity, $fieldName);
-            $column = $metadata->getColumnName($fieldName);
-            $type   = $metadata->getTypeOfField($fieldName);
-            if ($metadata->isIdentifier($fieldName)) {
-                if ($value) {
-                    // Existing entity: include id in INSERT (needed for conflict matching)
-                    $hasId     = true;
-                    $columns[] = $column;
-                    $values[]  = $value;
-                    $types[]   = $type;
-                    $set[]     = '?';
-                    $update[]  = $makeUpdate($column);  // usually not updated, but harmless
-                } elseif ($isPg) {
-                    // New entity on PG: use nextval in VALUES (no bound param)
-                    $sequence  = $this->getSerialSequence($metadata->getTableName(), $column);
-                    $columns[] = $column;
-                    $set[]     = "NEXTVAL('{$sequence}')";
-                    // Do NOT add to $values/$types - it's not bound
-                    continue;
-                } elseif ($fieldName === $identifier) {
-                    // https://bugs.php.net/bug.php?id=76896
-                    // mysql_last_insert_id might return 0 if our insert updates a row
-                    // Call LAST_INSERT_ID() for the column to ensure the correct value
-                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
-                    continue;
-                } else {
-                    continue;
-                }
+            if (DatabasePlatform::processIdentifierForUpsert(
+                $connection,
+                $entity,
+                $metadata,
+                $this->getTableName(),
+                $fieldName,
+                $makeUpdate,
+                $columns,
+                $values,
+                $types,
+                $set,
+                $update,
+            )) {
+                $hasId = true;
             }
-            $columns[] = $column;
-            $values[]  = $value;
-            $types[]   = $type;
-            $set[]     = '?';
-            $update[]  = $makeUpdate($column);
         }
+
         // 2. Process Associations
         foreach ($metadata->getAssociationNames() as $fieldName) {
             $assocEntity = $metadata->getFieldValue($entity, $fieldName);
@@ -923,44 +888,20 @@ class CommonRepository extends ServiceEntityRepository
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
         }
-        $columnList = implode(', ', $columns);
-        $setList    = implode(', ', $set);
-        $updateList = implode(', ', $update);
 
         // 3. Execution & Result Detection
-        if ($isPg) {
-            // Always RETURNING to get both the (generated or existing) id and insert detection
-            $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) "
-                ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
-                .'RETURNING id, (xmax = 0) AS is_new';
-
-            $result = $connection->fetchAssociative($sql, $values, $types);
-
-            if (false === $result) {
-                // Should never happen in upsert
-                throw new RecordNotFoundException('Upsert failed - no row returned');
-            }
-
-            $generatedOrExistingId = (int) $result['id'];
-            $wasInserted           = (bool) $result['is_new'];
-            $wasUpdated            = !$wasInserted;
-
-            // Always set the ID back (important for new entities)
-            $metadata->setFieldValue($entity, $identifier, $generatedOrExistingId);
-        } else {
-            // MySQL: Use affected rows count (1 = Insert, 2 = Update)
-            $sql = "INSERT INTO {$this->getTableName()} ($columnList) VALUES ($setList) ".
-                "ON DUPLICATE KEY UPDATE $updateList";
-
-            $affectedRows = $connection->executeStatement($sql, $values, $types);
-            $wasInserted  = (1 === $affectedRows);
-            $wasUpdated   = (2 === $affectedRows);
-
-            if (!$hasId) {
-                $id = (int) $connection->lastInsertId();
-                $metadata->setFieldValue($entity, $identifier, $id);
-            }
-        }
+        [$wasInserted, $wasUpdated] = DatabasePlatform::getUpsertStatement(
+            $connection,
+            $entity,
+            $metadata,
+            $this->getTableName(),
+            $columns,
+            $values,
+            $types,
+            $set,
+            $update,
+            $hasId
+        );
 
         // 4. Update Interface
         if ($entity instanceof UpsertInterface) {
@@ -1161,12 +1102,12 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param object       $filter
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param object                        $filter
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
     {
-        $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
+        $unique = $this->generateRandomParameterName();
         $string = $filter->string;
 
         if (!$filter->strict) {
@@ -1175,26 +1116,22 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        // PostgreSQL LIKE is case sensitive
         $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-        $isPg     = DatabasePlatform::isPostgreSQL($platform);
+        $isOrm    = $q instanceof QueryBuilder;
 
-        $ormQb = true;
-
-        if ($q instanceof QueryBuilder) {
+        if ($isOrm) {
+            // ORM path - PostgreSQL uses LOWER(column) LIKE, MySQL uses column LIKE
             $expr = $q->expr()->orX();
             foreach ($columns as $col) {
+                $columnExpr = DatabasePlatform::applyCaseInsensitiveWrap($platform, $col);
                 $expr->add(
-                    $q->expr()->like(
-                        $isPg ? $q->expr()->lower($col) : $col,
-                        ":$unique"
-                    )
+                    $q->expr()->like($columnExpr, ":$unique")
                 );
             }
         } else {
-            $ormQb    = false;
+            // DBAL path: use native ILIKE on PostgreSQL, LIKE on MySQL
             $xFunc    = $filter->not ? 'andX' : 'orX';
-            $exprFunc = DatabasePlatform::getLikeOperator($platform, false);
+            $exprFunc = DatabasePlatform::getDbalLikeOperator($platform, $filter->not);
 
             $expr = $q->expr()->$xFunc();
             foreach ($columns as $col) {
@@ -1208,7 +1145,8 @@ class CommonRepository extends ServiceEntityRepository
             $expr = $q->expr()->not($expr);
         }
 
-        $value = DatabasePlatform::shouldLowercaseSearchValue($platform, $ormQb)
+        // Lowercase value only for ORM + PostgreSQL (to match LOWER(column))
+        $value = (DatabasePlatform::shouldLowercaseSearchValue($platform, $isOrm))
             ? mb_strtolower($string)
             : $string;
 
@@ -1898,44 +1836,5 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         return $sequence;
-    }
-
-    /**
-     * Tries to find a suitable unique constraint for ON CONFLICT (prefers non-PK).
-     */
-    protected function getUpsertConflictTarget(ClassMetadata $metadata, string $pkColumn): ?string
-    {
-        // From mapping attributes/annotations
-        $uniqueConstraints = $metadata->table['uniqueConstraints'] ?? [];
-
-        foreach ($uniqueConstraints as $uc) {
-            $cols = $uc['columns'];
-            // Prefer if it doesn't include PK or has more columns
-            if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
-                return implode(', ', $cols);
-            }
-        }
-
-        // Fallback: introspect unique indexes (runtime, requires schema access)
-        try {
-            $helper = new IndexSchemaHelper(
-                $this->getEntityManager()->getConnection(),
-                MAUTIC_TABLE_PREFIX
-            );
-
-            $indexes = $helper->getTableIndexes($metadata->getTableName());
-            foreach ($indexes as $index) {
-                if ($index->isUnique() && !$index->isPrimary()) {
-                    $cols = $index->getColumns();
-                    if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
-                        return implode(', ', $cols);
-                    }
-                }
-            }
-        } catch (\Throwable) {
-            // Silent fallback if introspection fails
-        }
-
-        return null; // Caller decides what to do (e.g. throw or fallback to PK)
     }
 }

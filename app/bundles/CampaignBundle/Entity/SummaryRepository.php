@@ -175,7 +175,7 @@ class SummaryRepository extends CommonRepository
             }
 
             // Build upsert using centralized helper
-            $sql = DatabasePlatform::getUpsertStatement(
+            $sql = DatabasePlatform::getSummarizeUpsertStatement(
                 $platform,
                 MAUTIC_TABLE_PREFIX.'campaign_summary',
                 implode(', ', $columns),

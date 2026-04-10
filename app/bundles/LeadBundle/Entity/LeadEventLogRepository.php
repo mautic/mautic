@@ -139,7 +139,7 @@ class LeadEventLogRepository extends CommonRepository
                 DatabasePlatform::getCaseInsensitiveLike(
                     $connection->getDatabasePlatform(),
                     $alias.'.properties',
-                    '%'.strtolower($options['search']).'%',
+                    $qb->expr()->literal('%'.mb_strtolower($options['search']).'%'),
                     true,
                     true
                 )

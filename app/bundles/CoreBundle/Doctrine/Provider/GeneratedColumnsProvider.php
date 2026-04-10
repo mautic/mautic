@@ -64,7 +64,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
              * We disable it on postgresql by default as the expressions we try to use are not immutable
              * ERROR:  generation expression is not immutable
              *
-             * As workaround for postgresql we should probably use
+             * As workaround for postgresql in future we should probably use
              * standard column + trigger on update/edit which will fill the data.
              */
             return false;

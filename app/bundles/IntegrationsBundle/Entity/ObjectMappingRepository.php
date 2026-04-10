@@ -227,7 +227,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectName', $internalObjectName);
 
         if ($lock) {
-            $lockClause = DatabasePlatform::getShareLockClause($connection->getDatabasePlatform());
+            $lockClause = ' '.DatabasePlatform::getShareLockClause($connection->getDatabasePlatform());
         } else {
             $lockClause = '';
         }

@@ -10,58 +10,8 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
+final class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
-    private const TABLE_NAME    = 'campaign_leads';
-    private const DATE_COLUMN   = 'date_added';
-    private const INDEX_COLUMN  = 'campaign_id';
-
-    private const FORMAT_DATE_MYSQL      = 'DATE_FORMAT';
-    private const FORMAT_DATE_POSTGRESQL = 'TO_CHAR';
-
-    private const DEFINITIONS = [
-        'hour' => [
-            'column'      => 'generated_date_added_hour',
-            'type'        => 'varchar(16)',
-            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y-%m-%d %H:00")',
-            'postgres'    => self::FORMAT_DATE_POSTGRESQL.'('.self::DATE_COLUMN.', \'YYYY-MM-DD HH24:00\')',
-            'granularity' => 'H',
-            'filter'      => false,
-        ],
-        'day' => [
-            'column'      => 'generated_date_added_day',
-            'type'        => 'date',
-            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y-%m-%d")',
-            'postgres'    => self::DATE_COLUMN.'::date',
-            'granularity' => 'd',
-            'filter'      => true,
-        ],
-        'week' => [
-            'column'      => 'generated_date_added_week',
-            'type'        => 'char(8)',
-            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y %U")',
-            'postgres'    => self::FORMAT_DATE_POSTGRESQL.'('.self::DATE_COLUMN.', \'IYYY IW\')',
-            'granularity' => 'W',
-            'filter'      => false,
-        ],
-        'month' => [
-            'column'      => 'generated_date_added_month',
-            'type'        => 'char(7)',
-            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y-%m")',
-            'postgres'    => self::FORMAT_DATE_POSTGRESQL.'('.self::DATE_COLUMN.', \'YYYY-MM\')',
-            'granularity' => 'm',
-            'filter'      => false,
-        ],
-        'year' => [
-            'column'      => 'generated_date_added_year',
-            'type'        => 'smallint',
-            'mysql'       => self::FORMAT_DATE_MYSQL.'('.self::DATE_COLUMN.', "%Y")',
-            'postgres'    => 'EXTRACT(YEAR FROM '.self::DATE_COLUMN.')::smallint',
-            'granularity' => 'Y',
-            'filter'      => false,
-        ],
-    ];
-
     public function __construct(private VersionProviderInterface $versionProvider)
     {
     }
@@ -75,31 +25,38 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
-        $isMySQL = $this->versionProvider->isMySql();
+        /*
+         * Currently only MySQL support generated columns.
+         *
+         * We disable it on postgresql by default as the expressions we try to use are not immutable
+         * ERROR:  generation expression is not immutable
+         *
+         * As workaround for postgresql in future we should probably use
+         * standard column + trigger on update/edit which will fill the data.
+         */
+        if ($this->versionProvider->isMySql()) {
+            $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', '%Y-%m-%d %H:00', 'H'));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', '%Y-%m-%d', 'd', true));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', '%Y %U', 'W'));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
+        }
+    }
 
-        if (!$isMySQL && !$this->versionProvider->isPostgreSql()) {
-            return;
+    private function buildGeneratedColumn(string $name, string $type, string $format, string $unit, bool $filterDateColumn = false): GeneratedColumn
+    {
+        $columnName      = 'generated_date_added_'.$name;
+        $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, 'DATE_FORMAT(date_added, "'.$format.'")');
+        $generatedColumn->prependIndexColumn('campaign_id');
+        $generatedColumn->setOriginalDateColumn('date_added', $unit);
+        $generatedColumn->setStored(true);
+
+        if ($filterDateColumn) {
+            $generatedColumn->setFilterDateColumn($columnName);
+        } else {
+            $generatedColumn->addIndexColumn('date_added');
         }
 
-        foreach (self::DEFINITIONS as $def) {
-            $expr = $isMySQL ? $def['mysql'] : $def['postgres'];
-
-            $generatedColumn = new GeneratedColumn(
-                self::TABLE_NAME,
-                $def['column'],
-                $def['type'],
-                $expr
-            );
-
-            $generatedColumn->prependIndexColumn(self::INDEX_COLUMN);
-            $generatedColumn->setOriginalDateColumn(self::DATE_COLUMN, $def['granularity']);
-            $generatedColumn->setStored(true);
-
-            if ($def['filter']) {
-                $generatedColumn->setFilterDateColumn($def['column']);
-            }
-
-            $event->addGeneratedColumn($generatedColumn);
-        }
+        return $generatedColumn;
     }
 }

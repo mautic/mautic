@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
-use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
 final class Version20211020092759 extends PreUpAssertionMigration
 {
@@ -18,10 +17,11 @@ final class Version20211020092759 extends PreUpAssertionMigration
         $this->skipAssertion(
             function () {
                 $tableName = $this->getPrefixedTableName(self::TABLE);
+                $platform  = $this->connection->getDatabasePlatform();
 
                 // Check index limit
                 $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
-                if (count($indexes) >= IndexHelper::MAX_COUNT_ALLOWED) {
+                if (count($indexes) >= DatabasePlatform::getMaxIndexAllowed($platform)) {
                     return true;
                 }
 
@@ -54,7 +54,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
         $tableName = $this->getPrefixedTableName(self::TABLE);
         $indexName = $this->getIndexName();
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             $this->addSql(sprintf(
                 'DROP INDEX IF EXISTS %s',
                 $indexName
@@ -77,7 +77,7 @@ final class Version20211020092759 extends PreUpAssertionMigration
     {
         $platform = $this->connection->getDatabasePlatform();
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             $sql = '
                 SELECT 1
                 FROM pg_indexes

@@ -14,6 +14,8 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\CoreBundle\Exception\RecordNotFoundException;
 
 /**
  * Central abstraction point for database platform differences (MySQL vs PostgreSQL).
@@ -22,6 +24,137 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  */
 class DatabasePlatform
 {
+    /* ===================================================================
+     * Platform detection helpers
+     * =================================================================== */
+
+    /**
+     * Returns a short string identifier for the given database platform.
+     *
+     * This is a workaround for the deprecated \Doctrine\DBAL\Platforms\AbstractPlatform::getName() method.
+     */
+    public static function getDatabasePlatform(AbstractPlatform $platform): string
+    {
+        if ($platform instanceof AbstractMySQLPlatform) {
+            return 'mysql';
+        }
+
+        if ($platform instanceof DB2Platform) {
+            return 'db2';
+        }
+
+        if ($platform instanceof OraclePlatform) {
+            return 'oracle';
+        }
+
+        if ($platform instanceof PostgreSQLPlatform) {
+            return 'postgresql';
+        }
+
+        if ($platform instanceof SQLServerPlatform) {
+            return 'mssql';
+        }
+
+        if ($platform instanceof SqlitePlatform) {
+            return 'sqlite';
+        }
+
+        throw new \RuntimeException('Unknown platform '.$platform::class);
+    }
+
+    /**
+     * Checks whether the given platform is PostgreSQL.
+     */
+    public static function isPostgreSQL(?AbstractPlatform $platform): bool
+    {
+        return $platform instanceof PostgreSQLPlatform;
+    }
+
+    /**
+     * Checks whether the given platform is MySQL.
+     */
+    public static function isMySQL(?AbstractPlatform $platform): bool
+    {
+        return $platform instanceof AbstractMySQLPlatform;
+    }
+
+    /* ===================================================================
+     * LIKE / ILIKE helpers
+     * =================================================================== */
+
+    /**
+     * Returns case-insensitive LIKE / ILIKE expression.
+     *
+     * PostgreSQL → ILIKE (faster, no LOWER needed in most cases)
+     * MySQL      → LIKE (with optional LOWER for consistency when search term is lowercased)
+     *
+     * @param bool $lowerValue Set true only when the right-hand side is a literal that still needs LOWER()
+     *                         (rare – most of the code already lowercases the parameter)
+     */
+    public static function getCaseInsensitiveLike(
+        ?AbstractPlatform $platform,
+        string $column,
+        string $valueOrParameter,
+        bool $ensureCast = false,
+        bool $lowerColumn = false,
+        bool $lowerValue = false,
+        bool $forceLower = false,
+    ): string {
+        $col = $ensureCast ? self::castIfStrict($platform, $column) : $column;
+
+        if (self::isPostgreSQL($platform)) {
+            if ($forceLower) {
+                return 'LOWER('.$col.') LIKE LOWER('.$valueOrParameter.')';
+            }
+
+            return $col.' ILIKE '.$valueOrParameter;
+        }
+
+        // MySQL
+        if ($lowerColumn || $lowerValue) {
+            return ($lowerColumn ? 'LOWER('.$col.')' : $col).' LIKE '.($lowerValue ? 'LOWER('.$valueOrParameter.')' : $col);
+        }
+
+        return $col.' LIKE '.$valueOrParameter;
+    }
+
+    /* ===================================================================
+     * REGEXP helpers
+     * =================================================================== */
+
+    /**
+     * REGEXP handling (positive and negative).
+     *
+     * MySQL:   column REGEXP pattern
+     *          NOT column REGEXP pattern
+     *
+     * PostgreSQL: column ~* pattern     (case-insensitive)
+     *             column !~* pattern
+     *
+     * @param bool $negative true for NOT REGEXP / notRegexp
+     */
+    public static function getRegexpExpression(
+        ?AbstractPlatform $platform,
+        string $column,
+        string $pattern,
+        bool $negative = false,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            $operator = $negative ? '!~*' : '~*';
+
+            return $column.' '.$operator.' '.$pattern;
+        }
+
+        // MySQL
+        $operator = $negative ? 'NOT REGEXP' : 'REGEXP';
+
+        return $column.' '.$operator.' '.$pattern;
+    }
+
+    /* ===================================================================
+     * Date / Time helpers
+     * =================================================================== */
+
     /**
      * Match date/time unit to a SQL datetime format
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
@@ -77,110 +210,6 @@ class DatabasePlatform
         'M' => 'YYYY-MM', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'YYYY',
     ];
-
-    public static function getDatabasePlatform(AbstractPlatform $platform): string
-    {
-        if ($platform instanceof AbstractMySQLPlatform) {
-            return 'mysql';
-        }
-
-        if ($platform instanceof DB2Platform) {
-            return 'db2';
-        }
-
-        if ($platform instanceof OraclePlatform) {
-            return 'oracle';
-        }
-
-        if ($platform instanceof PostgreSQLPlatform) {
-            return 'postgresql';
-        }
-
-        if ($platform instanceof SQLServerPlatform) {
-            return 'mssql';
-        }
-
-        if ($platform instanceof SqlitePlatform) {
-            return 'sqlite';
-        }
-
-        throw new \RuntimeException('Unknown platform '.$platform::class);
-    }
-
-    public static function isPostgreSQL(?AbstractPlatform $platform): bool
-    {
-        return $platform instanceof PostgreSQLPlatform;
-    }
-
-    public static function isMySQL(?AbstractPlatform $platform): bool
-    {
-        return $platform instanceof AbstractMySQLPlatform;
-    }
-
-    /**
-     * Returns case-insensitive LIKE / ILIKE expression.
-     *
-     * PostgreSQL → ILIKE (faster, no LOWER needed in most cases)
-     * MySQL      → LIKE (with optional LOWER for consistency when search term is lowercased)
-     *
-     * @param bool $lowerValue Set true only when the right-hand side is a literal that still needs LOWER()
-     *                         (rare – most of the code already lowercases the parameter)
-     */
-    public static function getCaseInsensitiveLike(
-        ?AbstractPlatform $platform,
-        string $column,
-        string $valueOrParameter,
-        bool $ensureCast = false,
-        bool $lowerColumn = false,
-        bool $lowerValue = false,
-        bool $forceLower = false,
-    ): string {
-        $col = $ensureCast ? self::castIfStrict($platform, $column) : $column;
-
-        if (self::isPostgreSQL($platform)) {
-            if ($forceLower) {
-                return 'LOWER('.$col.') LIKE LOWER('.$valueOrParameter.')';
-            }
-
-            return $col.' ILIKE '.$valueOrParameter;
-        }
-
-        // MySQL
-        if ($lowerColumn || $lowerValue) {
-            return ($lowerColumn ? 'LOWER('.$col.')' : $col).' LIKE '.($lowerValue ? 'LOWER('.$valueOrParameter.')' : $col);
-        }
-
-        return $col.' LIKE '.$valueOrParameter;
-    }
-
-    /**
-     * REGEXP handling (positive and negative).
-     *
-     * MySQL:   column REGEXP pattern
-     *          NOT column REGEXP pattern
-     *
-     * PostgreSQL: column ~* pattern     (case-insensitive)
-     *             column !~* pattern
-     *
-     * @param bool $negative true for NOT REGEXP / notRegexp
-     */
-    public static function getRegexpExpression(
-        ?AbstractPlatform $platform,
-        string $column,
-        string $pattern,
-        bool $negative = false,
-    ): string {
-        if (self::isPostgreSQL($platform)) {
-            $operator = $negative ? '!~*' : '~*';
-
-            return $column.' '.$operator.' '.$pattern;
-        }
-
-        // MySQL
-        $operator = $negative ? 'NOT REGEXP' : 'REGEXP';
-
-        return $column.' '.$operator.' '.$pattern;
-    }
 
     /**
      * Returns the full date construct expression used in charts (group by + display).
@@ -284,6 +313,26 @@ class DatabasePlatform
         }
 
         return "CASE WHEN {$readColumn} IS NOT NULL THEN TIMEDIFF({$readColumn}, {$sentColumn}) ELSE '-' END";
+    }
+
+    /* ===================================================================
+     * Other helpers
+     * =================================================================== */
+
+    public const MYSQL_MAX_INDEX_ALLOWED = 64;
+
+    /**
+     * In PostgreSQL there is basically no limitation.
+     * But for our purpose we set it to reasonable number which will probably be never reached.
+     */
+    public const POSTGRESQL_MAX_INDEX_ALLOWED = 1024;
+
+    /**
+     * Return max index allowed per platform.
+     */
+    public static function getMaxIndexAllowed(?AbstractPlatform $platform = null): int
+    {
+        return self::isPostgreSQL($platform) ? self::POSTGRESQL_MAX_INDEX_ALLOWED : self::MYSQL_MAX_INDEX_ALLOWED;
     }
 
     /**
@@ -496,10 +545,10 @@ class DatabasePlatform
     public static function getShareLockClause(?AbstractPlatform $platform): string
     {
         if (self::isPostgreSQL($platform)) {
-            return ' FOR SHARE';
+            return 'FOR SHARE';
         }
 
-        return ' LOCK IN SHARE MODE';
+        return 'LOCK IN SHARE MODE';
     }
 
     /**
@@ -551,52 +600,6 @@ class DatabasePlatform
         $connection->executeStatement(
             'ALTER TABLE '.$tableName.' AUTO_INCREMENT='.$startWith
         );
-    }
-
-    /**
-     * Returns platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
-     *
-     * @param string        $tableName  Target table
-     * @param string        $columns    Target columns
-     * @param string        $innerSql   Subquery that provides the data
-     * @param string        $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
-     * @param array<string> $updateSet  Columns to update on conflict (without table prefix)
-     */
-    public static function getUpsertStatement(
-        ?AbstractPlatform $platform,
-        string $tableName,
-        string $columns,
-        string $innerSql,
-        string $conflictOn,
-        array $updateSet,
-    ): string {
-        if (self::isPostgreSQL($platform)) {
-            $setClauses = [];
-            foreach ($updateSet as $col) {
-                $setClauses[] = "{$col} = EXCLUDED.{$col}";
-            }
-
-            return "
-                INSERT INTO {$tableName} ({$columns})
-                SELECT * FROM ({$innerSql}) AS tmp
-                ON CONFLICT ({$conflictOn})
-                DO UPDATE SET
-                    ".implode(',', $setClauses).'
-            ';
-        }
-
-        // MySQL
-        $setClauses = [];
-        foreach ($updateSet as $col) {
-            $setClauses[] = "{$col} = VALUES({$col})";
-        }
-
-        return "
-            INSERT INTO {$tableName} ({$columns})
-            SELECT {$columns} FROM ({$innerSql}) AS tmp
-            ON DUPLICATE KEY UPDATE
-                ".implode(',', $setClauses).'
-        ';
     }
 
     /**
@@ -912,20 +915,31 @@ class DatabasePlatform
      * =================================================================== */
 
     /**
-     * Returns the correct LIKE operator for case-insensitive search.
-     *
-     * In ORM context we always use LOWER(column) LIKE on both platforms.
-     * In raw DBAL we can use native ILIKE on PostgreSQL.
+     * Returns the operator for case-insensitive search in DBAL (non-ORM) queries.
+     * PostgreSQL: ILIKE / NOT ILIKE
+     * MySQL:      LIKE / NOT LIKE.
      */
-    public static function getLikeOperator(
-        ?AbstractPlatform $platform,
-        bool $isOrm = true,
-    ): string {
-        if (self::isPostgreSQL($platform) && !$isOrm) {
-            return 'ILIKE';
+    public static function getDbalLikeOperator(AbstractPlatform $platform, bool $not = false): string
+    {
+        if (self::isPostgreSQL($platform)) {
+            return $not ? 'NOT ILIKE' : 'ILIKE';
         }
 
-        return 'LIKE';
+        return $not ? 'NOT LIKE' : 'LIKE';
+    }
+
+    /**
+     * Returns column or value wrapped for case-insensitive search in ORM queries.
+     * PostgreSQL: LOWER(column)
+     * MySQL:      column (no LOWER needed).
+     */
+    public static function applyCaseInsensitiveWrap(?AbstractPlatform $platform, string $column): string
+    {
+        if (self::isPostgreSQL($platform)) {
+            return 'LOWER('.$column.')';
+        }
+
+        return $column;
     }
 
     /**
@@ -938,5 +952,275 @@ class DatabasePlatform
         bool $isOrm = true,
     ): bool {
         return self::isPostgreSQL($platform) && $isOrm;
+    }
+
+    /**
+     * Returns the platform-specific conflict target for upsert.
+     *
+     * Prefers non-primary unique constraint if available, otherwise falls back to primary key.
+     */
+    public static function getUpsertConflictTarget(Connection $connection, ClassMetadata $metadata, string $pkColumn): ?string
+    {
+        /**
+         * Currently Unique Constrains are only used in PostgreSQL
+         * So this logic no need to run on any platform beside it.
+         */
+        if (self::isPostgreSQL($connection->getDatabasePlatform())) {
+            // From mapping attributes/annotations
+            $uniqueConstraints = $metadata->table['uniqueConstraints'] ?? [];
+
+            foreach ($uniqueConstraints as $uc) {
+                $cols = $uc['columns'];
+                // Prefer if it doesn't include PK or has more columns
+                if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
+                    return implode(', ', $cols);
+                }
+            }
+
+            // Fallback: introspect unique indexes (runtime, requires schema access)
+            try {
+                $helper = new IndexSchemaHelper(
+                    $connection,
+                    MAUTIC_TABLE_PREFIX
+                );
+
+                $indexes = $helper->getTableIndexes($metadata->getTableName());
+                foreach ($indexes as $index) {
+                    if ($index->isUnique() && !$index->isPrimary()) {
+                        $cols = $index->getColumns();
+                        if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
+                            return implode(', ', $cols);
+                        }
+                    }
+                }
+            } catch (\Throwable) {
+                // Silent fallback if introspection fails
+            }
+        }
+
+        return $pkColumn; // Fallback: if nothing was found pk column is returned as default
+    }
+
+    /**
+     * Returns the platform-specific UPDATE expression for upsert.
+     *
+     * PostgreSQL uses EXCLUDED table, MySQL uses VALUES() function.
+     */
+    public static function getUpsertUpdateExpression(
+        AbstractPlatform $platform,
+        string $column,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return "{$column} = EXCLUDED.{$column}";
+        }
+
+        return "{$column} = VALUES({$column})";
+    }
+
+    /**
+     * Returns platform-specific summarize upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
+     *
+     * @param string        $tableName  Target table
+     * @param string        $columns    Target columns
+     * @param string        $innerSql   Subquery that provides the data
+     * @param string        $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
+     * @param array<string> $updateSet  Columns to update on conflict (without table prefix)
+     */
+    public static function getSummarizeUpsertStatement(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        string $columns,
+        string $innerSql,
+        string $conflictOn,
+        array $updateSet,
+    ): string {
+        $setClauses = [];
+        foreach ($updateSet as $col) {
+            $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
+        }
+
+        if (self::isPostgreSQL($platform)) {
+            return "
+                INSERT INTO {$tableName} ({$columns})
+                SELECT * FROM ({$innerSql}) AS tmp
+                ON CONFLICT ({$conflictOn})
+                DO UPDATE SET
+                    ".implode(',', $setClauses).'
+            ';
+        }
+
+        return "
+            INSERT INTO {$tableName} ({$columns})
+            SELECT {$columns} FROM ({$innerSql}) AS tmp
+            ON DUPLICATE KEY UPDATE
+                ".implode(',', $setClauses).'
+        ';
+    }
+
+    /**
+     * Processes an identifier field during upsert and directly modifies the provided arrays and $hasId flag by reference.
+     *
+     * This centralizes all platform-specific identifier handling (PostgreSQL NEXTVAL vs MySQL LAST_INSERT_ID).
+     *
+     * @param callable $makeUpdate Function that returns the update expression for a column
+     *
+     * @return bool hasId
+     */
+    public static function processIdentifierForUpsert(
+        Connection $connection,
+        object $entity,
+        ClassMetadata $metadata,
+        string $tableName,
+        string $fieldName,
+        callable $makeUpdate,
+        array &$columns,
+        array &$values,
+        array &$types,
+        array &$set,
+        array &$update,
+    ): bool {
+        $platform   = $connection->getDatabasePlatform();
+        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
+
+        $value  = $metadata->getFieldValue($entity, $fieldName);
+        $column = $metadata->getColumnName($fieldName);
+        $type   = $metadata->getTypeOfField($fieldName);
+
+        if ($metadata->isIdentifier($fieldName)) {
+            if ($value) {
+                $columns[] = $column;
+                $values[]  = $value;
+                $types[]   = $type;
+                $set[]     = '?';
+                $update[]  = $makeUpdate($column);
+
+                return true; // Existing entity: include id in INSERT (needed for conflict matching)
+            } elseif (self::isPostgreSQL($platform)) {
+                // New entity on PG: use nextval in VALUES (no bound param)
+                $sequence  = self::getSerialSequence($connection, $tableName, $column);
+                $columns[] = $column;
+                $set[]     = "NEXTVAL('{$sequence}')";
+            } elseif ($fieldName === $identifier) {
+                // MySQL special case for LAST_INSERT_ID
+                $update[] = "{$column} = LAST_INSERT_ID({$column})";
+            }
+
+            return false;
+        }
+
+        $columns[] = $column;
+        $values[]  = $value;
+        $types[]   = $type;
+        $set[]     = '?';
+        $update[]  = $makeUpdate($column);
+
+        return false;
+    }
+
+    /**
+     * Returns platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
+     *
+     * @param array<string> $columns Target columns
+     * @param array<string> $values
+     * @param array<string> $types
+     * @param array<string> $set
+     * @param array<string> $update  Columns to update
+     *
+     * @throw RecordNotFoundException
+     */
+    public static function getUpsertStatement(
+        Connection $connection,
+        object $entity,
+        ClassMetadata $metadata,
+        string $tableName,
+        array $columns = [],
+        array $values = [],
+        array $types = [],
+        array $set = [],
+        array $update = [],
+        bool $hasId = false,
+    ): array {
+        $platform   = $connection->getDatabasePlatform();
+        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
+
+        $columnList = implode(', ', $columns);
+        $setList    = implode(', ', $set);
+        $updateList = implode(', ', $update);
+
+        if (self::isPostgreSQL($platform)) {
+            $idColumn   = $metadata->getColumnName($identifier);
+            // Detect best conflict target (prefer non-PK unique constraint)
+            $conflictTarget = self::getUpsertConflictTarget($connection, $metadata, $idColumn);
+
+            // Always RETURNING to get both the (generated or existing) id and insert detection
+            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
+                ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
+                .'RETURNING {$idColumn}, (xmax = 0) AS is_new';
+
+            $result = $connection->fetchAssociative($sql, $values, $types);
+
+            if (false === $result) {
+                // Should never happen in upsert
+                throw new RecordNotFoundException('Upsert failed - no row returned');
+            }
+
+            $generatedOrExistingId = (int) $result['id'];
+            $wasInserted           = (bool) $result['is_new'];
+            $wasUpdated            = !$wasInserted;
+
+            // Always set the ID back (important for new entities)
+            $metadata->setFieldValue($entity, $identifier, $generatedOrExistingId);
+        } else {
+            // MySQL: Use affected rows count (1 = Insert, 2 = Update)
+            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) ".
+                "ON DUPLICATE KEY UPDATE $updateList";
+
+            $affectedRows = $connection->executeStatement($sql, $values, $types);
+            $wasInserted  = (1 === $affectedRows);
+            $wasUpdated   = (2 === $affectedRows);
+
+            if (!$hasId) {
+                $id = (int) $connection->lastInsertId();
+                $metadata->setFieldValue($entity, $identifier, $id);
+            }
+        }
+
+        return [$wasInserted, $wasUpdated];
+    }
+
+    /**
+     * Returns the name of the sequence for a given table and field (PostgreSQL only).
+     *
+     * First attempts to use the standard `pg_get_serial_sequence()` function.
+     * Falls back to Doctrine's default naming convention (`{table}_{field}_seq`)
+     * if the sequence is not registered or visible to `pg_get_serial_sequence()`.
+     *
+     * This is required because PostgreSQL tables created via Doctrine migrations
+     * often use GENERATED ... AS IDENTITY without a visible named sequence.
+     *
+     * @param string $fullTable Full table name (with prefix if applicable)
+     * @param string $field     Column name (defaults to 'id')
+     *
+     * @return string Sequence name or empty string if none found
+     */
+    public static function getSerialSequence(Connection $connection, string $fullTable, string $field = 'id'): string
+    {
+        // Step 1: Try standard pg_get_serial_sequence (may return NULL)
+        $sequence    = $connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
+
+        // Step 2: Fallback - set common sequence name as doctrine do
+        if (!$sequence) {
+            // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
+            // without linking a named sequence in a way visible to pg_get_serial_sequence()
+            // Test DB uses a different config that doesn't register the sequence properly
+            $doctrineSequence = $fullTable.'_'.$field.'_seq';
+            if ($connection->fetchOne(
+                "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
+                [$doctrineSequence])) {
+                $sequence = $doctrineSequence;
+            }
+        }
+
+        return $sequence;
     }
 }
