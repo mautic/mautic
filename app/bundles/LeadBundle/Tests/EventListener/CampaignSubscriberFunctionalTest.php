@@ -1111,7 +1111,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             campaign: $campaign,
             name: 'Check if company is in Glibi Segment',
             type: 'lead.company_segments',
-            properties: ['company_segment_ids' => [$segmentGlibi->getId()]],
+            properties: ['companySegments' => [$segmentGlibi->getId()]],
             order: 1
         );
 
