@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use Mautic\LeadBundle\Validator\Constraints\CompanySegmentCircularReference;
 use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
 use Symfony\Component\Form\AbstractType;
@@ -29,6 +30,7 @@ class CompanySegmentType extends AbstractType
     public function __construct(
         private CompanySegmentModel $companySegmentModel,
         private TranslatorInterface $translator,
+        private RelativeDate $relativeDate,
     ) {
     }
 
@@ -97,7 +99,7 @@ class CompanySegmentType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object' => CompanySegment::LINKED_ENTITY]);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate, ['object' => CompanySegment::LINKED_ENTITY]);
         $builder->add(
             $builder->create(
                 'filters',
