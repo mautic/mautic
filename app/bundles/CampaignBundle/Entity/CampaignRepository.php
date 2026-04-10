@@ -6,9 +6,11 @@ use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\RelatedEntityAliasFilterRepositoryTrait;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
@@ -18,6 +20,7 @@ class CampaignRepository extends CommonRepository
 {
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+    use RelatedEntityAliasFilterRepositoryTrait;
     use ProjectRepositoryTrait;
 
     public function getEntities(array $args = [])
@@ -252,7 +255,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param OrmQueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -263,7 +266,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param OrmQueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -275,6 +278,11 @@ class CampaignRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName();
 
         switch ($filter->command) {
+            case 'list':
+                if ($q instanceof OrmQueryBuilder) {
+                    [$expr, $forceParameters] = $this->handleRelatedEntityAliasFilter($q, 'lists', 'l', $filter->string, $unique);
+                }
+                break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->and(
@@ -324,6 +332,7 @@ class CampaignRepository extends CommonRepository
     public function getSearchCommands(): array
     {
         return array_merge([
+            'mautic.campaign.campaign.searchcommand.list',
             'mautic.campaign.campaign.searchcommand.isexpired',
             'mautic.campaign.campaign.searchcommand.ispending',
             'mautic.project.searchcommand.name',
