@@ -1135,7 +1135,7 @@ class CommonRepository extends ServiceEntityRepository
 
             $expr = $q->expr()->$xFunc();
             foreach ($columns as $col) {
-                $expr->add(
+                $expr->with( // add() is deprecated
                     $q->expr()->comparison($col, $exprFunc, ":$unique")
                 );
             }

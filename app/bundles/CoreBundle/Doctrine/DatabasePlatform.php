@@ -525,7 +525,7 @@ class DatabasePlatform
             $sequenceName = $metadata ? $metadata->getSequenceName($platform) : $tableName.'_'.$idColumn.'_seq';
 
             return [
-                'idColumn' => $idColumn.', ',
+                'idColumn' => $idColumn,
                 'idSelect' => "nextval('{$sequenceName}') AS {$idColumn}, ",
             ];
         }
@@ -1062,7 +1062,12 @@ class DatabasePlatform
      *
      * This centralizes all platform-specific identifier handling (PostgreSQL NEXTVAL vs MySQL LAST_INSERT_ID).
      *
-     * @param callable $makeUpdate Function that returns the update expression for a column
+     * @param callable      $makeUpdate Function that returns the update expression for a column
+     * @param array<string> $columns    Target columns
+     * @param array<string> $values
+     * @param array<string> $types
+     * @param array<string> $set
+     * @param array<string> $update     Columns to update
      *
      * @return bool hasId
      */
@@ -1118,13 +1123,20 @@ class DatabasePlatform
     }
 
     /**
-     * Returns platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
+     * Builds and executes platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY).
+     *
+     * This method handles the full upsert logic including:
+     * - Building SQL for PostgreSQL (ON CONFLICT + RETURNING) and MySQL (ON DUPLICATE KEY)
+     * - Returning the generated/existing ID to the entity
+     * - Detecting whether the operation was an INSERT or UPDATE
      *
      * @param array<string> $columns Target columns
      * @param array<string> $values
      * @param array<string> $types
      * @param array<string> $set
      * @param array<string> $update  Columns to update
+     *
+     * @return array<bool> {wasInserted, wasUpdated}
      *
      * @throw RecordNotFoundException
      */
@@ -1155,7 +1167,7 @@ class DatabasePlatform
             // Always RETURNING to get both the (generated or existing) id and insert detection
             $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
                 ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
-                .'RETURNING {$idColumn}, (xmax = 0) AS is_new';
+                ."RETURNING {$idColumn}, (xmax = 0) AS is_new";
 
             $result = $connection->fetchAssociative($sql, $values, $types);
 
