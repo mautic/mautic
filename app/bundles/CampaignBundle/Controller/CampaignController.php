@@ -891,22 +891,22 @@ class CampaignController extends AbstractStandardFormController
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
-            $listIds = [];
+            $formIds = $listAliases = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('list' == $type) {
-                        $listIds[] = (int) $fltr;
+                        $listAliases[] = $fltr;
                     } else {
                         $formIds[] = (int) $fltr;
                     }
                 }
             }
 
-            if (!empty($listIds)) {
+            if (!empty($listAliases)) {
                 $joinLists         = true;
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             }
 
             if (!empty($formIds)) {

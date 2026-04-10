@@ -108,10 +108,12 @@ class EmailController extends FormController
         // retrieve a list of Lead Lists
         $leadListModel = $this->getModel('lead.list');
         \assert($leadListModel instanceof ListModel);
+        $availableLists = $leadListModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $leadListModel->getUserLists(),
+            'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => 'list',
         ];
+        $listAliasLookup = array_column($availableLists, 'alias', 'id');
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
@@ -145,7 +147,7 @@ class EmailController extends FormController
         $session->set('mautic.email.list_filters', $currentFilters);
 
         if (!empty($currentFilters)) {
-            $listIds = $catIds = $templates = [];
+            $listAliases = $catIds = $templates = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 switch ($type) {
                     case 'list':
@@ -164,7 +166,7 @@ class EmailController extends FormController
                 foreach ($typeFilters as $fltr) {
                     switch ($type) {
                         case 'list':
-                            $listIds[] = (int) $fltr;
+                            $listAliases[] = $listAliasLookup[(int) $fltr] ?? $fltr;
                             break;
                         case 'category':
                             $catIds[] = (int) $fltr;
@@ -176,8 +178,8 @@ class EmailController extends FormController
                 }
             }
 
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+            if (!empty($listAliases)) {
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
                 $ignoreListJoin    = false;
             }
 

@@ -5,11 +5,9 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Entity\RelatedEntityAliasFilterRepositoryTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -19,7 +17,6 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
  */
 class EmailRepository extends CommonRepository
 {
-    use RelatedEntityAliasFilterRepositoryTrait;
     use ProjectRepositoryTrait;
     public const EMAILS_PREFIX        = 'e';
 
@@ -554,8 +551,8 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param OrmQueryBuilder|QueryBuilder $q
-     * @param object                       $filter
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     * @param object                                  $filter
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -566,8 +563,8 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param OrmQueryBuilder|QueryBuilder $q
-     * @param object                       $filter
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     * @param object                                  $filter
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -581,11 +578,6 @@ class EmailRepository extends CommonRepository
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
-            case 'list':
-                if ($q instanceof OrmQueryBuilder) {
-                    [$expr, $forceParameters] = $this->handleRelatedEntityAliasFilter($q, 'lists', 'l', $filter->string, $unique);
-                }
-                break;
             case $this->translator->trans('mautic.email.email.searchcommand.isexpired'):
             case $this->translator->trans('mautic.email.email.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = sprintf(
@@ -648,7 +640,6 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
-            'mautic.email.email.searchcommand.list',
             'mautic.email.email.searchcommand.isexpired',
             'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',
