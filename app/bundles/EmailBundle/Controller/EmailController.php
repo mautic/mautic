@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
@@ -37,6 +38,7 @@ class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
@@ -108,7 +110,7 @@ class EmailController extends FormController
         // retrieve a list of Lead Lists
         $leadListModel = $this->getModel('lead.list');
         \assert($leadListModel instanceof ListModel);
-        $availableLists = $leadListModel->getUserLists();
+        $availableLists                                               = $leadListModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => 'list',
@@ -147,7 +149,7 @@ class EmailController extends FormController
         $session->set('mautic.email.list_filters', $currentFilters);
 
         if (!empty($currentFilters)) {
-            $listAliases = $catIds = $templates = [];
+            $listAliases = $catIds = $templates = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 switch ($type) {
                     case 'list':
@@ -166,17 +168,26 @@ class EmailController extends FormController
                 foreach ($typeFilters as $fltr) {
                     switch ($type) {
                         case 'list':
-                            $listAliases[] = $listAliasLookup[(int) $fltr] ?? $fltr;
+                            $resolvedAlias       = $listAliasLookup[(int) $fltr] ?? $fltr;
+                            $listAliases[]       = $resolvedAlias;
+                            $searchFilterTerms[] = 'list:'.$fltr;
+                            $searchFilterTerms[] = 'list:'.$resolvedAlias;
                             break;
                         case 'category':
-                            $catIds[] = (int) $fltr;
+                            $catIds[]            = (int) $fltr;
+                            $searchFilterTerms[] = 'category:'.$fltr;
                             break;
                         case 'theme':
-                            $templates[] = $fltr;
+                            $templates[]         = $fltr;
+                            $searchFilterTerms[] = 'theme:'.$fltr;
                             break;
                     }
                 }
             }
+
+            $search = $this->stripQuickFilterTokensFromSearch($search, $searchFilterTerms);
+            $session->set('mautic.email.filter', $search);
+            $filter['string'] = $search;
 
             if (!empty($listAliases)) {
                 $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];

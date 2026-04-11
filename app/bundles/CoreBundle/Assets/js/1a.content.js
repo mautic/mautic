@@ -1835,17 +1835,20 @@ Mautic.applyFilters = function () {
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
 
     const activeFilters = document.querySelectorAll('.label.active');
-    let filterCommands = Array.from(activeFilters).map(function (filterElement) {
+    const searchCommands = Array.from(activeFilters).map(function (filterElement) {
         return filterElement.dataset.filter;
     });
 
     const selectFields = document.querySelectorAll('.popover-content select');
+    const selectedFilterValues = [];
     selectFields.forEach(function (selectElement) {
         const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
-        filterCommands.push(...selectedOptions);
+        selectedFilterValues.push(...selectedOptions);
     });
 
-    const newSearchValue = (currentSearchValue + ' ' + filterCommands.join(' ')).trim();
+    searchInput.setAttribute('data-filters', JSON.stringify(selectedFilterValues));
+
+    const newSearchValue = (currentSearchValue + ' ' + searchCommands.concat(selectedFilterValues).join(' ')).trim();
     searchInput.value = newSearchValue;
 
     // Properly destroy and reinitialize popover
@@ -1873,6 +1876,7 @@ Mautic.resetFilters = function () {
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
     searchInput.value = currentSearchValue.trim();
+    searchInput.setAttribute('data-filters', JSON.stringify([]));
 
     const activeFilters = document.querySelectorAll('.label.active');
     activeFilters.forEach(function (filterElement) {
@@ -1947,6 +1951,26 @@ Mautic.getActiveFilterCommands = function () {
     return matches ? matches : [];
 };
 
+Mautic.getSelectedPopoverFilters = function () {
+    const searchInput = document.getElementById('list-search');
+    if (!searchInput) {
+        return [];
+    }
+
+    const serializedFilters = searchInput.getAttribute('data-filters');
+    if (!serializedFilters) {
+        return [];
+    }
+
+    try {
+        const filters = JSON.parse(serializedFilters);
+
+        return Array.isArray(filters) ? filters : [];
+    } catch (error) {
+        return [];
+    }
+};
+
 /**
  * Initializes the active states of filter labels based on the current search input.
  *
@@ -1954,6 +1978,8 @@ Mautic.getActiveFilterCommands = function () {
  */
 Mautic.initializePopoverFilters = function (popoverElement) {
     const activeFilterCommands = Mautic.getActiveFilterCommands();
+    const selectedPopoverFilters = Mautic.getSelectedPopoverFilters();
+    const selectFields = popoverElement.querySelectorAll('select');
 
     // Handle regular filter labels
     activeFilterCommands.forEach(function (filterCommand) {
@@ -1961,28 +1987,22 @@ Mautic.initializePopoverFilters = function (popoverElement) {
         if (label) {
             label.classList.add('active');
         }
+    });
 
-        // Handle select fields
-        const selectFields = popoverElement.querySelectorAll('select');
-        selectFields.forEach(function (selectElement) {
-            // Check if the value matches either the raw value or a category format
-            Array.from(selectElement.options).forEach(function (option) {
-                const isSelected = activeFilterCommands.some(cmd =>
-                    cmd === option.value ||
-                    cmd === `category:${option.value}`
-                );
-                option.selected = isSelected;
-            });
-
-            // Initialize chosen
-            mQuery(selectElement).chosen({
-                width: '100%',
-                allow_single_deselect: true
-            });
-
-            // Update the UI
-            mQuery(selectElement).trigger('chosen:updated');
+    selectFields.forEach(function (selectElement) {
+        Array.from(selectElement.options).forEach(function (option) {
+            const isSelected = selectedPopoverFilters.includes(option.value);
+            option.selected = isSelected;
         });
+
+        // Initialize chosen
+        mQuery(selectElement).chosen({
+            width: '100%',
+            allow_single_deselect: true
+        });
+
+        // Update the UI
+        mQuery(selectElement).trigger('chosen:updated');
     });
 };
 
