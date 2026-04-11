@@ -146,6 +146,9 @@ class LeadNote extends FormEntity
         $metadata->addPropertyConstraint('text', new NotBlank(
             ['message' => 'mautic.lead.note.text.notblank']
         ));
+        $metadata->addPropertyConstraint('dateTime', new NotBlank(
+            ['message' => 'mautic.lead.note.date_time.notblank']
+        ));
     }
 
     /**
@@ -167,11 +170,11 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return mixed
      */
     public function getDateTime()
     {
-        return $this->dateTime ?? ($this->getDateAdded() ? clone $this->getDateAdded() : ($this->getDateModified() ? clone $this->getDateModified() : null));
+        return $this->dateTime;
     }
 
     /**
