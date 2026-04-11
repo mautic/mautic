@@ -46,8 +46,8 @@ class AbstractReportEvent extends Event
             return true;
         } elseif (0 === stripos($this->context, (string) $context)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

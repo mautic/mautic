@@ -57,7 +57,7 @@ class ChartQuery extends AbstractChart
     /**
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
      *
-     * @see \Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait::getTimeUnitFromDateRange()
+     * @see DateRangeUnitTrait::getTimeUnitFromDateRange()
      *
      * @param string|null $unit
      */

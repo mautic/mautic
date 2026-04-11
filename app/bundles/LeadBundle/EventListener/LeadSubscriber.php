@@ -409,9 +409,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this in engagements graph as it's info only
         }
+        // Purposively not including this in engagements graph as it's info only
     }
 
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
@@ -438,9 +437,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this in engagements graph as it's info only
         }
+        // Purposively not including this in engagements graph as it's info only
     }
 
     /**
@@ -481,9 +479,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         ]
                     );
                 }
-            } else {
-                // Purposively not including this in engagements graph as it's info only
             }
+            // Purposively not including this in engagements graph as it's info only
         }
     }
 
@@ -539,9 +536,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this in engagements graph as the engagement is counted by the page hit
         }
+        // Purposively not including this in engagements graph as the engagement is counted by the page hit
     }
 
     private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
@@ -662,9 +658,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this
         }
+        // Purposively not including this
     }
 
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
@@ -711,8 +706,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this
         }
+        // Purposively not including this
     }
 }
