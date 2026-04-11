@@ -1123,20 +1123,28 @@ class CommonRepository extends ServiceEntityRepository
             // ORM path - PostgreSQL uses LOWER(column) LIKE, MySQL uses column LIKE
             $expr = $q->expr()->orX();
             foreach ($columns as $col) {
-                $columnExpr = DatabasePlatform::applyCaseInsensitiveWrap($platform, $col);
                 $expr->add(
-                    $q->expr()->like($columnExpr, ":$unique")
+                    DatabasePlatform::getCaseInsensitiveLike(
+                        $platform,
+                        $col,
+                        ":$unique",
+                        DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                    )
                 );
             }
         } else {
             // DBAL path: use native ILIKE on PostgreSQL, LIKE on MySQL
-            $xFunc    = $filter->not ? 'andX' : 'orX';
-            $exprFunc = DatabasePlatform::getDbalLikeOperator($platform, $filter->not);
+            $xFunc = $filter->not ? 'andX' : 'orX';
 
             $expr = $q->expr()->$xFunc();
             foreach ($columns as $col) {
-                $expr->with( // add() is deprecated
-                    $q->expr()->comparison($col, $exprFunc, ":$unique")
+                $expr->add(
+                    DatabasePlatform::getCaseInsensitiveLike(
+                        $platform,
+                        $col,
+                        ":$unique",
+                        $filter->not ? DatabasePlatform::FLAG_NEGATIVE : 0
+                    )
                 );
             }
         }

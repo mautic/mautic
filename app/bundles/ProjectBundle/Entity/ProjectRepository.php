@@ -26,14 +26,13 @@ class ProjectRepository extends CommonRepository
 
     public function getProjectByName(string $name, ?int $ignoredId = null): ?Project
     {
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+
         $where = DatabasePlatform::getCaseInsensitiveLike(
-            $this->getEntityManager()->getConnection()->getDatabasePlatform(),
+            $platform,
             $this->getTableAlias().'.name',
             ':name',
-            false,
-            false,
-            false,
-            true
+            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
         );
 
         $q = $this->createQueryBuilder($this->getTableAlias());

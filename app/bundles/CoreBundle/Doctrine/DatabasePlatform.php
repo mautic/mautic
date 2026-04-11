@@ -82,40 +82,53 @@ class DatabasePlatform
      * LIKE / ILIKE helpers
      * =================================================================== */
 
+    // Define bitwise flags
+    public const FLAG_ENSURE_CAST        = 1;  // 1 << 0
+    public const FLAG_LOWER_COLUMN       = 2;  // 1 << 1
+    public const FLAG_LOWER_VALUE        = 4;  // 1 << 2
+    public const FLAG_FORCE_LOWER_COLUMN = 8;  // 1 << 3
+    public const FLAG_FORCE_LOWER_VALUE  = 16; // 1 << 4
+    public const FLAG_NEGATIVE           = 32; // 1 << 5
+
     /**
      * Returns case-insensitive LIKE / ILIKE expression.
      *
      * PostgreSQL → ILIKE (faster, no LOWER needed in most cases)
      * MySQL      → LIKE (with optional LOWER for consistency when search term is lowercased)
-     *
-     * @param bool $lowerValue Set true only when the right-hand side is a literal that still needs LOWER()
-     *                         (rare – most of the code already lowercases the parameter)
      */
     public static function getCaseInsensitiveLike(
         ?AbstractPlatform $platform,
         string $column,
         string $valueOrParameter,
-        bool $ensureCast = false,
-        bool $lowerColumn = false,
-        bool $lowerValue = false,
-        bool $forceLower = false,
+        int $flags = 0,
     ): string {
+        // Extract flags into local booleans for readability
+        $ensureCast       = ($flags & self::FLAG_ENSURE_CAST);
+        $lowerColumn      = ($flags & self::FLAG_LOWER_COLUMN);
+        $lowerValue       = ($flags & self::FLAG_LOWER_VALUE);
+        $forceLowerColumn = ($flags & self::FLAG_FORCE_LOWER_COLUMN);
+        $forceLowerValue  = ($flags & self::FLAG_FORCE_LOWER_VALUE);
+        $negative         = ($flags & self::FLAG_NEGATIVE);
+
         $col = $ensureCast ? self::castIfStrict($platform, $column) : $column;
+        $not = $negative ? ' NOT ' : ' ';
 
         if (self::isPostgreSQL($platform)) {
-            if ($forceLower) {
-                return 'LOWER('.$col.') LIKE LOWER('.$valueOrParameter.')';
+            if ($forceLowerColumn || $forceLowerValue) {
+                $c = $forceLowerColumn ? "LOWER($col)" : $col;
+                $v = $forceLowerValue ? "LOWER($valueOrParameter)" : $valueOrParameter;
+
+                return "{$c}{$not}LIKE {$v}";
             }
 
-            return $col.' ILIKE '.$valueOrParameter;
+            return "{$col}{$not}ILIKE {$valueOrParameter}";
         }
 
-        // MySQL
-        if ($lowerColumn || $lowerValue) {
-            return ($lowerColumn ? 'LOWER('.$col.')' : $col).' LIKE '.($lowerValue ? 'LOWER('.$valueOrParameter.')' : $col);
-        }
+        // MySQL / Default
+        $c = ($lowerColumn || $forceLowerColumn) ? "LOWER($col)" : $col;
+        $v = ($lowerValue || $forceLowerValue) ? "LOWER($valueOrParameter)" : $valueOrParameter;
 
-        return $col.' LIKE '.$valueOrParameter;
+        return "{$c}{$not}LIKE {$v}";
     }
 
     /* ===================================================================
@@ -915,34 +928,6 @@ class DatabasePlatform
      * =================================================================== */
 
     /**
-     * Returns the operator for case-insensitive search in DBAL (non-ORM) queries.
-     * PostgreSQL: ILIKE / NOT ILIKE
-     * MySQL:      LIKE / NOT LIKE.
-     */
-    public static function getDbalLikeOperator(AbstractPlatform $platform, bool $not = false): string
-    {
-        if (self::isPostgreSQL($platform)) {
-            return $not ? 'NOT ILIKE' : 'ILIKE';
-        }
-
-        return $not ? 'NOT LIKE' : 'LIKE';
-    }
-
-    /**
-     * Returns column or value wrapped for case-insensitive search in ORM queries.
-     * PostgreSQL: LOWER(column)
-     * MySQL:      column (no LOWER needed).
-     */
-    public static function applyCaseInsensitiveWrap(?AbstractPlatform $platform, string $column): string
-    {
-        if (self::isPostgreSQL($platform)) {
-            return 'LOWER('.$column.')';
-        }
-
-        return $column;
-    }
-
-    /**
      * Returns whether the search value should be lowercased.
      *
      * On PostgreSQL + ORM we lowercase the value because we use LOWER(column).
@@ -1060,16 +1045,19 @@ class DatabasePlatform
     /**
      * Processes an identifier field during upsert and directly modifies the provided arrays and $hasId flag by reference.
      *
-     * This centralizes all platform-specific identifier handling (PostgreSQL NEXTVAL vs MySQL LAST_INSERT_ID).
+     * This centralizes all platform-specific identifier handling:
+     * - Existing entity → include ID in INSERT
+     * - New PostgreSQL entity → use NEXTVAL()
+     * - MySQL special case for LAST_INSERT_ID()
      *
-     * @param callable      $makeUpdate Function that returns the update expression for a column
-     * @param array<string> $columns    Target columns
-     * @param array<string> $values
-     * @param array<string> $types
-     * @param array<string> $set
-     * @param array<string> $update     Columns to update
+     * @param callable           $makeUpdate Function that returns the update expression for a column
+     * @param array<string>      &$columns
+     * @param array<mixed>       &$values
+     * @param array<string|null> &$types
+     * @param array<string>      &$set
+     * @param array<string>      &$update
      *
-     * @return bool hasId
+     * @return bool Whether the identifier was processed as an existing entity (true = $hasId should be set)
      */
     public static function processIdentifierForUpsert(
         Connection $connection,

@@ -103,13 +103,17 @@ class BuilderTokenHelper
         }
 
         if (!empty($filter)) {
-            $platform = $this->connection->getDatabasePlatform();
             $expr     = $expr->with(
-                DatabasePlatform::getCaseInsensitiveLike($platform, $labelColumn, ':label', true, true)
+                DatabasePlatform::getCaseInsensitiveLike(
+                    $this->connection->getDatabasePlatform(),
+                    $labelColumn,
+                    ':label',
+                    DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
+                )
             );
 
             $parameters = [
-                'label' => strtolower($filter).'%',
+                'label' => mb_strtolower($filter).'%',
             ];
         } else {
             $parameters = [];
