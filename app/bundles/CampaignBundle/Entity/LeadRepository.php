@@ -3,10 +3,10 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -644,38 +644,34 @@ class LeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
+        $platform       = $conn->getDatabasePlatform();
 
-        if ($conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-            // 1. PostgreSQL uses standard DROP TABLE for temporary tables
-            $conn->executeStatement(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
+        // Drop temporary table (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true)
+        );
 
-            // 2. PostgreSQL requires the "AS" keyword and specific JOIN syntax for table creation
-            $conn->executeStatement(sprintf(
-                'CREATE TEMPORARY TABLE %s AS
-         SELECT DISTINCT lll.lead_id
-         FROM %s lll
-         JOIN %s l ON l.id = lll.lead_id
-         WHERE l.date_identified IS NULL',
-                $tempTableName,
-                $tableName,
-                $leadsTableName
-            ));
+        $selectSql = sprintf(
+            'SELECT DISTINCT lll.lead_id
+            FROM %s lll
+            JOIN %s l ON l.id = lll.lead_id
+            WHERE l.date_identified IS NULL',
+            $tableName,
+            $leadsTableName
+        );
 
-            // 3. PostgreSQL DELETE syntax uses "USING" and explicit join in WHERE
-            // Note: executeStatement() is used to get the count of affected rows directly
-            $deleteQuery = sprintf(
-                'DELETE FROM %s lll
-         USING (SELECT lead_id FROM %s LIMIT %d) d
-         WHERE lll.lead_id = d.lead_id',
-                $tableName,
-                $tempTableName,
-                self::DELETE_BATCH_SIZE
-            );
-        } else {
-            $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-            $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select DISTINCT lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
-            $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
-        }
+        // Create temporary table with the select (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql)
+        );
+
+        // Build the delete query (platform-safe)
+        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsSql(
+            $platform,
+            $tableName,
+            $tempTableName,
+            self::DELETE_BATCH_SIZE
+        );
 
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {

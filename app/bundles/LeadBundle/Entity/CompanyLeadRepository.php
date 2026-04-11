@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
@@ -218,14 +218,12 @@ class CompanyLeadRepository extends CommonRepository
         $conn = $this->getEntityManager()->getConnection();
 
         do {
-            if ($conn->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads
-                WHERE (company_id, lead_id) IN (SELECT company_id, lead_id
-                    FROM '.MAUTIC_TABLE_PREFIX.'companies_leads
-                    WHERE is_primary = FALSE LIMIT '.self::DELETE_BATCH_SIZE.')';
-            } else {
-                $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = FALSE LIMIT '.self::DELETE_BATCH_SIZE;
-            }
+            $sql = DatabasePlatform::getRemoveSecondaryCompaniesSql(
+                $conn->getDatabasePlatform(),
+                MAUTIC_TABLE_PREFIX.'companies_leads',
+                self::DELETE_BATCH_SIZE
+            );
+
             $row = $conn->executeStatement($sql);
         } while ($row);
     }

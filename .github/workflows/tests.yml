@@ -158,10 +158,6 @@ jobs:
         include:
           - php-versions: '8.2'
             postgres-versions: '16'
-          - php-versions: '8.2'
-            postgres-versions: '18'    
-          - php-versions: '8.5'
-            postgres-versions: '16'              
           - php-versions: '8.5'
             postgres-versions: '18'       
 
@@ -217,7 +213,7 @@ jobs:
         uses: shivammathur/setup-php@v2 # NOSONAR – matches official Mautic workflows, low risk
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql, imap, gd
           coverage: pcov
           ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
 

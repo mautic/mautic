@@ -131,6 +131,18 @@ class DatabasePlatform
         return "{$c}{$not}LIKE {$v}";
     }
 
+    /**
+     * Returns whether the search value should be lowercased.
+     *
+     * On PostgreSQL + ORM we lowercase the value because we use LOWER(column).
+     */
+    public static function shouldLowercaseSearchValue(
+        ?AbstractPlatform $platform,
+        bool $isOrm = true,
+    ): bool {
+        return self::isPostgreSQL($platform) && $isOrm;
+    }
+
     /* ===================================================================
      * REGEXP helpers
      * =================================================================== */
@@ -162,6 +174,22 @@ class DatabasePlatform
         $operator = $negative ? 'NOT REGEXP' : 'REGEXP';
 
         return $column.' '.$operator.' '.$pattern;
+    }
+
+    /**
+     * Returns regex pattern for "in" / "notIn" delimited matching (e.g. |value|).
+     * PostgreSQL uses ~* (case-insensitive), MySQL uses REGEXP.
+     */
+    public static function getDelimitedRegexPattern(
+        ?AbstractPlatform $platform,
+        string $value,
+    ): string {
+        $escaped = preg_quote($value, '~');
+        if (self::isPostgreSQL($platform)) {
+            return '\\|?'.$escaped.'\\|?';
+        }
+
+        return "\\|?$value\\|?";
     }
 
     /* ===================================================================
@@ -328,24 +356,88 @@ class DatabasePlatform
         return "CASE WHEN {$readColumn} IS NOT NULL THEN TIMEDIFF({$readColumn}, {$sentColumn}) ELSE '-' END";
     }
 
-    /* ===================================================================
-     * Other helpers
-     * =================================================================== */
+    /**
+     * Returns interval expression for date arithmetic.
+     *
+     * MySQL:      INTERVAL 30 MINUTE
+     * PostgreSQL: INTERVAL '30 MINUTES'
+     */
+    public static function getIntervalExpression(
+        ?AbstractPlatform $platform,
+        int $value,
+        string $unit = 'MINUTE',
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            // PostgreSQL prefers plural form and quoted string
+            $unit = rtrim($unit, 'S').'S'; // ensure plural
 
-    public const MYSQL_MAX_INDEX_ALLOWED = 64;
+            return "INTERVAL '{$value} {$unit}'";
+        }
+
+        // MySQL
+        return "INTERVAL {$value} {$unit}";
+    }
 
     /**
-     * In PostgreSQL there is basically no limitation.
-     * But for our purpose we set it to reasonable number which will probably be never reached.
+     * Returns expression to adjust a timestamp by timezone offset (in seconds).
+     *
+     * PostgreSQL: column + (offset || ' second')::interval
+     * MySQL:      TIMESTAMPADD(SECOND, offset, column)
      */
-    public const POSTGRESQL_MAX_INDEX_ALLOWED = 1024;
+    public static function getOffsetAdjustedDate(
+        ?AbstractPlatform $platform,
+        string $column,
+        string $offsetParam = ':timezoneOffset',
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return "{$column} + ({$offsetParam} || ' second')::interval";
+        }
+
+        return "TIMESTAMPADD(SECOND, {$offsetParam}, {$column})";
+    }
 
     /**
-     * Return max index allowed per platform.
+     * Hour extraction.
      */
-    public static function getMaxIndexAllowed(?AbstractPlatform $platform = null): int
+    public static function getHourExpression(?AbstractPlatform $platform, string $column): string
     {
-        return self::isPostgreSQL($platform) ? self::POSTGRESQL_MAX_INDEX_ALLOWED : self::MYSQL_MAX_INDEX_ALLOWED;
+        if (self::isPostgreSQL($platform)) {
+            return "TO_CHAR({$column}, 'HH24')";
+        }
+
+        return "TIME_FORMAT({$column}, '%H')";
+    }
+
+    /**
+     * Returns date subtraction expression for "last X interval".
+     *
+     * PostgreSQL: NOW() - INTERVAL '1 DAY'
+     * MySQL:      DATE_SUB(NOW(), INTERVAL 1 DAY)
+     */
+    public static function getDateSubExpression(
+        ?AbstractPlatform $platform,
+        string $intervalUnit = 'DAY',   // 'DAY', 'WEEK', 'MONTH'
+        int $value = 1,
+    ): string {
+        $intervalUnit = strtoupper($intervalUnit);
+
+        if (self::isPostgreSQL($platform)) {
+            return "NOW() - INTERVAL '{$value} {$intervalUnit}'";
+        }
+
+        return "DATE_SUB(NOW(), INTERVAL {$value} {$intervalUnit})";
+    }
+
+    /**
+     * Weekday calculation (0 = Monday ... 6 = Sunday).
+     */
+    public static function getWeekdayExpression(?AbstractPlatform $platform, string $column): string
+    {
+        if (self::isPostgreSQL($platform)) {
+            return "FLOOR((EXTRACT(DOW FROM {$column}) + 6)::int % 7)";
+        }
+
+        return "WEEKDAY({$column})";
     }
 
     /**
@@ -364,6 +456,403 @@ class DatabasePlatform
         }
 
         return "TIMESTAMPDIFF(SECOND, {$dateColumn1}, {$dateColumn2})";
+    }
+
+    /* ===================================================================
+     * Upsert helpers
+     * =================================================================== */
+
+    /**
+     * Returns the platform-specific conflict target for upsert.
+     *
+     * Prefers non-primary unique constraint if available, otherwise falls back to primary key.
+     */
+    public static function getUpsertConflictTarget(Connection $connection, ClassMetadata $metadata, string $pkColumn): ?string
+    {
+        /**
+         * Currently Unique Constrains are only used in PostgreSQL
+         * So this logic no need to run on any platform beside it.
+         */
+        if (self::isPostgreSQL($connection->getDatabasePlatform())) {
+            // From mapping attributes/annotations
+            $uniqueConstraints = $metadata->table['uniqueConstraints'] ?? [];
+
+            foreach ($uniqueConstraints as $uc) {
+                $cols = $uc['columns'];
+                // Prefer if it doesn't include PK or has more columns
+                if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
+                    return implode(', ', $cols);
+                }
+            }
+
+            // Fallback: introspect unique indexes (runtime, requires schema access)
+            try {
+                $helper = new IndexSchemaHelper(
+                    $connection,
+                    MAUTIC_TABLE_PREFIX
+                );
+
+                $indexes = $helper->getTableIndexes($metadata->getTableName());
+                foreach ($indexes as $index) {
+                    if ($index->isUnique() && !$index->isPrimary()) {
+                        $cols = $index->getColumns();
+                        if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
+                            return implode(', ', $cols);
+                        }
+                    }
+                }
+            } catch (\Throwable) {
+                // Silent fallback if introspection fails
+            }
+        }
+
+        return $pkColumn; // Fallback: if nothing was found pk column is returned as default
+    }
+
+    /**
+     * Returns the platform-specific UPDATE expression for upsert.
+     *
+     * PostgreSQL uses EXCLUDED table, MySQL uses VALUES() function.
+     */
+    public static function getUpsertUpdateExpression(
+        AbstractPlatform $platform,
+        string $column,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return "{$column} = EXCLUDED.{$column}";
+        }
+
+        return "{$column} = VALUES({$column})";
+    }
+
+    /**
+     * Returns platform-specific summarize upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
+     *
+     * @param string        $tableName  Target table
+     * @param string        $columns    Target columns
+     * @param string        $innerSql   Subquery that provides the data
+     * @param string        $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
+     * @param array<string> $updateSet  Columns to update on conflict (without table prefix)
+     */
+    public static function getSummarizeUpsertStatement(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        string $columns,
+        string $innerSql,
+        string $conflictOn,
+        array $updateSet,
+    ): string {
+        $setClauses = [];
+        foreach ($updateSet as $col) {
+            $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
+        }
+
+        if (self::isPostgreSQL($platform)) {
+            return "
+                INSERT INTO {$tableName} ({$columns})
+                SELECT * FROM ({$innerSql}) AS tmp
+                ON CONFLICT ({$conflictOn})
+                DO UPDATE SET
+                    ".implode(',', $setClauses).'
+            ';
+        }
+
+        return "
+            INSERT INTO {$tableName} ({$columns})
+            SELECT {$columns} FROM ({$innerSql}) AS tmp
+            ON DUPLICATE KEY UPDATE
+                ".implode(',', $setClauses).'
+        ';
+    }
+
+    /**
+     * Processes an identifier field during upsert and directly modifies the provided arrays and $hasId flag by reference.
+     *
+     * This centralizes all platform-specific identifier handling:
+     * - Existing entity → include ID in INSERT
+     * - New PostgreSQL entity → use NEXTVAL()
+     * - MySQL special case for LAST_INSERT_ID()
+     *
+     * @param callable           $makeUpdate Function that returns the update expression for a column
+     * @param array<string>      &$columns
+     * @param array<mixed>       &$values
+     * @param array<string|null> &$types
+     * @param array<string>      &$set
+     * @param array<string>      &$update
+     *
+     * @param-out array<string>  $columns
+     * @param-out array<mixed>   $values
+     * @param-out array<string|null> $types
+     * @param-out array<string>  $set
+     * @param-out array<string>  $update
+     *
+     * @return bool Whether the identifier was processed as an existing entity (true = $hasId should be set)
+     */
+    public static function processIdentifierForUpsert(
+        Connection $connection,
+        object $entity,
+        ClassMetadata $metadata,
+        string $tableName,
+        string $fieldName,
+        callable $makeUpdate,
+        array &$columns,
+        array &$values,
+        array &$types,
+        array &$set,
+        array &$update,
+    ): bool {
+        $platform   = $connection->getDatabasePlatform();
+        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
+
+        $value  = $metadata->getFieldValue($entity, $fieldName);
+        $column = $metadata->getColumnName($fieldName);
+        $type   = $metadata->getTypeOfField($fieldName);
+
+        if ($metadata->isIdentifier($fieldName)) {
+            if ($value) {
+                $columns[] = $column;
+                $values[]  = $value;
+                $types[]   = $type;
+                $set[]     = '?';
+                $update[]  = (string) $makeUpdate($column); // Cast to string to satisfy PHPSTAN array<string>
+
+                return true; // Existing entity: include id in INSERT (needed for conflict matching)
+            } elseif (self::isPostgreSQL($platform)) {
+                // New entity on PG: use nextval in VALUES (no bound param)
+                $sequence  = self::getSerialSequence($connection, $tableName, $column);
+                $columns[] = $column;
+                $set[]     = "NEXTVAL('{$sequence}')";
+            } elseif ($fieldName === $identifier) {
+                // MySQL special case for LAST_INSERT_ID
+                $update[] = "{$column} = LAST_INSERT_ID({$column})";
+            }
+
+            return false;
+        }
+
+        $columns[] = $column;
+        $values[]  = $value;
+        $types[]   = $type;
+        $set[]     = '?';
+        $update[]  = (string) $makeUpdate($column); // Cast to string to satisfy PHPSTAN array<string>
+
+        return false;
+    }
+
+    /**
+     * Builds and executes platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY).
+     *
+     * This method handles the full upsert logic including:
+     * - Building SQL for PostgreSQL (ON CONFLICT + RETURNING) and MySQL (ON DUPLICATE KEY)
+     * - Returning the generated/existing ID to the entity
+     * - Detecting whether the operation was an INSERT or UPDATE
+     *
+     * @param array<string> $columns Target columns
+     * @param array<string> $values
+     * @param array<string> $types
+     * @param array<string> $set
+     * @param array<string> $update  Columns to update
+     *
+     * @return array<bool> {wasInserted, wasUpdated}
+     *
+     * @throw RecordNotFoundException
+     */
+    public static function getUpsertStatement(
+        Connection $connection,
+        object $entity,
+        ClassMetadata $metadata,
+        string $tableName,
+        array $columns = [],
+        array $values = [],
+        array $types = [],
+        array $set = [],
+        array $update = [],
+        bool $hasId = false,
+    ): array {
+        $platform   = $connection->getDatabasePlatform();
+        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
+
+        $columnList = implode(', ', $columns);
+        $setList    = implode(', ', $set);
+        $updateList = implode(', ', $update);
+
+        if (self::isPostgreSQL($platform)) {
+            $idColumn   = $metadata->getColumnName($identifier);
+            // Detect best conflict target (prefer non-PK unique constraint)
+            $conflictTarget = self::getUpsertConflictTarget($connection, $metadata, $idColumn);
+
+            // Always RETURNING to get both the (generated or existing) id and insert detection
+            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
+                ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
+                ."RETURNING {$idColumn}, (xmax = 0) AS is_new";
+
+            $result = $connection->fetchAssociative($sql, $values, $types);
+
+            if (false === $result) {
+                // Should never happen in upsert
+                throw new RecordNotFoundException('Upsert failed - no row returned');
+            }
+
+            $generatedOrExistingId = (int) $result['id'];
+            $wasInserted           = (bool) $result['is_new'];
+            $wasUpdated            = !$wasInserted;
+
+            // Always set the ID back (important for new entities)
+            $metadata->setFieldValue($entity, $identifier, $generatedOrExistingId);
+        } else {
+            // MySQL: Use affected rows count (1 = Insert, 2 = Update)
+            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) ".
+                "ON DUPLICATE KEY UPDATE $updateList";
+
+            $affectedRows = $connection->executeStatement($sql, $values, $types);
+            $wasInserted  = (1 === $affectedRows);
+            $wasUpdated   = (2 === $affectedRows);
+
+            if (!$hasId) {
+                $id = (int) $connection->lastInsertId();
+                $metadata->setFieldValue($entity, $identifier, $id);
+            }
+        }
+
+        return [$wasInserted, $wasUpdated];
+    }
+
+    /* ===================================================================
+     * LeadEventLogRepository helpers
+     * =================================================================== */
+
+    /**
+     * Returns SQL to drop a temporary table (works for both MySQL and PostgreSQL).
+     */
+    public static function getDropTemporaryTableSql(?AbstractPlatform $platform, string $tempTableName, bool $ifExists = false): string
+    {
+        $condition = $ifExists ? 'IF EXISTS ' : '';
+        $temporary = !self::isPostgreSQL($platform) ? 'TEMPORARY ' : '';
+
+        return "DROP {$temporary}TABLE {$condition}{$tempTableName}";
+    }
+
+    /**
+     * Returns SQL to create a temporary table from a SELECT.
+     * PostgreSQL requires "AS", MySQL does not (and uses different quoting style).
+     */
+    public static function getCreateTemporaryTableSql(
+        ?AbstractPlatform $platform,
+        string $tempTableName,
+        string $selectSql,
+    ): string {
+        $as = self::isPostgreSQL($platform) ? ' AS ' : ' ';
+
+        return "CREATE TEMPORARY TABLE {$tempTableName}{$as}{$selectSql}";
+    }
+
+    /**
+     * Returns the DELETE query for anonymous contacts batch removal.
+     * Uses USING on PostgreSQL, JOIN ... USING on MySQL.
+     */
+    public static function getDeleteAnonymousContactsSql(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        string $tempTableName,
+        int $batchSize,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return sprintf(
+                'DELETE FROM %s lll USING (SELECT lead_id FROM %s LIMIT %d) d WHERE lll.lead_id = d.lead_id',
+                $tableName,
+                $tempTableName,
+                $batchSize
+            );
+        }
+
+        return sprintf(
+            'DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id)',
+            $tableName,
+            $tempTableName,
+            $batchSize
+        );
+    }
+
+    /**
+     * Returns SQL to delete secondary company-lead relations in batches.
+     *
+     * PostgreSQL needs a subquery with LIMIT because it does not support LIMIT directly on DELETE with multi-column matching.
+     * MySQL supports simple DELETE ... WHERE ... LIMIT.
+     */
+    public static function getRemoveSecondaryCompaniesSql(
+        AbstractPlatform $platform,
+        string $tableName,
+        int $batchSize,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return sprintf(
+                'DELETE FROM %s
+                WHERE (company_id, lead_id) IN (
+                    SELECT company_id, lead_id
+                    FROM %s
+                    WHERE is_primary = FALSE
+                    LIMIT %d
+                )',
+                $tableName,
+                $tableName,
+                $batchSize
+            );
+        }
+
+        return sprintf(
+            'DELETE FROM %s WHERE is_primary = FALSE LIMIT %d',
+            $tableName,
+            $batchSize
+        );
+    }
+
+    /* ===================================================================
+     * Other helpers
+     * =================================================================== */
+
+    /**
+     * Returns expression that safely casts to integer.
+     *
+     * MySQL:      just the column (already numeric or implicitly cast)
+     * PostgreSQL: explicit cast to int because status_code is often stored as varchar/text
+     */
+    public static function applyTypeIfStrict(?AbstractPlatform $platform, string $column, string $type='integer'): string
+    {
+        if (self::isPostgreSQL($platform)) {
+            return '('.$column.')::'.$type;
+        }
+
+        return $column;
+    }
+
+    /**
+     * Returns column wrapped with CAST AS text when needed for PostgreSQL.
+     *
+     * Used for JSON, properties, array-type fields, etc.
+     */
+    public static function castIfStrict(?AbstractPlatform $platform, string $column, string $type='text'): string
+    {
+        if (self::isPostgreSQL($platform)) {
+            return "CAST({$column} AS {$type})";
+        }
+
+        return $column;
+    }
+
+    public const MYSQL_MAX_INDEX_ALLOWED = 64;
+
+    /**
+     * In PostgreSQL there is basically no limitation.
+     * But for our purpose we set it to reasonable number which will probably be never reached.
+     */
+    public const POSTGRESQL_MAX_INDEX_ALLOWED = 1024;
+
+    /**
+     * Return max index allowed per platform.
+     */
+    public static function getMaxIndexAllowed(?AbstractPlatform $platform = null): int
+    {
+        return self::isPostgreSQL($platform) ? self::POSTGRESQL_MAX_INDEX_ALLOWED : self::MYSQL_MAX_INDEX_ALLOWED;
     }
 
     /**
@@ -413,51 +902,6 @@ class DatabasePlatform
         }
 
         return $sql." SEPARATOR '{$separator}')";
-    }
-
-    /**
-     * Returns expression that safely casts to integer.
-     *
-     * MySQL:      just the column (already numeric or implicitly cast)
-     * PostgreSQL: explicit cast to int because status_code is often stored as varchar/text
-     */
-    public static function applyTypeIfStrict(?AbstractPlatform $platform, string $column, string $type='integer'): string
-    {
-        if (self::isPostgreSQL($platform)) {
-            return '('.$column.')::'.$type;
-        }
-
-        return $column;
-    }
-
-    /**
-     * Returns column wrapped with CAST AS text when needed for PostgreSQL.
-     *
-     * Used for JSON, properties, array-type fields, etc.
-     */
-    public static function castIfStrict(?AbstractPlatform $platform, string $column, string $type='text'): string
-    {
-        if (self::isPostgreSQL($platform)) {
-            return "CAST({$column} AS {$type})";
-        }
-
-        return $column;
-    }
-
-    /**
-     * Returns regex pattern for "in" / "notIn" delimited matching (e.g. |value|).
-     * PostgreSQL uses ~* (case-insensitive), MySQL uses REGEXP.
-     */
-    public static function getDelimitedRegexPattern(
-        ?AbstractPlatform $platform,
-        string $value,
-    ): string {
-        $escaped = preg_quote($value, '~');
-        if (self::isPostgreSQL($platform)) {
-            return '\\|?'.$escaped.'\\|?';
-        }
-
-        return "\\|?$value\\|?";
     }
 
     /**
@@ -513,7 +957,7 @@ class DatabasePlatform
         if (self::isPostgreSQL($platform)) {
             $sequence = $tableName.'_'.$idColumn.'_seq';
 
-            return ['id' => "NEXTVAL('{$sequence}')"];
+            return [$idColumn => "NEXTVAL('{$sequence}')"];
         }
 
         return [];
@@ -539,7 +983,7 @@ class DatabasePlatform
 
             return [
                 'idColumn' => $idColumn,
-                'idSelect' => "nextval('{$sequenceName}') AS {$idColumn}, ",
+                'idSelect' => "NEXTVAL('{$sequenceName}') AS {$idColumn}, ",
             ];
         }
 
@@ -837,361 +1281,6 @@ class DatabasePlatform
     public static function allowsIndexHint(?AbstractPlatform $platform): bool
     {
         return !self::isPostgreSQL($platform);
-    }
-
-    /**
-     * Returns interval expression for date arithmetic.
-     *
-     * MySQL:      INTERVAL 30 MINUTE
-     * PostgreSQL: INTERVAL '30 MINUTES'
-     */
-    public static function getIntervalExpression(
-        ?AbstractPlatform $platform,
-        int $value,
-        string $unit = 'MINUTE',
-    ): string {
-        if (self::isPostgreSQL($platform)) {
-            // PostgreSQL prefers plural form and quoted string
-            $unit = rtrim($unit, 'S').'S'; // ensure plural
-
-            return "INTERVAL '{$value} {$unit}'";
-        }
-
-        // MySQL
-        return "INTERVAL {$value} {$unit}";
-    }
-
-    /**
-     * Returns expression to adjust a timestamp by timezone offset (in seconds).
-     *
-     * PostgreSQL: column + (offset || ' second')::interval
-     * MySQL:      TIMESTAMPADD(SECOND, offset, column)
-     */
-    public static function getOffsetAdjustedDate(
-        ?AbstractPlatform $platform,
-        string $column,
-        string $offsetParam = ':timezoneOffset',
-    ): string {
-        if (self::isPostgreSQL($platform)) {
-            return "{$column} + ({$offsetParam} || ' second')::interval";
-        }
-
-        return "TIMESTAMPADD(SECOND, {$offsetParam}, {$column})";
-    }
-
-    /**
-     * Hour extraction.
-     */
-    public static function getHourExpression(?AbstractPlatform $platform, string $column): string
-    {
-        if (self::isPostgreSQL($platform)) {
-            return "TO_CHAR({$column}, 'HH24')";
-        }
-
-        return "TIME_FORMAT({$column}, '%H')";
-    }
-
-    /**
-     * Returns date subtraction expression for "last X interval".
-     *
-     * PostgreSQL: NOW() - INTERVAL '1 DAY'
-     * MySQL:      DATE_SUB(NOW(), INTERVAL 1 DAY)
-     */
-    public static function getDateSubExpression(
-        ?AbstractPlatform $platform,
-        string $intervalUnit = 'DAY',   // 'DAY', 'WEEK', 'MONTH'
-        int $value = 1,
-    ): string {
-        $intervalUnit = strtoupper($intervalUnit);
-
-        if (self::isPostgreSQL($platform)) {
-            return "NOW() - INTERVAL '{$value} {$intervalUnit}'";
-        }
-
-        return "DATE_SUB(NOW(), INTERVAL {$value} {$intervalUnit})";
-    }
-
-    /**
-     * Weekday calculation (0 = Monday ... 6 = Sunday).
-     */
-    public static function getWeekdayExpression(?AbstractPlatform $platform, string $column): string
-    {
-        if (self::isPostgreSQL($platform)) {
-            return "FLOOR((EXTRACT(DOW FROM {$column}) + 6)::int % 7)";
-        }
-
-        return "WEEKDAY({$column})";
-    }
-
-    /* ===================================================================
-     * LIKE / ILIKE helpers
-     * =================================================================== */
-
-    /**
-     * Returns whether the search value should be lowercased.
-     *
-     * On PostgreSQL + ORM we lowercase the value because we use LOWER(column).
-     */
-    public static function shouldLowercaseSearchValue(
-        ?AbstractPlatform $platform,
-        bool $isOrm = true,
-    ): bool {
-        return self::isPostgreSQL($platform) && $isOrm;
-    }
-
-    /**
-     * Returns the platform-specific conflict target for upsert.
-     *
-     * Prefers non-primary unique constraint if available, otherwise falls back to primary key.
-     */
-    public static function getUpsertConflictTarget(Connection $connection, ClassMetadata $metadata, string $pkColumn): ?string
-    {
-        /**
-         * Currently Unique Constrains are only used in PostgreSQL
-         * So this logic no need to run on any platform beside it.
-         */
-        if (self::isPostgreSQL($connection->getDatabasePlatform())) {
-            // From mapping attributes/annotations
-            $uniqueConstraints = $metadata->table['uniqueConstraints'] ?? [];
-
-            foreach ($uniqueConstraints as $uc) {
-                $cols = $uc['columns'];
-                // Prefer if it doesn't include PK or has more columns
-                if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
-                    return implode(', ', $cols);
-                }
-            }
-
-            // Fallback: introspect unique indexes (runtime, requires schema access)
-            try {
-                $helper = new IndexSchemaHelper(
-                    $connection,
-                    MAUTIC_TABLE_PREFIX
-                );
-
-                $indexes = $helper->getTableIndexes($metadata->getTableName());
-                foreach ($indexes as $index) {
-                    if ($index->isUnique() && !$index->isPrimary()) {
-                        $cols = $index->getColumns();
-                        if (count($cols) > 1 || !in_array($pkColumn, $cols, true)) {
-                            return implode(', ', $cols);
-                        }
-                    }
-                }
-            } catch (\Throwable) {
-                // Silent fallback if introspection fails
-            }
-        }
-
-        return $pkColumn; // Fallback: if nothing was found pk column is returned as default
-    }
-
-    /**
-     * Returns the platform-specific UPDATE expression for upsert.
-     *
-     * PostgreSQL uses EXCLUDED table, MySQL uses VALUES() function.
-     */
-    public static function getUpsertUpdateExpression(
-        AbstractPlatform $platform,
-        string $column,
-    ): string {
-        if (self::isPostgreSQL($platform)) {
-            return "{$column} = EXCLUDED.{$column}";
-        }
-
-        return "{$column} = VALUES({$column})";
-    }
-
-    /**
-     * Returns platform-specific summarize upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
-     *
-     * @param string        $tableName  Target table
-     * @param string        $columns    Target columns
-     * @param string        $innerSql   Subquery that provides the data
-     * @param string        $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
-     * @param array<string> $updateSet  Columns to update on conflict (without table prefix)
-     */
-    public static function getSummarizeUpsertStatement(
-        ?AbstractPlatform $platform,
-        string $tableName,
-        string $columns,
-        string $innerSql,
-        string $conflictOn,
-        array $updateSet,
-    ): string {
-        $setClauses = [];
-        foreach ($updateSet as $col) {
-            $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
-        }
-
-        if (self::isPostgreSQL($platform)) {
-            return "
-                INSERT INTO {$tableName} ({$columns})
-                SELECT * FROM ({$innerSql}) AS tmp
-                ON CONFLICT ({$conflictOn})
-                DO UPDATE SET
-                    ".implode(',', $setClauses).'
-            ';
-        }
-
-        return "
-            INSERT INTO {$tableName} ({$columns})
-            SELECT {$columns} FROM ({$innerSql}) AS tmp
-            ON DUPLICATE KEY UPDATE
-                ".implode(',', $setClauses).'
-        ';
-    }
-
-    /**
-     * Processes an identifier field during upsert and directly modifies the provided arrays and $hasId flag by reference.
-     *
-     * This centralizes all platform-specific identifier handling:
-     * - Existing entity → include ID in INSERT
-     * - New PostgreSQL entity → use NEXTVAL()
-     * - MySQL special case for LAST_INSERT_ID()
-     *
-     * @param callable           $makeUpdate Function that returns the update expression for a column
-     * @param array<string>      &$columns
-     * @param array<mixed>       &$values
-     * @param array<string|null> &$types
-     * @param array<string>      &$set
-     * @param array<string>      &$update
-     *
-     * @param-out array<string>  $columns
-     * @param-out array<mixed>   $values
-     * @param-out array<string|null> $types
-     * @param-out array<string>  $set
-     * @param-out array<string>  $update
-     *
-     * @return bool Whether the identifier was processed as an existing entity (true = $hasId should be set)
-     */
-    public static function processIdentifierForUpsert(
-        Connection $connection,
-        object $entity,
-        ClassMetadata $metadata,
-        string $tableName,
-        string $fieldName,
-        callable $makeUpdate,
-        array &$columns,
-        array &$values,
-        array &$types,
-        array &$set,
-        array &$update,
-    ): bool {
-        $platform   = $connection->getDatabasePlatform();
-        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
-
-        $value  = $metadata->getFieldValue($entity, $fieldName);
-        $column = $metadata->getColumnName($fieldName);
-        $type   = $metadata->getTypeOfField($fieldName);
-
-        if ($metadata->isIdentifier($fieldName)) {
-            if ($value) {
-                $columns[] = $column;
-                $values[]  = $value;
-                $types[]   = $type;
-                $set[]     = '?';
-                $update[]  = $makeUpdate($column);
-
-                return true; // Existing entity: include id in INSERT (needed for conflict matching)
-            } elseif (self::isPostgreSQL($platform)) {
-                // New entity on PG: use nextval in VALUES (no bound param)
-                $sequence  = self::getSerialSequence($connection, $tableName, $column);
-                $columns[] = $column;
-                $set[]     = "NEXTVAL('{$sequence}')";
-            } elseif ($fieldName === $identifier) {
-                // MySQL special case for LAST_INSERT_ID
-                $update[] = "{$column} = LAST_INSERT_ID({$column})";
-            }
-
-            return false;
-        }
-
-        $columns[] = $column;
-        $values[]  = $value;
-        $types[]   = $type;
-        $set[]     = '?';
-        $update[]  = $makeUpdate($column);
-
-        return false;
-    }
-
-    /**
-     * Builds and executes platform-specific upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY).
-     *
-     * This method handles the full upsert logic including:
-     * - Building SQL for PostgreSQL (ON CONFLICT + RETURNING) and MySQL (ON DUPLICATE KEY)
-     * - Returning the generated/existing ID to the entity
-     * - Detecting whether the operation was an INSERT or UPDATE
-     *
-     * @param array<string> $columns Target columns
-     * @param array<string> $values
-     * @param array<string> $types
-     * @param array<string> $set
-     * @param array<string> $update  Columns to update
-     *
-     * @return array<bool> {wasInserted, wasUpdated}
-     *
-     * @throw RecordNotFoundException
-     */
-    public static function getUpsertStatement(
-        Connection $connection,
-        object $entity,
-        ClassMetadata $metadata,
-        string $tableName,
-        array $columns = [],
-        array $values = [],
-        array $types = [],
-        array $set = [],
-        array $update = [],
-        bool $hasId = false,
-    ): array {
-        $platform   = $connection->getDatabasePlatform();
-        $identifier = $metadata->getSingleIdentifierFieldName(); // usually 'id'
-
-        $columnList = implode(', ', $columns);
-        $setList    = implode(', ', $set);
-        $updateList = implode(', ', $update);
-
-        if (self::isPostgreSQL($platform)) {
-            $idColumn   = $metadata->getColumnName($identifier);
-            // Detect best conflict target (prefer non-PK unique constraint)
-            $conflictTarget = self::getUpsertConflictTarget($connection, $metadata, $idColumn);
-
-            // Always RETURNING to get both the (generated or existing) id and insert detection
-            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
-                ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
-                ."RETURNING {$idColumn}, (xmax = 0) AS is_new";
-
-            $result = $connection->fetchAssociative($sql, $values, $types);
-
-            if (false === $result) {
-                // Should never happen in upsert
-                throw new RecordNotFoundException('Upsert failed - no row returned');
-            }
-
-            $generatedOrExistingId = (int) $result['id'];
-            $wasInserted           = (bool) $result['is_new'];
-            $wasUpdated            = !$wasInserted;
-
-            // Always set the ID back (important for new entities)
-            $metadata->setFieldValue($entity, $identifier, $generatedOrExistingId);
-        } else {
-            // MySQL: Use affected rows count (1 = Insert, 2 = Update)
-            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) ".
-                "ON DUPLICATE KEY UPDATE $updateList";
-
-            $affectedRows = $connection->executeStatement($sql, $values, $types);
-            $wasInserted  = (1 === $affectedRows);
-            $wasUpdated   = (2 === $affectedRows);
-
-            if (!$hasId) {
-                $id = (int) $connection->lastInsertId();
-                $metadata->setFieldValue($entity, $identifier, $id);
-            }
-        }
-
-        return [$wasInserted, $wasUpdated];
     }
 
     /**

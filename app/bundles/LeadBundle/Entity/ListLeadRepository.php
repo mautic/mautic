@@ -80,24 +80,30 @@ class ListLeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
+        $platform       = $conn->getDatabasePlatform();
+
+        // Drop temporary table (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true)
+        );
+
+        $selectSql = sprintf(
+            'SELECT lll.leadlist_id, lll.lead_id
+            FROM %s lll
+            JOIN %s l ON l.id = lll.lead_id
+            WHERE l.date_identified IS NULL',
+            $tableName,
+            $leadsTableName
+        );
+
+        // Create temporary table with the select (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql)
+        );
+
+        // Todo: Migrate this later too
         if (DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
-            // 1. PostgreSQL uses standard DROP TABLE for session-based temp tables
-            $conn->executeStatement(sprintf('DROP TABLE IF EXISTS %s', $tempTableName));
-
-            // 2. PostgreSQL requires the "AS" keyword for CREATE TABLE AS SELECT
-            // and standard join syntax.
-            $conn->executeStatement(sprintf(
-                'CREATE TEMPORARY TABLE %s AS
-         SELECT lll.leadlist_id, lll.lead_id
-         FROM %s lll
-         JOIN %s l ON l.id = lll.lead_id
-         WHERE l.date_identified IS NULL',
-                $tempTableName,
-                $tableName,
-                $leadsTableName
-            ));
-
-            // 3. PostgreSQL DELETE logic using the USING clause.
+            // PostgreSQL DELETE logic using the USING clause.
             // PostgreSQL does not support the "USING(col1, col2)" shorthand in DELETE;
             // you must use a standard WHERE clause for the join conditions.
             $deleteQuery = sprintf(
@@ -109,8 +115,6 @@ class ListLeadRepository extends CommonRepository
                 self::DELETE_BATCH_SIZE
             );
         } else {
-            $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-            $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select lll.leadlist_id, lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
             $deleteQuery = sprintf('DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
         }
         $deletedRecordCount= 0;
