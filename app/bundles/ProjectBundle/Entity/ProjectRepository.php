@@ -32,7 +32,7 @@ class ProjectRepository extends CommonRepository
             $platform,
             $this->getTableAlias().'.name',
             ':name',
-            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN | DatabasePlatform::FLAG_FORCE_LOWER_VALUE
         );
 
         $q = $this->createQueryBuilder($this->getTableAlias());

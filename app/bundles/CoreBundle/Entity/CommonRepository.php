@@ -1138,7 +1138,7 @@ class CommonRepository extends ServiceEntityRepository
 
             $expr = $q->expr()->$xFunc();
             foreach ($columns as $col) {
-                $expr->add(
+                $expr->add( /** @phpstan-ignore-line add is deprecated */
                     DatabasePlatform::getCaseInsensitiveLike(
                         $platform,
                         $col,

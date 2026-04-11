@@ -140,8 +140,7 @@ class LeadEventLogRepository extends CommonRepository
                     $connection->getDatabasePlatform(),
                     $alias.'.properties',
                     $qb->expr()->literal('%'.mb_strtolower($options['search']).'%'),
-                    true,
-                    true
+                    DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
                 )
             );
         }

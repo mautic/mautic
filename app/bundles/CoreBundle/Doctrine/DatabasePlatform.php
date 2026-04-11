@@ -1057,6 +1057,12 @@ class DatabasePlatform
      * @param array<string>      &$set
      * @param array<string>      &$update
      *
+     * @param-out array<string>  $columns
+     * @param-out array<mixed>   $values
+     * @param-out array<string|null> $types
+     * @param-out array<string>  $set
+     * @param-out array<string>  $update
+     *
      * @return bool Whether the identifier was processed as an existing entity (true = $hasId should be set)
      */
     public static function processIdentifierForUpsert(
