@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ListController extends FormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
@@ -902,20 +904,24 @@ class ListController extends FormController
 
         $joinCategories = false;
         if (!empty($currentFilters)) {
-            $catIds = [];
+            $catAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('category' == $type) {
-                        $catIds[] = (int) $fltr;
+                        $catAliases[]        = $fltr;
+                        $searchFilterTerms[] = 'category:'.$fltr;
                     } // else for other group filters
                 }
             }
 
-            if (!empty($catIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.lead.list.filter', $filter['string']);
+
+            if (!empty($catAliases)) {
                 $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+                $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
             }
         }
 
