@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class VersionProvider implements VersionProviderInterface
 {
@@ -37,6 +38,11 @@ class VersionProvider implements VersionProviderInterface
     public function isPostgreSql(): bool
     {
         return str_contains($this->getVersion(), 'PostgreSQL');
+    }
+
+    public function getDatabasePlatform(): ?AbstractPlatform
+    {
+        return $this->connection->getDatabasePlatform();
     }
 
     private function fetchVersionFromDb(): string

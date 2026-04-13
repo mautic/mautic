@@ -543,7 +543,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         try {
             $fullTable = $this->getTablePrefix().'ip_addresses';
             if ($this->isPostgresqlPlatform()) {
-                $sequence = $this->getSerialSequence($fullTable);
+                $sequence = DatabasePlatform::getSerialSequence($this->connection, $fullTable);
                 $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '0.0.0.0')");
             } else {
                 $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('0.0.0.0')");
@@ -581,27 +581,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $cacheProvider->clear();
     }
 
-    protected function getSerialSequence(string $fullTable, string $field = 'id'): string
-    {
-        // Step 1: Try standard pg_get_serial_sequence (may return NULL)
-        $sequence    = $this->connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
-
-        // Step 2: Fallback - set common sequence name as doctrine do
-        if (!$sequence) {
-            // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-            // without linking a named sequence in a way visible to pg_get_serial_sequence()
-            // Test DB uses a different config that doesn't register the sequence properly
-            $doctrineSequence = $fullTable.'_'.$field.'_seq';
-            if ($this->connection->fetchOne(
-                "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                [$doctrineSequence])) {
-                $sequence = $doctrineSequence;
-            }
-        }
-
-        return $sequence;
-    }
-
     /**
      * Helper method to ensure booleans are strings in HTTP payloads.
      *
@@ -616,5 +595,51 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         });
 
         return $payload;
+    }
+
+    /**
+     * Platform-safe create (unique) test index.
+     *
+     * @param array<string> $columns
+     */
+    protected function createTestIndex(
+        string $tableName,
+        string $indexName,
+        array $columns,
+        bool $unique = false,
+        bool $withAlter = false,
+        bool $ifNotExists = false,
+    ): string {
+        return $this->connection->executeStatement(
+            DatabasePlatform::getCreateIndexSql(
+                $this->connection->getDatabasePlatform(),
+                $tableName,
+                $indexName,
+                $columns,
+                $unique,
+                $withAlter,
+                $ifNotExists
+            )
+        );
+    }
+
+    /**
+     * Platform-safe drop test index.
+     */
+    protected function dropTestIndex(
+        string $tableName,
+        string $indexName,
+        bool $withAlter = false,
+        bool $ifExists = false,
+    ): string {
+        return $this->connection->executeStatement(
+            DatabasePlatform::getDropIndexSql(
+                $this->connection->getDatabasePlatform(),
+                $tableName,
+                $indexName,
+                $withAlter,
+                $ifExists
+            )
+        );
     }
 }

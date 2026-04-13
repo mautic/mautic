@@ -101,22 +101,15 @@ class ListLeadRepository extends CommonRepository
             DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql)
         );
 
-        // Todo: Migrate this later too
-        if (DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
-            // PostgreSQL DELETE logic using the USING clause.
-            // PostgreSQL does not support the "USING(col1, col2)" shorthand in DELETE;
-            // you must use a standard WHERE clause for the join conditions.
-            $deleteQuery = sprintf(
-                'DELETE FROM %s lll
-         USING (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d
-         WHERE lll.leadlist_id = d.leadlist_id AND lll.lead_id = d.lead_id',
-                $tableName,
-                $tempTableName,
-                self::DELETE_BATCH_SIZE
-            );
-        } else {
-            $deleteQuery = sprintf('DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
-        }
+        // Build the delete query (platform-safe)
+        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsUsingTempTableSql(
+            $platform,
+            $tableName,
+            $tempTableName,
+            ['leadlist_id', 'lead_id'],
+            self::DELETE_BATCH_SIZE
+        );
+
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
@@ -130,29 +123,12 @@ class ListLeadRepository extends CommonRepository
         $tableName  = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
         $conn       = $this->getEntityManager()->getConnection();
 
-        if (DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
-            $deleteQuery = sprintf(
-                'DELETE FROM %s
-             WHERE leadlist_id = :listId
-               AND ctid IN (
-                   SELECT ctid
-                   FROM %s
-                   WHERE leadlist_id = :listId
-                   LIMIT %d
-               )',
-                $tableName,
-                $tableName,
-                self::DELETE_BATCH_SIZE
-            );
-        } else {
-            $deleteQuery = sprintf(
-                'DELETE FROM %s
-             WHERE leadlist_id = :listId
-             LIMIT %d',
-                $tableName,
-                self::DELETE_BATCH_SIZE
-            );
-        }
+        $deleteQuery = DatabasePlatform::getDeleteByListIdSql(
+            $conn->getDatabasePlatform(),
+            $tableName,
+            self::DELETE_BATCH_SIZE,
+            'listId',
+        );
 
         do {
             $deletedRows = $conn->executeStatement(

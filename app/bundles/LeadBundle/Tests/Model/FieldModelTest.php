@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -315,9 +316,11 @@ class FieldModelTest extends MauticMysqlTestCase
         $alteredIndexes = $stack->getIndexQueries();
         Assert::assertCount(3, $alteredIndexes);
 
-        $dropAssertString = $this->isPostgresqlPlatform() ?
-            sprintf('DROP INDEX %1$slead_unique_identifier_search', MAUTIC_TABLE_PREFIX) :
-            sprintf('DROP INDEX %1$slead_unique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX);
+        $dropAssertString = DatabasePlatform::getDropIndexSql(
+            $this->connection->getDatabasePlatform(),
+            MAUTIC_TABLE_PREFIX.'leads',
+            MAUTIC_TABLE_PREFIX.'lead_unique_identifier_search',
+        );
 
         Assert::assertEquals($dropAssertString, $alteredIndexes[0]);
         Assert::assertEquals(sprintf('CREATE INDEX %1$slead_unique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
@@ -371,7 +374,6 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns(string $table, string $column): array
     {
-        $platform = $this->connection->getDatabasePlatform();
         $dbName   = $this->connection->getDatabase();
 
         if ($this->isPostgresqlPlatform()) {

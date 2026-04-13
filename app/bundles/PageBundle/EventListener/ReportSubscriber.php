@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -140,9 +141,10 @@ class ReportSubscriber implements EventSubscriberInterface
                 $hitPrefix.'time_spent' => [
                     'label'   => 'mautic.page.report.hits.time_spent',
                     'type'    => 'string',
-                    'formula' => $this->versionProvider->isPostgreSql() ? "CASE WHEN {$hitPrefix}date_left IS NOT NULL
-                           THEN TO_CHAR(({$hitPrefix}date_left - {$hitPrefix}date_hit), 'HH24:MI:SS')
-                           ELSE '' END" : 'IF('.$hitPrefix.'date_left IS NOT NULL, SEC_TO_TIME(TIMESTAMPDIFF(SECOND, '.$hitPrefix.'date_hit, '.$hitPrefix.'date_left)), \'\')',
+                    'formula' => DatabasePlatform::getTimeSpentFormula(
+                        $this->versionProvider->getDatabasePlatform(),
+                        $hitPrefix
+                    ),
                 ],
                 $hitPrefix.'country' => [
                     'label' => 'mautic.page.report.hits.country',
@@ -419,8 +421,9 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $graphs = $event->getRequestedGraphs();
-        $qb     = $event->getQueryBuilder();
+        $platform = $this->versionProvider->getDatabasePlatform();
+        $graphs   = $event->getRequestedGraphs();
+        $qb       = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -444,13 +447,18 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.page.graph.line.time.on.site':
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    if ($this->versionProvider->isPostgreSql()) {
-                        // PostgreSQL: EXTRACT(epoch FROM (date_left - date_hit))
-                        $queryBuilder->select('CAST(EXTRACT(EPOCH FROM (ph.date_left - ph.date_hit)) AS integer) AS data, ph.date_hit AS date');
-                    } else {
-                        // MySQL: keep original
-                        $queryBuilder->select('TIMESTAMPDIFF(SECOND, ph.date_hit, ph.date_left) as data, ph.date_hit as date');
-                    }
+
+                    $queryBuilder->select(
+                        DatabasePlatform::castIfStrict(
+                            $platform,
+                            DatabasePlatform::getDateDiffInSeconds(
+                                $platform,
+                                'ph.date_left',
+                                'ph.date_hit'
+                            ),
+                            'integer'
+                        )
+                    );
                     $queryBuilder->andWhere($qb->expr()->isNotNull('ph.date_left'));
 
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);

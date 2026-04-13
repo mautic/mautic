@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
@@ -233,7 +234,10 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             'custom_html' => $this->loadHtml('email2'),
         ]), $fieldTypes);
 
-        $this->syncSerialSequence($table);
+        DatabasePlatform::syncSerialSequence(
+            $this->em->getConnection(),
+            $table
+        );
     }
 
     private function insertLeadTags(): void
@@ -250,7 +254,10 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             ]);
         }
 
-        $this->syncSerialSequence($table);
+        DatabasePlatform::syncSerialSequence(
+            $this->em->getConnection(),
+            $table
+        );
     }
 
     private function insertCampaignWithEvents(\DateTime $sendEmailTimestamp, \DateTime $conditionTimestamp): void
@@ -270,7 +277,10 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             // 'publish_down'        => Types::DATETIME_MUTABLE,
         ]);
 
-        $this->syncSerialSequence($table1);
+        DatabasePlatform::syncSerialSequence(
+            $this->em->getConnection(),
+            $table1
+        );
 
         $table2 = $this->prefix.'campaign_events';
         $events = $this->loadJson('campaign_events');
@@ -292,7 +302,10 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             $connection->insert($table2, $event, $fieldTypes);
         }
 
-        $this->syncSerialSequence($table2);
+        DatabasePlatform::syncSerialSequence(
+            $this->em->getConnection(),
+            $table2
+        );
     }
 
     private function insertLeadLists(): void
@@ -330,7 +343,10 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             'is_global'            => Types::BOOLEAN,
         ]);
 
-        $this->syncSerialSequence($table);
+        DatabasePlatform::syncSerialSequence(
+            $this->em->getConnection(),
+            $table
+        );
 
         $connection->insert($this->prefix.'campaign_leadlist_xref', [
             'campaign_id' => 1,
@@ -383,24 +399,6 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
                 // 'date_last_exited'  => Types::DATETIME_MUTABLE,
             ]);
         }
-    }
-
-    private function syncSerialSequence(string $table, string $field = 'id'): bool
-    {
-        if ($this->isPostgresqlPlatform()) {
-            $sequence = $this->getSerialSequence($table, $field);
-
-            if ($sequence) {
-                $maxId = $this->em->getConnection()->fetchOne("SELECT MAX($field) FROM $table");
-                $next  = $maxId ? (int) $maxId + 1 : 1;
-
-                return !$this->em->getConnection()->executeStatement('SELECT setval(?, ?, false)', [$sequence, $next]);
-            }
-
-            return false;
-        }
-
-        return true;
     }
 
     /** @return array<string, mixed> */

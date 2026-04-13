@@ -10,20 +10,23 @@ class CommonRepositoryUpsertTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            $this->connection->executeStatement('CREATE UNIQUE INDEX IF NOT EXISTS idx_ip_address ON '.MAUTIC_TABLE_PREFIX.'ip_addresses (ip_address)');
-        } else {
-            $this->connection->executeStatement('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'ip_addresses ADD UNIQUE INDEX idx_ip_address (ip_address)');
-        }
+        $this->createTestIndex(
+            MAUTIC_TABLE_PREFIX.'ip_addresses',
+            'idx_ip_address',
+            ['ip_address'],
+            true,
+            true,
+            true
+        );
     }
 
     protected function afterRollback(): void
     {
-        if ($this->isPostgresqlPlatform()) {
-            $this->connection->executeStatement('DROP INDEX idx_ip_address');
-        } else {
-            $this->connection->executeStatement('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'ip_addresses DROP INDEX idx_ip_address');
-        }
+        $this->dropTestIndex(
+            MAUTIC_TABLE_PREFIX.'ip_addresses',
+            'idx_ip_address',
+            true
+        );
     }
 
     public function testUpsert(): void

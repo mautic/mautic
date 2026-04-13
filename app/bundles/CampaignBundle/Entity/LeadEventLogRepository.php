@@ -703,10 +703,11 @@ SQL;
         );
 
         // Build the delete query (platform-safe)
-        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsSql(
+        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsUsingTempTableSql(
             $platform,
             $tableName,
             $tempTableName,
+            ['lead_id'],
             self::LOG_DELETE_BATCH_SIZE
         );
 

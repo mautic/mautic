@@ -458,6 +458,22 @@ class DatabasePlatform
         return "TIMESTAMPDIFF(SECOND, {$dateColumn1}, {$dateColumn2})";
     }
 
+    public static function getTimeSpentFormula(?AbstractPlatform $platform, string $hitPrefix): string
+    {
+        $hit  = $hitPrefix.'date_hit';
+        $left = $hitPrefix.'date_left';
+
+        if (self::isPostgreSQL($platform)) {
+            return "CASE WHEN {$left} IS NOT NULL
+                    THEN TO_CHAR(({$left} - {$hit}), 'HH24:MI:SS')
+                    ELSE '' END";
+        }
+
+        $secondsExpr = self::getDateDiffInSeconds($platform, $left, $hit);
+
+        return "IF({$left} IS NOT NULL, SEC_TO_TIME({$secondsExpr}), '')";
+    }
+
     /* ===================================================================
      * Upsert helpers
      * =================================================================== */
@@ -747,29 +763,46 @@ class DatabasePlatform
     }
 
     /**
-     * Returns the DELETE query for anonymous contacts batch removal.
-     * Uses USING on PostgreSQL, JOIN ... USING on MySQL.
+     * Returns DELETE query for batch removal of rows using a temporary table.
+     *
+     * Supports both single-column and multi-column matching.
+     *
+     * PostgreSQL: DELETE FROM ... USING (subquery) WHERE col1 = d.col1 AND col2 = d.col2
+     * MySQL:      DELETE t FROM ... JOIN (subquery) d USING (col1, col2)
+     *
+     * @param string[] $joinColumns Columns used for matching (e.g. ['lead_id'] or ['leadlist_id', 'lead_id'])
      */
-    public static function getDeleteAnonymousContactsSql(
+    public static function getDeleteAnonymousContactsUsingTempTableSql(
         ?AbstractPlatform $platform,
         string $tableName,
         string $tempTableName,
+        array $joinColumns,
         int $batchSize,
     ): string {
+        $subSelect = 'SELECT '.implode(', ', $joinColumns)." FROM {$tempTableName} LIMIT {$batchSize}";
+
         if (self::isPostgreSQL($platform)) {
+            $whereConditions = [];
+            foreach ($joinColumns as $col) {
+                $whereConditions[] = "lll.{$col} = d.{$col}";
+            }
+
             return sprintf(
-                'DELETE FROM %s lll USING (SELECT lead_id FROM %s LIMIT %d) d WHERE lll.lead_id = d.lead_id',
+                'DELETE FROM %s lll USING (%s) d WHERE %s',
                 $tableName,
-                $tempTableName,
-                $batchSize
+                $subSelect,
+                implode(' AND ', $whereConditions)
             );
         }
 
+        // MySQL
+        $usingClause = implode(', ', $joinColumns);
+
         return sprintf(
-            'DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id)',
+            'DELETE lll FROM %s lll JOIN (%s) d USING (%s)',
             $tableName,
-            $tempTableName,
-            $batchSize
+            $subSelect,
+            $usingClause
         );
     }
 
@@ -801,6 +834,43 @@ class DatabasePlatform
 
         return sprintf(
             'DELETE FROM %s WHERE is_primary = FALSE LIMIT %d',
+            $tableName,
+            $batchSize
+        );
+    }
+
+    /**
+     * Returns batched DELETE query for removing leads from a specific list (lead_lists_leads table).
+     *
+     * PostgreSQL requires ctid hack because it does not support LIMIT on DELETE with a simple WHERE.
+     * MySQL supports direct LIMIT.
+     */
+    public static function getDeleteByListIdSql(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        int $batchSize,
+        string $listIdParam = ':listId',
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return sprintf(
+                'DELETE FROM %s
+                 WHERE leadlist_id = '.$listIdParam.'
+                   AND ctid IN (
+                       SELECT ctid
+                       FROM %s
+                       WHERE leadlist_id = '.$listIdParam.'
+                       LIMIT %d
+                   )',
+                $tableName,
+                $tableName,
+                $batchSize
+            );
+        }
+
+        return sprintf(
+            'DELETE FROM %s
+             WHERE leadlist_id = '.$listIdParam.'
+             LIMIT %d',
             $tableName,
             $batchSize
         );
@@ -1183,6 +1253,76 @@ class DatabasePlatform
     }
 
     /**
+     * Returns SQL to DROP an index.
+     *
+     * PostgreSQL: DROP INDEX ...
+     * MySQL:      ALTER TABLE ... DROP INDEX ...
+     */
+    public static function getDropIndexSql(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        string $indexName,
+        bool $withAlter = false,
+        bool $ifExists = false,
+    ): string {
+        $if = $ifExists ? 'IF EXISTS ' : '';
+        if (self::isPostgreSQL($platform)) {
+            return sprintf('DROP INDEX %s%s', $if, $indexName);
+        }
+
+        // MySQL / MariaDB
+        if (!$withAlter) {
+            return sprintf('DROP INDEX %s%s ON %s', $if, $indexName, $tableName);
+        }
+
+        return sprintf(
+            'ALTER TABLE %s DROP INDEX %s',
+            $tableName,
+            $indexName
+        );
+    }
+
+    /**
+     * Platform-safe get create a (unique) index sql.
+     *
+     * PostgreSQL: CREATE UNIQUE INDEX IF NOT EXISTS ...
+     * MySQL:      ALTER TABLE ... ADD UNIQUE INDEX ...
+     *
+     * @param array<string> $columns
+     */
+    public static function getCreateIndexSql(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        string $indexName,
+        array $columns,
+        bool $unique = false,
+        bool $withAlter = false,
+        bool $ifNotExists = false,
+    ): string {
+        $columnList    = implode(', ', $columns);
+        $uniqueKeyword = $unique ? 'UNIQUE ' : '';
+
+        // we can use alter only on non postgresql
+        if (!self::isPostgreSQL($platform) && $withAlter) {
+            return sprintf(
+                'ALTER TABLE %s ADD %sINDEX %s (%s)',
+                $tableName,
+                $uniqueKeyword,
+                $indexName,
+                $columnList
+            );
+        }
+
+        return sprintf(
+            'CREATE %sINDEX '.($ifNotExists ? 'IF NOT EXISTS ' : '').'%s ON %s (%s)',
+            $uniqueKeyword,
+            $indexName,
+            $tableName,
+            $columnList
+        );
+    }
+
+    /**
      * Returns platform-specific DISTINCT expression for COUNT(DISTINCT ...).
      *
      * MySQL:      DISTINCT col1, col2, col3
@@ -1281,6 +1421,28 @@ class DatabasePlatform
     public static function allowsIndexHint(?AbstractPlatform $platform): bool
     {
         return !self::isPostgreSQL($platform);
+    }
+
+    public static function syncSerialSequence(Connection $connection, string $table, string $field = 'id'): bool
+    {
+        if (self::isPostgreSQL($connection->getDatabasePlatform())) {
+            $sequence = DatabasePlatform::getSerialSequence(
+                $connection,
+                $table,
+                $field
+            );
+
+            if ($sequence) {
+                $maxId = $connection->fetchOne("SELECT MAX($field) FROM $table");
+                $next  = $maxId ? (int) $maxId + 1 : 1;
+
+                return !$connection->executeStatement('SELECT setval(?, ?, false)', [$sequence, $next]);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
