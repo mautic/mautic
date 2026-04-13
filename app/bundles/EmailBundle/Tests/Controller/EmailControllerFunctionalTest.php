@@ -84,6 +84,36 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
+    public function testIndexActionFiltersEmailsBySegmentAliasQuickFilter(): void
+    {
+        $segmentPeople = $this->createSegment('People', 'people');
+        $segmentOther  = $this->createSegment('Other', 'other');
+
+        $matchingEmail    = $this->createEmail('Email For People', 'Subject A', 'list', 'blank', 'Test html', $segmentPeople);
+        $nonMatchingEmail = $this->createEmail('Email For Other', 'Subject B', 'list', 'blank', 'Test html', $segmentOther);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/emails',
+            [
+                'search'  => 'list:people',
+                'filters' => json_encode(['list:people']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingEmail->getName(), $response['newContent']);
+        $this->assertStringNotContainsString($nonMatchingEmail->getName(), $response['newContent']);
+        $this->assertStringNotContainsString('No Results Found', $response['newContent']);
+    }
+
     /**
      * Ensure there is no query for DNC reasons if there are no contacts who received the email
      * because it loads the whole DNC table if no contact IDs are provided. It can lead to

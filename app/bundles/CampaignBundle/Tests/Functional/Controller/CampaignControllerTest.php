@@ -202,6 +202,39 @@ class CampaignControllerTest extends MauticMysqlTestCase
         Assert::assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
     }
 
+    public function testIndexActionFiltersCampaignsBySegmentAliasQuickFilter(): void
+    {
+        $segmentPeople = $this->createSegment('people', []);
+        $segmentOther  = $this->createSegment('other', []);
+
+        $matchingCampaign = $this->createCampaign('Campaign For People');
+        $matchingCampaign->addList($segmentPeople);
+
+        $nonMatchingCampaign = $this->createCampaign('Campaign For Other');
+        $nonMatchingCampaign->addList($segmentOther);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/campaigns',
+            [
+                'search'  => 'list:people',
+                'filters' => json_encode(['list:people']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingCampaign->getName(), $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', $responseData['newContent']);
+    }
+
     private function getCrawler(Campaign $campaign): Crawler
     {
         $now    = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
