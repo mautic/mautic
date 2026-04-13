@@ -69,6 +69,23 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $this->prefix    = (string) $container->get(CoreParametersHelper::class)->get('db_table_prefix', '');
     }
 
+    public function indexExists(string $tableName, string $indexName): bool
+    {
+        $indexes = DatabasePlatform::listTableIndexes(
+            $this->connection,
+            $tableName
+        );
+
+        $lowerIndexName = strtolower($indexName);
+        foreach ($indexes as $index) {
+            if (strtolower($index->getName()) === $lowerIndexName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Finds/creates the local name for constraints and indexes.
      *
@@ -207,22 +224,5 @@ abstract class AbstractMauticMigration extends AbstractMigration
         }
 
         return $idDataType;
-    }
-
-    protected function indexExists(string $tableName, string $indexName): bool
-    {
-        $indexes = DatabasePlatform::listTableIndexes(
-            $this->connection,
-            $tableName
-        );
-
-        $lowerIndexName = strtolower($indexName);
-        foreach ($indexes as $index) {
-            if (strtolower($index->getName()) === $lowerIndexName) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
