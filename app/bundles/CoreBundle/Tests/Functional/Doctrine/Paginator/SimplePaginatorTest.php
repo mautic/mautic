@@ -74,9 +74,14 @@ class SimplePaginatorTest extends MauticMysqlTestCase
      */
     private function getQueries(): array
     {
-        // Exclude PostgreSQL sequence queries
-        return array_values(array_filter($this->debugDataHolder->getData()['default'], function ($item) {
-            return 0 !== strpos($item['sql'], 'SELECT NEXTVAL');
-        }));
+        // Exclude PostgreSQL sequence queries (NEXTVAL)
+        return array_values(
+            array_filter(
+                $this->debugDataHolder->getData()['default'],
+                function (array $item): bool {
+                    return 0 !== strpos($item['sql'], 'SELECT NEXTVAL');
+                }
+            )
+        );
     }
 }

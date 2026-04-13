@@ -1505,9 +1505,9 @@ class DatabasePlatform
      * @param string $fullTable Full table name (with prefix if applicable)
      * @param string $field     Column name (defaults to 'id')
      *
-     * @return string Sequence name or empty string if none found
+     * @return string|null Sequence name or empty string if none found
      */
-    public static function getSerialSequence(Connection $connection, string $fullTable, string $field = 'id'): string
+    public static function getSerialSequence(Connection $connection, string $fullTable, string $field = 'id'): ?string
     {
         // Step 1: Try standard pg_get_serial_sequence (may return NULL)
         $sequence    = $connection->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");

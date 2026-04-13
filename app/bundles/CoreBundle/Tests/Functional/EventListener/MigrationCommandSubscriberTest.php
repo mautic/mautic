@@ -67,7 +67,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
             $this->assertGeneratedColumnsAndIndexesExist();
         } else {
             // We skip generated column test as they are not immutable (so cant be created)
-            $this->markTestSkipped('PostgreSQL platform currently don`t support generated columns');
+            $this->markTestSkipped('PostgreSQL platform don`t support generated columns');
         }
     }
 
