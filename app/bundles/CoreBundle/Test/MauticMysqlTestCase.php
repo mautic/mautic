@@ -166,7 +166,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
             } elseif ($this->isPostgresqlPlatform()) {
-                $sequence = $this->getSerialSequence($fullTable);
+                $sequence = DatabasePlatform::getSerialSequence($this->connection, $fullTable);
 
                 if ($sequence) {
                     $quotedSequence = $this->connection->quoteIdentifier($sequence);

@@ -42,13 +42,14 @@ final class Version20230321133733 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $platform  = $this->connection->getDatabasePlatform();
 
         $alterStatements = [];
 
         foreach (self::COLUMNS as $column => $definition) {
             $alterStatements[] = sprintf(
                 '%s %s %s',
-                DatabasePlatform::getAddColumnKeyword(),
+                DatabasePlatform::getAddColumnKeyword($platform),
                 $this->connection->quoteIdentifier($column),
                 $definition
             );

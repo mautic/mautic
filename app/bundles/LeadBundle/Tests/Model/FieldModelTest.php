@@ -374,28 +374,11 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns(string $table, string $column): array
     {
-        $dbName   = $this->connection->getDatabase();
-
-        if ($this->isPostgresqlPlatform()) {
-            $sql = "SELECT * FROM information_schema.columns
-                WHERE table_catalog = :db
-                  AND table_schema = 'public'
-                  AND table_name = :table
-                  AND column_name = :column";
-            $params = ['db' => $dbName, 'table' => MAUTIC_TABLE_PREFIX.$table, 'column' => $column];
-            $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
-        } else {
-            $sql = 'SELECT * FROM information_schema.COLUMNS
-                WHERE TABLE_SCHEMA = :db
-                  AND TABLE_NAME = :table
-                  AND COLUMN_NAME = :column';
-            $params = ['db' => $dbName, 'table' => MAUTIC_TABLE_PREFIX.$table, 'column' => $column];
-            $types  = ['db' => 'string', 'table' => 'string', 'column' => 'string'];
-        }
-
-        $stmt = $this->connection->executeQuery($sql, $params, $types);
-
-        return $stmt->fetchAllAssociative();
+        return DatabasePlatform::getColumnMetadata(
+            $this->connection,
+            MAUTIC_TABLE_PREFIX.$table,
+            $column
+        );
     }
 
     /**
@@ -403,48 +386,30 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getUniqueIdentifierIndexColumns(string $table, string $object = 'lead'): array
     {
-        $platform  = $this->connection->getDatabasePlatform();
         $fullTable = MAUTIC_TABLE_PREFIX.$table;
         $indexName = MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search';
 
-        if ($platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform) {
-            $sql = sprintf(
-                "SELECT * FROM information_schema.statistics
-             WHERE table_schema = '%s'
-               AND table_name = '%s'
-               AND index_name = '%s'",
-                $this->connection->getDatabase(),
-                $fullTable,
-                $indexName
-            );
+        $indexes = DatabasePlatform::listTableIndexes(
+            $this->connection,
+            $fullTable
+        );
 
-            return $this->connection->executeQuery($sql)->fetchAllAssociative();
-        }
+        foreach ($indexes as $index) {
+            if (strtolower($index->getName()) === strtolower($indexName)) {
+                // Return columns in the same format as the old queries
+                $result = [];
+                foreach ($index->getColumns() as $col) {
+                    $result[] = [
+                        'COLUMN_NAME'  => $col,
+                        'IS_UNIQUE'    => $index->isUnique() ? 1 : 0,
+                        'IS_PRIMARY'   => $index->isPrimary() ? 1 : 0,
+                        'TABLE_NAME'   => $fullTable,
+                        'INDEX_NAME'   => $index->getName(),
+                    ];
+                }
 
-        if ($this->isPostgresqlPlatform()) {
-            $sql = 'SELECT
-                    t.relname          AS "TABLE_NAME",
-                    i.relname          AS "INDEX_NAME",
-                    a.attname          AS "COLUMN_NAME",
-                    ix.indisunique     AS "IS_UNIQUE",
-                    ix.indisprimary    AS "IS_PRIMARY"
-                FROM
-                    pg_index ix
-                JOIN
-                    pg_class t ON t.oid = ix.indrelid
-                JOIN
-                    pg_class i ON i.oid = ix.indexrelid
-                JOIN
-                    pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
-                WHERE
-                    t.relname = :table
-                    AND i.relname = :index
-                ORDER BY a.attnum';
-
-            return $this->connection->executeQuery($sql, [
-                'table' => $fullTable,
-                'index' => $indexName,
-            ])->fetchAllAssociative();
+                return $result;
+            }
         }
 
         return [];

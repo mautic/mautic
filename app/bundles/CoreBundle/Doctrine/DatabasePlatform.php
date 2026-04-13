@@ -1253,6 +1253,53 @@ class DatabasePlatform
     }
 
     /**
+     * Returns column metadata from information_schema.
+     *
+     * Returns array of columns (usually one row) matching the given table + column name.
+     * Works on both MySQL/MariaDB and PostgreSQL.
+     *
+     * @return array<array<string, mixed>>
+     */
+    public static function getColumnMetadata(
+        Connection $connection,
+        string $fullTableName,
+        string $columnName,
+        string $tableSchema = 'public',
+    ): array {
+        $platform = $connection->getDatabasePlatform();
+        $dbName   = $connection->getDatabase();
+
+        if (self::isPostgreSQL($platform)) {
+            $sql = "SELECT * FROM information_schema.columns
+                    WHERE table_catalog = :db
+                      AND table_schema = ':schema'
+                      AND table_name   = :table
+                      AND column_name  = :column";
+
+            $params = [
+                'db'     => $dbName,
+                'schema' => $tableSchema,
+                'table'  => $fullTableName,
+                'column' => $columnName,
+            ];
+        } else {
+            // MySQL / MariaDB
+            $sql = 'SELECT * FROM information_schema.COLUMNS
+                    WHERE TABLE_SCHEMA = :db
+                      AND TABLE_NAME   = :table
+                      AND COLUMN_NAME  = :column';
+
+            $params = [
+                'db'     => $dbName,
+                'table'  => $fullTableName,
+                'column' => $columnName,
+            ];
+        }
+
+        return $connection->executeQuery($sql, $params)->fetchAllAssociative();
+    }
+
+    /**
      * Returns SQL to DROP an index.
      *
      * PostgreSQL: DROP INDEX ...
