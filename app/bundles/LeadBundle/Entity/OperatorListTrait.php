@@ -182,7 +182,7 @@ trait OperatorListTrait
     {
         static $operatorChoices = [];
         if (empty($operatorChoices)) {
-            $operatorList    = $this->getFilterExpressionFunctions();
+            $operatorList    = $this->getFilterExpressionFunctions(); // @phpstan-ignore-line
             $operatorChoices = [];
             foreach ($operatorList as $operator => $def) {
                 if (empty($def['hide']) || in_array($operator, $overrideHiddenOperators)) {

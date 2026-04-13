@@ -80,7 +80,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
                 ['onCampaignTriggerActionChangePoints', 0],
                 ['onCampaignTriggerActionChangeLists', 1],
-                ['onCampaignTriggerActionChangeCompanySegments', 2],
                 ['onCampaignTriggerActionUpdateTags', 3],
                 ['onCampaignTriggerActionAddToCompany', 4],
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
@@ -90,6 +89,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             ],
             LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
                 ['onCampaignTriggerActionUpdateLead', 0],
+                ['onCampaignTriggerActionChangeCompanySegments', 1],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => [
                 ['onCampaignTriggerCondition', 0],
@@ -170,10 +170,10 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('lead.scorecontactscompanies', $action);
 
         $action = [
-            'label'       => 'mautic.company_segments.campaign.action.change_segments',
-            'description' => 'mautic.company_segments.campaign.action.change_segments_descr',
-            'formType'    => CompanySegmentActionType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'label'          => 'mautic.company_segments.campaign.action.change_segments',
+            'description'    => 'mautic.company_segments.campaign.action.change_segments_descr',
+            'formType'       => CompanySegmentActionType::class,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.changecompanysegments', $action);
 
@@ -355,43 +355,53 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->setResult($somethingHappened);
     }
 
-    public function onCampaignTriggerActionChangeCompanySegments(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionChangeCompanySegments(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changecompanysegments')) {
             return;
         }
 
-        $addTo      = $event->getConfig()['addToLists'] ?? [];
-        $removeFrom = $event->getConfig()['removeFromLists'] ?? [];
+        $properties = $event->getEvent()->getProperties();
+        $addTo      = $properties['addToLists'] ?? [];
+        $removeFrom = $properties['removeFromLists'] ?? [];
 
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        $logs = $event->getPending();
 
-        $primaryCompany = $lead->getPrimaryCompany();
-        if (empty($primaryCompany) || !is_array($primaryCompany) || empty($primaryCompany['id'])) {
-            $event->setResult(false);
+        foreach ($logs as $log) {
+            $lead = $log->getLead();
 
-            return;
+            $primaryCompany = $lead->getPrimaryCompany();
+            if (empty($primaryCompany) || !is_array($primaryCompany) || empty($primaryCompany['id'])) {
+                $event->fail($log, 'No primary company found for contact');
+
+                continue;
+            }
+
+            $companyEntity = $this->companyModel->getRepository()->find($primaryCompany['id']);
+            if (!$companyEntity) {
+                $event->fail($log, 'Company not found');
+
+                continue;
+            }
+
+            $somethingHappened = false;
+
+            if (!empty($addTo)) {
+                $this->companySegmentModel->addCompany($companyEntity, $addTo);
+                $somethingHappened = true;
+            }
+
+            if (!empty($removeFrom)) {
+                $this->companySegmentModel->removeCompany($companyEntity, $removeFrom, false, true);
+                $somethingHappened = true;
+            }
+
+            if ($somethingHappened) {
+                $event->pass($log);
+            } else {
+                $event->fail($log, 'No segments to add or remove');
+            }
         }
-
-        $companyEntity = $this->companyModel->getRepository()->find($primaryCompany['id']);
-        if (!$companyEntity) {
-            $event->setResult(false);
-
-            return;
-        }
-
-        if (!empty($addTo)) {
-            $this->companySegmentModel->addCompany($companyEntity, $addTo);
-            $somethingHappened = true;
-        }
-
-        if (!empty($removeFrom)) {
-            $this->companySegmentModel->removeCompany($companyEntity, $removeFrom, false, true);
-            $somethingHappened = true;
-        }
-
-        $event->setResult($somethingHappened);
     }
 
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void

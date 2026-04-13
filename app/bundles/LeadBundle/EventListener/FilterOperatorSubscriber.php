@@ -350,7 +350,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_date'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->getDatetimeComparisonOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'lead_email_read_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_count'),
@@ -362,19 +362,19 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->getTextOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->getDatetimeComparisonOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'hit_url_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_count'),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->getNumberComparisonOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             // Clicked any link from any email
             'email_id' => [ // kept as email_id for BC
@@ -391,7 +391,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_link_date'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->getDatetimeComparisonOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             // Clicked any link from any sms
             'sms_clicked_link' => [
@@ -408,31 +408,31 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link_date'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->getDatetimeComparisonOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->getNumberComparisonOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'referer' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->getTextOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'url_title' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.url_title'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->getTextOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'source' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.source'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->getTextOperators(),
-                'object' => 'lead',
+                'object'     => 'lead',
             ],
             'source_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.source.id'),
@@ -547,7 +547,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     private function addCustomFieldsToFilterChoices(
         ArrayCollection $fields,
-        LeadListFiltersChoicesEvent|CompanySegmentFiltersChoicesEvent $event
+        LeadListFiltersChoicesEvent|CompanySegmentFiltersChoicesEvent $event,
     ): void {
         $fields->map(function (LeadField $field) use ($event): void {
             $type               = $field->getType();

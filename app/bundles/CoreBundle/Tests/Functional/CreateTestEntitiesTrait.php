@@ -215,6 +215,9 @@ trait CreateTestEntitiesTrait
         return $companyLead;
     }
 
+    /**
+     * @param array<array<mixed>> $filters
+     */
     private function createCompanySegment(string $name, string $alias, bool $isPublished = true, array $filters = []): CompanySegment
     {
         $companySegment = new CompanySegment();
