@@ -184,10 +184,10 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 url: route,
                 type: "GET",
                 data: (function () {
-                    var requestData = searchName + "=" + encodeURIComponent(value) + tmplParam;
-                    var filters = el.attr('data-filters');
+                    let requestData = searchName + "=" + encodeURIComponent(value) + tmplParam;
+                    const filters = el.attr('data-filters');
 
-                    if (typeof filters !== 'undefined') {
+                    if (filters !== undefined) {
                         requestData += "&filters=" + encodeURIComponent(filters);
                     }
 

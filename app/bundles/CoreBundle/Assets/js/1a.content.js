@@ -1846,7 +1846,7 @@ Mautic.applyFilters = function () {
         selectedFilterValues.push(...selectedOptions);
     });
 
-    searchInput.setAttribute('data-filters', JSON.stringify(selectedFilterValues));
+    searchInput.dataset.filters = JSON.stringify(selectedFilterValues);
 
     const newSearchValue = (currentSearchValue + ' ' + searchCommands.concat(selectedFilterValues).join(' ')).trim();
     searchInput.value = newSearchValue;
@@ -1876,7 +1876,7 @@ Mautic.resetFilters = function () {
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
     searchInput.value = currentSearchValue.trim();
-    searchInput.setAttribute('data-filters', JSON.stringify([]));
+    searchInput.dataset.filters = JSON.stringify([]);
 
     const activeFilters = document.querySelectorAll('.label.active');
     activeFilters.forEach(function (filterElement) {
