@@ -21052,7 +21052,7 @@ parameters:
 				Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent$#
 			'''
 			identifier: classConstant.deprecated
-			count: 9
+			count: 8
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
 
 		-

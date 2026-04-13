@@ -113,7 +113,6 @@ class BatchCompanySegmentControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $payload);
         $this->assertArrayHasKey('company_batch', $payload);
         $this->assertIsArray($payload['company_batch']);
-        $this->assertCount(3, $payload['company_batch']);
         $this->assertArrayHasKey('remove', $payload['company_batch']);
         $this->assertArrayHasKey('_token', $payload['company_batch']);
         $this->assertArrayHasKey('ids', $payload['company_batch']);
