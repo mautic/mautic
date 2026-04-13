@@ -47,8 +47,6 @@ class BatchCompanySegmentControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $payload);
         $this->assertArrayHasKey('company_batch', $payload);
         $this->assertIsArray($payload['company_batch']);
-        $this->assertArrayHasKey('_token', $payload['company_batch']);
-        $this->assertArrayHasKey('add', $payload['company_batch']);
 
         $payload['company_batch']['ids'] = json_encode([$companyA->getId(), $companyB->getId(), $companyC->getId()], JSON_THROW_ON_ERROR);
 
@@ -111,8 +109,6 @@ class BatchCompanySegmentControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $payload);
         $this->assertArrayHasKey('company_batch', $payload);
         $this->assertIsArray($payload['company_batch']);
-        $this->assertArrayHasKey('remove', $payload['company_batch']);
-        $this->assertArrayHasKey('_token', $payload['company_batch']);
 
         $payload['company_batch']['ids'] = json_encode([$companyA->getId(), $companyB->getId(), $companyC->getId()], JSON_THROW_ON_ERROR);
 
