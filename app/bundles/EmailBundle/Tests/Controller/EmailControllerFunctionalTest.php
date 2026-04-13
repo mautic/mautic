@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
@@ -112,6 +113,60 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($matchingEmail->getName(), $response['newContent']);
         $this->assertStringNotContainsString($nonMatchingEmail->getName(), $response['newContent']);
         $this->assertStringNotContainsString('No Results Found', $response['newContent']);
+    }
+
+    public function testIndexActionFiltersEmailsByCategoryAndThemeQuickFilters(): void
+    {
+        $matchingCategory    = $this->createCategory('Marketing Emails', 'marketing-emails', 'email');
+        $nonMatchingCategory = $this->createCategory('Transactional Emails', 'transactional-emails', 'email');
+        $this->em->flush();
+
+        $matchingEmail = $this->createEmail('Blank Marketing Email', 'Subject A', 'template', 'blank', 'Test html');
+        $matchingEmail->setCategory($matchingCategory);
+
+        $nonMatchingThemeEmail = $this->createEmail('Builder Marketing Email', 'Subject B', 'template', 'brienz', 'Test html');
+        $nonMatchingThemeEmail->setCategory($matchingCategory);
+
+        $nonMatchingCategoryEmail = $this->createEmail('Blank Transactional Email', 'Subject C', 'template', 'blank', 'Test html');
+        $nonMatchingCategoryEmail->setCategory($nonMatchingCategory);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/emails',
+            [
+                'search'  => sprintf('category:%d theme:blank', $matchingCategory->getId()),
+                'filters' => json_encode([sprintf('category:%d', $matchingCategory->getId()), 'theme:blank']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingEmail->getName(), $response['newContent']);
+        $this->assertStringNotContainsString($nonMatchingThemeEmail->getName(), $response['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCategoryEmail->getName(), $response['newContent']);
+        $this->assertStringNotContainsString('No Results Found', $response['newContent']);
+    }
+
+    public function testIndexActionHandlesEmptyQuickFiltersPayload(): void
+    {
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/emails',
+            [
+                'search'  => '',
+                'filters' => json_encode([]),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -1245,6 +1300,17 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
 
         return $segment;
+    }
+
+    private function createCategory(string $title, string $alias, string $bundle): Category
+    {
+        $category = new Category();
+        $category->setTitle($title);
+        $category->setAlias($alias);
+        $category->setBundle($bundle);
+        $this->em->persist($category);
+
+        return $category;
     }
 
     /**
