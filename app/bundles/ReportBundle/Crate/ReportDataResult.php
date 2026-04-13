@@ -211,7 +211,7 @@ class ReportDataResult
     /**
      * @param array<mixed> $aggregatorVal
      */
-    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, float|string|null $previousVal = null): float|int|string|null
+    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, float|int|string|null $previousVal = null): float|int|string|null
     {
         switch ($calcFunction) {
             case 'COUNT':
