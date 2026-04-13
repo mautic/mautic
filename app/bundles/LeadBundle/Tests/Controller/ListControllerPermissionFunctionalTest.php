@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -103,6 +104,48 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/segments/2');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testIndexActionFiltersSegmentsByCategoryAliasQuickFilter(): void
+    {
+        $matchingCategory    = $this->createCategory('Operating Systems', 'os');
+        $nonMatchingCategory = $this->createCategory('Hardware', 'hardware');
+
+        $matchingSegment = $this->createSegment('Segment OS', $this->userOne);
+        $matchingSegment->setCategory($matchingCategory);
+        $this->em->persist($matchingSegment);
+
+        $nonMatchingSegment = $this->createSegment('Segment Hardware', $this->userOne);
+        $nonMatchingSegment->setCategory($nonMatchingCategory);
+        $this->em->persist($nonMatchingSegment);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $matchingSegment    = $this->em->getRepository(LeadList::class)->find($matchingSegment->getId());
+        $nonMatchingSegment = $this->em->getRepository(LeadList::class)->find($nonMatchingSegment->getId());
+
+        $this->assertSame('os', $matchingSegment?->getCategory()?->getAlias());
+        $this->assertSame('hardware', $nonMatchingSegment?->getCategory()?->getAlias());
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/segments',
+            [
+                'search'  => 'category:os',
+                'filters' => json_encode(['category:os']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingSegment->getName(), $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingSegment->getName(), $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', $responseData['newContent']);
     }
 
     public function testCreateSegmentForUserWithoutPermission(): void
@@ -719,6 +762,18 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $permission->setRole($role);
         $permission->setBitwise($bitwise);
         $this->em->persist($permission);
+    }
+
+    private function createCategory(string $title, string $alias): Category
+    {
+        $category = new Category();
+        $category->setTitle($title);
+        $category->setAlias($alias);
+        $category->setBundle('lead.list');
+
+        $this->em->persist($category);
+
+        return $category;
     }
 
     /**
