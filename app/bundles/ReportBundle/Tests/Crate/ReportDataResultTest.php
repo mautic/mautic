@@ -193,4 +193,50 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Fixtures::getValidReportWithAggregatedColumnsKeys(), $reportDataResultWithAggregatedColumns->getColumnKeys());
         $this->assertEmpty($reportDataResultWithAggregatedColumnsInvalid->getColumnKeys());
     }
+
+    public function testDateAggregatedColumnsComputeTotals(): void
+    {
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResultWithDateAggregatedColumns());
+
+        $totals = $reportDataResult->getTotals();
+
+        $this->assertSame('2021-12-01 18:42:24', $totals['MIN es.date_sent']);
+        $this->assertSame('2026-04-12 22:59:11', $totals['MAX es.date_sent']);
+        $this->assertSame(40017, $totals['COUNT l.email']);
+    }
+
+    public function testDateAggregatedColumnsPreserveType(): void
+    {
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResultWithDateAggregatedColumns());
+
+        $this->assertSame('datetime', $reportDataResult->getType('MIN es.date_sent'));
+        $this->assertSame('datetime', $reportDataResult->getType('MAX es.date_sent'));
+        $this->assertSame('int', $reportDataResult->getType('COUNT l.email'));
+    }
+
+    public function testCalcTotalMinMaxWithDateStrings(): void
+    {
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
+
+        $values = ['2021-12-01 18:42:24', '2024-02-16 00:42:17'];
+        $result = $reportDataResult->calcTotal('MIN', 2, $values);
+        $this->assertSame('2021-12-01 18:42:24', $result);
+
+        $values = ['2021-12-01 18:42:24', '2024-02-16 00:42:17'];
+        $result = $reportDataResult->calcTotal('MAX', 2, $values);
+        $this->assertSame('2024-02-16 00:42:17', $result);
+    }
+
+    public function testCalcTotalMinMaxWithPreviousDateValue(): void
+    {
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
+
+        $values = ['2024-02-16 00:42:17'];
+        $result = $reportDataResult->calcTotal('MIN', 1, $values, '2021-12-01 18:42:24');
+        $this->assertSame('2021-12-01 18:42:24', $result);
+
+        $values = ['2021-12-01 18:42:24'];
+        $result = $reportDataResult->calcTotal('MAX', 1, $values, '2026-04-12 22:59:11');
+        $this->assertSame('2026-04-12 22:59:11', $result);
+    }
 }

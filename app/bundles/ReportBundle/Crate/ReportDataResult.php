@@ -193,7 +193,14 @@ class ReportDataResult
     {
         foreach ($this->columnKeys as $k) {
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
-                $this->types[$k] = (str_starts_with($k, 'AVG')) ? 'float' : 'int';
+                if (str_starts_with($k, 'AVG')) {
+                    $this->types[$k] = 'float';
+                } elseif (str_starts_with($k, 'MIN') || str_starts_with($k, 'MAX')) {
+                    $underlyingColumn = $data['aggregatorColumns'][$k];
+                    $this->types[$k]  = $data['columns'][$underlyingColumn]['type'] ?? 'int';
+                } else {
+                    $this->types[$k] = 'int';
+                }
             } else {
                 $dataColumn      = $data['dataColumns'][$k];
                 $this->types[$k] = $data['columns'][$dataColumn]['type'];
@@ -204,7 +211,7 @@ class ReportDataResult
     /**
      * @param array<mixed> $aggregatorVal
      */
-    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, ?float $previousVal = null): float|int|null
+    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, float|string|null $previousVal = null): float|int|string|null
     {
         switch ($calcFunction) {
             case 'COUNT':
