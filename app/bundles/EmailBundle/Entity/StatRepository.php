@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -868,7 +867,6 @@ class StatRepository extends CommonRepository
     {
         $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $platform                   = $this->getEntityManager()->getConnection()->getDatabasePlatform();
 
         $leadAlias     = 'l'; // leads
         $statsAlias    = 'es'; // email_stats
@@ -897,7 +895,7 @@ class StatRepository extends CommonRepository
         // main query
         $queryBuilder->addSelect(
             "COUNT({$statsAlias}.id) AS sent_count",
-            "SUM(CASE WHEN {$statsAlias}.is_read = ".(DatabasePlatform::isPostgreSQL($platform) ? 'true' : '1').' THEN 1 ELSE 0 END) AS read_count',
+            "SUM(CASE WHEN {$statsAlias}.is_read = true THEN 1 ELSE 0 END) AS read_count",
             "SUM(CASE WHEN {$subQueryAlias}.hits IS NOT NULL THEN 1 ELSE 0 END) AS clicked_through_count",
             "{$leadAlias}.country AS country"
         )

@@ -1270,11 +1270,11 @@ class DatabasePlatform
         $dbName   = $connection->getDatabase();
 
         if (self::isPostgreSQL($platform)) {
-            $sql = "SELECT * FROM information_schema.columns
+            $sql = 'SELECT * FROM information_schema.columns
                     WHERE table_catalog = :db
-                      AND table_schema = ':schema'
+                      AND table_schema = :schema
                       AND table_name   = :table
-                      AND column_name  = :column";
+                      AND column_name  = :column';
 
             $params = [
                 'db'     => $dbName,

@@ -374,9 +374,11 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns(string $table, string $column): array
     {
+        $fullTable = MAUTIC_TABLE_PREFIX.$table;
+
         return DatabasePlatform::getColumnMetadata(
             $this->connection,
-            MAUTIC_TABLE_PREFIX.$table,
+            $fullTable,
             $column
         );
     }

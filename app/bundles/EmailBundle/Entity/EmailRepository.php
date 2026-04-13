@@ -399,13 +399,19 @@ class EmailRepository extends CommonRepository
             } else {
                 $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
 
-                if (DatabasePlatform::isPostgreSQL($platform)) {
-                    $q->andWhere($q->expr()->like($q->expr()->lower('e.name'), ':'.$param));
-                    $q->setParameter($param, '%'.mb_strtolower($search).'%');
-                } else {
-                    $q->andWhere($q->expr()->like('e.name', ':'.$param));
-                    $q->setParameter($param, "%{$search}%");
-                }
+                $q->andWhere(
+                    DatabasePlatform::getCaseInsensitiveLike(
+                        $platform,
+                        'e.name',
+                        ':'.$param,
+                        DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                    )
+                );
+
+                $q->setParameter(
+                    $param,
+                    DatabasePlatform::shouldLowercaseSearchValue($platform) ? '%'.mb_strtolower($search).'%' : "%{$search}%"
+                );
             }
         }
 
