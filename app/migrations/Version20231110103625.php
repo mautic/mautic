@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20231110103625 extends AbstractMauticMigration
 {
@@ -24,9 +24,8 @@ final class Version20231110103625 extends AbstractMauticMigration
         $permissionsTable = $this->prefix.'permissions';
 
         $platform   = $this->connection->getDatabasePlatform();
-        $isPostgres = $platform instanceof PostgreSQLPlatform;
 
-        if ($isPostgres) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             $sequenceName = $permissionsTable.'_id_seq';
             $nextval      = "nextval('{$sequenceName}')";
 

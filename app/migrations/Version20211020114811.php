@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20211020114811 extends PreUpAssertionMigration
@@ -44,46 +44,54 @@ final class Version20211020114811 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $platform = $this->connection->getDatabasePlatform();
-        $isPg     = $platform instanceof PostgreSQLPlatform;
 
         // PostgreSQL does not have FOREIGN_KEY_CHECKS – skip that part
-        if (!$isPg) {
+        if (!DatabasePlatform::isPostgreSQL($platform)) {
             $this->addSql('SET FOREIGN_KEY_CHECKS=0;');
         }
 
         // 1. Companies table – shorten indexed columns to 191 chars
         $companiesTable = $this->getPrefixedTableName(self::COMPANIES_TABLE);
-        $this->dropIndexIfExists($companiesTable, self::INDEX_COMPANY_MATCH);
 
-        $this->addSql(sprintf(
-            'CREATE INDEX %s ON %s (companyname(191), companycity(191), companycountry(191), companystate(191))',
-            self::INDEX_COMPANY_MATCH,
-            $companiesTable
-        ));
+        $this->dropIndexIfExists($companiesTable, self::INDEX_COMPANY_MATCH);
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $platform,
+                $companiesTable,
+                self::INDEX_COMPANY_MATCH,
+                ['companyname(191)', 'companycity(191)', 'companycountry(191)', 'companystate(191)']
+            )
+        );
 
         // 2. sync_object_mapping table – shorten indexed columns to 191 chars
         $syncTable = $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE);
 
         $this->dropIndexIfExists($syncTable, self::INDEX_INTEGRATION_OBJECT);
-        $this->addSql(sprintf(
-            'CREATE INDEX %s ON %s (integration(191), integration_object_name(191), integration_object_id(191), integration_reference_id(191))',
-            self::INDEX_INTEGRATION_OBJECT,
-            $syncTable
-        ));
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $platform,
+                $syncTable,
+                self::INDEX_INTEGRATION_OBJECT,
+                ['integration(191)', 'integration_object_name(191)', 'integration_object_id(191)', 'integration_reference_id(191)']
+            )
+        );
 
         $this->dropIndexIfExists($syncTable, self::INDEX_INTEGRATION_REFERENCE);
-        $this->addSql(sprintf(
-            'CREATE INDEX %s ON %s (integration(191), integration_object_name(191), integration_reference_id(191), integration_object_id(191))',
-            self::INDEX_INTEGRATION_REFERENCE,
-            $syncTable
-        ));
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $platform,
+                $syncTable,
+                self::INDEX_INTEGRATION_REFERENCE,
+                ['integration(191)', 'integration_object_name(191)', 'integration_reference_id(191)', 'integration_object_id(191)']
+            )
+        );
 
         // 3. Convert tables to utf8mb4 / UTF8
         $tables = $this->getTablesToConvert();
         foreach ($tables as $table) {
             $tableName = $table['TABLE_NAME'];
 
-            if ($isPg) {
+            if (DatabasePlatform::isPostgreSQL($platform)) {
                 // PostgreSQL: change collation (no charset concept)
                 $this->addSql(sprintf(
                     'ALTER TABLE %s ALTER COLUMN companyname TYPE varchar(191) COLLATE "utf8_general_ci",
@@ -101,7 +109,7 @@ final class Version20211020114811 extends PreUpAssertionMigration
             }
         }
 
-        if (!$isPg) {
+        if (!DatabasePlatform::isPostgreSQL($platform)) {
             $this->addSql('SET FOREIGN_KEY_CHECKS=1;');
         }
     }
@@ -109,34 +117,18 @@ final class Version20211020114811 extends PreUpAssertionMigration
     private function dropIndexIfExists(string $tableName, string $indexName): void
     {
         $platform = $this->connection->getDatabasePlatform();
-        $isPg     = $platform instanceof PostgreSQLPlatform;
 
-        if ($isPg) {
-            $this->addSql(sprintf('DROP INDEX IF EXISTS %s;', $indexName));
-        } else {
-            $this->addSql(sprintf('DROP INDEX IF EXISTS %s ON %s;', $indexName, $tableName));
+        if ($this->indexExists($tableName, $indexName)) {
+            $this->addSql(
+                DatabasePlatform::getDropIndexSql(
+                    $platform,
+                    $tableName,
+                    $indexName,
+                    false,
+                    true
+                )
+            );
         }
-    }
-
-    private function indexExists(string $tableName, string $indexName): bool
-    {
-        $platform = $this->connection->getDatabasePlatform();
-
-        if ($platform instanceof PostgreSQLPlatform) {
-            $sql = '
-                SELECT 1
-                FROM pg_indexes
-                WHERE schemaname = current_schema()
-                  AND tablename = ?
-                  AND indexname = ?
-            ';
-
-            return (bool) $this->connection->executeQuery($sql, [$tableName, $indexName])->fetchOne();
-        }
-
-        $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
-
-        return isset($indexes[$indexName]);
     }
 
     /**
@@ -149,7 +141,7 @@ final class Version20211020114811 extends PreUpAssertionMigration
     {
         $platform = $this->connection->getDatabasePlatform();
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             // On PostgreSQL we usually don't need to change charset (already UTF8)
             // If you want to enforce specific collation, implement check here
             return [];

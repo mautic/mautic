@@ -7,6 +7,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20220722074516 extends AbstractMauticMigration
 {
@@ -19,13 +20,32 @@ final class Version20220722074516 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
+        $platform  = $this->connection->getDatabasePlatform();
+
         $this->addSql("ALTER TABLE {$this->getTableName()} ADD deduplicate VARCHAR(32) DEFAULT NULL");
-        $this->addSql("CREATE INDEX deduplicate_date_added ON {$this->getTableName()} (deduplicate, date_added)");
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $platform,
+                $this->getTableName(),
+                'deduplicate_date_added',
+                ['deduplicate', 'date_added']
+            )
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DROP INDEX deduplicate_date_added ON {$this->getTableName()}");
+        $platform  = $this->connection->getDatabasePlatform();
+
+        $this->addSql(
+            DatabasePlatform::getDropIndexSql(
+                $platform,
+                $this->getTableName(),
+                'deduplicate_date_added',
+                false,
+                true
+            )
+        );
         $this->addSql("ALTER TABLE {$this->getTableName()} DROP deduplicate");
     }
 

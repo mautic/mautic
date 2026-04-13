@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20211026153057 extends PreUpAssertionMigration
@@ -15,8 +15,11 @@ final class Version20211026153057 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
+        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $indexName = $this->getPrefixedIndexName();
+
         $this->skipAssertion(
-            fn () => $this->indexExists(),
+            fn () => $this->indexExists($tableName, $indexName),
             sprintf('Index %s already exists', self::INDEX_NAME)
         );
     }
@@ -24,14 +27,17 @@ final class Version20211026153057 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $platform  = $this->connection->getDatabasePlatform();
         $indexName = $this->getPrefixedIndexName();
 
-        // CREATE INDEX syntax works on both platforms
-        $this->addSql(sprintf(
-            'CREATE INDEX %s ON %s (lead_id, date_added)',
-            $indexName,
-            $tableName
-        ));
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $platform,
+                $tableName,
+                $indexName,
+                ['lead_id', 'date_added']
+            )
+        );
     }
 
     public function down(Schema $schema): void
@@ -39,41 +45,13 @@ final class Version20211026153057 extends PreUpAssertionMigration
         $platform  = $this->connection->getDatabasePlatform();
         $indexName = $this->getPrefixedIndexName();
 
-        if ($platform instanceof PostgreSQLPlatform) {
-            $this->addSql(sprintf('DROP INDEX IF EXISTS %s', $indexName));
-        } else {
-            $this->addSql(sprintf(
-                'DROP INDEX %s ON %s',
+        $this->addSql(
+            DatabasePlatform::getDropIndexSql(
+                $platform,
                 $indexName,
                 $this->getPrefixedTableName(self::TABLE_NAME)
-            ));
-        }
-    }
-
-    private function indexExists(): bool
-    {
-        $platform  = $this->connection->getDatabasePlatform();
-        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
-        $indexName = $this->getPrefixedIndexName();
-
-        if ($platform instanceof PostgreSQLPlatform) {
-            $sql = '
-                SELECT 1
-                FROM pg_indexes
-                WHERE schemaname = current_schema()
-                  AND tablename  = ?
-                  AND indexname  = ?
-            ';
-
-            $result = $this->connection->executeQuery($sql, [$tableName, $indexName])->fetchOne();
-
-            return (bool) $result;
-        }
-
-        // MySQL fallback
-        $indexes = $this->connection->createSchemaManager()->listTableIndexes($tableName);
-
-        return isset($indexes[$indexName]);
+            ),
+        );
     }
 
     private function getPrefixedIndexName(): string

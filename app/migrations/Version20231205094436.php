@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -21,55 +20,24 @@ final class Version20231205094436 extends PreUpAssertionMigration
         return "{$this->prefix}lead_id_lists_id_removed";
     }
 
-    private function indexExists(): bool
+    protected function preUpAssertions(): void
     {
         $tableName = $this->getTableName();
         $indexName = $this->getIndexName();
 
-        $platform = $this->connection->getDatabasePlatform();
-
-        if ($platform instanceof PostgreSQLPlatform) {
-            // PostgreSQL folds unquoted identifiers to lowercase
-            $indexNameLower = strtolower($indexName);
-
-            $sql = '
-                SELECT 1
-                FROM pg_indexes
-                WHERE schemaname = current_schema()
-                  AND tablename = ?
-                  AND indexname = ?
-            ';
-
-            return (bool) $this->connection->fetchOne($sql, [$tableName, $indexNameLower]);
-        }
-
-        // Fallback for MySQL/MariaDB (Doctrine schema manager is reliable here)
-        $schemaManager = $this->connection->createSchemaManager();
-        $indexes       = $schemaManager->listTableIndexes($tableName);
-
-        $indexNameLower = strtolower($indexName);
-        foreach ($indexes as $index) {
-            if (strtolower($index->getName()) === $indexNameLower) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function preUpAssertions(): void
-    {
         $this->skipAssertion(
-            fn (Schema $schema) => $this->indexExists(),
-            sprintf('Index %s already exists', $this->getIndexName())
+            fn (Schema $schema) => $this->indexExists($tableName, $indexName),
+            sprintf('Index %s already exists', $indexName)
         );
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->getTable($this->getTableName());
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+        $table     = $schema->getTable($tableName);
 
-        if (!$this->indexExists()) {
+        if (!$this->indexExists($tableName, $indexName)) {
             $table->addIndex(
                 ['lead_id', 'leadlist_id', 'manually_removed'],
                 $this->getIndexName()
@@ -79,9 +47,11 @@ final class Version20231205094436 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $table = $schema->getTable($this->getTableName());
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+        $table     = $schema->getTable($tableName);
 
-        if ($this->indexExists()) {
+        if ($this->indexExists($tableName, $indexName)) {
             $table->dropIndex($this->getIndexName());
         }
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250923135527 extends PreUpAssertionMigration
@@ -41,9 +42,19 @@ final class Version20250923135527 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
+        $platform     = $this->connection->getDatabasePlatform();
+
         $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
 
-        $this->addSql('DROP INDEX IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
+        $this->addSql(
+            DatabasePlatform::getDropIndexSql(
+                $platform,
+                $this->getPrefixedTableName(),
+                'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT',
+                false,
+                true
+            )
+        );
 
         $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
     }

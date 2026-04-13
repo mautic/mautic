@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20230321133733 extends PreUpAssertionMigration
@@ -41,44 +41,24 @@ final class Version20230321133733 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
 
         $alterStatements = [];
 
         foreach (self::COLUMNS as $column => $definition) {
-            if ($platform instanceof PostgreSQLPlatform) {
-                // PostgreSQL: separate ALTER COLUMN statements (more reliable)
-                $alterStatements[] = sprintf(
-                    'ADD COLUMN %s %s',
-                    $this->connection->quoteIdentifier($column),
-                    $definition
-                );
-            } else {
-                // MySQL: can do multiple in one ALTER TABLE
-                $alterStatements[] = sprintf(
-                    'ADD %s %s',
-                    $this->connection->quoteIdentifier($column),
-                    $definition
-                );
-            }
+            $alterStatements[] = sprintf(
+                '%s %s %s',
+                DatabasePlatform::getAddColumnKeyword(),
+                $this->connection->quoteIdentifier($column),
+                $definition
+            );
         }
 
-        if ($platform instanceof PostgreSQLPlatform) {
-            // PostgreSQL: one ALTER per column is safer (avoids long syntax issues)
-            foreach ($alterStatements as $stmt) {
-                $this->addSql(sprintf(
-                    self::ALTER_TABLE_SQL.' %s %s',
-                    $tableName,
-                    $stmt
-                ));
-            }
-        } else {
-            // MySQL: one ALTER TABLE with multiple ADD
+        foreach ($alterStatements as $stmt) {
             $this->addSql(sprintf(
                 self::ALTER_TABLE_SQL.' %s %s',
                 $tableName,
-                implode(', ', $alterStatements)
+                $stmt
             ));
         }
     }
@@ -90,7 +70,8 @@ final class Version20230321133733 extends PreUpAssertionMigration
 
         $columns = array_keys(self::COLUMNS);
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        // MySQL dont support if exists, where MariaDB and PostgreSQL does
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             foreach ($columns as $column) {
                 $this->addSql(sprintf(
                     self::ALTER_TABLE_SQL.' %s DROP COLUMN IF EXISTS %s',

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20260120130000 extends AbstractMigration
 {
@@ -17,9 +17,11 @@ final class Version20260120130000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        $platform = $this->connection->getDatabasePlatform();
+
         // Safety check - only run on PostgreSQL
         $this->abortIf(
-            !$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform,
+            !DatabasePlatform::isPostgreSQL($platform),
             'Migration can only be executed safely on \'postgresql\'.'
         );
 
@@ -196,8 +198,10 @@ final class Version20260120130000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
+        $platform = $this->connection->getDatabasePlatform();
+
         $this->abortIf(
-            !$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform,
+            !DatabasePlatform::isPostgreSQL($platform),
             'Migration can only be executed safely on \'postgresql\'.'
         );
 

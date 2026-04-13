@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 /**
  * This migration must run first otherwise the pre-up assertions for other migrations will fail on M5.
@@ -21,8 +21,6 @@ final class Version020230615115326 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $platform = $this->connection->getDatabasePlatform();
-
-        $isPostgreSQL = $platform instanceof PostgreSQLPlatform;
 
         $tables = [
             'message_channels'    => ['properties'],
@@ -41,7 +39,7 @@ final class Version020230615115326 extends AbstractMauticMigration
             $prefixedTable = $this->prefix.$table;
 
             foreach ($columns as $column) {
-                if ($isPostgreSQL) {
+                if (DatabasePlatform::isPostgreSQL($platform)) {
                     // PostgreSQL needs explicit USING for safe cast (TEXT -> jsonb)
                     // Assumes existing data is valid JSON or NULL – if not, add custom validation/cleanup first
                     $this->addSql(
@@ -49,9 +47,6 @@ final class Version020230615115326 extends AbstractMauticMigration
                         "ALTER COLUMN {$column} TYPE jsonb ".
                         "USING {$column}::jsonb"
                     );
-
-                // Optional: Set default if needed (e.g. '{}' for non-nullable)
-                // $this->addSql("ALTER TABLE {$prefixedTable} ALTER COLUMN {$column} SET DEFAULT '{}'::jsonb");
                 } else {
                     // MySQL/MariaDB – keep original or similar
                     $this->addSql(

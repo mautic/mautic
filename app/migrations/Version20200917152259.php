@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20200917152259 extends AbstractMauticMigration
 {
@@ -37,7 +37,7 @@ final class Version20200917152259 extends AbstractMauticMigration
         $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getTableName();
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             // PostgreSQL: change to text (equivalent of LONGTEXT)
             // Using USING clause is not needed here because VARCHAR → text is safe
             $this->addSql("ALTER TABLE {$tableName} ALTER COLUMN default_value TYPE text");
@@ -55,10 +55,9 @@ final class Version20200917152259 extends AbstractMauticMigration
         $platform  = $this->connection->getDatabasePlatform();
         $tableName = $this->getTableName();
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             // Revert to varchar(191) – may truncate data if longer text exists!
             $this->addSql("ALTER TABLE {$tableName} ALTER COLUMN default_value TYPE varchar(191)");
-        // Optional: add back constraints if originally present
         } else {
             $this->addSql("ALTER TABLE {$tableName} MODIFY default_value VARCHAR(191) NULL DEFAULT NULL");
         }

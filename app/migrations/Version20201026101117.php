@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Copy;
@@ -30,7 +30,7 @@ final class Version20201026101117 extends AbstractMauticMigration
 
         $subjectColumn = $table->getColumn('subject');
 
-        if ($platform instanceof PostgreSQLPlatform) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
             // PostgreSQL: safe check for collation (may not be in platformOptions)
             $collation = $subjectColumn->hasPlatformOption('collation') ? $subjectColumn->getPlatformOption('collation') : null;
             if ($collation && str_starts_with($collation, 'utf8')) {
@@ -65,7 +65,7 @@ final class Version20201026101117 extends AbstractMauticMigration
             $fullTable = $this->prefix.$table;
 
             foreach ($columns as $column) {
-                if ($platform instanceof PostgreSQLPlatform) {
+                if (DatabasePlatform::isPostgreSQL($platform)) {
                     // PostgreSQL: set collation to a utf8-compatible one
                     // "utf8_general_ci" is common and supports emojis
                     // Use quoted identifier if needed
