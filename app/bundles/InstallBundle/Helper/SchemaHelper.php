@@ -247,9 +247,14 @@ class SchemaHelper
                       * sequence ownership to column/table for postgresql
                       * need to check all
                       */
-                    $sequence = $this->getSerialSequence($t, $c->getName());
-                    if ($sequence) {
-                        $sequences[] = $sequence;
+                    try {
+                        $sequence = DatabasePlatform::getSerialSequence($this->db, $t, $c->getName());
+
+                        if ($sequence) {
+                            $sql[] = $this->platform->getDropSequenceSQL($sequence);
+                        }
+                    } catch (DBALException) {
+                        // ignore, nothing todo
                     }
                 }
             }
@@ -364,9 +369,14 @@ class SchemaHelper
                          * sequence ownership to column/table for postgresql
                          * need to check all
                          */
-                        $sequence = $this->getSerialSequence($t, $c->getName());
-                        if ($sequence) {
-                            $sql[] = $this->platform->getDropSequenceSQL($sequence);
+                        try {
+                            $sequence = DatabasePlatform::getSerialSequence($this->db, $t, $c->getName());
+
+                            if ($sequence) {
+                                $sql[] = $this->platform->getDropSequenceSQL($sequence);
+                            }
+                        } catch (DBALException) {
+                            // ignore, nothing todo
                         }
                     }
                 }
@@ -418,31 +428,5 @@ class SchemaHelper
         }
 
         return '0.0'; // string_compare not accept NULL, prevent NULL errors
-    }
-
-    protected function getSerialSequence(string $fullTable, string $field = 'id'): ?string
-    {
-        try {
-            // Step 1: Try standard pg_get_serial_sequence (may return NULL)
-            $sequence = $this->db->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
-
-            // Step 2: Fallback - set common sequence name as doctrine do
-            if (!$sequence) {
-                // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-                // without linking a named sequence in a way visible to pg_get_serial_sequence()
-                // Test DB uses a different config that doesn't register the sequence properly
-                $doctrineSequence = $fullTable.'_'.$field.'_seq';
-                if ($this->db->fetchOne(
-                    "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                    [$doctrineSequence])) {
-                    $sequence = $doctrineSequence;
-                }
-            }
-        } catch (DBALException) {
-            // sequence not found
-            $sequence = null;
-        }
-
-        return $sequence;
     }
 }
