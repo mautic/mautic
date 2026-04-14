@@ -308,8 +308,8 @@ class DatabasePlatform
             $localTime = "({$column} AT TIME ZONE 'UTC' AT TIME ZONE '{$offset}')";
 
             return "
-                TO_CHAR({$localTime}, '{$format}') || '-' || 
-                TO_CHAR({$localTime} + INTERVAL '1 hour', '{$format}') as hour, 
+                TO_CHAR({$localTime}, '{$format}') || '-' ||
+                TO_CHAR({$localTime} + INTERVAL '1 hour', '{$format}') as hour,
                 COUNT(t.id) AS count
             ";
         }
@@ -320,9 +320,9 @@ class DatabasePlatform
 
         return "
             CONCAT(
-                TIME_FORMAT({$localTime}, '{$format}'), '-', 
+                TIME_FORMAT({$localTime}, '{$format}'), '-',
                 TIME_FORMAT({$localTime} + INTERVAL 1 HOUR, '{$format}')
-            ) as hour, 
+            ) as hour,
             COUNT(t.id) AS count
         ";
     }
@@ -919,7 +919,7 @@ class DatabasePlatform
      * PostgreSQL: LENGTH(col)
      * MySQL:      CHAR_LENGTH(col)
      */
-    public static function getLength(
+    public static function getLengthSql(
         ?AbstractPlatform $platform,
         string $column,
     ): string {
@@ -1157,7 +1157,7 @@ class DatabasePlatform
     ): string {
         if (self::isPostgreSQL($platform)) {
             $as      = 'GENERATED ALWAYS AS';
-            $stored  = $stored ? ' STORED' : ' VIRTUAL';   // PG 12-17 requires STORED; 18+ supports VIRTUAL
+            $stored  = $stored ? ' STORED' : ' VIRTUAL';  // PG 12-17 requires STORED; 18+ supports VIRTUAL
             $comment = '';                                // PostgreSQL does not support COMMENT in ADD COLUMN for generated columns
         } else {
             $as      = 'AS';

@@ -125,17 +125,18 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
     private function createTables(): void
     {
-        $platform = $this->connection->getDatabasePlatform();
-
-        $idType   = DatabasePlatform::isPostgreSQL($platform) ? 'integer' : 'int unsigned';
-        $dateType = DatabasePlatform::isPostgreSQL($platform) ? 'timestamp' : 'datetime';
+        $platform     = $this->connection->getDatabasePlatform();
+        $isPostgreSQL = DatabasePlatform::isPostgreSQL($platform);
 
         // Generated column syntax differs significantly between MySQL and PostgreSQL
         $generatedColumnSql = DatabasePlatform::getGeneratedColumnDefinition(
             $platform,
             'generated_name_two CHAR(2)',
-            'substring(name from 3 for 2)'
+            $isPostgreSQL ? 'substring(name from 3 for 2)' : 'SUBSTRING(name, 3, 2)'
         );
+
+        $idType   = $isPostgreSQL ? 'integer' : 'int unsigned';
+        $dateType = $isPostgreSQL ? 'timestamp' : 'datetime';
 
         // test_first (pre-creates one generated column to test skipping duplicates)
         $sqlFirst = <<<SQL
