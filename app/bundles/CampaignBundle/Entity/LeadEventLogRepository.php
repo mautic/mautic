@@ -587,7 +587,7 @@ class LeadEventLogRepository extends CommonRepository
     public function unscheduleEvents(Lead $campaignMember, $message): void
     {
         $connection = $this->getEntityManager()->getConnection();
-        $isPg       = 'postgresql' == DatabasePlatform::getDatabasePlatform($connection->getDatabasePlatform());
+        $platform   = $connection->getDatabasePlatform();
 
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();
@@ -596,21 +596,20 @@ class LeadEventLogRepository extends CommonRepository
         // Insert entries into the failed log so it's known why they were never executed
         $prefix = MAUTIC_TABLE_PREFIX;
 
-        if ($isPg) {
-            $sql = <<<SQL
-INSERT INTO {$prefix}campaign_lead_event_failed_log (log_id, date_added, reason)
-SELECT id, :dateAdded as date_added, :message as reason
-FROM {$prefix}campaign_lead_event_log
-WHERE is_scheduled = TRUE AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
-ON CONFLICT (log_id) DO UPDATE SET date_added = EXCLUDED.date_added, reason = EXCLUDED.reason
-SQL;
-        } else {
-            $sql    = <<<SQL
-REPLACE INTO {$prefix}campaign_lead_event_failed_log( `log_id`, `date_added`, `reason`)
-SELECT id, :dateAdded as date_added, :message as reason from {$prefix}campaign_lead_event_log
-WHERE is_scheduled = TRUE AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
-SQL;
-        }
+        // Universal upsert into failed log
+        $sql = DatabasePlatform::getUpsertSql(
+            $platform,
+            $prefix.'campaign_lead_event_failed_log',
+            ['log_id', 'date_added', 'reason'],              // columns to insert
+            "SELECT id, '{$dateAdded}' as date_added, '{$message}' as reason
+         FROM {$prefix}campaign_lead_event_log
+         WHERE is_scheduled = TRUE
+           AND lead_id = :contactId
+           AND campaign_id = :campaignId
+           AND rotation = :rotation",                         // select source
+            'log_id',                                // conflict target
+            ['date_added', 'reason']                          // columns to update on conflict
+        );
 
         $stmt       = $connection->prepare($sql);
         $stmt->bindValue('dateAdded', $dateAdded, \PDO::PARAM_STR);

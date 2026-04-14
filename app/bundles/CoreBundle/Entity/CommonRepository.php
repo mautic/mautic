@@ -1821,25 +1821,4 @@ class CommonRepository extends ServiceEntityRepository
 
         return (bool) count($query->executeQuery()->fetchAllAssociative());
     }
-
-    protected function getSerialSequence(string $fullTable, string $field = 'id'): string
-    {
-        // Step 1: Try standard pg_get_serial_sequence (may return NULL)
-        $sequence    = $this->getEntityManager()->getConnection()->fetchOne("SELECT pg_get_serial_sequence('$fullTable', '$field')");
-
-        // Step 2: Fallback - set common sequence name as doctrine do
-        if (!$sequence) {
-            // Doctrine schema tool/migrations created the table with GENERATED ... AS IDENTITY
-            // without linking a named sequence in a way visible to pg_get_serial_sequence()
-            // Test DB uses a different config that doesn't register the sequence properly
-            $doctrineSequence = $fullTable.'_'.$field.'_seq';
-            if ($this->getEntityManager()->getConnection()->fetchOne(
-                "SELECT 1 FROM pg_class WHERE relname = ? AND relkind = 'S'",
-                [$doctrineSequence])) {
-                $sequence = $doctrineSequence;
-            }
-        }
-
-        return $sequence;
-    }
 }

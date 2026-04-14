@@ -367,6 +367,32 @@ class DatabasePlatform
     }
 
     /**
+     * Returns platform-safe expression that extracts only the DATE part from a datetime column.
+     *
+     * PostgreSQL: make_date(EXTRACT(YEAR ...), EXTRACT(MONTH ...), EXTRACT(DAY ...))
+     * MySQL/MariaDB: CONCAT(YEAR(), '-', LPAD(MONTH(),2,'0'), '-', LPAD(DAY(),2,'0'))
+     */
+    public static function getDateOnlyExpression(
+        ?AbstractPlatform $platform,
+        string $columnName,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return "make_date(
+                EXTRACT(YEAR FROM {$columnName})::int,
+                EXTRACT(MONTH FROM {$columnName})::int,
+                EXTRACT(DAY FROM {$columnName})::int
+            )";
+        }
+
+        // MySQL / MariaDB
+        return "CONCAT(
+            YEAR({$columnName}), '-',
+            LPAD(MONTH({$columnName}), 2, '0'), '-',
+            LPAD(DAY({$columnName}), 2, '0')
+        )";
+    }
+
+    /**
      * Returns expression to adjust a timestamp by timezone offset (in seconds).
      *
      * PostgreSQL: column + (offset || ' second')::interval
@@ -527,6 +553,49 @@ class DatabasePlatform
         }
 
         return "{$column} = VALUES({$column})";
+    }
+
+    /**
+     * Universal upsert (REPLACE INTO on MySQL, INSERT ... ON CONFLICT on PostgreSQL).
+     *
+     * @param string $tableName     Full table name (with prefix)
+     * @param array  $columns       List of columns to insert
+     * @param string $selectSql     Sub-select that provides the data (the SELECT part)
+     * @param string $conflictOn    Column(s) for ON CONFLICT (PostgreSQL only). Use comma-separated string for multiple columns.
+     * @param array  $updateColumns Columns to update on conflict (if empty, all columns except conflict keys are updated)
+     */
+    public static function getUpsertSql(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        array $columns,
+        string $selectSql,
+        string $conflictOn,
+        array $updateColumns = [],
+    ): string {
+        $columnList = implode(', ', $columns);
+
+        if (self::isPostgreSQL($platform)) {
+            if (empty($updateColumns)) {
+                // Default: update all columns except the conflict target
+                $updateColumns = array_diff($columns, explode(',', str_replace(' ', '', $conflictOn)));
+            }
+
+            $setClauses = [];
+            foreach ($updateColumns as $col) {
+                $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
+            }
+
+            return "
+                INSERT INTO {$tableName} ({$columnList})
+                SELECT {$columnList} FROM ({$selectSql}) AS tmp
+                ON CONFLICT ({$conflictOn})
+                DO UPDATE SET ".implode(', ', $setClauses);
+        }
+
+        // MySQL: REPLACE INTO
+        return "
+            REPLACE INTO {$tableName} ({$columnList})
+            SELECT {$columnList} FROM ({$selectSql}) AS tmp";
     }
 
     /**

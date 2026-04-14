@@ -1128,7 +1128,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         if (!$this->isPostgresqlPlatform()) {
             // If useCleanupRollback is not disabled then this test trigger error on MySQL
-            // Doctrine\DBAL\Driver\PDO\PDOException: There is no active transactio
+            // Doctrine\DBAL\Driver\PDO\PDOException: There is no active transaction
             $this->useCleanupRollback = false;
         }
 

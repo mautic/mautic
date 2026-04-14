@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -1150,7 +1151,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function getFieldSegments(LeadField $field)
     {
-        $alias       = mb_strtolower($field->getAlias());
+        $platform    = $this->em->getConnection()->getDatabasePlatform();
+        $alias       = DatabasePlatform::normalizeSearchValue($platform, $field->getAlias());
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
         $filter      = [
