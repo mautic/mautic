@@ -1126,6 +1126,12 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
+        if (!$this->isPostgresqlPlatform()) {
+            // If useCleanupRollback is not disabled then this test trigger error on MySQL
+            // Doctrine\DBAL\Driver\PDO\PDOException: There is no active transactio
+            $this->useCleanupRollback = false;
+        }
+
         // Create the custom date field
         $this->createField([
             'type'        => 'date',
