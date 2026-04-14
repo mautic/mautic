@@ -143,7 +143,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first (
     id $idType NOT NULL,
     name varchar(100) NOT NULL,
-    $generatedColumnSql
+    $generatedColumnSql,
     PRIMARY KEY (id)
 )
 SQL;

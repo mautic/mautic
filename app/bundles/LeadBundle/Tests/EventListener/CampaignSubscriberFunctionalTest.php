@@ -1126,10 +1126,6 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
-        if (!$this->isPostgresqlPlatform()) {
-            $this->useCleanupRollback = false;
-        }
-
         // Create the custom date field
         $this->createField([
             'type'        => 'date',
