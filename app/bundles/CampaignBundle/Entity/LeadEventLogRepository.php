@@ -601,7 +601,7 @@ class LeadEventLogRepository extends CommonRepository
             $platform,
             $prefix.'campaign_lead_event_failed_log',
             ['log_id', 'date_added', 'reason'],              // columns to insert
-            "SELECT id, '{$dateAdded}' as date_added, '{$message}' as reason
+            "SELECT id, :dateAdded as date_added, :message as reason
          FROM {$prefix}campaign_lead_event_log
          WHERE is_scheduled = TRUE
            AND lead_id = :contactId

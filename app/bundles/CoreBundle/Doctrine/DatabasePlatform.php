@@ -558,11 +558,11 @@ class DatabasePlatform
     /**
      * Universal upsert (REPLACE INTO on MySQL, INSERT ... ON CONFLICT on PostgreSQL).
      *
-     * @param string $tableName     Full table name (with prefix)
-     * @param array  $columns       List of columns to insert
-     * @param string $selectSql     Sub-select that provides the data (the SELECT part)
-     * @param string $conflictOn    Column(s) for ON CONFLICT (PostgreSQL only). Use comma-separated string for multiple columns.
-     * @param array  $updateColumns Columns to update on conflict (if empty, all columns except conflict keys are updated)
+     * @param string        $tableName     Full table name (with prefix)
+     * @param array<string> $columns       List of columns to insert
+     * @param string        $selectSql     Sub-select that provides the data (the SELECT part)
+     * @param string        $conflictOn    Column(s) for ON CONFLICT (PostgreSQL only). Use comma-separated string for multiple columns.
+     * @param array<string> $updateColumns Columns to update on conflict (if empty, all columns except conflict keys are updated)
      */
     public static function getUpsertSql(
         ?AbstractPlatform $platform,
@@ -575,11 +575,6 @@ class DatabasePlatform
         $columnList = implode(', ', $columns);
 
         if (self::isPostgreSQL($platform)) {
-            if (empty($updateColumns)) {
-                // Default: update all columns except the conflict target
-                $updateColumns = array_diff($columns, explode(',', str_replace(' ', '', $conflictOn)));
-            }
-
             $setClauses = [];
             foreach ($updateColumns as $col) {
                 $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
@@ -587,7 +582,7 @@ class DatabasePlatform
 
             return "
                 INSERT INTO {$tableName} ({$columnList})
-                SELECT {$columnList} FROM ({$selectSql}) AS tmp
+                {$selectSql}
                 ON CONFLICT ({$conflictOn})
                 DO UPDATE SET ".implode(', ', $setClauses);
         }
@@ -595,7 +590,7 @@ class DatabasePlatform
         // MySQL: REPLACE INTO
         return "
             REPLACE INTO {$tableName} ({$columnList})
-            SELECT {$columnList} FROM ({$selectSql}) AS tmp";
+            {$selectSql}";
     }
 
     /**
