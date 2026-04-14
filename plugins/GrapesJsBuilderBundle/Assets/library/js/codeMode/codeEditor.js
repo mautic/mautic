@@ -93,7 +93,7 @@ class CodeEditor {
       const doc = parser.parseFromString(trimmedCode, 'text/html');
       const body = doc.body;
 
-      if (body && body.innerHTML) {
+      if (body) {
         return body.innerHTML;
       }
     }
