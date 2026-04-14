@@ -410,7 +410,7 @@ class EmailRepository extends CommonRepository
 
                 $q->setParameter(
                     $param,
-                    DatabasePlatform::shouldLowercaseSearchValue($platform) ? '%'.mb_strtolower($search).'%' : "%{$search}%"
+                    '%'.DatabasePlatform::normalizeSearchValue($platform, $search).'%'
                 );
             }
         }

@@ -70,14 +70,14 @@ class SimplePaginatorTest extends MauticMysqlTestCase
     /**
      * Return real queries (with excluded NEXTVAL() calls on PostgreSQL).
      *
-     * @return array<int, array{sql: string, params: array, types: array, executionMS: float}>
+     * @return array<int, mixed>
      */
     private function getQueries(): array
     {
         // Exclude PostgreSQL sequence queries (NEXTVAL)
         return array_values(
             array_filter(
-                $this->debugDataHolder->getData()['default'],
+                $this->debugDataHolder->getData()['default'] ?? [],
                 function (array $item): bool {
                     return 0 !== strpos($item['sql'], 'SELECT NEXTVAL');
                 }

@@ -131,18 +131,6 @@ class DatabasePlatform
         return "{$c}{$not}LIKE {$v}";
     }
 
-    /**
-     * Returns whether the search value should be lowercased.
-     *
-     * On PostgreSQL + ORM we lowercase the value because we use LOWER(column).
-     */
-    public static function shouldLowercaseSearchValue(
-        ?AbstractPlatform $platform,
-        bool $isOrm = true,
-    ): bool {
-        return self::isPostgreSQL($platform) && $isOrm;
-    }
-
     /* ===================================================================
      * REGEXP helpers
      * =================================================================== */
@@ -1009,6 +997,18 @@ class DatabasePlatform
         }
 
         return $value; // keep as string for text fields, pattern operators, etc.
+    }
+
+    /**
+     * Returns normalized search value should (lowercased for postgresql).
+     *
+     * On PostgreSQL (+ ORM) we lowercase the value because we use LOWER(column).
+     */
+    public static function normalizeSearchValue(
+        ?AbstractPlatform $platform,
+        string $searchValue,
+    ): string {
+        return self::isPostgreSQL($platform) ? mb_strtolower($searchValue) : $searchValue;
     }
 
     /**

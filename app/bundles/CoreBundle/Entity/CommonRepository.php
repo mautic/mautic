@@ -1110,12 +1110,6 @@ class CommonRepository extends ServiceEntityRepository
         $unique = $this->generateRandomParameterName();
         $string = $filter->string;
 
-        if (!$filter->strict) {
-            if (!str_contains($string, '%')) {
-                $string = "%$string%";
-            }
-        }
-
         $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
         $isOrm    = $q instanceof QueryBuilder;
 
@@ -1132,6 +1126,8 @@ class CommonRepository extends ServiceEntityRepository
                     )
                 );
             }
+
+            $string = DatabasePlatform::normalizeSearchValue($platform, $string);
         } else {
             // DBAL path: use native ILIKE on PostgreSQL, LIKE on MySQL
             $xFunc = $filter->not ? 'andX' : 'orX';
@@ -1153,14 +1149,15 @@ class CommonRepository extends ServiceEntityRepository
             $expr = $q->expr()->not($expr);
         }
 
-        // Lowercase value only for ORM + PostgreSQL (to match LOWER(column))
-        $value = (DatabasePlatform::shouldLowercaseSearchValue($platform, $isOrm))
-            ? mb_strtolower($string)
-            : $string;
+        if (!$filter->strict) {
+            if (!str_contains($string, '%')) {
+                $string = "%$string%";
+            }
+        }
 
         return [
             $expr,
-            ["$unique" => $value],
+            ["$unique" => $string],
         ];
     }
 

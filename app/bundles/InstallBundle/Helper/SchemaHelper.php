@@ -321,9 +321,11 @@ class SchemaHelper
             $sql     = array_merge($sql, $queries);
 
             // rename sequences
-            foreach ($backupSequences[$t] as $oldSequence) {
-                $newSequence = str_replace($t, $backup, $oldSequence);
-                $sql[]       = 'ALTER SEQUENCE '.$this->db->quoteIdentifier($oldSequence).' RENAME TO '.$this->db->quoteIdentifier($newSequence);
+            if (!empty($backupSequences[$t])) {
+                foreach ($backupSequences[$t] as $oldSequence) {
+                    $newSequence = str_replace($t, $backup, $oldSequence);
+                    $sql[]       = 'ALTER SEQUENCE '.$this->db->quoteIdentifier($oldSequence).' RENAME TO '.$this->db->quoteIdentifier($newSequence);
+                }
             }
 
             // create new index
