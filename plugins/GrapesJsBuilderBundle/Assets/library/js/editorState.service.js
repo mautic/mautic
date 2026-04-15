@@ -1,10 +1,13 @@
 export default class EditorStateService {
   setFieldValue;
 
+  setTemplateHeadValue;
+
   setContextReset;
 
-  constructor({ setFieldValue, setContextReset }) {
+  constructor({ setFieldValue, setTemplateHeadValue, setContextReset }) {
     this.setFieldValue = setFieldValue;
+    this.setTemplateHeadValue = setTemplateHeadValue;
     this.setContextReset = setContextReset;
   }
 
@@ -86,6 +89,27 @@ export default class EditorStateService {
     return payload.editorState ?? null;
   }
 
+  extractTemplateHeadFromPayload(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return null;
+    }
+
+    return payload.templateHead ?? null;
+  }
+
+  applyPrefilledTemplateHead(templateHead) {
+    if (typeof this.setTemplateHeadValue !== 'function') {
+      return;
+    }
+
+    if (typeof templateHead !== 'string') {
+      this.setTemplateHeadValue('');
+      return;
+    }
+
+    this.setTemplateHeadValue(templateHead);
+  }
+
   applyPrefilledEditorState(editorState, context) {
     if (typeof editorState === 'string') {
       const parsed = this.safeParseEditorState(editorState);
@@ -140,6 +164,9 @@ export default class EditorStateService {
 
       const payload = await response.json();
       const editorState = this.extractEditorStateFromPayload(payload);
+      const templateHead = this.extractTemplateHeadFromPayload(payload);
+
+      this.applyPrefilledTemplateHead(templateHead);
 
       return this.applyPrefilledEditorState(editorState, context);
     } catch (error) {

@@ -1,5 +1,6 @@
     {% set templateObject = {
         'templateHtml': templateHtml,
         'templateMjml': templateMjml,
+        'templateHead': templateHead,
     } %}
     {{ templateObject | json_encode() | raw }}

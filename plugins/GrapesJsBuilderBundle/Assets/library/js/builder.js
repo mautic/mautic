@@ -80,6 +80,7 @@ function setThemeHtml(theme) {
       const textareaHtml = mQuery('textarea.builder-html');
       const textareaMjml = mQuery('textarea.builder-mjml');
       const textareaJson = mQuery('textarea.builder-json');
+      const textareaHead = mQuery('textarea.builder-head');
       const form = textareaHtml.closest('form');
 
       textareaHtml.val(response.templateHtml);
@@ -90,6 +91,10 @@ function setThemeHtml(theme) {
 
       if (textareaJson.length) {
         textareaJson.val('');
+      }
+
+      if (textareaHead.length) {
+        textareaHead.val(response.templateHead || '');
       }
 
       if (form.length) {

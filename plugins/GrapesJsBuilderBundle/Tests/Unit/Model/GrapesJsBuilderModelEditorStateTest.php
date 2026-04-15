@@ -32,8 +32,9 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [
             'grapesjsbuilder' => [
-                'customMjml'  => '<mjml/>',
-                'editorState' => '{"pages":[{"id":"main"}]}',
+                'customMjml'   => '<mjml/>',
+                'editorState'  => '{"pages":[{"id":"main"}]}',
+                'templateHead' => '<link rel="stylesheet" href="https://example.test/theme.css">',
             ],
             'customHtml' => '<html/>',
         ]));
@@ -75,6 +76,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         Assert::assertArrayHasKey('grapesjsbuilder', $content);
         Assert::assertIsArray($content['grapesjsbuilder']);
         Assert::assertSame(['pages' => [['id' => 'main']]], $content['grapesjsbuilder']['editorState']);
+        Assert::assertSame('<link rel="stylesheet" href="https://example.test/theme.css">', $content['grapesjsbuilder']['templateHead']);
         Assert::assertArrayHasKey('updatedAt', $content['grapesjsbuilder']);
     }
 
@@ -106,6 +108,58 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         $model->addOrEditEntity(new Email());
     }
 
+    public function testAddOrEditEntitySanitizesRuntimeAssetsFromTemplateHead(): void
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request([], [
+            'grapesjsbuilder' => [
+                'editorState'  => '{"pages":[{"id":"main"}]}',
+                'templateHead' => '<meta charset="utf-8">'
+                    .'<link rel="stylesheet" href="/themes/theme-a/css/theme.css">'
+                    .'<link rel="stylesheet" href="/plugins/GrapesJsBuilderBundle/Assets/library/js/dist/builder.css?v=1">'
+                    .'<script src="/media/libraries/ckeditor/ckeditor.js"></script>'
+                    .'<style data-cke="true">.ck-editor{position:fixed;}</style>'
+                    .'<style>.ck-content{line-height:1.6;}</style>',
+            ],
+        ]));
+
+        /** @var MockObject&EmailRepository $emailRepository */
+        $emailRepository = $this->createMock(EmailRepository::class);
+        $emailRepository->expects(self::once())
+            ->method('saveEntity')
+            ->with(self::isInstanceOf(Email::class));
+
+        /** @var MockObject&EmailModel $emailModel */
+        $emailModel = $this->createMock(EmailModel::class);
+        $emailModel->method('isUpdatingTranslationChildren')->willReturn(false);
+        $emailModel->method('getRepository')->willReturn($emailRepository);
+
+        /** @var MockObject&GrapesJsBuilderRepository $grapesRepository */
+        $grapesRepository = $this->createMock(GrapesJsBuilderRepository::class);
+        $grapesRepository->method('findOneBy')->willReturn(null);
+        $grapesRepository->expects(self::once())
+            ->method('saveEntity')
+            ->with(self::isInstanceOf(GrapesJsBuilder::class));
+
+        /** @var MockObject&EntityManager $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->method('getRepository')->with(GrapesJsBuilder::class)->willReturn($grapesRepository);
+
+        $model = $this->getModel($requestStack, $emailModel, $entityManager);
+
+        $email = new Email();
+        $model->addOrEditEntity($email);
+
+        $content = $email->getContent();
+
+        Assert::assertIsArray($content);
+        Assert::assertIsArray($content['grapesjsbuilder']);
+        Assert::assertSame(
+            '<meta charset="utf-8"><link rel="stylesheet" href="/themes/theme-a/css/theme.css">',
+            $content['grapesjsbuilder']['templateHead']
+        );
+    }
+
     public function testAddOrEditPageEntityPersistsOnlyWhenEditorStateProvided(): void
     {
         $requestStack = new RequestStack();
@@ -135,6 +189,28 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         Assert::assertArrayHasKey('grapesjsbuilder', $content);
         Assert::assertIsArray($content['grapesjsbuilder']);
         Assert::assertSame(['pages' => [['id' => 'landing']]], $content['grapesjsbuilder']['editorState']);
+
+        $requestStackTemplateHead = new RequestStack();
+        $requestStackTemplateHead->push(new Request([], [
+            'grapesjsbuilder' => [
+                'templateHead' => '<style>.landing{display:block}</style>',
+            ],
+        ]));
+
+        /** @var MockObject&EntityManager $entityManagerTemplateHead */
+        $entityManagerTemplateHead = $this->createMock(EntityManager::class);
+        $entityManagerTemplateHead->expects(self::once())->method('persist');
+        $entityManagerTemplateHead->expects(self::once())->method('flush');
+
+        $modelTemplateHead = $this->getModel($requestStackTemplateHead, $emailModel, $entityManagerTemplateHead);
+
+        $pageWithTemplateHead = new Page();
+        $modelTemplateHead->addOrEditPageEntity($pageWithTemplateHead);
+
+        $pageWithTemplateHeadContent = $pageWithTemplateHead->getContent();
+        Assert::assertIsArray($pageWithTemplateHeadContent);
+        Assert::assertSame('<style>.landing{display:block}</style>', $pageWithTemplateHeadContent['grapesjsbuilder']['templateHead']);
+        Assert::assertNull($pageWithTemplateHeadContent['grapesjsbuilder']['editorState']);
 
         $requestStackNoEditor = new RequestStack();
         $requestStackNoEditor->push(new Request([], [

@@ -99,7 +99,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             $grapesJsBuilder->setCustomMjml($data['customMjml']);
         }
 
-        $this->updateEntityEditorState($entity, $data);
+        $this->updateEntityBuilderPayload($entity, $data);
         $this->getRepository()->saveEntity($grapesJsBuilder);
 
         $emailForm  = $request->request->all('emailform');
@@ -117,7 +117,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
      */
     private function handlePageEntity(Page $entity, array $data): void
     {
-        if (!$this->updateEntityEditorState($entity, $data)) {
+        if (!$this->updateEntityBuilderPayload($entity, $data)) {
             return;
         }
 
@@ -128,9 +128,9 @@ class GrapesJsBuilderModel extends AbstractCommonModel
     /**
      * @param array<string, mixed> $data
      */
-    private function hasEditorStatePayload(array $data): bool
+    private function hasBuilderPayload(array $data): bool
     {
-        return array_key_exists('editorState', $data);
+        return array_key_exists('editorState', $data) || array_key_exists('templateHead', $data);
     }
 
     /**
@@ -152,6 +152,138 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         }
 
         return null;
+    }
+
+    private function decodeTemplateHead(mixed $templateHead): ?string
+    {
+        if (!is_string($templateHead)) {
+            return null;
+        }
+
+        $normalizedTemplateHead = trim($templateHead);
+
+        if ('' === $normalizedTemplateHead) {
+            return null;
+        }
+
+        $normalizedTemplateHead = $this->sanitizeTemplateHead($normalizedTemplateHead);
+
+        return '' !== $normalizedTemplateHead ? $normalizedTemplateHead : null;
+    }
+
+    private function sanitizeTemplateHead(string $templateHead): string
+    {
+        if (!class_exists(\DOMDocument::class)) {
+            return $this->sanitizeTemplateHeadWithRegex($templateHead);
+        }
+
+        $document = new \DOMDocument();
+        $wrapped  = '<!DOCTYPE html><html><head>'.$templateHead.'</head><body></body></html>';
+
+        $useInternalErrors = libxml_use_internal_errors(true);
+        $isLoaded          = $document->loadHTML($wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($useInternalErrors);
+
+        if (!$isLoaded) {
+            return $this->sanitizeTemplateHeadWithRegex($templateHead);
+        }
+
+        /** @var \DOMNodeList<\DOMElement> $nodes */
+        $nodes = $document->getElementsByTagName('*');
+
+        $nodesToRemove = [];
+
+        foreach ($nodes as $node) {
+            if (!$node->parentNode || !$node->ownerDocument || 'head' !== strtolower($node->parentNode->nodeName)) {
+                continue;
+            }
+
+            $tagName = strtolower($node->nodeName);
+            if (!in_array($tagName, ['link', 'script', 'style'], true)) {
+                continue;
+            }
+
+            $src            = strtolower((string) $node->getAttribute('src'));
+            $href           = strtolower((string) $node->getAttribute('href'));
+            $id             = strtolower((string) $node->getAttribute('id'));
+            $textContent    = strtolower((string) $node->textContent);
+            $assetSource    = $src.' '.$href;
+            $hasDataCkeAttr = false;
+
+            if ($node->hasAttributes()) {
+                foreach ($node->attributes as $attribute) {
+                    if (str_starts_with(strtolower($attribute->name), 'data-cke')) {
+                        $hasDataCkeAttr = true;
+                        break;
+                    }
+                }
+            }
+
+            $isBuilderRuntimeAsset = str_contains($assetSource, '/plugins/grapesjsbuilderbundle/assets/library/js/dist/builder')
+                || str_contains($assetSource, 'grapesjs-editor.css');
+            $isCkEditorRuntimeAsset = str_contains($assetSource, '/media/libraries/ckeditor')
+                || str_contains($assetSource, '/ckeditor')
+                || str_starts_with($id, 'cke_')
+                || $hasDataCkeAttr;
+            $isCkEditorRuntimeStyle = 'style' === $tagName
+                && (str_contains($textContent, '.ck-') || str_contains($textContent, 'ck-content') || str_contains($textContent, '--ck-'));
+
+            if ($isBuilderRuntimeAsset || $isCkEditorRuntimeAsset || $isCkEditorRuntimeStyle) {
+                $nodesToRemove[] = $node;
+            }
+        }
+
+        foreach ($nodesToRemove as $nodeToRemove) {
+            $nodeToRemove->parentNode?->removeChild($nodeToRemove);
+        }
+
+        $headList = $document->getElementsByTagName('head');
+        if (0 === $headList->length) {
+            return '';
+        }
+
+        $head      = $headList->item(0);
+        $sanitized = '';
+
+        if ($head instanceof \DOMElement) {
+            foreach ($head->childNodes as $childNode) {
+                $sanitized .= $document->saveHTML($childNode);
+            }
+        }
+
+        return trim($sanitized);
+    }
+
+    private function sanitizeTemplateHeadWithRegex(string $templateHead): string
+    {
+        $sanitizedTemplateHead = $templateHead;
+
+        $sanitizedTemplateHead = (string) preg_replace(
+            '#<link\b[^>]*(?:href\s*=\s*["\"][^"\"]*(?:GrapesJsBuilderBundle/Assets/library/js/dist/builder|grapesjs-editor\.css)[^"\"]*["\"])[^>]*>\s*#i',
+            '',
+            $sanitizedTemplateHead
+        );
+
+        $sanitizedTemplateHead = (string) preg_replace(
+            '#<(?:script|link)\b[^>]*(?:src|href)\s*=\s*["\"][^"\"]*(?:/media/libraries/ckeditor|/ckeditor)[^"\"]*["\"][^>]*>\s*(?:</script>\s*)?#i',
+            '',
+            $sanitizedTemplateHead
+        );
+
+        $sanitizedTemplateHead = (string) preg_replace(
+            '#<(?:script|style|link)\b[^>]*(?:id\s*=\s*["\"][^"\"]*cke_[^"\"]*["\"]|data-cke[a-z0-9_-]*\s*=\s*["\"][^"\"]*["\"])[^>]*>\s*[\s\S]*?(?:</(?:script|style)>\s*)?#is',
+            '',
+            $sanitizedTemplateHead
+        );
+
+        $sanitizedTemplateHead = (string) preg_replace(
+            '#<style\b[^>]*>[\s\S]*?(?:\.ck-|ck-content|--ck-)[\s\S]*?</style>\s*#i',
+            '',
+            $sanitizedTemplateHead
+        );
+
+        return trim($sanitizedTemplateHead);
     }
 
     /**
@@ -179,14 +311,15 @@ class GrapesJsBuilderModel extends AbstractCommonModel
      *
      * @return array<string, mixed>
      */
-    private function mergeEditorStateIntoContent(array $content, ?array $editorState): array
+    private function mergeBuilderPayloadIntoContent(array $content, ?array $editorState, ?string $templateHead): array
     {
         if (!isset($content['grapesjsbuilder']) || !is_array($content['grapesjsbuilder'])) {
             $content['grapesjsbuilder'] = [];
         }
 
-        $content['grapesjsbuilder']['editorState'] = $editorState;
-        $content['grapesjsbuilder']['updatedAt']   = (new \DateTime())->format('c');
+        $content['grapesjsbuilder']['editorState']  = $editorState;
+        $content['grapesjsbuilder']['templateHead'] = $templateHead;
+        $content['grapesjsbuilder']['updatedAt']    = (new \DateTime())->format('c');
 
         return $content;
     }
@@ -194,16 +327,18 @@ class GrapesJsBuilderModel extends AbstractCommonModel
     /**
      * @param array<string, mixed> $data
      */
-    private function updateEntityEditorState(Email|Page $entity, array $data): bool
+    private function updateEntityBuilderPayload(Email|Page $entity, array $data): bool
     {
-        if (!$this->hasEditorStatePayload($data)) {
+        if (!$this->hasBuilderPayload($data)) {
             return false;
         }
 
-        $rawEditorState = $data['editorState'] ?? null;
-        $editorState    = $this->decodeEditorState($rawEditorState);
-        $content        = $this->normalizeContent($entity->getContent());
-        $entity->setContent($this->mergeEditorStateIntoContent($content, $editorState));
+        $rawEditorState  = $data['editorState'] ?? null;
+        $rawTemplateHead = $data['templateHead'] ?? null;
+        $editorState     = $this->decodeEditorState($rawEditorState);
+        $templateHead    = $this->decodeTemplateHead($rawTemplateHead);
+        $content         = $this->normalizeContent($entity->getContent());
+        $entity->setContent($this->mergeBuilderPayloadIntoContent($content, $editorState, $templateHead));
 
         return true;
     }

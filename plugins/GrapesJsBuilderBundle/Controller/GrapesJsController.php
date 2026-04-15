@@ -101,6 +101,25 @@ class GrapesJsController extends CommonController
         return is_array($decodedEditorState) ? $decodedEditorState : null;
     }
 
+    private function extractTemplateHeadFromContent(array $content): ?string
+    {
+        $builderConfig = $content['grapesjsbuilder'] ?? null;
+
+        if (!is_array($builderConfig)) {
+            return null;
+        }
+
+        $templateHead = $builderConfig['templateHead'] ?? null;
+
+        if (!is_string($templateHead)) {
+            return null;
+        }
+
+        $normalizedTemplateHead = trim($templateHead);
+
+        return '' !== $normalizedTemplateHead ? $normalizedTemplateHead : null;
+    }
+
     public function builderAction(
         Request $request,
         LoggerInterface $mauticLogger,
@@ -151,8 +170,9 @@ class GrapesJsController extends CommonController
 
             return $this->json(false);
         }
-        $templateName = '@themes/'.$template.'/html/'.$objectType;
-        $content      = $resetEditorState ? [] : $entity->getContent();
+        $templateName      = '@themes/'.$template.'/html/'.$objectType;
+        $content           = $resetEditorState ? [] : $entity->getContent();
+        $normalizedContent = $this->normalizeContentToArray($content);
 
         // Check for MJML template
         // @deprecated - use mjml directly in email.html.twig
@@ -182,12 +202,14 @@ class GrapesJsController extends CommonController
 
         $renderedTemplateHtml = ('html' === $type) ? $renderedTemplate : '';
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
+        $templateHead         = $this->extractTemplateHeadFromContent($normalizedContent);
 
         return $this->render(
             '@GrapesJsBuilder/Builder/template.html.twig',
             [
                 'templateHtml' => $renderedTemplateHtml,
                 'templateMjml' => $renderedTemplateMjml,
+                'templateHead' => $templateHead,
             ]
         );
     }
@@ -201,7 +223,7 @@ class GrapesJsController extends CommonController
         }
 
         if (str_contains($objectId, 'new')) {
-            return $this->json(['editorState' => null]);
+            return $this->json(['editorState' => null, 'templateHead' => null]);
         }
 
         $model      = $this->getModel($objectType);
@@ -220,10 +242,11 @@ class GrapesJsController extends CommonController
             return $this->accessDenied();
         }
 
-        $content     = $this->normalizeContentToArray($entity->getContent());
-        $editorState = $this->extractEditorStateFromContent($content);
+        $content      = $this->normalizeContentToArray($entity->getContent());
+        $editorState  = $this->extractEditorStateFromContent($content);
+        $templateHead = $this->extractTemplateHeadFromContent($content);
 
-        return $this->json(['editorState' => $editorState]);
+        return $this->json(['editorState' => $editorState, 'templateHead' => $templateHead]);
     }
 
     /**

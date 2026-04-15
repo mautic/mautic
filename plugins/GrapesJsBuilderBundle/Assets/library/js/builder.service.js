@@ -35,6 +35,12 @@ export default class BuilderService {
 
   editorStateField;
 
+  templateHeadField;
+
+  templateHeadContent;
+
+  templateHeadReapplyTimers;
+
   pendingEditorState;
 
   context;
@@ -57,11 +63,15 @@ export default class BuilderService {
   constructor(assetService) {
     this.assetService = assetService;
     this.editorStateField = null;
+    this.templateHeadField = null;
+    this.templateHeadContent = null;
+    this.templateHeadReapplyTimers = [];
     this.pendingEditorState = null;
     this.context = null;
     this.editorStateLoaded = false;
     this.editorStateService = new EditorStateService({
       setFieldValue: (value) => this.setEditorStateFieldValue(value),
+      setTemplateHeadValue: (value) => this.setTemplateHeadFieldValue(value),
       setContextReset: (context, resetEditorState) => this.setContextEditorStateReset(context, resetEditorState),
     });
     this.typographySector = null;
@@ -353,6 +363,285 @@ export default class BuilderService {
     this.editorStateField.value = value;
   }
 
+  ensureTemplateHeadField(context) {
+    if (!context?.form) {
+      return null;
+    }
+
+    const existingTemplateHeadField = context.form.querySelector('textarea.builder-head[name="grapesjsbuilder[templateHead]"]');
+    if (existingTemplateHeadField) {
+      return existingTemplateHeadField;
+    }
+
+    const field = document.createElement('textarea');
+    field.name = 'grapesjsbuilder[templateHead]';
+    field.id = 'grapesjsbuilder_templateHead';
+    field.className = 'builder-head hide';
+    field.style.display = 'none';
+    context.form.appendChild(field);
+
+    return field;
+  }
+
+  normalizeTemplateHead(templateHead) {
+    if (typeof templateHead !== 'string') {
+      return null;
+    }
+
+    const normalizedTemplateHead = this.sanitizeTemplateHead(templateHead.trim());
+
+    return normalizedTemplateHead.length ? normalizedTemplateHead : null;
+  }
+
+  sanitizeTemplateHead(templateHead) {
+    if (!templateHead) {
+      return '';
+    }
+
+    const parser = new DOMParser();
+    const parsedHeadDocument = parser.parseFromString(`<html><head>${templateHead}</head><body></body></html>`, 'text/html');
+
+    const shouldRemoveRuntimeNode = (node) => {
+      if (!node || node.nodeType !== Node.ELEMENT_NODE) {
+        return false;
+      }
+
+      const element = /** @type {Element} */ (node);
+      const tagName = element.tagName.toLowerCase();
+      const sourceCandidate = `${element.getAttribute('href') || ''} ${element.getAttribute('src') || ''}`.toLowerCase();
+      const idCandidate = (element.getAttribute('id') || '').toLowerCase();
+      const textCandidate = (element.textContent || '').toLowerCase();
+      const attributeNames = element.getAttributeNames ? element.getAttributeNames() : [];
+
+      const isBuilderRuntimeAsset = sourceCandidate.includes('/plugins/grapesjsbuilderbundle/assets/library/js/dist/builder')
+        || sourceCandidate.includes('grapesjs-editor.css');
+      const isCkEditorRuntimeAsset = sourceCandidate.includes('/media/libraries/ckeditor')
+        || sourceCandidate.includes('/ckeditor')
+        || idCandidate.startsWith('cke_')
+        || attributeNames.some((name) => name.toLowerCase().startsWith('data-cke'));
+      const isCkEditorRuntimeStyle = tagName === 'style' && (
+        textCandidate.includes('.ck-')
+        || textCandidate.includes('ck-content')
+        || textCandidate.includes('--ck-')
+      );
+
+      return isBuilderRuntimeAsset || isCkEditorRuntimeAsset || isCkEditorRuntimeStyle;
+    };
+
+    Array.from(parsedHeadDocument.head.childNodes).forEach((node) => {
+      if (shouldRemoveRuntimeNode(node)) {
+        node.parentNode?.removeChild(node);
+      }
+    });
+
+    return parsedHeadDocument.head.innerHTML.trim();
+  }
+
+  hasBuilderInjectedHeadAssets(templateHead) {
+    const normalizedTemplateHead = this.normalizeTemplateHead(templateHead);
+    if (!normalizedTemplateHead) {
+      return false;
+    }
+
+    return normalizedTemplateHead.includes('GrapesJsBuilderBundle/Assets/library/js/dist/builder')
+      || normalizedTemplateHead.includes('grapesjs-editor.css')
+      || normalizedTemplateHead.includes('data-source="mautic"');
+  }
+
+  setTemplateHeadFieldValue(value) {
+    const normalizedValue = this.normalizeTemplateHead(value);
+    this.templateHeadContent = normalizedValue;
+
+    if (!this.templateHeadField) {
+      this.injectTemplateHeadIntoCanvas();
+      this.scheduleTemplateHeadReapply();
+      return;
+    }
+
+    this.templateHeadField.value = normalizedValue || '';
+    this.injectTemplateHeadIntoCanvas();
+    this.scheduleTemplateHeadReapply();
+  }
+
+  extractTemplateHeadFromOriginalContent() {
+    const originalContent = contentService.getOriginalContentHtml();
+
+    if (!originalContent?.head) {
+      return null;
+    }
+
+    return this.normalizeTemplateHead(originalContent.head.innerHTML || '');
+  }
+
+  bootstrapTemplateHeadField() {
+    const fieldTemplateHead = this.normalizeTemplateHead(this.templateHeadField?.value);
+    const originalTemplateHead = this.extractTemplateHeadFromOriginalContent();
+
+    const shouldUseOriginalTemplateHead = Boolean(
+      originalTemplateHead
+      && fieldTemplateHead
+      && this.hasBuilderInjectedHeadAssets(fieldTemplateHead)
+    );
+
+    if (shouldUseOriginalTemplateHead) {
+      this.setTemplateHeadFieldValue(originalTemplateHead);
+      return;
+    }
+
+    if (fieldTemplateHead) {
+      this.setTemplateHeadFieldValue(fieldTemplateHead);
+      return;
+    }
+
+    this.setTemplateHeadFieldValue(originalTemplateHead || '');
+  }
+
+  injectTemplateHeadIntoCanvas() {
+    if (!this.editor) {
+      return;
+    }
+
+    const normalizedTemplateHead = this.normalizeTemplateHead(this.templateHeadContent);
+    if (!normalizedTemplateHead) {
+      return;
+    }
+
+    const canvasDocument = this.editor.Canvas && typeof this.editor.Canvas.getDocument === 'function'
+      ? this.editor.Canvas.getDocument()
+      : null;
+
+    if (!canvasDocument?.head) {
+      return;
+    }
+
+    this.applyTemplateHeadToCanvasDocument(canvasDocument, normalizedTemplateHead);
+
+    this.syncHeadComponentWithTemplateHead(canvasDocument, normalizedTemplateHead);
+  }
+
+  applyTemplateHeadToCanvasDocument(canvasDocument, normalizedTemplateHead) {
+    if (!canvasDocument?.head || !normalizedTemplateHead) {
+      return;
+    }
+
+    const currentHead = canvasDocument.head;
+    if (currentHead.innerHTML === normalizedTemplateHead) {
+      return;
+    }
+
+    const isCkEditorRuntimeNode = (node) => {
+      if (!node || node.nodeType !== Node.ELEMENT_NODE) {
+        return false;
+      }
+
+      const element = /** @type {Element} */ (node);
+      const tagName = element.tagName.toLowerCase();
+      if (!['style', 'link', 'script'].includes(tagName)) {
+        return false;
+      }
+
+      const sourceCandidate = `${element.getAttribute('href') || ''} ${element.getAttribute('src') || ''}`.toLowerCase();
+      const idCandidate = (element.getAttribute('id') || '').toLowerCase();
+      const textCandidate = (element.textContent || '').toLowerCase();
+      const attributeNames = element.getAttributeNames ? element.getAttributeNames() : [];
+
+      return sourceCandidate.includes('/media/libraries/ckeditor')
+        || sourceCandidate.includes('/ckeditor')
+        || idCandidate.startsWith('cke_')
+        || attributeNames.some((name) => name.toLowerCase().startsWith('data-cke'))
+        || (tagName === 'style' && (textCandidate.includes('.ck-') || textCandidate.includes('ck-content') || textCandidate.includes('--ck-')));
+    };
+
+    const runtimeNodesToPreserve = Array.from(currentHead.childNodes)
+      .filter((node) => isCkEditorRuntimeNode(node))
+      .map((node) => node.cloneNode(true));
+
+    const replacementHead = canvasDocument.createElement('head');
+
+    Array.from(currentHead.attributes).forEach((attributeNode) => {
+      replacementHead.setAttribute(attributeNode.name, attributeNode.value);
+    });
+
+    replacementHead.innerHTML = normalizedTemplateHead;
+
+    runtimeNodesToPreserve.forEach((runtimeNode) => {
+      replacementHead.appendChild(runtimeNode);
+    });
+
+    if (currentHead.parentNode) {
+      currentHead.parentNode.replaceChild(replacementHead, currentHead);
+    }
+  }
+
+  clearTemplateHeadReapplyTimers() {
+    this.templateHeadReapplyTimers.forEach((timerId) => {
+      clearTimeout(timerId);
+    });
+
+    this.templateHeadReapplyTimers = [];
+  }
+
+  scheduleTemplateHeadReapply() {
+    this.clearTemplateHeadReapplyTimers();
+
+    if (!this.normalizeTemplateHead(this.templateHeadContent)) {
+      return;
+    }
+
+    const delays = [0, 60, 180, 420, 900];
+
+    this.templateHeadReapplyTimers = delays.map((delay) => setTimeout(() => {
+      this.injectTemplateHeadIntoCanvas();
+    }, delay));
+  }
+
+  findHeadComponentByCanvasDocument(canvasDocument) {
+    if (!this.editor || !canvasDocument?.head) {
+      return null;
+    }
+
+    const headElement = canvasDocument.head.matches('[data-gjs-type="head"]')
+      ? canvasDocument.head
+      : canvasDocument.querySelector('head[data-gjs-type="head"]');
+
+    if (!headElement) {
+      return null;
+    }
+
+    const headComponentId = headElement.getAttribute('id');
+    if (!headComponentId || !this.editor.Components || typeof this.editor.Components.getById !== 'function') {
+      return null;
+    }
+
+    const headComponent = this.editor.Components.getById(headComponentId);
+
+    if (!headComponent || typeof headComponent.components !== 'function') {
+      return null;
+    }
+
+    return headComponent;
+  }
+
+  syncHeadComponentWithTemplateHead(canvasDocument, normalizedTemplateHead) {
+    const headComponent = this.findHeadComponentByCanvasDocument(canvasDocument);
+    if (!headComponent) {
+      return;
+    }
+
+    if (!normalizedTemplateHead) {
+      return;
+    }
+
+    try {
+      headComponent.components(normalizedTemplateHead, {
+        avoidStore: true,
+        fromTemplateHead: true,
+      });
+    } catch (error) {
+      console.warn('Unable to sync GrapesJS head component from templateHead payload', error);
+    }
+  }
+
   setContextEditorStateReset(context, resetEditorState) {
     if (!context) {
       return;
@@ -484,6 +773,7 @@ export default class BuilderService {
     try {
       this.editor.loadProjectData(editorState);
       this.editorStateLoaded = true;
+      this.scheduleTemplateHeadReapply();
     } catch (error) {
       console.warn('Unable to load GrapesJS editor state into the editor', error);
     }
@@ -656,6 +946,7 @@ export default class BuilderService {
     this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
 
     this.editor.on('load', () => this.setupTypographySectorVisibility());
+    this.editor.on('load', () => this.injectTemplateHeadIntoCanvas());
     this.editor.on('load', () => this.normalizeTextComponentContainers());
     this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
@@ -674,6 +965,8 @@ export default class BuilderService {
     this.context = this.getContext(object);
     this.cacheOptimisticLockVersion();
     this.editorStateField = this.editorStateService.ensureEditorStateField(this.context);
+    this.templateHeadField = this.ensureTemplateHeadField(this.context);
+    this.bootstrapTemplateHeadField();
     this.pendingEditorState = null;
     this.editorStateLoaded = false;
 

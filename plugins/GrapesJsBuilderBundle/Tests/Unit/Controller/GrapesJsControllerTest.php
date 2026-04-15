@@ -32,7 +32,7 @@ final class GrapesJsControllerTest extends TestCase
         $response   = $controller->editorStateAction('email', 'new123');
 
         self::assertInstanceOf(JsonResponse::class, $response);
-        self::assertSame('{"editorState":null}', $response->getContent());
+        self::assertSame('{"editorState":null,"templateHead":null}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsEditorStateFromJsonContent(): void
@@ -44,14 +44,21 @@ final class GrapesJsControllerTest extends TestCase
         $entity->method('getCreatedBy')->willReturn(1);
         $entity->method('getContent')->willReturn(json_encode([
             'grapesjsbuilder' => [
-                'editorState' => json_encode(['components' => [['type' => 'text']]]),
+                'editorState'  => json_encode(['components' => [['type' => 'text']]]),
+                'templateHead' => '<link rel="stylesheet" href="https://example.test/theme.css">',
             ],
         ]));
 
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '15');
 
-        self::assertSame('{"editorState":{"components":[{"type":"text"}]}}', $response->getContent());
+        self::assertSame(
+            [
+                'editorState'  => ['components' => [['type' => 'text']]],
+                'templateHead' => '<link rel="stylesheet" href="https://example.test/theme.css">',
+            ],
+            json_decode((string) $response->getContent(), true)
+        );
     }
 
     public function testEditorStateActionReturnsEditorStateFromSerializedContent(): void
@@ -61,12 +68,18 @@ final class GrapesJsControllerTest extends TestCase
 
         $entity = $this->createMock(Email::class);
         $entity->method('getCreatedBy')->willReturn(1);
-        $entity->method('getContent')->willReturn('a:1:{s:15:"grapesjsbuilder";a:1:{s:11:"editorState";a:1:{s:5:"pages";a:0:{}}}}');
+        $entity->method('getContent')->willReturn('a:1:{s:15:"grapesjsbuilder";a:2:{s:11:"editorState";a:1:{s:5:"pages";a:0:{}}s:12:"templateHead";s:35:"<style>.page{display:block}</style>";}}');
 
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '33');
 
-        self::assertSame('{"editorState":{"pages":[]}}', $response->getContent());
+        self::assertSame(
+            [
+                'editorState'  => ['pages' => []],
+                'templateHead' => '<style>.page{display:block}</style>',
+            ],
+            json_decode((string) $response->getContent(), true)
+        );
     }
 
     public function testEditorStateActionReturnsNullWhenEditorStateCannotBeDecoded(): void
@@ -85,7 +98,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '20');
 
-        self::assertSame('{"editorState":null}', $response->getContent());
+        self::assertSame('{"editorState":null,"templateHead":null}', $response->getContent());
     }
 
     private function getControllerForEditorState(CorePermissions $security, ?Email $entity): GrapesJsController
