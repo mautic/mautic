@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
@@ -191,10 +192,12 @@ class SchemaHelper
 
     public function validateDatabaseVersion(): void
     {
+        $versionProvider = new VersionProvider($this->db);
+
         // Version strings are in the format:
         // 10.3.30-MariaDB-1:10.3.30+maria~focal-log
         // PostgreSQL 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit
-        $version  = $this->extractDatabaseVersion($this->db->executeQuery('SELECT VERSION()')->fetchOne());
+        $version = VersionProvider::getNumericVersion($versionProvider->getVersion());
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($this->db->getDatabasePlatform()::class);
@@ -417,18 +420,5 @@ class SchemaHelper
         }
 
         return $this->schemaManager = $this->db->createSchemaManager();
-    }
-
-    /**
-     * This will extract the database version.
-     */
-    private function extractDatabaseVersion(string $version): string
-    {
-        // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
-        if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
-            return $matches[0];
-        }
-
-        return '0.0'; // string_compare not accept NULL, prevent NULL errors
     }
 }

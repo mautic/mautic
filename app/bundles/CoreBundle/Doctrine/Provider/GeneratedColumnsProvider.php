@@ -69,8 +69,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
              */
             return false;
         }
-
-        $version = $this->extractDatabaseVersion($this->versionProvider->getVersion());
+        $version = VersionProvider::getNumericVersion($this->versionProvider->getVersion());
 
         return 1 !== version_compare($this->getMinimalSupportedVersion(), $version);
     }
@@ -86,15 +85,5 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
         }
 
         return self::MYSQL_MINIMUM_VERSION;
-    }
-
-    private function extractDatabaseVersion(string $version): string
-    {
-        // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
-        if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
-            return $matches[0];
-        }
-
-        return '0.0'; // string_compare not accept NULL, prevent NULL errors
     }
 }

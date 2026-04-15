@@ -49,4 +49,14 @@ class VersionProvider implements VersionProviderInterface
     {
         return $this->connection->executeQuery('SELECT VERSION()')->fetchOne();
     }
+
+    public static function getNumericVersion(string $version): string
+    {
+        // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
+        if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
+            return $matches[0];
+        }
+
+        return '0.0'; // string_compare not accept NULL, prevent NULL errors
+    }
 }

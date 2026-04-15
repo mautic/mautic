@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 
 class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
@@ -16,13 +17,14 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 
     public function runCheck(): PreUpdateCheckResult
     {
-        $metadata   = $this->getUpdateCandidateMetadata();
-        $connection = $this->em->getConnection();
+        $metadata        = $this->getUpdateCandidateMetadata();
+        $connection      = $this->em->getConnection();
+        $versionProvider = new VersionProvider($connection);
 
         // Version strings are in the format:
         // 10.3.30-MariaDB-1:10.3.30+maria~focal-log
         // PostgreSQL 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit
-        $version  = $this->extractDatabaseVersion($connection->executeQuery('SELECT VERSION()')->fetchOne());
+        $version  = $versionProvider::getNumericVersion($versionProvider->getVersion());
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($connection->getDatabasePlatform()::class);
@@ -60,15 +62,5 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         }
 
         return new PreUpdateCheckResult(true, $this);
-    }
-
-    private function extractDatabaseVersion(string $version): string
-    {
-        // Pattern matches X.Y or X.Y.Z (with word boundaries to avoid partial matches)
-        if (preg_match('/\b\d+\.\d+(?:\.\d+)?\b/', $version, $matches)) {
-            return $matches[0];
-        }
-
-        return '0.0'; // string_compare not accept NULL, prevent NULL errors
     }
 }
