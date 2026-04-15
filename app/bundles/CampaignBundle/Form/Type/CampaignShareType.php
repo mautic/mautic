@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -14,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -73,8 +71,8 @@ final class CampaignShareType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                     new Regex([
-                        'pattern' => '/^\d+\.\d+\.\d+$/',
-                        'message' => 'Version must follow semantic versioning (e.g. 1.0.0).',
+                        'pattern' => '/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/',
+                        'message' => 'mautic.campaign.share.version.invalid',
                     ]),
                 ],
             ]
@@ -82,18 +80,9 @@ final class CampaignShareType extends AbstractType
 
         $builder->add(
             'bannerImage',
-            FileType::class,
+            ImageType::class,
             [
-                'label'       => 'mautic.campaign.share.banner_image',
-                'required'    => false,
-                'mapped'      => true,
-                'constraints' => [
-                    new File([
-                        'maxSize'   => '2M',
-                        'mimeTypes' => ['image/png', 'image/jpeg', 'image/webp'],
-                    ]),
-                ],
-                'attr' => ['class' => 'form-control', 'accept' => 'image/png,image/jpeg,image/webp'],
+                'label' => 'mautic.campaign.share.banner_image',
             ]
         );
 
@@ -139,7 +128,7 @@ final class CampaignShareType extends AbstractType
                 'required' => false,
                 'attr'     => [
                     'class'       => 'form-control',
-                    'placeholder' => 'e.g. email, drip, re-engagement',
+                    'placeholder' => 'mautic.campaign.share.keywords.placeholder',
                 ],
             ]
         );
@@ -160,7 +149,7 @@ final class CampaignShareType extends AbstractType
                 'multiple'    => true,
                 'required'    => true,
                 'constraints' => [
-                    new Count(['min' => 1, 'minMessage' => 'Select at least one compatible Mautic version.']),
+                    new Count(['min' => 1, 'minMessage' => 'mautic.campaign.share.works_with.min']),
                 ],
             ]
         );
@@ -184,18 +173,9 @@ final class CampaignShareType extends AbstractType
         for ($i = 1; $i <= 8; ++$i) {
             $builder->add(
                 'galleryImage'.$i,
-                FileType::class,
+                ImageType::class,
                 [
-                    'label'       => 'mautic.campaign.share.gallery_image',
-                    'required'    => false,
-                    'mapped'      => true,
-                    'constraints' => [
-                        new File([
-                            'maxSize'   => '2M',
-                            'mimeTypes' => ['image/png', 'image/jpeg', 'image/webp'],
-                        ]),
-                    ],
-                    'attr' => ['class' => 'form-control', 'accept' => 'image/png,image/jpeg,image/webp'],
+                    'label' => 'mautic.campaign.share.gallery_image',
                 ]
             );
 
