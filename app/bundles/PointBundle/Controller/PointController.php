@@ -108,7 +108,7 @@ class PointController extends AbstractFormController
         $model = $this->getModel('point');
         \assert($model instanceof PointModel);
 
-        if (!($entity instanceof Point)) {
+        if (!$entity instanceof Point) {
             /** @var Point $entity */
             $entity = $model->getEntity();
         }

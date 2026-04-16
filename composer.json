@@ -143,13 +143,15 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
-      "@generate-assets"
+      "@generate-assets",
+      "@motd"
     ],
     "post-update-cmd": [
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
-      "@generate-assets"
+      "@generate-assets",
+      "@motd"
     ],
     "test": "bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
     "e2e-test": "APP_ENV=test bin/codecept run acceptance",
@@ -164,7 +166,8 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
+    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./",
+    "motd": "bin/console mautic:motd"
   },
   "config": {
     "platform": {

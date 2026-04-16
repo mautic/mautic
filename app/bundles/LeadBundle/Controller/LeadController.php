@@ -1662,42 +1662,41 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            // Get a list of campaigns
-            $campaigns = $campaignModel->getPublishedCampaigns(true);
-            $items     = [];
-            foreach ($campaigns as $campaign) {
-                $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchCampaigns',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            BatchType::class,
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        // Get a list of campaigns
+        $campaigns = $campaignModel->getPublishedCampaigns(true);
+        $items     = [];
+        foreach ($campaigns as $campaign) {
+            $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];
+        }
+
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchCampaigns',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        BatchType::class,
+                        [],
+                        [
+                            'items'  => $items,
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1842,44 +1841,43 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            // Get a list of lists
-            /** @var \Mautic\StageBundle\Model\StageModel $model */
-            $model  = $this->getModel('stage');
-            $stages = $model->getUserStages();
-            $items  = [];
-            foreach ($stages as $stage) {
-                $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchStages',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            StageType::class,
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        // Get a list of lists
+        /** @var \Mautic\StageBundle\Model\StageModel $model */
+        $model  = $this->getModel('stage');
+        $stages = $model->getUserStages();
+        $items  = [];
+        foreach ($stages as $stage) {
+            $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
+        }
+
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchStages',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        StageType::class,
+                        [],
+                        [
+                            'items'  => $items,
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1945,43 +1943,42 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            $userModel = $this->getModel('user.user');
-            \assert($userModel instanceof UserModel);
-            $users = $userModel->getRepository()->getUserList('', 0);
-            $items = [];
-            foreach ($users as $user) {
-                $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchOwners',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            OwnerType::class,
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        $userModel = $this->getModel('user.user');
+        \assert($userModel instanceof UserModel);
+        $users = $userModel->getRepository()->getUserList('', 0);
+        $items = [];
+        foreach ($users as $user) {
+            $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
+        }
+
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchOwners',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        OwnerType::class,
+                        [],
+                        [
+                            'items'  => $items,
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**

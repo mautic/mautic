@@ -177,8 +177,9 @@
                             {{ form_row(form.publishUp) }}
                             {{ form_row(form.publishDown) }}
                         {% else %}
-                            {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                            {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                            <div class="alert alert-info" id="scheduleOptionsNotice" style="display: none;">
+                                {{ 'mautic.email.send.schedule.options_notice'|trans }}
+                            </div>
                         {% endif %}
                     </div>
                 {% else %}
@@ -211,8 +212,9 @@
                             {{ form_row(form.publishUp) }}
                             {{ form_row(form.publishDown) }}
                         {% else %}
-                            {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                            {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                            <div class="alert alert-info" id="scheduleOptionsNotice" style="display: none;">
+                                {{ 'mautic.email.send.schedule.options_notice'|trans }}
+                            </div>
                         {% endif %}
                     </div>
 

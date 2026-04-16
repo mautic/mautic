@@ -349,20 +349,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $this->em->detach($companyLead);
 
                 continue;
-            } else {
-                $companyLead = new CompanyLead();
-                $companyLead->setCompany($companyLeadAdd[$companyId]);
-                $companyLead->setLead($lead);
-                $companyLead->setDateAdded($dateManipulated);
-                $contactAdded     = true;
-                $persistCompany[] = $companyLead;
-                $dispatchEvents[] = $companyId;
+            }
+            $companyLead = new CompanyLead();
+            $companyLead->setCompany($companyLeadAdd[$companyId]);
+            $companyLead->setLead($lead);
+            $companyLead->setDateAdded($dateManipulated);
+            $contactAdded     = true;
+            $persistCompany[] = $companyLead;
+            $dispatchEvents[] = $companyId;
 
-                if (!$companyName) {
-                    // CompanyLeadRepository::saveEntities will set the first company of the batch as primary so
-                    // use the first company name to ensure they match
-                    $companyName = $companyLeadAdd[$companyId]->getName();
-                }
+            if (!$companyName) {
+                // CompanyLeadRepository::saveEntities will set the first company of the batch as primary so
+                // use the first company name to ensure they match
+                $companyName = $companyLeadAdd[$companyId]->getName();
             }
         }
 
@@ -657,9 +656,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

@@ -482,7 +482,7 @@ class EmailController extends FormController
         ThemeHelper $themeHelper,
         $entity = null,
     ) {
-        if (!($entity instanceof Email)) {
+        if (!$entity instanceof Email) {
             $entity = $model->getEntity();
         }
 

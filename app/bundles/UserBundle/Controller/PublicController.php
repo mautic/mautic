@@ -95,37 +95,35 @@ class PublicController extends FormController
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
 
                     return $this->redirectToRoute('login');
-                } else {
-                    if ($request->getSession()->has('resetToken')) {
-                        $resetToken = $request->getSession()->get('resetToken');
-
-                        if ($model->confirmResetToken($user, $resetToken)) {
-                            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
-                            $user->setPassword($encodedPassword);
-                            $model->saveEntity($user);
-
-                            $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
-
-                            $request->getSession()->remove('resetToken');
-
-                            return $this->redirectToRoute('login');
-                        }
-
-                        return $this->delegateView([
-                            'viewParameters' => [
-                                'form' => $form->createView(),
-                            ],
-                            'contentTemplate' => '@MauticUser/Security/resetconfirm.html.twig',
-                            'passthroughVars' => [
-                                'route' => $action,
-                            ],
-                        ]);
-                    } else {
-                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
-
-                        return $this->redirectToRoute('mautic_user_passwordresetconfirm');
-                    }
                 }
+                if ($request->getSession()->has('resetToken')) {
+                    $resetToken = $request->getSession()->get('resetToken');
+
+                    if ($model->confirmResetToken($user, $resetToken)) {
+                        $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
+                        $user->setPassword($encodedPassword);
+                        $model->saveEntity($user);
+
+                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
+
+                        $request->getSession()->remove('resetToken');
+
+                        return $this->redirectToRoute('login');
+                    }
+
+                    return $this->delegateView([
+                        'viewParameters' => [
+                            'form' => $form->createView(),
+                        ],
+                        'contentTemplate' => '@MauticUser/Security/resetconfirm.html.twig',
+                        'passthroughVars' => [
+                            'route' => $action,
+                        ],
+                    ]);
+                }
+                $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
+
+                return $this->redirectToRoute('mautic_user_passwordresetconfirm');
             }
         }
 
