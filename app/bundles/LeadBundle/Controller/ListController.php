@@ -540,23 +540,24 @@ class ListController extends FormController
                 return $this->accessDenied();
             } elseif ($model->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
-            } elseif (($deletedException = $model->preDeleteEntity($list)) instanceof RecordCanNotBeDeletedException) {
-                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-                $flashes[]                      = [
-                    'type'  => 'notice',
-                    'msg'   => $deletedException->getMessage(),
-                ];
             } else {
-                $model->deleteEntity($list);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.core.notice.deleted',
-                    'msgVars' => [
-                        '%name%' => $list->getName(),
-                        '%id%'   => $objectId,
-                    ],
-                ];
+                try {
+                    $model->deleteEntity($list);
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.core.notice.deleted',
+                        'msgVars' => [
+                            '%name%' => $list->getName(),
+                            '%id%'   => $objectId,
+                        ],
+                    ];
+                } catch (RecordCanNotBeDeletedException $deletedException) {
+                    $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
+                    $flashes[]                      = [
+                        'type'  => 'error',
+                        'msg'   => $deletedException->getMessage(),
+                    ];
+                }
             }
         } // else don't do anything
 
@@ -631,7 +632,7 @@ class ListController extends FormController
                 $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
                 foreach ($deletedExceptions as $deletedException) {
                     $flashes[] = [
-                        'type'  => 'notice',
+                        'type'  => 'error',
                         'msg'   => $deletedException->getMessage(),
                     ];
                 }
