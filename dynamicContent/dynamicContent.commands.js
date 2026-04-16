@@ -1,5 +1,4 @@
 import Logger from '../logger';
-import MjmlService from '../mjml/mjml.service';
 import DynamicContentService from './dynamicContent.service';
 
 export default class DynamicContentCommands {
@@ -95,14 +94,10 @@ export default class DynamicContentCommands {
       const dynConTarget = mQuery(dynConId);
       const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
       const dynConToken = `{dynamiccontent="${dynConName}"}`;
-
-      // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
-      // dynamicContent.addAttributes({ 'data-param-dec-id': '' });
       this.logger.debug("DC: Replaced component's content with its token", {
         dynamicContent,
         dynConToken,
       });
-      dynamicContent.components('');
       dynamicContent.set('content', dynConToken);
     });
 
