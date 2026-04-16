@@ -118,7 +118,7 @@ class AjaxController extends CommonAjaxController
             return $clearCacheResult;
         }
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([]);
     }
 
     public function removePackageAction(Request $request): JsonResponse
@@ -165,7 +165,7 @@ class AjaxController extends CommonAjaxController
                 return $this->removeError($e);
             }
 
-            return new JsonResponse(['success' => true]);
+            return new JsonResponse([]);
         }
 
         if (!$this->config->isComposerEnabled()) {
@@ -197,7 +197,7 @@ class AjaxController extends CommonAjaxController
             return $clearCacheResult;
         }
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([]);
     }
 
     private function clearCacheOrReturnError(): ?JsonResponse
@@ -225,7 +225,7 @@ class AjaxController extends CommonAjaxController
 
     private function installResource(string $packageName): JsonResponse
     {
-        $userId = $this->userHelper->getUser()->getId() ?? 1;
+        $userId = $this->userHelper->getUser()->getId();
 
         try {
             $result = $this->resourceInstaller->install($packageName, $userId);
@@ -242,7 +242,7 @@ class AjaxController extends CommonAjaxController
             ], 500);
         }
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([]);
     }
 
     private function installError(\Exception $e): JsonResponse

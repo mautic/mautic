@@ -13,15 +13,17 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ResourceInstaller
+final class ResourceInstaller
 {
     private const INSTALLED_FILE = 'marketplace_installed_resources.json';
 
     public function __construct(
         private Connection $connection,
+        #[Autowire(service: 'mautic.http.client')]
         private ClientInterface $httpClient,
         private PathsHelper $pathsHelper,
         private EventDispatcherInterface $dispatcher,
@@ -131,7 +133,6 @@ class ResourceInstaller
                 'sink'            => $filePath,
                 'allow_redirects' => true,
                 'headers'         => [
-                    'Accept'     => 'application/vnd.github+json',
                     'User-Agent' => 'Mautic Marketplace',
                 ],
             ]);

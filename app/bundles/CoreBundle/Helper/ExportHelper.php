@@ -249,9 +249,8 @@ class ExportHelper
 
     /**
      * @param array<string|int, string> $assetList
-     * @param array<string, mixed>|null $composerJson
      */
-    public function writeToZipFile(string $jsonOutput, array $assetList, string $path, ?array $composerJson = null): string
+    public function writeToZipFile(string $jsonOutput, array $assetList, string $path): string
     {
         if ('' === $path) {
             $tempDir      = sys_get_temp_dir();
@@ -279,10 +278,6 @@ class ExportHelper
                 if (file_exists($assetPath)) {
                     $zip->addFile($assetPath, 'assets/'.basename($assetPath));
                 }
-            }
-
-            if (null !== $composerJson) {
-                $zip->addFromString('composer.json', json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             }
 
             $zip->close();

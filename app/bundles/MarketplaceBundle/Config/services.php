@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -21,7 +19,4 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->alias('marketplace.model.package', Mautic\MarketplaceBundle\Model\PackageModel::class);
-
-    $services->set(Mautic\MarketplaceBundle\Service\ResourceInstaller::class)
-        ->arg('$httpClient', service('mautic.http.client'));
 };

@@ -299,7 +299,8 @@ class CampaignController extends AbstractStandardFormController
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
         $composerJson   = $shareService->buildComposerJson($campaign, $metadata);
         $jsonOutput     = json_encode([$data], JSON_PRETTY_PRINT);
-        $filePath       = $exportHelper->writeToZipFile($jsonOutput, $assetList, '', $composerJson);
+        $filePath       = $exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+        $shareService->addComposerJsonToZip($filePath, $composerJson);
 
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
     }

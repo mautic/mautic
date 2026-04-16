@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
@@ -61,6 +62,26 @@ final class CampaignShareType extends AbstractType
         );
 
         $builder->add(
+            'vendorName',
+            TextType::class,
+            [
+                'label'       => 'mautic.campaign.share.vendor_name',
+                'required'    => true,
+                'attr'        => [
+                    'class'       => 'form-control',
+                    'placeholder' => 'mautic.campaign.share.vendor_name.placeholder',
+                ],
+                'constraints' => [
+                    new NotBlank(),
+                    new Regex([
+                        'pattern' => '/^(?!mautic$)[a-z0-9]([a-z0-9-]*[a-z0-9])?$/',
+                        'message' => 'mautic.campaign.share.vendor_name.invalid',
+                    ]),
+                ],
+            ]
+        );
+
+        $builder->add(
             'version',
             TextType::class,
             [
@@ -93,8 +114,9 @@ final class CampaignShareType extends AbstractType
                 'label'       => 'mautic.campaign.share.headline',
                 'required'    => true,
                 'attr'        => [
-                    'class'     => 'form-control',
-                    'maxlength' => 60,
+                    'class'               => 'form-control',
+                    'maxlength'           => 60,
+                    'data-share-headline' => true,
                 ],
                 'constraints' => [
                     new NotBlank(),
@@ -159,7 +181,7 @@ final class CampaignShareType extends AbstractType
             ChoiceType::class,
             [
                 'label'    => 'mautic.campaign.share.languages',
-                'choices'  => $this->getLanguageChoices(),
+                'choices'  => array_flip(Locales::getNames()),
                 'expanded' => false,
                 'multiple' => true,
                 'required' => false,
@@ -187,7 +209,7 @@ final class CampaignShareType extends AbstractType
                     'required' => false,
                     'attr'     => [
                         'class'       => 'form-control',
-                        'placeholder' => 'Image description for accessibility',
+                        'placeholder' => 'mautic.campaign.share.gallery_alt.placeholder',
                     ],
                 ]
             );
@@ -233,41 +255,5 @@ final class CampaignShareType extends AbstractType
                 ],
             ]
         );
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function getLanguageChoices(): array
-    {
-        return [
-            'English'    => 'en',
-            'Spanish'    => 'es',
-            'French'     => 'fr',
-            'German'     => 'de',
-            'Portuguese' => 'pt',
-            'Italian'    => 'it',
-            'Dutch'      => 'nl',
-            'Russian'    => 'ru',
-            'Chinese'    => 'zh',
-            'Japanese'   => 'ja',
-            'Korean'     => 'ko',
-            'Arabic'     => 'ar',
-            'Turkish'    => 'tr',
-            'Polish'     => 'pl',
-            'Czech'      => 'cs',
-            'Hungarian'  => 'hu',
-            'Romanian'   => 'ro',
-            'Swedish'    => 'sv',
-            'Norwegian'  => 'no',
-            'Danish'     => 'da',
-            'Finnish'    => 'fi',
-            'Hebrew'     => 'he',
-            'Hindi'      => 'hi',
-            'Thai'       => 'th',
-            'Vietnamese' => 'vi',
-            'Indonesian' => 'id',
-            'Malay'      => 'ms',
-        ];
     }
 }

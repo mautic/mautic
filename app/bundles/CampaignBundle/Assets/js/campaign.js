@@ -216,6 +216,44 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     Mautic.campaignAuditlogOnLoad(container, response);
+    Mautic.campaignShareOnLoad(container, response);
+};
+
+Mautic.campaignShareOnLoad = function (container, response) {
+    var headlineInput = document.querySelector('[data-share-headline]');
+    var counter = document.getElementById('headline-counter');
+    if (headlineInput && counter) {
+        var updateCounter = function () {
+            counter.textContent = headlineInput.value.length + '/60';
+        };
+        headlineInput.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+
+    var addBtn = document.getElementById('add-gallery-slot');
+    var maxSlots = 8;
+    if (addBtn) {
+        addBtn.addEventListener('click', function () {
+            var slots = document.querySelectorAll('[data-gallery-slot]');
+            var shown = 0;
+            var nextHidden = null;
+            for (var i = 0; i < slots.length; i++) {
+                if (slots[i].style.display !== 'none') {
+                    shown++;
+                } else if (!nextHidden) {
+                    nextHidden = slots[i];
+                }
+            }
+            if (nextHidden) {
+                nextHidden.style.display = '';
+                nextHidden.style.marginTop = '10px';
+                shown++;
+            }
+            if (shown >= maxSlots) {
+                addBtn.style.display = 'none';
+            }
+        });
+    }
 };
 
 Mautic.lazyLoadContactListOnCampaignDetail = function() {

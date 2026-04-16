@@ -10,13 +10,15 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignShareService
+final class CampaignShareService
 {
     public function __construct(
         private ExportHelper $exportHelper,
         private AssetModel $assetModel,
         private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -34,7 +36,8 @@ class CampaignShareService
 
         $jsonOutput = json_encode([$exportData], JSON_PRETTY_PRINT);
 
-        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '', $composerJson);
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+        $this->addComposerJsonToZip($zipFilePath, $composerJson);
 
         // Add banner image
         $bannerImage = $metadata['bannerImage'] ?? null;
@@ -68,7 +71,8 @@ class CampaignShareService
     public function buildComposerJson(Campaign $campaign, array $metadata = []): array
     {
         $title   = $metadata['title'] ?? $campaign->getName();
-        $name    = $this->toPackageName($title);
+        $vendor  = $metadata['vendorName'] ?? '';
+        $name    = $this->toPackageName($title, $vendor);
         $version = $metadata['version'] ?? '1.0.0';
 
         $worksWithVersions = $metadata['worksWithVersions'] ?? [];
@@ -115,6 +119,18 @@ class CampaignShareService
         return $composerJson;
     }
 
+    /**
+     * @param array<string, mixed> $composerJson
+     */
+    public function addComposerJsonToZip(string $zipFilePath, array $composerJson): void
+    {
+        $zip = new \ZipArchive();
+        if (true === $zip->open($zipFilePath)) {
+            $zip->addFromString('composer.json', json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            $zip->close();
+        }
+    }
+
     private function addImageToZip(string $zipFilePath, UploadedFile $image, string $baseName): void
     {
         $zip = new \ZipArchive();
@@ -149,8 +165,9 @@ class CampaignShareService
         $title = $metadata['title'] ?? $campaign->getName();
 
         $asset = new Asset();
-        $asset->setTitle('Campaign: '.$title);
-        $asset->setDescription($metadata['description'] ?? 'Shared campaign export for the Mautic Marketplace.');
+        $asset->setTitle($this->translator->trans('mautic.campaign.share.asset_title', ['%title%' => $title]));
+        $asset->setDescription($metadata['description'] ?? $this->translator->trans('mautic.campaign.share.asset_description'));
+        $asset->setDisallow(true);
         $asset->setStorageLocation('local');
         $asset->setPath($fileName);
         $asset->setOriginalFileName($title.'.zip');
@@ -165,7 +182,7 @@ class CampaignShareService
         return $asset;
     }
 
-    private function toPackageName(string $campaignName): string
+    private function toPackageName(string $campaignName, string $vendor): string
     {
         $slug = strtolower(trim($campaignName));
         $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
@@ -175,7 +192,15 @@ class CampaignShareService
             $slug = 'campaign';
         }
 
-        return 'mautic/'.$slug;
+        $vendorSlug = strtolower(trim($vendor));
+        $vendorSlug = preg_replace('/[^a-z0-9]+/', '-', $vendorSlug);
+        $vendorSlug = trim($vendorSlug, '-');
+
+        if ('' === $vendorSlug || 'mautic' === $vendorSlug) {
+            $vendorSlug = 'unknown-vendor';
+        }
+
+        return $vendorSlug.'/'.$slug;
     }
 
     public function getMarketplaceUrl(): string

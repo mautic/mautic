@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Command;
 
 use Mautic\CoreBundle\Helper\ComposerHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: InstallCommand::NAME,
@@ -27,7 +29,7 @@ class InstallCommand extends Command
         private ComposerHelper $composer,
         private PackageModel $packageModel,
         private ResourceInstaller $resourceInstaller,
-        private UserHelper $userHelper,
+        private UserModel $userModel,
     ) {
         parent::__construct();
     }
@@ -36,6 +38,7 @@ class InstallCommand extends Command
     {
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
         $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
+        $this->addOption('user-id', null, InputOption::VALUE_REQUIRED, 'ID of the admin user who will own the installed resource. Required for mautic-resource packages when not run interactively.');
 
         parent::configure();
     }
@@ -58,10 +61,10 @@ class InstallCommand extends Command
         $type = $package->packageBase->type ?? '';
 
         if ('mautic-resource' === $type) {
-            return $this->installResource($packageName, $dryRun, $output);
+            return $this->installResource($packageName, $dryRun, $input, $output);
         }
 
-        if ('mautic-plugin' !== $type) {
+        if (!in_array($type, ['mautic-plugin', 'mautic-theme'], true)) {
             throw new \Exception('Unsupported package type: '.$type);
         }
 
@@ -73,7 +76,7 @@ class InstallCommand extends Command
         $result = $this->composer->install($input->getArgument('package'), $dryRun);
 
         if (0 !== $result->exitCode) {
-            $output->writeln('<error>Error while installing this plugin.</error>');
+            $output->writeln(sprintf('<error>Error while installing this %s.</error>', 'mautic-theme' === $type ? 'theme' : 'plugin'));
 
             if ($result->output) {
                 $output->writeln($result->output);
@@ -89,7 +92,7 @@ class InstallCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function installResource(string $packageName, bool $dryRun, OutputInterface $output): int
+    private function installResource(string $packageName, bool $dryRun, InputInterface $input, OutputInterface $output): int
     {
         if ($dryRun) {
             $output->writeln('Note: dry-run mode. Would install resource '.$packageName);
@@ -97,9 +100,10 @@ class InstallCommand extends Command
             return Command::SUCCESS;
         }
 
+        $userId = $this->resolveOwnerUserId($input, $output);
+
         $output->writeln('Installing resource '.$packageName.', this might take a while...');
 
-        $userId = $this->userHelper->getUser()->getId() ?? 1;
         $result = $this->resourceInstaller->install($packageName, $userId);
 
         if (!$result['success']) {
@@ -114,5 +118,43 @@ class InstallCommand extends Command
         $output->writeln('All done! '.$packageName.' has successfully been installed.');
 
         return Command::SUCCESS;
+    }
+
+    private function resolveOwnerUserId(InputInterface $input, OutputInterface $output): int
+    {
+        $providedUserId = $input->getOption('user-id');
+        if (null !== $providedUserId) {
+            $userId = (int) $providedUserId;
+            $user   = $this->userModel->getEntity($userId);
+
+            if (null === $user) {
+                throw new \InvalidArgumentException(sprintf('User with ID %d was not found.', $userId));
+            }
+
+            if (!$user->isAdmin()) {
+                throw new \InvalidArgumentException(sprintf('User %d is not an admin. Resources must be owned by an admin user.', $userId));
+            }
+
+            return $userId;
+        }
+
+        $adminUsers = $this->userModel->getRepository()->getAllAdminUsers();
+        if ([] === $adminUsers) {
+            throw new \RuntimeException('No admin users found. Create one first or pass --user-id.');
+        }
+
+        if (!$input->isInteractive()) {
+            throw new \InvalidArgumentException('--user-id is required when running non-interactively.');
+        }
+
+        $choices = [];
+        foreach ($adminUsers as $user) {
+            $choices[(int) $user->getId()] = sprintf('%s (%s)', $user->getName(), $user->getEmail());
+        }
+
+        $io       = new SymfonyStyle($input, $output);
+        $selected = $io->choice('Select the admin user who will own this resource', $choices);
+
+        return (int) array_search($selected, $choices, true);
     }
 }
