@@ -187,9 +187,9 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function getRepository(): TweetRepository

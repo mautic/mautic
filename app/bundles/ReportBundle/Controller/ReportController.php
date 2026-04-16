@@ -445,7 +445,7 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        if (!($entity instanceof Report)) {
+        if (!$entity instanceof Report) {
             $entity = $model->getEntity();
         }
 

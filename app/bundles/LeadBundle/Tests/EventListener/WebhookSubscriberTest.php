@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -208,8 +209,98 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $changeEvent->method('getLead')->willReturn(null);
         $changeEvent->method('wasAdded')->willReturn(true);
 
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->expects($this->once())
+            ->method('detachEntity')
+            ->with($contactEntity);
+
         $leadModel    = $this->createMock(LeadModel::class);
         $webhookModel = $this->createMock(WebhookModel::class);
+
+        $leadModel->expects($this->once())
+            ->method('getEntity')
+            ->with($this->equalTo($contact['id']))
+            ->willReturn($contactEntity);
+        $leadModel->expects($this->once())
+            ->method('getRepository')
+            ->with()
+            ->willReturn($leadRepository);
+
+        $webhookModel->expects($this->once())
+            ->method('queueWebhooksByType')
+            ->with(
+                $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
+                $this->equalTo([
+                    'contact'  => $contactEntity,
+                    'segment'  => $changeEvent->getList(),
+                    'action'   => 'added',
+                ])
+            );
+
+        $example = new WebhookSubscriber($webhookModel, $leadModel);
+
+        $example->onSegmentChange($changeEvent);
+    }
+
+    public function testOnSegmentBatchChangeWithObjectContact(): void
+    {
+        $changeEvent = $this->createMock(ListChangeEvent::class);
+
+        $contactEntity = new Lead();
+
+        $changeEvent->method('getLeads')->willReturn([$contactEntity]);
+        $changeEvent->method('getLead')->willReturn(null);
+        $changeEvent->method('wasAdded')->willReturn(true);
+
+        $leadModel      = $this->createMock(LeadModel::class);
+        $webhookModel   = $this->createMock(WebhookModel::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
+
+        $leadRepository->expects($this->never())
+            ->method('detachEntity');
+
+        $leadModel->expects($this->never())
+            ->method('getEntity');
+        $leadModel->method('getRepository')
+            ->willReturn($leadRepository);
+
+        $webhookModel->expects($this->once())
+            ->method('queueWebhooksByType')
+            ->with(
+                $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
+                $this->equalTo([
+                    'contact'  => $contactEntity,
+                    'segment'  => $changeEvent->getList(),
+                    'action'   => 'added',
+                ])
+            );
+
+        $example = new WebhookSubscriber($webhookModel, $leadModel);
+
+        $example->onSegmentBatchChange($changeEvent);
+    }
+
+    public function testOnSegmentBatchChangeWithArrayContact(): void
+    {
+        $changeEvent = $this->createMock(ListChangeEvent::class);
+
+        $contact       = ['id' => 1];
+        $contactEntity = new Lead();
+        $contactEntity->setId($contact['id']);
+
+        $changeEvent->method('getLeads')->willReturn([$contact]);
+        $changeEvent->method('getLead')->willReturn(null);
+        $changeEvent->method('wasAdded')->willReturn(true);
+
+        $leadModel      = $this->createMock(LeadModel::class);
+        $webhookModel   = $this->createMock(WebhookModel::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
+
+        $leadRepository->expects($this->once())
+            ->method('detachEntity')
+            ->with($contactEntity);
+        $leadModel->method('getRepository')
+            ->willReturn($leadRepository);
 
         $leadModel->expects($this->once())
             ->method('getEntity')
@@ -229,6 +320,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $example = new WebhookSubscriber($webhookModel, $leadModel);
 
-        $example->onSegmentChange($changeEvent);
+        $example->onSegmentBatchChange($changeEvent);
     }
 }
