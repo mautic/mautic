@@ -21,7 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class ResourceInstallerTest extends AbstractMauticTestCase
 {
-    private MockObject&Connection $connection;
+    private MockObject&Connection $marketplaceConnection;
     private MockObject&ClientInterface $httpClient;
     private MockObject&PathsHelper $pathsHelper;
     private MockObject&EventDispatcherInterface $dispatcher;
@@ -41,17 +41,17 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         (new Filesystem())->mkdir([$this->tmpRoot, $this->tmpRoot.'/var']);
 
-        $this->connection  = $this->createMock(Connection::class);
-        $this->httpClient  = $this->createMock(ClientInterface::class);
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
-        $this->dispatcher  = $this->createMock(EventDispatcherInterface::class);
-        $this->logger      = $this->createMock(LoggerInterface::class);
+        $this->marketplaceConnection  = $this->createMock(Connection::class);
+        $this->httpClient             = $this->createMock(ClientInterface::class);
+        $this->pathsHelper            = $this->createMock(PathsHelper::class);
+        $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $this->logger                 = $this->createMock(LoggerInterface::class);
 
         $this->pathsHelper->method('getImportCampaignsPath')->willReturn($this->importDir);
         $this->pathsHelper->method('getSystemPath')->with('root')->willReturn($this->tmpRoot);
 
         $this->installer = new ResourceInstaller(
-            $this->connection,
+            $this->marketplaceConnection,
             $this->httpClient,
             $this->pathsHelper,
             $this->dispatcher,
@@ -86,7 +86,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     public function testInstallReturnsErrorWhenPackageHasNoDownloadableVersion(): void
     {
-        $this->connection->method('getPackage')->willReturn([
+        $this->marketplaceConnection->method('getPackage')->willReturn([
             'package' => ['versions' => []],
         ]);
 
@@ -234,7 +234,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     private function mockPackageWithDistUrl(string $url): void
     {
-        $this->connection->method('getPackage')->willReturn([
+        $this->marketplaceConnection->method('getPackage')->willReturn([
             'package' => [
                 'versions' => [
                     '1.0.0' => [
