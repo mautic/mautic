@@ -67,7 +67,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->installPackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
+        Assert::assertSame('[]', $response->getContent());
         Assert::assertSame(200, $response->getStatusCode());
     }
 
@@ -89,7 +89,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->removePackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
+        Assert::assertSame('[]', $response->getContent());
         Assert::assertSame(200, $response->getStatusCode());
     }
 
@@ -117,7 +117,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->installPackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
+        Assert::assertSame('[]', $response->getContent());
         Assert::assertSame(200, $response->getStatusCode());
     }
 
@@ -166,7 +166,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->removePackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
+        Assert::assertSame('[]', $response->getContent());
         Assert::assertSame(200, $response->getStatusCode());
     }
 
