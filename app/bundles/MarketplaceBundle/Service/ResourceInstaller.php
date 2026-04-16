@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class ResourceInstaller
+class ResourceInstaller
 {
     private const INSTALLED_FILE = 'marketplace_installed_resources.json';
 

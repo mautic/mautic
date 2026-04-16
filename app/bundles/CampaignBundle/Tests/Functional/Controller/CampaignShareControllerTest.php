@@ -98,6 +98,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('campaign_share[download]')->form();
         $form->setValues([
             'campaign_share[title]'                => self::CAMPAIGN_NAME,
+            'campaign_share[vendorName]'           => 'acme',
             'campaign_share[version]'              => '1.0.0',
             'campaign_share[headline]'             => 'Test Headline For Campaign',
             'campaign_share[description]'          => self::TEST_DESCRIPTION,
@@ -123,6 +124,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('campaign_share[publish]')->form();
         $form->setValues([
             'campaign_share[title]'                => self::CAMPAIGN_NAME,
+            'campaign_share[vendorName]'           => 'acme',
             'campaign_share[version]'              => '1.0.0',
             'campaign_share[headline]'             => 'Test Headline For Campaign',
             'campaign_share[description]'          => self::TEST_DESCRIPTION,
@@ -147,6 +149,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('campaign_share[download]')->form();
         $form->setValues([
             'campaign_share[title]'                => self::CAMPAIGN_NAME,
+            'campaign_share[vendorName]'           => 'acme',
             'campaign_share[version]'              => 'invalid-version',
             'campaign_share[headline]'             => 'Test Headline',
             'campaign_share[description]'          => self::TEST_DESCRIPTION,
