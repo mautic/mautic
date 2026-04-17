@@ -254,6 +254,24 @@ Mautic.campaignShareOnLoad = function (container, response) {
             }
         });
     }
+
+    var $shareForm = mQuery('form[name="campaign_share"]');
+    var $downloadBtn = $shareForm.find('#campaign_share_download');
+    if ($shareForm.length && $downloadBtn.length) {
+        $downloadBtn.off('click.shareDownload').on('click.shareDownload', function (e) {
+            e.preventDefault();
+
+            $shareForm.find('input.button-clicked').remove();
+            mQuery('<input type="hidden" class="button-clicked">')
+                .attr({
+                    name: $downloadBtn.attr('name'),
+                    value: $downloadBtn.attr('value') || ''
+                })
+                .appendTo($shareForm);
+
+            $shareForm.get(0).submit();
+        });
+    }
 };
 
 Mautic.lazyLoadContactListOnCampaignDetail = function() {

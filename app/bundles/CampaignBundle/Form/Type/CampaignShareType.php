@@ -11,6 +11,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count;
@@ -43,6 +45,14 @@ final class CampaignShareType extends AbstractType
                 '6.0' => '6.0',
                 '7.0' => '7.0',
             ],
+            'validation_groups' => static function (FormInterface $form): array {
+                $publish = $form->has('publish') ? $form->get('publish') : null;
+                if ($publish instanceof SubmitButton && $publish->isClicked()) {
+                    return ['Default', 'publish'];
+                }
+
+                return ['Default'];
+            },
         ]);
 
         $resolver->setAllowedTypes('mautic_versions', 'array');
@@ -66,16 +76,17 @@ final class CampaignShareType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.campaign.share.vendor_name',
-                'required'    => true,
+                'required'    => false,
                 'attr'        => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.campaign.share.vendor_name.placeholder',
                 ],
                 'constraints' => [
-                    new NotBlank(),
+                    new NotBlank(['groups' => ['publish']]),
                     new Regex([
                         'pattern' => '/^(?!mautic$)[a-z0-9]([a-z0-9-]*[a-z0-9])?$/',
                         'message' => 'mautic.campaign.share.vendor_name.invalid',
+                        'groups'  => ['publish'],
                     ]),
                 ],
             ]
@@ -169,9 +180,13 @@ final class CampaignShareType extends AbstractType
                 'choices'     => $options['mautic_versions'],
                 'expanded'    => true,
                 'multiple'    => true,
-                'required'    => true,
+                'required'    => false,
                 'constraints' => [
-                    new Count(['min' => 1, 'minMessage' => 'mautic.campaign.share.works_with.min']),
+                    new Count([
+                        'min'        => 1,
+                        'minMessage' => 'mautic.campaign.share.works_with.min',
+                        'groups'     => ['publish'],
+                    ]),
                 ],
             ]
         );
