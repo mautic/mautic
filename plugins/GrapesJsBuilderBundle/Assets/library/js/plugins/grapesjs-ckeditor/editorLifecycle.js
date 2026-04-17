@@ -155,9 +155,9 @@ export const editorLifecycleMixin = {
     const classSlug = variant.classes
       .join('_')
       .replace(/[^a-z0-9_-]/gi, '_')
-      .replace(/_+/g, '_')
-      .replace(/^_+/, '')
-      .replace(/_+$/, '')
+      .split('_')
+      .filter(s => s.length > 0)
+      .join('_')
       .toLowerCase();
 
     const suffix = classSlug || `variant_${index}`;
