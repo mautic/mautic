@@ -177,6 +177,18 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             return $this->sanitizeTemplateHeadWithRegex($templateHead);
         }
 
+        $document = $this->loadHtmlDocument($templateHead);
+        if (null === $document) {
+            return $this->sanitizeTemplateHeadWithRegex($templateHead);
+        }
+
+        $this->removeRuntimeNodes($document);
+
+        return $this->extractHeadContent($document);
+    }
+
+    private function loadHtmlDocument(string $templateHead): ?\DOMDocument
+    {
         $document = new \DOMDocument();
         $wrapped  = '<!DOCTYPE html><html><head>'.$templateHead.'</head><body></body></html>';
 
@@ -185,13 +197,13 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         libxml_clear_errors();
         libxml_use_internal_errors($useInternalErrors);
 
-        if (!$isLoaded) {
-            return $this->sanitizeTemplateHeadWithRegex($templateHead);
-        }
+        return $isLoaded ? $document : null;
+    }
 
+    private function removeRuntimeNodes(\DOMDocument $document): void
+    {
         /** @var \DOMNodeList<\DOMElement> $nodes */
-        $nodes = $document->getElementsByTagName('*');
-
+        $nodes         = $document->getElementsByTagName('*');
         $nodesToRemove = [];
 
         foreach ($nodes as $node) {
@@ -204,32 +216,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
                 continue;
             }
 
-            $src            = strtolower((string) $node->getAttribute('src'));
-            $href           = strtolower((string) $node->getAttribute('href'));
-            $id             = strtolower((string) $node->getAttribute('id'));
-            $textContent    = strtolower((string) $node->textContent);
-            $assetSource    = $src.' '.$href;
-            $hasDataCkeAttr = false;
-
-            if ($node->hasAttributes()) {
-                foreach ($node->attributes as $attribute) {
-                    if (str_starts_with(strtolower($attribute->name), 'data-cke')) {
-                        $hasDataCkeAttr = true;
-                        break;
-                    }
-                }
-            }
-
-            $isBuilderRuntimeAsset = str_contains($assetSource, '/plugins/grapesjsbuilderbundle/assets/library/js/dist/builder')
-                || str_contains($assetSource, 'grapesjs-editor.css');
-            $isCkEditorRuntimeAsset = str_contains($assetSource, '/media/libraries/ckeditor')
-                || str_contains($assetSource, '/ckeditor')
-                || str_starts_with($id, 'cke_')
-                || $hasDataCkeAttr;
-            $isCkEditorRuntimeStyle = 'style' === $tagName
-                && (str_contains($textContent, '.ck-') || str_contains($textContent, 'ck-content') || str_contains($textContent, '--ck-'));
-
-            if ($isBuilderRuntimeAsset || $isCkEditorRuntimeAsset || $isCkEditorRuntimeStyle) {
+            if ($this->isRuntimeNode($node, $tagName)) {
                 $nodesToRemove[] = $node;
             }
         }
@@ -237,7 +224,47 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         foreach ($nodesToRemove as $nodeToRemove) {
             $nodeToRemove->parentNode?->removeChild($nodeToRemove);
         }
+    }
 
+    private function isRuntimeNode(\DOMElement $node, string $tagName): bool
+    {
+        $src         = strtolower((string) $node->getAttribute('src'));
+        $href        = strtolower((string) $node->getAttribute('href'));
+        $id          = strtolower((string) $node->getAttribute('id'));
+        $textContent = strtolower((string) $node->textContent);
+        $assetSource = $src.' '.$href;
+
+        $isBuilderRuntimeAsset = str_contains($assetSource, '/plugins/grapesjsbuilderbundle/assets/library/js/dist/builder')
+            || str_contains($assetSource, 'grapesjs-editor.css');
+
+        $isCkEditorRuntimeAsset = str_contains($assetSource, '/media/libraries/ckeditor')
+            || str_contains($assetSource, '/ckeditor')
+            || str_starts_with($id, 'cke_')
+            || $this->hasDataCkeAttribute($node);
+
+        $isCkEditorRuntimeStyle = 'style' === $tagName
+            && (str_contains($textContent, '.ck-') || str_contains($textContent, 'ck-content') || str_contains($textContent, '--ck-'));
+
+        return $isBuilderRuntimeAsset || $isCkEditorRuntimeAsset || $isCkEditorRuntimeStyle;
+    }
+
+    private function hasDataCkeAttribute(\DOMElement $node): bool
+    {
+        if (!$node->hasAttributes()) {
+            return false;
+        }
+
+        foreach ($node->attributes as $attribute) {
+            if (str_starts_with(strtolower($attribute->name), 'data-cke')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function extractHeadContent(\DOMDocument $document): string
+    {
         $headList = $document->getElementsByTagName('head');
         if (0 === $headList->length) {
             return '';

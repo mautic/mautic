@@ -209,6 +209,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         $pageWithTemplateHeadContent = $pageWithTemplateHead->getContent();
         Assert::assertIsArray($pageWithTemplateHeadContent);
+        Assert::assertIsArray($pageWithTemplateHeadContent['grapesjsbuilder']);
         Assert::assertSame('<style>.landing{display:block}</style>', $pageWithTemplateHeadContent['grapesjsbuilder']['templateHead']);
         Assert::assertNull($pageWithTemplateHeadContent['grapesjsbuilder']['editorState']);
 

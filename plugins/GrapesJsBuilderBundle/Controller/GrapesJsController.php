@@ -101,6 +101,9 @@ class GrapesJsController extends CommonController
         return is_array($decodedEditorState) ? $decodedEditorState : null;
     }
 
+    /**
+     * @param array<string, mixed> $content
+     */
     private function extractTemplateHeadFromContent(array $content): ?string
     {
         $builderConfig = $content['grapesjsbuilder'] ?? null;

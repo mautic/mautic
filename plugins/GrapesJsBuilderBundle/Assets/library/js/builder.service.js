@@ -1468,7 +1468,7 @@ export default class BuilderService {
 
       dc.addType('text', {
         isComponent(el) {
-          if (el.tagName === 'DIV' && el.getAttribute && el.getAttribute('data-slot') === 'text') {
+          if (el.tagName === 'DIV' && el.dataset?.slot === 'text') {
             return { type: 'text' };
           }
           return originalIsComponent ? originalIsComponent(el) : undefined;
