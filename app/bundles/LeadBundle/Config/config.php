@@ -859,9 +859,6 @@ return [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\CompanySegmentMembershipFilterQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
-                    'mautic.lead.repository.company_segment_query_builder',
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory',
                     'event_dispatcher',
                 ],
             ],
