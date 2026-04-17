@@ -113,6 +113,72 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals([0, 0, 0, 0, 0, 0, 0, 1], $result['datasets'][5]['data']);
     }
 
+    public function testContactWhenSendToDncIsNo(): void
+    {
+        $contact = $this->createDncMatrixContact();
+        $email   = $this->createDncMatrixEmail(false);
+
+        $this->sendEmailForDncMatrix($email, $contact);
+        $this->assertEmailSentState($email, $contact, true);
+    }
+
+    public function testContactWhenSendToDncIsYes(): void
+    {
+        $contact = $this->createDncMatrixContact();
+        $email   = $this->createDncMatrixEmail(true);
+
+        $this->sendEmailForDncMatrix($email, $contact);
+        $this->assertEmailSentState($email, $contact, true);
+    }
+
+    /**
+     * @dataProvider dncReasonsWhenSendToDncIsNoProvider
+     */
+    public function testDNCContactWhenSendToDncIsNo(int $reason): void
+    {
+        $contact = $this->createDncMatrixContact();
+        $email   = $this->createDncMatrixEmail(false);
+        $this->createDnc('email', $contact, $reason);
+        $this->em->flush();
+
+        $this->sendEmailForDncMatrix($email, $contact);
+        $this->assertEmailSentState($email, $contact, false);
+    }
+
+    /**
+     * @return iterable<int[]>
+     */
+    public static function dncReasonsWhenSendToDncIsNoProvider(): iterable
+    {
+        yield [DoNotContact::UNSUBSCRIBED];
+        yield [DoNotContact::BOUNCED];
+        yield [DoNotContact::MANUAL];
+    }
+
+    /**
+     * @dataProvider dncReasonsWhenSendToDncIsYesProvider
+     */
+    public function testDNCContactWhenSendToDncIsYes(int $reason, bool $shouldSend): void
+    {
+        $contact = $this->createDncMatrixContact();
+        $email   = $this->createDncMatrixEmail(true);
+        $this->createDnc('email', $contact, $reason);
+        $this->em->flush();
+
+        $this->sendEmailForDncMatrix($email, $contact);
+        $this->assertEmailSentState($email, $contact, $shouldSend);
+    }
+
+    /**
+     * @return iterable<array{int,bool}>
+     */
+    public static function dncReasonsWhenSendToDncIsYesProvider(): iterable
+    {
+        yield [DoNotContact::UNSUBSCRIBED, true];
+        yield [DoNotContact::BOUNCED, false];
+        yield [DoNotContact::MANUAL, true];
+    }
+
     /**
      * @return Lead[]
      */
@@ -336,6 +402,61 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     {
         $emailStat->setIsFailed(true);
         $this->em->persist($emailStat);
+    }
+
+    private function createDncMatrixContact(): Lead
+    {
+        $contact = new Lead();
+        $contact->setFirstname('John');
+        $contact->setLastname('Doe');
+        $contact->setEmail(uniqid('contact-', true).'@example.test');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        return $contact;
+    }
+
+    private function createDncMatrixEmail(bool $sendToDnc): Email
+    {
+        $email = new Email();
+        $email->setName('DNC Matrix Email '.uniqid('', false));
+        $email->setSubject('DNC Matrix Subject');
+        $email->setCustomHtml('DNC Matrix Content');
+        $email->setEmailType('template');
+        $email->setIsPublished(true);
+        $email->setSendToDnc($sendToDnc);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        return $email;
+    }
+
+    private function sendEmailForDncMatrix(Email $email, Lead $contact): void
+    {
+        $this->emailModel->sendEmail($email, [
+            [
+                'id'        => $contact->getId(),
+                'email'     => $contact->getEmail(),
+                'firstname' => $contact->getFirstname(),
+                'lastname'  => $contact->getLastname(),
+            ],
+        ]);
+    }
+
+    private function assertEmailSentState(Email $email, Lead $contact, bool $shouldExist): void
+    {
+        $stats = $this->em->getRepository(Stat::class)->findBy([
+            'email' => $email,
+            'lead'  => $contact,
+        ]);
+
+        if ($shouldExist) {
+            $this->assertCount(1, $stats);
+
+            return;
+        }
+
+        $this->assertCount(0, $stats);
     }
 
     private function createDnc(string $channel, Lead $contact, int $reason, ?int $channelId = null): DoNotContact

@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
@@ -31,7 +32,7 @@ class EmailRepository extends CommonRepository
      *
      * @param array $leadIds
      */
-    public function getDoNotEmailList($leadIds = []): array
+    public function getDoNotEmailList($leadIds = [], ?array $reasons = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -39,6 +40,12 @@ class EmailRepository extends CommonRepository
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
             ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
+
+        if (null !== $reasons) {
+            $q->andWhere(
+                $q->expr()->in('dnc.reason', ':reasons')
+            )->setParameter('reasons', $reasons, ArrayParameterType::INTEGER);
+        }
 
         if ($leadIds) {
             $q->andWhere(
@@ -175,6 +182,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
+        bool $sendToDnc = false,
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -185,6 +193,10 @@ class EmailRepository extends CommonRepository
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
                     $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
                 ));
+
+        if ($sendToDnc) {
+            $dncQb->andWhere($dncQb->expr()->eq('dnc.reason', DoNotContact::BOUNCED));
+        }
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -337,6 +349,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
+        bool $sendToDnc = false,
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -350,7 +363,8 @@ class EmailRepository extends CommonRepository
             null,
             $maxThreads,
             $threadId,
-            $sendStopDate
+            $sendStopDate,
+            $sendToDnc,
         );
 
         if (!$q instanceof QueryBuilder) {

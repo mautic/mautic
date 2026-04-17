@@ -83,7 +83,6 @@ class FormSubscriber implements EventSubscriberInterface
             $this->emailModel->sendEmail($email, $currentLead, [
                 'source'    => ['form', $event->getAction()->getForm()->getId()],
                 'tokens'    => $event->getTokens(),
-                'ignoreDNC' => true,
             ]);
         }
     }
