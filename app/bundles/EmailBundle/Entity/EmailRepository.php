@@ -30,7 +30,8 @@ class EmailRepository extends CommonRepository
     /**
      * Get an array of do not email.
      *
-     * @param array $leadIds
+     * @param array      $leadIds
+     * @param int[]|null $reasons
      */
     public function getDoNotEmailList($leadIds = [], ?array $reasons = null): array
     {

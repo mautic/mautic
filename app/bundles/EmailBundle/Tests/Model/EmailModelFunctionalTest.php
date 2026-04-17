@@ -131,9 +131,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailSentState($email, $contact, true);
     }
 
-    /**
-     * @dataProvider dncReasonsWhenSendToDncIsNoProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dncReasonsWhenSendToDncIsNoProvider')]
     public function testDNCContactWhenSendToDncIsNo(int $reason): void
     {
         $contact = $this->createDncMatrixContact();
@@ -155,9 +153,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         yield [DoNotContact::MANUAL];
     }
 
-    /**
-     * @dataProvider dncReasonsWhenSendToDncIsYesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dncReasonsWhenSendToDncIsYesProvider')]
     public function testDNCContactWhenSendToDncIsYes(int $reason, bool $shouldSend): void
     {
         $contact = $this->createDncMatrixContact();
