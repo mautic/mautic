@@ -134,7 +134,7 @@ export const editorLifecycleMixin = {
       const classes = Array.from(element.classList || [])
         .map(item => item.trim())
         .filter(item => item && !item.startsWith('ck-'))
-        .sort();
+        .sort((a, b) => a.localeCompare(b));
 
       if (!classes.length) {
         return;
@@ -155,8 +155,9 @@ export const editorLifecycleMixin = {
     const classSlug = variant.classes
       .join('_')
       .replace(/[^a-z0-9_-]/gi, '_')
-      .replace(/_+/g, '_')
-      .replace(/^_+|_+$/g, '')
+      .split('_')
+      .filter(s => s.length > 0)
+      .join('_')
       .toLowerCase();
 
     const suffix = classSlug || `variant_${index}`;
