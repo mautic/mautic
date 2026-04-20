@@ -102,6 +102,28 @@ class CodeEditor {
   }
 
   /**
+   * Extract head content from HTML code.
+   * Used to preserve user head modifications (styles, scripts, meta) when saving.
+   * @param {string} code - The HTML code from the code editor
+   * @returns {string|null} - The head innerHTML or null if no head found
+   */
+  extractHeadContent(code) {
+    const trimmedCode = code.trim();
+
+    if (trimmedCode.includes('<html') || trimmedCode.includes('<!DOCTYPE')) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(trimmedCode, 'text/html');
+      const head = doc.head;
+
+      if (head && head.innerHTML.trim()) {
+        return head.innerHTML;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Update the main editors canvas content with the
    * content from modals editor.
    * @todo show validation results in UI
@@ -118,11 +140,23 @@ class CodeEditor {
       this.editor.DomComponents.getWrapper().set('content', '');
 
       let componentCode = code.trim();
+      // Preserve user head modifications before stripping to body content
+      let userHeadContent = null;
       if (!ContentService.isMjmlMode(this.editor)) {
+        userHeadContent = this.extractHeadContent(code);
         componentCode = this.extractBodyContent(code);
       }
 
-      this.editor.setComponents(componentCode)
+      this.editor.setComponents(componentCode);
+
+      // Restore preserved head content after setComponents() clears it
+      // This fixes the data-loss regression where head edits were silently dropped
+      if (userHeadContent !== null) {
+        const canvasDoc = this.editor.Canvas.getDocument();
+        if (canvasDoc && canvasDoc.head) {
+          canvasDoc.head.innerHTML = userHeadContent;
+        }
+      }
 
       // Reinitialize the content after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
