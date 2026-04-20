@@ -373,7 +373,13 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    ckeditor.data.set(this.latestContent);
+    // CKEditor 5 silently drops plain <span> elements (no attributes) because its
+    // model is attribute-based and has nothing to store for them. Injecting a
+    // placeholder attribute gives GHS something to preserve; it is removed in getContent().
+    // A non-empty value ("1") is required — CKEditor GHS may discard attributes whose
+    // value is an empty string, which would cause the span to be silently dropped.
+    const contentForEditor = this.latestContent.replace(/<span\s*>/gi, '<span data-gjs-span="1">');
+    ckeditor.data.set(contentForEditor);
     this.latestContent = null;
     el.innerHTML = '';
 
@@ -616,6 +622,8 @@ export const editorLifecycleMixin = {
     const ckeditor = this.ckeditor;
     let ckeditorContent = ckeditor?.data ? ckeditor.data.get() : '';
     if (typeof ckeditorContent !== "string") ckeditorContent = "";
+    // Remove the placeholder injected in mountEditorUi() to preserve plain <span> elements.
+    ckeditorContent = ckeditorContent.replace(/\s*data-gjs-span="1"/gi, '');
     const baseContent = this.resolveBaseContent(ckeditorContent);
 
     return this.normalizeWordInlineStyles(
