@@ -91,6 +91,18 @@ trait FilterTrait
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
                 break;
+            case 'company_segments':
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+
+                $customOptions['choices']                   = $options['companySegments'] ?? [];
+                $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in']);
+                $customOptions['choice_translation_domain'] = false;
+                $type                                       = ChoiceType::class;
+                break;
             case 'campaign':
                 if (!isset($data['filter'])) {
                     $data['filter'] = [];

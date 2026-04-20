@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
+use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -13,8 +14,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $segmentRepository)
-    {
+    public function __construct(
+        private LeadListRepository $segmentRepository,
+        private CompaniesSegmentsRepository $companySegmentRepository,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -31,6 +34,15 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
                 // Segment membership evaluation. Check if contact/segment relationship is correct.
                 $event->setIsMatched(
                     $this->isContactSegmentRelationshipValid($event->getContact(), $filter['operator'], $filter['filter'])
+                );
+                $event->setIsEvaluated(true);
+
+                return;
+            }
+
+            if ('company_segments' === $filter['type']) {
+                $event->setIsMatched(
+                    $this->isContactPrimaryCompanySegmentRelationshipValid($event->getContact(), $filter['operator'], $filter['filter'])
                 );
                 $event->setIsEvaluated(true);
 
@@ -54,6 +66,25 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             OperatorOptions::EXCLUDING_ANY => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
             OperatorOptions::INCLUDING_ALL => $this->segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
             OperatorOptions::EXCLUDING_ALL => $this->segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+        };
+    }
+
+    /**
+     * @param string $operator   empty, !empty, in, !in
+     * @param ?int[] $segmentIds
+     */
+    private function isContactPrimaryCompanySegmentRelationshipValid(Lead $contact, string $operator, ?array $segmentIds = null): bool
+    {
+        $contactId = (int) $contact->getId();
+
+        return match ($operator) {
+            OperatorOptions::EMPTY         => $this->companySegmentRepository->isNotContactPrimaryCompanyInAnySegment($contactId), // Contact's primary company is not in any segment
+            OperatorOptions::NOT_EMPTY     => $this->companySegmentRepository->isContactPrimaryCompanyInAnySegment($contactId), // Contact's primary company is in any segment
+            OperatorOptions::INCLUDING_ANY => $this->companySegmentRepository->isContactPrimaryCompanyInSegments($contactId, $segmentIds), // Contact's primary company is in one of the segments provided
+            OperatorOptions::EXCLUDING_ANY => $this->companySegmentRepository->isNotContactPrimaryCompanyInSegments($contactId, $segmentIds), // Contact's primary company is not in some segments provided
+            OperatorOptions::INCLUDING_ALL => $this->companySegmentRepository->isContactPrimaryCompanyInAllSegments($contactId, $segmentIds), // Contact's primary company is in all segments provided
+            OperatorOptions::EXCLUDING_ALL => $this->companySegmentRepository->isNotContactPrimaryCompanyInAllSegments($contactId, $segmentIds), // Contact's primary company is not in all segments provided
             default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }

@@ -125,10 +125,10 @@ class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder 
 
         // Handle empty/notEmpty operators - check if lead has ANY company in ANY segment
         if (OperatorOptions::EMPTY === $operator || 'notEmpty' === $operator) {
-            $sub               = $queryBuilder->createQueryBuilder();
-            $clAlias           = $this->generateRandomParameterName();
-            $csAlias           = $this->generateRandomParameterName();
-            $isPrimaryParam    = $this->generateRandomParameterName();
+            $sub                  = $queryBuilder->createQueryBuilder();
+            $clAlias              = $this->generateRandomParameterName();
+            $csAlias              = $this->generateRandomParameterName();
+            $isPrimaryParam       = $this->generateRandomParameterName();
             $manuallyRemovedParam = $this->generateRandomParameterName();
 
             $sub->select('1')

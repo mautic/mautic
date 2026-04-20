@@ -87,6 +87,7 @@ class DwcEntryFiltersType extends AbstractType
                 'deviceOs',
                 'tags',
                 'lists',
+                'companySegments',
             ]
         );
 

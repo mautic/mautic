@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
+use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\EventListener\DynamicContentSubscriber;
@@ -21,14 +22,20 @@ class DynamicContentSubscriberTest extends TestCase
     private $segmentRepository;
 
     /**
+     * @var CompaniesSegmentsRepository|MockObject
+     */
+    private $companySegmentRepository;
+
+    /**
      * @var DynamicContentSubscriber
      */
     private $subscriber;
 
     protected function setUp(): void
     {
-        $this->segmentRepository = $this->createMock(LeadListRepository::class);
-        $this->subscriber        = new DynamicContentSubscriber($this->segmentRepository);
+        $this->segmentRepository        = $this->createMock(LeadListRepository::class);
+        $this->companySegmentRepository = $this->createMock(CompaniesSegmentsRepository::class);
+        $this->subscriber               = new DynamicContentSubscriber($this->segmentRepository, $this->companySegmentRepository);
 
         parent::setUp();
     }
@@ -199,6 +206,30 @@ class DynamicContentSubscriberTest extends TestCase
         $this->segmentRepository->expects($this->once())
             ->method('isNotContactInAllSegments')
             ->with($contactId, $filters[0]['filter'])
+            ->willReturn(true);
+
+        $this->subscriber->onContactFilterEvaluate($event);
+        self::assertTrue($event->isEvaluated());
+        self::assertTrue($event->isMatched());
+    }
+
+    public function testOnContactFilterEvaluateCompanySegmentsIncludingAny(): void
+    {
+        $contactId = 1;
+        $filters   = [
+            [
+                'type'     => 'company_segments',
+                'operator' => OperatorOptions::INCLUDING_ANY,
+                'filter'   => [1, 2, 3],
+            ],
+        ];
+        $contact = (new Lead())->setId($contactId);
+
+        $event = new ContactFiltersEvaluateEvent($filters, $contact);
+
+        $this->companySegmentRepository->expects(self::once())
+            ->method('isContactPrimaryCompanyInSegments')
+            ->with($contactId, [1, 2, 3])
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);

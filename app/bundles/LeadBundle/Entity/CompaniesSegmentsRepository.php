@@ -93,6 +93,122 @@ class CompaniesSegmentsRepository extends CommonRepository
         return array_values(array_unique($result, SORT_REGULAR));
     }
 
+    /**
+     * Check if contact's primary company is in any company segment.
+     */
+    public function isContactPrimaryCompanyInAnySegment(int $contactId): bool
+    {
+        $tableName           = MAUTIC_TABLE_PREFIX.'companies_segments';
+        $companiesLeadsTable = MAUTIC_TABLE_PREFIX.'companies_leads';
+
+        $sql = <<<SQL
+            SELECT cs.segment_id
+            FROM $tableName cs
+            INNER JOIN $companiesLeadsTable cl ON cs.company_id = cl.company_id
+            WHERE cl.lead_id = ?
+              AND cl.is_primary = 1
+              AND cs.manually_removed = 0
+            LIMIT 1
+            SQL;
+
+        $segmentIds = $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$contactId],
+                [\PDO::PARAM_INT]
+            )
+            ->fetchFirstColumn();
+
+        return !empty($segmentIds);
+    }
+
+    public function isNotContactPrimaryCompanyInAnySegment(int $contactId): bool
+    {
+        return !$this->isContactPrimaryCompanyInAnySegment($contactId);
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isContactPrimaryCompanyInSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactPrimaryCompanyToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        return !empty($segmentIds);
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isNotContactPrimaryCompanyInSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactPrimaryCompanyToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        if (empty($segmentIds)) {
+            return true; // Contact's primary company is not in any segment
+        }
+
+        foreach ($expectedSegmentIds as $expectedSegmentId) {
+            if (in_array($expectedSegmentId, $segmentIds)) { // No exact type comparison used!
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isContactPrimaryCompanyInAllSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactPrimaryCompanyToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        return count($segmentIds) === count($expectedSegmentIds);
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isNotContactPrimaryCompanyInAllSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactPrimaryCompanyToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        return [] === $segmentIds;
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     *
+     * @return int[]
+     */
+    private function fetchContactPrimaryCompanyToSegmentIdsRelationships(int $contactId, array $expectedSegmentIds): array
+    {
+        $tableName           = MAUTIC_TABLE_PREFIX.'companies_segments';
+        $companiesLeadsTable = MAUTIC_TABLE_PREFIX.'companies_leads';
+
+        $sql = <<<SQL
+            SELECT cs.segment_id
+            FROM $tableName cs
+            INNER JOIN $companiesLeadsTable cl ON cs.company_id = cl.company_id
+            WHERE cl.lead_id = ?
+              AND cl.is_primary = 1
+              AND cs.segment_id IN (?)
+              AND cs.manually_removed = 0
+            SQL;
+
+        return $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$contactId, $expectedSegmentIds],
+                [
+                    \PDO::PARAM_INT,
+                    \Doctrine\DBAL\ArrayParameterType::INTEGER,
+                ]
+            )
+            ->fetchFirstColumn();
+    }
+
     private function getPreTable(): string
     {
         if (is_string(MAUTIC_TABLE_PREFIX)) {
