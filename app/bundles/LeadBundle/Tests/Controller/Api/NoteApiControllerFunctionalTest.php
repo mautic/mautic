@@ -21,7 +21,7 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCreateNoteRequiresDateTime(): void
     {
-        $lead = $this->createLead();
+        $lead    = $this->createLead();
         $payload = [
             'lead' => $lead->getId(),
             'text' => 'API note without date',
@@ -40,11 +40,11 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCreateNoteWithDateTime(): void
     {
-        $lead = $this->createLead();
+        $lead    = $this->createLead();
         $payload = [
-            'lead' => $lead->getId(),
-            'text' => 'API note with date',
-            'type' => 'general',
+            'lead'     => $lead->getId(),
+            'text'     => 'API note with date',
+            'type'     => 'general',
             'dateTime' => '2026-03-30 10:00:00',
         ];
 
