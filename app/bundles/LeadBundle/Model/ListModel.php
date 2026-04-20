@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -163,18 +163,23 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array<int> $ids
+     * @param array<int>                        $ids
+     * @param DeleteEntityDependencyException[] $exceptions
      *
      * @return array<object>
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities($ids, array &$exceptions = []): array
     {
         $entities = [];
         foreach ($ids as $listId) {
             $leadList = $this->getEntity($listId);
             if ($leadList) {
-                $entities[$listId] = $leadList;
-                $this->deleteEntity($leadList);
+                try {
+                    $this->deleteEntity($leadList);
+                    $entities[$listId] = $leadList;
+                } catch (DeleteEntityDependencyException $e) {
+                    $exceptions[$listId] = $e;
+                }
             }
         }
 
@@ -193,20 +198,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $entity->deletedId = $id;
         $this->dispatchEvent('on_list_delete', $entity);
         $entity->setId(null);
-    }
-
-    /**
-     * Check if entity can be deleted and returns an Exception var.
-     */
-    public function preDeleteEntity(LeadList $entity): ?RecordCanNotBeDeletedException
-    {
-        try {
-            $this->dispatchEvent('pre_delete', $entity);
-        } catch (RecordCanNotBeDeletedException $deleteException) { // @phpstan-ignore catch.neverThrown
-            return $deleteException;
-        }
-
-        return null;
     }
 
     public function hardDeleteEntity(LeadList $leadList): void

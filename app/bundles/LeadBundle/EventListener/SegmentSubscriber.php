@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -91,7 +91,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws RecordCanNotBeDeletedException
+     * @throws DeleteEntityDependencyException
      */
     public function onSegmentPreDelete(SegmentEvent $event): void
     {
@@ -105,11 +105,11 @@ class SegmentSubscriber implements EventSubscriberInterface
                     '%segmentNames%' => $leadList->getName(),
                 ],
                 'validators');
-            throw new RecordCanNotBeDeletedException($message);
+            throw new DeleteEntityDependencyException([], $message);
         }
 
         if ($this->validateSegmentsUsedInCampaigns($event, 'delete')) {
-            throw new RecordCanNotBeDeletedException($this->segmentUsedInCampaignsValidator->getErrorMessage());
+            throw new DeleteEntityDependencyException([], $this->segmentUsedInCampaignsValidator->getErrorMessage());
         }
     }
 

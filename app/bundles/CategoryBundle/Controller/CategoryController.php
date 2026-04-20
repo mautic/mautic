@@ -7,7 +7,7 @@ use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -498,7 +498,7 @@ class CategoryController extends AbstractFormController
                         '%id%'   => $objectId,
                     ],
                 ];
-            } catch (RecordCanNotBeDeletedException $exception) {
+            } catch (DeleteEntityDependencyException $exception) {
                 $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
                 $flashes[]                      = [
                     'type' => 'notice',
@@ -566,7 +566,7 @@ class CategoryController extends AbstractFormController
                         // Delete everything we are able to
                         $model->deleteEntity($entity);
                         $deleteIds[] = $objectId;
-                    } catch (RecordCanNotBeDeletedException $exception) {
+                    } catch (DeleteEntityDependencyException $exception) {
                         $deletedExceptions[] = $exception;
                     }
                 }
