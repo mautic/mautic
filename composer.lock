@@ -8387,16 +8387,16 @@
         },
         {
             "name": "studio-42/elfinder",
-            "version": "2.1.66",
+            "version": "2.1.67",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Studio-42/elFinder.git",
-                "reference": "78488951e44d69e8b9e4e849f8268df408632a6c"
+                "reference": "5e463d1384972dffcb736ad3c94f35af10656ca2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/78488951e44d69e8b9e4e849f8268df408632a6c",
-                "reference": "78488951e44d69e8b9e4e849f8268df408632a6c",
+                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/5e463d1384972dffcb736ad3c94f35af10656ca2",
+                "reference": "5e463d1384972dffcb736ad3c94f35af10656ca2",
                 "shasum": ""
             },
             "require": {
@@ -8443,7 +8443,7 @@
             "homepage": "http://elfinder.org",
             "support": {
                 "issues": "https://github.com/Studio-42/elFinder/issues",
-                "source": "https://github.com/Studio-42/elFinder/tree/2.1.66"
+                "source": "https://github.com/Studio-42/elFinder/tree/2.1.67"
             },
             "funding": [
                 {
@@ -8451,7 +8451,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-28T11:51:22+00:00"
+            "time": "2026-04-17T03:02:32+00:00"
         },
         {
             "name": "symfony/asset",
