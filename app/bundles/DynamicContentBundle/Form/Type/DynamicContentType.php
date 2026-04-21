@@ -83,9 +83,9 @@ class DynamicContentType extends AbstractType
     private array $tagChoices = [];
 
     /**
-     * @var mixed[]
+     * @var array<string, int>|null
      */
-    private array $companySegmentsChoices = [];
+    private ?array $companySegmentsChoices = null;
 
     /**
      * @throws \InvalidArgumentException
@@ -111,11 +111,6 @@ class DynamicContentType extends AbstractType
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
             $this->tagChoices[$tag['value']] = $tag['label'];
-        }
-
-        $companySegments = $companySegmentModel->getCompanySegments();
-        foreach ($companySegments as $segment) {
-            $this->companySegmentsChoices[$segment['name']] = $segment['id'];
         }
 
         $this->deviceTypesChoices  = array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames());
@@ -289,7 +284,7 @@ class DynamicContentType extends AbstractType
                         'deviceBrands'    => $this->deviceBrandsChoices,
                         'deviceOs'        => $this->deviceOsChoices,
                         'tags'            => $this->tagChoices,
-                        'companySegments' => $this->companySegmentsChoices,
+                        'companySegments' => $this->getCompanySegmentChoices(),
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -350,7 +345,7 @@ class DynamicContentType extends AbstractType
         $view->vars['deviceOs']       = $this->deviceOsChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['locales']        = $this->localeChoices;
-        $view->vars['companySegments'] = $this->companySegmentsChoices;
+        $view->vars['companySegments'] = $this->getCompanySegmentChoices();
     }
 
     private function filterFieldChoices(): void
@@ -396,6 +391,25 @@ class DynamicContentType extends AbstractType
             ],
             'required' => false,
         ]);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getCompanySegmentChoices(): array
+    {
+        if (null === $this->companySegmentsChoices) {
+            $companySegments = $this->companySegmentModel->getCompanySegments();
+            $choices         = [];
+
+            foreach ($companySegments as $segment) {
+                $choices[$segment['name']] = $segment['id'];
+            }
+
+            $this->companySegmentsChoices = $choices;
+        }
+
+        return $this->companySegmentsChoices;
     }
 
     public function getBlockPrefix(): string
