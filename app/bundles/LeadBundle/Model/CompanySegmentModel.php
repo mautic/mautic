@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\CompanySegmentChangeEvent;
 use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
@@ -36,6 +35,7 @@ use Mautic\LeadBundle\Event\SegmentPreRebuildSegmentEvent;
 use Mautic\LeadBundle\Form\Type\CompanySegmentType;
 use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Services\CompanySegmentService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -53,8 +53,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CompanySegmentModel extends FormModel
 {
-    use OperatorListTrait;
-
     public const PROPERTIES_FIELD = CompanySegment::TABLE_NAME;
     public const SEARCH_COMMAND   = 'mautic.company_segments.searchcommand.list';
 
@@ -69,6 +67,7 @@ class CompanySegmentModel extends FormModel
         private CompanySegmentService $companySegmentService,
         private ListModel $listModel,
         private Connection $connection,
+        private TypeOperatorProviderInterface $typeOperatorProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -450,7 +449,10 @@ class CompanySegmentModel extends FormModel
         $choices = [];
 
         if ($this->dispatcher->hasListeners(LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE)) {
-            $operatorsForFieldType = $this->getOperatorsForFieldType();
+            $operatorsForFieldType = [];
+            foreach ($this->typeOperatorProvider->getAllTypeOperators() as $type => $definition) {
+                $operatorsForFieldType[$type] = $this->typeOperatorProvider->getOperatorsForFieldType($type);
+            }
 
             $event = new CompanySegmentFiltersChoicesEvent([], $operatorsForFieldType, $this->translator, $this->requestStack->getCurrentRequest());
             $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE);
