@@ -120,13 +120,16 @@ class FileManager
                 continue;
             }
 
-            if ($size = @getimagesize($this->getCompleteFilePath($file->getRelativePathname()))) {
+            $filePath = $this->getCompleteFilePath($file->getRelativePathname());
+            if ($size = @getimagesize($filePath)) {
                 $files[] = [
                     'src'    => $this->getFullUrl($file->getRelativePathname()),
                     'width'  => $size[0],
                     'type'   => 'image',
                     'height' => $size[1],
                 ];
+            } elseif ('svg' === strtolower($file->getExtension())) {
+                $files[] = $this->getSvgFileInfo($filePath, $file->getRelativePathname());
             } else {
                 $files[] = $this->getFullUrl($file->getRelativePathname());
             }
@@ -210,23 +213,75 @@ class FileManager
      */
     private function getFileInfo(SplFileInfo $file): ?array
     {
-        $filePath = $this->getCompleteFilePath($file->getRelativePathname());
-        $size     = @getimagesize($filePath);
+        $filePath  = $this->getCompleteFilePath($file->getRelativePathname());
+        $size      = @getimagesize($filePath);
+        $extension = strtolower($file->getExtension());
 
         if ($size) {
-            return [
+            $info = [
                 'src'    => $this->getFullUrl($file->getRelativePathname()),
                 'width'  => $size[0],
                 'height' => $size[1],
                 'type'   => 'image',
             ];
-        } elseif (in_array($file->getExtension(), ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
-            return [
+        } elseif ('svg' === $extension) {
+            $info = $this->getSvgFileInfo($filePath, $file->getRelativePathname());
+        } elseif (in_array($extension, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
+            $info = [
                 'src'  => $this->getFullUrl($file->getRelativePathname()),
                 'type' => 'document',
             ];
+        } else {
+            $info = null;
         }
 
-        return null;
+        return $info;
+    }
+
+    /**
+     * Extract full file metadata from an SVG file.
+     *
+     * @return array<string, int|string>
+     */
+    private function getSvgFileInfo(string $filePath, string $relativePathName): array
+    {
+        $info = [
+            'src'    => $this->getFullUrl($relativePathName),
+            'width'  => 0,
+            'height' => 0,
+            'type'   => 'image',
+        ];
+
+        $svgContent = @file_get_contents($filePath);
+        if ($svgContent) {
+            // Suppress XML warnings and enable internal error handling
+            $previousErrors = libxml_use_internal_errors(true);
+
+            // Parse SVG with network access disabled to mitigate XXE/SSRF risks
+            $svg = simplexml_load_string($svgContent, 'SimpleXMLElement', LIBXML_NONET);
+
+            // Clear any accumulated libxml errors and restore previous setting
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrors);
+
+            if ($svg) {
+                $svgAttributes = $svg->attributes();
+
+                // Try to get width and height directly
+                if (isset($svgAttributes->width) && isset($svgAttributes->height)) {
+                    $info['width']  = (int) $svgAttributes->width;
+                    $info['height'] = (int) $svgAttributes->height;
+                } elseif (isset($svgAttributes->viewBox)) {
+                    // Parse the viewBox attribute (format: "x y width height")
+                    $viewBox = explode(' ', (string) $svgAttributes->viewBox);
+                    if (4 === count($viewBox)) {
+                        $info['width']  = (int) $viewBox[2];
+                        $info['height'] = (int) $viewBox[3];
+                    }
+                }
+            }
+        }
+
+        return $info;
     }
 }

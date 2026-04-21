@@ -155,7 +155,7 @@ class InactiveExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
         $totalContacts = 0;
-        if (!($this->output instanceof NullOutput)) {
+        if (!$this->output instanceof NullOutput) {
             $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
             $this->output->writeln(

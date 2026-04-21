@@ -103,9 +103,9 @@ class ContactSegmentFilter implements \Stringable
     {
         if ($this->filterDecorator instanceof ContactDecoratorForeignInterface) {
             return $this->filterDecorator->getForeignContactColumn($this->contactSegmentFilterCrate);
-        } else {
-            return 'lead_id';
         }
+
+        return 'lead_id';
     }
 
     /**
