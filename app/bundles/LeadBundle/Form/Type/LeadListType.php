@@ -30,7 +30,7 @@ class LeadListType extends AbstractType
                     if (empty($options['preference_center_only'])) {
                         $choices[$l['name'].' ('.$l['id'].')'] = $l['id'];
                     } else {
-                        $choices[empty($l['publicName']) ? $l['name'].' ('.$l['id'].')' : $l['publicName'].' ('.$l['id'].')'] = $l['id'];
+                        $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
                     }
                 }
 
