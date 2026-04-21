@@ -100,7 +100,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        if (!($request instanceof Request)) {
+        if (!$request instanceof Request) {
             // likely this download came via a cron (no request), do not bother logging the download.
             // https://github.com/mautic/mautic/issues/13577
             return;
@@ -260,9 +260,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         } catch (\Exception $e) {
             if (MAUTIC_ENV === 'dev') {
                 throw $e;
-            } else {
-                error_log($e);
             }
+            error_log($e);
         }
 
         $this->em->detach($download);
@@ -372,9 +371,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

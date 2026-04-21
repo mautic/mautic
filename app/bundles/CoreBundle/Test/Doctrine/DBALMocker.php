@@ -264,9 +264,9 @@ class DBALMocker
             ->willReturnCallback(function () {
                 if (isset($this->queryResponse[0]) && is_array($this->queryResponse[0])) {
                     return count($this->queryResponse[0]);
-                } else {
-                    return count($this->queryResponse);
                 }
+
+                return count($this->queryResponse);
             });
 
         $mock->expects($this->testCase->any())

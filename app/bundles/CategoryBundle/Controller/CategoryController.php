@@ -280,24 +280,24 @@ class CategoryController extends AbstractFormController
         } elseif (!empty($valid)) {
             // return edit view to prevent duplicates
             return $this->editAction($request, $bundle, $entity->getId(), true);
-        } else {
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCategory/Category/form.html.twig',
-                    'viewParameters'  => [
-                        'form'           => $form->createView(),
-                        'activeCategory' => $entity,
-                        'bundle'         => $bundle,
-                    ],
-                    'passthroughVars' => [
-                        'mauticContent' => 'category',
-                        'success'       => $success,
-                        'route'         => false,
-                    ],
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCategory/Category/form.html.twig',
+                'viewParameters'  => [
+                    'form'           => $form->createView(),
+                    'activeCategory' => $entity,
+                    'bundle'         => $bundle,
+                ],
+                'passthroughVars' => [
+                    'mauticContent' => 'category',
+                    'success'       => $success,
+                    'route'         => false,
+                ],
+            ]
+        );
     }
 
     /**

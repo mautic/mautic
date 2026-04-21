@@ -8,12 +8,12 @@ use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
     /**
-     * @const TAR_CACHE_FOLDER
+     * @var string
      */
     public const TAR_CACHE_FOLDER = 'unpack';
 
     /**
-     * @const TAR_TEMP_FILE
+     * @var string
      */
     public const TAR_TEMP_FILE = 'temp.tar.gz';
 

@@ -352,9 +352,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
