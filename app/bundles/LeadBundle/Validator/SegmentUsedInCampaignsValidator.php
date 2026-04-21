@@ -22,20 +22,20 @@ class SegmentUsedInCampaignsValidator
             return false;
         }
 
-        $segments = $this->leadListRepository->getSegmentCampaigns($segment->getId());
-        if (1 > count($segments)) {
+        $campaignNames = $this->leadListRepository->getSegmentCampaigns($segment->getId());
+        if (1 > count($campaignNames)) {
             return false;
         }
 
-        $campaignNames = array_map(fn (string $campaignName): string => sprintf('"%s"', $campaignName), $segments);
-        $campaignNames = implode(', ', $campaignNames);
+        $campaignNamesQuotes = array_map(fn (string $campaignName): string => sprintf('"%s"', $campaignName), $campaignNames);
+        $campaignNamesCsv    = implode(', ', $campaignNamesQuotes);
 
         $this->errorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.'.$action,
             [
-                '%campaignNames%' => $campaignNames,
+                '%campaignNames%' => $campaignNamesCsv,
                 '%segmentNames%'  => $segment->getName(),
-                '%count%'         => count($segments),
+                '%count%'         => count($campaignNames),
             ],
             'validators'
         );
