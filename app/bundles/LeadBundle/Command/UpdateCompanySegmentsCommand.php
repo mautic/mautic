@@ -126,6 +126,17 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
                 return Command::FAILURE;
             }
 
+            // Track already rebuilt segments to avoid rebuilding them multiple times
+            $rebuiltSegments = [];
+
+            // First check if this segment has dependencies and rebuild them
+            if ($segment->hasFilterTypeOf(CompanySegmentModel::PROPERTIES_FIELD)) {
+                $this->rebuildDependentSegments($segment, $rebuiltSegments, $batch, $max, $output, $enableTimeMeasurement, [], $excludeSegments);
+            }
+
+            // Add the current segment ID to the rebuilt segments to avoid rebuilding it again
+            $rebuiltSegments[] = (int) $segment->getId();
+
             $this->rebuildSegment($segment, $batch, $max, $output, $enableTimeMeasurement);
         } else {
             $filter = [
@@ -145,8 +156,26 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
             }
             $companySegments = $this->companySegmentModel->getEntities($filter);
 
+            $rebuiltSegments = [];
             foreach ($companySegments as $companySegment) {
                 assert($companySegment instanceof CompanySegment);
+
+                $segmentId = $companySegment->getId();
+
+                // Skip if already rebuilt
+                if (in_array($segmentId, $rebuiltSegments)) {
+                    continue;
+                }
+
+                // Process any dependent segments first (segments that are used as filters in this segment)
+                if ($companySegment->hasFilterTypeOf(CompanySegmentModel::PROPERTIES_FIELD)) {
+                    $this->rebuildDependentSegments($companySegment, $rebuiltSegments, $batch, $max, $output, $enableTimeMeasurement, [], $excludeSegments);
+                }
+
+                // Add the current segment ID to the rebuilt segments to avoid rebuilding it again
+                $rebuiltSegments[] = $segmentId;
+
+                // Rebuild the current segment
                 $this->rebuildSegment($companySegment, $batch, $max, $output, $enableTimeMeasurement);
                 unset($companySegment);
             }
@@ -161,6 +190,73 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param array<int>        $rebuiltSegments List of segment IDs that have already been rebuilt
+     * @param array<int>        $dependencyChain Chain of segment IDs to detect circular dependencies
+     * @param array<int|string> $excludeSegments List of segment IDs to exclude from rebuilding
+     *
+     * @param-out array<int> $rebuiltSegments Updated list of segment IDs that have been rebuilt
+     */
+    private function rebuildDependentSegments(
+        CompanySegment $companySegment,
+        array &$rebuiltSegments,
+        int $batch,
+        ?int $max,
+        OutputInterface $output,
+        bool $enableTimeMeasurement,
+        array $dependencyChain = [],
+        array $excludeSegments = [],
+    ): void {
+        $currentId         = $companySegment->getId();
+        $dependencyChain[] = $currentId;
+
+        foreach ($companySegment->getFilters() as $filter) {
+            if (CompanySegmentModel::PROPERTIES_FIELD === $filter['type']) {
+                foreach ($filter['filter'] ?? [] as $dependentSegmentId) {
+                    $dependentSegmentId = (int) $dependentSegmentId;
+
+                    // Skip if already rebuilt or in exclude list
+                    if (in_array($dependentSegmentId, $rebuiltSegments) || in_array($dependentSegmentId, $excludeSegments)) {
+                        continue;
+                    }
+
+                    // Check for circular dependency
+                    if (in_array($dependentSegmentId, $dependencyChain)) {
+                        $output->writeln(
+                            '<error>'.$this->translator->trans(
+                                'Circular dependency detected in company segment chain: %chain%',
+                                ['%chain%' => implode(' → ', array_merge($dependencyChain, [$dependentSegmentId]))]
+                            ).'</error>'
+                        );
+                        continue; // Skip this dependency to prevent infinite recursion
+                    }
+
+                    $dependentCompanySegment = $this->companySegmentModel->getEntity($dependentSegmentId);
+                    if (!$dependentCompanySegment instanceof CompanySegment) {
+                        continue;
+                    }
+
+                    // Check if this dependent segment has its own dependencies
+                    if ($dependentCompanySegment->hasFilterTypeOf(CompanySegmentModel::PROPERTIES_FIELD)) {
+                        $this->rebuildDependentSegments(
+                            $dependentCompanySegment,
+                            $rebuiltSegments,
+                            $batch,
+                            $max,
+                            $output,
+                            $enableTimeMeasurement,
+                            $dependencyChain,
+                            $excludeSegments
+                        );
+                    }
+
+                    $this->rebuildSegment($dependentCompanySegment, $batch, $max, $output, $enableTimeMeasurement);
+                    $rebuiltSegments[] = $dependentSegmentId;
+                }
+            }
+        }
     }
 
     private function rebuildSegment(CompanySegment $companySegment, int $batch, ?int $max, OutputInterface $output, bool $enableTimeMeasurement = false): void

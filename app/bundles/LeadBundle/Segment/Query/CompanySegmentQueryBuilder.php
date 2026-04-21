@@ -375,7 +375,7 @@ class CompanySegmentQueryBuilder
                 $edgeCompanySegment = $this->companySegmentRepository->find($edge);
 
                 if (null === $edgeCompanySegment) {
-                    throw new SegmentQueryException('Dependent segment is not found.');
+                    continue; // Skip if the dependent segment doesn't exist - it may have been deleted
                 }
 
                 $resolved = $this->getResolutionPlan($edgeCompanySegment, $seen, $resolved);
@@ -398,7 +398,7 @@ class CompanySegmentQueryBuilder
         $segmentEdges   = [];
 
         foreach ($segmentFilters as $segmentFilter) {
-            if (isset($segmentFilter['field']) && 'companysegment' === $segmentFilter['field']) {
+            if (isset($segmentFilter['field']) && CompanySegment::TABLE_NAME === $segmentFilter['field']) {
                 $filterEdges = [];
                 if (
                     is_array($segmentFilter)
