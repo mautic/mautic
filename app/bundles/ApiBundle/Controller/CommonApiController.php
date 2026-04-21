@@ -157,7 +157,7 @@ class CommonApiController extends FetchCommonApiController
                 'validators'
             );
 
-            return $this->returnError($msg, $e->getCode());
+            return $this->returnError($msg, $e->getCode(), $e->getErrors());
         }
         $this->preSerializeEntity($entity);
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);
