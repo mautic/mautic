@@ -518,8 +518,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
 
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $clientResponse     = $this->client->getResponse();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
         $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);

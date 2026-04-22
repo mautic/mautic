@@ -535,8 +535,6 @@ class ListController extends FormController
                         ],
                     ];
                 } catch (DeleteEntityDependencyException $deletedException) {
-                    $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-
                     foreach ($deletedException->getErrors() as $error) {
                         $flashes[] = [
                             'type' => 'error',
