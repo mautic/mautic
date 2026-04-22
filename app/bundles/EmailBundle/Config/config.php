@@ -163,13 +163,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.email.columns.dictionary' => [
-                'class'     => Mautic\EmailBundle\Services\EmailColumnsDictionary::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
             'mautic.email.helper.stats_collection' => [
                 'class'     => Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
                 'arguments' => [
