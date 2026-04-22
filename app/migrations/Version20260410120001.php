@@ -21,8 +21,8 @@ final class Version20260410120001 extends PreUpAssertionMigration
     {
         $this->oldTableName = $this->prefix.'companies_segments';
         $this->newTableName = $this->prefix.'company_segments_companies';
-        $this->segmentFk = $this->generatePropertyName('company_segments_companies', 'fk', ['segment_id']);
-        $this->companyFk = $this->generatePropertyName('company_segments_companies', 'fk', ['company_id']);
+        $this->segmentFk    = $this->generatePropertyName('company_segments_companies', 'fk', ['segment_id']);
+        $this->companyFk    = $this->generatePropertyName('company_segments_companies', 'fk', ['company_id']);
     }
 
     protected function preUpAssertions(): void
