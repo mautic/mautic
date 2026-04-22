@@ -135,12 +135,7 @@ enum EmailListColumn: string
     {
         return array_map(
             static fn (self $column): string => $column->value,
-            array_filter(self::cases(), static fn (self $column): bool => $column->isDefault())
+            array_values(array_filter(self::cases(), static fn (self $column): bool => $column->isDefault()))
         );
-    }
-
-    public static function tryFromValue(string $value): ?self
-    {
-        return self::tryFrom($value);
     }
 }
