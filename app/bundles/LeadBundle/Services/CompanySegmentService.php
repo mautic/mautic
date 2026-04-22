@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Services;
 
 use Doctrine\DBAL\ParameterType;
-use Mautic\LeadBundle\Entity\CompaniesSegments;
 use Mautic\LeadBundle\Entity\CompanySegment;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\CompanyBatchLimiterTrait;
@@ -247,7 +247,7 @@ class CompanySegmentService
             $segment->getFilters(),
             $batchLimiters
         );
-        $queryBuilder   = $this->companySegmentQueryBuilder->assembleCompaniesSegmentQueryBuilder(
+        $queryBuilder   = $this->companySegmentQueryBuilder->assembleCompanySegmentQueryBuilder(
             $segment,
             $segmentFilters
         );
@@ -273,7 +273,7 @@ class CompanySegmentService
             []
         );
 
-        $queryBuilder = $this->companySegmentQueryBuilder->assembleCompaniesSegmentQueryBuilder($companySegment, $segmentFilters);
+        $queryBuilder = $this->companySegmentQueryBuilder->assembleCompanySegmentQueryBuilder($companySegment, $segmentFilters);
         $queryBuilder = $this->companySegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $companySegment);
 
         return $this->companySegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $companySegment);
@@ -291,7 +291,7 @@ class CompanySegmentService
             $batchLimiters
         );
 
-        $queryBuilder = $this->companySegmentQueryBuilder->assembleCompaniesSegmentQueryBuilder($companySegment, $segmentFilters);
+        $queryBuilder = $this->companySegmentQueryBuilder->assembleCompanySegmentQueryBuilder($companySegment, $segmentFilters);
 
         $this->addMinMaxLimiters($queryBuilder, $batchLimiters, 'companies', 'id');
 
@@ -306,14 +306,14 @@ class CompanySegmentService
         if (is_string(MAUTIC_TABLE_PREFIX)) {
             $preTable = MAUTIC_TABLE_PREFIX;
         }
-        $qbO->from($preTable.CompaniesSegments::TABLE_NAME, 'orp');
+        $qbO->from($preTable.SegmentCompany::TABLE_NAME, 'orp');
         $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $qbO->andWhere($expr->eq('orp.segment_id', ':orpsegid'));
         $qbO->andWhere($expr->eq('orp.manually_added', ':false'));
         $qbO->andWhere($expr->notIn('orp.company_id', $queryBuilder->getSQL()));
         $qbO->setParameter('orpsegid', $companySegment->getId());
         $qbO->setParameter('false', false, ParameterType::BOOLEAN);
-        $this->addMinMaxLimiters($qbO, $batchLimiters, CompaniesSegments::TABLE_NAME, 'company_id');
+        $this->addMinMaxLimiters($qbO, $batchLimiters, SegmentCompany::TABLE_NAME, 'company_id');
 
         if (null !== $limit && $limit > 0) {
             $qbO->setMaxResults($limit);

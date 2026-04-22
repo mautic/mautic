@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Segment\Query\CompanySegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -48,7 +49,7 @@ class CompanySegmentQueryBuilderTest extends TestCase
 
         Assert::assertSame($queryBuilder, $filterQueryBuilder->addNewCompaniesRestrictions($queryBuilder, $companySegment));
         Assert::assertSame(
-            'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies comp WHERE (NULL) AND (comp.id NOT IN (SELECT par0.company_id FROM '.MAUTIC_TABLE_PREFIX.'companies_segments par0 WHERE par0.segment_id = 8))',
+            'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies comp WHERE (NULL) AND (comp.id NOT IN (SELECT par0.company_id FROM '.MAUTIC_TABLE_PREFIX.SegmentCompany::TABLE_NAME.' par0 WHERE par0.segment_id = 8))',
             $queryBuilder->getDebugOutput()
         );
     }
@@ -93,7 +94,7 @@ class CompanySegmentQueryBuilderTest extends TestCase
 
         Assert::assertSame($queryBuilder, $filterQueryBuilder->addNewCompaniesRestrictions($queryBuilder, $companySegment, $batchLimiters));
         Assert::assertSame(
-            'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies comp WHERE (NULL) AND (comp.id NOT IN (SELECT par0.company_id FROM '.MAUTIC_TABLE_PREFIX.'companies_segments par0 WHERE (par0.segment_id = 8) AND ('.$expectedWhereClause.')))',
+            'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies comp WHERE (NULL) AND (comp.id NOT IN (SELECT par0.company_id FROM '.MAUTIC_TABLE_PREFIX.SegmentCompany::TABLE_NAME.' par0 WHERE (par0.segment_id = 8) AND ('.$expectedWhereClause.')))',
             $queryBuilder->getDebugOutput()
         );
     }

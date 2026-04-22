@@ -9,11 +9,11 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * @extends CommonRepository<CompaniesSegments>
+ * @extends CommonRepository<SegmentCompany>
  *
  * @see ListLeadRepository
  */
-class CompaniesSegmentsRepository extends CommonRepository
+class SegmentCompanyRepository extends CommonRepository
 {
     /**
      * @param array<int, int> $segmentIds
@@ -23,19 +23,19 @@ class CompaniesSegmentsRepository extends CommonRepository
     public function getCompanyCount(array $segmentIds): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('COUNT(1) as thecount, '.CompaniesSegments::RELATIONS_NAME.'.segment_id')
-            ->from($this->getPreTable().CompaniesSegments::TABLE_NAME, CompaniesSegments::RELATIONS_NAME)
-            ->groupBy(CompaniesSegments::RELATIONS_NAME.'.segment_id');
+        $q->select('COUNT(1) as thecount, '.SegmentCompany::RELATIONS_NAME.'.segment_id')
+            ->from($this->getPreTable().SegmentCompany::TABLE_NAME, SegmentCompany::RELATIONS_NAME)
+            ->groupBy(SegmentCompany::RELATIONS_NAME.'.segment_id');
 
         if (1 === count($segmentIds)) {
             $q          = $this->forceUseIndex($q, $this->getPreTable().'companies_segment_manually_removed');
-            $expression = $q->expr()->eq(CompaniesSegments::RELATIONS_NAME.'.segment_id', (string) array_pop($segmentIds));
+            $expression = $q->expr()->eq(SegmentCompany::RELATIONS_NAME.'.segment_id', (string) array_pop($segmentIds));
         } else {
-            $expression = $q->expr()->in(CompaniesSegments::RELATIONS_NAME.'.segment_id', array_map(static fn ($segmentId): string => (string) $segmentId, $segmentIds));
+            $expression = $q->expr()->in(SegmentCompany::RELATIONS_NAME.'.segment_id', array_map(static fn ($segmentId): string => (string) $segmentId, $segmentIds));
         }
 
         $q->where($expression);
-        $q->andWhere(CompaniesSegments::RELATIONS_NAME.'.manually_removed = :false')
+        $q->andWhere(SegmentCompany::RELATIONS_NAME.'.manually_removed = :false')
             ->setParameter('false', false, ParameterType::BOOLEAN);
 
         $result = $q->executeQuery()->fetchAllAssociative();
@@ -81,9 +81,9 @@ class CompaniesSegmentsRepository extends CommonRepository
     /**
      * @param int[] $segmentIds
      *
-     * @return CompaniesSegments[]
+     * @return SegmentCompany[]
      */
-    public function getCompaniesSegmentsBySegmentIds(array $segmentIds): array
+    public function getSegmentCompaniesBySegmentIds(array $segmentIds): array
     {
         $result = $this->findBy([
             'companySegment'  => $segmentIds,
@@ -98,7 +98,7 @@ class CompaniesSegmentsRepository extends CommonRepository
      */
     public function isContactPrimaryCompanyInAnySegment(int $contactId): bool
     {
-        $tableName           = MAUTIC_TABLE_PREFIX.'companies_segments';
+        $tableName           = MAUTIC_TABLE_PREFIX.SegmentCompany::TABLE_NAME;
         $companiesLeadsTable = MAUTIC_TABLE_PREFIX.'companies_leads';
 
         $sql = <<<SQL
@@ -184,7 +184,7 @@ class CompaniesSegmentsRepository extends CommonRepository
      */
     private function fetchContactPrimaryCompanyToSegmentIdsRelationships(int $contactId, array $expectedSegmentIds): array
     {
-        $tableName           = MAUTIC_TABLE_PREFIX.'companies_segments';
+        $tableName           = MAUTIC_TABLE_PREFIX.SegmentCompany::TABLE_NAME;
         $companiesLeadsTable = MAUTIC_TABLE_PREFIX.'companies_leads';
 
         $sql = <<<SQL

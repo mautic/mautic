@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog as CampaignLeadEventLog;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\LeadBundle\Entity\CompaniesSegments;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanySegment;
@@ -234,17 +234,17 @@ trait CreateTestEntitiesTrait
         return $companySegment;
     }
 
-    private function addCompanyToCompanySegment(Company $company, CompanySegment $companySegment): CompaniesSegments
+    private function addCompanyToCompanySegment(Company $company, CompanySegment $companySegment): SegmentCompany
     {
-        $companiesSegments = new CompaniesSegments();
-        $companiesSegments->setCompany($company);
-        $companiesSegments->setCompanySegment($companySegment);
-        $companiesSegments->setDateAdded(new \DateTime());
+        $segmentCompany = new SegmentCompany();
+        $segmentCompany->setCompany($company);
+        $segmentCompany->setCompanySegment($companySegment);
+        $segmentCompany->setDateAdded(new \DateTime());
 
-        $this->em->persist($companiesSegments);
+        $this->em->persist($segmentCompany);
         $this->em->flush();
 
-        return $companiesSegments;
+        return $segmentCompany;
     }
 
     private function createCampaignLeadEventLog(Lead $lead, Event $event, ?Campaign $campaign, int $rotation = 1, bool $isScheduled =  false): CampaignLeadEventLog

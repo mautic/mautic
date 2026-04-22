@@ -1223,8 +1223,8 @@ class CompanyController extends FormController
         }
 
         $companiesIds = [];
-        foreach ($companySegment->getCompaniesSegments() as $companiesSegment) {
-            $companiesIds[] = $companiesSegment->getCompany()->getId();
+        foreach ($companySegment->getSegmentCompanies() as $segmentCompany) {
+            $companiesIds[] = $segmentCompany->getCompany()->getId();
         }
 
         if (empty($companiesIds)) {

@@ -7,9 +7,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class CompaniesSegments
+class SegmentCompany
 {
-    public const TABLE_NAME     = 'companies_segments';
+    public const TABLE_NAME     = 'company_segments_companies';
     public const RELATIONS_NAME = 'css';
 
     private CompanySegment $companySegment;
@@ -27,7 +27,7 @@ class CompaniesSegments
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(CompaniesSegmentsRepository::class);
+            ->setCustomRepositoryClass(SegmentCompanyRepository::class);
 
         $builder->createManyToOne('companySegment', CompanySegment::class)
             ->isPrimaryKey()

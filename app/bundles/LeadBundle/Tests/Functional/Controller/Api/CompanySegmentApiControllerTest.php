@@ -99,7 +99,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
         self::assertNull($companySegment);
     }
 
-    public function testBatchAddCompaniesSegments(): void
+    public function testBatchAddCompanySegments(): void
     {
         $data = [
             [

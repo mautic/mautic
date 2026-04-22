@@ -420,7 +420,7 @@ class CompanySegmentController extends AbstractStandardFormController
             'returnUrl'      => $this->generateUrl('mautic_company_segments_action', ['objectAction' => 'view', 'objectId' => $objectId]),
             'viewParameters' => [
                 'segment'      => $segment,
-                'segmentCount' => current($model->getCompaniesSegmentsRepository()->getCompanyCount([$objectId])),
+                'segmentCount' => current($model->getSegmentCompanyRepository()->getCompanyCount([$objectId])),
                 'permissions'  => $security->isGranted([
                     'lead:leads:editown',
                     $this->getPermissionBase().':viewother',

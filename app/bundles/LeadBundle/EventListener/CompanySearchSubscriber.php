@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Mautic\LeadBundle\Entity\CompaniesSegments;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -51,15 +51,15 @@ class CompanySearchSubscriber implements EventSubscriberInterface
 
         $sq = new QueryBuilder($this->connection);
         $sq->select('1')
-            ->from(MAUTIC_TABLE_PREFIX.CompaniesSegments::TABLE_NAME, CompaniesSegments::TABLE_NAME)
+            ->from(MAUTIC_TABLE_PREFIX.SegmentCompany::TABLE_NAME, SegmentCompany::TABLE_NAME)
             ->where(
                 $sq->expr()->and(
                     $sq->expr()->eq(
                         $this->companyRepository->getTableAlias().'.id',
-                        CompaniesSegments::TABLE_NAME.'.company_id'
+                        SegmentCompany::TABLE_NAME.'.company_id'
                     ),
-                    $sq->expr()->in(CompaniesSegments::TABLE_NAME.'.segment_id', ':'.$uniqueParameterAlias),
-                    $sq->expr()->neq(CompaniesSegments::TABLE_NAME.'.manually_removed', ':manually_removed_true')
+                    $sq->expr()->in(SegmentCompany::TABLE_NAME.'.segment_id', ':'.$uniqueParameterAlias),
+                    $sq->expr()->neq(SegmentCompany::TABLE_NAME.'.manually_removed', ':manually_removed_true')
                 )
             );
 

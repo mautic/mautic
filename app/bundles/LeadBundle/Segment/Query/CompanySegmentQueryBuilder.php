@@ -7,10 +7,10 @@ namespace Mautic\LeadBundle\Segment\Query;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\CompaniesSegments;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Event\CompanySegmentFilteringEvent;
 use Mautic\LeadBundle\Event\CompanySegmentQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -43,7 +43,7 @@ class CompanySegmentQueryBuilder
     /**
      * @throws SegmentQueryException
      */
-    public function assembleCompaniesSegmentQueryBuilder(CompanySegment $companySegment, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleCompanySegmentQueryBuilder(CompanySegment $companySegment, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
@@ -98,7 +98,7 @@ class CompanySegmentQueryBuilder
     /**
      * @throws SegmentQueryException
      */
-    public function assembleCompaniesSegmentQueryBuilderLeadSegment(CompanySegment $companySegment, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleCompanySegmentQueryBuilderLeadSegment(CompanySegment $companySegment, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
@@ -125,7 +125,7 @@ class CompanySegmentQueryBuilder
                 $companyTableAlias.'.id = '.$companyLeadsTableAlias.'.company_id'
             )->join(
                 $companyTableAlias,
-                $this->getBaseTableName().'companies_segments',
+                $this->getBaseTableName().SegmentCompany::TABLE_NAME,
                 $companySegmentTableAlias,
                 $companySegmentTableAlias.'.segment_id = '.$companySegment->getId().' and '.$companySegmentTableAlias.'.manually_removed = 0',
             );
@@ -210,12 +210,12 @@ class CompanySegmentQueryBuilder
 
         $segmentQueryBuilder = $queryBuilder->createQueryBuilder()
             ->select($tableAlias.'.company_id')
-            ->from($this->getBaseTableName().CompaniesSegments::TABLE_NAME, $tableAlias)
+            ->from($this->getBaseTableName().SegmentCompany::TABLE_NAME, $tableAlias)
             ->andWhere($expr->eq($tableAlias.'.segment_id', $segmentIdParameter));
 
         $queryBuilder->setParameter(sprintf('%ssegmentId', $tableAlias), $segmentId);
 
-        $this->addMinMaxLimiters($segmentQueryBuilder, $batchLimiters, CompaniesSegments::TABLE_NAME, 'company_id');
+        $this->addMinMaxLimiters($segmentQueryBuilder, $batchLimiters, SegmentCompany::TABLE_NAME, 'company_id');
 
         $queryBuilder->andWhere($expr->notIn($companiesTableAlias.'.id', $segmentQueryBuilder->getSQL()));
 
@@ -232,7 +232,7 @@ class CompanySegmentQueryBuilder
 
         $existsQueryBuilder
             ->select('null')
-            ->from($this->getBaseTableName().CompaniesSegments::TABLE_NAME, $tableAlias)
+            ->from($this->getBaseTableName().SegmentCompany::TABLE_NAME, $tableAlias)
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.segment_id', (int) $companySegment->getId()));
 
         $existingQueryWherePart = $existsQueryBuilder->getQueryPart('where');
@@ -271,7 +271,7 @@ class CompanySegmentQueryBuilder
 
         $existsQueryBuilder
             ->select('null')
-            ->from($this->getBaseTableName().CompaniesSegments::TABLE_NAME, $tableAlias)
+            ->from($this->getBaseTableName().SegmentCompany::TABLE_NAME, $tableAlias)
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.segment_id', $companySegment->getId()))
             ->andWhere(
                 $queryBuilder->expr()->or(
@@ -308,7 +308,7 @@ class CompanySegmentQueryBuilder
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin(
             $companyTableAlias,
-            $this->getBaseTableName().CompaniesSegments::TABLE_NAME,
+            $this->getBaseTableName().SegmentCompany::TABLE_NAME,
             $tableAlias,
             $companyTableAlias.'.id = '.$tableAlias.'.company_id and '.$tableAlias.'.segment_id = :manually_unsubscribed_segment_id'
         )->setParameter('manually_unsubscribed_segment_id', $companySegment->getId())

@@ -336,15 +336,15 @@ class DynamicContentType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $view->vars['fields']         = $this->fieldChoices;
-        $view->vars['countries']      = $this->countryChoices;
-        $view->vars['regions']        = $this->regionChoices;
-        $view->vars['timezones']      = $this->timezoneChoices;
-        $view->vars['deviceTypes']    = $this->deviceTypesChoices;
-        $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
-        $view->vars['deviceOs']       = $this->deviceOsChoices;
-        $view->vars['tags']           = $this->tagChoices;
-        $view->vars['locales']        = $this->localeChoices;
+        $view->vars['fields']          = $this->fieldChoices;
+        $view->vars['countries']       = $this->countryChoices;
+        $view->vars['regions']         = $this->regionChoices;
+        $view->vars['timezones']       = $this->timezoneChoices;
+        $view->vars['deviceTypes']     = $this->deviceTypesChoices;
+        $view->vars['deviceBrands']    = $this->deviceBrandsChoices;
+        $view->vars['deviceOs']        = $this->deviceOsChoices;
+        $view->vars['tags']            = $this->tagChoices;
+        $view->vars['locales']         = $this->localeChoices;
         $view->vars['companySegments'] = $this->getCompanySegmentChoices();
     }
 

@@ -107,14 +107,14 @@ class CompanySegmentTest extends TestCase
         self::assertNull($clonedEntity->getLastBuiltDate());
     }
 
-    public function testCloneResetsCompaniesSegments(): void
+    public function testCloneResetsSegmentCompanies(): void
     {
         $entity = new CompanySegment();
-        // companiesSegments should be a new empty collection after cloning
+        // segmentCompanies should be a new empty collection after cloning
 
         $clonedEntity = clone $entity;
 
-        self::assertCount(0, $clonedEntity->getCompaniesSegments());
-        self::assertNotSame($entity->getCompaniesSegments(), $clonedEntity->getCompaniesSegments());
+        self::assertCount(0, $clonedEntity->getSegmentCompanies());
+        self::assertNotSame($entity->getSegmentCompanies(), $clonedEntity->getSegmentCompanies());
     }
 }

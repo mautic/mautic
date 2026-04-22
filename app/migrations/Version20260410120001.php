@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20260410120001 extends PreUpAssertionMigration
 {
-    private string $tableName;
+    private string $oldTableName;
+
+    private string $newTableName;
 
     private string $segmentFk;
 
@@ -17,9 +19,10 @@ final class Version20260410120001 extends PreUpAssertionMigration
 
     private function initTableNames(): void
     {
-        $this->tableName = $this->prefix.'companies_segments';
-        $this->segmentFk = $this->generatePropertyName('companies_segments', 'fk', ['segment_id']);
-        $this->companyFk = $this->generatePropertyName('companies_segments', 'fk', ['company_id']);
+        $this->oldTableName = $this->prefix.'companies_segments';
+        $this->newTableName = $this->prefix.'company_segments_companies';
+        $this->segmentFk = $this->generatePropertyName('company_segments_companies', 'fk', ['segment_id']);
+        $this->companyFk = $this->generatePropertyName('company_segments_companies', 'fk', ['company_id']);
     }
 
     protected function preUpAssertions(): void
@@ -27,17 +30,17 @@ final class Version20260410120001 extends PreUpAssertionMigration
         $this->initTableNames();
 
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->hasTable($this->tableName),
-            "Table {$this->tableName} already exists"
+            fn (Schema $schema) => $schema->hasTable($this->newTableName),
+            "Table {$this->newTableName} already exists"
         );
 
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->tableName)->hasForeignKey($this->segmentFk),
+            fn (Schema $schema) => $schema->hasTable($this->newTableName) && $schema->getTable($this->newTableName)->hasForeignKey($this->segmentFk),
             "Foreign key {$this->segmentFk} already exists"
         );
 
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->tableName)->hasForeignKey($this->companyFk),
+            fn (Schema $schema) => $schema->hasTable($this->newTableName) && $schema->getTable($this->newTableName)->hasForeignKey($this->companyFk),
             "Foreign key {$this->companyFk} already exists"
         );
     }
@@ -46,7 +49,10 @@ final class Version20260410120001 extends PreUpAssertionMigration
     {
         $this->initTableNames();
 
-        $this->addSql("CREATE TABLE `{$this->tableName}`
+        if ($schema->hasTable($this->oldTableName)) {
+            $this->addSql("RENAME TABLE `{$this->oldTableName}` TO `{$this->newTableName}`");
+        } else {
+            $this->addSql("CREATE TABLE `{$this->newTableName}`
 (
     `segment_id`        INT UNSIGNED NOT NULL,
     `company_id`        INT          NOT NULL,
@@ -60,16 +66,17 @@ final class Version20260410120001 extends PreUpAssertionMigration
   ENGINE = InnoDB
   ROW_FORMAT = DYNAMIC;");
 
-        $this->addSql("ALTER TABLE `{$this->tableName}` ADD CONSTRAINT `{$this->segmentFk}` FOREIGN KEY (`segment_id`) REFERENCES `{$this->prefix}company_segments` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$this->tableName}` ADD CONSTRAINT `{$this->companyFk}` FOREIGN KEY (`company_id`) REFERENCES `{$this->prefix}companies` (`id`) ON DELETE CASCADE");
+            $this->addSql("ALTER TABLE `{$this->newTableName}` ADD CONSTRAINT `{$this->segmentFk}` FOREIGN KEY (`segment_id`) REFERENCES `{$this->prefix}company_segments` (`id`) ON DELETE CASCADE");
+            $this->addSql("ALTER TABLE `{$this->newTableName}` ADD CONSTRAINT `{$this->companyFk}` FOREIGN KEY (`company_id`) REFERENCES `{$this->prefix}companies` (`id`) ON DELETE CASCADE");
+        }
     }
 
     public function down(Schema $schema): void
     {
         $this->initTableNames();
 
-        if ($schema->hasTable($this->tableName)) {
-            $this->addSql("DROP TABLE {$this->tableName}");
+        if ($schema->hasTable($this->newTableName)) {
+            $this->addSql("DROP TABLE {$this->newTableName}");
         }
     }
 }

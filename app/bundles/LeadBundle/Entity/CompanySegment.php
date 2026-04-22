@@ -68,9 +68,9 @@ class CompanySegment extends FormEntity
     private array $filters = [];
 
     /**
-     * @var Collection<int, CompaniesSegments>
+     * @var Collection<int, SegmentCompany>
      */
-    private Collection $companiesSegments;
+    private Collection $segmentCompanies;
 
     private ?\DateTimeInterface $lastBuiltDate = null;
 
@@ -78,7 +78,7 @@ class CompanySegment extends FormEntity
 
     public function __construct()
     {
-        $this->companiesSegments = new ArrayCollection();
+        $this->segmentCompanies = new ArrayCollection();
     }
 
     public static function loadMetadata(ORMClassMetadata $metadata): void
@@ -102,7 +102,7 @@ class CompanySegment extends FormEntity
 
         $builder->addField('filters', 'json');
 
-        $builder->createOneToMany('companiesSegments', CompaniesSegments::class)
+        $builder->createOneToMany('segmentCompanies', SegmentCompany::class)
             ->mappedBy('companySegment')
             ->fetchExtraLazy()
             ->build();
@@ -275,39 +275,39 @@ class CompanySegment extends FormEntity
     }
 
     /**
-     * @return Collection<int, CompaniesSegments>
+     * @return Collection<int, SegmentCompany>
      */
-    public function getCompaniesSegments(): Collection
+    public function getSegmentCompanies(): Collection
     {
-        return $this->companiesSegments;
+        return $this->segmentCompanies;
     }
 
-    public function addCompaniesSegment(CompaniesSegments $companiesSegments): void
+    public function addSegmentCompany(SegmentCompany $segmentCompany): void
     {
-        if ($this->companiesSegments->contains($companiesSegments)) {
+        if ($this->segmentCompanies->contains($segmentCompany)) {
             return;
         }
 
-        if ($this->companiesSegments->exists(static fn (int $key, CompaniesSegments $companySegment): bool => $companySegment->getCompanySegment() === $companiesSegments->getCompanySegment()
-            && $companySegment->getCompany() === $companiesSegments->getCompany())) {
+        if ($this->segmentCompanies->exists(static fn (int $key, SegmentCompany $existingSegmentCompany): bool => $existingSegmentCompany->getCompanySegment() === $segmentCompany->getCompanySegment()
+            && $existingSegmentCompany->getCompany() === $segmentCompany->getCompany())) {
             return;
         }
 
-        $this->companiesSegments->add($companiesSegments);
+        $this->segmentCompanies->add($segmentCompany);
     }
 
-    public function removeCompaniesSegment(CompaniesSegments $companiesSegments): void
+    public function removeSegmentCompany(SegmentCompany $segmentCompany): void
     {
-        if (!$this->companiesSegments->contains($companiesSegments)) {
+        if (!$this->segmentCompanies->contains($segmentCompany)) {
             return;
         }
 
-        $this->companiesSegments->removeElement($companiesSegments);
+        $this->segmentCompanies->removeElement($segmentCompany);
     }
 
     public function hasCompany(Company $company): bool
     {
-        return $this->companiesSegments->exists(static fn (int $key, CompaniesSegments $companiesSegments): bool => $companiesSegments->getCompany() === $company);
+        return $this->segmentCompanies->exists(static fn (int $key, SegmentCompany $segmentCompany): bool => $segmentCompany->getCompany() === $company);
     }
 
     public function getLastBuiltDate(): ?\DateTimeInterface
@@ -349,8 +349,8 @@ class CompanySegment extends FormEntity
     {
         parent::__clone();
 
-        $this->id                = null;
-        $this->companiesSegments = new ArrayCollection();
+        $this->id               = null;
+        $this->segmentCompanies = new ArrayCollection();
         $this->setIsPublished(false);
         $this->setAlias('');
         $this->lastBuiltDate = null;

@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
-use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\SegmentCompanyRepository;
 use Mautic\LeadBundle\EventListener\DynamicContentSubscriber;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,7 +22,7 @@ class DynamicContentSubscriberTest extends TestCase
     private $segmentRepository;
 
     /**
-     * @var CompaniesSegmentsRepository|MockObject
+     * @var SegmentCompanyRepository|MockObject
      */
     private $companySegmentRepository;
 
@@ -34,7 +34,7 @@ class DynamicContentSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->segmentRepository        = $this->createMock(LeadListRepository::class);
-        $this->companySegmentRepository = $this->createMock(CompaniesSegmentsRepository::class);
+        $this->companySegmentRepository = $this->createMock(SegmentCompanyRepository::class);
         $this->subscriber               = new DynamicContentSubscriber($this->segmentRepository, $this->companySegmentRepository);
 
         parent::setUp();

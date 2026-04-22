@@ -25,7 +25,7 @@ class BatchCompanySegmentControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->assertCount(0, $segment->getCompaniesSegments());
+        $this->assertCount(0, $segment->getSegmentCompanies());
 
         $this->client->request(Request::METHOD_GET, '/s/company-segments/batch/company/view', [], [], $this->createAjaxHeaders());
         $this->assertResponseIsSuccessful();
@@ -59,25 +59,25 @@ class BatchCompanySegmentControllerTest extends MauticMysqlTestCase
         $segment = $this->em->getRepository(\Mautic\LeadBundle\Entity\CompanySegment::class)->find($segmentId);
         $this->assertNotNull($segment);
 
-        $this->assertCount(3, $segment->getCompaniesSegments());
+        $this->assertCount(3, $segment->getSegmentCompanies());
 
-        $companiesSegments = $segment->getCompaniesSegments()->get(0);
-        $this->assertNotNull($companiesSegments);
-        $this->assertTrue($companiesSegments->isManuallyAdded());
-        $this->assertFalse($companiesSegments->isManuallyRemoved());
-        $this->assertSame($companyA->getId(), $companiesSegments->getCompany()->getId());
+        $segmentCompany = $segment->getSegmentCompanies()->get(0);
+        $this->assertNotNull($segmentCompany);
+        $this->assertTrue($segmentCompany->isManuallyAdded());
+        $this->assertFalse($segmentCompany->isManuallyRemoved());
+        $this->assertSame($companyA->getId(), $segmentCompany->getCompany()->getId());
 
-        $companiesSegments = $segment->getCompaniesSegments()->get(1);
-        $this->assertNotNull($companiesSegments);
-        $this->assertTrue($companiesSegments->isManuallyAdded());
-        $this->assertFalse($companiesSegments->isManuallyRemoved());
-        $this->assertSame($companyB->getId(), $companiesSegments->getCompany()->getId());
+        $segmentCompany = $segment->getSegmentCompanies()->get(1);
+        $this->assertNotNull($segmentCompany);
+        $this->assertTrue($segmentCompany->isManuallyAdded());
+        $this->assertFalse($segmentCompany->isManuallyRemoved());
+        $this->assertSame($companyB->getId(), $segmentCompany->getCompany()->getId());
 
-        $companiesSegments = $segment->getCompaniesSegments()->get(2);
-        $this->assertNotNull($companiesSegments);
-        $this->assertTrue($companiesSegments->isManuallyAdded());
-        $this->assertFalse($companiesSegments->isManuallyRemoved());
-        $this->assertSame($companyC->getId(), $companiesSegments->getCompany()->getId());
+        $segmentCompany = $segment->getSegmentCompanies()->get(2);
+        $this->assertNotNull($segmentCompany);
+        $this->assertTrue($segmentCompany->isManuallyAdded());
+        $this->assertFalse($segmentCompany->isManuallyRemoved());
+        $this->assertSame($companyC->getId(), $segmentCompany->getCompany()->getId());
 
         $content = $clientResponse->getContent();
         $this->assertNotFalse($content);
@@ -121,7 +121,7 @@ class BatchCompanySegmentControllerTest extends MauticMysqlTestCase
         $segment = $this->em->getRepository(\Mautic\LeadBundle\Entity\CompanySegment::class)->find($segmentId);
         $this->assertNotNull($segment);
 
-        $this->assertCount(0, $segment->getCompaniesSegments());
+        $this->assertCount(0, $segment->getSegmentCompanies());
 
         $content = $clientResponse->getContent();
         $this->assertNotFalse($content);

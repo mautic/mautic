@@ -1315,27 +1315,27 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        $companiesSegmentsRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\CompaniesSegments::class);
+        $segmentCompanyRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\SegmentCompany::class);
 
-        $glibiSegmentA = $companiesSegmentsRepo->findOneBy([
+        $glibiSegmentA = $segmentCompanyRepo->findOneBy([
             'company'        => $companyGlibi,
             'companySegment' => $segmentA,
         ]);
         self::assertNull($glibiSegmentA, 'Glibi should be removed from Segment A');
 
-        $glibiSegmentC = $companiesSegmentsRepo->findOneBy([
+        $glibiSegmentC = $segmentCompanyRepo->findOneBy([
             'company'        => $companyGlibi,
             'companySegment' => $segmentC,
         ]);
         self::assertNotNull($glibiSegmentC, 'Glibi should be added to Segment C');
 
-        $tbsSegmentB = $companiesSegmentsRepo->findOneBy([
+        $tbsSegmentB = $segmentCompanyRepo->findOneBy([
             'company'        => $companyTBS,
             'companySegment' => $segmentB,
         ]);
         self::assertNotNull($tbsSegmentB, 'TBS should still be in Segment B');
 
-        $tbsSegmentC = $companiesSegmentsRepo->findOneBy([
+        $tbsSegmentC = $segmentCompanyRepo->findOneBy([
             'company'        => $companyTBS,
             'companySegment' => $segmentC,
         ]);

@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
-use Mautic\LeadBundle\Entity\CompaniesSegmentsRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\SegmentCompanyRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,7 +16,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadListRepository $segmentRepository,
-        private CompaniesSegmentsRepository $companySegmentRepository,
+        private SegmentCompanyRepository $companySegmentRepository,
     ) {
     }
 

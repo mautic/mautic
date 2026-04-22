@@ -6,12 +6,12 @@ namespace Mautic\LeadBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use Mautic\LeadBundle\Entity\CompaniesSegments;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -43,7 +43,7 @@ class UpdateCompanySegmentsCommandTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $companySegmentOne    = $this->createCompanySegment('Test Segment 1', 'test_segment');
-        $companiesSegmentsOne = $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
+        $segmentCompanyOne    = $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
         $filters              = [
             'filters' => [
                 'glue'       => 'and',
@@ -57,9 +57,9 @@ class UpdateCompanySegmentsCommandTest extends MauticMysqlTestCase
             ],
         ];
         $companySegmentTwo             = $this->createCompanySegment('Test Segment 2', 'test_segment2', true, $filters);
-        $resultCompaniesSegmentsBefore = $this->em->getRepository(CompaniesSegments::class)->findAll();
+        $resultSegmentCompaniesBefore  = $this->em->getRepository(SegmentCompany::class)->findAll();
 
-        self::assertCount(1, $resultCompaniesSegmentsBefore);
+        self::assertCount(1, $resultSegmentCompaniesBefore);
 
         $kernel        = static::getContainer()->get('kernel');
         assert($kernel instanceof \Symfony\Component\HttpKernel\KernelInterface);
@@ -69,10 +69,10 @@ class UpdateCompanySegmentsCommandTest extends MauticMysqlTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--bypass-locking' => true]);
 
-        $resultCompaniesSegmentsAfter = $this->em->getRepository(CompaniesSegments::class)->findAll();
-        self::assertCount(2, $resultCompaniesSegmentsAfter);
-        self::assertEquals($resultCompaniesSegmentsAfter[0]->getCompany()->getId(), $resultCompaniesSegmentsAfter[1]->getCompany()->getId());
-        self::assertEquals($resultCompaniesSegmentsAfter[1]->getCompanySegment()->getId(), $companySegmentTwo->getId());
+        $resultSegmentCompaniesAfter = $this->em->getRepository(SegmentCompany::class)->findAll();
+        self::assertCount(2, $resultSegmentCompaniesAfter);
+        self::assertEquals($resultSegmentCompaniesAfter[0]->getCompany()->getId(), $resultSegmentCompaniesAfter[1]->getCompany()->getId());
+        self::assertEquals($resultSegmentCompaniesAfter[1]->getCompanySegment()->getId(), $companySegmentTwo->getId());
     }
 
     public function testUpdateLeadSegmentsUsingExcludeACompanySegment(): void
@@ -94,9 +94,9 @@ class UpdateCompanySegmentsCommandTest extends MauticMysqlTestCase
         $totalCompanyLeadsBefore = $this->em->getRepository(CompanyLead::class)->findAll();
         self::assertCount(4, $totalCompanyLeadsBefore);
         $companySegmentOne             = $this->createCompanySegment('Test Company Segment 1', 'test_comp_segment');
-        $companiesSegmentsOne          = $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
-        $resultCompaniesSegmentsBefore = $this->em->getRepository(CompaniesSegments::class)->findAll();
-        self::assertCount(1, $resultCompaniesSegmentsBefore);
+        $segmentCompanyOne             = $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
+        $resultSegmentCompaniesBefore  = $this->em->getRepository(SegmentCompany::class)->findAll();
+        self::assertCount(1, $resultSegmentCompaniesBefore);
 
         $filtersToLeadSegment = [
             [
@@ -222,24 +222,24 @@ class UpdateCompanySegmentsCommandTest extends MauticMysqlTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--bypass-locking' => true]);
 
-        $companiesInSegment1 = $this->em->getRepository(CompaniesSegments::class)
+        $companiesInSegment1 = $this->em->getRepository(SegmentCompany::class)
             ->findBy(['companySegment' => $companySegmentLeadList1]);
         self::assertCount(1, $companiesInSegment1);
         self::assertEquals('leadsegment1', $companiesInSegment1[0]->getCompany()->getName());
 
-        $companiesInSegment2 = $this->em->getRepository(CompaniesSegments::class)
+        $companiesInSegment2 = $this->em->getRepository(SegmentCompany::class)
             ->findBy(['companySegment' => $companySegmentLeadList2]);
         self::assertCount(1, $companiesInSegment2);
         self::assertEquals('leadsegment2', $companiesInSegment2[0]->getCompany()->getName());
 
-        $companiesInEmptySegment = $this->em->getRepository(CompaniesSegments::class)
+        $companiesInEmptySegment = $this->em->getRepository(SegmentCompany::class)
             ->findBy(['companySegment' => $companySegmentEmptyLeadList]);
         $companyNames = array_map(fn ($cs) => $cs->getCompany()->getName(), $companiesInEmptySegment);
         self::assertCount(2, $companiesInEmptySegment);
         self::assertContains('noleadsegment', $companyNames);
         self::assertContains('companywithoutlead', $companyNames);
 
-        $companiesInNotEmptySegment = $this->em->getRepository(CompaniesSegments::class)
+        $companiesInNotEmptySegment = $this->em->getRepository(SegmentCompany::class)
             ->findBy(['companySegment' => $companySegmentNotEmptyLeadList]);
         self::assertCount(2, $companiesInNotEmptySegment);
         $companyNames = array_map(fn ($cs) => $cs->getCompany()->getName(), $companiesInNotEmptySegment);
