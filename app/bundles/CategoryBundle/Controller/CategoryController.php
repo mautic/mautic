@@ -499,8 +499,6 @@ class CategoryController extends AbstractFormController
                     ],
                 ];
             } catch (DeleteEntityDependencyException $exception) {
-                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-
                 foreach ($exception->getErrors() as $error) {
                     $flashes[] = [
                         'type' => 'error',
