@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -489,8 +490,6 @@ class ListController extends FormController
      */
     public function deleteAction(Request $request, $objectId)
     {
-        /** @var ListModel $model */
-        $model     = $this->getModel('lead.list');
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
 
@@ -505,22 +504,6 @@ class ListController extends FormController
                 'mauticContent' => 'lead',
             ],
         ];
-
-        $dependents = $model->getSegmentsWithDependenciesOnSegment($objectId);
-
-        if (!empty($dependents)) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.lead.list.error.cannot.delete',
-                'msgVars' => ['%segments%' => implode(', ', $dependents)],
-            ];
-
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => $flashes,
-                ])
-            );
-        }
 
         if ('POST' === $request->getMethod()) {
             /** @var ListModel $model */
@@ -553,10 +536,13 @@ class ListController extends FormController
                     ];
                 } catch (DeleteEntityDependencyException $deletedException) {
                     $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-                    $flashes[]                      = [
-                        'type'  => 'error',
-                        'msg'   => $deletedException->getMessage(),
-                    ];
+
+                    foreach ($deletedException->getErrors() as $error) {
+                        $flashes[] = [
+                            'type' => 'error',
+                            'msg'  => $error,
+                        ];
+                    }
                 }
             }
         } // else don't do anything
@@ -588,21 +574,11 @@ class ListController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            $ids             = json_decode($request->query->get('ids', '{}'));
-            $canNotBeDeleted = $model->canNotBeDeleted($ids);
-
-            if (!empty($canNotBeDeleted)) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
-                    'msgVars' => ['%segments%' => implode(', ', $canNotBeDeleted)],
-                ];
-            }
-
-            $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
+            $ids       = json_decode($request->query->get('ids', '{}'));
+            $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
-            foreach ($toBeDeleted as $objectId) {
+            foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
@@ -617,29 +593,39 @@ class ListController extends FormController
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.list', true);
+                } else {
+                    $deleteIds[] = $objectId;
                 }
             }
 
-            if (!empty($toBeDeleted)) {
-                $exceptions = [];
-                // Delete everything we are able to
-                $entities  = $model->deleteEntities($toBeDeleted, $exceptions);
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.lead.list.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
+            if ($deleteIds) {
+                try {
+                    $deletedEntities = $model->deleteEntities($deleteIds);
+                } catch (DeleteEntitiesDependencyException $e) {
+                    $deletedEntities = $e->getDeletedEntities();
 
-                foreach ($exceptions as $e) {
+                    if ($e->getUnableToDeleteEntities()) {
+                        $flashes[] = [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                            'msgVars' => [
+                                '%segments%' => implode(', ', array_map(fn (LeadList $entity) => $entity->getName(), $e->getUnableToDeleteEntities())),
+                            ],
+                        ];
+                    }
+                }
+
+                if ($deletedEntities) {
                     $flashes[] = [
-                        'type' => 'error',
-                        'msg'  => $e->getMessage(),
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.lead.list.notice.batch_deleted',
+                        'msgVars' => [
+                            '%count%' => count($deletedEntities),
+                        ],
                     ];
                 }
             }
-        } // else don't do anything
+        }
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [

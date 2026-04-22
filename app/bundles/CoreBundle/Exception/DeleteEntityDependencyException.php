@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Exception;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class DeleteEntityDependencyException extends \Exception
+final class DeleteEntityDependencyException extends \Exception
 {
     /**
      * @param string[] $errors

@@ -4,9 +4,13 @@ namespace Mautic\CategoryBundle\Event;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\DependencyErrorEventTrait;
 
-class CategoryEvent extends CommonEvent
+class CategoryEvent extends CommonEvent implements DependencyErrorEventInterface
 {
+    use DependencyErrorEventTrait;
+
     /**
      * @param bool $isNew
      */

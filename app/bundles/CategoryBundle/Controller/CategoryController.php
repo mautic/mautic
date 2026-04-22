@@ -500,10 +500,13 @@ class CategoryController extends AbstractFormController
                 ];
             } catch (DeleteEntityDependencyException $exception) {
                 $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-                $flashes[]                      = [
-                    'type' => 'notice',
-                    'msg'  => $exception->getMessage(),
-                ];
+
+                foreach ($exception->getErrors() as $error) {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => $error,
+                    ];
+                }
             }
         } // else don't do anything
 
@@ -583,10 +586,12 @@ class CategoryController extends AbstractFormController
             }
 
             foreach ($deletedExceptions as $deletedException) {
-                $flashes[] = [
-                    'type' => 'notice',
-                    'msg'  => $deletedException->getMessage(),
-                ];
+                foreach ($deletedException->getErrors() as $error) {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => $error,
+                    ];
+                }
             }
         } // else don't do anything
 

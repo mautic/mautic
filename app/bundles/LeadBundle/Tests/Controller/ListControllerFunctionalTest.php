@@ -457,13 +457,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $expectedErrorMessage = sprintf('The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
 
-        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
+        $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
         $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
     }
@@ -474,13 +474,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $list2 = $this->saveSegment('s2', 's2');
         $this->em->clear();
 
-        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
+        $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
         $this->assertTrue($this->client->getResponse()->isOk());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
 
         $rows = $this->listRepo->findAll();
@@ -547,24 +547,12 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id'   => $list2->getId(),
         ]);
 
-        $expectedErrorMessage1 = $this->translator->trans(
-            'mautic.lead.lists.used_in_campaigns.delete',
+        $expectedErrorMessage = $this->translator->trans(
+            'mautic.lead.list.error.cannot.delete.batch',
             [
-                '%campaignNames%' => '"'.$campaignName.'"',
-                '%segmentNames%'  => $list1->getName(),
-                '%count%'         => 1,
+                '%segments%'  => $list1->getName().', '.$list2->getName(),
             ],
-            'validators'
-        );
-
-        $expectedErrorMessage2 = $this->translator->trans(
-            'mautic.lead.lists.used_in_campaigns.delete',
-            [
-                '%campaignNames%' => '"'.$campaignName.'"',
-                '%segmentNames%'  => $list2->getName(),
-                '%count%'         => 1,
-            ],
-            'validators'
+            'flashes'
         );
 
         $parameters = 'ids=["'.$list1->getId().'","'.$list2->getId().'"]';
@@ -574,8 +562,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage1, $clientResponseBody['flashes']);
-        $this->assertStringContainsString($expectedErrorMessage2, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
     }
 
     private function saveSegment(string $name, string $alias, ?array $filters = null, ?LeadList $segment = null): LeadList

@@ -714,6 +714,16 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('errors', $response);
 
         $expectedErrorMessage = $this->translator->trans(
+            'mautic.api.dependent.entity.delete.error',
+            [
+                '%id%' => $segment->getId(),
+            ],
+            'validators'
+        );
+
+        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['message']);
+
+        $expectedErrorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.delete',
             [
                 '%campaignNames%' => '"'.$campaignName.'"',
@@ -723,19 +733,16 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['message']);
+        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['details'][0]);
     }
 
     public function testBatchDeleteUsedInCampaignSegment(): void
     {
-        $segment1Name = 's1';
-        $segment2Name = 's2';
-        $segment1     = $this->saveSegment($segment1Name, $segment1Name);
-        $segment2     = $this->saveSegment($segment2Name, $segment2Name);
+        $segment1 = $this->saveSegment('s1', 's1');
+        $segment2 = $this->saveSegment('s2', 's2');
 
-        $campaign     = new Campaign();
-        $campaignName = 'Campaign1';
-        $campaign->setName($campaignName);
+        $campaign = new Campaign();
+        $campaign->setName('Campaign1');
 
         $this->em->persist($campaign);
         $this->em->flush();
@@ -750,7 +757,6 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id' => $segment2->getId(),
         ]);
 
-        $ids = json_encode([$segment1->getId(), $segment2->getId()]);
         $ids = $segment1->getId().','.$segment2->getId();
         $this->client->request('DELETE', "/api/segments/batch/delete?ids={$ids}");
 
@@ -761,20 +767,36 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('errors', $response);
 
         $expectedErrorMessage1 = $this->translator->trans(
-            'mautic.lead.lists.used_in_campaigns.delete',
+            'mautic.api.dependent.entity.delete.error',
             [
-                '%campaignNames%' => '"'.$campaignName.'"',
-                '%segmentNames%'  => $segment1Name,
-                '%count%'         => 1,
+                '%id%' => $segment1->getId(),
             ],
             'validators'
         );
 
         $expectedErrorMessage2 = $this->translator->trans(
+            'mautic.api.dependent.entity.delete.error',
+            [
+                '%id%' => $segment2->getId(),
+            ],
+            'validators'
+        );
+
+        $expectedDetailMessage1 = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.delete',
             [
-                '%campaignNames%' => '"'.$campaignName.'"',
-                '%segmentNames%'  => $segment2Name,
+                '%campaignNames%' => '"'.$campaign->getName().'"',
+                '%segmentNames%'  => $segment1->getName(),
+                '%count%'         => 1,
+            ],
+            'validators'
+        );
+
+        $expectedDetailMessage2 = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaign->getName().'"',
+                '%segmentNames%'  => $segment2->getName(),
                 '%count%'         => 1,
             ],
             'validators'
@@ -783,6 +805,10 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $allErrors = implode(' ', array_column($response['errors'], 'message'));
         Assert::assertStringContainsString($expectedErrorMessage1, $allErrors);
         Assert::assertStringContainsString($expectedErrorMessage2, $allErrors);
+
+        $allDetails = implode(' ', array_column(array_column($response['errors'], 'details'), 0));
+        Assert::assertStringContainsString($expectedDetailMessage1, $allDetails);
+        Assert::assertStringContainsString($expectedDetailMessage2, $allDetails);
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList

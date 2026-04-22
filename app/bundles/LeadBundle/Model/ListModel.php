@@ -6,6 +6,8 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -163,27 +165,33 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array<int>                        $ids
-     * @param DeleteEntityDependencyException[] $exceptions
+     * @param array<int> $ids
      *
      * @return array<object>
      */
-    public function deleteEntities($ids, array &$exceptions = []): array
+    public function deleteEntities($ids): array
     {
-        $entities = [];
-        foreach ($ids as $listId) {
-            $leadList = $this->getEntity($listId);
-            if ($leadList) {
+        $deleted        = [];
+        $unableToDelete = [];
+
+        foreach ($ids as $id) {
+            $entity = $this->getEntity($id);
+
+            if ($entity) {
                 try {
-                    $this->deleteEntity($leadList);
-                    $entities[$listId] = $leadList;
-                } catch (DeleteEntityDependencyException $e) {
-                    $exceptions[$listId] = $e;
+                    $this->deleteEntity($entity);
+                    $deleted[$id] = $entity;
+                } catch (DeleteEntityDependencyException) {
+                    $unableToDelete[$id] = $entity;
                 }
             }
         }
 
-        return $entities;
+        if ($unableToDelete) {
+            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
+        }
+
+        return $deleted;
     }
 
     /**
@@ -192,7 +200,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
     public function deleteEntity($entity): void
     {
         $id    = $entity->getId();
-        $this->dispatchEvent('pre_delete', $entity);
+        $event = $this->dispatchEvent('pre_delete', $entity);
+
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
+        }
+
         $this->getRepository()->setSegmentAsDeleted($id);
 
         $entity->deletedId = $id;

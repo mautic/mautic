@@ -73,7 +73,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     public function onSegmentPreUnpublish(SegmentEvent $event): void
     {
         $leadList = $event->getList();
-        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
+        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId());
         if (count($lists)) {
             $message = $this->translator->trans(
                 'mautic.lead_list.is_in_use.unpublish',
@@ -96,7 +96,8 @@ class SegmentSubscriber implements EventSubscriberInterface
     public function onSegmentPreDelete(SegmentEvent $event): void
     {
         $leadList = $event->getList();
-        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
+        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId());
+
         if (count($lists)) {
             $message = $this->translator->trans(
                 'mautic.lead_list.is_in_use.delete',
@@ -105,11 +106,11 @@ class SegmentSubscriber implements EventSubscriberInterface
                     '%segmentNames%' => $leadList->getName(),
                 ],
                 'validators');
-            throw new DeleteEntityDependencyException([], $message);
+            $event->addDependencyError($message);
         }
 
         if ($this->validateSegmentsUsedInCampaigns($event, 'delete')) {
-            throw new DeleteEntityDependencyException([], $this->segmentUsedInCampaignsValidator->getErrorMessage());
+            $event->addDependencyError($this->segmentUsedInCampaignsValidator->getErrorMessage());
         }
     }
 

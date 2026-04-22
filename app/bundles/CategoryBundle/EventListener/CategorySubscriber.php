@@ -7,7 +7,6 @@ use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -98,7 +97,7 @@ class CategorySubscriber implements EventSubscriberInterface
                     '%categoryName%' => $event->getCategory()->getTitle(),
                 ],
                 'validators');
-            throw new DeleteEntityDependencyException([], $message);
+            $event->addDependencyError($message);
         }
     }
 
