@@ -8,6 +8,7 @@ use Mautic\ConfigBundle\Form\Type\DsnType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Enum\EmailListColumn;
 use Mautic\EmailBundle\Validator\Dsn;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -27,8 +28,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigType extends AbstractType
 {
-    public const MINIFY_EMAIL_HTML      = 'minify_email_html';
-    private const DEFAULT_EMAIL_COLUMNS = ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
+    public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
     public function __construct(
         private TranslatorInterface $translator,
@@ -391,9 +391,9 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            static function (FormEvent $event) use ($buildEmailColumnsField): void {
+            function (FormEvent $event) use ($buildEmailColumnsField): void {
                 $data    = $event->getData();
-                $columns = $data['email_columns'] ?? self::DEFAULT_EMAIL_COLUMNS;
+                $columns = $data['email_columns'] ?: $this->getDefaultEmailColumns();
                 $buildEmailColumnsField($event->getForm(), $columns, ['data' => $columns]);
             }
         );
@@ -582,5 +582,13 @@ class ConfigType extends AbstractType
     public function getBlockPrefix(): string
     {
         return 'emailconfig';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getDefaultEmailColumns(): array
+    {
+        return EmailListColumn::defaultValues();
     }
 }

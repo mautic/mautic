@@ -5,32 +5,19 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Enum\EmailListColumn;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailColumnsDictionary
 {
-    /**
-     * @var string[]
-     */
-    private const DEFAULT_COLUMNS = [
-        'name',
-        'category',
-        'template',
-        'stats',
-        'dateAdded',
-        'dateModified',
-        'createdByUser',
-        'id',
-    ];
-
     /**
      * @var array<string, string>
      */
     private array $fieldList = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -43,7 +30,7 @@ class EmailColumnsDictionary
         $columns = [];
 
         /** @var string[] $configuredColumns */
-        $configuredColumns = $this->coreParametersHelper->get('email_columns', self::DEFAULT_COLUMNS);
+        $configuredColumns = $this->coreParametersHelper->get('email_columns', EmailListColumn::defaultValues());
         foreach ($configuredColumns as $column) {
             if (isset($fields[$column])) {
                 $columns[$column] = $fields[$column];
@@ -51,7 +38,7 @@ class EmailColumnsDictionary
         }
 
         if ([] === $columns) {
-            foreach (self::DEFAULT_COLUMNS as $column) {
+            foreach (EmailListColumn::defaultValues() as $column) {
                 $columns[$column] = $fields[$column];
             }
         }
@@ -65,25 +52,25 @@ class EmailColumnsDictionary
     public function getFields(): array
     {
         if ([] === $this->fieldList) {
-            $this->fieldList = [
-                'name'          => $this->translator->trans('mautic.core.name'),
-                'subject'       => $this->translator->trans('mautic.email.subject'),
-                'description'   => $this->translator->trans('mautic.core.description'),
-                'emailType'     => $this->translator->trans('mautic.email.column.type'),
-                'language'      => $this->translator->trans('mautic.core.language'),
-                'category'      => $this->translator->trans('mautic.core.category'),
-                'template'      => $this->translator->trans('mautic.core.form.theme'),
-                'isPublished'   => $this->translator->trans('mautic.email.column.is_published'),
-                'stats'         => $this->translator->trans('mautic.core.stats'),
-                'publishUp'     => $this->translator->trans('mautic.core.form.activate_at'),
-                'publishDown'   => $this->translator->trans('mautic.core.form.publishdown'),
-                'dateAdded'     => $this->translator->trans('mautic.lead.import.label.dateAdded'),
-                'dateModified'  => $this->translator->trans('mautic.lead.import.label.dateModified'),
-                'createdByUser' => $this->translator->trans('mautic.core.createdby'),
-                'id'            => $this->translator->trans('mautic.core.id'),
-            ];
+            foreach (EmailListColumn::cases() as $column) {
+                $this->fieldList[$column->value] = $this->translator->trans($column->labelKey());
+            }
         }
 
         return $this->fieldList;
+    }
+
+    /**
+     * @return array<string, array<string, bool|string>>
+     */
+    public function getHeaderMeta(): array
+    {
+        $headerMeta = [];
+
+        foreach (EmailListColumn::cases() as $column) {
+            $headerMeta[$column->value] = $column->headerMeta();
+        }
+
+        return $headerMeta;
     }
 }
