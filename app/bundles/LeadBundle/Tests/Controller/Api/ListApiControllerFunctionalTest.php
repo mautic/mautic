@@ -460,7 +460,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
-        $expectedErrorMessage = sprintf('leadlist: The segment %s is used in %s, please go back and check segments before unpublishing', 'API segment renamed', $list2->getName());
+        $expectedErrorMessage = sprintf('isPublished: The segment %s is used in %s, please go back and check segments before unpublishing', 'API segment renamed', $list2->getName());
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -492,7 +492,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]];
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
-        $expectedErrorMessage = sprintf('leadlist: The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
+        $expectedErrorMessage = sprintf('isPublished: The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
 
         $segments = [
             ['id' => $list1->getId(), 'isPublished' => false],
@@ -541,7 +541,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('errors', $response);
 
         $expectedErrorMessage = sprintf(
-            'leadlist: The segment %s is used in %s, please go back and check segments before unpublishing',
+            'isPublished: The segment %s is used in %s, please go back and check segments before unpublishing',
             $list1->getName(),
             $list2->getName()
         );
