@@ -530,13 +530,18 @@ class LeadEventLogRepository extends CommonRepository
         return $dates;
     }
 
-    public function getOldestTriggeredDate(): ?\DateTime
+    public function getOldestTriggeredDate(?int $campaignId = null): ?\DateTime
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->orderBy('log.date_triggered', 'ASC')
             ->setMaxResults(1);
+
+        if (null !== $campaignId) {
+            $qb->where('log.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId, \PDO::PARAM_INT);
+        }
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 

@@ -72,4 +72,39 @@ final class SummarizeCommandTest extends AbstractCampaignTestCase
         Assert::assertSame($campaign->getId(), $summaries[2]->getCampaign()->getId());
         Assert::assertSame('Event B', $summaries[2]->getEvent()->getName());
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function testBackwardSummarizationCanBeLimitedToOneCampaign(): void
+    {
+        $campaignToSummarize = $this->saveSomeCampaignLeadEventLogs();
+        $this->saveSomeCampaignLeadEventLogs();
+
+        $commandResult = $this->testSymfonyCommand(
+            SummarizeCommand::NAME,
+            [
+                '--env'         => 'test',
+                '--max-hours'   => 768,
+                '--campaign-id' => $campaignToSummarize->getId(),
+            ]
+        );
+
+        /** @var SummaryRepository $summaryRepo */
+        $summaryRepo = $this->em->getRepository(Summary::class);
+
+        /** @var Summary[] $summaries */
+        $summaries = $summaryRepo->findAll();
+
+        Assert::assertCount(3, $summaries);
+
+        foreach ($summaries as $summary) {
+            Assert::assertSame($campaignToSummarize->getId(), $summary->getCampaign()->getId());
+        }
+
+        Assert::assertStringContainsString(
+            'Only campaign ID '.$campaignToSummarize->getId().' will be summarized.',
+            $commandResult->getDisplay()
+        );
+    }
 }

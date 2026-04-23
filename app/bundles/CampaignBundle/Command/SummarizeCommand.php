@@ -54,6 +54,12 @@ class SummarizeCommand extends ModeratedCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Rebuild existing data. To be used only if database exceptions have been known to cause inaccuracies.'
+            )
+            ->addOption(
+                '--campaign-id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Only summarize data for a specific campaign ID.'
             );
 
         parent::configure();
@@ -71,12 +77,20 @@ class SummarizeCommand extends ModeratedCommand
         $batchLimit = (int) $input->getOption('batch-limit');
         $maxHours   = (int) $input->getOption('max-hours');
         $rebuild    = (bool) $input->getOption('rebuild');
+        $campaignId = $input->getOption('campaign-id');
+        $campaignId = null !== $campaignId ? (int) $campaignId : null;
 
-        $output->writeln(
-            "<info>{$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit])}</info>"
-        );
+        if (null !== $campaignId) {
+            $output->writeln(
+                "<info>{$this->translator->trans('mautic.campaign.summarizing_campaign', ['%campaignId%' => $campaignId, '%batch%' => $batchLimit])}</info>"
+            );
+        } else {
+            $output->writeln(
+                "<info>{$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit])}</info>"
+            );
+        }
 
-        $this->summaryModel->summarize($output, $batchLimit, $maxHours, $rebuild);
+        $this->summaryModel->summarize($output, $batchLimit, $maxHours, $rebuild, $campaignId);
 
         $this->completeRun();
 

@@ -73,18 +73,18 @@ class SummaryModel extends AbstractCommonModel
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function summarize(OutputInterface $output, int $hoursPerBatch = 1, ?int $maxHours = null, bool $rebuild = false): void
+    public function summarize(OutputInterface $output, int $hoursPerBatch = 1, ?int $maxHours = null, bool $rebuild = false, ?int $campaignId = null): void
     {
         $start = null;
 
         if (!$rebuild) {
-            $start = $this->getRepository()->getOldestTriggeredDate();
+            $start = $this->getRepository()->getOldestTriggeredDate($campaignId);
         }
 
         // Start with the current hour.
         $start ??= new \DateTime('+1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
-        $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
+        $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate($campaignId);
 
         if (!$end) {
             $output->writeln('There are no records in the campaign lead event log table. Nothing to summarize.');
@@ -116,7 +116,7 @@ class SummaryModel extends AbstractCommonModel
                 $dateFromFormatted = $dateFrom->format('Y-m-d H:i:s');
                 $dateToFormatted   = $dateTo->format('Y-m-d H:i:s');
                 $output->write("\t".$dateFromFormatted.' - '.$dateToFormatted);
-                $this->getRepository()->summarize($dateFrom, $dateTo);
+                $this->getRepository()->summarize($dateFrom, $dateTo, $campaignId);
                 $progressBar->advance($hoursPerBatch);
                 $dateTo = $dateTo->sub($interval);
             } while ($end < $dateFrom);
