@@ -509,16 +509,19 @@ class ContactManagementCest
         $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
 
         // Click the upload button
+        $I->waitForElementClickable(ContactPage::$uploadButton, 30);
         $I->click(ContactPage::$uploadButton);
 
         // Wait for the new form to open
         $I->waitForElement(ContactPage::$importForm, 30);
 
         // Fill in the form
+        $I->waitForElementVisible(ContactPage::$importFormFields, 30);
         $I->seeElement(ContactPage::$importFormFields);
         $contact->fillImportFormFields();
 
         // Click 'import in browser'
+        $I->waitForElementClickable(ContactPage::$importInBrowser, 30);
         $I->click(ContactPage::$importInBrowser);
 
         // Wait for import completion message

@@ -140,24 +140,34 @@ class ContactStep extends \AcceptanceTester
     public function fillImportFormFields(): void
     {
         $I = $this;
+
         // Fill out the first name field in the import form
-        $I->click(ContactPage::$firstName.'> a > span');
+        $I->waitForElementClickable(ContactPage::$firstName.' > a > span', 30);
+        $I->click(ContactPage::$firstName.' > a > span');
         $I->fillField(ContactPage::$firstName.' > div > div > input', 'first name');
         $I->pressKey(ContactPage::$firstName.' > div > div > input', WebDriverKeys::ENTER);
+
         // Fill out the last name field in the import form
-        $I->click(ContactPage::$lastName.'> a > span');
+        $I->waitForElementClickable(ContactPage::$lastName.' > a > span', 30);
+        $I->click(ContactPage::$lastName.' > a > span');
         $I->fillField(ContactPage::$lastName.' > div > div > input', 'last name');
         $I->pressKey(ContactPage::$lastName.' > div > div > input', WebDriverKeys::ENTER);
+
         // Fill out the email field in the import form
-        $I->click(ContactPage::$email.'> a > span');
+        $I->waitForElementClickable(ContactPage::$email.' > a > span', 30);
+        $I->click(ContactPage::$email.' > a > span');
         $I->fillField(ContactPage::$email.' > div > div > input', 'email');
         $I->pressKey(ContactPage::$email.' > div > div > input', WebDriverKeys::ENTER);
+
         // Fill out the company field in the import form
-        $I->click(ContactPage::$company.'> a > span');
+        $I->waitForElementClickable(ContactPage::$company.' > a > span', 30);
+        $I->click(ContactPage::$company.' > a > span');
         $I->fillField(ContactPage::$company.' > div > div > input', 'company name');
         $I->pressKey(ContactPage::$company.' > div > div > input', WebDriverKeys::ENTER);
+
         // Fill out the country field in the import form
-        $I->click(ContactPage::$country.'> a > span');
+        $I->waitForElementClickable(ContactPage::$country.' > a > span', 30);
+        $I->click(ContactPage::$country.' > a > span');
         $I->fillField(ContactPage::$country.' > div > div > input', 'country');
         $I->pressKey(ContactPage::$country.' > div > div > input', WebDriverKeys::ENTER);
     }
