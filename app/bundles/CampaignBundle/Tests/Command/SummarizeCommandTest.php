@@ -102,9 +102,11 @@ final class SummarizeCommandTest extends AbstractCampaignTestCase
             Assert::assertSame($campaignToSummarize->getId(), $summary->getCampaign()->getId());
         }
 
+        $normalizedDisplay = preg_replace('/\s+/', ' ', strip_tags($commandResult->getDisplay()));
+        Assert::assertNotFalse($normalizedDisplay);
         Assert::assertStringContainsString(
             'Only campaign ID '.$campaignToSummarize->getId().' will be summarized.',
-            $commandResult->getDisplay()
+            trim($normalizedDisplay)
         );
     }
 }
