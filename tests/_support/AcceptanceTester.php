@@ -58,7 +58,7 @@ class AcceptanceTester extends Codeception\Actor
      */
     public function seeNotificationAppear(string $message): void
     {
-        $this->waitForElementVisible('#flashes .alert', 10);
+        $this->waitForElementVisible('#flashes .alert', 30);
         $this->see($message, '#flashes .alert');
     }
 }

@@ -9,6 +9,9 @@ class CampaignStep extends \AcceptanceTester
 {
     private const CAMPAIGN_EVENT_MODAL_SAVE_BUTTON = '#CampaignEventModal .modal-form-buttons .btn-save.btn-copy';
     private const MODAL_SELECTOR                   = '#MauticSharedModal';
+    private const CAMPAIGN_SOURCE_SEGMENT_PICKER   = '#campaign_leadsource_lists_chosen';
+    private const CAMPAIGN_SOURCE_SEGMENT_SEARCH   = '#campaign_leadsource_lists_chosen .chosen-search-input';
+    private const CAMPAIGN_SOURCE_SEGMENT_RESULTS  = '#campaign_leadsource_lists_chosen .chosen-results li.active-result';
 
     public function createCampaign(string $campaignName): void
     {
@@ -35,10 +38,17 @@ class CampaignStep extends \AcceptanceTester
 
         $I->waitForElementVisible('.bundle-form-header', 30);
         $I->see('Contact Source', '.bundle-form-header h3');
-        $I->waitForElementClickable('#campaign_leadsource_lists_chosen', 30);
-        $I->click('#campaign_leadsource_lists_chosen');
-        $I->waitForText($segmentName, 30, '#campaign_leadsource_lists_chosen .chosen-results');
-        $I->click($this->chosenResultByText('campaign_leadsource_lists_chosen', $segmentName));
+        $I->waitForElementClickable(self::CAMPAIGN_SOURCE_SEGMENT_PICKER, 30);
+        $I->click(self::CAMPAIGN_SOURCE_SEGMENT_PICKER);
+
+        $I->waitForElementVisible(self::CAMPAIGN_SOURCE_SEGMENT_SEARCH, 30);
+        $I->fillField(self::CAMPAIGN_SOURCE_SEGMENT_SEARCH, $segmentName);
+
+        $resultSelector = $this->chosenResultByText('campaign_leadsource_lists_chosen', $segmentName);
+        $I->waitForElementVisible(self::CAMPAIGN_SOURCE_SEGMENT_RESULTS, 30);
+        $I->waitForElementVisible($resultSelector, 30);
+        $I->click($resultSelector);
+        $I->waitForText($segmentName, 30, self::CAMPAIGN_SOURCE_SEGMENT_PICKER.' .search-choice');
 
         $I->waitForElementClickable(self::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON, 30);
         $I->click(self::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON);
