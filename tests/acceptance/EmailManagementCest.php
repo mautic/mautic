@@ -35,7 +35,7 @@ class EmailManagementCest
         $this->selectChangeCategoryAction($I);
         $newCategoryName = $email->changeEmailCategory();
 
-        $I->ensureNotificationAppears('emails affected');
+        $I->seeNotificationAppear('emails affected');
 
         $I->reloadPage();
 

@@ -311,7 +311,7 @@ class ContactManagementCest
         $I->click(ContactPage::$firstCampaignFromRemoveList);
         $I->click(ContactPage::$campaignsModalSaveButton);
         $I->waitForElementNotVisible('#MauticSharedModal', 30);
-        $I->ensureNotificationAppears('2 contacts affected');
+        $I->seeNotificationAppear('2 contacts affected');
 
         // Navigate to the campaign page and click the Contacts tab
         $I->amOnPage(CampaignPage::$URL);
@@ -478,7 +478,7 @@ class ContactManagementCest
         $I->waitForElementClickable(ContactPage::$doNotContactSaveButton, 10);
         $I->click(ContactPage::$doNotContactSaveButton);
 
-        $I->ensureNotificationAppears('2 contacts affected');
+        $I->seeNotificationAppear('2 contacts affected');
 
         $I->reloadPage();
 

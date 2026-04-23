@@ -56,7 +56,7 @@ class AcceptanceTester extends Codeception\Actor
     /**
      * Ensures that a notification appears after an action and contains the expected text.
      */
-    public function ensureNotificationAppears(string $message): void
+    public function seeNotificationAppear(string $message): void
     {
         $this->waitForElementVisible('#flashes .alert', 10);
         $this->see($message, '#flashes .alert');
