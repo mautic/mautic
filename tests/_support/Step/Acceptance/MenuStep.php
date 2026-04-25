@@ -17,11 +17,11 @@ class MenuStep extends \AcceptanceTester
     public function navigateToManageGroups(): void
     {
         $I = $this;
-        $I->waitForElementClickable(MenuPage::$POINTS, 30);
+        $I->waitForElementClickable(MenuPage::$POINTS, self::TIMEOUT);
         $I->click(MenuPage::$POINTS);
-        $I->waitForElementClickable(MenuPage::$MANAGE_GROUPS_ID, 30);
+        $I->waitForElementClickable(MenuPage::$MANAGE_GROUPS_ID, self::TIMEOUT);
         $I->click(MenuPage::$MANAGE_GROUPS);
-        $I->waitForElementVisible(MenuPage::$ACTIVE_NAV_GROUP, 30);
+        $I->waitForElementVisible(MenuPage::$ACTIVE_NAV_GROUP, self::TIMEOUT);
         $I->seeElement(MenuPage::$ACTIVE_NAV_GROUP);
     }
 }

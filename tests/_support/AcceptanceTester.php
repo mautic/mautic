@@ -22,6 +22,8 @@ class AcceptanceTester extends Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
 
+    public const TIMEOUT = 30;
+
     public function login(string $name = 'admin', string $password = 'Maut1cR0cks!'): void
     {
         $I = $this;
@@ -34,7 +36,7 @@ class AcceptanceTester extends Codeception\Actor
         $I->fillField('#username', $name);
         $I->fillField('#password', $password);
         $I->click('button[type=submit]');
-        $I->waitForElement('h1.page-header-title', 30);
+        $I->waitForElement('h1.page-header-title', self::TIMEOUT);
         // saving snapshot
         $I->saveSessionSnapshot('login');
     }
@@ -58,7 +60,7 @@ class AcceptanceTester extends Codeception\Actor
      */
     public function seeNotificationAppear(string $message): void
     {
-        $this->waitForElementVisible('#flashes .alert', 30);
+        $this->waitForElementVisible('#flashes .alert', self::TIMEOUT);
         $this->see($message, '#flashes .alert');
     }
 }

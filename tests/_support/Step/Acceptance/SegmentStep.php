@@ -13,13 +13,13 @@ class SegmentStep extends \AcceptanceTester
     {
         $I = $this;
         $I->amOnPage(SegmentsPage::$URL);
-        $I->waitForElementClickable(SegmentsPage::$NEW_BUTTON, 30);
+        $I->waitForElementClickable(SegmentsPage::$NEW_BUTTON, self::TIMEOUT);
         $I->click(SegmentsPage::$NEW_BUTTON);
-        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME, 30);
+        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME, self::TIMEOUT);
         $I->reloadPage(); // Temp fix: The CSRF token is invalid. Please try to resubmit the form.
-        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME, 30);
+        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME, self::TIMEOUT);
         $I->fillField(SegmentsPage::$SEGMENT_NAME, $name);
-        $I->waitForElementClickable(SegmentsPage::$SAVE_AND_CLOSE_BUTTON, 30);
+        $I->waitForElementClickable(SegmentsPage::$SAVE_AND_CLOSE_BUTTON, self::TIMEOUT);
         $I->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
         $I->seeNotificationAppear('has been created!');
     }

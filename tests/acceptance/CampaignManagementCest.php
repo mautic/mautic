@@ -16,7 +16,7 @@ class CampaignManagementCest
     public function viewCampaignList(AcceptanceTester $I): void
     {
         $I->amOnPage(CampaignPage::URL);
-        $I->waitForText('Campaigns', 30, 'h1.page-header-title');
+        $I->waitForText('Campaigns', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
         $I->seeElement(CampaignPage::NEW_BUTTON);
     }
 
