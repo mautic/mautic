@@ -6,6 +6,8 @@ namespace Page\Acceptance;
 
 class CategoriesPage
 {
+    public const CATEGORY_TABLE = '#categoryTable';
+
     public static $URL                 = '/s/categories';
     public static $NEW_BUTTON          = '#new';
     public static $BUNDLE_DROPDOWN     = '#category_form_bundle_chosen > a > span';

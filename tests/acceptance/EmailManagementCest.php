@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Page\Acceptance\EmailsPage;
+use Step\Acceptance\CategoryStep;
 use Step\Acceptance\EmailStep;
 use Step\Acceptance\SegmentStep;
 
@@ -21,12 +22,13 @@ class EmailManagementCest
         AcceptanceTester $I,
         SegmentStep $segment,
         EmailStep $email,
+        CategoryStep $category,
     ): void {
         $now = date(self::DATE_FORMAT);
 
         // Arrange
         $segment->createAContactSegment('Segment '.$now);
-        $I->createACategory('Category '.$now);
+        $category->createACategory('Category '.$now);
         $email->createSegmentEmail('Email '.$now);
 
         // Act
