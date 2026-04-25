@@ -8,9 +8,9 @@ use Step\Acceptance\MenuStep;
 
 final class MenuNavigationCest
 {
-    public function _before(\AcceptanceTester $I, MenuStep $menuStep): void
+    public function _before(\AcceptanceTester $I): void
     {
-        $menuStep->loginAsAdmin($I);
+        $I->login();
     }
 
     public function ensureManageGroupsHighlights(MenuStep $menuStep): void
