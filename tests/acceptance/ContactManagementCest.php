@@ -502,30 +502,30 @@ class ContactManagementCest
         $contact->selectOptionFromDropDownContactsPage(3);
 
         // Wait for the import page to load
-        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
+        $I->waitForText('Import Contacts', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
         $I->seeElement(ContactPage::$importModal);
 
         // Click 'Choose file' and select a file
         $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
 
         // Click the upload button
-        $I->waitForElementClickable(ContactPage::$uploadButton, 30);
+        $I->waitForElementClickable(ContactPage::$uploadButton, AcceptanceTester::TIMEOUT);
         $I->click(ContactPage::$uploadButton);
 
         // Wait for the new form to open
-        $I->waitForElement(ContactPage::$importForm, 30);
+        $I->waitForElement(ContactPage::$importForm, AcceptanceTester::TIMEOUT);
 
         // Fill in the form
-        $I->waitForElementVisible(ContactPage::$importFormFields, 30);
+        $I->waitForElementVisible(ContactPage::$importFormFields, AcceptanceTester::TIMEOUT);
         $I->seeElement(ContactPage::$importFormFields);
         $contact->fillImportFormFields();
 
         // Click 'import in browser'
-        $I->waitForElementClickable(ContactPage::$importInBrowser, 30);
+        $I->waitForElementClickable(ContactPage::$importInBrowser, AcceptanceTester::TIMEOUT);
         $I->click(ContactPage::$importInBrowser);
 
         // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, 30);
+        $I->waitForElement(ContactPage::$importProgressComplete, AcceptanceTester::TIMEOUT);
         $I->see('Successful import', 'h2');
 
         // Extract the number of contacts created from the progress message
