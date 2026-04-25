@@ -7,12 +7,6 @@ use Page\Acceptance\ContactPage;
 
 class CampaignStep extends \AcceptanceTester
 {
-    private const CAMPAIGN_EVENT_MODAL_SAVE_BUTTON = '#CampaignEventModal .modal-form-buttons .btn-save.btn-copy';
-    private const MODAL_SELECTOR                   = '#MauticSharedModal';
-    private const CAMPAIGN_SOURCE_SEGMENT_PICKER   = '#campaign_leadsource_lists_chosen';
-    private const CAMPAIGN_SOURCE_SEGMENT_SEARCH   = '#campaign_leadsource_lists_chosen .chosen-search-input';
-    private const CAMPAIGN_SOURCE_SEGMENT_RESULTS  = '#campaign_leadsource_lists_chosen .chosen-results li.active-result';
-
     public function createCampaign(string $campaignName): void
     {
         $I = $this;
@@ -38,20 +32,20 @@ class CampaignStep extends \AcceptanceTester
 
         $I->waitForElementVisible('.bundle-form-header', 30);
         $I->see('Contact Source', '.bundle-form-header h3');
-        $I->waitForElementClickable(self::CAMPAIGN_SOURCE_SEGMENT_PICKER, 30);
-        $I->click(self::CAMPAIGN_SOURCE_SEGMENT_PICKER);
+        $I->waitForElementClickable(CampaignPage::CAMPAIGN_SOURCE_SEGMENT_PICKER, 30);
+        $I->click(CampaignPage::CAMPAIGN_SOURCE_SEGMENT_PICKER);
 
-        $I->waitForElementVisible(self::CAMPAIGN_SOURCE_SEGMENT_SEARCH, 30);
-        $I->fillField(self::CAMPAIGN_SOURCE_SEGMENT_SEARCH, $segmentName);
+        $I->waitForElementVisible(CampaignPage::CAMPAIGN_SOURCE_SEGMENT_SEARCH, 30);
+        $I->fillField(CampaignPage::CAMPAIGN_SOURCE_SEGMENT_SEARCH, $segmentName);
 
         $resultSelector = $this->chosenResultByText('campaign_leadsource_lists_chosen', $segmentName);
-        $I->waitForElementVisible(self::CAMPAIGN_SOURCE_SEGMENT_RESULTS, 30);
+        $I->waitForElementVisible(CampaignPage::CAMPAIGN_SOURCE_SEGMENT_RESULTS, 30);
         $I->waitForElementVisible($resultSelector, 30);
         $I->click($resultSelector);
-        $I->waitForText($segmentName, 30, self::CAMPAIGN_SOURCE_SEGMENT_PICKER.' .search-choice');
+        $I->waitForText($segmentName, 30, CampaignPage::CAMPAIGN_SOURCE_SEGMENT_PICKER.' .search-choice');
 
-        $I->waitForElementClickable(self::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON, 30);
-        $I->click(self::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON);
+        $I->waitForElementClickable(CampaignPage::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON, 30);
+        $I->click(CampaignPage::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON);
     }
 
     public function addAdjustContactPointsAction(int $points): void
@@ -68,8 +62,8 @@ class CampaignStep extends \AcceptanceTester
         $I->waitForElementVisible('.bundle-form-header', 30);
         $I->see('Adjust contact points', '.bundle-form-header h3');
         $I->fillField('#campaignevent_properties_points', (string) $points);
-        $I->waitForElementClickable(self::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON, 30);
-        $I->click(self::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON);
+        $I->waitForElementClickable(CampaignPage::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON, 30);
+        $I->click(CampaignPage::CAMPAIGN_EVENT_MODAL_SAVE_BUTTON);
     }
 
     public function closeCampaignBuilder(): void
@@ -98,7 +92,7 @@ class CampaignStep extends \AcceptanceTester
         $selectedCampaignText = $I->grabTextFrom(ContactPage::$firstCampaignFromAddList);
         $I->click(ContactPage::$firstCampaignFromAddList);
         $I->click(ContactPage::$campaignsModalSaveButton); // Click Save
-        $I->waitForElementNotVisible(self::MODAL_SELECTOR, 30); // Wait for modal to close
+        $I->waitForElementNotVisible(CampaignPage::MODAL_SELECTOR, 30); // Wait for modal to close
         $I->seeNotificationAppear('2 contacts affected');
 
         preg_match('/\((\d+)\)\s*$/', $selectedCampaignText, $campaignIdMatch);
