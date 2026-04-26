@@ -3,6 +3,7 @@
 namespace Helper;
 
 use Codeception\Module;
+use Symfony\Component\Dotenv\Dotenv;
 
 class EnvHelper extends Module
 {
@@ -12,6 +13,10 @@ class EnvHelper extends Module
 
     public function _beforeSuite($settings = [])
     {
+        if ($this->isTestEnvironment()) {
+            return;
+        }
+
         $this->backupLocalEnv();
         $this->useTestLocalEnv();
     }
@@ -19,6 +24,17 @@ class EnvHelper extends Module
     public function _afterSuite(): void
     {
         $this->restoreLocalEnv();
+    }
+
+    private function isTestEnvironment(): bool
+    {
+        if (!file_exists($this->envLocalPath)) {
+            return false;
+        }
+
+        (new Dotenv())->load($this->envLocalPath);
+
+        return 'test' === ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null);
     }
 
     private function backupLocalEnv(): void
