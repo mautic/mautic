@@ -9,6 +9,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
+    ->in(__DIR__.'/tests')
+    ->exclude('_support/_generated')
     ->in(__DIR__.'/.github/workflows/mautic-asset-upload')
     ->append([
         __DIR__.'/app/AppKernel.php',
