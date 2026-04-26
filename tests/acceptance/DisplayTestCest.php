@@ -1,18 +1,18 @@
 <?php
 
-namespace Acceptance;
+declare(strict_types=1);
 
 use Page\Acceptance\EmailsPage;
 
 class DisplayTestCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(AcceptanceTester $I)
     {
-        $I->login('admin', 'Maut1cR0cks!');
+        $I->login();
     }
 
     // tests
-    public function testCampaignDisplay(\AcceptanceTester $I): void
+    public function testCampaignDisplay(AcceptanceTester $I): void
     {
         // Go directly to the batch campaign selection page
         $I->amOnPage('/s/contacts/batchCampaigns');
@@ -25,11 +25,11 @@ class DisplayTestCest
 
         // Assert that each campaign follows the format "name (id)"
         foreach ($campaigns as $campaign) {
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $campaign);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $campaign);
         }
     }
 
-    public function testCategoryDisplay(\AcceptanceTester $I): void
+    public function testCategoryDisplay(AcceptanceTester $I): void
     {
         // Go directly to the batch category selection page
         $I->amOnPage('/s/categories/batch/contact/view');
@@ -42,11 +42,11 @@ class DisplayTestCest
 
         // Assert that each category follows the format "name (id)"
         foreach ($categories as $category) {
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $category);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $category);
         }
     }
 
-    public function testOwnerDisplay(\AcceptanceTester $I): void
+    public function testOwnerDisplay(AcceptanceTester $I): void
     {
         // Go directly to the batch owner selection page
         $I->amOnPage('/s/contacts/batchOwners');
@@ -62,11 +62,11 @@ class DisplayTestCest
             if (empty($owner)) {
                 continue;
             }
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $owner);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $owner);
         }
     }
 
-    public function segmentDisplayTest(\AcceptanceTester $I): void
+    public function segmentDisplayTest(AcceptanceTester $I): void
     {
         // Go directly to the batch segment selection page
         $I->amOnPage('/s/segments/batch/contact/view');
@@ -79,11 +79,11 @@ class DisplayTestCest
 
         // Assert that each segment follows the format "name (id)"
         foreach ($segments as $segment) {
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $segment);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $segment);
         }
     }
 
-    public function testStageDisplay(\AcceptanceTester $I): void
+    public function testStageDisplay(AcceptanceTester $I): void
     {
         // Go directly to the batch stage selection page
         $I->amOnPage('/s/contacts/batchStages');
@@ -99,11 +99,11 @@ class DisplayTestCest
             if (empty($stage)) {
                 continue;
             }
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $stage);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $stage);
         }
     }
 
-    public function testPointGroupDisplay(\AcceptanceTester $I): void
+    public function testPointGroupDisplay(AcceptanceTester $I): void
     {
         // Go to the page where point groups are managed
         $I->amOnPage('/s/points/triggers/new');
@@ -116,11 +116,11 @@ class DisplayTestCest
 
         // Assert that each point group follows the format "name (id)"
         foreach ($pointGroups as $pointGroup) {
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $pointGroup);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $pointGroup);
         }
     }
 
-    public function testFormDisplay(\AcceptanceTester $I): void
+    public function testFormDisplay(AcceptanceTester $I): void
     {
         // Go to the page where point groups are managed
         $I->amOnPage('/s/emails/new');
@@ -144,7 +144,7 @@ class DisplayTestCest
 
         // Assert that each point group follows the format "name (id)"
         foreach ($forms as $form) {
-            \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $form);
+            PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $form);
         }
     }
 }

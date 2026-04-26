@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Acceptance;
-
 use Step\Acceptance\MenuStep;
 
 final class MenuNavigationCest
 {
-    public function _before(\AcceptanceTester $I): void
+    public function _before(AcceptanceTester $I): void
     {
         $I->login();
     }

@@ -17,6 +17,7 @@ class CampaignManagementCest
     {
         $I->amOnPage(CampaignPage::URL);
         $I->waitForText('Campaigns', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
+        $I->waitForElement(CampaignPage::NEW_BUTTON, AcceptanceTester::TIMEOUT);
         $I->seeElement(CampaignPage::NEW_BUTTON);
     }
 

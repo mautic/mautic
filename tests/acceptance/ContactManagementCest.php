@@ -1,7 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 use Facebook\WebDriver\WebDriverKeys;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Page\Acceptance\CampaignPage;
 use Page\Acceptance\ContactPage;
 use PHPUnit\Framework\Assert;
@@ -12,12 +13,11 @@ class ContactManagementCest
 {
     public function _before(AcceptanceTester $I): void
     {
-        $I->login('admin', 'Maut1cR0cks!');
+        $I->login();
     }
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        ContactStep $contact,
     ): void {
         $email               = sprintf('quickadd%s@example.com', time());
         $initialContactCount = $I->grabNumRecords('test_leads');
