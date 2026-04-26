@@ -33,6 +33,8 @@ class AcceptanceTester extends Codeception\Actor
         $I->amOnPage('/s/login');
         $I->fillField('#username', $name);
         $I->fillField('#password', $password);
+        $I->click('label[for="remember_me"]');
+        $I->seeCheckboxIsChecked('#remember_me');
         $I->click('button[type=submit]');
         $I->waitForElement('h1.page-header-title', self::TIMEOUT);
         // saving snapshot
