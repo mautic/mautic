@@ -14,7 +14,10 @@ class CampaignStep extends \AcceptanceTester
         $I->waitForElementClickable(CampaignPage::NEW_BUTTON, self::TIMEOUT);
         $I->click(CampaignPage::NEW_BUTTON);
         $I->waitForElementVisible(CampaignPage::NAME_FIELD, self::TIMEOUT);
+        $I->reloadPage(); // Temp fix: The CSRF token is invalid. Please try to resubmit the form.
+        $I->waitForElementVisible(CampaignPage::NAME_FIELD, self::TIMEOUT);
         $I->fillField(CampaignPage::NAME_FIELD, $campaignName);
+        $I->seeInField(CampaignPage::NAME_FIELD, $campaignName);
     }
 
     public function launchCampaignBuilder(): void
