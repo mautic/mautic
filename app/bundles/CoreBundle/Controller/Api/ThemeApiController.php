@@ -69,25 +69,23 @@ class ThemeApiController extends CommonApiController
                 $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators'),
                 Response::HTTP_BAD_REQUEST
             );
-        } else {
-            $fileName  = InputHelper::filename($themeZip->getClientOriginalName());
-            $themeName = basename($fileName, '.zip');
-            $dir       = $pathsHelper->getSystemPath('themes', true);
+        }
+        $fileName  = InputHelper::filename($themeZip->getClientOriginalName());
+        $dir       = $pathsHelper->getSystemPath('themes', true);
 
-            if (!empty($themeZip)) {
-                try {
-                    $themeZip->move($dir, $fileName);
-                    $response['success'] = $this->themeHelper->install($dir.'/'.$fileName);
-                } catch (\Exception $e) {
-                    return $this->returnError(
-                        $this->translator->trans($e->getMessage(), [], 'validators')
-                    );
-                }
-            } else {
+        if (!empty($themeZip)) {
+            try {
+                $themeZip->move($dir, $fileName);
+                $response['success'] = $this->themeHelper->install($dir.'/'.$fileName);
+            } catch (\Exception $e) {
                 return $this->returnError(
-                    $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                    $this->translator->trans($e->getMessage(), [], 'validators')
                 );
             }
+        } else {
+            return $this->returnError(
+                $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+            );
         }
 
         $view = $this->view($response);

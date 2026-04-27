@@ -64,8 +64,7 @@ class PlainTextHelperTest extends TestCase
             [
                 <<<HTML
 <a href="https://example.com">text</a>
-HTML
-                ,
+HTML,
                 <<<HTML
 text [https://example.com]
 HTML,
@@ -74,8 +73,7 @@ HTML,
                 <<<HTML
 <a href="https://example.com">link 1</a>
 <a href="https://examples.com">link 2</a>
-HTML
-                ,
+HTML,
                 <<<HTML
 link 1 [https://example.com] link 2 [https://examples.com]
 HTML,
@@ -83,8 +81,7 @@ HTML,
             [
                 <<<HTML
 <a href="https://example.com">text<br></a>
-HTML
-                ,
+HTML,
                 <<<HTML
 text
 [https://example.com]
@@ -94,8 +91,7 @@ HTML,
                 <<<HTML
 <h1>something</h1>
 <h2>another something</h2>
-HTML
-                ,
+HTML,
                 <<<HTML
 SOMETHING
 

@@ -734,9 +734,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         if (null !== $this->role) {
             return $this->role->isAdmin();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
