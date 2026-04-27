@@ -111,6 +111,7 @@ class CommonApiController extends FetchCommonApiController
                 $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
                     ['%id%'   => $entity->getId()], 'validators');
                 $this->setBatchError($key, $msg, $e->getCode(), $errors, $entities, $entity);
+                $errors[$key]['details'] = $e->getErrors();
                 continue;
             }
 
@@ -151,7 +152,7 @@ class CommonApiController extends FetchCommonApiController
             $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
                 ['%id%'   => $entity->getId()], 'validators');
 
-            return $this->returnError($msg, $e->getCode());
+            return $this->returnError($msg, $e->getCode(), $e->getErrors());
         }
         $this->preSerializeEntity($entity);
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);

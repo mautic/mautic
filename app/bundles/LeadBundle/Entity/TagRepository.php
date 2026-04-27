@@ -212,4 +212,17 @@ class TagRepository extends CommonRepository
 
         return $this->getTagsByName($tagsIdName);
     }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function addCatchAllWhereClause($qb, $filter): array
+    {
+        $alias = $this->getTableAlias();
+
+        return $this->addStandardCatchAllWhereClause($qb, $filter, [
+            $alias.'.tag',
+            $alias.'.description',
+        ]);
+    }
 }

@@ -72,6 +72,27 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain tag2');
     }
 
+    public function testIndexActionWhenFilteredByDescription(): void
+    {
+        $matchingTag = $this->tagRepository->findOneBy(['tag' => 'tag1']);
+        \assert($matchingTag instanceof Tag);
+        $matchingTag->setDescription('Contains the test keyword.');
+        $this->tagRepository->saveEntity($matchingTag, false);
+
+        $otherTag = $this->tagRepository->findOneBy(['tag' => 'tag2']);
+        \assert($otherTag instanceof Tag);
+        $otherTag->setDescription('No related content.');
+        $this->tagRepository->saveEntity($otherTag);
+
+        $this->client->request('GET', '/s/tags?search=test');
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+
+        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain the tag whose description matches.');
+        $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain unrelated tags.');
+    }
+
     public function testTagDeletion(): void
     {
         $tagId = $this->tagRepository->findOneBy([])->getId();
