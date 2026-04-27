@@ -32,7 +32,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
                         </body></html>';
         $email = $this->createEmail(
             'test subject',
-            [$segment->getId() => $segment],
+            [$segment->getId() ?? '' => $segment],
             $content
         );
         $this->em->flush();
@@ -54,8 +54,8 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         /** @var MauticMessage[] $messages */
         $messages = [
-            $this->getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
-            $this->getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
+            self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
+            self::getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
         ];
 
         foreach ($messages as $message) {
@@ -97,7 +97,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotEquals($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
     }
 
-    public function testSendEmailWithContactWithInvalidClickthrough(): void
+    public function testEmailSendToBatchOneContact(): void
     {
         $segment = $this->createSegment('Segment A', 'seg-a');
         $this->createContacts(1, $segment);
@@ -107,7 +107,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
                         </body></html>';
         $email = $this->createEmail(
             'test subject',
-            [$segment->getId() => $segment],
+            [$segment->getId() ?? '' => $segment],
             $content
         );
         $this->em->flush();

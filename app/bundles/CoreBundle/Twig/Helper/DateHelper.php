@@ -51,13 +51,12 @@ final class DateHelper
     {
         if (empty($datetime)) {
             return '';
-        } else {
-            $this->helper->setDateTime($datetime, $fromFormat, $timezone);
-
-            return $this->helper->toLocalString(
-                $this->formats[$type]
-            );
         }
+        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+
+        return $this->helper->toLocalString(
+            $this->formats[$type]
+        );
     }
 
     /**
@@ -155,17 +154,16 @@ final class DateHelper
 
         if ($textDate) {
             return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format($this->coreParametersHelper->get('date_format_timeonly'))]);
-        } else {
-            $interval = $this->helper->getDiff('now', null, true);
-
-            if ($interval->invert && !$forceDateForNonText) {
-                // In the past
-                return $this->translator->trans('mautic.core.date.ago', ['%days%' => $interval->days]);
-            } else {
-                // In the future
-                return $this->toFullConcat($datetime, $timezone, $fromFormat);
-            }
         }
+        $interval = $this->helper->getDiff('now', null, true);
+
+        if ($interval->invert && !$forceDateForNonText) {
+            // In the past
+            return $this->translator->trans('mautic.core.date.ago', ['%days%' => $interval->days]);
+        }
+
+        // In the future
+        return $this->toFullConcat($datetime, $timezone, $fromFormat);
     }
 
     /**

@@ -25,7 +25,7 @@ trait EventArrayTrait
      */
     protected function getEventArray(Event $event)
     {
-        $eventId = $event->getId();
+        $eventId = $event->getId() ?? '';
         if (isset($this->eventArray[$eventId])) {
             return $this->eventArray[$eventId];
         }

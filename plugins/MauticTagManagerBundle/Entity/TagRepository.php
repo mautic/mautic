@@ -74,14 +74,4 @@ class TagRepository extends BaseTagRepository
 
         return ($returnArray) ? $return : $return[$tagIds[0]];
     }
-
-    /**
-     * @return array<mixed>
-     */
-    protected function addCatchAllWhereClause($qb, $filter): array
-    {
-        return $this->addStandardCatchAllWhereClause($qb, $filter, [
-            'lt.tag',
-        ]);
-    }
 }

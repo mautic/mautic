@@ -126,6 +126,16 @@ Mautic.ajaxifyForm = function (formName) {
         e.preventDefault();
         var form = mQuery(this);
 
+        // Sync CKEditor content (including source mode) before AJAX submission
+        if (typeof ckEditors !== 'undefined' && ckEditors.size > 0) {
+            form.find('textarea.editor').each(function() {
+                var editor = ckEditors.get(this);
+                if (editor && typeof editor.updateSourceElement === 'function') {
+                    editor.updateSourceElement();
+                }
+            });
+        }
+
         if (MauticVars.formSubmitInProgress) {
             return false;
         } else {
@@ -574,6 +584,12 @@ Mautic.updatePublishingToggle = function(element) {
         $publishDown = $form.find('input[name$="[publishDown]"]'),
         hasPublishUp = $publishUp.length && $publishUp.val().trim() !== '',
         hasPublishDown = $publishDown.length && $publishDown.val().trim() !== '';
+
+    // Toggle schedule options notice for Segment Emails based on isPublished state
+    const $scheduleOptionsNotice = $form.find('#scheduleOptionsNotice');
+    if ($scheduleOptionsNotice.length) {
+        $scheduleOptionsNotice.toggle(isYes);
+    }
 
     // Inner function to toggle publish fields and datepicker buttons
     function togglePublishFields(enable) {

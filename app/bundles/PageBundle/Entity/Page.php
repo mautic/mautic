@@ -209,6 +209,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->cloneObjectId = (int) $this->id;
         $this->isCloned      = true;
         $this->id            = null;
+        $this->sessionId     = 'new_'.hash('sha1', uniqid((string) mt_rand()));
         $this->clearTranslations();
         $this->clearVariants();
         $this->setDraft(null);

@@ -74,12 +74,13 @@ class BuilderSubscriber implements EventSubscriberInterface
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }
 
-        $tokens = [
-            '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
-            '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
-            '{brand=name}'       => $this->translator->trans('mautic.core.token.brand_name'),
-            '{subject}'          => $this->translator->trans('mautic.email.subject'),
+        $emailPrefix = $this->translator->trans('mautic.email.email').': ';
+        $tokens      = [
+            '{unsubscribe_text}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_text'),
+            '{webview_text}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_text'),
+            '{signature}'        => $emailPrefix.$this->translator->trans('mautic.email.token.signature'),
+            '{brand=name}'       => $emailPrefix.$this->translator->trans('mautic.core.token.brand_name'),
+            '{subject}'          => $emailPrefix.$this->translator->trans('mautic.email.subject'),
         ];
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -90,10 +91,10 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         // these should not allow visual tokens
         $tokens = [
-            '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{dnc_url}'         => $this->translator->trans('mautic.email.token.unsubscribe_all_url'),
-            '{resubscribe_url}' => $this->translator->trans('mautic.email.token.resubscribe_url'),
-            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
+            '{unsubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{dnc_url}'         => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_all_url'),
+            '{resubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.resubscribe_url'),
+            '{webview_url}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -203,12 +204,13 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
-        if ($event->isInternalSend() || $this->coreParametersHelper->get('disable_trackable_urls')) {
-            // Don't convert urls
+        if ($event->isInternalSend()) {
             return;
         }
 
-        $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
+        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls');
+        $shortenEnabled       = $this->coreParametersHelper->get('shortener_email_enable', false);
+
         $email          = $event->getEmail();
         $emailId        = $email instanceof Email ? $email->getId() : null;
         $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
@@ -217,11 +219,27 @@ class BuilderSubscriber implements EventSubscriberInterface
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
         foreach ($trackables as $token => $trackable) {
-            $url = ($trackable instanceof Trackable)
-                ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled, $utmTags)
-                :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shortenEnabled, $utmTags);
+            if ($disableTrackableUrls) {
+                $url = ($trackable instanceof Trackable)
+                    ?
+                    $trackable->getRedirect()->getUrl()
+                    :
+                    $trackable->getUrl();
+            } else {
+                $url = ($trackable instanceof Trackable)
+                    ?
+                    $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough)
+                    :
+                    $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough);
+            }
+
+            if ($utmTags) {
+                $url = $this->pageRedirectModel->applyUtmTags($url, $utmTags);
+            }
+
+            if ($shortenEnabled) {
+                $url = $this->pageRedirectModel->shortenUrl($url);
+            }
 
             $event->addToken($token, $url);
         }

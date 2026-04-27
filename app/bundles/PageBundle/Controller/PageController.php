@@ -370,7 +370,7 @@ class PageController extends FormController
      */
     public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null)
     {
-        if (!($entity instanceof Page)) {
+        if (!$entity instanceof Page) {
             $entity = $model->getEntity();
         }
 
@@ -594,7 +594,7 @@ class PageController extends FormController
                         'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
-            } elseif ($valid && $this->isButtonClicked($form, 'apply')) {
+            } elseif ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action);
                 $this->setOptimisticLockVersion($entity, $form);

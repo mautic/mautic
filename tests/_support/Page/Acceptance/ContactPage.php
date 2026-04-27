@@ -51,10 +51,10 @@ class ContactPage
     public static $importProgressComplete = '#leadImportProgressComplete';
 
     // Campaigns
-    public static $campaignsModalAddOption     = '//*[@id="lead_batch_add_chosen"]/ul/li/input';
-    public static $campaignsModalRemoveOption  = '//*[@id="lead_batch_remove_chosen"]/ul/li/input';
-    public static $firstCampaignFromAddList    = '#lead_batch_add_chosen > div > ul > li';
-    public static $firstCampaignFromRemoveList = '#lead_batch_remove_chosen > div > ul > li';
+    public static $campaignsModalAddOption     = '//*[@id="MauticSharedModal"]//*[@id="lead_batch_add_chosen"]/ul/li/input';
+    public static $campaignsModalRemoveOption  = '//*[@id="MauticSharedModal"]//*[@id="lead_batch_remove_chosen"]/ul/li/input';
+    public static $firstCampaignFromAddList    = '#MauticSharedModal #lead_batch_add_chosen > div > ul > li';
+    public static $firstCampaignFromRemoveList = '#MauticSharedModal #lead_batch_remove_chosen > div > ul > li';
     public static $campaignsModalSaveButton    = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-save.btn-copy';
 
     // Change Owner From

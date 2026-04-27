@@ -482,7 +482,7 @@ class EmailController extends FormController
         ThemeHelper $themeHelper,
         $entity = null,
     ) {
-        if (!($entity instanceof Email)) {
+        if (!$entity instanceof Email) {
             $entity = $model->getEntity();
         }
 
@@ -810,7 +810,7 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
+            } elseif ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
                 $this->setOptimisticLockVersion($entity, $form);
@@ -994,9 +994,9 @@ class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
-                            return $this->redirectToRoute('mautic_email_action', [
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
+                            return $this->forward(static::class.'::editAction', [
+                                'objectId'   => $entity->getId(),
+                                'ignorePost' => true,
                             ]);
                         }
                     } catch (InvalidRenderedHtmlException $e) {

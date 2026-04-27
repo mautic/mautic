@@ -127,14 +127,14 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Creates translation ready label Owner Firstname etc.
+     * Creates translation ready label Owner: Firstname etc.
      *
      * @param string $field
      */
     private function buildLabel($field): string
     {
         return sprintf(
-            '%s %s',
+            '%s: %s',
             $this->translator->trans('mautic.lead.list.filter.owner'),
             $this->translator->trans('mautic.core.'.$field)
         );

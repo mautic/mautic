@@ -232,6 +232,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             ]
         ) : '';
 
+        if ($form) {
+            $formName = $form->generateFormName("{$form->getName()}_focus", ['_']);
+            $this->formModel->populateValuesWithLead($form, $formContent, $formName);
+        }
+
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
             if (!$formReplaced && !empty($formContent)) {
@@ -345,9 +350,9 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

@@ -11,18 +11,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MenuBuilder
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
-     */
-    private $dispatcher;
-
     public function __construct(
         private FactoryInterface $factory,
         private MatcherInterface $matcher,
-        EventDispatcherInterface $dispatcher,
+        private EventDispatcherInterface $dispatcher,
         private MenuHelper $menuHelper,
     ) {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

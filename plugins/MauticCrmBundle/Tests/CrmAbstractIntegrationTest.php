@@ -31,10 +31,8 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $integration = $mockBuilder->getMock();
 
         $methodMautic = new \ReflectionMethod(StubIntegration::class, 'getPriorityFieldsForMautic');
-        $methodMautic->setAccessible(true);
 
         $methodIntegration = new \ReflectionMethod(StubIntegration::class, 'getPriorityFieldsForIntegration');
-        $methodIntegration->setAccessible(true);
 
         $fieldsForMautic = $methodMautic->invokeArgs($integration, [$config]);
 
@@ -132,7 +130,6 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $integration = $this->createMock(StubIntegration::class);
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
-        $methodLimitString->setAccessible(true);
 
         $string = 'SomeRandomString';
 

@@ -46,36 +46,34 @@ class DeleteLeadListsCommand extends Command
                 $output->writeln("<info>segment {$listId} has been deleted.</info>");
 
                 return ExitCode::SUCCESS;
-            } else {
-                $output->writeln("<info>segment {$listId} couldn't be deleted as it was not found.</info>");
-
-                return ExitCode::FAILURE;
             }
-        } else {
-            // All soft deleted segments
-            $prefix = $this->leadListRepository->getTableAlias();
+            $output->writeln("<info>segment {$listId} couldn't be deleted as it was not found.</info>");
 
-            /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $leadLists */
-            $leadLists = $this->leadListRepository->getEntities([
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => $prefix.'.deleted',
-                            'expr'   => 'isNotNull',
-                        ],
+            return ExitCode::FAILURE;
+        }
+        // All soft deleted segments
+        $prefix = $this->leadListRepository->getTableAlias();
+
+        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $leadLists */
+        $leadLists = $this->leadListRepository->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => $prefix.'.deleted',
+                        'expr'   => 'isNotNull',
                     ],
                 ],
-                'ignore_paginator'  => true,
-                'iterable_mode'     => true,
-            ]);
-            foreach ($leadLists as $list) {
-                $listId = $list->getId();
-                $this->deleteLeadList($list);
-                $output->writeln("<info>segment {$listId} has been deleted.</info>");
-            }
-
-            return ExitCode::SUCCESS;
+            ],
+            'ignore_paginator'  => true,
+            'iterable_mode'     => true,
+        ]);
+        foreach ($leadLists as $list) {
+            $listId = $list->getId();
+            $this->deleteLeadList($list);
+            $output->writeln("<info>segment {$listId} has been deleted.</info>");
         }
+
+        return ExitCode::SUCCESS;
     }
 
     private function deleteLeadList(LeadList $list): void

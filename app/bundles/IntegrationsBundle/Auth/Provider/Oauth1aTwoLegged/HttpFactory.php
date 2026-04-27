@@ -38,17 +38,17 @@ class HttpFactory implements AuthProviderInterface
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
         // Return cached initialized client if there is one.
-        if (!empty($this->initializedClients[$credentials->getConsumerKey()])) {
-            return $this->initializedClients[$credentials->getConsumerKey()];
+        if (!empty($this->initializedClients[$credentials->getConsumerKey() ?? ''])) {
+            return $this->initializedClients[$credentials->getConsumerKey() ?? ''];
         }
 
         if (!$this->credentialsAreConfigured($credentials)) {
             throw new PluginNotConfiguredException('Oauth1a Credentials or URL is missing');
         }
 
-        $this->initializedClients[$credentials->getConsumerKey()] = $this->buildClient($credentials);
+        $this->initializedClients[$credentials->getConsumerKey() ?? ''] = $this->buildClient($credentials);
 
-        return $this->initializedClients[$credentials->getConsumerKey()];
+        return $this->initializedClients[$credentials->getConsumerKey() ?? ''];
     }
 
     private function buildClient(CredentialsInterface $credentials): Client

@@ -174,9 +174,8 @@ class EventLogApiController extends FetchCommonApiController
 
         if (is_string($result)) {
             return $this->returnError($result, Response::HTTP_CONFLICT);
-        } else {
-            [$log, $created] = $result;
         }
+        [$log, $created] = $result;
 
         $event->addContactLog($log);
         $view = $this->view(

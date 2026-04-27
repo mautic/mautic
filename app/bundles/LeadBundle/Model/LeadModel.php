@@ -388,9 +388,9 @@ class LeadModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -681,7 +681,7 @@ class LeadModel extends FormModel
                     }
 
                     $isEmpty = (null == $newValue || '' == $newValue);
-                    if ($curValue !== $newValue && (!$isEmpty || ($isEmpty && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (!$isEmpty || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
                     }
