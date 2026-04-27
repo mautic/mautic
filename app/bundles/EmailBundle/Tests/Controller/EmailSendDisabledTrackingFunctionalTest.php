@@ -27,6 +27,8 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
     {
         $segment = $this->createSegment('Segment A', []);
 
+        $this->em->flush();
+
         $utmParameters = [
             'utmSource'   => 'utmSourceA',
             'utmMedium'   => 'utmMediumA',
