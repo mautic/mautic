@@ -243,8 +243,8 @@ jobs:
   upload-release-asset:
     name: Upload release asset to m.mautic.org
     needs: [release, test-fresh-install, test-update-install]
-    # We only want this job to run in Mautic's repo, not in forks
-    if: github.repository_owner == 'mautic' && needs.release.outputs.is-prerelease
+    # We only want this job to run in Mautic's repo, not in forks. Upload only stable releases, not pre-releases.
+    if: github.repository_owner == 'mautic' && needs.release.outputs.is-prerelease == 'false'
     runs-on: ubuntu-latest
 
     steps:

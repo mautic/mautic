@@ -67,7 +67,7 @@ class FormSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
-        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+        if (!array_key_exists($form->getLanguage() ?? '', $this->languageHelper->getSupportedLanguages())) {
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }

@@ -209,9 +209,8 @@ class FormApiController extends CommonApiController
                     $msg = $this->translator->trans('mautic.form.field.alias.unique', ['%alias%' => $fieldEntityArray['alias']], 'validators');
 
                     return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
-                } else {
-                    $requestUsedAliases[] = $fieldEntityArray['alias'];
                 }
+                $requestUsedAliases[] = $fieldEntityArray['alias'];
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);

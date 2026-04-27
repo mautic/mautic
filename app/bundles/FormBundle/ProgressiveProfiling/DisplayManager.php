@@ -26,18 +26,17 @@ class DisplayManager
         if ($field->isAlwaysDisplay()) {
             if ($this->form->getProgressiveProfilingLimit() <= $this->displayCounter->getDisplayFields()) {
                 return false;
-            } else {
-                $this->displayCounter->increaseAlreadyAlwaysDisplayed();
-
-                return true;
             }
+            $this->displayCounter->increaseAlreadyAlwaysDisplayed();
+
+            return true;
         }
 
         if ($this->shouldDisplayNotAlwaysDisplayField($field)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     private function shouldDisplayNotAlwaysDisplayField(Field $field): bool

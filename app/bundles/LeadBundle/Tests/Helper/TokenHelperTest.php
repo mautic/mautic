@@ -25,7 +25,6 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $reflectionProperty = new \ReflectionProperty(TokenHelper::class, 'parameters');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue(null, [
             'date_format_dateonly' => 'F j, Y',
             'date_format_timeonly' => 'g:i a',
@@ -47,7 +46,6 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fields);
 
         $reflectionProperty = new \ReflectionProperty(LeadRepository::class, 'leadFieldRepository');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue(null, $leadFieldRepository);
 
         parent::setUp();

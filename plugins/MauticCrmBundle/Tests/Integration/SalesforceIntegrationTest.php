@@ -251,7 +251,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $class          = new \ReflectionClass(SalesforceIntegration::class);
         $lastSyncMethod = $class->getMethod('getLastSyncDate');
-        $lastSyncMethod->setAccessible(true);
 
         $sf = $this->getSalesforceIntegration();
 
@@ -272,7 +271,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lead          = new Lead();
         $reflectedLead = new \ReflectionObject($lead);
         $reflectedId   = $reflectedLead->getProperty('id');
-        $reflectedId->setAccessible(true);
         $reflectedId->setValue($lead, 1);
 
         $modified = new \DateTime('-15 minutes');
@@ -1023,18 +1021,17 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                                 ];
                             } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
                                 return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
-                            } else {
-                                // Extract emails
-                                $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
-                                if ($found) {
-                                    $emails = explode("','", $match[1]);
-
-                                    return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
-                                } else {
-                                    return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
-                                }
                             }
-                            // no break
+                            // Extract emails
+                            $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
+                            if ($found) {
+                                $emails = explode("','", $match[1]);
+
+                                return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                            }
+
+                            return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
+
                         case str_contains($args[0], '/composite'):
                             return $this->getSalesforceCompositeResponse($args[1]);
                     }
@@ -1426,7 +1423,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $parentProperties = [];
 
         foreach ($parentReflectionClass->getProperties() as $p) {
-            $p->setAccessible(true);
             $parentProperties[$p->getName()] = $p->getValue($instance);
         }
 

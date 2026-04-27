@@ -294,13 +294,12 @@ class ThemeHelper implements ThemeHelperInterface
                             if (isset($this->themeHelpers[$installedTheme])) {
                                 // theme found so return it
                                 return $this->themeHelpers[$installedTheme];
-                            } else {
-                                $this->themeHelpers[$installedTheme] = $this->createThemeHelper($installedTheme);
-                                // found so use this theme
-                                $theme = $installedTheme;
-                                $found = true;
-                                break;
                             }
+                            $this->themeHelpers[$installedTheme] = $this->createThemeHelper($installedTheme);
+                            // found so use this theme
+                            $theme = $installedTheme;
+                            $found = true;
+                            break;
                         } catch (FileNotFoundException) {
                             continue;
                         }
@@ -388,12 +387,11 @@ class ThemeHelper implements ThemeHelperInterface
         // Extract the archive file now
         if (!$zipper->extractTo($themePath, $allowedFiles)) {
             throw new \Exception('mautic.core.update.error_extracting_package');
-        } else {
-            $zipper->close();
-            unlink($zipFile);
-
-            return true;
         }
+        $zipper->close();
+        unlink($zipFile);
+
+        return true;
     }
 
     /**
@@ -426,16 +424,15 @@ class ThemeHelper implements ThemeHelperInterface
 
         if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
-        } else {
-            foreach ($this->finder as $file) {
-                $filePath  = $file->getRealPath();
-                $localPath = $file->getRelativePathname();
-                $zipper->addFile($filePath, $localPath);
-            }
-            $zipper->close();
-
-            return $tmpPath;
         }
+        foreach ($this->finder as $file) {
+            $filePath  = $file->getRealPath();
+            $localPath = $file->getRelativePathname();
+            $zipper->addFile($filePath, $localPath);
+        }
+        $zipper->close();
+
+        return $tmpPath;
     }
 
     /**

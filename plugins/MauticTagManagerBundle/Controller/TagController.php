@@ -62,19 +62,7 @@ class TagController extends FormController
         $orderBy    = $session->get('mautic.tags.orderby', 'lt.tag');
         $orderByDir = $session->get('mautic.tags.orderbydir', 'ASC');
 
-        if (!empty($search)) {
-            $filter = [
-                'where' => [
-                    [
-                        'expr' => 'like',
-                        'col'  => 'lt.tag',
-                        'val'  => '%'.$search.'%',
-                    ],
-                ],
-            ];
-        } else {
-            $filter = '';
-        }
+        $filter = !empty($search) ? ['string' => $search] : '';
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
@@ -351,9 +339,9 @@ class TagController extends FormController
                         ];
 
                         return $this->postActionRedirect($postActionVars);
-                    } else {
-                        return $this->viewAction($request, $tagDependencies, $tag->getId());
                     }
+
+                    return $this->viewAction($request, $tagDependencies, $tag->getId());
                 }
             }
 
