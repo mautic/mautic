@@ -40,12 +40,7 @@ class AssetController extends FormController
 
         $this->setListFilters();
 
-        // Remove the "default_assetlimit" in Mautic 8.
-        $limit = $request->getSession()->get(
-            'mautic.asset.limit',
-            $parametersHelper->get('default_assetlimit', $parametersHelper->get('default_pagelimit'))
-        );
-
+        $limit = $request->getSession()->get('mautic.asset.limit', $parametersHelper->get('default_assetlimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
