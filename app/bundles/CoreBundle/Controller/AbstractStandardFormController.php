@@ -211,16 +211,16 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     $permissionUser
                 ),
             };
-        } else {
-            return match ($action) {
-                'new' => $this->security->isGranted($this->getPermissionBase().':create'),
-                'view', 'index' => $this->security->isGranted($this->getPermissionBase().':view'),
-                'clone' => $this->security->isGranted($this->getPermissionBase().':create')
-                && $this->security->isGranted($this->getPermissionBase().':view'),
-                'delete', 'batchDelete' => $this->security->isGranted($this->getPermissionBase().':delete'),
-                default => $this->security->isGranted($this->getPermissionBase().':'.$action),
-            };
         }
+
+        return match ($action) {
+            'new' => $this->security->isGranted($this->getPermissionBase().':create'),
+            'view', 'index' => $this->security->isGranted($this->getPermissionBase().':view'),
+            'clone' => $this->security->isGranted($this->getPermissionBase().':create')
+            && $this->security->isGranted($this->getPermissionBase().':view'),
+            'delete', 'batchDelete' => $this->security->isGranted($this->getPermissionBase().':delete'),
+            default => $this->security->isGranted($this->getPermissionBase().':'.$action),
+        };
     }
 
     /**
@@ -244,9 +244,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 array_unshift($arguments, $request);
 
                 return call_user_func_array([$this, 'editAction'], $arguments);
-            } else {
-                return $this->editAction($request, $newEntity, true);
             }
+
+            return $this->editAction($request, $newEntity, true);
         }
 
         return $this->newAction($request);
