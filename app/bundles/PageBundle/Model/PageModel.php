@@ -467,12 +467,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
         } catch (\Exception $exception) {
             if (MAUTIC_ENV !== 'prod') {
                 throw $exception;
-            } else {
-                $this->logger->error(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
             }
+            $this->logger->error(
+                $exception->getMessage(),
+                ['exception' => $exception]
+            );
         }
 
         // save hit to the cookie to use to update the exit time
@@ -637,12 +636,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 } catch (\Exception $exception) {
                     if (MAUTIC_ENV !== 'prod') {
                         throw $exception;
-                    } else {
-                        $this->logger->error(
-                            $exception->getMessage(),
-                            ['exception' => $exception]
-                        );
                     }
+                    $this->logger->error(
+                        $exception->getMessage(),
+                        ['exception' => $exception]
+                    );
                 }
             }
         }
@@ -686,12 +684,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
-            } else {
-                $this->logger->error(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
             }
+            $this->logger->error(
+                $exception->getMessage(),
+                ['exception' => $exception]
+            );
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {

@@ -171,34 +171,32 @@ class InstallController extends CommonController
                 // On to the next step
 
                 return $this->redirectToRoute('mautic_installer_step', ['index' => (int) $index]);
-            } else {
-                $siteUrl  = $request->getSchemeAndHttpHost().$request->getBaseUrl();
-                $messages = $this->installer->createFinalConfigStep($siteUrl);
-
-                if (!empty($messages)) {
-                    $this->handleInstallerErrors($form, $messages);
-                }
-
-                return $this->postActionRedirect(
-                    [
-                        'viewParameters'    => [
-                            'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
-                            'parameters'  => $this->configurator->render(),
-                            'version'     => MAUTIC_VERSION,
-                            'tmpl'        => $tmpl,
-                        ],
-                        'returnUrl'         => $this->generateUrl('mautic_installer_final'),
-                        'contentTemplate'   => '@MauticInstall/Install/final.html.twig',
-                        'forwardController' => false,
-                    ]
-                );
             }
-        } else {
-            // Redirect back to last step if the user advanced ahead via the URL
-            $last = (int) end($completedSteps) + 1;
-            if ($index && $index > $last) {
-                return $this->redirectToRoute('mautic_installer_step', ['index' => $last]);
+            $siteUrl  = $request->getSchemeAndHttpHost().$request->getBaseUrl();
+            $messages = $this->installer->createFinalConfigStep($siteUrl);
+
+            if (!empty($messages)) {
+                $this->handleInstallerErrors($form, $messages);
             }
+
+            return $this->postActionRedirect(
+                [
+                    'viewParameters'    => [
+                        'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
+                        'parameters'  => $this->configurator->render(),
+                        'version'     => MAUTIC_VERSION,
+                        'tmpl'        => $tmpl,
+                    ],
+                    'returnUrl'         => $this->generateUrl('mautic_installer_final'),
+                    'contentTemplate'   => '@MauticInstall/Install/final.html.twig',
+                    'forwardController' => false,
+                ]
+            );
+        }
+        // Redirect back to last step if the user advanced ahead via the URL
+        $last = (int) end($completedSteps) + 1;
+        if ($index && $index > $last) {
+            return $this->redirectToRoute('mautic_installer_step', ['index' => $last]);
         }
 
         return $this->delegateView(

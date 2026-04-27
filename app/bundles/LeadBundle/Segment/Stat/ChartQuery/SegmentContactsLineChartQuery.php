@@ -62,9 +62,9 @@ class SegmentContactsLineChartQuery extends ChartQuery
             $totalSum += $sum;
             if ($total > -1) {
                 return $total;
-            } else {
-                return 0;
             }
+
+            return 0;
         }, $sums);
 
         return array_reverse($totals);

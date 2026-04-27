@@ -95,9 +95,9 @@ class IteratorExportDataModel implements \Iterator
     {
         if ($this->position <= $this->totalResult && !is_null($this->data)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

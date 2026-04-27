@@ -12,7 +12,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @const TEMP_TEST_FILE
+     * @var string
      */
     public const TEMP_TEST_FILE = './DoNotSellTest.json';
 
