@@ -52,8 +52,13 @@ class CleanupExportedFilesCommand extends Command
         $contactExportedAllFiles = glob($downloadFolder.'/contacts_export_*');
 
         foreach ($contactExportedAllFiles as $file) {
-            if (filectime($file) <= $cleanUpTimestamp) {
-                @unlink($file);
+            // Use mtime rather than ctime: many NFS server implementations do not expose a
+            // useful ctime to clients, which leaves files looking permanently fresh and
+            // causes this cleanup to silently no-op on NFS-mounted contact_export_dir setups.
+            if (filemtime($file) <= $cleanUpTimestamp) {
+                if (!@unlink($file)) {
+                    $output->writeln(sprintf('<error>Failed to remove %s</error>', $file), OutputInterface::VERBOSITY_VERBOSE);
+                }
             }
         }
 
