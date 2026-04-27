@@ -191,16 +191,16 @@ class EventController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**

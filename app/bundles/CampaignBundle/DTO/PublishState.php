@@ -25,9 +25,8 @@ final class PublishState
         } elseif (null === $this->published) {
             // The current entity state is the best assumption we can make at this point.
             $this->published = $defaultPublishState;
-        } else {
-            // keep previous state
         }
+        // keep previous state
 
         if (isset($auditLog->getDetails()['publishUp'][1])) {
             $this->publishUp = (new \DateTimeImmutable($auditLog->getDetails()['publishUp'][1]))->setTimezone(new \DateTimeZone('UTC'));

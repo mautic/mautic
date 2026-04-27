@@ -39,7 +39,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionObject($trait);
         $method     = $reflection->getMethod('prepareDbalFieldsForSave');
-        $method->setAccessible(true);
         $method->invokeArgs($trait, [&$fields]);
 
         $this->assertEquals(1, $fields['true']);
@@ -65,7 +64,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
-        $refMethod->setAccessible(true);
 
         $refMethod->invoke($mock, 'email', ['test@example.com', 'test2@example.com']);
 
@@ -177,7 +175,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('getUniqueIdentifiersWherePart');
-        $refMethod->setAccessible(true);
 
         $this->assertEquals('andWhere', $refMethod->invoke($this->repository));
 

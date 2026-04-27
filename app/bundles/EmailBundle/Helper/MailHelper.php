@@ -476,45 +476,44 @@ class MailHelper
 
             // Assume success
             return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
-        } else {
-            $success = $this->send($dispatchSendEvent);
-
-            // Reset the message for the next
-            $this->queuedRecipients = [];
-
-            // Reset message
-            switch (strtoupper($returnMode)) {
-                case self::QUEUE_RESET_TO:
-                    $this->message->to();
-                    $this->clearErrors();
-                    break;
-                case self::QUEUE_NOTHING_IF_FAILED:
-                    if ($success) {
-                        $this->message->to();
-                        $this->clearErrors();
-                    }
-
-                    break;
-                case self::QUEUE_FULL_RESET:
-                    $this->message        = $this->getMessageInstance();
-                    $this->attachedAssets = [];
-                    $this->clearErrors();
-                    break;
-                case self::QUEUE_RETURN_ERRORS:
-                    $this->message->to();
-                    $errors = $this->getErrors();
-                    $this->clearErrors();
-
-                    return [$success, $errors];
-                case self::QUEUE_DO_NOTHING:
-                default:
-                    // Nada
-
-                    break;
-            }
-
-            return $success;
         }
+        $success = $this->send($dispatchSendEvent);
+
+        // Reset the message for the next
+        $this->queuedRecipients = [];
+
+        // Reset message
+        switch (strtoupper($returnMode)) {
+            case self::QUEUE_RESET_TO:
+                $this->message->to();
+                $this->clearErrors();
+                break;
+            case self::QUEUE_NOTHING_IF_FAILED:
+                if ($success) {
+                    $this->message->to();
+                    $this->clearErrors();
+                }
+
+                break;
+            case self::QUEUE_FULL_RESET:
+                $this->message        = $this->getMessageInstance();
+                $this->attachedAssets = [];
+                $this->clearErrors();
+                break;
+            case self::QUEUE_RETURN_ERRORS:
+                $this->message->to();
+                $errors = $this->getErrors();
+                $this->clearErrors();
+
+                return [$success, $errors];
+            case self::QUEUE_DO_NOTHING:
+            default:
+                // Nada
+
+                break;
+        }
+
+        return $success;
     }
 
     /**
@@ -1559,13 +1558,10 @@ class MailHelper
     {
         $reflectedMailer     = new \ReflectionClass($this->mailer);
         $reflectedTransports = $reflectedMailer->getProperty('transport');
-        $reflectedTransports->setAccessible(true);
-        $allTransports = $reflectedTransports->getValue($this->mailer);
+        $allTransports       = $reflectedTransports->getValue($this->mailer);
 
         $reflectedTransports = new \ReflectionClass($allTransports);
         $reflectedTransport  = $reflectedTransports->getProperty('transports');
-
-        $reflectedTransport->setAccessible(true);
 
         $currentTransport = $reflectedTransport->getValue($allTransports);
 

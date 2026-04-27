@@ -12,6 +12,8 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use PHPUnit\Framework\Assert;
@@ -83,5 +85,54 @@ final class DashboardModelTest extends TestCase
             $dateTo->format(\DateTimeInterface::ATOM),
             $filter['dateTo']->format(\DateTimeInterface::ATOM)
         );
+    }
+
+    public function testPopulateWidgetContentCatchesExceptionAndSetsGenericErrorMessage(): void
+    {
+        $widget    = new Widget();
+        $exception = new \RuntimeException('DB connection failed — secret host: db.internal');
+        $event     = $this->createMock(WidgetDetailEvent::class);
+
+        $widgetEventFactory = $this->createMock(WidgetDetailEventFactory::class);
+        $widgetEventFactory->method('create')->willReturn($event);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->willThrowException($exception);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('error')
+            ->with(
+                self::stringContains('failed to load'),
+                self::callback(fn (array $ctx): bool => $exception === $ctx['exception'])
+            );
+
+        $this->coreParametersHelper->method('get')->willReturn(null);
+
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')->willReturn($this->session);
+
+        $model = new DashboardModel(
+            $this->coreParametersHelper,
+            $this->createMock(PathsHelper::class),
+            $widgetEventFactory,
+            $this->createMock(Filesystem::class),
+            $requestStack,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $logger,
+            $this->createMock(CacheProviderTagAwareInterface::class),
+        );
+
+        // Pass timezone to skip userHelper->getUser()->getTimezone()
+        $model->populateWidgetContent($widget, ['timezone' => 'UTC']);
+
+        Assert::assertSame('mautic.dashboard.widget.load.failed', $widget->getErrorMessage());
     }
 }

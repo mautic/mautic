@@ -37,9 +37,9 @@ class ApiMetadataDriver implements DriverInterface
             $this->resetDefaults();
 
             return $metadata;
-        } else {
-            return new ClassMetadata($class->getName());
         }
+
+        return new ClassMetadata($class->getName());
     }
 
     private function resetDefaults(): void

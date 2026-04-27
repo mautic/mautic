@@ -17,6 +17,8 @@ parameters:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
+		- plugins/*/node_modules/*
+		- plugins/*/vendor/*
 		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
