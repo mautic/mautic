@@ -126,10 +126,10 @@ class DisplayTestCest
         $I->amOnPage('/s/emails/new');
 
         // Wait for the select button to appear
-        $I->waitForElementVisible(EmailsPage::$SELECT_SEGMENT_EMAIL, 5);
+        $I->waitForElementVisible(EmailsPage::SELECT_SEGMENT_EMAIL, 5);
 
         // Click the "Select" button to choose the email type
-        $I->click(EmailsPage::$SELECT_SEGMENT_EMAIL);
+        $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
 
         // Wait for the dropdown to be visible
         $I->waitForElementVisible('#emailform_unsubscribeForm_chosen', 5);

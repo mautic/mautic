@@ -130,9 +130,9 @@ trait TranslationEntityTrait
 
         if ($isChild) {
             return null !== $parent;
-        } else {
-            return !empty($parent) || ($children && count($children));
         }
+
+        return !empty($parent) || ($children && count($children));
     }
 
     /**

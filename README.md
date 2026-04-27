@@ -363,6 +363,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/feranmiemmanuel"><img src="https://avatars.githubusercontent.com/u/44700185?v=4?s=100" width="100px;" alt="Olasunkanmi Emmanuel Jesuferanmi "/><br /><sub><b>Olasunkanmi Emmanuel Jesuferanmi </b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=feranmiemmanuel" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://pfzone.com"><img src="https://avatars.githubusercontent.com/u/1042926?v=4?s=100" width="100px;" alt="Francois Paulin"/><br /><sub><b>Francois Paulin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pfz" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/introfini"><img src="https://avatars.githubusercontent.com/u/104880?v=4?s=100" width="100px;" alt="José Fernandes"/><br /><sub><b>José Fernandes</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=introfini" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://bareit.tech"><img src="https://avatars.githubusercontent.com/u/267231336?v=4?s=100" width="100px;" alt="Ross Young"/><br /><sub><b>Ross Young</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=theyoungrossco" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
