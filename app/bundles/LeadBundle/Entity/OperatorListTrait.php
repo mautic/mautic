@@ -35,8 +35,6 @@ trait OperatorListTrait
                 OperatorOptions::NOT_REGEXP,
                 OperatorOptions::INCLUDING_ANY,
                 OperatorOptions::EXCLUDING_ANY,
-                OperatorOptions::INCLUDING_ALL,
-                OperatorOptions::EXCLUDING_ALL,
             ],
         ],
         'bool' => [

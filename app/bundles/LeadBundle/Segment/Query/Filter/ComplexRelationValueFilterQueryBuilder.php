@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
@@ -110,13 +111,78 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'multiselect':
             case '!multiselect':
-                $operator    = 'multiselect' === $filterOperator ? 'regexp' : 'notRegexp';
+                /**
+                 * Multi-select filter behavior:
+                 * - INCLUDING_ALL => AND regexp(...)
+                 * - INCLUDING_ANY => OR regexp(...)
+                 * - EXCLUDING_ALL => NOT(AND regexp(...)) OR field IS NULL
+                 * - EXCLUDING_ANY => AND notRegexp(...) OR field IS NULL
+                 */
+                $filterArray      = $filter->contactSegmentFilterCrate->getArray();
+                $originalOperator = $filterArray['operator'];
+                $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
+                $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
+
+                $operator = 'regexp';
+                if (OperatorOptions::EXCLUDING_ANY === $originalOperator) {
+                    $operator = 'notRegexp';
+                }
+
+                if (in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true)) {
+                    $filterGlue = 'and';
+                } else {
+                    $filterGlue = 'or';
+                }
+
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
                     $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                $expression = $queryBuilder->expr()->and(...$expressions);
+                if (empty($expressions)) {
+                    $expression = $queryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
+                    break;
+                }
+
+                if ($applyIsNull) {
+                    if ($applyNot) {
+                        $expression = $queryBuilder->expr()->or(
+                            'NOT('.$queryBuilder->expr()->$filterGlue(...$expressions).')',
+                            $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
+                        );
+                    } else {
+                        $expression = $queryBuilder->expr()->or(
+                            $queryBuilder->expr()->$filterGlue(...$expressions),
+                            $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
+                        );
+                    }
+                } else {
+                    $expression = $queryBuilder->expr()->$filterGlue(...$expressions);
+                }
+                break;
+            case OperatorOptions::INCLUDING_ALL:
+                // Single-select field can't match all values at once - always false for multiple values.
+                if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
+                    $expression = $queryBuilder->expr()->and('1 = 0');
+                    break;
+                }
+                $parameter  = is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder;
+                $expression = $queryBuilder->expr()->eq(
+                    $tableAlias.'.'.$filter->getField(),
+                    $parameter
+                );
+                break;
+            case OperatorOptions::EXCLUDING_ALL:
+                // Single-select field can't hold all values at once - always true for multiple values.
+                if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
+                    $expression = $queryBuilder->expr()->and('1 = 1');
+                    break;
+                }
+                $parameter  = is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder;
+                $expression = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                    $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), $parameter)
+                );
                 break;
             default:
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');

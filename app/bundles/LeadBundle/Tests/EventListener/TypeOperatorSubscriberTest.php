@@ -128,9 +128,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['number']['include']);
         $this->assertContains(OperatorOptions::EMPTY, $operators['country']['include']);
         $this->assertContains(OperatorOptions::INCLUDING_ANY, $operators['country']['include']);
-        $this->assertContains(OperatorOptions::INCLUDING_ALL, $operators['country']['include']);
         $this->assertContains(OperatorOptions::EXCLUDING_ANY, $operators['multiselect']['include']);
-        $this->assertContains(OperatorOptions::EXCLUDING_ALL, $operators['multiselect']['include']);
         $this->assertNotContains(OperatorOptions::STARTS_WITH, $operators['country']['include']);
     }
 
