@@ -253,10 +253,12 @@ class CampaignController extends AbstractStandardFormController
             ? mb_substr($campaignName, 0, 57).'...'
             : $campaignName;
 
+        $description = trim(html_entity_decode(strip_tags($campaign->getDescription() ?: ''), ENT_QUOTES | ENT_HTML5));
+
         return $this->createForm(CampaignShareType::class, [
             'title'             => $campaignName,
             'headline'          => $headline,
-            'description'       => $campaign->getDescription() ?: '',
+            'description'       => $description,
             'version'           => '1.0.0',
             'worksWithVersions' => [$mauticVersion],
             'languages'         => ['en'],

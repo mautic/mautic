@@ -32,6 +32,12 @@
                     </div>
 
                     <div class="form-group">
+                        {{ form_label(form.vendorName) }}
+                        {{ form_widget(form.vendorName) }}
+                        {{ form_errors(form.vendorName) }}
+                    </div>
+
+                    <div class="form-group">
                         {{ form_label(form.headline) }}
                         {{ form_widget(form.headline) }}
                         {{ form_errors(form.headline) }}
