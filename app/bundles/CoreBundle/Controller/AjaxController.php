@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
-use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TokenSorter;
@@ -280,7 +280,7 @@ class AjaxController extends CommonController
                         );
                         $dataArray['statusHtml'] = $html;
                     }
-                } catch (RecordNotUnpublishedException $exception) {
+                } catch (RecordCanNotUnpublishException $exception) {
                     $this->addFlash(FlashBag::LEVEL_ERROR, $exception->getMessage());
                     $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
