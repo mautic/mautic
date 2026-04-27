@@ -22,6 +22,7 @@
     },
   "require": {
     "composer/installers": "^2.3",
+    "cweagans/composer-patches": "^1.7.3",
     "mautic/core-lib": "^7.0"
   },
   "require-dev": {
@@ -126,11 +127,6 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/oauth2-php"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/gaufrette-extras.git",
-      "only": ["gaufrette/extras"]
     }
   ],
   "conflict": {
@@ -147,13 +143,15 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
-      "@generate-assets"
+      "@generate-assets",
+      "@motd"
     ],
     "post-update-cmd": [
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
-      "@generate-assets"
+      "@generate-assets",
+      "@motd"
     ],
     "test": "bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
     "e2e-test": "APP_ENV=test bin/codecept run acceptance",
@@ -168,7 +166,8 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
+    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./",
+    "motd": "bin/console mautic:motd"
   },
   "config": {
     "platform": {
@@ -207,6 +206,11 @@
     "symfony-assets-install": "relative",
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
+    },
+    "patches": {
+      "studio-42/elfinder": {
+        "Fix PHP 8.5 deprecated scalar casts": "patches/studio-42-elfinder-php85-float-cast.patch"
+      }
     }
   }
 }

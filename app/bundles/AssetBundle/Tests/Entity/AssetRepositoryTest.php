@@ -39,7 +39,6 @@ class AssetRepositoryTest extends TestCase
         $filter     = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(AssetRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 

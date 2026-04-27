@@ -52,7 +52,6 @@ function launchBuilderGrapesjs(formName) {
 function useBuilderForCodeMode() {
   const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
   const isCodeMode = theme === 'mautic_code_mode';
-
   if (isCodeMode) {
     if (confirm(Mautic.translate('grapesjsbuilder.builder.warning.code_mode')) === false) {
       return false;
@@ -72,16 +71,29 @@ function setThemeHtml(theme) {
   // Load template and fill field
   mQuery.ajax({
     url: mQuery('#builder_url').val(),
-    data: `template=${theme}`,
+    data: {
+      template: theme,
+      resetEditorState: 1,
+    },
     dataType: 'json',
     success(response) {
       const textareaHtml = mQuery('textarea.builder-html');
       const textareaMjml = mQuery('textarea.builder-mjml');
+      const textareaJson = mQuery('textarea.builder-json');
+      const form = textareaHtml.closest('form');
 
       textareaHtml.val(response.templateHtml);
 
       if (typeof textareaMjml !== 'undefined') {
         textareaMjml.val(response.templateMjml);
+      }
+
+      if (textareaJson.length) {
+        textareaJson.val('');
+      }
+
+      if (form.length) {
+        form.attr('data-grapesjsbuilder-reset', 'true');
       }
 
       // If MJML template, generate HTML before save

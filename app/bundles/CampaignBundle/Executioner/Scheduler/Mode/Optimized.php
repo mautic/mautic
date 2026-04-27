@@ -30,8 +30,8 @@ class Optimized implements ScheduleModeInterface
     {
         if (self::OPTIMIZED_DAY_AND_TIME === $event->getTriggerWindow()) {
             return $this->peakInteractionTimer->getOptimalTimeAndDay($contact);
-        } else {
-            return $this->peakInteractionTimer->getOptimalTime($contact);
         }
+
+        return $this->peakInteractionTimer->getOptimalTime($contact);
     }
 }

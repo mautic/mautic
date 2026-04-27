@@ -261,9 +261,8 @@ class CorePermissions implements ResetInterface
             return in_array(1, $permissions) ? true : false;
         } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
-        } else {
-            throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
         }
+        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
     }
 
     /**
@@ -378,16 +377,16 @@ class CorePermissions implements ResetInterface
         if (0 === $ownerId) {
             if ($other) {
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
         } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

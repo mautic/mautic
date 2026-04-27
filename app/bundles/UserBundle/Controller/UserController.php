@@ -191,7 +191,7 @@ class UserController extends FormController
                         'mauticContent' => 'user',
                     ],
                 ]);
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $languageHelper, $hasher, $samlHelper, $user->getId(), true);
             }
         }

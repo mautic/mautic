@@ -585,6 +585,12 @@ Mautic.updatePublishingToggle = function(element) {
         hasPublishUp = $publishUp.length && $publishUp.val().trim() !== '',
         hasPublishDown = $publishDown.length && $publishDown.val().trim() !== '';
 
+    // Toggle schedule options notice for Segment Emails based on isPublished state
+    const $scheduleOptionsNotice = $form.find('#scheduleOptionsNotice');
+    if ($scheduleOptionsNotice.length) {
+        $scheduleOptionsNotice.toggle(isYes);
+    }
+
     // Inner function to toggle publish fields and datepicker buttons
     function togglePublishFields(enable) {
         [$publishUp, $publishDown].forEach($input => {
