@@ -4,7 +4,7 @@
         {{ include('@MauticLead/Note/note.html.twig', {
             'note': note,
             'lead': lead,
-            'permissions': permissions,
+            'permissions': notePermissions[note.id] ?? note.permissions ?? permissions,
         }) }}
     {% endfor %}
 </ul>
