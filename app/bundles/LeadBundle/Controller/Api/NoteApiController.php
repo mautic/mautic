@@ -35,6 +35,7 @@ class NoteApiController extends CommonApiController
         $this->entityClass      = LeadNote::class;
         $this->entityNameOne    = 'note';
         $this->entityNameMulti  = 'notes';
+        $this->permissionBase   = 'lead:notes';
         $this->serializerGroups = ['leadNoteDetails', 'leadList'];
 
         // When a user passes in a note like "This is <strong>text</strong>", this will
@@ -51,7 +52,8 @@ class NoteApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         if (!empty($parameters['lead'])) {
-            $lead = $this->checkLeadAccess($parameters['lead'], $action);
+            $leadAction = 'new' === $action ? 'view' : $action;
+            $lead       = $this->checkLeadAccess($parameters['lead'], $leadAction);
 
             if ($lead instanceof Response) {
                 return $lead;

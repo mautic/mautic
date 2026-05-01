@@ -17,6 +17,7 @@ final class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
 
         $content = $this->client->getResponse()->getContent();
         $this->assertStringContainsString('Contacts - User has access to', $content);
+        $this->assertStringContainsString('Notes - User has access to', $content);
         $this->assertStringContainsString('Segments - User has access to', $content);
         $this->assertStringContainsString('Custom Fields - User has access to', $content);
         $this->assertStringContainsString('Import - User has access to', $content);
@@ -26,6 +27,9 @@ final class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
 
         $leadsRole = $crawler->filter('input[name="role[permissions][lead:leads][]"]');
         $this->assertEquals(8, $leadsRole->count());
+
+        $notesRole = $crawler->filter('input[name="role[permissions][lead:notes][]"]');
+        $this->assertEquals(8, $notesRole->count());
 
         $listsRole = $crawler->filter('input[name="role[permissions][lead:lists][]"]');
         $this->assertEquals(10, $listsRole->count());
