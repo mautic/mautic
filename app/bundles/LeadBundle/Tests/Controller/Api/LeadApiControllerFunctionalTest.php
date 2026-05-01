@@ -19,10 +19,14 @@ use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -1373,6 +1377,95 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey($contact2->getId(), $response['contacts']);
         $this->assertArrayHasKey($contact3->getId(), $response['contacts']);
         $this->assertArrayNotHasKey($contact1->getId(), $response['contacts']);
+    }
+
+    public function testGetContactNotesActionReturnsOkForUserWithNoteViewPermissions(): void
+    {
+        $owner = $this->createApiUserWithPermissions([
+            'lead:leads' => ['viewown', 'viewother'],
+            'lead:notes' => ['viewown', 'viewother'],
+        ]);
+
+        $contact = new Lead();
+        $contact->setEmail('contact-notes-ok@test.com');
+        $contact->setOwner($owner);
+        $this->em->persist($contact);
+
+        $note = new LeadNote();
+        $note->setLead($contact);
+        $note->setText('Contact note');
+        $note->setCreatedBy($owner);
+        $this->em->persist($note);
+        $this->em->flush();
+
+        $this->authenticateApiUser($owner);
+        $this->client->request('GET', '/api/contacts/'.$contact->getId().'/notes');
+
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+    }
+
+    public function testGetContactNotesActionReturnsForbiddenWithoutNoteViewPermissions(): void
+    {
+        $owner = $this->createApiUserWithPermissions([
+            'lead:leads' => ['viewown', 'viewother'],
+        ]);
+
+        $contact = new Lead();
+        $contact->setEmail('contact-notes-denied@test.com');
+        $contact->setOwner($owner);
+        $this->em->persist($contact);
+
+        $note = new LeadNote();
+        $note->setLead($contact);
+        $note->setText('Contact note');
+        $note->setCreatedBy($owner);
+        $this->em->persist($note);
+        $this->em->flush();
+
+        $this->authenticateApiUser($owner);
+        $this->client->request('GET', '/api/contacts/'.$contact->getId().'/notes');
+
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), $response->getContent());
+    }
+
+    /**
+     * @param array<string, string[]> $permissions
+     */
+    private function createApiUserWithPermissions(array $permissions): User
+    {
+        $role = new Role();
+        $role->setName('Lead API Notes Role '.uniqid('', true));
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+
+        $user = new User();
+        $user->setFirstName('Lead');
+        $user->setLastName('Api');
+        $user->setUsername('lead.api.notes.'.uniqid());
+        $user->setEmail('lead.api.notes.'.uniqid().'@example.com');
+        $user->setRole($role);
+
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    private function authenticateApiUser(User $user): void
+    {
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
     }
 
     private function addContactToCampaign(Lead $contact, Campaign $campaign, bool $manuallyRemoved = false): void
