@@ -150,10 +150,11 @@
             </div>
 
             {# ── Actions ── #}
-            <div class="text-right">
-                <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaignId}) }}" class="btn btn-default">
+            {# Buttons are auto-cloned into the top-right toolbar by core's bottom-form-buttons handler. #}
+            <div class="bottom-form-buttons text-right">
+                <button type="button" class="btn btn-default btn-cancel btn-nospin" onclick="window.location.href='{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaignId}) }}'">
                     {{ 'mautic.core.form.cancel'|trans }}
-                </a>
+                </button>
                 {{ form_widget(form.download) }}
                 {{ form_widget(form.publish) }}
             </div>
