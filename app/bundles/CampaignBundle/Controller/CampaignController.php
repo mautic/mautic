@@ -32,6 +32,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Psr\Log\LoggerInterface;
@@ -253,7 +254,9 @@ class CampaignController extends AbstractStandardFormController
             ? mb_substr($campaignName, 0, 57).'...'
             : $campaignName;
 
-        $description = trim(html_entity_decode(strip_tags($campaign->getDescription() ?: ''), ENT_QUOTES | ENT_HTML5));
+        $description = (new PlainTextHelper(['width' => 0]))
+            ->setHtml($campaign->getDescription() ?: '')
+            ->getText();
 
         return $this->createForm(CampaignShareType::class, [
             'title'             => $campaignName,
