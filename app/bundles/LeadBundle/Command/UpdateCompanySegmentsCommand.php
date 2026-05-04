@@ -38,21 +38,21 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
             ->addOption(
                 'batch-limit',
                 'b',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Set batch size of companies to process per round. Defaults to 300.',
                 300
             )
             ->addOption(
                 'max-companies',
                 'm',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Set max number of companies to process per company segment for this script execution. Defaults to all.',
                 null
             )
             ->addOption(
                 'segment-id',
                 'i',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Specific ID to rebuild. Defaults to all.',
                 null
             )
@@ -65,7 +65,7 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
             ->addOption(
                 'exclude',
                 'd',
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Exclude a specific company segment from being rebuilt. Otherwise, all company segments will be rebuilt.',
                 []
             );
@@ -80,7 +80,7 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
         $max                   = $input->getOption('max-companies');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = true === $input->getOption('quiet') ? new NullOutput() : $output;
-        $excludeSegments       = $input->getOption('exclude');
+        $excludeSegments       = $this->cleanExcludeSegments($input->getOption('exclude'), $output);
 
         // Validate segment-id
         if (null !== $id && (!is_numeric($id) || ((int) $id <= 0))) {
@@ -143,7 +143,7 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
                 'iterable_mode' => true,
             ];
 
-            if (is_array($excludeSegments) && count($excludeSegments) > 0) {
+            if ([] !== $excludeSegments) {
                 $filter['filter'] = [
                     'force' => [
                         [
@@ -288,5 +288,33 @@ class UpdateCompanySegmentsCommand extends ModeratedCommand
                 ['%time%' => $rebuildTime]
             ).'</>'."\n");
         }
+    }
+
+    /**
+     * @param array<mixed> $excludeSegments
+     *
+     * @return array<int>
+     */
+    private function cleanExcludeSegments(array $excludeSegments, OutputInterface $output): array
+    {
+        if (0 === count($excludeSegments)) {
+            return [];
+        }
+
+        $existingExcludeSegments = [];
+
+        foreach ($excludeSegments as $id) {
+            if (null !== $id && (!is_numeric($id) || ((int) $id <= 0))) {
+                $output->writeln("<error>Skipped --exclude id {$id}: The segment id {$id} specified in the --exclude options is not a positive number.</error>");
+                continue;
+            }
+            if (!$this->companySegmentModel->getEntity((int) $id) instanceof CompanySegment) {
+                $output->writeln("<error>Skipped --exclude id {$id}: There is no segment with the id {$id} specified in the --exclude options.</error>");
+                continue;
+            }
+            $existingExcludeSegments[] = (int) $id;
+        }
+
+        return $existingExcludeSegments;
     }
 }

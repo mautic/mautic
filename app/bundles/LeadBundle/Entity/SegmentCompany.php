@@ -31,7 +31,7 @@ class SegmentCompany
 
         $builder->createManyToOne('companySegment', CompanySegment::class)
             ->isPrimaryKey()
-            ->inversedBy('companySegments')
+            ->inversedBy('segmentCompanies')
             ->addJoinColumn('segment_id', 'id', false, false, 'CASCADE')
             ->cascadeRefresh()
             ->build();

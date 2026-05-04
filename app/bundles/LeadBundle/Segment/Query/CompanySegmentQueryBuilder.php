@@ -375,7 +375,14 @@ class CompanySegmentQueryBuilder
                 $edgeCompanySegment = $this->companySegmentRepository->find($edge);
 
                 if (null === $edgeCompanySegment) {
-                    continue; // Skip if the dependent segment doesn't exist - it may have been deleted
+                    $this->logger->warning(
+                        sprintf(
+                            'Company segment dependency not found: segment %d references non-existent segment %d (may have been deleted)',
+                            $companySegmentId,
+                            $edge
+                        )
+                    );
+                    continue;
                 }
 
                 $resolved = $this->getResolutionPlan($edgeCompanySegment, $seen, $resolved);

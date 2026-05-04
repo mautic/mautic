@@ -29,7 +29,7 @@ class SegmentCompanyRepository extends CommonRepository
 
         if (1 === count($segmentIds)) {
             $q          = $this->forceUseIndex($q, $this->getPreTable().'companies_segment_manually_removed');
-            $expression = $q->expr()->eq(SegmentCompany::RELATIONS_NAME.'.segment_id', (string) array_pop($segmentIds));
+            $expression = $q->expr()->eq(SegmentCompany::RELATIONS_NAME.'.segment_id', (string) $segmentIds[0]);
         } else {
             $expression = $q->expr()->in(SegmentCompany::RELATIONS_NAME.'.segment_id', array_map(static fn ($segmentId): string => (string) $segmentId, $segmentIds));
         }
