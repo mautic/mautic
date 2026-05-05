@@ -33,7 +33,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/companies?search=segment:tech-companies');
+        $crawler = $this->client->request('GET', '/s/companies?search=companysegment:tech-companies');
         $this->assertResponseIsSuccessful();
 
         $rows = $crawler->filter('#companyTable tbody tr');
@@ -58,7 +58,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/companies?search=segment:non-existent-segment');
+        $crawler = $this->client->request('GET', '/s/companies?search=companysegment:non-existent-segment');
         $this->assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();

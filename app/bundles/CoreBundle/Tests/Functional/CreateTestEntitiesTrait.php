@@ -260,4 +260,15 @@ trait CreateTestEntitiesTrait
 
         return $campaignLeadEventLog;
     }
+
+    private function manuallyRemoveCompanyFromCompanySegment(Company $company, CompanySegment $companySegment): void
+    {
+        $segmentCompany = $this->em->getRepository(SegmentCompany::class)->findOneBy([
+            'company'        => $company,
+            'companySegment' => $companySegment,
+        ]);
+        $segmentCompany->setManuallyRemoved(true);
+        $this->em->persist($segmentCompany);
+        $this->em->flush();
+    }
 }

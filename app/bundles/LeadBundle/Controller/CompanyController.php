@@ -56,7 +56,7 @@ class CompanyController extends FormController
         $search     = $request->get('search', $request->getSession()->get('mautic.company.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
 
-        if (str_contains($search, 'segment:')) {
+        if (str_contains($search, 'companysegment:')) {
             $filter = $this->filterByCompanySegment($search);
         }
 
@@ -1208,7 +1208,7 @@ class CompanyController extends FormController
     private function filterByCompanySegment(string $search): array
     {
         $defaultFilter        = ['string' => 'Invalid company segment', 'force' => []];
-        $companySegmentSearch = str_replace('segment:', '', $search);
+        $companySegmentSearch = str_replace('companysegment:', '', $search);
         $companySegmentSearch = str_replace('"', '', $companySegmentSearch);
 
         $companySegmentModel = $this->getModel('lead.company_segment');
@@ -1222,10 +1222,15 @@ class CompanyController extends FormController
             return $defaultFilter;
         }
 
-        $companiesIds = [];
-        foreach ($companySegment->getSegmentCompanies() as $segmentCompany) {
-            $companiesIds[] = $segmentCompany->getCompany()->getId();
-        }
+        $segmentCompanies = $companySegmentModel->getSegmentCompanyRepository()->findBy([
+            'companySegment'  => $companySegment,
+            'manuallyRemoved' => false,
+        ]);
+
+        $companiesIds = array_map(
+            fn ($segmentCompany) => $segmentCompany->getCompany()->getId(),
+            $segmentCompanies
+        );
 
         if (empty($companiesIds)) {
             return $defaultFilter;

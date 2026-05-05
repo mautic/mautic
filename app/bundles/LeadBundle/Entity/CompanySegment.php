@@ -307,7 +307,10 @@ class CompanySegment extends FormEntity
 
     public function hasCompany(Company $company): bool
     {
-        return $this->segmentCompanies->exists(static fn (int $key, SegmentCompany $segmentCompany): bool => $segmentCompany->getCompany() === $company);
+        return $this->segmentCompanies->exists(
+            static fn (int $key, SegmentCompany $segmentCompany): bool => $segmentCompany->getCompany() === $company
+                && !$segmentCompany->isManuallyRemoved()
+        );
     }
 
     public function getLastBuiltDate(): ?\DateTimeInterface
