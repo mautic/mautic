@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\PrivateAddressChecker;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -147,5 +154,139 @@ class PublicController extends AbstractFormController
         }
 
         return $response;
+    }
+
+    public function autoTrackAction(
+        Request $request,
+        LoggerInterface $mauticLogger,
+        PrivateAddressChecker $privateAddressChecker,
+        IpLookupHelper $ipLookupHelper,
+        AssetModel $assetModel,
+    ): Response {
+        if (!$this->security->isAnonymous()) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Authenticated users are not tracked']);
+        }
+
+        if (!$ipLookupHelper->isRequestTrackable()) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Request not trackable']);
+        }
+
+        $forceTrack = $request->request->getBoolean('force');
+
+        if (!$forceTrack && !$this->coreParametersHelper->get('auto_asset_tracking_enabled')) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Auto asset tracking is disabled']);
+        }
+
+        $url = $request->request->get('url');
+
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            if ($privateAddressChecker->isPrivateUrl($url)) {
+                return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
+            }
+        } catch (\InvalidArgumentException) {
+            return new JsonResponse(['error' => 'Invalid URL'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $extension         = $this->getFileExtension($url);
+        $allowedExtensions = $this->coreParametersHelper->get('allowed_extensions');
+
+        if (!in_array(strtolower($extension), $allowedExtensions, true)) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Not a trackable file type']);
+        }
+
+        if ($this->isLocalAssetUrl($url)) {
+            return new JsonResponse(['skip' => true, 'reason' => 'Already a local Mautic asset']);
+        }
+
+        $existingRemoteAsset = $this->findRemoteAssetByUrl($assetModel, $url);
+        if (null !== $existingRemoteAsset) {
+            $trackingUrl = $assetModel->generateUrl($existingRemoteAsset, true);
+
+            return new JsonResponse([
+                'success'     => true,
+                'trackingUrl' => $trackingUrl,
+                'assetId'     => $existingRemoteAsset->getId(),
+                'existing'    => true,
+            ]);
+        }
+
+        $customTitle = $request->request->get('title');
+        if (!empty($customTitle)) {
+            $customTitle = InputHelper::clean($customTitle);
+        }
+        $asset = $this->createRemoteAsset($assetModel, $url, $customTitle, $mauticLogger);
+
+        if (null === $asset) {
+            return new JsonResponse(['error' => 'Failed to create asset'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $trackingUrl = $assetModel->generateUrl($asset, true);
+
+        return new JsonResponse([
+            'success'     => true,
+            'trackingUrl' => $trackingUrl,
+            'assetId'     => $asset->getId(),
+        ]);
+    }
+
+    private function getFileExtension(string $url): string
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        if (empty($path)) {
+            return '';
+        }
+
+        return pathinfo($path, PATHINFO_EXTENSION);
+    }
+
+    private function isLocalAssetUrl(string $url): bool
+    {
+        return (bool) preg_match('#/asset/\d+:[^/?\#]+#', $url);
+    }
+
+    private function findRemoteAssetByUrl(AssetModel $model, string $url): ?Asset
+    {
+        $repo  = $model->getRepository();
+        $asset = $repo->findOneBy(['remotePath' => $url]);
+
+        return $asset instanceof Asset ? $asset : null;
+    }
+
+    private function createRemoteAsset(AssetModel $model, string $url, ?string $customTitle, LoggerInterface $logger): ?Asset
+    {
+        $asset = new Asset();
+        $asset->setStorageLocation('remote');
+        $asset->setRemotePath($url);
+        $asset->setFileNameFromRemote();
+        $asset->setIsPublished(true);
+
+        $title = !empty($customTitle) ? $customTitle : ($asset->getOriginalFileName() ?: basename((string) parse_url($url, PHP_URL_PATH)));
+        $asset->setTitle($title);
+        $asset->setAlias(mb_strtolower(preg_replace('/[^a-zA-Z0-9]/', '-', pathinfo($title, PATHINFO_FILENAME))));
+
+        $categoryId = $this->coreParametersHelper->get('auto_asset_tracking_category');
+        if (!empty($categoryId)) {
+            $category = $this->doctrine->getRepository(Category::class)->find($categoryId);
+            if (null !== $category) {
+                $asset->setCategory($category);
+            }
+        }
+
+        try {
+            $model->saveEntity($asset);
+
+            return $asset;
+        } catch (DBALException|ORMException $e) {
+            $logger->alert('Failed to create remote asset for auto-tracking: '.$e->getMessage(), [
+                'url'       => $url,
+                'exception' => $e,
+            ]);
+
+            return null;
+        }
     }
 }
