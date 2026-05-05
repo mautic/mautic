@@ -392,7 +392,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
 
             if (!empty($removeFrom)) {
-                $this->companySegmentModel->removeCompany($companyEntity, $removeFrom, false, true);
+                $this->companySegmentModel->removeCompany($companyEntity, $removeFrom, true);
                 $somethingHappened = true;
             }
 
@@ -910,8 +910,9 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $companySegments = $this->companySegmentModel->getSegmentCompanyRepository()->findBy(
             [
-                'company'        => $company,
-                'companySegment' => $companySegmentIds,
+                'company'         => $company,
+                'companySegment'  => $companySegmentIds,
+                'manuallyRemoved' => false,
             ]
         );
 

@@ -1079,24 +1079,26 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $joe  = $this->createContact('joe@glibi.com');
         $mary = $this->createContact('mary@glibi.com');
         $john = $this->createContact('john@tbs.com');
-
-        self::assertNull($joe->getLastname());
-        self::assertNull($mary->getLastname());
-        self::assertNull($john->getLastname());
+        $anna = $this->createContact('anna@abc.com');
 
         $companyGlibi = $this->createCompany('Glibi Inc', 'info@glibi.com');
         $companyTBS   = $this->createCompany('TBS Corp', 'info@tbs.com');
+        $companyAbc   = $this->createCompany('Abc', 'info@abc.com');
         $this->em->flush();
 
         $this->createCompanyLead($companyGlibi, $joe, true);
         $this->createCompanyLead($companyGlibi, $mary, true);
         $this->createCompanyLead($companyTBS, $john, true);
+        $this->createCompanyLead($companyAbc, $anna, true);
 
         $segmentGlibi = $this->createCompanySegment('Glibi Segment', 'glibi-segment', true);
         $segmentTBS   = $this->createCompanySegment('TBS Segment', 'tbs-segment', true);
 
         $this->addCompanyToCompanySegment($companyGlibi, $segmentGlibi);
         $this->addCompanyToCompanySegment($companyTBS, $segmentTBS);
+        // make sure $companyAbc is manually removed from $segmentTBS
+        $this->addCompanyToCompanySegment($companyAbc, $segmentGlibi);
+        $this->manuallyRemoveCompanyFromCompanySegment($companyAbc, $segmentGlibi);
 
         $campaign = new Campaign();
         $campaign->setName('Company Segment Membership Test Campaign');
@@ -1106,6 +1108,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->addContactToCampaign($campaign, $joe);
         $this->addContactToCampaign($campaign, $mary);
         $this->addContactToCampaign($campaign, $john);
+        $this->addContactToCampaign($campaign, $anna);
 
         $condition = $this->createCampaignCondition(
             campaign: $campaign,
@@ -1179,6 +1182,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $joeAfter  = $this->contactRepository->getEntity($joe->getId());
         $maryAfter = $this->contactRepository->getEntity($mary->getId());
         $johnAfter = $this->contactRepository->getEntity($john->getId());
+        $annaAfter = $this->contactRepository->getEntity($anna->getId());
 
         self::assertNotNull($joeAfter);
         self::assertSame('PASS', $joeAfter->getLastname(), 'Joe\'s company (Glibi) is in the segment, should take YES branch');
@@ -1188,6 +1192,9 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         self::assertNotNull($johnAfter);
         self::assertSame('FAIL', $johnAfter->getLastname(), 'John\'s company (TBS) is NOT in the segment, should take NO branch');
+
+        self::assertNotNull($annaAfter);
+        self::assertSame('FAIL', $annaAfter->getLastname(), 'Anna\'s company (Abc) is manually removed from the segment, should take NO branch');
     }
 
     /**
@@ -1321,25 +1328,29 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'company'        => $companyGlibi,
             'companySegment' => $segmentA,
         ]);
-        self::assertNull($glibiSegmentA, 'Glibi should be removed from Segment A');
+        self::assertNotNull($glibiSegmentA, 'Glibi SegmentCompany entry should exist');
+        self::assertTrue($glibiSegmentA->isManuallyRemoved(), 'Glibi should be manually removed from Segment A');
 
         $glibiSegmentC = $segmentCompanyRepo->findOneBy([
             'company'        => $companyGlibi,
             'companySegment' => $segmentC,
         ]);
         self::assertNotNull($glibiSegmentC, 'Glibi should be added to Segment C');
+        self::assertFalse($glibiSegmentC->isManuallyRemoved(), 'Glibi should not be manually removed from Segment C');
 
         $tbsSegmentB = $segmentCompanyRepo->findOneBy([
             'company'        => $companyTBS,
             'companySegment' => $segmentB,
         ]);
         self::assertNotNull($tbsSegmentB, 'TBS should still be in Segment B');
+        self::assertFalse($tbsSegmentB->isManuallyRemoved(), 'TBS should not be manually removed from Segment B');
 
         $tbsSegmentC = $segmentCompanyRepo->findOneBy([
             'company'        => $companyTBS,
             'companySegment' => $segmentC,
         ]);
         self::assertNotNull($tbsSegmentC, 'TBS should be added to Segment C');
+        self::assertFalse($tbsSegmentC->isManuallyRemoved(), 'TBS should not be manually removed from Segment C');
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
