@@ -73,26 +73,41 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'neq',
             'notLike',
             'notBetween', // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
-            'notIn'
+            'notIn',
+            OperatorOptions::EXCLUDING_ALL // For non-multiselect fields (e.g. select/country), treat as notIn
         )) {
             return;
         }
 
+        // Handle excluding_all for non-multiselect fields (e.g. select/country)
+        if ($event->operatorIsOneOf(OperatorOptions::EXCLUDING_ALL)) {
+            $parameterHolder = $event->getParameterHolder();
+
+            // For single-select fields, "excluding all of [A, B, ...]" with multiple values is always true
+            // because a single-select field cannot contain all values simultaneously.
+            // If only one value is selected, fall through and treat as notIn.
+            if (is_array($parameterHolder) && count($parameterHolder) > 1) {
+                $event->addExpression('1 = 1');
+                $event->stopPropagation();
+
+                return;
+            }
+        }
+
         $leadsTableAlias = $event->getLeadsTableAlias();
 
+        // Treat EXCLUDING_ALL with a single value as notIn
+        $operator = $event->operatorIsOneOf(OperatorOptions::EXCLUDING_ALL) ? 'notIn' : $event->getFilter()->getOperator();
+
         $platform   = $event->getQueryBuilder()->getConnection()->getDatabasePlatform(); /** @phpstan-ignore-line getConnection is deprecated */
-        $fieldExpr  = 'notLike' == $event->getFilter()->getOperator() ?
+        $fieldExpr  = 'notLike' == $operator ?
             DatabasePlatform::applyTypeIfStrict($platform, $leadsTableAlias.'.'.$event->getFilter()->getField(), 'text') :
             $leadsTableAlias.'.'.$event->getFilter()->getField();
-
-        if (in_array($event->getFilter()->getOperator(), ['notLike'])) {
-            $fieldExpr .= '::text';
-        }
 
         $event->addExpression(
             $event->getQueryBuilder()->expr()->or(
                 $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
+                $event->getQueryBuilder()->expr()->{$operator}(
                     $fieldExpr,
                     $event->getParameterHolder()
                 )
@@ -180,16 +195,35 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'in',
             'between', // Used only for date with week combination (EQUAL [this week, next week, last week])
             'regexp',
-            'notRegexp' // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            'notRegexp', // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            OperatorOptions::INCLUDING_ALL // For non-multiselect fields (e.g. select/country), treat as in
         )) {
             return;
         }
 
+        // Handle including_all for non-multiselect fields (e.g. select/country)
+        if ($event->operatorIsOneOf(OperatorOptions::INCLUDING_ALL)) {
+            $parameterHolder = $event->getParameterHolder();
+
+            // For single-select fields, "including all of [A, B, ...]" with multiple values is always false
+            // because a single-select field cannot contain all values simultaneously.
+            // If only one value is selected, treat as in.
+            if (is_array($parameterHolder) && count($parameterHolder) > 1) {
+                // Always false - no contact can have all values in a single-select field
+                $event->addExpression('1 = 0');
+                $event->stopPropagation();
+
+                return;
+            }
+        }
+
         $leadsTableAlias = $event->getLeadsTableAlias();
+
+        $operator = $event->operatorIsOneOf(OperatorOptions::INCLUDING_ALL) ? 'in' : $event->getFilter()->getOperator();
 
         $qb         = $event->getQueryBuilder();
         $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
-        if (in_array($event->getFilter()->getOperator(), ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+        if (in_array($operator, ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
             $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
                 $connection->getDatabasePlatform(),
                 $leadsTableAlias.'.'.$event->getFilter()->getField(),
@@ -200,7 +234,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $event->addExpression(
-            $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
+            $event->getQueryBuilder()->expr()->{$operator}(
                 $fieldExpr,
                 $event->getParameterHolder()
             )

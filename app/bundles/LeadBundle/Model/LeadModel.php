@@ -2033,7 +2033,7 @@ class LeadModel extends FormModel
         $columns = [];
         foreach ($aliases as $alias) {
             $quotedAlias      = $platform->quoteIdentifier($alias);
-            $lengthExpression = DatabasePlatform::getLengthSql($platform, $quotedAlias);
+            $lengthExpression = DatabasePlatform::getCharLengthSql($platform, $quotedAlias);
             $columns[]        = sprintf('MAX(%s) %s', $lengthExpression, $quotedAlias);
         }
 

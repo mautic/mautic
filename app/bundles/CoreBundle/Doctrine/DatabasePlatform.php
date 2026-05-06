@@ -153,13 +153,12 @@ class DatabasePlatform
         bool $negative = false,
     ): string {
         if (self::isPostgreSQL($platform)) {
+            // PostgreSQL
             $operator = $negative ? '!~*' : '~*';
-
-            return $column.' '.$operator.' '.$pattern;
+        } else {
+            // MySQL
+            $operator = $negative ? 'NOT REGEXP' : 'REGEXP';
         }
-
-        // MySQL
-        $operator = $negative ? 'NOT REGEXP' : 'REGEXP';
 
         return $column.' '.$operator.' '.$pattern;
     }
@@ -172,12 +171,7 @@ class DatabasePlatform
         ?AbstractPlatform $platform,
         string $value,
     ): string {
-        $escaped = preg_quote($value, '~');
-        if (self::isPostgreSQL($platform)) {
-            return '\\|?'.$escaped.'\\|?';
-        }
-
-        return "\\|?$value\\|?";
+        return '\\|?'.(self::isPostgreSQL($platform) ? preg_quote($value, '~') : $value).'\\|?';
     }
 
     /* ===================================================================
@@ -983,7 +977,7 @@ class DatabasePlatform
      * PostgreSQL: LENGTH(col)
      * MySQL:      CHAR_LENGTH(col)
      */
-    public static function getLengthSql(
+    public static function getCharLengthSql(
         ?AbstractPlatform $platform,
         string $column,
     ): string {
@@ -1135,11 +1129,7 @@ class DatabasePlatform
      */
     public static function getShareLockClause(?AbstractPlatform $platform): string
     {
-        if (self::isPostgreSQL($platform)) {
-            return 'FOR SHARE';
-        }
-
-        return 'LOCK IN SHARE MODE';
+        return self::isPostgreSQL($platform) ? 'FOR SHARE' : 'LOCK IN SHARE MODE';
     }
 
     /**
@@ -1201,11 +1191,7 @@ class DatabasePlatform
      */
     public static function getAddColumnKeyword(?AbstractPlatform $platform): string
     {
-        if (self::isPostgreSQL($platform)) {
-            return 'ADD COLUMN';
-        }
-
-        return 'ADD';
+        return self::isPostgreSQL($platform) ? 'ADD COLUMN' : 'ADD';
     }
 
     /**
@@ -1333,6 +1319,12 @@ class DatabasePlatform
         $platform = $connection->getDatabasePlatform();
         $dbName   = $connection->getDatabase();
 
+        $params = [
+            'db'     => $dbName,
+            'table'  => $fullTableName,
+            'column' => $columnName,
+        ];
+
         if (self::isPostgreSQL($platform)) {
             $sql = 'SELECT * FROM information_schema.columns
                     WHERE table_catalog = :db
@@ -1340,24 +1332,13 @@ class DatabasePlatform
                       AND table_name   = :table
                       AND column_name  = :column';
 
-            $params = [
-                'db'     => $dbName,
-                'schema' => $tableSchema,
-                'table'  => $fullTableName,
-                'column' => $columnName,
-            ];
+            $params['schema'] = $tableSchema;
         } else {
             // MySQL / MariaDB
             $sql = 'SELECT * FROM information_schema.COLUMNS
                     WHERE TABLE_SCHEMA = :db
                       AND TABLE_NAME   = :table
                       AND COLUMN_NAME  = :column';
-
-            $params = [
-                'db'     => $dbName,
-                'table'  => $fullTableName,
-                'column' => $columnName,
-            ];
         }
 
         return $connection->executeQuery($sql, $params)->fetchAllAssociative();
@@ -1460,11 +1441,9 @@ class DatabasePlatform
      */
     public static function quoteIdentifier(?AbstractPlatform $platform, string $identifier): string
     {
-        if (self::isPostgreSQL($platform)) {
-            return '"'.$identifier.'"';
-        }
+        $quoteChar = self::isPostgreSQL($platform) ? '"' : '`';
 
-        return '`'.$identifier.'`';
+        return $quoteChar.$identifier.$quoteChar;
     }
 
     /**
@@ -1480,11 +1459,7 @@ class DatabasePlatform
 
         [$tableAlias, $columnName] = explode('.', $fullColumnName, 2);
 
-        if (self::isPostgreSQL($platform)) {
-            return '"'.$tableAlias.'"."'.$columnName.'"';
-        }
-
-        return '`'.$tableAlias.'`.`'.$columnName.'`';
+        return implode('.', [self::quoteIdentifier($platform, $tableAlias), self::quoteIdentifier($platform, $columnName)]);
     }
 
     /**
@@ -1492,15 +1467,10 @@ class DatabasePlatform
      */
     public static function unquoteIdentifier(?AbstractPlatform $platform, string $fullColumnName): string
     {
-        if (self::isPostgreSQL($platform)) {
-            return preg_match('/^["a-zA-Z0-9_\.\$]+$/', $fullColumnName)
-                ? str_replace('"', '', $fullColumnName)
-                : $fullColumnName;
-        }
+        $quoteChar = self::isPostgreSQL($platform) ? '"' : '`';
 
-        // MySQL
-        return preg_match('/^[`a-zA-Z0-9_\.\$]+$/', $fullColumnName)
-            ? str_replace('`', '', $fullColumnName)
+        return preg_match('/^['.$quoteChar.'a-zA-Z0-9_\.\$]+$/', $fullColumnName)
+            ? str_replace($quoteChar, '', $fullColumnName)
             : $fullColumnName;
     }
 
