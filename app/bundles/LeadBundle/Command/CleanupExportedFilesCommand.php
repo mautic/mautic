@@ -57,7 +57,7 @@ class CleanupExportedFilesCommand extends Command
             // causes this cleanup to silently no-op on NFS-mounted contact_export_dir setups.
             if (filemtime($file) <= $cleanUpTimestamp) {
                 if (!@unlink($file)) {
-                    $output->writeln(sprintf('<error>Failed to remove %s</error>', $file), OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln(sprintf('<error>Failed to remove %s</error>', $file), OutputInterface::VERBOSITY_VERY_VERBOSE);
                 }
             }
         }
