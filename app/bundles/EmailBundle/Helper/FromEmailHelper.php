@@ -105,6 +105,11 @@ class FromEmailHelper
         throw new OwnerNotFoundException();
     }
 
+    public function hasSignature(): bool
+    {
+        return (bool) $this->lastOwner;
+    }
+
     public function getSignature(): string
     {
         if (!$this->lastOwner) {

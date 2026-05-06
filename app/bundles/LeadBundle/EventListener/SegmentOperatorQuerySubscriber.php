@@ -160,7 +160,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         );
 
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $queryBuilder->expr()->$operator($fieldExpr, $parameter);
+            $expressions[] = $queryBuilder->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
         }
 
         if ($applyIsNull) {
