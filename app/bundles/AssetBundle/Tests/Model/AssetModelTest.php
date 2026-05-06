@@ -286,6 +286,78 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('http://localhost', $download->getReferer());
     }
 
+    /**
+     * Regression test: a system-entry tracked download (e.g. recorded when an email
+     * with an asset attachment is sent) must still link to the asset on the Download
+     * row. Previously setAsset() was inside the `empty($systemEntry)` guard, so
+     * emailed-asset tracking persisted rows with asset_id = NULL — orphans which then
+     * crashed the contact timeline once Asset::getSlug() was added in 7.1.0.
+     */
+    public function testTrackDownloadLinksAssetForSystemEntry(): void
+    {
+        $asset = new Asset();
+        $lead  = new Lead();
+
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+
+        $request          = $this->createMock(Request::class);
+        $serverBag        = $this->createMock(ServerBag::class);
+        $request->server  = $serverBag;
+
+        $serverBag->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('HTTP_REFERER'))
+            ->willReturn('http://localhost');
+
+        // System-entry path consults only utm_* params (5 calls); the user-triggered
+        // 'ct' lookup is skipped because that block is gated on empty($systemEntry).
+        $request->expects($this->exactly(5))
+            ->method('get')
+            ->willReturnCallback(function (...$parameters) {
+                self::assertContains($parameters[0], ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term']);
+
+                return null;
+            });
+
+        $ipAddress = new IpAddress('127.0.0.1');
+        $this->ipLookupHelper->expects($this->exactly(2))
+            ->method('getIpAddress')
+            ->willReturn($ipAddress);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('hasListeners')
+            ->with($this->equalTo(AssetEvents::ASSET_ON_LOAD))
+            ->willReturn(false);
+
+        // Per-asset download counter must NOT bump for system-entry tracking;
+        // emailed-attachment tracking should not inflate the public download stat.
+        $this->entityManager->expects($this->never())
+            ->method('getRepository');
+
+        /** @var ?Download $persisted */
+        $persisted = null;
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function ($downloadPersist) use (&$persisted) {
+                $persisted = $downloadPersist;
+
+                return $downloadPersist instanceof Download;
+            }));
+        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())
+            ->method('detach')
+            ->with($this->callback(function ($downloadDetach) use (&$persisted) {
+                self::assertSame($downloadDetach, $persisted);
+
+                return true;
+            }));
+
+        $this->assetModel->trackDownload($asset, $request, 200, ['lead' => $lead]);
+
+        self::assertSame($asset, $persisted->getAsset(), 'Download row must link to the asset even on the system-entry path.');
+        self::assertSame($lead, $persisted->getLead());
+    }
+
     #[DataProvider('getEntityBySlugsProvider')]
     public function testGetEntityBySlugs(
         string $slug,
