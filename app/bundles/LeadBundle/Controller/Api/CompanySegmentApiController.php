@@ -156,4 +156,138 @@ class CompanySegmentApiController extends CommonApiController
 
         return $response;
     }
+
+    /**
+     * @param int $id        Company Segment ID
+     * @param int $companyId Company ID
+     *
+     * @return Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function removeCompanyAction($id, $companyId)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if (null === $entity) {
+            return $this->notFound();
+        }
+
+        $companyModel = $this->getModel('lead.company');
+        \assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        $company = $companyModel->getEntity($companyId);
+
+        if (null === $company) {
+            return $this->notFound();
+        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        \assert($this->model instanceof CompanySegmentModel);
+
+        // Does the user have access to the company segment
+        $companySegments = $this->model->getCompanySegments();
+        if (!isset($companySegments[$id])) {
+            return $this->accessDenied();
+        }
+
+        $this->model->removeCompany($company, [$entity], true);
+
+        $view = $this->view(['success' => 1], Response::HTTP_OK);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * @param int $id        Company Segment ID
+     * @param int $companyId Company ID
+     *
+     * @return Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function addCompanyAction($id, $companyId)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if (null === $entity) {
+            return $this->notFound();
+        }
+
+        $companyModel = $this->getModel('lead.company');
+        \assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        $company = $companyModel->getEntity($companyId);
+
+        if (null === $company) {
+            return $this->notFound();
+        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        \assert($this->model instanceof CompanySegmentModel);
+
+        // Does the user have access to the company segment
+        $companySegments = $this->model->getCompanySegments();
+        if (!isset($companySegments[$id])) {
+            return $this->accessDenied();
+        }
+
+        $this->model->addCompany($company, [$entity], true);
+
+        $view = $this->view(['success' => 1], Response::HTTP_OK);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Adds companies to a company segment.
+     *
+     * @param int $id Company Segment ID
+     *
+     * @return Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function addCompaniesAction(Request $request, $id)
+    {
+        $companyIds = $request->request->all()['ids'] ?? null;
+        if (null === $companyIds) {
+            return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
+        }
+
+        $entity = $this->model->getEntity($id);
+
+        if (null === $entity) {
+            return $this->notFound();
+        }
+
+        \assert($this->model instanceof CompanySegmentModel);
+
+        // Does the user have access to the company segment
+        $companySegments = $this->model->getCompanySegments();
+        if (!isset($companySegments[$id])) {
+            return $this->accessDenied();
+        }
+
+        $companyModel = $this->getModel('lead.company');
+        \assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+
+        $responseDetail = [];
+        foreach ($companyIds as $companyId) {
+            $company = $companyModel->getEntity($companyId);
+
+            if (null === $company) {
+                $responseDetail[$companyId] = ['success' => false];
+            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
+                $responseDetail[$companyId] = ['success' => false];
+            } else {
+                $this->model->addCompany($company, [$entity], true);
+                $responseDetail[$company->getId()] = ['success' => true];
+            }
+        }
+
+        $view = $this->view(['success' => 1, 'details' => $responseDetail], Response::HTTP_OK);
+
+        return $this->handleView($view);
+    }
 }

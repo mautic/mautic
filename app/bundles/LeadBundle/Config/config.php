@@ -262,6 +262,21 @@ return [
                 'path'            => '/companysegments',
                 'controller'      => Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::class,
             ],
+            'mautic_api_companysegmentaddcompany' => [
+                'path'       => '/companysegments/{id}/company/{companyId}/add',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::addCompanyAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companysegmentaddcompanies' => [
+                'path'       => '/companysegments/{id}/companies/add',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::addCompaniesAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companysegmentremovecompany' => [
+                'path'       => '/companysegments/{id}/company/{companyId}/remove',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::removeCompanyAction',
+                'method'     => 'POST',
+            ],
             'mautic_api_companiesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'companies',
