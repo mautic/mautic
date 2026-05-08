@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
@@ -242,6 +243,42 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = $this->getContactRequestHelper();
         $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
+    }
+
+    public function testBlockedTrackingCookieStillAllowsClickthroughIdentification(): void
+    {
+        $query = [
+            'ct' => [
+                'stat' => 'abc123',
+            ],
+        ];
+
+        $request = new Request();
+        $request->cookies->set('Blocked-Tracking', '1');
+        $request->server->set('HTTP_USER_AGENT', 'phpunit');
+        $this->requestStack->method('getCurrentRequest')
+            ->willReturn($request);
+
+        $contact = new Lead();
+
+        $this->dispatcher->method('dispatch')
+            ->willReturnCallback(function (ContactIdentificationEvent $event) use ($contact) {
+                $event->setIdentifiedContact($contact, 'email');
+
+                return $event;
+            });
+
+        $this->contactTracker->expects($this->once())
+            ->method('setTrackedContact')
+            ->with($contact);
+
+        $this->leadModel->expects($this->never())
+            ->method('setFieldValues');
+
+        $helper       = $this->getContactRequestHelper();
+        $foundContact = $helper->getContactFromQuery($query);
+
+        $this->assertSame($contact, $foundContact);
     }
 
     private function getContactRequestHelper(): ContactRequestHelper

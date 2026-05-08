@@ -518,7 +518,6 @@ class PublicController extends AbstractFormController
 
             try {
                 $decodedClickthrough = is_array($ct) ? $ct : ClickthroughHelper::decodeArrayFromUrl($ct);
-
                 /** @var LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
                 /** @var \Mautic\EmailBundle\Entity\StatRepository $emailStatRepository */
