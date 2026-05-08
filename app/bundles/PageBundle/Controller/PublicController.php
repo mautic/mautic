@@ -505,12 +505,11 @@ class PublicController extends AbstractFormController
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
             try {
+                $decodedClickthrough = is_array($ct) ? $ct : ClickthroughHelper::decodeArrayFromUrl($ct);
                 /** @var LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
                 /** @var \Mautic\EmailBundle\Entity\StatRepository $emailStatRepository */
                 $emailStatRepository = $this->doctrine->getManager()->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
-
-                $decodedClickthrough = is_array($ct) ? $ct : ClickthroughHelper::decodeArrayFromUrl($ct);
 
                 // Resolve the contact for tokenized redirect URLs even when tracking is temporarily blocked.
                 $lead = null;
@@ -519,8 +518,9 @@ class PublicController extends AbstractFormController
                     $stat = $emailStatRepository->findOneBy(['trackingHash' => $decodedClickthrough['stat']]);
                     if (null !== $stat) {
                         $emailTokens = $stat->getTokens();
-                        if ($stat->getLead() instanceof Lead) {
-                            $lead = $stat->getLead();
+                        $statLead    = $stat->getLead();
+                        if ($statLead instanceof Lead) {
+                            $lead = $statLead;
                         }
                     }
                 }
