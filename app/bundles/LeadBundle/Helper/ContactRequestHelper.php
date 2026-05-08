@@ -48,7 +48,8 @@ class ContactRequestHelper
     public function getContactFromQuery(array $queryFields = []): ?Lead
     {
         $request = $this->getCurrentRequest();
-        if ($request && $request->cookies->get('Blocked-Tracking')) {
+        $blockedTracking = $request && $request->cookies->get('Blocked-Tracking');
+        if ($blockedTracking && empty($queryFields['ct'])) {
             return null;
         }
 
@@ -89,6 +90,10 @@ class ContactRequestHelper
             return null;
         }
 
+        if ($blockedTracking) {
+            return $this->trackedContact;
+        }
+
         $this->prepareContactFromRequest();
 
         return $this->trackedContact;
@@ -101,7 +106,7 @@ class ContactRequestHelper
     {
         $request = $this->getCurrentRequest();
 
-        if ($request && $request->cookies->get('Blocked-Tracking')) {
+        if ($request && $request->cookies->get('Blocked-Tracking') && !isset($this->queryFields['ct'])) {
             throw new ContactNotFoundException();
         }
 
