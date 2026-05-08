@@ -7,7 +7,7 @@ use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -498,12 +498,13 @@ class CategoryController extends AbstractFormController
                         '%id%'   => $objectId,
                     ],
                 ];
-            } catch (RecordCanNotBeDeletedException $exception) {
-                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-                $flashes[]                      = [
-                    'type' => 'notice',
-                    'msg'  => $exception->getMessage(),
-                ];
+            } catch (DeleteEntityDependencyException $exception) {
+                foreach ($exception->getErrors() as $error) {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => $error,
+                    ];
+                }
             }
         } // else don't do anything
 
@@ -566,7 +567,7 @@ class CategoryController extends AbstractFormController
                         // Delete everything we are able to
                         $model->deleteEntity($entity);
                         $deleteIds[] = $objectId;
-                    } catch (RecordCanNotBeDeletedException $exception) {
+                    } catch (DeleteEntityDependencyException $exception) {
                         $deletedExceptions[] = $exception;
                     }
                 }
@@ -583,10 +584,12 @@ class CategoryController extends AbstractFormController
             }
 
             foreach ($deletedExceptions as $deletedException) {
-                $flashes[] = [
-                    'type' => 'notice',
-                    'msg'  => $deletedException->getMessage(),
-                ];
+                foreach ($deletedException->getErrors() as $error) {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => $error,
+                    ];
+                }
             }
         } // else don't do anything
 

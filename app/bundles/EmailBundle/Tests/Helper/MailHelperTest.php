@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -142,6 +144,12 @@ class MailHelperTest extends TestCase
     protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        // Some local environments do not have ext-imap loaded, but Mailbox uses these
+        // constants in method signatures and class loading fails without them.
+        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
+        defined('SE_UID') or define('SE_UID', 1);
+        defined('FT_PEEK') or define('FT_PEEK', 2);
 
         $this->contactRepository    = $this->createMock(LeadRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -813,7 +821,6 @@ class MailHelperTest extends TestCase
         $email->setSubject('Subject');
         $email->setCustomHtml('content');
         $mailer->setEmail($email);
-
         $mailer->setBody('{signature}');
 
         foreach ($this->contacts as $contact) {
@@ -1860,5 +1867,67 @@ class MailHelperTest extends TestCase
         $this->assertEquals('Name 1', $bcc[0]->getName());
         $this->assertEquals('bcc2@example.com', $bcc[1]->getAddress());
         $this->assertEquals('Default Name', $bcc[1]->getName());
+    }
+
+    public function testEmailWithDefaultSignature(): void
+    {
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->coreParametersHelper->method('get')->willReturnMap([
+            ['mailer_convert_embed_images', false, true],
+            ['mailer_append_tracking_pixel', false, true],
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_reply_to_email', null, null],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, 320],
+            ['mailer_return_path', false, null],
+            ['brand_name', null, null],
+        ]);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $eventDispatcher,
+            $this->requestStack,
+            $this->entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
+        );
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $onSendDispatchCount = 0;
+        $eventDispatcher->expects(self::atLeastOnce())
+            ->method('dispatch')
+            ->willReturnCallback(function (object $event, ?string $eventName = null) use (&$onSendDispatchCount): object {
+                if ($event instanceof EmailSendEvent && EmailEvents::EMAIL_ON_SEND === $eventName) {
+                    ++$onSendDispatchCount;
+                    $event->addToken('{signature}', 'Demo Signature');
+                }
+
+                return $event;
+            });
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $mailer->setEmail($email);
+
+        Assert::assertNull($mailer->message->getHtmlBody());
+        $mailer->send(true);
+        Assert::assertSame(1, $onSendDispatchCount);
+        Assert::assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
     }
 }
