@@ -133,10 +133,10 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('blockedTrackingCookieProvider')]
-    public function testRedirectReplacesStoredEmailTokensWhenBlockedTrackingCookieIsPresent(bool $blockedTracking): void
+    public function testRedirectReplacesStoredEmailFieldValueWhenBlockedTrackingCookieIsPresent(bool $blockedTracking): void
     {
-        $resolvedToken = 'resolved-preference-token';
-        $url           = 'https://example.com/preferences?token={contactfield=preference_token}';
+        $resolvedUuid = '20a72128-75b4-468e-b8e6-0f0af25e4bcd';
+        $url          = 'https://example.com/preferences?uuid={contactfield=preference_uuid}';
 
         $lead = new Lead();
         $lead->setEmail('redirect-test@example.com');
@@ -148,7 +148,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $stat->setEmailAddress('redirect-test@example.com');
         $stat->setLead($lead);
         $stat->setTokens([
-            '{contactfield=preference_token}' => $resolvedToken,
+            '{contactfield=preference_uuid}' => $resolvedUuid,
         ]);
         $this->em->persist($stat);
 
@@ -173,7 +173,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         \assert($response instanceof RedirectResponse);
         Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         Assert::assertSame(
-            sprintf('https://example.com/preferences?token=%s', $resolvedToken),
+            sprintf('https://example.com/preferences?uuid=%s', $resolvedUuid),
             $response->getTargetUrl()
         );
     }

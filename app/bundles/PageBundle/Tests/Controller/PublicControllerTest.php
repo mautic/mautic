@@ -124,6 +124,27 @@ class PublicControllerTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param array<int, array{0: string, 1: object}> $expectedCalls
+     */
+    private function expectGetModelSequence(array $expectedCalls): void
+    {
+        $invocation = 0;
+
+        $this->modelFactory->expects(self::exactly(count($expectedCalls)))
+            ->method('getModel')
+            ->willReturnCallback(function (string $alias) use (&$invocation, $expectedCalls) {
+                self::assertArrayHasKey($invocation, $expectedCalls);
+
+                [$expectedAlias, $returnValue] = $expectedCalls[$invocation];
+                self::assertSame($expectedAlias, $alias);
+
+                ++$invocation;
+
+                return $returnValue;
+            });
+    }
+
+    /**
      * Test that the appropriate variant is displayed based on hit counts and variant weights.
      */
     public function testVariantPageWeightsAreAppropriate(): void
@@ -326,10 +347,11 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->modelFactory->expects(self::exactly(3))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+        $this->expectGetModelSequence([
+            ['page.redirect', $this->redirectModel],
+            ['lead', $this->leadModel],
+            ['page', $this->pageModel],
+        ]);
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -415,10 +437,11 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->modelFactory->expects(self::exactly(3))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+        $this->expectGetModelSequence([
+            ['page.redirect', $this->redirectModel],
+            ['lead', $this->leadModel],
+            ['page', $this->pageModel],
+        ]);
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -491,11 +514,11 @@ class PublicControllerTest extends MauticMysqlTestCase
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
-    public function testRedirectUsesStoredEmailTokensWhenBlockedTrackingCookieIsPresent(): void
+    public function testRedirectUsesStoredEmailFieldValueWhenBlockedTrackingCookieIsPresent(): void
     {
         $redirectId      = 'tokenizedRedirectId';
-        $redirectUrl     = 'https://example.com/preferences?token={contactfield=preference_token}';
-        $resolvedToken   = 'stored-token-value';
+        $redirectUrl     = 'https://example.com/preferences?uuid={contactfield=preference_uuid}';
+        $resolvedUuid    = '20a72128-75b4-468e-b8e6-0f0af25e4bcd';
         $trackingHash    = 'trackinghash123';
         $clickThrough    = ClickthroughHelper::encodeArrayForUrl([
             'source' => [],
@@ -516,10 +539,11 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->modelFactory->expects(self::exactly(3))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['page'], ['lead'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->pageModel, $leadModel);
+        $this->expectGetModelSequence([
+            ['page.redirect', $this->redirectModel],
+            ['page', $this->pageModel],
+            ['lead', $leadModel],
+        ]);
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -541,7 +565,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $emailStat->expects(self::once())
             ->method('getTokens')
             ->willReturn([
-                '{contactfield=preference_token}' => $resolvedToken,
+                '{contactfield=preference_uuid}' => $resolvedUuid,
             ]);
 
         $emailStat->expects(self::once())
@@ -608,7 +632,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
 
         self::assertSame(
-            sprintf('https://example.com/preferences?token=%s', $resolvedToken),
+            sprintf('https://example.com/preferences?uuid=%s', $resolvedUuid),
             $response->getTargetUrl()
         );
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
