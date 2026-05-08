@@ -378,8 +378,14 @@ class EmailRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
-                    ->setParameter('search', "%{$search}%");
+                $q->andWhere(
+                    $q->expr()->orX(
+                        $q->expr()->like('e.name', ':search'),
+                        $q->expr()->like('e.id', ':searchId')
+                    )
+                )
+                    ->setParameter('search', "%{$search}%")
+                    ->setParameter('searchId', "%{$search}%");
             }
         }
 

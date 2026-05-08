@@ -2116,7 +2116,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 foreach ($emails as $email) {
                     if (empty($options['name_is_key'])) {
-                        $results[$email['language']][$email['id']] = $email['name'];
+                        $results[$email['language']][$email['id']] = sprintf('(%s) %s', $email['id'], $email['name']);
                     } else {
                         $results[$email['language']][$email['name']] = $email['id'];
                     }
