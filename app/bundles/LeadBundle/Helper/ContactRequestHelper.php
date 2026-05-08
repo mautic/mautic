@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -51,20 +50,28 @@ class ContactRequestHelper
     public function getContactFromQuery(array $queryFields = []): ?Lead
     {
         $request = $this->getCurrentRequest();
-        if ($this->isBlockedTrackingWithoutClickthrough($request, $queryFields)) {
+        $blockedTracking = $request && $request->cookies->get('Blocked-Tracking');
+        if ($blockedTracking && empty($queryFields['ct'])) {
             return null;
         }
-
-        $blockedTracking = $request && $request->cookies->get('Blocked-Tracking');
 
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         if (!$ipAddress->isTrackable()) {
             return null;
         }
 
-        $queryFields = $this->normalizeClickthroughQueryFields($queryFields);
-        if ($this->isBotClickthroughHit($queryFields, $request, $ipAddress)) {
-            return null;
+        $dateTime  = new \DateTime();
+        $userAgent = $request ? $request->server->get('HTTP_USER_AGENT') : '';
+        if (!empty($queryFields['ct'])) {
+            $queryFields['ct'] = (is_array($queryFields['ct'])) ? $queryFields['ct'] : ClickthroughHelper::decodeArrayFromUrl($queryFields['ct']);
+        }
+
+        if (isset($queryFields['ct']['stat'])) {
+            /** @var Stat $stat */
+            $stat = $this->statRepository->findOneBy(['trackingHash' => $queryFields['ct']['stat']]);
+            if (null !== $stat && $this->botRatioHelper->isHitByBot($stat, $dateTime, $ipAddress, (string) $userAgent)) {
+                return null;
+            }
         }
 
         unset($queryFields['page_url']); // This is set now automatically by PageModel
@@ -92,44 +99,6 @@ class ContactRequestHelper
         $this->prepareContactFromRequest();
 
         return $this->trackedContact;
-    }
-
-    private function isBlockedTrackingWithoutClickthrough(?Request $request, array $queryFields): bool
-    {
-        return (bool) ($request && $request->cookies->get('Blocked-Tracking') && empty($queryFields['ct']));
-    }
-
-    private function normalizeClickthroughQueryFields(array $queryFields): array
-    {
-        if (empty($queryFields['ct'])) {
-            return $queryFields;
-        }
-
-        $queryFields['ct'] = is_array($queryFields['ct'])
-            ? $queryFields['ct']
-            : ClickthroughHelper::decodeArrayFromUrl($queryFields['ct']);
-
-        return $queryFields;
-    }
-
-    private function isBotClickthroughHit(array $queryFields, ?Request $request, IpAddress $ipAddress): bool
-    {
-        if (!isset($queryFields['ct']['stat'])) {
-            return false;
-        }
-
-        /** @var Stat|null $stat */
-        $stat = $this->statRepository->findOneBy(['trackingHash' => $queryFields['ct']['stat']]);
-        if (null === $stat) {
-            return false;
-        }
-
-        return $this->botRatioHelper->isHitByBot(
-            $stat,
-            new \DateTime(),
-            $ipAddress,
-            (string) ($request ? $request->server->get('HTTP_USER_AGENT') : '')
-        );
     }
 
     /**
