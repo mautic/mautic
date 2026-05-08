@@ -517,8 +517,8 @@ class PublicControllerTest extends MauticMysqlTestCase
     public function testRedirectUsesStoredEmailFieldValueWhenBlockedTrackingCookieIsPresent(): void
     {
         $redirectId      = 'tokenizedRedirectId';
-        $redirectUrl     = 'https://example.com/preferences?uuid={contactfield=preference_uuid}';
-        $resolvedUuid    = '20a72128-75b4-468e-b8e6-0f0af25e4bcd';
+        $redirectUrl     = 'https://example.com/preferences?choice={contactfield=preferred_choice}';
+        $resolvedValue   = 'weekly-digest';
         $trackingHash    = 'trackinghash123';
         $clickThrough    = ClickthroughHelper::encodeArrayForUrl([
             'source' => [],
@@ -565,7 +565,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $emailStat->expects(self::once())
             ->method('getTokens')
             ->willReturn([
-                '{contactfield=preference_uuid}' => $resolvedUuid,
+                '{contactfield=preferred_choice}' => $resolvedValue,
             ]);
 
         $emailStat->expects(self::once())
@@ -632,7 +632,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
 
         self::assertSame(
-            sprintf('https://example.com/preferences?uuid=%s', $resolvedUuid),
+            sprintf('https://example.com/preferences?choice=%s', $resolvedValue),
             $response->getTargetUrl()
         );
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
