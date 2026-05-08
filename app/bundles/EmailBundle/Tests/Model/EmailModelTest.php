@@ -863,7 +863,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->assertSame(
-            ['EN' => [123 => 'Email 123']],
+            ['EN' => [123 => '(123) Email 123']],
             $this->emailModel->getLookupResults('email', '', 0, 0)
         );
     }
@@ -980,5 +980,37 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);
         $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
+    }
+
+    public function testGetLookupResultsIdTextWithWithDefaultOptions(): void
+    {
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->emailRepository);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getEmailList')
+            ->with(
+                '',
+                0,
+                0,
+                null,
+                false,
+                null,
+                [],
+                null
+            )
+            ->willReturn([
+                [
+                    'id'       => 123,
+                    'name'     => 'Email 123',
+                    'language' => 'EN',
+                ],
+            ]);
+
+        self::assertEquals(
+            ['EN' => [123 => '(123) Email 123']],
+            $this->emailModel->getLookupResults('email', '', 0, 0)
+        );
     }
 }
