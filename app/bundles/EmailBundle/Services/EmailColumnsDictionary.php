@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Enum\EmailListColumn;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailColumnsDictionary
+final class EmailColumnsDictionary
 {
     /**
      * @var array<string, string>

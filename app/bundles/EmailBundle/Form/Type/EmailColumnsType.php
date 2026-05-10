@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailColumnsType extends AbstractType
+final class EmailColumnsType extends AbstractType
 {
     public function __construct(
         private EmailColumnsDictionary $columnsDictionary,
