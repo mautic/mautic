@@ -8,6 +8,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 
 class LeadDetailFunctionalTest extends MauticMysqlTestCase
@@ -150,5 +151,42 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(1, $fbProfile);
         $this->assertStringContainsString($fbLink, $fbProfile->text());
+    }
+
+    public function testHiddenGroupFieldsAreNotShownOnLeadDetailOrEditPages(): void
+    {
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        \assert($fieldModel instanceof FieldModel);
+
+        $field = new LeadField();
+        $field->setLabel('Internal API Field');
+        $field->setAlias('field_internal_api');
+        $field->setType('text');
+        $field->setObject('lead');
+        $field->setGroup(LeadField::GROUP_HIDDEN);
+        $fieldModel->saveEntity($field);
+
+        $lead = new Lead();
+        $lead->setEmail('hidden-group@test.com');
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $this->connection->update(
+            MAUTIC_TABLE_PREFIX.'leads',
+            ['field_internal_api' => 'Top Secret'],
+            ['id' => $lead->getId()]
+        );
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', 's/contacts/view/'.$lead->getId());
+
+        $this->assertCount(0, $crawler->filter('a.group[href="#hidden"]'));
+        $this->assertStringNotContainsString('Internal API Field', $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Top Secret', $this->client->getResponse()->getContent());
+
+        $crawler = $this->client->request('GET', 's/contacts/edit/'.$lead->getId());
+
+        $this->assertCount(0, $crawler->filter('a.steps[href="#hidden"]'));
+        $this->assertCount(0, $crawler->filter('[name="lead[field_internal_api]"]'));
     }
 }

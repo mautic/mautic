@@ -183,6 +183,30 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringNotContainsString($expectedMessage, $text);
     }
 
+    public function testCreatingNewFieldInHiddenGroup(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $form = $crawler->selectButton('Save')->form();
+        $form['leadfield[label]']->setValue('Internal API Field');
+        $form['leadfield[type]']->setValue('text');
+        $form['leadfield[object]']->setValue('lead');
+        $form['leadfield[group]']->setValue(LeadField::GROUP_HIDDEN);
+
+        $this->client->submit($form);
+
+        $text = strip_tags($this->client->getResponse()->getContent());
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $text);
+
+        /** @var LeadField|null $field */
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => 'Internal API Field']);
+        Assert::assertNotNull($field);
+        Assert::assertSame(LeadField::GROUP_HIDDEN, $field->getGroup());
+    }
+
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */

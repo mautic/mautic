@@ -854,7 +854,7 @@ class LeadModel extends FormModel
         }
 
         // make sure each group key is present
-        $groups = ['core', 'social', 'personal', 'professional'];
+        $groups = ['core', 'social', 'personal', 'professional', LeadField::GROUP_HIDDEN];
         foreach ($groups as $g) {
             if (!isset($array[$g])) {
                 $array[$g] = [];

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -18,6 +19,35 @@ use Symfony\Component\HttpFoundation\Response;
 class CompanyController extends FormController
 {
     use LeadDetailsTrait;
+
+    /**
+     * @param array<int, array<string, mixed>> $fields
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function excludeHiddenFieldDefinitions(array $fields): array
+    {
+        return array_values(array_filter(
+            $fields,
+            static fn (array $field): bool => LeadField::GROUP_HIDDEN !== ($field['group'] ?? null)
+        ));
+    }
+
+    /**
+     * @param array<string, mixed> $fieldsByGroup
+     *
+     * @return array<int, string>
+     */
+    private function getVisibleFieldGroups(array $fieldsByGroup): array
+    {
+        $groups = array_values(array_filter(
+            array_keys($fieldsByGroup),
+            static fn (string $group): bool => LeadField::GROUP_HIDDEN !== $group
+        ));
+        sort($groups);
+
+        return $groups;
+    }
 
     /**
      * @param int $page
@@ -206,8 +236,9 @@ class CompanyController extends FormController
 
         $leadFieldModel = $this->getModel('lead.field');
         \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('company');
-        $form   = $model->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        $fields        = $leadFieldModel->getPublishedFieldArrays('company');
+        $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
+        $form          = $model->createForm($entity, $this->formFactory, $action, ['fields' => $visibleFields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
@@ -285,9 +316,8 @@ class CompanyController extends FormController
             }
         }
 
-        $fields = $model->organizeFieldsByGroup($fields);
-        $groups = array_keys($fields);
-        sort($groups);
+        $fields = $model->organizeFieldsByGroup($visibleFields);
+        $groups = $this->getVisibleFieldGroups($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
@@ -383,12 +413,13 @@ class CompanyController extends FormController
 
         $leadFieldModel = $this->getModel('lead.field');
         \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $fields        = $leadFieldModel->getPublishedFieldArrays('company');
+        $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
         $form   = $model->createForm(
             $entity,
             $this->formFactory,
             $action,
-            ['fields' => $fields, 'update_select' => $updateSelect]
+            ['fields' => $visibleFields, 'update_select' => $updateSelect]
         );
 
         // /Check for a submitted form and process it
@@ -468,16 +499,15 @@ class CompanyController extends FormController
             } elseif ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $model->getEntity($objectId);
-                $form    = $model->createForm($company, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+                $form    = $model->createForm($company, $this->formFactory, $action, ['fields' => $visibleFields, 'update_select' => $updateSelect]);
             }
         } else {
             // lock the entity
             $model->lockEntity($entity);
         }
 
-        $fields = $model->organizeFieldsByGroup($fields);
-        $groups = array_keys($fields);
-        sort($groups);
+        $fields = $model->organizeFieldsByGroup($visibleFields);
+        $groups = $this->getVisibleFieldGroups($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
@@ -580,6 +610,7 @@ class CompanyController extends FormController
                 'viewParameters' => [
                     'company'           => $company,
                     'fields'            => $fields,
+                    'groups'            => $this->getVisibleFieldGroups($fields),
                     'permissions'       => $permissions,
                     'security'          => $this->security,
                 ],

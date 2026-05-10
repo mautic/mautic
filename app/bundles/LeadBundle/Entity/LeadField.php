@@ -57,6 +57,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         'url',
         'email',
     ];
+    public const GROUP_HIDDEN      = 'hidden';
     public const ENTITY_NAME        = 'lead_field';
 
     /**

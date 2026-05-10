@@ -77,6 +77,7 @@ class FieldType extends AbstractType
             [
                 'choices' => [
                     'mautic.lead.field.group.core'         => 'core',
+                    'mautic.lead.field.group.hidden'       => LeadField::GROUP_HIDDEN,
                     'mautic.lead.field.group.social'       => 'social',
                     'mautic.lead.field.group.personal'     => 'personal',
                     'mautic.lead.field.group.professional' => 'professional',
