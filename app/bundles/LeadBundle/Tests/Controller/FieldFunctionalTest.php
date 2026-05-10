@@ -223,6 +223,42 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testDefaultValueWithApostropheIsNotEncodedOnRepeatedSave(): void
+    {
+        $label   = 'Apostrophe default field';
+        $default = "Owner's choice";
+
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $form = $crawler->selectButton('Save')->form();
+        $form['leadfield[label]']->setValue($label);
+        $form['leadfield[type]']->setValue('text');
+        $form['leadfield[defaultValue]']->setValue($default);
+
+        $this->client->submit($form);
+
+        /** @var LeadField|null $field */
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
+        Assert::assertNotNull($field);
+        Assert::assertSame($default, $field->getDefaultValue());
+
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/edit/'.$field->getId());
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $form = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
+
+        $this->em->clear();
+
+        /** @var LeadField|null $field */
+        $field = $this->em->getRepository(LeadField::class)->find($field->getId());
+        Assert::assertNotNull($field);
+        Assert::assertSame($default, $field->getDefaultValue());
+    }
+
     public function testFieldsSearchByIds(): void
     {
         $urlEncodedSearch = urlencode('ids:2,3');
