@@ -51,7 +51,7 @@
 
               <ul class="list-group list-group-tabs">
                   {% for g in groups %}
-                      {% if fields[g] is not empty %}
+                      {% if 'hidden' != g and fields[g] is not empty %}
                           <li class="list-group-item {% if loop.first %}active{% endif %}">
                               <a href="#{{ g }}" class="list-group-item-heading steps" data-toggle="tab">
                                   {{ ('mautic.lead.field.group.'~g)|trans }}
@@ -69,7 +69,7 @@
           <div class="tab-content">
               <!-- pane -->
               {% for group in groups %}
-                  {% if fields[group] is defined %}
+                  {% if 'hidden' != group and fields[group] is defined %}
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
                           <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">

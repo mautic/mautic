@@ -181,12 +181,14 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', 's/contacts/view/'.$lead->getId());
 
         $this->assertCount(0, $crawler->filter('a.group[href="#hidden"]'));
+        $this->assertCount(0, $crawler->filter('div.tab-pane#hidden'));
         $this->assertStringNotContainsString('Internal API Field', $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('Top Secret', $this->client->getResponse()->getContent());
 
         $crawler = $this->client->request('GET', 's/contacts/edit/'.$lead->getId());
 
         $this->assertCount(0, $crawler->filter('a.steps[href="#hidden"]'));
+        $this->assertCount(0, $crawler->filter('div.tab-pane#hidden'));
         $this->assertCount(0, $crawler->filter('[name="lead[field_internal_api]"]'));
     }
 }
