@@ -61,31 +61,25 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
-    /**
-     * @param array<int, array<string, mixed>> $fields
-     *
-     * @return array<int, array<string, mixed>>
-     */
     private function excludeHiddenFieldDefinitions(array $fields): array
     {
-        return array_values(array_filter(
+        return array_filter(
             $fields,
             static fn (array $field): bool => LeadField::GROUP_HIDDEN !== ($field['group'] ?? null)
-        ));
+        );
     }
 
-    /**
-     * @param array<string, mixed> $fieldsByGroup
-     *
-     * @return array<int, string>
-     */
     private function getVisibleFieldGroups(array $fieldsByGroup): array
     {
-        $groups = array_values(array_filter(
-            array_keys($fieldsByGroup),
-            static fn (string $group): bool => LeadField::GROUP_HIDDEN !== $group
-        ));
-        sort($groups);
+        $groups = [];
+
+        foreach ($fieldsByGroup as $group => $groupFields) {
+            if (LeadField::GROUP_HIDDEN === $group || empty($groupFields)) {
+                continue;
+            }
+
+            $groups[] = $group;
+        }
 
         return $groups;
     }
@@ -334,9 +328,9 @@ class LeadController extends FormController
                 'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
-        $fields = $this->excludeHiddenFieldDefinitions(iterator_to_array($fields));
 
-        $quickForm = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
+        $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
+        $quickForm     = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $visibleFields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -427,6 +421,7 @@ class LeadController extends FormController
         }
 
         $fields            = $lead->getFields();
+        $visibleGroups     = $this->getVisibleFieldGroups($fields);
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
@@ -469,7 +464,7 @@ class LeadController extends FormController
                     'lead'                   => $lead,
                     'avatarPanelState'       => $request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'                 => $fields,
-                    'groups'                 => $this->getVisibleFieldGroups($fields),
+                    'groups'                 => $visibleGroups,
                     'companies'              => $companies,
                     'lists'                  => $lists,
                     'socialProfiles'         => $socialProfiles,
@@ -534,6 +529,7 @@ class LeadController extends FormController
         \assert($leadFieldModel instanceof FieldModel);
         $fields        = $leadFieldModel->getPublishedFieldArrays('lead');
         $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
+        $groupedFields = $model->organizeFieldsByGroup($visibleFields);
         $form          = $model->createForm($lead, $this->formFactory, $action, ['fields' => $visibleFields]);
 
         // /Check for a submitted form and process it
@@ -663,8 +659,6 @@ class LeadController extends FormController
             $currentUser = $tokenStorage->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
         }
-
-        $groupedFields = $model->organizeFieldsByGroup($visibleFields);
 
         return $this->delegateView(
             [
