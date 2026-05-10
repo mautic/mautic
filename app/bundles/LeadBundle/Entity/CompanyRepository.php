@@ -114,7 +114,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getFieldGroups(): array
     {
-        return ['core', 'professional', 'other', LeadField::GROUP_HIDDEN];
+        return ['core', 'professional', 'other'];
     }
 
     /**

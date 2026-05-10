@@ -212,7 +212,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // make sure each group key is present
-        $groups = ['core', 'social', 'personal', 'professional', LeadField::GROUP_HIDDEN];
+        $groups = ['core', 'social', 'personal', 'professional'];
         foreach ($groups as $g) {
             if (!isset($array[$g])) {
                 $array[$g] = [];

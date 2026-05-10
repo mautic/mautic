@@ -553,7 +553,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     public function getFieldGroups(): array
     {
-        return ['core', 'social', 'personal', 'professional', LeadField::GROUP_HIDDEN];
+        return ['core', 'social', 'personal', 'professional'];
     }
 
     /**

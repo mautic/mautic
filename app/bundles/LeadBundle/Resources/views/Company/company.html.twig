@@ -2,7 +2,6 @@
   Variables
     - company
     - fields
-        - groups
     - items
     - permissions
     - engagementData
@@ -86,7 +85,7 @@
             <!-- lead detail collapseable -->
             <div class="collapse pr-md pl-md" id="lead-details">
                 <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
-                    {% for g in groups %}
+                    {% for g in fields|keys %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
                                 <a href="#{{ g }}" class="group" data-toggle="tab">{{ ('mautic.lead.field.group.'~g)|trans }}</a>
@@ -97,7 +96,7 @@
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md">
-                    {% for group in groups %}
+                    {% for group in fields|keys %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">

@@ -61,29 +61,6 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
-    private function excludeHiddenFieldDefinitions(array $fields): array
-    {
-        return array_filter(
-            $fields,
-            static fn (array $field): bool => LeadField::GROUP_HIDDEN !== ($field['group'] ?? null)
-        );
-    }
-
-    private function getVisibleFieldGroups(array $fieldsByGroup): array
-    {
-        $groups = [];
-
-        foreach ($fieldsByGroup as $group => $groupFields) {
-            if (LeadField::GROUP_HIDDEN === $group || empty($groupFields)) {
-                continue;
-            }
-
-            $groups[] = $group;
-        }
-
-        return $groups;
-    }
-
     /**
      * @param int $page
      *
@@ -329,8 +306,7 @@ class LeadController extends FormController
             ]
         );
 
-        $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
-        $quickForm     = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $visibleFields, 'isShortForm' => true]);
+        $quickForm = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -421,7 +397,6 @@ class LeadController extends FormController
         }
 
         $fields            = $lead->getFields();
-        $visibleGroups     = $this->getVisibleFieldGroups($fields);
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
@@ -464,7 +439,6 @@ class LeadController extends FormController
                     'lead'                   => $lead,
                     'avatarPanelState'       => $request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'                 => $fields,
-                    'groups'                 => $visibleGroups,
                     'companies'              => $companies,
                     'lists'                  => $lists,
                     'socialProfiles'         => $socialProfiles,
@@ -527,10 +501,8 @@ class LeadController extends FormController
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $leadFieldModel = $this->getModel('lead.field');
         \assert($leadFieldModel instanceof FieldModel);
-        $fields        = $leadFieldModel->getPublishedFieldArrays('lead');
-        $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
-        $groupedFields = $model->organizeFieldsByGroup($visibleFields);
-        $form          = $model->createForm($lead, $this->formFactory, $action, ['fields' => $visibleFields]);
+        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
+        $form   = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -665,8 +637,7 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'form'   => $form->createView(),
                     'lead'   => $lead,
-                    'fields' => $groupedFields,
-                    'groups' => $this->getVisibleFieldGroups($groupedFields),
+                    'fields' => $model->organizeFieldsByGroup($fields),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [
@@ -742,9 +713,8 @@ class LeadController extends FormController
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $leadFieldModel = $this->getModel('lead.field');
         \assert($leadFieldModel instanceof FieldModel);
-        $fields        = $leadFieldModel->getPublishedFieldArrays('lead');
-        $visibleFields = $this->excludeHiddenFieldDefinitions($fields);
-        $form          = $model->createForm($lead, $this->formFactory, $action, ['fields' => $visibleFields]);
+        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
+        $form   = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -842,22 +812,19 @@ class LeadController extends FormController
             } elseif ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
-                $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $visibleFields]);
+                $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
             }
         } else {
             // lock the entity
             $model->lockEntity($lead);
         }
 
-        $leadFields = $lead->getFields();
-
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'form'   => $form->createView(),
                     'lead'   => $lead,
-                    'fields' => $leadFields, // pass in the lead fields as they are already organized by ['group']['alias']
-                    'groups' => $this->getVisibleFieldGroups($leadFields),
+                    'fields' => $lead->getFields(), // pass in the lead fields as they are already organized by ['group']['alias']
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [

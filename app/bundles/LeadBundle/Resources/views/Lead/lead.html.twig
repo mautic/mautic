@@ -2,7 +2,6 @@
   Variables
     - lead
     - events
-        - groups
 #}
 {% extends '@MauticCore/Default/content.html.twig' %}
 
@@ -17,6 +16,8 @@
 {% endset %}
 
 {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+{% set groups = fields|keys %}
+
 {% block headerTitle %}
     {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ leadName|purify }}</span><span class="span-block small ml-sm">
     {{ lead.secondaryIdentifier|purify }}</span></div>
@@ -159,7 +160,7 @@
             <div class="collapse pr-md pl-md" id="lead-details">
                 <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
                     {% for g in groups %}
-                        {% if 'hidden' != g and fields[g] is not empty %}
+                        {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
                                 <a href="#{{ g }}" class="group" data-toggle="tab">
                                     {{ ('mautic.lead.field.group.'~g)|trans }}
@@ -178,7 +179,6 @@
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md">
                     {% for group in groups %}
-                        {% if 'hidden' != group and fields[group] is not empty %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
@@ -228,7 +228,6 @@
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
                     {% endfor %}
                         <div class="tab-pane fade bdr-w-0" id="devices">
                             {% if devices %}
