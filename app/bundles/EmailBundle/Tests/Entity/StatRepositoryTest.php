@@ -101,4 +101,50 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(1, $this->statRepository->getReadCount(1, null, $query));
     }
+
+    public function testGetSentEmailToContactDataBuildsOnlyFullGroupByCompliantQuery(): void
+    {
+        $expectedRow = [
+            'id'            => '101',
+            'lead_id'       => '7',
+            'email_address' => 'contact@example.test',
+            'is_read'       => '1',
+            'email_id'      => '22',
+            'date_sent'     => '2026-03-10 08:00:00',
+            'date_read'     => '2026-03-10 08:30:00',
+            'email_name'    => 'March Newsletter',
+            'link_hits'     => '3',
+            'company_id'    => '11',
+            'company_name'  => 'ACME',
+            'campaign_id'   => '5',
+            'campaign_name' => 'Spring Campaign',
+            'segment_id'    => '13',
+            'segment_name'  => 'VIP Contacts',
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('executeQuery')
+            ->willReturnCallback(function (string $sql, array $params = [], array $types = []) {
+                self::assertStringContainsString('SELECT s.id AS id, s.lead_id AS lead_id, s.email_address AS email_address, s.is_read AS is_read, s.email_id AS email_id, s.date_sent AS date_sent, s.date_read AS date_read, e.name AS email_name, c.id AS company_id, c.companyname AS company_name, campaign.id AS campaign_id, campaign.name AS campaign_name, ll.id AS segment_id, ll.name AS segment_name, COUNT(ph.id) AS link_hits', $sql);
+                self::assertStringContainsString('LEFT JOIN test_companies_leads cl ON s.lead_id = cl.lead_id AND cl.is_primary = 1', $sql);
+                self::assertStringContainsString('GROUP BY s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read, e.name, c.id, c.companyname, campaign.id, campaign.name, ll.id, ll.name', $sql);
+                self::assertStringNotContainsString('GROUP BY s.id AS', $sql);
+                self::assertSame('2026-03-01 00:00:00', $params['dateFrom']);
+                self::assertSame('2026-03-31 23:59:59', $params['dateTo']);
+
+                return $this->result;
+            });
+
+        $this->result->method('fetchAllAssociative')
+            ->willReturn([$expectedRow]);
+
+        $this->assertSame(
+            [$expectedRow],
+            $this->statRepository->getSentEmailToContactData(
+                10,
+                new \DateTime('2026-03-01 00:00:00'),
+                new \DateTime('2026-03-31 23:59:59')
+            )
+        );
+    }
 }

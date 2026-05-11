@@ -244,9 +244,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

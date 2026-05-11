@@ -201,48 +201,44 @@ class PublicController extends CommonFormController
             if ($isAjax) {
                 // Post via ajax so return a json response
                 return new JsonResponse($data);
-            } else {
-                $response = json_encode($data);
-
-                return $this->render('@MauticForm/messenger.html.twig', ['response' => $response]);
             }
-        } else {
-            if (!empty($error)) {
-                if ($return) {
-                    $hash = (null !== $form) ? '#'.strtolower($form->getAlias()) : '';
+            $response = json_encode($data);
 
-                    return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
-                } else {
-                    $msg     = $error;
-                    $msgType = 'error';
-                }
-            } elseif ('redirect' == $postAction) {
-                return $this->redirect($postActionProperty);
-            } elseif ('return' == $postAction) {
-                if (!empty($return)) {
-                    if (!empty($postActionProperty)) {
-                        $return .= $query.'mauticMessage='.rawurlencode($postActionProperty);
-                    }
-
-                    return $this->redirect($return);
-                } else {
-                    $msg = $this->translator->trans('mautic.form.submission.thankyou');
-                }
-            } else {
-                $msg = $postActionProperty;
-            }
-
-            $session = $request->getSession();
-            $session->set(
-                'mautic.emailbundle.message',
-                [
-                    'message' => $msg,
-                    'type'    => (empty($msgType)) ? 'notice' : $msgType,
-                ]
-            );
-
-            return $this->redirectToRoute('mautic_form_postmessage');
+            return $this->render('@MauticForm/messenger.html.twig', ['response' => $response]);
         }
+        if (!empty($error)) {
+            if ($return) {
+                $hash = (null !== $form) ? '#'.strtolower($form->getAlias()) : '';
+
+                return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
+            }
+            $msg     = $error;
+            $msgType = 'error';
+        } elseif ('redirect' == $postAction) {
+            return $this->redirect($postActionProperty);
+        } elseif ('return' == $postAction) {
+            if (!empty($return)) {
+                if (!empty($postActionProperty)) {
+                    $return .= $query.'mauticMessage='.rawurlencode($postActionProperty);
+                }
+
+                return $this->redirect($return);
+            }
+            $msg = $this->translator->trans('mautic.form.submission.thankyou');
+        } else {
+            $msg = $postActionProperty;
+        }
+
+        $session = $request->getSession();
+        $session->set(
+            'mautic.emailbundle.message',
+            [
+                'message' => $msg,
+                'type'    => (empty($msgType)) ? 'notice' : $msgType,
+            ]
+        );
+
+        return $this->redirectToRoute('mautic_form_postmessage');
     }
 
     /**
@@ -291,33 +287,32 @@ class PublicController extends CommonFormController
 
         if (null === $form || !$form->isPublished()) {
             return $this->notFound();
-        } else {
-            $html = $model->getContent($form);
+        }
+        $html = $model->getContent($form);
 
-            $model->populateValuesWithGetParameters($form, $html);
+        $model->populateValuesWithGetParameters($form, $html);
 
-            $viewParams = [
-                'content'     => $html,
-                'stylesheets' => $customStylesheets,
-                'name'        => $form->getName(),
-                'metaRobots'  => '<meta name="robots" content="index">',
-            ];
+        $viewParams = [
+            'content'     => $html,
+            'stylesheets' => $customStylesheets,
+            'name'        => $form->getName(),
+            'metaRobots'  => '<meta name="robots" content="index">',
+        ];
 
-            if ($form->getNoIndex()) {
-                $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
-            }
+        if ($form->getNoIndex()) {
+            $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
+        }
 
-            // Use form specific template or system-wide default theme
-            $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
-            if (!empty($template)) {
-                $theme = $themeHelper->getTheme($template);
-                if ($theme->getTheme() != $template) {
-                    $config = $theme->getConfig();
-                    if (in_array('form', $config['features'])) {
-                        $template = $theme->getTheme();
-                    } else {
-                        $template = null;
-                    }
+        // Use form specific template or system-wide default theme
+        $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
+        if (!empty($template)) {
+            $theme = $themeHelper->getTheme($template);
+            if ($theme->getTheme() != $template) {
+                $config = $theme->getConfig();
+                if (in_array('form', $config['features'])) {
+                    $template = $theme->getTheme();
+                } else {
+                    $template = null;
                 }
             }
         }

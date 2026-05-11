@@ -216,6 +216,77 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $this->verifyReport($report->getId(), $expectedReport);
     }
 
+    public function testEmailReportWithUnsubscribedToOpenRatio(): void
+    {
+        $emails = [
+            $this->createEmail('Email 1'),
+            $this->createEmail('Email 2'),
+        ];
+        $this->em->flush();
+
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+            $this->createContact('test3@example.com'),
+        ];
+        $this->em->flush();
+
+        $statsEmail = [
+            $this->emulateEmailSend($emails[0], $contacts), // email 1
+            $this->emulateEmailSend($emails[1], $contacts), // email 2
+        ];
+
+        $this->emulateEmailRead($statsEmail[0][0]); // email 1
+        $this->emulateEmailRead($statsEmail[0][1]); // email 1
+        $this->emulateEmailRead($statsEmail[1][2]); // email 2
+
+        $this->em->flush();
+
+        $this->createDnc('email', $contacts[0], DoNotContact::UNSUBSCRIBED, $emails[0]->getId());
+
+        $report = new Report();
+        $report->setName('Email with unsubscribed to open ratio');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'e.name', 'e.read_count', 'unsubscribed', 'unsubscribed_to_open_ratio']);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        // -- test report table in mautic panel
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        // convert html table to php array
+        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 2);
+
+        $this->assertSame([
+            // no., id, name, read_count, unsubscribed, unsubscribed_to_open_ratio
+            ['1', (string) $emails[0]->getId(), 'Email 1', '2', '1', '50.0%'],
+            ['2', (string) $emails[1]->getId(), 'Email 2', '1', '0', '0.0%'],
+        ], $crawlerReportTable);
+
+        // -- test API report data
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $result         = json_decode($clientResponse->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'                        => (string) $emails[0]->getId(),
+                'e_name'                      => 'Email 1',
+                'read_count'                  => '2',
+                'unsubscribed'                => '1',
+                'unsubscribed_to_open_ratio'  => '50.0%',
+            ],
+            [
+                'e_id'                        => (string) $emails[1]->getId(),
+                'e_name'                      => 'Email 2',
+                'read_count'                  => '1',
+                'unsubscribed'                => '0',
+                'unsubscribed_to_open_ratio'  => '0.0%',
+            ],
+        ], $result['data']);
+    }
+
     private function createContact(string $email): Lead
     {
         $contact = new Lead();
@@ -327,23 +398,26 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         }
     }
 
-    public function createDnc(string $channel, Lead $contact, int $reason): DoNotContact
-    {
-        $dnc = new DoNotContact();
-        $dnc->setChannel($channel);
-        $dnc->setLead($contact);
-        $dnc->setReason($reason);
-        $dnc->setDateAdded(new \DateTime());
-        $this->em->persist($dnc);
-
-        return $dnc;
-    }
-
     /**
      * @return array<int,array<int,mixed>>
      */
     private function domTableToArray(Crawler $crawler): array
     {
         return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+    }
+
+    private function createDnc(string $channel, Lead $contact, int $reason, ?int $channelId = null): DoNotContact
+    {
+        $dnc = new DoNotContact();
+        $dnc->setChannel($channel);
+        $dnc->setLead($contact);
+        $dnc->setReason($reason);
+        $dnc->setDateAdded(new \DateTime());
+        if (null !== $channelId) {
+            $dnc->setChannelId($channelId);
+        }
+        $this->em->persist($dnc);
+
+        return $dnc;
     }
 }

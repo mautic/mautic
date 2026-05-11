@@ -29,26 +29,25 @@ class PRedisConnectionHelper
         if (is_iterable($configuredUrls)) {
             // assume arrays are already in the correct format
             return $configuredUrls;
-        } else {
-            $parsed = parse_url($configuredUrls);
-            if (!$parsed) {
-                return [$configuredUrls];
-            }
-
-            // resolve hostnames ahead of time to support dns records with multiple ip addresses
-            // we need to provide each one to predis separately or it will just use a single one
-            $resolvedArray = gethostbynamel($parsed['host']);
-            if (!$resolvedArray) {
-                return [$configuredUrls];
-            } else {
-                // this will return an array of associative arrays which is supported by Predis
-                return array_map(function ($i) use ($parsed) {
-                    $parsed['host'] = $i;
-
-                    return $parsed;
-                }, $resolvedArray);
-            }
         }
+        $parsed = parse_url($configuredUrls);
+        if (!$parsed) {
+            return [$configuredUrls];
+        }
+
+        // resolve hostnames ahead of time to support dns records with multiple ip addresses
+        // we need to provide each one to predis separately or it will just use a single one
+        $resolvedArray = gethostbynamel($parsed['host']);
+        if (!$resolvedArray) {
+            return [$configuredUrls];
+        }
+
+        // this will return an array of associative arrays which is supported by Predis
+        return array_map(function ($i) use ($parsed) {
+            $parsed['host'] = $i;
+
+            return $parsed;
+        }, $resolvedArray);
     }
 
     /**
