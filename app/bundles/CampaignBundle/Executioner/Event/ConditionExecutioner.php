@@ -11,6 +11,8 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Exception\ConditionFailedException;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
+use Psr\Log\LoggerInterface;
 
 class ConditionExecutioner implements EventInterface
 {
@@ -18,6 +20,8 @@ class ConditionExecutioner implements EventInterface
 
     public function __construct(
         private readonly ConditionDispatcher $dispatcher,
+        private OptimisticLockServiceInterface $optimisticLockService,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -31,6 +35,19 @@ class ConditionExecutioner implements EventInterface
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
+            // Acquire optimistic lock only on pre-existing logs (those that already have an ID).
+            // A log with version=1 and an ID was inserted during a previous execution that was
+            // killed mid-flight — acquiring the lock (version → 2) prevents the stuck-jobs command
+            // from treating it as completed.
+            // Newly generated logs (no ID yet) are fresh executions and do not need locking.
+            if (!$this->optimisticLockService->acquireLock($log)) {
+                $this->logger->error(sprintf(
+                    'Campaign condition event log ID "%s" was skipped as it had been executed already.',
+                    $log->getId(),
+                ));
+                continue;
+            }
+
             try {
                 /** @var ConditionAccessor $config */
                 $this->dispatchEvent($config, $log);

@@ -63,6 +63,31 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         )), 'There should be an error log regarding the skipped log.');
     }
 
+    public function testConditionLogsAreSkippedWhenAlreadyExecuted(): void
+    {
+        $event    = $this->createConditionEvent($this->createCampaign());
+        $contact  = $this->createContact();
+        $this->em->flush();
+
+        Assert::assertSame(0, $contact->getPoints());
+
+        $contacts = new ArrayCollection([$contact->getId() => $contact]);
+        $this->eventExecutioner->executeForContacts($event, $contacts);
+
+        $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        Assert::assertCount(1, $logs);
+
+        $log = reset($logs);
+        \assert($log instanceof LeadEventLog);
+        Assert::assertSame(2, $log->getVersion(), 'Version should be incremented.');
+
+        $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
+        Assert::assertTrue($this->testHandler->hasErrorThatContains(sprintf(
+            'Campaign condition event log ID "%s" was skipped as it had been executed already.',
+            $log->getId(),
+        )), 'There should be an error log regarding the skipped log.');
+    }
+
     public function testFailedLogsCanBeReExecuted(): void
     {
         $event    = $this->createEvent($this->createCampaign());
@@ -109,6 +134,23 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $event->setType('lead.changepoints');
         $event->setEventType('action');
         $event->setProperties(['points' => self::ADD_POINTS]);
+        $this->em->persist($event);
+
+        return $event;
+    }
+
+    private function createConditionEvent(Campaign $campaign): Event
+    {
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Contact Field Condition');
+        $event->setType('lead.field_value');
+        $event->setEventType('condition');
+        $event->setProperties([
+            'field'    => 'points',
+            'operator' => 'gt',
+            'value'    => '4',
+        ]);
         $this->em->persist($event);
 
         return $event;
