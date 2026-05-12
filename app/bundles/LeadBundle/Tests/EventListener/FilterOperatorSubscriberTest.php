@@ -505,7 +505,7 @@ final class FilterOperatorSubscriberTest extends TestCase
         );
     }
 
-    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
+    public function testFieldsAreLoadedForNonSegmentRoutes(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'mautic_dynamicContent_action');
@@ -564,15 +564,10 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $choices = $event->getChoices();
 
-        // Only custom fields should be shown
         Assert::assertArrayHasKey('lead', $choices);
         Assert::assertArrayHasKey('test_select', $choices['lead']);
-
-        // Static fields should not be included
-        Assert::assertArrayNotHasKey('utm_source', $choices['lead']);
-
-        // Behaviors should not be included
-        Assert::assertArrayNotHasKey('behaviors', $choices);
+        Assert::assertArrayHasKey('utm_source', $choices['lead']);
+        Assert::assertArrayHasKey('behaviors', $choices);
     }
 
     public function testOnGenerateSegmentFiltersAddCustomFieldsForTextTypesForValueAjaxRequest(): void
