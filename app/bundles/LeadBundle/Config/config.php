@@ -356,6 +356,7 @@ return [
                 'arguments' => [
                     'mautic.core.model.notification',
                     'translator',
+                    'mautic.user.repository',
                 ],
             ],
             'mautic.lead.contact_scheduled_export.subscriber' => [

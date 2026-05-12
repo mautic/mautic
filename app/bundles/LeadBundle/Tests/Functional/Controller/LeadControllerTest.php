@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
@@ -75,6 +76,76 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->client->request(Request::METHOD_GET, $notFoundLink);
         Assert::assertTrue($this->client->getResponse()->isNotFound());
+    }
+
+    public function testAdminUsersReceiveSecurityNotificationWhenContactExportIsScheduled(): void
+    {
+        $this->createContacts();
+        $this->setAdminUser();
+
+        $adminRole      = $this->createRole(true, 'Security Admin');
+        $secondaryAdmin = $this->createUser($adminRole, 'security-admin', 'security.admin@email.com');
+        $secondaryAdmin->setFirstName('Security');
+        $secondaryAdmin->setLastName('Admin');
+        $secondaryAdmin->setIsPublished(true);
+
+        $userRole = $this->createRole(false, 'Regular User');
+        $user     = $this->createUser($userRole, 'regular-user', 'regular.user@email.com');
+        $user->setFirstName('Regular');
+        $user->setLastName('User');
+        $user->setIsPublished(true);
+
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            's/contacts/batchExport',
+            ['filetype' => 'csv']
+        );
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        /** @var ContactExportScheduler $contactExportScheduler */
+        $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
+        $requestedAt            = $contactExportScheduler->getScheduledDateTime()->format('Y-m-d H:i:s P');
+        $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+
+        $requesterNotifications = $this->em->getRepository(Notification::class)->findBy(
+            [
+                'user'   => $requestingAdmin,
+                'header' => 'mautic.lead.export.being.prepared.header',
+            ]
+        );
+        Assert::assertCount(1, $requesterNotifications);
+
+        $adminNotifications = $this->em->getRepository(Notification::class)->findBy(
+            [
+                'user'   => $secondaryAdmin,
+                'header' => 'mautic.lead.export.admin.notification.header',
+            ]
+        );
+        Assert::assertCount(1, $adminNotifications);
+        Assert::assertStringContainsString($requestingAdmin->getName(), $adminNotifications[0]->getMessage());
+        Assert::assertStringContainsString($requestingAdmin->getEmail(), $adminNotifications[0]->getMessage());
+        Assert::assertStringContainsString('CSV', $adminNotifications[0]->getMessage());
+        Assert::assertStringContainsString($requestedAt, $adminNotifications[0]->getMessage());
+        Assert::assertStringNotContainsString('http', $adminNotifications[0]->getMessage());
+
+        $requesterAdminNotifications = $this->em->getRepository(Notification::class)->findBy(
+            [
+                'user'   => $requestingAdmin,
+                'header' => 'mautic.lead.export.admin.notification.header',
+            ]
+        );
+        Assert::assertCount(0, $requesterAdminNotifications);
+
+        $nonAdminNotifications = $this->em->getRepository(Notification::class)->findBy(
+            [
+                'user'   => $user,
+                'header' => 'mautic.lead.export.admin.notification.header',
+            ]
+        );
+        Assert::assertCount(0, $nonAdminNotifications);
     }
 
     private function createContacts(): void
@@ -159,10 +230,10 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $user;
     }
 
-    private function createRole(bool $isAdmin = false): Role
+    private function createRole(bool $isAdmin = false, string $name = 'Role'): Role
     {
         $role = new Role();
-        $role->setName('Role');
+        $role->setName($name);
         $role->setIsAdmin($isAdmin);
 
         $this->em->persist($role);
@@ -170,17 +241,18 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $role;
     }
 
-    private function createUser(Role $role): User
+    private function createUser(Role $role, string $username = self::USERNAME, string $email = 'john.doe@email.com'): User
     {
         $user = new User();
         $user->setFirstName('Jhony');
         $user->setLastName('Doe');
-        $user->setUsername(self::USERNAME);
-        $user->setEmail('john.doe@email.com');
+        $user->setUsername($username);
+        $user->setEmail($email);
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
         \assert($hasher instanceof PasswordHasherInterface);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
+        $user->setIsPublished(true);
 
         $this->em->persist($user);
 
