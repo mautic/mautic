@@ -358,6 +358,7 @@ return [
                     'translator',
                     'mautic.user.repository',
                     'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.contact_scheduled_export.subscriber' => [
@@ -915,6 +916,7 @@ return [
         'segment_rebuild_time_warning'                                                          => 30,
         'segment_build_time_warning'                                                            => 30,
         'contact_export_in_background'                                                          => true,
+        'contact_export_notify_admins'                                                          => true,
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_export_limit'                                                                  => 0,

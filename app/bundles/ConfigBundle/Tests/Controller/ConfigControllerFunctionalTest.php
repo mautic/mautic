@@ -233,6 +233,40 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
     }
 
+    public function testContactExportAdminNotificationsConfigDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        Assert::assertSame('1', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]'                     => 'https://mautic-community.local',
+                'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
+                'config[leadconfig][contact_export_notify_admins]' => '0',
+            ]
+        );
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        Assert::assertArrayHasKey('contact_export_notify_admins', $configParameters);
+        Assert::assertFalse((bool) $configParameters['contact_export_notify_admins']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        Assert::assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+    }
+
     public function testUserAndSystemLocale(): void
     {
         // 1. Change user locale in account - should change _locale session

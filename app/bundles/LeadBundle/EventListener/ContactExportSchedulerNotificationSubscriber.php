@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
@@ -20,6 +21,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
         private TranslatorInterface $translator,
         private UserRepository $userRepository,
         private MailHelper $mailHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -47,6 +49,10 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
             $user
         );
 
+        if (!$this->isAdminContactExportNotificationEnabled()) {
+            return;
+        }
+
         foreach ($this->getAdminUsersToNotify($user) as $adminUser) {
             $requestedAt = $event->getContactExportScheduler()->getScheduledDateTime();
 
@@ -72,6 +78,10 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
 
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
+        if (!$this->isAdminContactExportNotificationEnabled()) {
+            return;
+        }
+
         /** @var User $requestingUser */
         $requestingUser  = $event->getContactExportScheduler()->getUser();
         $requestedAt     = $event->getContactExportScheduler()->getScheduledDateTime();
@@ -134,5 +144,10 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
                     && $adminUser->getId() !== $requestingUser->getId()
             )
         );
+    }
+
+    private function isAdminContactExportNotificationEnabled(): bool
+    {
+        return (bool) $this->coreParametersHelper->get('contact_export_notify_admins');
     }
 }

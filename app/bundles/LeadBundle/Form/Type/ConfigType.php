@@ -142,6 +142,18 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+            'contact_export_notify_admins',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.lead.export.notify.admins',
+                'data'  => $options['data']['contact_export_notify_admins'] ?? true,
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.export.notify.admins.tooltip',
+                ],
+            ]
+        );
     }
 
     public function getBlockPrefix(): string

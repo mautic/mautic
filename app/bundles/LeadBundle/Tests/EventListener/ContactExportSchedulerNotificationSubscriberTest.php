@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
@@ -74,7 +75,12 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
         $mailHelper->expects($this->never())
             ->method('send');
 
-        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->with('contact_export_notify_admins')
+            ->willReturn(true);
+
+        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper);
         $subscriber->onContactExportScheduled(new ContactExportSchedulerEvent($contactExportScheduler));
 
         Assert::assertCount(2, $notificationModel->notifications);
@@ -178,8 +184,63 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
             ->method('send')
             ->with(true);
 
-        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->with('contact_export_notify_admins')
+            ->willReturn(true);
+
+        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper);
         $subscriber->onContactExportEmailSent(new ContactExportSchedulerEvent($contactExportScheduler));
+    }
+
+    public function testAdminNotificationsAreSkippedWhenDisabled(): void
+    {
+        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $contactExportScheduler = (new ContactExportScheduler())
+            ->setUser($requestingUser)
+            ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
+            ->setData(['fileType' => 'csv']);
+
+        $notificationModel = new class extends NotificationModel {
+            /**
+             * @var array<int, array<int, mixed>>
+             */
+            public array $notifications = [];
+
+            public function __construct()
+            {
+            }
+
+            public function addNotification($message, $type = null, $isRead = false, $header = null, $iconClass = null, ?\DateTime $datetime = null, ?User $user = null, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
+            {
+                $this->notifications[] = func_get_args();
+            }
+        };
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')
+            ->willReturn('message');
+
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->never())
+            ->method('getAllAdminUsers');
+
+        $mailHelper = $this->createMock(MailHelper::class);
+        $mailHelper->expects($this->never())
+            ->method('getMailer');
+
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->with('contact_export_notify_admins')
+            ->willReturn(false);
+
+        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper);
+        $subscriber->onContactExportScheduled(new ContactExportSchedulerEvent($contactExportScheduler));
+        $subscriber->onContactExportEmailSent(new ContactExportSchedulerEvent($contactExportScheduler));
+
+        Assert::assertCount(1, $notificationModel->notifications);
+        Assert::assertSame($requestingUser, $notificationModel->notifications[0][6]);
+        Assert::assertSame('mautic.lead.export.being.prepared.header', $notificationModel->notifications[0][3]);
     }
 
     private function createUser(int $id, string $name, string $email, bool $isPublished, bool $isAdmin = false): User
