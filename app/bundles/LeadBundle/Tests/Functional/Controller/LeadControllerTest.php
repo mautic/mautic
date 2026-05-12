@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
@@ -148,6 +149,84 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertCount(0, $nonAdminNotifications);
     }
 
+    public function testContactExportCompletionEmailsAreSentToRequesterAndAdmins(): void
+    {
+        $this->createContacts();
+        $this->setAdminUser();
+
+        $adminRole      = $this->createRole(true, 'Security Admin');
+        $secondaryAdmin = $this->createUser($adminRole, 'security-admin', 'security.admin@email.com');
+        $secondaryAdmin->setFirstName('Security');
+        $secondaryAdmin->setLastName('Admin');
+        $thirdAdmin = $this->createUser($adminRole, 'audit-admin', 'audit.admin@email.com');
+        $thirdAdmin->setFirstName('Audit');
+        $thirdAdmin->setLastName('Admin');
+
+        $userRole = $this->createRole(false, 'Regular User');
+        $user     = $this->createUser($userRole, 'regular-user', 'regular.user@email.com');
+        $user->setFirstName('Regular');
+        $user->setLastName('User');
+
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            's/contacts/batchExport',
+            ['filetype' => 'csv']
+        );
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        /** @var ContactExportScheduler $contactExportScheduler */
+        $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
+        $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $requestedAt            = $contactExportScheduler->getScheduledDateTime()->format('Y-m-d H:i:s P');
+
+        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
+        $this->checkContactExportScheduler(0);
+
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()->format('Y_m_d_H_i_s').'.zip';
+        $this->filePaths[]    = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
+        $downloadLink         = $this->router->generate(
+            'mautic_contact_export_download',
+            ['fileName' => basename($filePath)],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $messages = self::getMailerMessages();
+        Assert::assertCount(2, $messages);
+
+        $requesterEmail = $this->findMailerMessageByRecipient($requestingAdmin->getEmail());
+        Assert::assertNotNull($requesterEmail);
+        Assert::assertSame('Your contact export is ready', $requesterEmail->getSubject());
+        Assert::assertStringContainsString('Hi '.$requestingAdmin->getName().',', $requesterEmail->getHtmlBody());
+        Assert::assertStringContainsString('Your contact export is ready.', $requesterEmail->getHtmlBody());
+        Assert::assertStringContainsString($downloadLink, $requesterEmail->getHtmlBody());
+        Assert::assertStringContainsString($zipFileName, $requesterEmail->getHtmlBody());
+        Assert::assertStringContainsString('Regards,', $requesterEmail->getTextBody());
+
+        $adminEmail = $this->findMailerMessageByRecipient($secondaryAdmin->getEmail());
+        Assert::assertNotNull($adminEmail);
+        Assert::assertSame('Contact export completed', $adminEmail->getSubject());
+        Assert::assertStringContainsString('Hi,', $adminEmail->getHtmlBody());
+        Assert::assertStringContainsString('Initiated by: '.$requestingAdmin->getName().' &lt;'.$requestingAdmin->getEmail().'&gt;', $adminEmail->getHtmlBody());
+        Assert::assertStringContainsString('Requested at: '.$requestedAt, $adminEmail->getHtmlBody());
+        Assert::assertStringContainsString('Completed at:', $adminEmail->getHtmlBody());
+        Assert::assertStringContainsString('Status: Completed', $adminEmail->getHtmlBody());
+        Assert::assertStringContainsString('Export type: CSV', $adminEmail->getHtmlBody());
+        Assert::assertStringContainsString('download link is not included', $adminEmail->getHtmlBody());
+        Assert::assertStringNotContainsString($downloadLink, $adminEmail->getHtmlBody());
+        Assert::assertStringNotContainsString('href=', $adminEmail->getHtmlBody());
+        Assert::assertStringNotContainsString($downloadLink, $adminEmail->getTextBody());
+        Assert::assertCount(1, $adminEmail->getTo());
+        Assert::assertSame($secondaryAdmin->getEmail(), $adminEmail->getTo()[0]->getAddress());
+        Assert::assertCount(1, $adminEmail->getCc());
+        Assert::assertSame($thirdAdmin->getEmail(), $adminEmail->getCc()[0]->getAddress());
+
+        Assert::assertNull($this->findMailerMessageByRecipient($user->getEmail()));
+    }
+
     private function createContacts(): void
     {
         $contacts = [];
@@ -257,5 +336,22 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->persist($user);
 
         return $user;
+    }
+
+    private function findMailerMessageByRecipient(string $email): ?MauticMessage
+    {
+        foreach (self::getMailerMessages() as $message) {
+            if (!$message instanceof MauticMessage) {
+                continue;
+            }
+
+            foreach ($message->getTo() as $recipient) {
+                if ($recipient->getAddress() === $email) {
+                    return $message;
+                }
+            }
+        }
+
+        return null;
     }
 }

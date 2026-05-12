@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber;
@@ -69,7 +70,11 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
             ->method('getAllAdminUsers')
             ->willReturn([$sameAdmin, $otherAdmin, $inactiveAdmin, $nonAdmin]);
 
-        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository);
+        $mailHelper = $this->createMock(MailHelper::class);
+        $mailHelper->expects($this->never())
+            ->method('send');
+
+        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper);
         $subscriber->onContactExportScheduled(new ContactExportSchedulerEvent($contactExportScheduler));
 
         Assert::assertCount(2, $notificationModel->notifications);
@@ -94,6 +99,87 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
         Assert::assertStringContainsString('CSV', $notificationModel->notifications[1][0]);
         Assert::assertStringContainsString('2026-05-12 10:30:00 +00:00', $notificationModel->notifications[1][0]);
         Assert::assertStringNotContainsString('http', $notificationModel->notifications[1][0]);
+    }
+
+    public function testContactExportCompletionEmailsAreSentToOtherPublishedAdminsWithoutLink(): void
+    {
+        $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $otherAdmin     = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
+        $thirdAdmin     = $this->createUser(14, 'Audit Admin', 'audit@example.com', true, true);
+        $sameAdmin      = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $inactiveAdmin  = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
+        $nonAdmin       = $this->createUser(13, 'Regular User', 'user@example.com', true, false);
+
+        $contactExportScheduler = (new ContactExportScheduler())
+            ->setUser($requestingUser)
+            ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
+            ->setData(['fileType' => 'csv']);
+
+        $notificationModel = $this->createMock(NotificationModel::class);
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')
+            ->willReturnCallback(
+                static function (string $key, array $parameters = []): string {
+                    return match ($key) {
+                        'mautic.lead.export.admin.email_subject' => 'Contact export completed',
+                        'mautic.lead.export.admin.email'         => sprintf(
+                            'Hi, Initiated by: %s <%s> Requested at: %s Completed at: %s Status: %s Export type: %s This notification is for security awareness only. The export download link is not included.',
+                            $parameters['%requesting_user_name%'],
+                            $parameters['%requesting_user_email%'],
+                            $parameters['%requested_at%'],
+                            $parameters['%completed_at%'],
+                            $parameters['%status%'],
+                            $parameters['%file_type%']
+                        ),
+                        default => $key,
+                    };
+                }
+            );
+
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->once())
+            ->method('getAllAdminUsers')
+            ->willReturn([$sameAdmin, $otherAdmin, $thirdAdmin, $inactiveAdmin, $nonAdmin]);
+
+        $mailHelper = $this->createMock(MailHelper::class);
+        $mailHelper->expects($this->once())
+            ->method('getMailer')
+            ->with(true)
+            ->willReturnSelf();
+        $mailHelper->expects($this->once())
+            ->method('setTo')
+            ->with(['admin@example.com' => 'Admin User'])
+            ->willReturn(true);
+        $mailHelper->expects($this->once())
+            ->method('setCc')
+            ->with(['audit@example.com' => 'Audit Admin'])
+            ->willReturn(true);
+        $mailHelper->expects($this->once())
+            ->method('setSubject')
+            ->with('Contact export completed');
+        $mailHelper->expects($this->once())
+            ->method('setBody')
+            ->with($this->callback(function (string $message): bool {
+                Assert::assertStringContainsString('Hi,', $message);
+                Assert::assertStringContainsString('Requester User', $message);
+                Assert::assertStringContainsString('requester@example.com', $message);
+                Assert::assertStringContainsString('Requested at: 2026-05-12 10:30:00 +00:00', $message);
+                Assert::assertStringContainsString('Status: Completed', $message);
+                Assert::assertStringContainsString('Export type: CSV', $message);
+                Assert::assertStringContainsString('download link is not included', $message);
+                Assert::assertStringNotContainsString('http', $message);
+
+                return true;
+            }));
+        $mailHelper->expects($this->once())
+            ->method('parsePlainText');
+        $mailHelper->expects($this->once())
+            ->method('send')
+            ->with(true);
+
+        $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $userRepository, $mailHelper);
+        $subscriber->onContactExportEmailSent(new ContactExportSchedulerEvent($contactExportScheduler));
     }
 
     private function createUser(int $id, string $name, string $email, bool $isPublished, bool $isAdmin = false): User

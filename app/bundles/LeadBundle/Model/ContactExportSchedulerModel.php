@@ -155,17 +155,15 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         return $this->exportResultsAs($iterator, $fileType, $fileName);
     }
 
-    public function getEmailMessageWithLink(string $filePath): string
+    private function getEmailMessageWithLink(User $user, string $filePath): string
     {
-        $link = $this->router->generate(
-            'mautic_contact_export_download',
-            ['fileName' => basename($filePath)],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
         return $this->translator->trans(
             'mautic.lead.export.email',
-            ['%link%' => $link, '%label%' => basename($filePath)]
+            [
+                '%user_name%' => $user->getName(),
+                '%link%'      => $this->getDownloadLink($filePath),
+                '%label%'     => basename($filePath),
+            ]
         );
     }
 
@@ -173,15 +171,25 @@ class ContactExportSchedulerModel extends AbstractCommonModel
     {
         /** @var User $user */
         $user    = $contactExportScheduler->getUser();
-        $message = $this->getEmailMessageWithLink($filePath);
+        $mailer  = $this->mailHelper->getMailer(true);
+        $message = $this->getEmailMessageWithLink($user, $filePath);
 
-        $this->mailHelper->setTo([$user->getEmail() => $user->getName()]);
-        $this->mailHelper->setSubject(
-            $this->translator->trans('mautic.lead.export.email_subject', ['%file_name%' => basename($filePath)])
+        $mailer->setTo([$user->getEmail() => $user->getName()]);
+        $mailer->setSubject(
+            $this->translator->trans('mautic.lead.export.email_subject')
         );
-        $this->mailHelper->setBody($message);
-        $this->mailHelper->parsePlainText($message);
-        $this->mailHelper->send(true);
+        $mailer->setBody($message);
+        $mailer->parsePlainText($message);
+        $mailer->send(true);
+    }
+
+    private function getDownloadLink(string $filePath): string
+    {
+        return $this->router->generate(
+            'mautic_contact_export_download',
+            ['fileName' => basename($filePath)],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 
     public function deleteEntity(ContactExportScheduler $contactExportScheduler): void

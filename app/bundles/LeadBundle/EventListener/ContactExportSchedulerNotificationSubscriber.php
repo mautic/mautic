@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Entity\User;
@@ -18,6 +19,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
         private NotificationModel $notificationModel,
         private TranslatorInterface $translator,
         private UserRepository $userRepository,
+        private MailHelper $mailHelper,
     ) {
     }
 
@@ -25,6 +27,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
     {
         return [
             LeadEvents::POST_CONTACT_EXPORT_SCHEDULED  => 'onContactExportScheduled',
+            LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL => 'onContactExportEmailSent',
         ];
     }
 
@@ -65,6 +68,57 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
                 $adminUser
             );
         }
+    }
+
+    public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
+    {
+        /** @var User $requestingUser */
+        $requestingUser  = $event->getContactExportScheduler()->getUser();
+        $requestedAt     = $event->getContactExportScheduler()->getScheduledDateTime();
+        $completedAt     = new \DateTimeImmutable();
+        $fileType        = strtoupper((string) ($event->getContactExportScheduler()->getData()['fileType'] ?? ''));
+        $adminUsers      = $this->getAdminUsersToNotify($requestingUser);
+
+        if ([] === $adminUsers) {
+            return;
+        }
+
+        $message = $this->translator->trans(
+            'mautic.lead.export.admin.email',
+            [
+                '%requesting_user_name%'  => $requestingUser->getName(),
+                '%requesting_user_email%' => $requestingUser->getEmail(),
+                '%requested_at%'          => $requestedAt->format('Y-m-d H:i:s P'),
+                '%completed_at%'          => $completedAt->format('Y-m-d H:i:s P'),
+                '%status%'                => 'Completed',
+                '%file_type%'             => $fileType,
+            ]
+        );
+
+        $primaryAdmin = array_shift($adminUsers);
+        \assert($primaryAdmin instanceof User);
+
+        $mailer = $this->mailHelper->getMailer(true);
+        $mailer->setTo([$primaryAdmin->getEmail() => $primaryAdmin->getName()]);
+
+        if ([] !== $adminUsers) {
+            $mailer->setCc(
+                array_reduce(
+                    $adminUsers,
+                    static function (array $recipients, User $adminUser): array {
+                        $recipients[$adminUser->getEmail()] = $adminUser->getName();
+
+                        return $recipients;
+                    },
+                    []
+                )
+            );
+        }
+
+        $mailer->setSubject($this->translator->trans('mautic.lead.export.admin.email_subject'));
+        $mailer->setBody($message);
+        $mailer->parsePlainText($message);
+        $mailer->send(true);
     }
 
     /**
