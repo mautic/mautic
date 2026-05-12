@@ -90,26 +90,16 @@ class CodeEditor {
     }
 
     try {
-      // Round-trip CSS explicitly: extract <style> blocks from the input HTML
-      // so we can re-apply them to CssComposer. Without this, styles set via
-      // the right panel are dropped on save because setComponents only loads
-      // HTML, not CSS rules.
-      const { html: cleanedHtml, css } = CodeEditor.splitHtmlAndStyles(code);
-
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(cleanedHtml.trim());
-      if (css) {
-        this.editor.setStyle(css);
-      }
+      this.editor.setComponents(code);
 
       // Reinitialize the content after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
       // See: https://github.com/GrapesJS/mjml/issues/149
-      const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
-      this.editor.setComponents(parsedContent);
-      if (css) {
-        this.editor.setStyle(css);
+      if (ContentService.isMjmlMode(this.editor)) {
+        const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+        this.editor.setComponents(parsedContent);
       }
 
       this.editor.Modal.close();
@@ -133,42 +123,8 @@ class CodeEditor {
       content = MjmlService.getEditorMjmlContent(this.editor);
     } else {
       content = ContentService.getEditorHtmlContent(this.editor);
-      // Ensure <style> with current CSS rules lives inside <head> so the user
-      // can see and edit it. The upstream serializer can leave <style> outside
-      // <head>, which then gets stripped or hidden from the dialog view.
-      content = CodeEditor.ensureStyleInHead(content, this.editor.getCss({ avoidProtected: true }));
     }
     this.codeEditor.setContent(content);
-  }
-
-  // Extract all <style> tag contents from an HTML string and return both the
-  // concatenated CSS and the HTML with those tags removed.
-  static splitHtmlAndStyles(html) {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const styleTags = doc.querySelectorAll('style');
-    const css = Array.from(styleTags).map((s) => s.textContent || '').join('\n').trim();
-    styleTags.forEach((s) => s.remove());
-    const out = doc.documentElement
-      ? `<!DOCTYPE html>${doc.documentElement.outerHTML}`
-      : doc.body.innerHTML;
-    return { html: out, css };
-  }
-
-  // Make sure <head> contains a <style> block holding the given CSS. Replaces
-  // any existing <style> children of <head> and removes stray <style> tags
-  // elsewhere so the dialog shows exactly one consolidated <style> block.
-  static ensureStyleInHead(html, css) {
-    if (!css) return html;
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    if (!doc.head) return html;
-    doc.head.querySelectorAll('style').forEach((s) => s.remove());
-    Array.from(doc.querySelectorAll('style'))
-      .filter((s) => !doc.head.contains(s))
-      .forEach((s) => s.remove());
-    const styleEl = doc.createElement('style');
-    styleEl.textContent = css;
-    doc.head.appendChild(styleEl);
-    return `<!DOCTYPE html>${doc.documentElement.outerHTML}`;
   }
 }
 
