@@ -1697,6 +1697,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "theyoungrossco",
+      "name": "Ross Young",
+      "avatar_url": "https://avatars.githubusercontent.com/u/267231336?v=4",
+      "profile": "https://bareit.tech",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

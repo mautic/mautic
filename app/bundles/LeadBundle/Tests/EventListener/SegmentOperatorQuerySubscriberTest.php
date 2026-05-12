@@ -208,6 +208,69 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         yield [true, "(l.email IS NOT NULL) AND (l.email <> '')"];
     }
 
+    public function testOnNegativeOperatorsExcludingAllWithMultipleValuesAddsAlwaysTrueExpression(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a', 'value_b']
+        );
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::EXCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with('1 = 1', CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->never())
+            ->method('isNull');
+
+        $this->subscriber->onNegativeOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnNegativeOperatorsExcludingAllWithSingleValueTreatsAsNotIn(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('country');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::EXCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with($this->anything(), CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('isNull')
+            ->with('l.country');
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('notIn')
+            ->with('l.country', ['value_a']);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('or');
+
+        $this->subscriber->onNegativeOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
     public function testOnNegativeOperatorsIfNotNegativeOperator(): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -512,6 +575,62 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->contactSegmentFilter->contactSegmentFilterCrate = $contactSegmentFilterCrate;
 
         $this->subscriber->onMultiselectOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnDefaultOperatorsIncludingAllWithMultipleValuesAddsAlwaysFalseExpression(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a', 'value_b']
+        );
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::INCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with('1 = 0', CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->never())
+            ->method('in');
+
+        $this->subscriber->onDefaultOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnDefaultOperatorsIncludingAllWithSingleValueTreatsAsIn(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('country');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::INCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with($this->anything(), CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('in')
+            ->with('l.country', ['value_a']);
+
+        $this->subscriber->onDefaultOperators($event);
 
         $this->assertTrue($event->wasOperatorHandled());
     }

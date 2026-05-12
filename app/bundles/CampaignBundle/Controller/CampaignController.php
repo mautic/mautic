@@ -354,7 +354,7 @@ class CampaignController extends AbstractStandardFormController
         $this->addSchedulingLabels($events);
         $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
 
-        $sourcesList     = $this->getCampaignModel()->getSourceLists();
+        $sourcesList     = $this->getCampaignModel()->getSourceLists(null, false, true);
         $campaign        = $this->getCampaignModel()->getEntity($objectId);
         $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
         // Filter out deleted events for the preview (but keep them for action/decision/condition tabs)
@@ -956,8 +956,8 @@ class CampaignController extends AbstractStandardFormController
      */
     private function setCampaignSources(bool $isClone = false): void
     {
-        $campaignSources = (array) ($this->campaignElements['campaignSources'] ?? []);
-        $modifiedSources = (array) ($this->campaignElements['modifiedSources'] ?? []);
+        $campaignSources = $this->normalizeCampaignSources((array) ($this->campaignElements['campaignSources'] ?? []));
+        $modifiedSources = $this->normalizeCampaignSources((array) ($this->campaignElements['modifiedSources'] ?? []));
 
         if ($campaignSources === $modifiedSources) {
             if ($isClone) {
@@ -986,6 +986,32 @@ class CampaignController extends AbstractStandardFormController
             }
             $this->campaignSources = $modifiedSources;
         }
+    }
+
+    /**
+     * @param array<string, array<int|string, mixed>> $sources
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    private function normalizeCampaignSources(array $sources): array
+    {
+        $normalizedSources = [];
+
+        foreach ($sources as $type => $typeSources) {
+            if (!is_array($typeSources)) {
+                continue;
+            }
+
+            foreach ($typeSources as $sourceId => $label) {
+                if (!ctype_digit((string) $sourceId)) {
+                    continue;
+                }
+
+                $normalizedSources[$type][(int) $sourceId] = $label;
+            }
+        }
+
+        return $normalizedSources;
     }
 
     /**
@@ -1100,7 +1126,7 @@ class CampaignController extends AbstractStandardFormController
                     $campaignModel = $this->getModel('campaign');
                     \assert($campaignModel instanceof CampaignModel);
 
-                    $sourceList                   = $campaignModel->getSourceLists($type);
+                    $sourceList                   = $campaignModel->getSourceLists($type, false, true);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,
