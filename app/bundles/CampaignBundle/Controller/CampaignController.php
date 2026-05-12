@@ -330,6 +330,7 @@ class CampaignController extends AbstractStandardFormController
 
         return [
             'title'             => $formData['title'],
+            'vendorName'        => $formData['vendorName'] ?? '',
             'headline'          => $formData['headline'] ?? '',
             'description'       => $formData['description'] ?? '',
             'keywords'          => $formData['keywords'] ?? '',

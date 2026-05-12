@@ -76,17 +76,16 @@ final class CampaignShareType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.campaign.share.vendor_name',
-                'required'    => false,
+                'required'    => true,
                 'attr'        => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.campaign.share.vendor_name.placeholder',
                 ],
                 'constraints' => [
-                    new NotBlank(['groups' => ['publish']]),
+                    new NotBlank(),
                     new Regex([
                         'pattern' => '/^(?!mautic$)[a-z0-9]([a-z0-9-]*[a-z0-9])?$/',
                         'message' => 'mautic.campaign.share.vendor_name.invalid',
-                        'groups'  => ['publish'],
                     ]),
                 ],
             ]

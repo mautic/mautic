@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Service;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Service\Exception\InvalidPackageNameException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -29,6 +30,8 @@ final class CampaignShareService
      * @param array<int|string, mixed> $exportData
      * @param array<int, string>       $assetList
      * @param array<string, mixed>     $metadata
+     *
+     * @throws InvalidPackageNameException
      */
     public function share(Campaign $campaign, array $exportData, array $assetList, array $metadata = []): string
     {
@@ -67,6 +70,8 @@ final class CampaignShareService
      * @param array<string, mixed> $metadata
      *
      * @return array<string, mixed>
+     *
+     * @throws InvalidPackageNameException
      */
     public function buildComposerJson(Campaign $campaign, array $metadata = []): array
     {
@@ -182,6 +187,9 @@ final class CampaignShareService
         return $asset;
     }
 
+    /**
+     * @throws InvalidPackageNameException
+     */
     private function toPackageName(string $campaignName, string $vendor): string
     {
         $slug = strtolower(trim($campaignName));
@@ -192,15 +200,11 @@ final class CampaignShareService
             $slug = 'campaign';
         }
 
-        $vendorSlug = strtolower(trim($vendor));
-        $vendorSlug = preg_replace('/[^a-z0-9]+/', '-', $vendorSlug);
-        $vendorSlug = trim($vendorSlug, '-');
-
-        if ('' === $vendorSlug || 'mautic' === $vendorSlug) {
-            $vendorSlug = 'unknown-vendor';
+        if ('' === trim($vendor)) {
+            throw new InvalidPackageNameException('Vendor name is required to build a package name.');
         }
 
-        return $vendorSlug.'/'.$slug;
+        return $vendor.'/'.$slug;
     }
 
     public function getMarketplaceUrl(): string
