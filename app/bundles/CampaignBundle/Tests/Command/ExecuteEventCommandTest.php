@@ -117,7 +117,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         \assert($log instanceof LeadEventLog);
 
         Assert::assertTrue($log->getIsScheduled());
-        Assert::assertSame([], $log->getMetadata());
+        Assert::assertArrayHasKey('triggerDateLog', $log->getMetadata());
     }
 
     public function testRepublishScheduledCampaignEventActionWhenEventFailedBecauseCampaignPublishDownIsInThePast(): void
@@ -161,6 +161,12 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         Assert::assertStringContainsString('1 total events(s) to be processed', $commandResult->getDisplay());
         Assert::assertStringContainsString('0 total events were executed', $commandResult->getDisplay());
         Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertTrue($log->getIsScheduled());
+        Assert::assertArrayHasKey('triggerDateLog', $log->getMetadata());
     }
 
     public function testScheduledCampaignEventActionIfScheduledAtDefined(): void

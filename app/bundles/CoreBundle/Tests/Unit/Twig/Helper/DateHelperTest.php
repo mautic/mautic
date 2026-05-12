@@ -129,7 +129,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $result = $this->helper->toText($now);
@@ -179,13 +178,11 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     private function setDefaultLocalTimezone(string $timezone): void
     {
-        $reflectedClass    = new \ReflectionClass($this->helper);
-        $reflectedProperty = $reflectedClass->getProperty('helper');
-        $reflectedProperty->setAccessible(true);
+        $reflectedClass     = new \ReflectionClass($this->helper);
+        $reflectedProperty  = $reflectedClass->getProperty('helper');
         $dateTimeHelper     = $reflectedProperty->getValue($this->helper);
         $reflectedClass     = new \ReflectionClass($dateTimeHelper);
         $reflectedProperty2 = $reflectedClass->getProperty('defaultLocalTimezone');
-        $reflectedProperty2->setAccessible(true);
         $reflectedProperty2->setValue($dateTimeHelper, $timezone);
     }
 }

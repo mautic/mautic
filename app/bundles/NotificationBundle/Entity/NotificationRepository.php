@@ -200,15 +200,12 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param string $notificationType
+     * @param string|array<mixed> $search
+     * @param array<mixed>        $options
      *
-     * @return array
+     * @return array<int, array<string, int|string>>
      */
-    public function getMobileNotificationList($search = '', $limit = 10, $start = 0, $viewOther = false, $notificationType = null)
+    public function getMobileNotificationList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, array $options = []): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -229,10 +226,18 @@ class NotificationRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if (!empty($notificationType)) {
+        if (!empty($options['notification_type'])) {
             $q->andWhere(
-                $q->expr()->eq('e.notificationType', $q->expr()->literal($notificationType))
+                $q->expr()->eq('e.notificationType', $q->expr()->literal($options['notification_type']))
             );
+        }
+
+        if (!empty($options['top_level']) && 'translation' === $options['top_level']) {
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        }
+
+        if (!empty($options['ignore_ids'])) {
+            $q->andWhere($q->expr()->notIn('e.id', $options['ignore_ids']));
         }
 
         $q->andWhere('e.mobile = 1');

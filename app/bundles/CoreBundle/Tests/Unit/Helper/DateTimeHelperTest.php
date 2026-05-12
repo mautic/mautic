@@ -239,4 +239,83 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         // Assert that the original DateTime object remains unchanged
         $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('setTimeIfMissingDataProvider')]
+    public function testSetTimeIfMissing(string $input, string $defaultTime, string $timezone, string $expectedOutput, string $expectedTimezone): void
+    {
+        $result = DateTimeHelper::setTimeIfMissing($input, $defaultTime, $timezone);
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $result);
+        $this->assertEquals($expectedOutput, $result->format('Y-m-d H:i:s'));
+        $this->assertEquals($expectedTimezone, $result->getTimezone()->getName());
+    }
+
+    /**
+     * @return \Generator<string, array{string, string, string, string, string}>
+     */
+    public static function setTimeIfMissingDataProvider(): \Generator
+    {
+        // [input, defaultTime, timezone, expectedOutput, expectedTimezone]
+
+        // Date only - should add default time
+        yield 'date only with default 00:00:00' => [
+            '2025-01-31', '00:00:00', 'UTC', '2025-01-31 00:00:00', 'UTC',
+        ];
+        yield 'date only with custom default time' => [
+            '2025-01-31', '23:59:59', 'UTC', '2025-01-31 23:59:59', 'UTC',
+        ];
+        yield 'date only with custom timezone' => [
+            '2025-01-31', '12:30:45', 'America/New_York', '2025-01-31 12:30:45', 'America/New_York',
+        ];
+
+        // Existing time with space separator - should preserve
+        yield 'datetime with space separator full' => [
+            '2025-01-31 14:30:45', '00:00:00', 'UTC', '2025-01-31 14:30:45', 'UTC',
+        ];
+        yield 'datetime with space separator HH:MM' => [
+            '2025-01-31 14:30', '00:00:00', 'UTC', '2025-01-31 14:30:00', 'UTC',
+        ];
+        yield 'datetime space separator ignores default' => [
+            '2025-01-31 09:15:30', '23:59:59', 'UTC', '2025-01-31 09:15:30', 'UTC',
+        ];
+        yield 'midnight time preserved' => [
+            '2025-01-31 00:00:00', '12:00:00', 'UTC', '2025-01-31 00:00:00', 'UTC',
+        ];
+        yield 'end of day time preserved' => [
+            '2025-01-31 23:59:59', '00:00:00', 'UTC', '2025-01-31 23:59:59', 'UTC',
+        ];
+
+        // Existing time with T separator (ISO 8601) - should preserve
+        yield 'ISO 8601 with T separator full' => [
+            '2025-01-31T14:30:45', '00:00:00', 'UTC', '2025-01-31 14:30:45', 'UTC',
+        ];
+        yield 'ISO 8601 with T separator HH:MM' => [
+            '2025-01-31T14:30', '00:00:00', 'UTC', '2025-01-31 14:30:00', 'UTC',
+        ];
+        yield 'ISO 8601 T separator ignores default' => [
+            '2025-01-31T09:15:30', '23:59:59', 'UTC', '2025-01-31 09:15:30', 'UTC',
+        ];
+        yield 'ISO 8601 with timezone offset' => [
+            '2025-01-31T14:30:45+02:00', '00:00:00', 'UTC', '2025-01-31 14:30:45', '+02:00',
+        ];
+
+        // Different date formats
+        yield 'December date' => [
+            '2025-12-31', '00:00:00', 'UTC', '2025-12-31 00:00:00', 'UTC',
+        ];
+        yield 'January date' => [
+            '2025-01-01', '00:00:00', 'UTC', '2025-01-01 00:00:00', 'UTC',
+        ];
+        yield 'Mid year date' => [
+            '2025-06-15', '00:00:00', 'UTC', '2025-06-15 00:00:00', 'UTC',
+        ];
+
+        // Different timezones
+        yield 'with Europe/London timezone' => [
+            '2025-01-31', '00:00:00', 'Europe/London', '2025-01-31 00:00:00', 'Europe/London',
+        ];
+        yield 'with America/New_York timezone' => [
+            '2025-01-31', '00:00:00', 'America/New_York', '2025-01-31 00:00:00', 'America/New_York',
+        ];
+    }
 }

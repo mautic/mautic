@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
@@ -46,6 +47,11 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private MockObject $coreParametersHelper;
 
     /**
+     * @var CorePermissions&MockObject
+     */
+    private MockObject $corePermissions;
+
+    /**
      * @var EmailConfigInterface&MockObject
      */
     private MockObject $emailConfig;
@@ -64,6 +70,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->stageModel           = $this->createMock(StageModel::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->corePermissions      = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
         $this->form                 = new EmailType(
@@ -72,6 +79,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
             $this->stageModel,
             $this->coreParametersHelper,
             $this->themeHelper,
+            $this->corePermissions,
             $this->emailConfig
         );
 

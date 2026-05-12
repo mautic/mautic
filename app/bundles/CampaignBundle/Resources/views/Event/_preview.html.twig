@@ -76,16 +76,23 @@ data-event-no-percent="{{ event['noPercent'] }}">
     {% endif %}
 </div>
 
+<div class="campaign-event-details">
+    <div class="d-flex jc-center ai-center">
+        <div class="spinner fs-42">
+            <i class="ri-loader-3-line ri-spin"></i>
+        </div>
+    </div>
+</div>
 
 {% if update is not defined %}
 <div class="campaign-event-buttons hide">
  <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'clone', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-secondary btn-clone btn-xs" title="{{ 'mautic.campaign.event.clone.btn.tooltip'|trans }}">
      <i class="ri-file-copy-line"></i>
  </a>
- <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-secondary btn-xs btn-edit" title="{{ 'mautic.campaign.event.edit.btn.tooltip'|trans }}">
+ <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" data-method="POST" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-secondary btn-xs btn-edit" title="{{ 'mautic.campaign.event.edit.btn.tooltip'|trans }}">
      <i class="ri-pencil-line"></i>
  </a>
- <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-delete btn-danger btn-xs" title="{{ 'mautic.campaign.event.remove.btn.tooltip'|trans }}">
+ <a data-toggle="ajax-delete" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-delete btn-danger btn-xs" title="{{ 'mautic.campaign.event.remove.btn.tooltip'|trans }}">
      <i class="ri-delete-bin-line"></i>
  </a>
 </div>

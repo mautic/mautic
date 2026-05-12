@@ -75,9 +75,15 @@
                     'class'      : 'visible-md visible-lg col-role-desc',
                 }
             ) -}}
-            <th class="visible-md visible-lg col-rolelist-usercount">
-                {% trans %}mautic.user.role.list.thead.usercount{% endtrans %}
-            </th>
+            {{- include(
+                '@MauticCore/Helper/tableheader.html.twig',
+                {
+                    'sessionVar' : 'role',
+                    'orderBy'    : 'user_count',
+                    'text'       : 'mautic.user.role.list.thead.usercount',
+                    'class'      : 'visible-md visible-lg col-rolelist-usercount',
+                }
+            ) -}}
             {{- include('@MauticCore/Helper/tableheader.html.twig',
                 {
                     'sessionVar' : 'role',
@@ -89,7 +95,8 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in items %}
+        {% for i in items %}
+            {% set item = i[0] %}
             {% set mauticTemplateVars = _context|merge({'item' : item}) %}
             <tr>
                 <td>
@@ -122,9 +129,9 @@
                 </td>
                 <td class="visible-md visible-lg">
                     <a size="sm" class="label label-gray" href="{{ path('mautic_user_index',
-                        {'search' : ('mautic.user.user.searchcommand.role'|trans) ~ ':&quot;' ~ item.getName() ~ '&quot;'}) }}" data-toggle="ajax"{{ userCounts[item.getId()] == 0 ? 'disabled=disabled' : '' }}>
+                        {'search' : (('mautic.user.user.searchcommand.role'|trans) ~ ':"' ~ item.getName() ~ '"')}) }}" data-toggle="ajax"{{ i.user_count == 0 ? 'disabled=disabled' : '' }}>
                         {{ 'mautic.user.role.list.viewusers_count'|trans(
-                            {'%count%' : userCounts[item.getId()]}
+                            {'%count%' : i.user_count}
                         ) }}
                     </a>
                 </td>

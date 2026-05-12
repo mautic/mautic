@@ -325,7 +325,7 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->defaultTimezone = new \DateTimeZone(
-            $this->coreParametersHelper->get('default_timezone', 'UTC')
+            $this->coreParametersHelper->getDefaultTimezone()
         );
 
         return $this->defaultTimezone;

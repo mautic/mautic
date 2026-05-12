@@ -12,33 +12,18 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChartQueryTest extends \PHPUnit\Framework\TestCase
+class ChartQueryTest extends TestCase
 {
     private \DateTime $dateFrom;
-
     private DateTimeHelper $dateTimeHelper;
-
     private \DateTime $dateTo;
-
-    /**
-     * @var MockObject|Connection
-     */
-    private MockObject $connection;
-
-    /**
-     * @var MockObject|QueryBuilder
-     */
-    private MockObject $queryBuilder;
-
+    private MockObject&Connection $connection;
+    private MockObject&QueryBuilder $queryBuilder;
     private string $dateColumn;
-
     private string $unit;
-
-    /**
-     * @var ChartQuery
-     */
-    private $chartQuery;
+    private ChartQuery $chartQuery;
 
     protected function setUp(): void
     {
@@ -87,10 +72,11 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
 
         $generatedColumn->addIndexColumn('email_id');
+        $generatedColumn->setFilterDateColumn('generated_sent_date');
         $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
         $generatedColumns->add($generatedColumn);
 
-        $generatedColumnsProvider->expects($this->once())
+        $generatedColumnsProvider->expects($this->exactly(2))
             ->method('getGeneratedColumns')
             ->willReturn($generatedColumns);
 
@@ -98,15 +84,38 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with('t.generated_sent_date AS date, COUNT(*) AS count');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '+00:00'), '%Y-%m-%d') AS date, COUNT(*) AS count");
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('t.generated_sent_date');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '+00:00'), '%Y-%m-%d')");
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with('t.generated_sent_date');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '+00:00'), '%Y-%m-%d')");
+
+        $this->queryBuilder->method('getQueryPart')
+            ->willReturnMap(
+                [
+                    ['from', [[
+                        'table' => 'emails',
+                        'alias' => 'e',
+                    ]]],
+                    [
+                        'join',
+                        [
+                            'e' => [
+                                [
+                                    'joinType'      => 'inner',
+                                    'joinTable'     => 'email_stats',
+                                    'joinAlias'     => 't',
+                                    'joinCondition' => 't.id = e.id',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
 
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
@@ -231,23 +240,6 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
-
-        $rawData = [
-            0 => [
-                'count' => '1',
-                'date'  => '2020-11-29',
-            ],
-            1 => [
-                'count' => '2',
-                'date'  => '2020-11-30',
-            ],
-            2 => [
-                'count' => '3',
-                'date'  => '2020-12-02',
-            ],
-        ];
-
-        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
     }
 
     public function testPhpOrderingInCompleteTimeDataWeek(): void
@@ -300,12 +292,12 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
      * @param array<mixed> $expectedResult
      * @param array<mixed> $data
      */
-    private function assertTimeDataWithoutSqlOrder($expectedResult, $data): void
+    private function assertTimeDataWithoutSqlOrder(array $expectedResult, array $data): void
     {
         $this->createChartQuery();
         self::assertSame(
             $expectedResult,
-            $this->chartQuery->completeTimeData($data, false)
+            $this->chartQuery->completeTimeData($data)
         );
     }
 

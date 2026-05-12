@@ -55,7 +55,7 @@ class FormApiController extends CommonApiController
         $this->entityClass      = Form::class;
         $this->entityNameOne    = 'form';
         $this->entityNameMulti  = 'forms';
-        $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails', 'projectList'];
+        $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
 
         $this->dataInputMasks  = [
             'text'    => 'html',

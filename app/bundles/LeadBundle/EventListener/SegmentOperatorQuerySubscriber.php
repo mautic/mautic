@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
@@ -97,25 +99,53 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
-        $operator        = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
-        $queryBuilder    = $event->getQueryBuilder();
-        $field           = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
         $expressions = [];
-        foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $queryBuilder->expr()->$operator($field, $parameter);
+
+        $queryBuilder = $event->getQueryBuilder();
+
+        /**
+         * Given contact fields REX1, REX2:
+         * Including all: and(regexp) function must succeed if both fields are matched: REX1 AND REX2
+         * Excluding all: not(and(regexp)) function must succeed if both fields are matched, or the field is NULL: NOT (REX1 AND REX2) OR IS NULL
+         * Including any: or(regexp) function must succeed: REX1 OR REX2
+         * Excluding any: and(notRegexp) function must succeed, or field is null: (NOT REX1 AND NOT REX2) OR IS NULL
+         */
+        $filterArray      = $event->getFilter()->contactSegmentFilterCrate->getArray();
+        $originalOperator = $filterArray['operator'];
+        $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
+        $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
+
+        $operator = 'regexp';
+        if (OperatorOptions::EXCLUDING_ANY === $originalOperator) {
+            $operator = 'notRegexp';
         }
 
-        if ('notRegexp' === $operator) {
-            // Build and() from all expressions, then or() with isNull
-            $andExpr    = $queryBuilder->expr()->and(...$expressions);
-            $isNullExpr = $queryBuilder->expr()->isNull($field);
-            $finalExpr  = $queryBuilder->expr()->or($andExpr, $isNullExpr);
+        if (in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true)) {
+            $filterGlue = 'and';
         } else {
-            // For 'multiselect', or() with all expressions
-            $finalExpr = $queryBuilder->expr()->or(...$expressions);
+            $filterGlue = 'or';
         }
-        $event->addExpression($finalExpr);
+
+        foreach ($event->getParameterHolder() as $parameter) {
+            $expressions[] = $queryBuilder->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
+        }
+
+        if ($applyIsNull) {
+            if ($applyNot) {
+                $expressions = [$queryBuilder->expr()->or(
+                    (string) new Expr\Func('NOT', (string) $queryBuilder->expr()->$filterGlue(...$expressions)),
+                    $queryBuilder->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
+                )];
+            } else {
+                $expressions = [$queryBuilder->expr()->or(
+                    $queryBuilder->expr()->$filterGlue(...$expressions),
+                    $queryBuilder->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
+                )];
+            }
+        }
+
+        $event->addExpression($queryBuilder->expr()->$filterGlue(...$expressions));
         $event->stopPropagation();
     }
 

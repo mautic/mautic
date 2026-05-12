@@ -73,30 +73,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        if (empty($this->inConversion)) {
-            $alias = $entity->getAlias();
-            if (empty($alias)) {
-                $alias = $entity->getTitle();
-            }
-            $alias = $this->cleanAlias($alias, '', 0, '-');
-
-            // make sure alias is not already taken
-            $repo      = $this->getRepository();
-            $testAlias = $alias;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias.$aliasTag;
-                $count     = $repo->checkUniqueAlias($testAlias, $entity);
-                ++$aliasTag;
-            }
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
-            $entity->setAlias($alias);
-        }
-
         if (!$entity->isNew()) {
             // increase the revision
             $revision = $entity->getRevision();
@@ -137,6 +113,13 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmMedium($request->get('utm_medium'));
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
+
+        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
+            return;
+        }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Download triggered by lead
         if (empty($systemEntry)) {
@@ -427,21 +410,26 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Generate url for an asset.
      *
-     * @param Asset $entity
-     * @param bool  $absolute
-     * @param array $clickthrough
-     *
-     * @return string
+     * @param array<string, mixed> $clickthrough
      */
-    public function generateUrl($entity, $absolute = true, $clickthrough = [])
+    public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
-        $assetSlug = $entity->getId().':'.$entity->getAlias();
+        $routeParams = ['slug' => $entity->getSlug()];
+        if (!is_null($stream)) {
+            $routeParams['stream'] = $stream;
+        }
 
-        $slugs = [
-            'slug' => $assetSlug,
-        ];
+        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+        $url           = $this->router->generate('mautic_asset_download', $routeParams, $referenceType);
 
-        return $this->buildUrl('mautic_asset_download', $slugs, $absolute, $clickthrough);
+        if (empty($clickthrough)) {
+            return $url;
+        }
+
+        $ct        = $this->encodeArrayForUrl($clickthrough);
+        $separator = (null !== parse_url($url, PHP_URL_QUERY)) ? '&' : '?';
+
+        return $url.$separator.'ct='.$ct;
     }
 
     /**
@@ -619,5 +607,37 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $chartQuery->applyDateFilters($q, 'date_added');
 
         return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Asset-specific override for legacy public asset URLs.
+     *
+     * Backward compatibility rules:
+     * - Supports `{id}:{alias}` without validating the alias value
+     * - Allows `{id}:` and `{id}:<any>` only for assets that already have a
+     *   non-null alias, for BC
+     *
+     * @note The alias portion of the slug is no longer used for matching or validation.
+     */
+    public function getEntityBySlugs($slug): Asset|bool
+    {
+        if (!is_string($slug) || !str_contains($slug, ':')) {
+            return false;
+        }
+
+        [$id] = array_pad(explode(':', $slug, 2), 1, null);
+
+        if (empty($id) || !ctype_digit((string) $id)) {
+            return false;
+        }
+
+        $entity = $this->getEntity((int) $id);
+        if ($entity && null !== $entity->getAlias()) {
+            return $entity;
+        }
+
+        return false;
     }
 }

@@ -3,7 +3,9 @@
 namespace Mautic\WebhookBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Mautic\WebhookBundle\Service\WebhookService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,23 +23,25 @@ class ProcessWebhookQueuesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
 
-    public function __construct(
+    public function __construct(private WebhookModel $webhookModel,
         private CoreParametersHelper $coreParametersHelper,
-        private WebhookModel $webhookModel,
+        private WebhookService $webhookService,
     ) {
         parent::__construct();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
-        $this
-            ->addOption(
-                '--webhook-id',
-                '-i',
-                InputOption::VALUE_OPTIONAL,
-                'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
-                null
-            )
+        $this->addOption(
+            '--webhook-id',
+            '-i',
+            InputOption::VALUE_OPTIONAL,
+            'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
+            null
+        )
             ->addOption(
                 '--min-id',
                 null,
@@ -67,20 +71,43 @@ class ProcessWebhookQueuesCommand extends Command
         $minId = (int) $input->getOption('min-id');
         $maxId = (int) $input->getOption('max-id');
 
+        $queueRangeMode = false;
+
+        $healthyWebhookTime     = $this->webhookService->getHealthyWebhookTime();
         if ($id) {
             $webhook        = $this->webhookModel->getEntity($id);
-            $webhooks       = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhooks       = (null !== $webhook && $webhook->isPublished()
+                && $this->webhookService->isWebhookHealthy($webhook)) ? [$id => $webhook] : [];
             $queueRangeMode = $minId && $maxId;
         } else {
-            // make sure we only get published webhook entities
+            // make sure we only get published / healthy webhook entities
             $webhooks = $this->webhookModel->getEntities(
                 [
                     'filter' => [
-                        'force' => [
+                        'where' => [
                             [
-                                'column' => 'e.isPublished',
-                                'expr'   => 'eq',
-                                'value'  => 1,
+                                'expr' => 'andX',
+                                'val'  => [
+                                    [
+                                        'column' => 'e.isPublished',
+                                        'expr'   => 'eq',
+                                        'value'  => 1,
+                                    ],
+                                    [
+                                        'expr' => 'orX',
+                                        'val'  => [
+                                            [
+                                                'column' => 'e.markedUnhealthyAt',
+                                                'expr'   => 'lt',
+                                                'value'  => $healthyWebhookTime->format(DateTimeHelper::FORMAT_DB),
+                                            ],
+                                            [
+                                                'column' => 'e.markedUnhealthyAt',
+                                                'expr'   => 'isNull',
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -89,7 +116,7 @@ class ProcessWebhookQueuesCommand extends Command
         }
 
         if (!count($webhooks)) {
-            $output->writeln('<error>No published webhooks found. Try again later.</error>');
+            $output->writeln('<error>No published/Healthy webhooks found. Try again later.</error>');
 
             return Command::FAILURE;
         }
@@ -108,7 +135,6 @@ class ProcessWebhookQueuesCommand extends Command
                     $this->webhookModel
                         ->setMinQueueId($minId)
                         ->setMaxQueueId(min($minId + $webhookLimit - 1, $maxId));
-
                     $this->webhookModel->processWebhook(current($webhooks));
                 }
             } else {

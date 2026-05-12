@@ -74,6 +74,50 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    public function testAddToSegmentActionRendersBatchForm(): void
+    {
+        // Create a form
+        $formPayload = [
+            'name'        => 'Segment Test Form',
+            'formType'    => 'standalone',
+            'alias'       => 'segmenttestform',
+            'description' => 'Form for segment batch test',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'      => 'Email',
+                    'alias'      => 'email',
+                    'type'       => 'email',
+                    'properties' => [],
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $response = json_decode($clientResponse->getContent(), true);
+        $form     = $response['form'];
+        $formId   = $form['id'];
+
+        // Submit a form result (simulate a contact submission)
+        $this->client->request('POST', "/form/{$formId}", [
+            'mauticform[email]'  => 'test@example.com',
+            'mauticform[formId]' => $formId,
+            'mauticform[return]' => '',
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        // Call the addToSegmentAction
+        $this->client->request('GET', "/s/forms/results/{$formId}/add-to-segment");
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('form', $response->getContent());
+        $this->assertStringContainsString('batch', $response->getContent());
+    }
+
     public function testEditButtonIsDisplayedOnFormResultsPage(): void
     {
         $formPayload = [

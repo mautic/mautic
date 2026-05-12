@@ -223,7 +223,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($mappingForm);
 
         Assert::assertStringContainsString(
-            'Import process was successfully created. But it will not be processed as you do not have permission to publish.',
+            'The import process was successfully created. But it will not be processed as you do not have permission to publish.',
             $crawler->html()
         );
 

@@ -109,6 +109,7 @@ class EmailType extends AbstractType
                     'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens editor-email',
                     'data-token-callback'  => 'email:getBuilderTokens',
                     'data-token-activator' => '{',
+                    'allow-full-html'      => true,
                 ],
             ]
         );

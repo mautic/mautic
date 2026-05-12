@@ -138,7 +138,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && $supportsChoices) {
-                $isMultiple   = in_array($operator, [OperatorOptions::IN, OperatorOptions::NOT_IN]);
+                $isMultiple   = in_array($operator, [OperatorOptions::INCLUDING_ANY, OperatorOptions::EXCLUDING_ANY]);
                 $value        = $isMultiple && !is_array($data['value']) ? [$data['value']] : $data['value'];
                 $innerBuilder = $form->getConfig()->getFormFactory()->createNamedBuilder('value', ChoiceType::class, null, [
                     'choices'    => array_flip($fieldValues),

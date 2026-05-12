@@ -343,6 +343,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $path = $this->getLocalConfigFile();
 
+        if (!file_exists($path.'.backup')) {
+            return;
+        }
+
         if (!rename($path.'.backup', $path)) {
             throw new \RuntimeException(sprintf('Unable to move file %s => %s', $path.'.backup', $path));
         }

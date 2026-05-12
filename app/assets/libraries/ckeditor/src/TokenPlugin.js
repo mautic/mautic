@@ -1,6 +1,6 @@
-import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import Model from '@ckeditor/ckeditor5-ui/src/model';
-import Collection from '@ckeditor/ckeditor5-utils/src/collection';
+import { Plugin } from '@ckeditor/ckeditor5-core/src/plugin';
+import { UIModel as Model } from '@ckeditor/ckeditor5-ui/src/model';
+import { Collection } from '@ckeditor/ckeditor5-utils/src/collection';
 import { addListToDropdown, createDropdown } from '@ckeditor/ckeditor5-ui/src/dropdown/utils';
 
 export default class TokenPlugin extends Plugin {

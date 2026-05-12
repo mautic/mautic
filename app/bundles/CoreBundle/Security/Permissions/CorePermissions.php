@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
@@ -297,6 +298,38 @@ class CorePermissions implements ResetInterface
         }
 
         return (is_array($permission)) ? $result : $result[$permission];
+    }
+
+    public function hasPublishAccessForEntity(FormEntity $entity, string $ownPermission, string $otherPermission): bool
+    {
+        $user = $this->userHelper->getUser();
+
+        if (!$user) {
+            return false;
+        }
+
+        $hasOwnPermission   = $this->isGranted($ownPermission);
+        $hasOtherPermission = $this->isGranted($otherPermission);
+
+        if (!$hasOwnPermission && !$hasOtherPermission) {
+            return false;
+        }
+
+        if ($hasOwnPermission && $entity->isNew()) {
+            return true;
+        }
+
+        $ownerId = method_exists($entity, 'getPermissionUser') ? (int) $entity->getPermissionUser() : (int) $entity->getCreatedBy();
+
+        if ($hasOwnPermission && !$entity->isNew() && $ownerId === (int) $user->getId()) {
+            return true;
+        }
+
+        if ($hasOtherPermission && !$entity->isNew() && $ownerId !== (int) $user->getId()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

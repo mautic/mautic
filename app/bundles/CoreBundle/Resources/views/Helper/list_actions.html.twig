@@ -41,7 +41,7 @@
             {% if templateButtons.edit is defined and templateButtons.edit is not empty %}
             {{ buttonAdd({
                 attr: editAttr|merge({
-                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
+                    class: 'btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'edit', objectId: id})
@@ -56,7 +56,7 @@
             {% if templateButtons.clone is defined and templateButtons.clone is not empty %}
             {{ buttonAdd({
                 attr: editAttr|merge({
-                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
+                    class: 'btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'clone', objectId: id})
@@ -86,7 +86,7 @@
             {% if templateButtons.export is defined and templateButtons.export is not empty %}
             {{ buttonAdd({
                 attr: {
-                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
+                    class: 'btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'export', objectId: id})

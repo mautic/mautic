@@ -223,13 +223,13 @@ class PlainTextHelper
     /**
      * Set the source HTML.
      *
-     * @param string $html HTML source content
+     * @param string|null $html HTML source content
      *
      * @return PlainTextHelper
      */
     public function setHtml($html)
     {
-        $this->html      = $html;
+        $this->html      = $html ?? '';
         $this->converted = false;
 
         return $this;

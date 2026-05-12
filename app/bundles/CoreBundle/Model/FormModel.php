@@ -4,6 +4,9 @@ namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -299,6 +302,11 @@ class FormModel extends AbstractCommonModel
         // take note of ID before doctrine wipes it out
         $id    = $entity->getId();
         $event = $this->dispatchEvent('pre_delete', $entity);
+
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
+        }
+
         $this->getRepository()->deleteEntity($entity);
 
         // set the id for use in events
@@ -315,15 +323,23 @@ class FormModel extends AbstractCommonModel
      */
     public function deleteEntities($ids): array
     {
-        $entities = [];
+        $deleted        = [];
+        $unableToDelete = [];
+
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         foreach ($ids as $k => $id) {
             $entity        = $this->getEntity($id);
-            $entities[$id] = $entity;
             if (null !== $entity) {
                 $event = $this->dispatchEvent('pre_delete', $entity);
+
+                if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+                    $unableToDelete[$id] = $entity;
+                    continue;
+                }
+
                 $this->getRepository()->deleteEntity($entity, false);
+                $deleted[$id] = $entity;
                 // set the id for use in events
                 $entity->deletedId = $id;
                 $this->dispatchEvent('post_delete', $entity, false, $event);
@@ -334,8 +350,12 @@ class FormModel extends AbstractCommonModel
         }
         $this->em->flush();
 
+        if ($unableToDelete) {
+            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
+        }
+
         // retrieving the entities while here so may as well return them so they can be used if needed
-        return $entities;
+        return $deleted;
     }
 
     /**

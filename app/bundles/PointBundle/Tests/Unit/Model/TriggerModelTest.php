@@ -100,7 +100,6 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
         // reset private property cachedEvents in TriggerModel instance
         $reflectionClass = new \ReflectionClass(TriggerModel::class);
         $property        = $reflectionClass->getProperty('cachedEvents');
-        $property->setAccessible(true);
         $property->setValue($this->triggerModel, []);
     }
 

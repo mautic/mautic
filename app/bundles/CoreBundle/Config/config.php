@@ -305,6 +305,7 @@ return [
                     'request_stack',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
                 ],
             ],
@@ -338,6 +339,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
                 'arguments' => [
                     'mautic.helper.file_path_resolver',
+                    'translator',
                 ],
             ],
             'mautic.helper.file_path_resolver' => [
@@ -898,8 +900,10 @@ return [
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
+        'validate_remote_domains'         => false, // whether to validate remote domains in remote URLs
+        'allowed_remote_domains'          => [],
         'rememberme_key'                  => '%mautic.secret_key%',
-        'rememberme_lifetime'             => 31_536_000, // 365 days in seconds
+        'rememberme_lifetime'             => 7_776_000, // 90 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
         'default_pagelimit'               => 30,

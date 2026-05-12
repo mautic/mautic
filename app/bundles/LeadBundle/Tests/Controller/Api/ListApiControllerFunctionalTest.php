@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -546,6 +548,100 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($clientResponse->isOk());
         $this->assertCount(1, $response['lists']);
+    }
+
+    public function testGetSegmentsWithContactCounts(): void
+    {
+        $segment = new LeadList();
+        $segment->setName('Test Segment for Counts');
+        $segment->setAlias('test-segment-counts');
+        $segment->setPublicName('Test Segment');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'operator' => '!empty',
+            ],
+        ]);
+        $this->em->persist($segment);
+
+        $contact1 = new Lead();
+        $contact1->setEmail('test1@example.com');
+        $this->em->persist($contact1);
+
+        $contact2 = new Lead();
+        $contact2->setEmail('test2@example.com');
+        $this->em->persist($contact2);
+
+        $this->em->flush();
+
+        $listLead1 = new ListLead();
+        $listLead1->setList($segment);
+        $listLead1->setLead($contact1);
+        $listLead1->setDateAdded(new \DateTime());
+        $this->em->persist($listLead1);
+
+        $listLead2 = new ListLead();
+        $listLead2->setList($segment);
+        $listLead2->setLead($contact2);
+        $listLead2->setDateAdded(new \DateTime());
+        $this->em->persist($listLead2);
+
+        $this->em->flush();
+
+        $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
+        $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
+
+        $this->client->request(Request::METHOD_GET, '/api/segments');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertArrayHasKey('lists', $response);
+        Assert::assertArrayHasKey($segment->getId(), $response['lists']);
+        Assert::assertArrayNotHasKey(
+            'contactCount',
+            $response['lists'][$segment->getId()],
+            'contactCount should not be present without withCounts parameter'
+        );
+
+        $this->client->request(Request::METHOD_GET, '/api/segments?withCounts');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertArrayHasKey('lists', $response);
+        Assert::assertArrayHasKey($segment->getId(), $response['lists']);
+        Assert::assertArrayHasKey(
+            'contactCount',
+            $response['lists'][$segment->getId()],
+            'contactCount should be present with withCounts parameter'
+        );
+        Assert::assertSame(2, $response['lists'][$segment->getId()]['contactCount']);
+
+        $contact3 = new Lead();
+        $contact3->setEmail('test3@example.com');
+        $this->em->persist($contact3);
+
+        $listLead3 = new ListLead();
+        $listLead3->setList($segment);
+        $listLead3->setLead($contact3);
+        $listLead3->setDateAdded(new \DateTime());
+        $this->em->persist($listLead3);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/api/segments?withCounts');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertSame(
+            2,
+            $response['lists'][$segment->getId()]['contactCount'],
+            'Count should remain cached at 2 even after adding third contact'
+        );
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList

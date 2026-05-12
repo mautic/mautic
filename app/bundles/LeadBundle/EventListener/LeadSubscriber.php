@@ -36,8 +36,6 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    private RouterInterface $router;
-
     /**
      * @var string[]
      */
@@ -56,7 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private DncReasonHelper $dncReasonHelper,
         private EntityManager $entityManager,
         private TranslatorInterface $translator,
-        RouterInterface $router,
+        private RouterInterface $router,
         private LeadListRepository $leadListRepository,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         private CoreParametersHelper $coreParametersHelper,
@@ -64,8 +62,6 @@ class LeadSubscriber implements EventSubscriberInterface
         ?ModelFactory $modelFactory = null,
         private $isTest = false,
     ) {
-        $this->router = $router;
-
         if ($modelFactory) {
             $this->setModelFactory($modelFactory);
         }

@@ -8,6 +8,6 @@ class LogNotProcessedException extends \Exception
 {
     public function __construct(LeadEventLog $log)
     {
-        parent::__construct("LeadEventLog ID # {$log->getId()} must be passed to either pass() or fail()", 0, null);
+        parent::__construct("LeadEventLog ID # {$log->getId()} must be passed to either pass() or fail()");
     }
 }

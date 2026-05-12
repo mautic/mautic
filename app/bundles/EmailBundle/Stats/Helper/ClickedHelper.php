@@ -20,7 +20,7 @@ class ClickedHelper extends AbstractHelper
     public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection): void
     {
         $query = $this->getQuery($fromDateTime, $toDateTime);
-        $q     = $query->prepareTimeDataQuery('page_hits', 'date_hit', []);
+        $q     = $query->prepareTimeDataQuery('page_hits', 'date_hit', [], 'DISTINCT t.email_id, t.redirect_id, t.lead_id');
 
         if ($segmentId = $options->getSegmentId()) {
             $q->innerJoin(

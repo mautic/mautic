@@ -67,7 +67,7 @@ abstract class AbstractFormController extends CommonController
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);
-        $returnUrl              = $postActionVars['returnUrl'];
+        $returnUrl              = $postActionVars['returnUrl'] ?? null;
         $override               = '';
 
         $modelClass             = $this->getModel($model);

@@ -26,6 +26,8 @@ class FileManager
 
     /**
      * @return array
+     *
+     * @throws FileUploadException
      */
     public function uploadFiles($request)
     {
@@ -35,10 +37,11 @@ class FileManager
             $uploadedFiles = [];
 
             foreach ($files as $file) {
-                try {
-                    $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
-                } catch (FileUploadException) {
-                }
+                $this->fileUploader->validateImage($file);
+            }
+
+            foreach ($files as $file) {
+                $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
             }
         }
 

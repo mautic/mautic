@@ -6,24 +6,6 @@ use Page\Acceptance\FormPage;
 
 class FormStep extends \AcceptanceTester
 {
-    public function selectAStandAloneType(): void
-    {
-        $I = $this;
-        $I->waitForText('What type of form do you want to create?', 10);
-        $I->wait(1); // Give the modal time to fully render
-
-        // Try to find and click the standalone form tile
-        try {
-            // First try clicking by selector
-            $I->click(FormPage::$FORM_TYPE);
-        } catch (\Exception $e) {
-            // If that fails, try JavaScript approach
-            $I->executeJS("Mautic.selectFormType('standalone');");
-        }
-
-        $I->see('New Form');
-    }
-
     public function addFormMetaData(): void
     {
         $I = $this;
@@ -32,14 +14,24 @@ class FormStep extends \AcceptanceTester
         $I->fillField('mauticform[postActionProperty]', FormPage::$FORM_POST_ACTION_PROPERTY);
     }
 
-    public function createFormField(string $fieldType, string $modalHeader, string $label): void
-    {
+    public function createFormField(
+        string $fieldType,
+        string $modalHeader,
+        string $label,
+        ?string $labelSelector = null,
+        ?string $saveButtonSelector = null,
+    ): void {
         $I = $this;
+        $labelSelector ??= FormPage::$FORM_FIELD_LABEL_SELECTOR;
+        $saveButtonSelector ??= FormPage::$FORM_FIELD_SAVE_BUTTON_SELECTOR;
+
         $I->click(FormPage::$ADD_NEW_FIELD_BUTTON_TEXT);
         $I->click($fieldType);
-        $I->waitForText($modalHeader, 2);
-        $I->fillField('formfield[label]', $label);
-        $I->click('div.modal-footer button.btn-primary');
-        $I->wait(2);
+        $I->waitForText($modalHeader, 5);
+        $I->waitForElementVisible($labelSelector, 10);
+        $I->fillField($labelSelector, $label);
+        $I->waitForElementClickable($saveButtonSelector, 10);
+        $I->click($saveButtonSelector);
+        $I->waitForElementNotVisible($labelSelector, 10); // modal closed
     }
 }

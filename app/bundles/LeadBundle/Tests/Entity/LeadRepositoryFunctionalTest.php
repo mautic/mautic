@@ -132,7 +132,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array<int, int|string|bool|string[]>>
+     * @return iterable<string, array<int, int|string|bool|string[]>>
      */
     public static function dataForTestAjaxGetLeadsByFieldValue(): iterable
     {
