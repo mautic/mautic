@@ -521,6 +521,11 @@ class LeadList extends FormEntity implements UuidInterface
         $this->deleted = $deletedDate;
     }
 
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
     /**
      * @param mixed[] $filters
      *
