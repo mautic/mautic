@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
@@ -108,7 +109,9 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
-        $requestedAt            = $contactExportScheduler->getScheduledDateTime()->format('Y-m-d H:i:s P');
+        /** @var DateHelper $dateHelper */
+        $dateHelper             = static::getContainer()->get('mautic.helper.twig.date');
+        $requestedAt            = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         $requesterNotifications = $this->em->getRepository(Notification::class)->findBy(
@@ -179,7 +182,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $requestedAt            = $contactExportScheduler->getScheduledDateTime()->format('Y-m-d H:i:s P');
+        /** @var DateHelper $dateHelper */
+        $dateHelper      = static::getContainer()->get('mautic.helper.twig.date');
+        $requestedAt     = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
 
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);

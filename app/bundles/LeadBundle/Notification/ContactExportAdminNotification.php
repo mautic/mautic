@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Notification;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\UserBundle\Entity\User;
@@ -20,6 +21,7 @@ class ContactExportAdminNotification
         private UserRepository $userRepository,
         private MailHelper $mailHelper,
         private CoreParametersHelper $coreParametersHelper,
+        private DateHelper $dateHelper,
     ) {
     }
 
@@ -40,7 +42,7 @@ class ContactExportAdminNotification
                     [
                         '%requesting_user_name%'  => $requestingUser->getName(),
                         '%requesting_user_email%' => $requestingUser->getEmail(),
-                        '%requested_at%'          => $requestedAt->format('Y-m-d H:i:s P'),
+                        '%requested_at%'          => $this->dateHelper->toFull($requestedAt),
                         '%file_type%'             => strtoupper((string) ($contactExportScheduler->getData()['fileType'] ?? '')),
                     ]
                 ),
@@ -76,8 +78,8 @@ class ContactExportAdminNotification
             [
                 '%requesting_user_name%'  => $requestingUser->getName(),
                 '%requesting_user_email%' => $requestingUser->getEmail(),
-                '%requested_at%'          => $requestedAt->format('Y-m-d H:i:s P'),
-                '%completed_at%'          => $completedAt->format('Y-m-d H:i:s P'),
+                '%requested_at%'          => $this->dateHelper->toFull($requestedAt),
+                '%completed_at%'          => $this->dateHelper->toFull($completedAt),
                 '%status%'                => 'Completed',
                 '%file_type%'             => $fileType,
             ]

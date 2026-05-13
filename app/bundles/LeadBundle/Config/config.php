@@ -375,6 +375,7 @@ return [
                     'mautic.user.repository',
                     'mautic.helper.mailer',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.twig.date',
                 ],
             ],
             'mautic.validator.leadlistaccess' => [

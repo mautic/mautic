@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Notification;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Notification\ContactExportAdminNotification;
@@ -78,7 +79,10 @@ class ContactExportAdminNotificationTest extends TestCase
             ->with('contact_export_notify_admins')
             ->willReturn(true);
 
-        $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper);
+        $dateHelper           = $this->createDateHelper();
+        $formattedRequestedAt = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
+
+        $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper, $dateHelper);
         $notification->notifyRequested($contactExportScheduler);
 
         Assert::assertCount(1, $notificationModel->notifications);
@@ -94,7 +98,7 @@ class ContactExportAdminNotificationTest extends TestCase
         Assert::assertStringContainsString('Requester User', $notificationModel->notifications[0][0]);
         Assert::assertStringContainsString('requester@example.com', $notificationModel->notifications[0][0]);
         Assert::assertStringContainsString('CSV', $notificationModel->notifications[0][0]);
-        Assert::assertStringContainsString('2026-05-12 10:30:00 +00:00', $notificationModel->notifications[0][0]);
+        Assert::assertStringContainsString($formattedRequestedAt, $notificationModel->notifications[0][0]);
         Assert::assertStringNotContainsString('http', $notificationModel->notifications[0][0]);
     }
 
@@ -155,13 +159,17 @@ class ContactExportAdminNotificationTest extends TestCase
         $mailHelper->expects($this->once())
             ->method('setSubject')
             ->with('Contact export completed');
+        $dateHelper           = $this->createDateHelper();
+        $formattedRequestedAt = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
+
         $mailHelper->expects($this->once())
             ->method('setBody')
-            ->with($this->callback(function (string $message): bool {
+            ->with($this->callback(function (string $message) use ($formattedRequestedAt): bool {
                 Assert::assertStringContainsString('Hi,', $message);
                 Assert::assertStringContainsString('Requester User', $message);
                 Assert::assertStringContainsString('requester@example.com', $message);
-                Assert::assertStringContainsString('Requested at: 2026-05-12 10:30:00 +00:00', $message);
+                Assert::assertStringContainsString('Requested at: '.$formattedRequestedAt, $message);
+                Assert::assertStringContainsString('Completed at:', $message);
                 Assert::assertStringContainsString('Status: Completed', $message);
                 Assert::assertStringContainsString('Export type: CSV', $message);
                 Assert::assertStringContainsString('download link is not included', $message);
@@ -180,7 +188,7 @@ class ContactExportAdminNotificationTest extends TestCase
             ->with('contact_export_notify_admins')
             ->willReturn(true);
 
-        $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper);
+        $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper, $dateHelper);
         $notification->notifyCompleted($contactExportScheduler);
     }
 
@@ -212,9 +220,23 @@ class ContactExportAdminNotificationTest extends TestCase
             ->with('contact_export_notify_admins')
             ->willReturn(false);
 
-        $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper);
+        $dateHelper = $this->createDateHelper();
+
+        $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper, $dateHelper);
         $notification->notifyRequested($contactExportScheduler);
         $notification->notifyCompleted($contactExportScheduler);
+    }
+
+    private function createDateHelper(): DateHelper
+    {
+        return new DateHelper(
+            'Y-m-d H:i:s P',
+            'Y-m-d',
+            'Y-m-d',
+            'H:i:s',
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(CoreParametersHelper::class)
+        );
     }
 
     private function createUser(int $id, string $name, string $email, bool $isPublished, bool $isAdmin = false): User
