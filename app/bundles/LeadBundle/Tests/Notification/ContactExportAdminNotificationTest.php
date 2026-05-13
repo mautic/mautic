@@ -81,7 +81,7 @@ class ContactExportAdminNotificationTest extends TestCase
             ->willReturn(true);
 
         $dateHelper           = $this->createDateHelper();
-        $formattedRequestedAt = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
+        $formattedRequestedAt = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
 
         $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper, $dateHelper);
         $notification->notifyRequested($contactExportScheduler);
@@ -161,7 +161,7 @@ class ContactExportAdminNotificationTest extends TestCase
             ->method('setSubject')
             ->with('Contact export completed');
         $dateHelper           = $this->createDateHelper();
-        $formattedRequestedAt = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
+        $formattedRequestedAt = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
 
         $mailHelper->expects($this->once())
             ->method('setBody')
@@ -239,6 +239,14 @@ class ContactExportAdminNotificationTest extends TestCase
             $this->createMock(TranslatorInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
+    }
+
+    private function getScheduledDateTimeForDisplay(ContactExportScheduler $contactExportScheduler): \DateTime
+    {
+        $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
+        Assert::assertInstanceOf(\DateTimeImmutable::class, $scheduledDateTime);
+
+        return \DateTime::createFromInterface($scheduledDateTime);
     }
 
     private function createUser(int $id, string $name, string $email, bool $isPublished, bool $isAdmin = false): User

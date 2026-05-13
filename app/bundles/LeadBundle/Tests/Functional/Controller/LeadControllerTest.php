@@ -113,7 +113,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
         /** @var DateHelper $dateHelper */
         $dateHelper             = static::getContainer()->get('mautic.helper.twig.date');
-        $requestedAt            = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
+        $requestedAt            = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         $requesterNotifications = $this->em->getRepository(Notification::class)->findBy(
@@ -186,7 +186,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         /** @var DateHelper $dateHelper */
         $dateHelper      = static::getContainer()->get('mautic.helper.twig.date');
-        $requestedAt     = $dateHelper->toFull($contactExportScheduler->getScheduledDateTime());
+        $requestedAt     = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
 
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
@@ -264,6 +264,14 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertCount($count, $allRows);
 
         return $allRows;
+    }
+
+    private function getScheduledDateTimeForDisplay(ContactExportScheduler $contactExportScheduler): \DateTime
+    {
+        $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
+        Assert::assertInstanceOf(\DateTimeImmutable::class, $scheduledDateTime);
+
+        return \DateTime::createFromInterface($scheduledDateTime);
     }
 
     public function testAccessContactQuickAddWithPermission(): void

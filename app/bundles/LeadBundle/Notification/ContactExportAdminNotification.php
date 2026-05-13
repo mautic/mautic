@@ -42,7 +42,7 @@ class ContactExportAdminNotification
                     [
                         '%requesting_user_name%'  => $requestingUser->getName(),
                         '%requesting_user_email%' => $requestingUser->getEmail(),
-                        '%requested_at%'          => $this->dateHelper->toFull($requestedAt),
+                        '%requested_at%'          => $this->formatForDisplay($requestedAt),
                         '%file_type%'             => strtoupper((string) ($contactExportScheduler->getData()['fileType'] ?? '')),
                     ]
                 ),
@@ -78,8 +78,8 @@ class ContactExportAdminNotification
             [
                 '%requesting_user_name%'  => $requestingUser->getName(),
                 '%requesting_user_email%' => $requestingUser->getEmail(),
-                '%requested_at%'          => $this->dateHelper->toFull($requestedAt),
-                '%completed_at%'          => $this->dateHelper->toFull($completedAt),
+                '%requested_at%'          => $this->formatForDisplay($requestedAt),
+                '%completed_at%'          => $this->formatForDisplay($completedAt),
                 '%status%'                => 'Completed',
                 '%file_type%'             => $fileType,
             ]
@@ -137,5 +137,10 @@ class ContactExportAdminNotification
         \assert($scheduledDateTime instanceof \DateTimeImmutable);
 
         return $scheduledDateTime;
+    }
+
+    private function formatForDisplay(\DateTimeImmutable $dateTime): string
+    {
+        return $this->dateHelper->toFull(\DateTime::createFromInterface($dateTime));
     }
 }
