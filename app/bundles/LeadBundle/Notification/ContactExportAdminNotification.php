@@ -33,7 +33,7 @@ class ContactExportAdminNotification
 
         /** @var User $requestingUser */
         $requestingUser = $contactExportScheduler->getUser();
-        $requestedAt    = $contactExportScheduler->getScheduledDateTime();
+        $requestedAt    = $this->getScheduledDateTime($contactExportScheduler);
 
         foreach ($this->getAdminUsersToNotify($requestingUser) as $adminUser) {
             $this->notificationModel->addNotification(
@@ -70,7 +70,7 @@ class ContactExportAdminNotification
             return;
         }
 
-        $requestedAt = $contactExportScheduler->getScheduledDateTime();
+        $requestedAt = $this->getScheduledDateTime($contactExportScheduler);
         $completedAt = new \DateTimeImmutable();
         $fileType    = strtoupper((string) ($contactExportScheduler->getData()['fileType'] ?? ''));
         $message     = $this->translator->trans(
@@ -129,5 +129,13 @@ class ContactExportAdminNotification
     private function isEnabled(): bool
     {
         return (bool) $this->coreParametersHelper->get('contact_export_notify_admins');
+    }
+
+    private function getScheduledDateTime(ContactExportScheduler $contactExportScheduler): \DateTimeImmutable
+    {
+        $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
+        \assert($scheduledDateTime instanceof \DateTimeImmutable);
+
+        return $scheduledDateTime;
     }
 }
