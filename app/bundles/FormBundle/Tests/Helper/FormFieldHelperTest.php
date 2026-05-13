@@ -100,6 +100,20 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
                 '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
                 'Select lists should have their values set appropriately via GET.',
             ],
+            [
+                self::getField('Select', 'select'),
+                'myvalue',
+                '<select name="mauticform[select]" value="{contactfield=myvalue}" id="mauticform_input_mautic_select" class="mauticform-selectbox"><option value="myvalue">My Value</option></select>',
+                '<select name="mauticform[select]" value="{contactfield=myvalue}" id="mauticform_input_mautic_select" class="mauticform-selectbox"><option value="myvalue" selected="selected">My Value</option></select>',
+                'Select lists should match the form field even when the id attribute is not the first select attribute.',
+            ],
+            [
+                self::getField('Select', 'select'),
+                'myvalue',
+                '<select id="mauticform_input_mautic_select"><option value="myvalue" >My Value</option></select>',
+                '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
+                'Select lists should match the option tag even when there is whitespace before the closing angle bracket.',
+            ],
         ];
     }
 
