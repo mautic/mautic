@@ -1,0 +1,131 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mautic\LeadBundle\Notification;
+
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\LeadBundle\Entity\ContactExportScheduler;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+class ContactExportAdminNotification
+{
+    public function __construct(
+        private NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private UserRepository $userRepository,
+        private MailHelper $mailHelper,
+        private CoreParametersHelper $coreParametersHelper,
+    ) {
+    }
+
+    public function notifyRequested(ContactExportScheduler $contactExportScheduler): void
+    {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        /** @var User $requestingUser */
+        $requestingUser = $contactExportScheduler->getUser();
+        $requestedAt    = $contactExportScheduler->getScheduledDateTime();
+
+        foreach ($this->getAdminUsersToNotify($requestingUser) as $adminUser) {
+            $this->notificationModel->addNotification(
+                $this->translator->trans(
+                    'mautic.lead.export.admin.notification',
+                    [
+                        '%requesting_user_name%'  => $requestingUser->getName(),
+                        '%requesting_user_email%' => $requestingUser->getEmail(),
+                        '%requested_at%'          => $requestedAt->format('Y-m-d H:i:s P'),
+                        '%file_type%'             => strtoupper((string) ($contactExportScheduler->getData()['fileType'] ?? '')),
+                    ]
+                ),
+                'info',
+                false,
+                'mautic.lead.export.admin.notification.header',
+                null,
+                \DateTime::createFromImmutable($requestedAt),
+                $adminUser
+            );
+        }
+    }
+
+    public function notifyCompleted(ContactExportScheduler $contactExportScheduler): void
+    {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        /** @var User $requestingUser */
+        $requestingUser = $contactExportScheduler->getUser();
+        $adminUsers     = $this->getAdminUsersToNotify($requestingUser);
+
+        if ([] === $adminUsers) {
+            return;
+        }
+
+        $requestedAt = $contactExportScheduler->getScheduledDateTime();
+        $completedAt = new \DateTimeImmutable();
+        $fileType    = strtoupper((string) ($contactExportScheduler->getData()['fileType'] ?? ''));
+        $message     = $this->translator->trans(
+            'mautic.lead.export.admin.email',
+            [
+                '%requesting_user_name%'  => $requestingUser->getName(),
+                '%requesting_user_email%' => $requestingUser->getEmail(),
+                '%requested_at%'          => $requestedAt->format('Y-m-d H:i:s P'),
+                '%completed_at%'          => $completedAt->format('Y-m-d H:i:s P'),
+                '%status%'                => 'Completed',
+                '%file_type%'             => $fileType,
+            ]
+        );
+
+        $primaryAdmin = array_shift($adminUsers);
+        \assert($primaryAdmin instanceof User);
+
+        $mailer = $this->mailHelper->getMailer(true);
+        $mailer->setTo([$primaryAdmin->getEmail() => $primaryAdmin->getName()]);
+
+        if ([] !== $adminUsers) {
+            $mailer->setCc(
+                array_reduce(
+                    $adminUsers,
+                    static function (array $recipients, User $adminUser): array {
+                        $recipients[$adminUser->getEmail()] = $adminUser->getName();
+
+                        return $recipients;
+                    },
+                    []
+                )
+            );
+        }
+
+        $mailer->setSubject($this->translator->trans('mautic.lead.export.admin.email_subject'));
+        $mailer->setBody($message);
+        $mailer->parsePlainText($message);
+        $mailer->send(true);
+    }
+
+    /**
+     * @return User[]
+     */
+    private function getAdminUsersToNotify(User $requestingUser): array
+    {
+        return array_values(
+            array_filter(
+                $this->userRepository->getAllAdminUsers(),
+                static fn (User $adminUser): bool => $adminUser->isAdmin()
+                    && $adminUser->isPublished()
+                    && $adminUser->getId() !== $requestingUser->getId()
+            )
+        );
+    }
+
+    private function isEnabled(): bool
+    {
+        return (bool) $this->coreParametersHelper->get('contact_export_notify_admins');
+    }
+}

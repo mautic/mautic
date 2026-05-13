@@ -356,9 +356,7 @@ return [
                 'arguments' => [
                     'mautic.core.model.notification',
                     'translator',
-                    'mautic.user.repository',
-                    'mautic.helper.mailer',
-                    'mautic.helper.core_parameters',
+                    'mautic.lead.contact_export_admin_notification',
                 ],
             ],
             'mautic.lead.contact_scheduled_export.subscriber' => [
@@ -369,6 +367,16 @@ return [
             ],
         ],
         'other' => [
+            'mautic.lead.contact_export_admin_notification' => [
+                'class'     => Mautic\LeadBundle\Notification\ContactExportAdminNotification::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                    'translator',
+                    'mautic.user.repository',
+                    'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class,
                 'arguments' => ['mautic.lead.model.list'],
