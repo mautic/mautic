@@ -34,6 +34,7 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
 
             public function __construct()
             {
+                // Intentionally bypass the parent constructor because this test double only records notifications.
             }
 
             public function addNotification($message, $type = null, $isRead = false, $header = null, $iconClass = null, ?\DateTime $datetime = null, ?User $user = null, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
@@ -89,15 +90,19 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
         $role = new Role();
         $role->setName('User');
 
-        $user = new User();
+        // Use a tiny test double so we can assign an entity ID without reflection-based private property access.
+        $user = new class extends User {
+            public function setId(int $id): void
+            {
+                $this->id = $id;
+            }
+        };
         $user->setFirstName(explode(' ', $name)[0]);
         $user->setLastName(explode(' ', $name)[1] ?? 'User');
         $user->setEmail($email);
         $user->setUsername($email);
         $user->setRole($role);
-
-        $reflectionProperty = new \ReflectionProperty(User::class, 'id');
-        $reflectionProperty->setValue($user, $id);
+        $user->setId($id);
 
         return $user;
     }
