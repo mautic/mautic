@@ -351,14 +351,6 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.lead.export_scheduled_notification_subscriber' => [
-                'class'     => Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.notification',
-                    'translator',
-                    'mautic.lead.contact_export_admin_notification',
-                ],
-            ],
             'mautic.lead.contact_scheduled_export.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ContactScheduledExportSubscriber::class,
                 'arguments' => [
@@ -367,17 +359,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.lead.contact_export_admin_notification' => [
-                'class'     => Mautic\LeadBundle\Notification\ContactExportAdminNotification::class,
-                'arguments' => [
-                    'mautic.core.model.notification',
-                    'translator',
-                    'mautic.user.repository',
-                    'mautic.helper.mailer',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.twig.date',
-                ],
-            ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class,
                 'arguments' => ['mautic.lead.model.list'],

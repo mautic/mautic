@@ -125,7 +125,7 @@ class ContactExportAdminNotificationTest extends TestCase
                     return match ($key) {
                         'mautic.lead.export.admin.email_subject' => 'Contact export completed',
                         'mautic.lead.export.admin.email'         => sprintf(
-                            'Hi, Initiated by: %s <%s> Requested at: %s Completed at: %s Status: %s Export type: %s This notification is for security awareness only. The export download link is not included.',
+                            'Hi, Initiated by: %s <%s> Requested at: %s Completed at: %s Status: %s Export type: %s This notification is for security awareness only. The export download link is not included. {signature}',
                             $parameters['%requesting_user_name%'],
                             $parameters['%requesting_user_email%'],
                             $parameters['%requested_at%'],
@@ -173,6 +173,7 @@ class ContactExportAdminNotificationTest extends TestCase
                 Assert::assertStringContainsString('Status: Completed', $message);
                 Assert::assertStringContainsString('Export type: CSV', $message);
                 Assert::assertStringContainsString('download link is not included', $message);
+                Assert::assertStringContainsString('{signature}', $message);
                 Assert::assertStringNotContainsString('http', $message);
 
                 return true;

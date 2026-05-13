@@ -209,7 +209,8 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Your contact export is ready.', $requesterEmail->getHtmlBody());
         Assert::assertStringContainsString($downloadLink, $requesterEmail->getHtmlBody());
         Assert::assertStringContainsString($zipFileName, $requesterEmail->getHtmlBody());
-        Assert::assertStringContainsString('Regards,', $requesterEmail->getTextBody());
+        Assert::assertStringNotContainsString('{signature}', $requesterEmail->getHtmlBody());
+        Assert::assertStringNotContainsString('{signature}', $requesterEmail->getTextBody());
 
         $adminEmail = $this->findMailerMessageByRecipient($secondaryAdmin->getEmail());
         Assert::assertNotNull($adminEmail);
@@ -223,7 +224,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('download link is not included', $adminEmail->getHtmlBody());
         Assert::assertStringNotContainsString($downloadLink, $adminEmail->getHtmlBody());
         Assert::assertStringNotContainsString('href=', $adminEmail->getHtmlBody());
+        Assert::assertStringNotContainsString('{signature}', $adminEmail->getHtmlBody());
         Assert::assertStringNotContainsString($downloadLink, $adminEmail->getTextBody());
+        Assert::assertStringNotContainsString('{signature}', $adminEmail->getTextBody());
         Assert::assertCount(1, $adminEmail->getTo());
         Assert::assertSame($secondaryAdmin->getEmail(), $adminEmail->getTo()[0]->getAddress());
         Assert::assertCount(1, $adminEmail->getCc());
