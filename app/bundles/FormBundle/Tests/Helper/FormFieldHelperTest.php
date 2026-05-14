@@ -100,6 +100,20 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
                 '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
                 'Select lists should have their values set appropriately via GET.',
             ],
+            [
+                self::getField('Select with class before id', 'select'),
+                'myvalue',
+                '<select class="form-control" id="mauticform_input_mautic_select"><option value="myvalue">My Value</option></select>',
+                '<select class="form-control" id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
+                'Select lists with attributes before id should have their values set appropriately via GET.',
+            ],
+            [
+                self::getField('Select with whitespace before option close', 'select'),
+                'myvalue',
+                '<select id="mauticform_input_mautic_select"><option value="myvalue" >My Value</option></select>',
+                '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
+                'Select lists with whitespace before option close should have their values set appropriately via GET.',
+            ],
         ];
     }
 

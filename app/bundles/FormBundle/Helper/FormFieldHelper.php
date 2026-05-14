@@ -127,8 +127,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     if (EqualTo::class == $constraint) {
                         $opts['value'] = $captcha;
                     }
-                }
 
+                }
                 /** @var ConstraintViolationList $violations */
                 $violations = $this->validator->validate($value, new $constraint($opts));
 
@@ -219,14 +219,45 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 break;
             case 'select':
             case 'country':
-                $regex = '/<select\s*id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)<\/select>/is';
-                if (preg_match($regex, $formHtml, $match)) {
-                    $origText = $match[0];
-                    $replace  = str_replace(
-                        '<option value="'.$this->sanitizeValue($value).'">',
-                        '<option value="'.$this->sanitizeValue($value).'" selected="selected">',
-                        $origText
-                    );
+                $selectIdAttr = 'id="mauticform_input_'.$formName.'_'.$alias.'"';
+                $selectStart  = stripos($formHtml, '<select');
+                $origText     = null;
+
+                while ($selectStart !== false) {
+                    $selectEnd = stripos($formHtml, '>', $selectStart);
+                    if ($selectEnd === false) {
+                        break;
+                    }
+                    $tagContent = substr($formHtml, $selectStart, $selectEnd - $selectStart + 1);
+                    if (stripos($tagContent, $selectIdAttr) !== false) {
+                        $closeTagStart = stripos($formHtml, '</select>', $selectEnd);
+                        if ($closeTagStart !== false) {
+                            $origText = substr($formHtml, $selectStart, $closeTagStart - $selectStart + 9);
+                        }
+                        break;
+                    }
+                    $selectStart = stripos($formHtml, '<select', $selectEnd);
+                }
+
+                if ($origText !== null) {
+                    $sv          = $this->sanitizeValue($value);
+                    $optionValue = 'value="'.$sv.'"';
+                    $replace     = $origText;
+                    $offset      = 0;
+
+                    while (($pos = stripos($replace, $optionValue, $offset)) !== false) {
+                        $closePos = strpos($replace, '>', $pos);
+                        if ($closePos === false) {
+                            break;
+                        }
+                        $between = substr($replace, $pos + strlen($optionValue), $closePos - $pos - strlen($optionValue));
+                        if (stripos($between, 'selected') === false) {
+                            $replace = substr($replace, 0, $closePos).' selected="selected"'.substr($replace, $closePos);
+                            $offset  = $closePos + strlen(' selected="selected"');
+                        }
+                        $offset += strlen($optionValue);
+                    }
+
                     $formHtml = str_replace($origText, $replace, $formHtml);
                 }
 
