@@ -961,18 +961,20 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
             // Register method to initiate new
             $select.on('change', function () {
                 var url = $select.attr('data-new-route');
-                // If the element is already in a modal then use a popup
-                if ($select.val() == 'new' && ($select.attr('data-popup') == "true" || $select.closest('.modal').length > 0)) {
-                    var queryGlue = url.indexOf('?') >= 0 ? '&' : '?';
-                    // De-select the new select option
-                    $select.find('option[value="new"]').prop('selected', false);
-                    $select.trigger('chosen:updated');
+                if ($select.val() == 'new') {
+                    // If the element is already in a modal then use a popup
+                    if ($select.attr('data-popup') == "true" || $select.closest('.modal').length > 0) {
+                        var queryGlue = url.indexOf('?') >= 0 ? '&' : '?';
+                        // De-select the new select option
+                        $select.find('option[value="new"]').prop('selected', false);
+                        $select.trigger('chosen:updated');
 
-                    Mautic.loadNewWindow({
-                        "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + $select.attr('id')
-                    });
-                } else {
-                    Mautic.loadAjaxModalBySelectValue(this, 'new', url, $select.attr('data-header'));
+                        Mautic.loadNewWindow({
+                            "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + $select.attr('id')
+                        });
+                    } else {
+                        Mautic.loadAjaxModalBySelectValue(this, 'new', url, $select.attr('data-header'));
+                    }
                 }
             });
         }
