@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -269,6 +270,16 @@ class LeadSubscriber implements EventSubscriberInterface
     public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->entityManager->getRepository(LeadEventLog::class)->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
+
+        $this->entityManager->getRepository(DoNotContact::class)->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
+
+        $this->entityManager->getRepository(AuditLog::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
