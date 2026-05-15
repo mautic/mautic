@@ -600,16 +600,16 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function addList(LeadList $list)
     {
-        $this->lists[$list->getId()] = $list;
+        $this->lists[$list->getId() ?? ''] = $list;
 
-        $this->changes['lists']['added'][$list->getId()] = $list->getName();
+        $this->changes['lists']['added'][$list->getId() ?? ''] = $list->getName();
 
         return $this;
     }
 
     public function removeList(LeadList $list): void
     {
-        $this->changes['lists']['removed'][$list->getId()] = $list->getName();
+        $this->changes['lists']['removed'][$list->getId() ?? ''] = $list->getName();
         $this->lists->removeElement($list);
     }
 
@@ -626,16 +626,16 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function addForm(Form $form)
     {
-        $this->forms[$form->getId()] = $form;
+        $this->forms[$form->getId() ?? ''] = $form;
 
-        $this->changes['forms']['added'][$form->getId()] = $form->getName();
+        $this->changes['forms']['added'][$form->getId() ?? ''] = $form->getName();
 
         return $this;
     }
 
     public function removeForm(Form $form): void
     {
-        $this->changes['forms']['removed'][$form->getId()] = $form->getName();
+        $this->changes['forms']['removed'][$form->getId() ?? ''] = $form->getName();
         $this->forms->removeElement($form);
     }
 

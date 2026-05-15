@@ -370,7 +370,7 @@ class PageController extends FormController
      */
     public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null)
     {
-        if (!($entity instanceof Page)) {
+        if (!$entity instanceof Page) {
             $entity = $model->getEntity();
         }
 

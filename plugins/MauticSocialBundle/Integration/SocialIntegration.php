@@ -219,9 +219,9 @@ abstract class SocialIntegration extends AbstractIntegration
     {
         if ($postAuthorization) {
             return json_decode($data, true);
-        } else {
-            return json_decode($data);
         }
+
+        return json_decode($data);
     }
 
     /**

@@ -305,9 +305,8 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                     $toReschedule = $this->addForReschedule($toReschedule, $log, $log->getTriggerDate());
 
                     continue;
-                } else {
-                    $this->repo->saveEntity($log);
                 }
+                $this->repo->saveEntity($log);
             }
 
             $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);

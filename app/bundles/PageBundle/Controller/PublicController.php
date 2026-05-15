@@ -79,14 +79,13 @@ class PublicController extends AbstractFormController
 
                     if ($entity->getRedirectUrl()) {
                         return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
-                    } else {
-                        return $this->notFound();
                     }
-                } else {
-                    $model->hitPage($entity, $request, 401);
 
-                    return $this->accessDenied();
+                    return $this->notFound();
                 }
+                $model->hitPage($entity, $request, 401);
+
+                return $this->accessDenied();
             }
 
             $lead  = null;

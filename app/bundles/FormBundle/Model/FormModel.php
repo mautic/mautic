@@ -159,9 +159,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function setFields(Form $entity, $sessionFields): void
@@ -227,11 +227,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (!isset($existingFields[$fieldId])) {
+            if (!isset($existingFields[$fieldId ?? ''])) {
                 continue;
             }
-            $this->handleFilesDelete($existingFields[$fieldId]);
-            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $this->handleFilesDelete($existingFields[$fieldId ?? '']);
+            $entity->removeField($fieldId, $existingFields[$fieldId ?? '']);
             $deleteFields[] = $fieldId;
         }
 
@@ -900,10 +900,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
-        } else {
-            // remove DOCTYPE, <html>, and <body> tags for old libxml
-            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
         }
+
+        // remove DOCTYPE, <html>, and <body> tags for old libxml
+        return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
     }
 
     /**

@@ -6,12 +6,14 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
 
 class SourceControllerTest extends MauticMysqlTestCase
 {
     private const ACCESS_DENIED      = 'You do not have access to the requested area\/action';
     private const NEW_FORMS_URL      = '/s/campaigns/sources/new/1?sourceType=forms';
     private const DELETE_FORMS_URL   = '/s/campaigns/sources/delete/1?sourceType=forms';
+    private const NEW_LISTS_URL      = '/s/campaigns/sources/new/1?sourceType=lists';
 
     public function testNewActionWithInvalidSourceType(): void
     {
@@ -122,6 +124,60 @@ class SourceControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString("<option value=\"{$form2->getId()}\">test ({$form2->getId()})</option>", $html);
     }
 
+    public function testListSourceFormUsesNumericSegmentIds(): void
+    {
+        $segment = $this->createSegment('Page URL Segment', 'list-one');
+
+        $this->client->xmlHttpRequest('GET', self::NEW_LISTS_URL);
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $json = json_decode($response->getContent(), true);
+        if (!is_array($json)) {
+            $this->fail('Response is not valid JSON: '.$response->getContent());
+        }
+
+        $this->assertArrayHasKey('newContent', $json);
+        $this->assertStringContainsString(
+            sprintf('<option value="%d">%s (%d)</option>', $segment->getId(), $segment->getName(), $segment->getId()),
+            $json['newContent']
+        );
+        $this->assertStringNotContainsString(
+            sprintf('<option value="%s">%s (%s)</option>', $segment->getAlias(), $segment->getName(), $segment->getAlias()),
+            $json['newContent']
+        );
+    }
+
+    public function testNewListSourceReturnsIdKeyedModifiedSources(): void
+    {
+        $segment = $this->createSegment('Page URL Segment', 'list-one');
+
+        $formData = [
+            'campaign_leadsource' => [
+                'sourceType' => 'lists',
+                'lists'      => [(string) $segment->getId()],
+            ],
+            'submit' => '1',
+        ];
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest('POST', self::NEW_LISTS_URL, $formData);
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $json = json_decode($response->getContent(), true);
+        if (!is_array($json)) {
+            $this->fail('Response is not valid JSON: '.$response->getContent());
+        }
+
+        $this->assertJsonResponseEquals('success', 1, $json);
+        $this->assertArrayHasKey('modifiedSources', $json);
+        $this->assertSame(
+            ['lists' => [$segment->getId() => true]],
+            $json['modifiedSources']
+        );
+    }
+
     /**
      * @param array<string, mixed> $json
      */
@@ -138,5 +194,20 @@ class SourceControllerTest extends MauticMysqlTestCase
     {
         $this->assertJsonResponseHasKey($key, $json, $message);
         $this->assertEquals($expected, $json[$key], $message);
+    }
+
+    private function createSegment(string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($name);
+        $segment->setAlias($alias);
+        $segment->setFilters([]);
+
+        $this->em->persist($segment);
+        $this->em->flush();
+        $this->em->detach($segment);
+
+        return $segment;
     }
 }

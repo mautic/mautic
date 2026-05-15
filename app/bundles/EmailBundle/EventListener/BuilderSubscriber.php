@@ -9,6 +9,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -33,6 +34,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private RedirectModel $pageRedirectModel,
         private TranslatorInterface $translator,
         private MailHashHelper $mailHash,
+        private FromEmailHelper $fromEmailHelper,
     ) {
     }
 
@@ -74,12 +76,13 @@ class BuilderSubscriber implements EventSubscriberInterface
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }
 
-        $tokens = [
-            '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
-            '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
-            '{brand=name}'       => $this->translator->trans('mautic.core.token.brand_name'),
-            '{subject}'          => $this->translator->trans('mautic.email.subject'),
+        $emailPrefix = $this->translator->trans('mautic.email.email').': ';
+        $tokens      = [
+            '{unsubscribe_text}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_text'),
+            '{webview_text}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_text'),
+            '{signature}'        => $emailPrefix.$this->translator->trans('mautic.email.token.signature'),
+            '{brand=name}'       => $emailPrefix.$this->translator->trans('mautic.core.token.brand_name'),
+            '{subject}'          => $emailPrefix.$this->translator->trans('mautic.email.subject'),
         ];
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -90,10 +93,10 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         // these should not allow visual tokens
         $tokens = [
-            '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{dnc_url}'         => $this->translator->trans('mautic.email.token.unsubscribe_all_url'),
-            '{resubscribe_url}' => $this->translator->trans('mautic.email.token.resubscribe_url'),
-            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
+            '{unsubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{dnc_url}'         => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_all_url'),
+            '{resubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.resubscribe_url'),
+            '{webview_url}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -193,8 +196,20 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
 
         $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
-        $fromName      = $this->coreParametersHelper->get('mailer_from_name');
-        $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
+
+        // In owner-mailer mode, use the owner's signature for display/send generation.
+        if ($email && $email->getUseOwnerAsMailer() && is_array($lead)) {
+            $this->fromEmailHelper->getFromAddressConsideringOwner($this->fromEmailHelper->getFrom($email), $lead, $email);
+            if ($this->fromEmailHelper->hasSignature()) {
+                $signatureText = $this->fromEmailHelper->getSignature();
+            } else {
+                $signatureText = '';
+            }
+        } else {
+            $fromName      = $this->coreParametersHelper->get('mailer_from_name');
+            $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
+        }
+
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));

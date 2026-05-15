@@ -17,9 +17,8 @@ class TranslatorTest extends AbstractMauticTestCase
         $fallback   = 'en_US';
         $locale     = 'ru';
 
-        $reflection = new \ReflectionClass($translator);
-        $property   = $reflection->getProperty('translator');
-        $property->setAccessible(true);
+        $reflection         = new \ReflectionClass($translator);
+        $property           = $reflection->getProperty('translator');
         $internalTranslator = $property->getValue($translator);
 
         $internalTranslator->addLoader('array', new ArrayLoader());

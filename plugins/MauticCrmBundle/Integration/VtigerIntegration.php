@@ -95,17 +95,15 @@ class VtigerIntegration extends CrmAbstractIntegration
             }
 
             return false;
-        } else {
-            $error = $this->extractAuthKeys($response['result']);
-
-            if (empty($error)) {
-                return true;
-            } else {
-                $this->authorzationError = $error;
-
-                return false;
-            }
         }
+        $error = $this->extractAuthKeys($response['result']);
+
+        if (empty($error)) {
+            return true;
+        }
+        $this->authorzationError = $error;
+
+        return false;
     }
 
     public function getAuthLoginUrl(): string
