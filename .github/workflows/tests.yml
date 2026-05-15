@@ -224,7 +224,7 @@ jobs:
           curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
-          sudo apt-get install -y postgresql-client-${{ matrix.postgres-versions }}
+          sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y postgresql-client-${{ matrix.postgres-versions }}
 
       - name: Prepare PostgreSQL environment
         run: |
