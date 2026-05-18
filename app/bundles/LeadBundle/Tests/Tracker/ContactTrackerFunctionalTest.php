@@ -26,6 +26,27 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
         $this->requestStack   = static::getContainer()->get(RequestStack::class);
     }
 
+    public function testDeletedContactTrackedDeviceDoesNotThrow(): void
+    {
+        static::getContainer()->get(TokenStorageInterface::class)->setToken(null);
+        $this->contactTracker->setUseSystemContact(false);
+
+        $contact = $this->createContact('deleted-contact@domain.tld');
+        $device  = $this->createDevice($contact, 'track-deleted-contact');
+        $this->em->flush();
+
+        // Delete the contact but leave the device record pointing to the deleted ID
+        $this->em->remove($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        // A returning visitor whose cookie still references the deleted contact ID
+        // should be treated as a new anonymous visitor instead of throwing EntityNotFoundException
+        $result = $this->trackContactByDevice($device);
+
+        Assert::assertNull($result, 'Expected null (new anonymous visitor) when tracked device references a deleted contact.');
+    }
+
     public function testReset(): void
     {
         static::getContainer()->get(TokenStorageInterface::class)->setToken(null);
