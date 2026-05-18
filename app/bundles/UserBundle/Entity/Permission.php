@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -42,37 +42,32 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
     /**
      * @var int
-     *
-     * @Groups({"permission:read", "role:read"})
      */
+    #[Groups(['permission:read', 'role:read'])]
     protected $id;
 
     /**
      * @var string
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $bundle;
 
     /**
      * @var string
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $name;
 
     /**
      * @var Role
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $role;
 
     /**
      * @var int
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $bitwise;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

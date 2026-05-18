@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -35,8 +36,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     private const EMAIL_ALIAS = 'email';
 
-    private TranslatorInterface $translator;
-
     public function __construct(
         private LeadModel $leadModel,
         private ListModel $listModel,
@@ -45,9 +44,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private StageModel $stageModel,
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
-        TranslatorInterface $translator,
+        private TranslatorInterface $translator,
     ) {
-        $this->translator    = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -59,7 +57,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleTags', 1000],
                 ['onSegmentFilterFormHandleLookupId', 800],
                 ['onSegmentFilterFormHandleLookup', 600],
-                ['onSegmentFilterFormHandleSelect', 400],
+                ['onSegmentFilterFormHandleGlobalCategory', 400],
+                ['onSegmentFilterFormHandleSelect', 200],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
         ];
@@ -232,6 +231,34 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                     'data-action'  => 'lead:fieldList',
                     'placeholder'  => $this->translator->trans('mautic.lead.list.form.filtervalue'),
                 ],
+            ]
+        );
+
+        $event->stopPropagation();
+    }
+
+    public function onSegmentFilterFormHandleGlobalCategory(FormAdjustmentEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('globalcategory')) {
+            return;
+        }
+
+        $form = $event->getForm();
+
+        // This field will hold the label of the lookup item.
+        $form->add(
+            'filter',
+            GlobalCategoryType::class,
+            [
+                'label'       => false,
+                'multiple'    => true,
+                'required'    => $event->filterShouldBeRequired(),
+                'disabled'    => $event->filterShouldBeDisabled(),
+                'constraints' => $event->filterShouldBeRequired() ? [
+                    new NotBlank(
+                        ['message' => $this->translator->trans('mautic.core.value.required')]
+                    ),
+                ] : [],
             ]
         );
 

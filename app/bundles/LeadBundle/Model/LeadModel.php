@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
@@ -85,11 +87,6 @@ class LeadModel extends FormModel
     public const CHANNEL_FEATURE = 'contact_preference';
 
     /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
      * @var array
      */
     protected $leadFields = [];
@@ -117,7 +114,7 @@ class LeadModel extends FormModel
         protected IpLookupHelper $ipLookupHelper,
         protected PathsHelper $pathsHelper,
         protected IntegrationHelper $integrationHelper,
-        FieldModel $leadFieldModel,
+        protected FieldModel $leadFieldModel,
         protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected ListModel $leadListModel,
         protected FormFactoryInterface $formFactory,
@@ -138,8 +135,6 @@ class LeadModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
     ) {
-        $this->leadFieldModel       = $leadFieldModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -333,9 +328,8 @@ class LeadModel extends FormModel
     {
         $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
-
         for ($i = 0; $i < count($contactIds); ++$i) {
-            $contactId = $contactIds[$i];
+            $contactId = (int) $contactIds[$i];
             if (empty($entities[$contactId])) {
                 if ($entity = $this->getMergeRecordRepository()->findMergedContact($contactId)) {
                     $entity->setPreviousId($contactId);
@@ -394,9 +388,9 @@ class LeadModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -603,7 +597,7 @@ class LeadModel extends FormModel
                         $this->translator->trans('mautic.stage.event.changed')
                     );
                 } else {
-                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageIdOrName]));
+                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['%id%' => $newLeadStageIdOrName]));
                 }
             }
         }
@@ -687,7 +681,7 @@ class LeadModel extends FormModel
                     }
 
                     $isEmpty = (null == $newValue || '' == $newValue);
-                    if ($curValue !== $newValue && (!$isEmpty || ($isEmpty && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (!$isEmpty || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -1128,6 +1122,14 @@ class LeadModel extends FormModel
             $this->unsubscribeCategories($unsubscribedCategories);
         }
 
+        // Add non associated categories relations as removed.
+        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
+
+        $unsubscribeNewCategories = array_diff($nonAssociatedCategories, $data['global_categories']);
+        if (!empty($unsubscribeNewCategories)) {
+            $this->addToCategory($lead, $unsubscribeNewCategories, false);
+        }
+
         // Delete channels that were removed
         $deleted = array_diff_key($frequencyRules, $entities);
         if (!empty($deleted)) {
@@ -1138,30 +1140,48 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param bool $manuallyAdded
+     * @param array<int|Category> $categories
+     *
+     * @return mixed[]
      */
-    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true): array
+    public function addToCategory(Lead $lead, array $categories, bool $subscribedFlag = true): array
     {
-        $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
-
         $results = [];
         foreach ($categories as $category) {
-            if (!isset($leadCategories[$category])) {
+            if (!$category instanceof Category) {
+                $category = $this->categoryModel->getEntity($category);
+            }
+
+            $dispatchEvent = false;
+
+            /** @var ?LeadCategory $leadCategory */
+            $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
+            if (is_null($leadCategory)) {
+                $dispatchEvent = true;
+
                 $newLeadCategory = new LeadCategory();
                 $newLeadCategory->setLead($lead);
-                if (!$category instanceof Category) {
-                    $category = $this->categoryModel->getEntity($category);
-                }
                 $newLeadCategory->setCategory($category);
                 $newLeadCategory->setDateAdded(new \DateTime());
-                $newLeadCategory->setManuallyAdded($manuallyAdded);
+                $newLeadCategory->setManuallyAdded($subscribedFlag);
+                $newLeadCategory->setManuallyRemoved(!$subscribedFlag);
                 $results[$category->getId()] = $newLeadCategory;
+            } elseif (true === $leadCategory->getManuallyRemoved()) {
+                $dispatchEvent = true;
 
+                $leadCategory->setManuallyAdded($subscribedFlag);
+                $leadCategory->setManuallyRemoved(!$subscribedFlag);
+                $leadCategory->setDateAdded(new \DateTime());
+                $results[$category->getId()] = $leadCategory;
+            }
+
+            if ($dispatchEvent) {
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
                     $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
                 }
             }
         }
+
         if (!empty($results)) {
             $this->getLeadCategoryRepository()->saveEntities($results);
         }
@@ -1180,6 +1200,7 @@ class LeadModel extends FormModel
             $category     = $this->getLeadCategoryRepository()->getEntity($key);
             $category->setManuallyRemoved(true);
             $category->setManuallyAdded(false);
+            $category->setDateAdded(new \DateTime());
 
             $unsubscribedCats[] = $category;
 
@@ -1228,6 +1249,16 @@ class LeadModel extends FormModel
         }
 
         return $leadCategoryList;
+    }
+
+    /**
+     * @param string[] $types
+     *
+     * @return array<int, int>
+     */
+    public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
+    {
+        return $this->getLeadCategoryRepository()->getSubscribedAndNewCategoryIds($lead, $types);
     }
 
     /**
@@ -1489,7 +1520,11 @@ class LeadModel extends FormModel
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
 
-                if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
+                if (
+                    'email' === $leadField['type']
+                    && isset($fieldData[$leadField['alias']])
+                    && '' !== $fieldData[$leadField['alias']]
+                ) {
                     try {
                         $this->emailValidator->validate($fieldData[$leadField['alias']], false);
                     } catch (\Exception $exception) {

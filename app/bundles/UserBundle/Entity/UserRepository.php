@@ -97,7 +97,7 @@ class UserRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
 
-        $q->select('partial u.{id, firstName, lastName}')
+        $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
             ->from(User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');

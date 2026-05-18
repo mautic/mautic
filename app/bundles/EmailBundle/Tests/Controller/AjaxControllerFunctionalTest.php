@@ -235,6 +235,17 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($emailName, $response[0]['items'][$email->getId()]);
     }
 
+    public function testGetBuilderTokensAction(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getBuilderTokens');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        Assert::assertArrayHasKey('tokens', $response);
+        Assert::assertArrayHasKey('{contactfield=email}', $response['tokens']);
+        Assert::assertArrayHasKey('{ownerfield=email}', $response['tokens']);
+        Assert::assertArrayHasKey('{unsubscribe_url}', $response['tokens']);
+    }
+
     private function createContact(string $email): Lead
     {
         $lead = new Lead();

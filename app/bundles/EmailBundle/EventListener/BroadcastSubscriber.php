@@ -48,6 +48,17 @@ class BroadcastSubscriber implements EventSubscriberInterface
                 $event->getThreadId()
             );
 
+            if ($emailEntity->shouldCheckForUnpublishEmail()) {
+                $isNotParallelSending = !$event->getThreadId() || 1 === $event->getThreadId();
+                $totalPendingCount ??= $this->model->getPendingLeads($emailEntity, null, true);
+                // only If no pending and nothing was sent
+                if ($isNotParallelSending && !$totalPendingCount && !$sentCount) {
+                    $emailEntity->setIsPublished(false);
+                    $this->model->saveEntity($emailEntity);
+                    $event->getOutput()->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
+                }
+            }
+
             $event->setResults(
                 $this->translator->trans('mautic.email.email').': '.$emailEntity->getName(),
                 $sentCount,

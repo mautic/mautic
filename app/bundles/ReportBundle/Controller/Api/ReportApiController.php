@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -103,11 +104,11 @@ class ReportApiController extends CommonApiController
         $options = ['paginate'=> false, 'ignoreGraphData' => true];
 
         if ($request->query->has('dateFrom')) {
-            $options['dateFrom'] = new \DateTimeImmutable($request->query->get('dateFrom'), new \DateTimeZone('UTC'));
+            $options['dateFrom'] = DateTimeHelper::setTimeIfMissing($request->query->get('dateFrom'), '00:00:00');
         }
 
         if ($request->query->has('dateTo')) {
-            $options['dateTo']   = new \DateTimeImmutable($request->query->get('dateTo'), new \DateTimeZone('UTC'));
+            $options['dateTo'] = DateTimeHelper::setTimeIfMissing($request->query->get('dateTo'), '23:59:59');
         }
 
         if ($request->query->has('page')) {

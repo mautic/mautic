@@ -729,6 +729,26 @@
 .animation--slide-scale-in-left { animation: animationSlideScaleInLeft var(--duration-expressive) forwards; }
 .animation--slide-scale-in-right { animation: animationSlideScaleInRight var(--duration-expressive) forwards; }
 
+// Scale animations
+.animation--grow { 
+  transition: transform var(--duration-expressive);
+  &:hover { transform: scale(1.02); }
+}
+.animation--shrink { 
+  transition: transform var(--duration-expressive);
+  &:hover { transform: scale(0.9); }
+}
+.animation--grow-in { 
+  transform: scale(0);
+  transition: transform var(--duration-expressive);
+  &.active { transform: scale(1); }
+}
+.animation--shrink-out { 
+  transform: scale(1);
+  transition: transform var(--duration-expressive);
+  &.active { transform: scale(0); }
+}
+
 @keyframes animationSlideInUp {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }

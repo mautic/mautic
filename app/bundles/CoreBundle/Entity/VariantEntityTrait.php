@@ -4,10 +4,12 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+/**
+ * @template T of VariantEntityInterface
+ */
 trait VariantEntityTrait
 {
     /**
@@ -17,13 +19,15 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var mixed
+     * @var VariantEntityInterface|null
+     *
+     * @phpstan-var T|null
      **/
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = [];
@@ -88,9 +92,6 @@ trait VariantEntityTrait
         return $this->variantChildren;
     }
 
-    /**
-     * Set variantParent.
-     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {
         if (method_exists($this, 'isChanged')) {
@@ -102,9 +103,6 @@ trait VariantEntityTrait
         return $this;
     }
 
-    /**
-     * Get variantParent.
-     */
     public function getVariantParent(): ?VariantEntityInterface
     {
         return $this->variantParent;
@@ -143,7 +141,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettings(): array
     {
-        return $this->variantSettings;
+        return $this->variantSettings ?? [];
     }
 
     public function getVariantStartDate(): mixed
@@ -172,9 +170,9 @@ trait VariantEntityTrait
 
         if ($isChild) {
             return (null === $parent) ? false : true;
-        } else {
-            return (!empty($parent) || count($children)) ? true : false;
         }
+
+        return (!empty($parent) || count($children)) ? true : false;
     }
 
     /**

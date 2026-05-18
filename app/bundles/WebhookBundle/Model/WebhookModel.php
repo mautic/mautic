@@ -300,6 +300,7 @@ class WebhookModel extends FormModel
         }
 
         $start            = microtime(true);
+        $logged           = false;
         $webhookQueueRepo = $this->getQueueRepository();
 
         try {
@@ -326,6 +327,7 @@ class WebhookModel extends FormModel
             }
 
             $this->addLog($webhook, $responseStatusCode, microtime(true) - $start, $responseBody);
+            $logged = true;
 
             // throw an error exception if we don't get a 200 back
             if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
@@ -351,8 +353,10 @@ class WebhookModel extends FormModel
             // log any errors but allow the script to keep running
             $this->logger->error($message);
 
-            // log that the request failed to display it to the user
-            $this->addLog($webhook, 'N/A', microtime(true) - $start, $message);
+            if (!$logged) {
+                // log that the request failed to display it to the user
+                $this->addLog($webhook, 'N/A', microtime(true) - $start, $message);
+            }
 
             return false;
         }
@@ -661,9 +665,9 @@ class WebhookModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -46,98 +46,83 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @var int
-     *
-     * @Groups("focus:read")
      */
+    #[Groups(['focus:read'])]
     private $id;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $description;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $editor;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $html;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $htmlMode;
 
     /**
      * @var string
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $name;
 
-    /**
-     * @Groups({"focus:read", "focus:write"})
-     */
+    #[Groups(['focus:read', 'focus:write'])]
     private $category;
 
     /**
      * @var string
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $type;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $website;
 
     /**
      * @var string
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $style;
 
     /**
      * @var \DateTimeInterface
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $publishDown;
 
     /**
      * @var array<mixed>
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $properties = [];
 
     /**
      * @var array
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $utmTags = [];
 
     /**

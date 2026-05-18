@@ -485,7 +485,7 @@ class FieldType extends AbstractType
 
                 $fields       = $this->fieldCollector->getFields($mappedObject);
                 $mappedFields = [];
-                if (in_array('formId', $fieldData)) {
+                if (!empty($fieldData['formId'])) {
                     $mappedFields = $this->mappedFieldCollector->getFields((string) $fieldData['formId'], $mappedObject);
                 }
                 $fields = $fields->removeFieldsWithKeys($mappedFields, (string) $mappedField);

@@ -61,7 +61,6 @@ class EmailApiController extends CommonApiController
             'assetList',
             'formList',
             'leadListList',
-            'projectList',
         ];
         $this->dataInputMasks   = [
             'customHtml'     => 'html',

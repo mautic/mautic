@@ -49,7 +49,6 @@ class SmsApiController extends CommonApiController
             'categoryList',
             'publishDetails',
             'leadListList',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);

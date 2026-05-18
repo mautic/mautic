@@ -1,6 +1,6 @@
-import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import Model from '@ckeditor/ckeditor5-ui/src/model';
-import Collection from '@ckeditor/ckeditor5-utils/src/collection';
+import { Plugin } from '@ckeditor/ckeditor5-core/src/plugin';
+import { UIModel as Model } from '@ckeditor/ckeditor5-ui/src/model';
+import { Collection } from '@ckeditor/ckeditor5-utils/src/collection';
 import { addListToDropdown, createDropdown } from '@ckeditor/ckeditor5-ui/src/dropdown/utils';
 
 export default class TokenPlugin extends Plugin {
@@ -48,9 +48,9 @@ export default class TokenPlugin extends Plugin {
                 editor.model.change(writer => {
                     let content = "<span class='atwho-inserted' data-fr-verified='true'>"+id+"</span>";
                     if (id.match(/assetlink=/i)) {
-                        content = '<a title="Asset Link" href="' + id + '">' + label + '</a>';
+                        content = '<a title="Asset Link" href="' + id + '">' + this.getCleanLinkLabel(label) + '</a>';
                     } else if (id.match(/pagelink=/i)) {
-                        content = '<a title="Page Link" href="' + id + '">' + label + '</a>';
+                        content = '<a title="Page Link" href="' + id + '">' + this.getCleanLinkLabel(label) + '</a>';
                     }
 
                     const viewFragment = editor.data.processor.toView( content );
@@ -61,5 +61,16 @@ export default class TokenPlugin extends Plugin {
 
             return dropdownView;
         });
+    }
+
+    getCleanLinkLabel(label) {
+        // Label format is: "Category: name (id)" - extract just "name"
+        // 1. Remove prefix (everything before first ": ")
+        const colonIndex = label.indexOf(': ');
+        if (colonIndex !== -1) {
+            label = label.substring(colonIndex + 2);
+        }
+        // 2. Remove ID suffix " (number)" at the end
+        return label.replace(/\s+\(\d+\)$/, '');
     }
 };

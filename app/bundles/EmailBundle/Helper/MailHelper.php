@@ -142,10 +142,8 @@ class MailHelper
 
     /**
      * Tells the helper that the transport supports tokenized emails (likely HTTP API).
-     *
-     * @var bool
      */
-    protected $tokenizationEnabled = false;
+    protected bool $tokenizationEnabled;
 
     /**
      * Use queue mode when sending email through this mailer; this requires a transport that supports tokenization and the use of queue/flushQueue.
@@ -255,6 +253,7 @@ class MailHelper
         private AssetModel $assetModel,
         private TrackableModel $trackableModel,
         private RedirectModel $redirectModel,
+        private SMimeHelper $sMimeHelper,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -268,12 +267,18 @@ class MailHelper
         $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
-        // Check if batching is supported by the transport
-        if ($this->transport instanceof TokenTransportInterface) {
-            $this->tokenizationEnabled = true;
+        $this->message = $this->getMessageInstance();
+
+        $this->tokenizationEnabled = $this->isTokenizationSupported();
+    }
+
+    private function isTokenizationSupported(): bool
+    {
+        if ($this->sMimeHelper->sMimeSigningEnabled()) {
+            return false;
         }
 
-        $this->message = $this->getMessageInstance();
+        return $this->transport instanceof TokenTransportInterface;
     }
 
     /**
@@ -353,8 +358,8 @@ class MailHelper
                 // Replace token content
                 $tokens = $this->getTokens();
 
-                if ($ownerSignature = $this->fromEmailHelper->getSignature()) {
-                    $tokens['{signature}'] = $ownerSignature;
+                if ($this->fromEmailHelper->hasSignature()) {
+                    $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
                 }
 
                 if ($brandName = $this->coreParametersHelper->get('brand_name')) {
@@ -390,9 +395,12 @@ class MailHelper
                 }
             }
 
+            // Sign the message with S/MIME if enabled
+            $messageToSend = $this->sMimeHelper->signContent($this->message);
+
             try {
                 if (!$this->skip) {
-                    $this->mailer->send($this->message);
+                    $this->mailer->send($messageToSend);
                     $this->message->clearMetadata();
                 }
                 $this->skip = false;
@@ -450,8 +458,15 @@ class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $from   = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->advancedFrom, $this->lead, $this->email);
-                $tokens = $this->getTokens();
+                $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
+                $fromAddress = $from->getEmail();
+                $tokens      = $this->getTokens();
+
+                $tokens['{signature}'] = '';
+
+                if ($this->fromEmailHelper->hasSignature()) {
+                    $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
+                }
 
                 // replace tokens remaining in the from address
                 $fromAddress = key($from);
@@ -482,45 +497,44 @@ class MailHelper
 
             // Assume success
             return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
-        } else {
-            $success = $this->send($dispatchSendEvent);
-
-            // Reset the message for the next
-            $this->queuedRecipients = [];
-
-            // Reset message
-            switch (strtoupper($returnMode)) {
-                case self::QUEUE_RESET_TO:
-                    $this->message->to();
-                    $this->clearErrors();
-                    break;
-                case self::QUEUE_NOTHING_IF_FAILED:
-                    if ($success) {
-                        $this->message->to();
-                        $this->clearErrors();
-                    }
-
-                    break;
-                case self::QUEUE_FULL_RESET:
-                    $this->message        = $this->getMessageInstance();
-                    $this->attachedAssets = [];
-                    $this->clearErrors();
-                    break;
-                case self::QUEUE_RETURN_ERRORS:
-                    $this->message->to();
-                    $errors = $this->getErrors();
-                    $this->clearErrors();
-
-                    return [$success, $errors];
-                case self::QUEUE_DO_NOTHING:
-                default:
-                    // Nada
-
-                    break;
-            }
-
-            return $success;
         }
+        $success = $this->send($dispatchSendEvent);
+
+        // Reset the message for the next
+        $this->queuedRecipients = [];
+
+        // Reset message
+        switch (strtoupper($returnMode)) {
+            case self::QUEUE_RESET_TO:
+                $this->message->to();
+                $this->clearErrors();
+                break;
+            case self::QUEUE_NOTHING_IF_FAILED:
+                if ($success) {
+                    $this->message->to();
+                    $this->clearErrors();
+                }
+
+                break;
+            case self::QUEUE_FULL_RESET:
+                $this->message        = $this->getMessageInstance();
+                $this->attachedAssets = [];
+                $this->clearErrors();
+                break;
+            case self::QUEUE_RETURN_ERRORS:
+                $this->message->to();
+                $errors = $this->getErrors();
+                $this->clearErrors();
+
+                return [$success, $errors];
+            case self::QUEUE_DO_NOTHING:
+            default:
+                // Nada
+
+                break;
+        }
+
+        return $success;
     }
 
     /**
@@ -1133,6 +1147,7 @@ class MailHelper
     {
         try {
             $this->message->from($from->toMailerAddress());
+            $this->message->sender($from->toMailerAddress());
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }
@@ -1564,13 +1579,10 @@ class MailHelper
     {
         $reflectedMailer     = new \ReflectionClass($this->mailer);
         $reflectedTransports = $reflectedMailer->getProperty('transport');
-        $reflectedTransports->setAccessible(true);
-        $allTransports = $reflectedTransports->getValue($this->mailer);
+        $allTransports       = $reflectedTransports->getValue($this->mailer);
 
         $reflectedTransports = new \ReflectionClass($allTransports);
         $reflectedTransport  = $reflectedTransports->getProperty('transports');
-
-        $reflectedTransport->setAccessible(true);
 
         $currentTransport = $reflectedTransport->getValue($allTransports);
 

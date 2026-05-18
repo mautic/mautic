@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Mautic\LeadBundle\Validator\LeadFieldMinimumLength;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -691,7 +691,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function setIsShortVisible(?bool $isShortVisible): self
     {
-        $isShortVisible = $isShortVisible ?? false;
+        $isShortVisible ??= false;
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
 

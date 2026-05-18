@@ -63,7 +63,7 @@ class SubmitActionEmailType extends AbstractType
             [
                 'label'      => 'mautic.form.action.sendemail.message',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control editor editor-basic'],
+                'attr'       => ['class' => 'form-control editor editor-basic', 'allow-full-html' => true],
                 'required'   => false,
                 'data'       => $message,
             ]

@@ -92,7 +92,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, mixed[]>
+     * @return iterable<string, mixed[]>
      */
     public static function dataInvalidDsn(): iterable
     {

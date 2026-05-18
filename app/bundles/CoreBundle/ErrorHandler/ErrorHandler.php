@@ -202,7 +202,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if (null !== $error) {
                 $name = $this->getErrorName($error['type']);
-                if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {
+                if ($error['type'] & (E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
                     if (!$handlingFatal) {
                         // Prevent fatal loop
                         $handlingFatal = true;

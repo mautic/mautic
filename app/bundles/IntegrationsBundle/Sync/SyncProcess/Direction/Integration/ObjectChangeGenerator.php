@@ -100,7 +100,7 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     $fieldMappingDAO->getIntegrationField()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;

@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
@@ -16,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -40,15 +42,17 @@ class CampaignSubscriber implements EventSubscriberInterface
         private SendEmailToUser $sendEmailToUser,
         private TranslatorInterface $translator,
         private LeadModel $leadModel,
+        private StatRepository $statRepository,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
-            EmailEvents::ON_CAMPAIGN_BATCH_ACTION   => [
+            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
+            EventPreview::class                      => ['onEventPreviewRequest', 0],
+            EmailEvents::EMAIL_ON_OPEN               => ['onEmailOpen', 0],
+            EmailEvents::ON_CAMPAIGN_BATCH_ACTION    => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
@@ -135,6 +139,21 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'channelIdField'       => 'email',
             ]
         );
+    }
+
+    public function onEventPreviewRequest(EventPreview $eventPreview): void
+    {
+        if ($eventPreview->isType('email.send')) {
+            $eventId           = $eventPreview->event->getId();
+            $statsSummaryArray = $this->statRepository->getStatsSummaryForCampaignEvents([$eventId]);
+            $emailStats        = $statsSummaryArray[$eventId];
+            $eventPreview->addEventStat('sent_count', $emailStats['sent_count']);
+            $eventPreview->addEventStat('read_count', $emailStats['read_count']);
+            $eventPreview->addEventStat('clicked_count', $emailStats['clicked_count']);
+            $eventPreview->addEventStat('open_rate', round($emailStats['open_rate'] * 100, 2).'%');
+            $eventPreview->addEventStat('click_through_rate', round($emailStats['click_through_rate'] * 100, 2).'%');
+            $eventPreview->addEventStat('click_through_open_rate', round($emailStats['click_through_open_rate'] * 100, 2).'%');
+        }
     }
 
     /**
@@ -224,6 +243,13 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $config  = $event->getEvent()->getProperties();
+
+        if (!isset($config['email'])) {
+            $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
+
+            return;
+        }
+
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
 

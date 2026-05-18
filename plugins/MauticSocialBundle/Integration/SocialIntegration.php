@@ -18,6 +18,7 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
@@ -72,9 +73,9 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {
@@ -218,9 +219,9 @@ abstract class SocialIntegration extends AbstractIntegration
     {
         if ($postAuthorization) {
             return json_decode($data, true);
-        } else {
-            return json_decode($data);
         }
+
+        return json_decode($data);
     }
 
     /**

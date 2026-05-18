@@ -6,8 +6,10 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationTokenFactory;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+#[Group('time-sensitive')]
 class IntegrationTokenFactoryTest extends TestCase
 {
     public function testTokenGeneratedWithExpiresIn(): void
