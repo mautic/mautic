@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -35,9 +36,15 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
         $device  = $this->createDevice($contact, 'track-deleted-contact');
         $this->em->flush();
 
-        // Delete the contact but leave the device record pointing to the deleted ID
-        $this->em->remove($contact);
-        $this->em->flush();
+        $contactId = $contact->getId();
+
+        // Simulate the race condition: delete the lead row directly via DBAL, bypassing
+        // Doctrine's ON DELETE CASCADE so the device record remains orphaned.
+        // This replicates the window where a request has already loaded the lead_id
+        // from the device table but the lead is deleted before it can be fetched.
+        static::getContainer()->get(Connection::class)
+            ->executeStatement('DELETE FROM leads WHERE id = :id', ['id' => $contactId]);
+
         $this->em->clear();
 
         // A returning visitor whose cookie still references the deleted contact ID
