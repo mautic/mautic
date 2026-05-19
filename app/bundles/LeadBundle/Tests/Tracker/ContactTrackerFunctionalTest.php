@@ -42,7 +42,7 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
         // This replicates the window where a request has already loaded the lead_id
         // from the device table but the lead is deleted before it can be fetched.
         $this->em->getConnection()
-            ->executeStatement('DELETE FROM leads WHERE id = :id', ['id' => $contactId]);
+            ->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = :id', ['id' => $contactId]);
 
         $this->em->clear();
 
