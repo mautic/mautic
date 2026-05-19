@@ -153,7 +153,8 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->_em->getConnection());
+        $connection = $this->_em->getConnection();
+        $query      = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($connection);
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -170,13 +171,19 @@ class LeadEventLogRepository extends CommonRepository
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
-                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
-            ->add('from', [
+                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name');
+
+        if (DatabasePlatform::allowsIndexHint($connection->getDatabasePlatform())) {
+            $query->add('from', [
                 'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'alias' => 'll',
                 'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'idx_scheduled_events)',
-            ], true)
-            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', $joinCondition)
+            ], true);
+        } else {
+            $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll');
+        }
+
+        $query->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', $joinCondition)
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
             ->where($query->expr()->eq('ll.is_scheduled', 1))

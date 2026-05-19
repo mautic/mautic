@@ -1252,6 +1252,7 @@ class DatabasePlatform
         }
 
         // Reliable custom query for PostgreSQL
+        // Use this till we apply doctrine-dbal-pgsql-platform-indexes.patch
         $sql = "
             SELECT
                 i.relname AS index_name,
@@ -1317,10 +1318,9 @@ class DatabasePlatform
         string $tableSchema = 'public',
     ): array {
         $platform = $connection->getDatabasePlatform();
-        $dbName   = $connection->getDatabase();
 
         $params = [
-            'db'     => $dbName,
+            'db'     => $connection->getDatabase(),
             'table'  => $fullTableName,
             'column' => $columnName,
         ];
