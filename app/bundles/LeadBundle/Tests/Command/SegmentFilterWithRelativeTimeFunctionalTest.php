@@ -38,7 +38,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
             $contact = new Lead();
             $contact->setFirstname('fn'.$i);
             $contact->setLastname('ln'.$i);
-            $contact->setLastActive(new \DateTime(sprintf('-%s hours +15 seconds', $i)));
+            $contact->setLastActive(new \DateTime(sprintf('-%s hours +5 minutes', $i)));
             $contacts[] = $contact;
         }
 
