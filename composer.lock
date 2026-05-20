@@ -8874,16 +8874,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "5.4.x-dev",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "0fe08ee32cec2748fbfea10c52d3ee02049e0f6b"
+                "reference": "03b191dda148c490b5b3929eaac827ee64f1d421"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/0fe08ee32cec2748fbfea10c52d3ee02049e0f6b",
-                "reference": "0fe08ee32cec2748fbfea10c52d3ee02049e0f6b",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/03b191dda148c490b5b3929eaac827ee64f1d421",
+                "reference": "03b191dda148c490b5b3929eaac827ee64f1d421",
                 "shasum": ""
             },
             "require": {
@@ -8951,7 +8951,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/5.4"
+                "source": "https://github.com/symfony/cache/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -8963,11 +8963,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-04T11:43:55+00:00"
+            "time": "2026-05-15T06:40:15+00:00"
         },
         {
             "name": "symfony/cache-contracts",
@@ -10640,16 +10644,16 @@
         },
         {
             "name": "symfony/http-kernel",
-            "version": "v5.4.47",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-kernel.git",
-                "reference": "0ac42d5e16317f15dc5f8ea83742c51d2ed2350f"
+                "reference": "bc30eed68e20ad16e6c9885075eac81a8eca08a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/0ac42d5e16317f15dc5f8ea83742c51d2ed2350f",
-                "reference": "0ac42d5e16317f15dc5f8ea83742c51d2ed2350f",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/bc30eed68e20ad16e6c9885075eac81a8eca08a5",
+                "reference": "bc30eed68e20ad16e6c9885075eac81a8eca08a5",
                 "shasum": ""
             },
             "require": {
@@ -10733,7 +10737,7 @@
             "description": "Provides a structured process for converting a Request into a Response",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-kernel/tree/v5.4.47"
+                "source": "https://github.com/symfony/http-kernel/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -10745,11 +10749,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-13T13:47:53+00:00"
+            "time": "2026-05-20T08:20:12+00:00"
         },
         {
             "name": "symfony/intl",
@@ -10922,16 +10930,16 @@
         },
         {
             "name": "symfony/mailer",
-            "version": "5.4.x-dev",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mailer.git",
-                "reference": "f732e1fafdf0f4a2d865e91f1018aaca174aeed9"
+                "reference": "5b5385bc21c3549a80abc1353ccf8eb0b6861c61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mailer/zipball/f732e1fafdf0f4a2d865e91f1018aaca174aeed9",
-                "reference": "f732e1fafdf0f4a2d865e91f1018aaca174aeed9",
+                "url": "https://api.github.com/repos/symfony/mailer/zipball/5b5385bc21c3549a80abc1353ccf8eb0b6861c61",
+                "reference": "5b5385bc21c3549a80abc1353ccf8eb0b6861c61",
                 "shasum": ""
             },
             "require": {
@@ -10978,7 +10986,7 @@
             "description": "Helps sending emails",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/mailer/tree/5.4"
+                "source": "https://github.com/symfony/mailer/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -10990,11 +10998,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-25T14:11:13+00:00"
+            "time": "2026-05-11T06:39:31+00:00"
         },
         {
             "name": "symfony/messenger",
@@ -11088,7 +11100,7 @@
         },
         {
             "name": "symfony/mime",
-            "version": "5.4.x-dev",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mime.git",
@@ -11153,7 +11165,7 @@
                 "mime-type"
             ],
             "support": {
-                "source": "https://github.com/symfony/mime/tree/5.4"
+                "source": "https://github.com/symfony/mime/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -11177,16 +11189,16 @@
         },
         {
             "name": "symfony/monolog-bridge",
-            "version": "5.4.x-dev",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bridge.git",
-                "reference": "cf7d75d4d64a41fbb1c0e92301bec404134fa84b"
+                "reference": "3d698683d59e739af40596833ddd8bfc1540ed1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/cf7d75d4d64a41fbb1c0e92301bec404134fa84b",
-                "reference": "cf7d75d4d64a41fbb1c0e92301bec404134fa84b",
+                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/3d698683d59e739af40596833ddd8bfc1540ed1a",
+                "reference": "3d698683d59e739af40596833ddd8bfc1540ed1a",
                 "shasum": ""
             },
             "require": {
@@ -11241,7 +11253,7 @@
             "description": "Provides integration for Monolog with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/monolog-bridge/tree/5.4"
+                "source": "https://github.com/symfony/monolog-bridge/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -11253,11 +11265,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-10-10T06:37:45+00:00"
+            "time": "2026-05-07T16:46:23+00:00"
         },
         {
             "name": "symfony/monolog-bundle",
@@ -12548,16 +12564,16 @@
         },
         {
             "name": "symfony/routing",
-            "version": "5.4.x-dev",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "dd08c19879a9b37ff14fd30dcbdf99a4cf045db1"
+                "reference": "275b31328b2e58cab004be0cf086380e2a5c5ee7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/dd08c19879a9b37ff14fd30dcbdf99a4cf045db1",
-                "reference": "dd08c19879a9b37ff14fd30dcbdf99a4cf045db1",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/275b31328b2e58cab004be0cf086380e2a5c5ee7",
+                "reference": "275b31328b2e58cab004be0cf086380e2a5c5ee7",
                 "shasum": ""
             },
             "require": {
@@ -12618,7 +12634,7 @@
                 "url"
             ],
             "support": {
-                "source": "https://github.com/symfony/routing/tree/5.4"
+                "source": "https://github.com/symfony/routing/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -12630,11 +12646,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-12T18:20:21+00:00"
+            "time": "2026-04-16T14:40:03+00:00"
         },
         {
             "name": "symfony/security-acl",
@@ -12806,7 +12826,7 @@
         },
         {
             "name": "symfony/security-core",
-            "version": "5.4.x-dev",
+            "version": "v5.4.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-core.git",
@@ -12880,7 +12900,7 @@
             "description": "Symfony Security Component - Core Library",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-core/tree/5.4"
+                "source": "https://github.com/symfony/security-core/tree/v5.4.48"
             },
             "funding": [
                 {
@@ -13605,16 +13625,16 @@
         },
         {
             "name": "symfony/twig-bridge",
-            "version": "v5.4.45",
+            "version": "v5.4.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/twig-bridge.git",
-                "reference": "b3d3738b4be14bf1a4544a6faeed89463fe8b60e"
+                "reference": "853a0c9aa40123a9feeb335c865b659d94e49e5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/b3d3738b4be14bf1a4544a6faeed89463fe8b60e",
-                "reference": "b3d3738b4be14bf1a4544a6faeed89463fe8b60e",
+                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/853a0c9aa40123a9feeb335c865b659d94e49e5d",
+                "reference": "853a0c9aa40123a9feeb335c865b659d94e49e5d",
                 "shasum": ""
             },
             "require": {
@@ -13706,7 +13726,7 @@
             "description": "Provides integration for Twig with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/twig-bridge/tree/v5.4.45"
+                "source": "https://github.com/symfony/twig-bridge/tree/v5.4.48"
             },
             "funding": [
                 {
@@ -13722,7 +13742,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-10-24T15:46:29+00:00"
+            "time": "2024-11-22T08:19:51+00:00"
         },
         {
             "name": "symfony/twig-bundle",
@@ -14095,16 +14115,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "5.4.x-dev",
+            "version": "v5.4.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "a454d47278cc16a5db371fe73ae66a78a633371e"
+                "reference": "b0b27055f055f0d314c5c68ed0c10f0bbd90aee0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/a454d47278cc16a5db371fe73ae66a78a633371e",
-                "reference": "a454d47278cc16a5db371fe73ae66a78a633371e",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/b0b27055f055f0d314c5c68ed0c10f0bbd90aee0",
+                "reference": "b0b27055f055f0d314c5c68ed0c10f0bbd90aee0",
                 "shasum": ""
             },
             "require": {
@@ -14150,7 +14170,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/5.4"
+                "source": "https://github.com/symfony/yaml/tree/v5.4.52"
             },
             "funding": [
                 {
@@ -14162,11 +14182,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-25T14:11:13+00:00"
+            "time": "2026-05-15T06:40:16+00:00"
         },
         {
             "name": "theofidry/psysh-bundle",
