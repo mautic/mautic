@@ -150,13 +150,14 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $campaign;
     }
 
-    protected function createCampaignLead(Campaign $campaign, Lead $lead, bool $manuallyRemoved = false): CampaignLead
+    protected function createCampaignLead(Campaign $campaign, Lead $lead, bool $manuallyRemoved = false, int $rotation = 1): CampaignLead
     {
         $campaignLead = new CampaignLead();
         $campaignLead->setCampaign($campaign);
         $campaignLead->setLead($lead);
         $campaignLead->setDateAdded(new \DateTime());
         $campaignLead->setManuallyRemoved($manuallyRemoved);
+        $campaignLead->setRotation($rotation);
         $this->em->persist($campaignLead);
 
         return $campaignLead;
@@ -175,7 +176,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 
     protected function createEvent(string $name, Campaign $campaign, string $type, string $eventType, ?array $property = null): Event
     {
-        $event = new Event();
+        $event = new Event(new \DateTime());
         $event->setName($name);
         $event->setCampaign($campaign);
         $event->setType($type);
@@ -188,13 +189,14 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $event;
     }
 
-    protected function createEventLog(Lead $lead, Event $event, Campaign $campaign): LeadEventLog
+    protected function createEventLog(Lead $lead, Event $event, Campaign $campaign, int $rotation): LeadEventLog
     {
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
         $leadEventLog->setEvent($event);
         $leadEventLog->setCampaign($campaign);
-        $leadEventLog->setRotation(0);
+        $leadEventLog->setRotation($rotation);
+        $leadEventLog->setDateTriggered(new \DateTime());
         $this->em->persist($leadEventLog);
 
         return $leadEventLog;
@@ -286,18 +288,18 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $events = $this->loadJson('campaign_events');
 
         foreach ($events as $event) {
+            $fieldTypes = ['date_added' => Types::DATETIME_MUTABLE];
+
             switch ($event['id']) {
                 case 2:
-                    $event['trigger_date'] = $sendEmailTimestamp->format(self::DATE_TIME_FORMAT);
-                    $fieldTypes            = ['trigger_date' => Types::DATETIME_MUTABLE];
+                    $event['trigger_date']      = $sendEmailTimestamp->format(self::DATE_TIME_FORMAT);
+                    $fieldTypes['trigger_date'] = Types::DATETIME_MUTABLE;
                     break;
                 case 4:
                 case 5:
-                    $event['trigger_date'] = $conditionTimestamp->format(self::DATE_TIME_FORMAT);
-                    $fieldTypes            = ['trigger_date' => Types::DATETIME_MUTABLE];
+                    $event['trigger_date']      = $conditionTimestamp->format(self::DATE_TIME_FORMAT);
+                    $fieldTypes['trigger_date'] = Types::DATETIME_MUTABLE;
                     break;
-                default:
-                    $fieldTypes = [];
             }
             $connection->insert($table2, $event, $fieldTypes);
         }
