@@ -3,6 +3,8 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 class VtigerIntegration extends CrmAbstractIntegration
 {
@@ -93,17 +95,15 @@ class VtigerIntegration extends CrmAbstractIntegration
             }
 
             return false;
-        } else {
-            $error = $this->extractAuthKeys($response['result']);
-
-            if (empty($error)) {
-                return true;
-            } else {
-                $this->authorzationError = $error;
-
-                return false;
-            }
         }
+        $error = $this->extractAuthKeys($response['result']);
+
+        if (empty($error)) {
+            return true;
+        }
+        $this->authorzationError = $error;
+
+        return false;
     }
 
     public function getAuthLoginUrl(): string
@@ -218,9 +218,9 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {

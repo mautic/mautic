@@ -344,16 +344,17 @@ class CampaignController extends AbstractStandardFormController
             $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId);
+        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
         $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
         $this->processCampaignEvents($events, $hasCampaignLeads, $campaignLogCounts, $campaignLogCountsProcessed);
+        $this->addSchedulingLabels($events);
         $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
 
-        $sourcesList     = $this->getCampaignModel()->getSourceLists();
+        $sourcesList     = $this->getCampaignModel()->getSourceLists(null, false, true);
         $campaign        = $this->getCampaignModel()->getEntity($objectId);
         $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
         // Filter out deleted events for the preview (but keep them for action/decision/condition tabs)
@@ -955,8 +956,8 @@ class CampaignController extends AbstractStandardFormController
      */
     private function setCampaignSources(bool $isClone = false): void
     {
-        $campaignSources = (array) ($this->campaignElements['campaignSources'] ?? []);
-        $modifiedSources = (array) ($this->campaignElements['modifiedSources'] ?? []);
+        $campaignSources = $this->normalizeCampaignSources((array) ($this->campaignElements['campaignSources'] ?? []));
+        $modifiedSources = $this->normalizeCampaignSources((array) ($this->campaignElements['modifiedSources'] ?? []));
 
         if ($campaignSources === $modifiedSources) {
             if ($isClone) {
@@ -985,6 +986,32 @@ class CampaignController extends AbstractStandardFormController
             }
             $this->campaignSources = $modifiedSources;
         }
+    }
+
+    /**
+     * @param array<string, array<int|string, mixed>> $sources
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    private function normalizeCampaignSources(array $sources): array
+    {
+        $normalizedSources = [];
+
+        foreach ($sources as $type => $typeSources) {
+            if (!is_array($typeSources)) {
+                continue;
+            }
+
+            foreach ($typeSources as $sourceId => $label) {
+                if (!ctype_digit((string) $sourceId)) {
+                    continue;
+                }
+
+                $normalizedSources[$type][(int) $sourceId] = $label;
+            }
+        }
+
+        return $normalizedSources;
     }
 
     /**
@@ -1057,7 +1084,6 @@ class CampaignController extends AbstractStandardFormController
         $campaignEvents = [];
 
         $existingEvents = $entity->getEvents()->toArray();
-        $translator     = $this->translator;
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events
             if (!empty($e->getDeleted())) {
@@ -1076,32 +1102,8 @@ class CampaignController extends AbstractStandardFormController
             unset($event['parent']);
             unset($event['log']);
 
-            $label = false;
-            switch ($event['triggerMode']) {
-                case 'interval':
-                    $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
-                        [
-                            '%number%' => $event['triggerInterval'],
-                            '%unit%'   => $translator->trans(
-                                'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                ['%count%' => $event['triggerInterval']]
-                            ),
-                        ]
-                    );
-                    break;
-                case 'date':
-                    $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.date.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
-                        [
-                            '%full%' => $this->dateHelper->toFull($event['triggerDate']),
-                            '%time%' => $this->dateHelper->toTime($event['triggerDate']),
-                            '%date%' => $this->dateHelper->toShort($event['triggerDate']),
-                        ]
-                    );
-                    break;
-            }
-            if ($label) {
+            $label = $this->getSchedulingLabel($event);
+            if (null !== $label) {
                 $event['label'] = $label;
             }
 
@@ -1124,7 +1126,7 @@ class CampaignController extends AbstractStandardFormController
                     $campaignModel = $this->getModel('campaign');
                     \assert($campaignModel instanceof CampaignModel);
 
-                    $sourceList                   = $campaignModel->getSourceLists($type);
+                    $sourceList                   = $campaignModel->getSourceLists($type, false, true);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,
@@ -1153,10 +1155,11 @@ class CampaignController extends AbstractStandardFormController
             $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
+            $cacheTTL = (int) $this->coreParametersHelper->get('campaign_event_cache_ttl');
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
         }
 
         return [
@@ -1234,6 +1237,56 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $sortedEvents;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $events
+     */
+    private function addSchedulingLabels(array &$events): void
+    {
+        foreach ($events as &$event) {
+            $label = $this->getSchedulingLabel($event);
+            if (null !== $label) {
+                $event['label'] = $label;
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $event
+     */
+    private function getSchedulingLabel(array $event): ?string
+    {
+        switch ($event['triggerMode'] ?? null) {
+            case 'interval':
+                if (!empty($event['triggerInterval']) && !empty($event['triggerIntervalUnit'])) {
+                    return $this->translator->trans(
+                        'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
+                        [
+                            '%number%' => $event['triggerInterval'],
+                            '%unit%'   => $this->translator->trans(
+                                'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
+                                ['%count%' => $event['triggerInterval']]
+                            ),
+                        ]
+                    );
+                }
+                break;
+            case 'date':
+                if (!empty($event['triggerDate'])) {
+                    return $this->translator->trans(
+                        'mautic.campaign.connection.trigger.date.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
+                        [
+                            '%full%' => $this->dateHelper->toFull($event['triggerDate']),
+                            '%time%' => $this->dateHelper->toTime($event['triggerDate']),
+                            '%date%' => $this->dateHelper->toShort($event['triggerDate']),
+                        ]
+                    );
+                }
+                break;
+        }
+
+        return null;
     }
 
     /**

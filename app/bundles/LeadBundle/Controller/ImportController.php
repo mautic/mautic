@@ -298,10 +298,9 @@ class ImportController extends FormController
                     $this->importModel->saveEntity($import);
 
                     break;
-                } else {
-                    ++$checks;
-                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.progresschecks', $checks);
                 }
+                ++$checks;
+                $this->requestStack->getSession()->set('mautic.'.$object.'.import.progresschecks', $checks);
         }
 
         // /Check for a submitted form and process it

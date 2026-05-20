@@ -176,38 +176,37 @@ class LeadListRepository extends CommonRepository
             }
 
             return $return;
-        } else {
-            $q = $this->getEntityManager()->createQueryBuilder()
-                ->from(LeadList::class, 'l', 'l.id');
-
-            if ($forList) {
-                $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
-            } else {
-                $q->select('l');
-            }
-
-            $q->leftJoin('l.leads', 'il');
-
-            $q->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('IDENTITY(il.lead)', (int) $lead),
-                    $q->expr()->in('il.manuallyRemoved', ':false')
-                )
-            )
-                ->setParameter('false', false, 'boolean');
-
-            if ($isPublic) {
-                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
-                    ->setParameter('isPublic', true, 'boolean');
-            }
-
-            if ($isPreferenceCenter) {
-                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
-                    ->setParameter('isPreferenceCenter', true, 'boolean');
-            }
-
-            return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         }
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from(LeadList::class, 'l', 'l.id');
+
+        if ($forList) {
+            $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
+        } else {
+            $q->select('l');
+        }
+
+        $q->leftJoin('l.leads', 'il');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('IDENTITY(il.lead)', (int) $lead),
+                $q->expr()->in('il.manuallyRemoved', ':false')
+            )
+        )
+            ->setParameter('false', false, 'boolean');
+
+        if ($isPublic) {
+            $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                ->setParameter('isPublic', true, 'boolean');
+        }
+
+        if ($isPreferenceCenter) {
+            $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                ->setParameter('isPreferenceCenter', true, 'boolean');
+        }
+
+        return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
     }
 
     /**
@@ -446,6 +445,12 @@ class LeadListRepository extends CommonRepository
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.filters_field'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.filters_field', [], null, 'en_US'):
+                $pattern         = sprintf('%%s:5:"field";s:%d:"%s"%%', strlen($filter->string), $filter->string);
+                $expr            = $q->expr()->like('l.filters', ':'.$unique);
+                $forceParameters = [$unique => $pattern];
+                break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
@@ -483,6 +488,7 @@ class LeadListRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
+            'mautic.lead.list.searchcommand.filters_field',
             'mautic.project.searchcommand.name',
         ];
 

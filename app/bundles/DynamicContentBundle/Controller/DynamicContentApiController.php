@@ -32,9 +32,8 @@ class DynamicContentApiController extends CommonController
                 ],
                 $request->query->all()
             );
-        } else {
-            throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
         }
+        throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
     }
 
     public function getAction(

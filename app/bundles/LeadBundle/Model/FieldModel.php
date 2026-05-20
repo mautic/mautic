@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -663,12 +665,20 @@ class FieldModel extends FormModel
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws SchemaException
+     * @throws DeleteEntityDependencyException
      */
     public function deleteEntity($entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
+
+        $event = $this->dispatchEvent('pre_delete', $entity);
+
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
+        }
+
         $this->customFieldColumn->deleteLeadColumn($entity);
         $this->leadFieldDeleter->deleteLeadFieldEntity($entity);
     }
@@ -688,14 +698,7 @@ class FieldModel extends FormModel
 
         /** @var LeadField $entity */
         foreach ($entities as $entity) {
-            switch ($entity->getObject()) {
-                case 'lead':
-                    $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
-                    break;
-                case 'company':
-                    $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
-                    break;
-            }
+            $this->customFieldColumn->deleteLeadColumn($entity);
         }
 
         return $entities;

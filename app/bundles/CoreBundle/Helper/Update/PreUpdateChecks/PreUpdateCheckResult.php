@@ -20,7 +20,7 @@ class PreUpdateCheckResult
         array $errors = [],
     ) {
         foreach ($errors as $error) {
-            if (!($error instanceof PreUpdateCheckError)) {
+            if (!$error instanceof PreUpdateCheckError) {
                 throw new \InvalidArgumentException('Error must be of type PreUpdateCheckError');
             }
         }
