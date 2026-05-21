@@ -4,28 +4,34 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Service;
 
-use Mautic\AssetBundle\Entity\Asset;
-use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Service\Exception\InvalidPackageNameException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class CampaignShareService
 {
+    // The marketplace copies the ZIP into its own storage on submit, so the file only
+    // needs to be reachable for the short window between user clicking Publish on Mautic
+    // and Submit on the marketplace publish page.
+    public const SHARE_TTL_SECONDS = 3600;
+
+    public const SHARE_DIR = 'campaign_share';
+
     public function __construct(
         private ExportHelper $exportHelper,
-        private AssetModel $assetModel,
         private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private UrlGeneratorInterface $urlGenerator,
+        private Filesystem $filesystem,
     ) {
     }
 
     /**
-     * Creates a shareable ZIP with composer.json, saves it as an Asset,
-     * and returns the public download URL.
+     * Creates a shareable ZIP with composer.json, stores it under a transient token,
+     * and returns the public download URL. The token is unguessable so no auth is needed.
      *
      * @param array<int|string, mixed> $exportData
      * @param array<int, string>       $assetList
@@ -61,9 +67,13 @@ final class CampaignShareService
             }
         }
 
-        $asset = $this->createAssetFromZip($campaign, $zipFilePath, $metadata);
+        $token = $this->storeTransientZip($zipFilePath);
 
-        return $this->assetModel->generateUrl($asset, true);
+        return $this->urlGenerator->generate(
+            'mautic_campaign_share_download',
+            ['token' => $token],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        );
     }
 
     /**
@@ -156,35 +166,42 @@ final class CampaignShareService
     }
 
     /**
-     * @param array<string, mixed> $metadata
+     * Moves the generated ZIP into the transient share directory under an unguessable
+     * token. Returns the token, which is the lookup key for the download endpoint.
      */
-    private function createAssetFromZip(Campaign $campaign, string $zipFilePath, array $metadata = []): Asset
+    private function storeTransientZip(string $zipFilePath): string
     {
-        $uploadDir = $this->coreParametersHelper->get('upload_dir', 'media/files');
-        $fileName  = 'campaign_share_'.bin2hex(random_bytes(20)).'.zip';
-        $destPath  = $uploadDir.'/'.$fileName;
+        $shareDir = $this->getShareDir();
+        $this->filesystem->mkdir($shareDir, 0775);
 
-        copy($zipFilePath, $destPath);
-        @unlink($zipFilePath);
+        $token    = bin2hex(random_bytes(16));
+        $destPath = $shareDir.'/'.$token.'.zip';
 
-        $title = $metadata['title'] ?? $campaign->getName();
+        // Filesystem::rename transparently falls back to copy+remove when crossing
+        // filesystem boundaries (e.g. /tmp on a different mount than upload_dir).
+        $this->filesystem->rename($zipFilePath, $destPath, true);
 
-        $asset = new Asset();
-        $asset->setTitle($this->translator->trans('mautic.campaign.share.asset_title', ['%title%' => $title]));
-        $asset->setDescription($metadata['description'] ?? $this->translator->trans('mautic.campaign.share.asset_description'));
-        $asset->setDisallow(true);
-        $asset->setStorageLocation('local');
-        $asset->setPath($fileName);
-        $asset->setOriginalFileName($title.'.zip');
-        $asset->setExtension('zip');
-        $asset->setMime('application/zip');
-        $asset->setSize(filesize($destPath) ?: 0);
-        $asset->setIsPublished(true);
-        $asset->setUploadDir($uploadDir);
+        $this->purgeExpiredShares($shareDir);
 
-        $this->assetModel->saveEntity($asset);
+        return $token;
+    }
 
-        return $asset;
+    public function getShareDir(): string
+    {
+        $uploadDir = (string) $this->coreParametersHelper->get('upload_dir', 'media/files');
+
+        return rtrim($uploadDir, '/').'/'.self::SHARE_DIR;
+    }
+
+    private function purgeExpiredShares(string $shareDir): void
+    {
+        $cutoff = time() - self::SHARE_TTL_SECONDS;
+        foreach (glob($shareDir.'/*.zip') ?: [] as $file) {
+            $mtime = @filemtime($file);
+            if (false !== $mtime && $mtime < $cutoff) {
+                @unlink($file);
+            }
+        }
     }
 
     /**

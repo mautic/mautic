@@ -60,6 +60,16 @@ return [
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::eventDetailsAction',
             ],
         ],
+        'public' => [
+            'mautic_campaign_share_download' => [
+                'path'         => '/s/campaign-share/{token}',
+                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignShareDownloadController::downloadAction',
+                'method'       => 'GET',
+                'requirements' => [
+                    'token' => '[a-f0-9]{32}',
+                ],
+            ],
+        ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [
                 'standard_entity' => true,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Service\CampaignShareService;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
@@ -137,6 +138,82 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $content  = $response->getContent();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertStringContainsString('Redirecting to Marketplace', $content);
+        // The publish flow should hand the marketplace a token URL pointing back at the share
+        // download endpoint — not a Mautic Asset URL — so the marketplace can fetch the ZIP
+        // without depending on the Asset table. The redirect URL is url-encoded inside an
+        // `asset_url=` query param, so look for the encoded slashes.
+        $this->assertMatchesRegularExpression('#campaign-share%2F[a-f0-9]{32}#', $content);
+    }
+
+    public function testShareDownloadEndpointRejectsUnknownToken(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/campaign-share/'.str_repeat('a', 32));
+
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testShareDownloadEndpointRejectsMalformedToken(): void
+    {
+        // Routing requires 32 hex chars — anything else must not even reach the controller.
+        $this->client->request(Request::METHOD_GET, '/s/campaign-share/not-a-real-token');
+
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testShareDownloadServesStoredZip(): void
+    {
+        $shareService = self::getContainer()->get(CampaignShareService::class);
+        \assert($shareService instanceof CampaignShareService);
+        $shareDir = $shareService->getShareDir();
+
+        if (!is_dir($shareDir)) {
+            mkdir($shareDir, 0775, true);
+        }
+
+        $token   = bin2hex(random_bytes(16));
+        $zipPath = $shareDir.'/'.$token.'.zip';
+
+        $zip = new \ZipArchive();
+        $this->assertTrue(true === $zip->open($zipPath, \ZipArchive::CREATE));
+        $zip->addFromString('composer.json', '{"name":"acme/test","type":"mautic-resource","version":"1.0.0"}');
+        $zip->close();
+        $this->assertFileExists($zipPath);
+
+        $this->client->request(Request::METHOD_GET, '/s/campaign-share/'.$token);
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('campaign-share.zip', (string) $response->headers->get('Content-Disposition'));
+
+        // Test cleanup — the controller asks the kernel to delete the file after send, but
+        // that hook does not always fire in WebTestCase, so unlink defensively here.
+        @unlink($zipPath);
+    }
+
+    public function testShareDownloadReturnsGoneForExpiredFile(): void
+    {
+        $shareService = self::getContainer()->get(CampaignShareService::class);
+        \assert($shareService instanceof CampaignShareService);
+        $shareDir = $shareService->getShareDir();
+
+        if (!is_dir($shareDir)) {
+            mkdir($shareDir, 0775, true);
+        }
+
+        $token   = bin2hex(random_bytes(16));
+        $zipPath = $shareDir.'/'.$token.'.zip';
+        file_put_contents($zipPath, 'PK-placeholder');
+
+        // Backdate the file past the TTL so the controller treats it as expired.
+        $staleTime = time() - (CampaignShareService::SHARE_TTL_SECONDS + 60);
+        touch($zipPath, $staleTime);
+
+        $this->client->request(Request::METHOD_GET, '/s/campaign-share/'.$token);
+
+        $this->assertEquals(Response::HTTP_GONE, $this->client->getResponse()->getStatusCode());
+        // Expired files are unlinked on access.
+        $this->assertFileDoesNotExist($zipPath);
     }
 
     public function testShareFormValidationRejectsInvalidVersion(): void
