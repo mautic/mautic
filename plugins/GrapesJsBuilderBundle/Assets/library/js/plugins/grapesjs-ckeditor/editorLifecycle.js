@@ -134,7 +134,7 @@ export const editorLifecycleMixin = {
       const classes = Array.from(element.classList || [])
         .map(item => item.trim())
         .filter(item => item && !item.startsWith('ck-'))
-        .sort();
+        .sort((a, b) => a.localeCompare(b));
 
       if (!classes.length) {
         return;
@@ -155,8 +155,9 @@ export const editorLifecycleMixin = {
     const classSlug = variant.classes
       .join('_')
       .replace(/[^a-z0-9_-]/gi, '_')
-      .replace(/_+/g, '_')
-      .replace(/^_+|_+$/g, '')
+      .split('_')
+      .filter(s => s.length > 0)
+      .join('_')
       .toLowerCase();
 
     const suffix = classSlug || `variant_${index}`;
@@ -372,7 +373,13 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    ckeditor.data.set(this.latestContent);
+    // CKEditor 5 silently drops plain <span> elements (no attributes) because its
+    // model is attribute-based and has nothing to store for them. Injecting a
+    // placeholder attribute gives GHS something to preserve; it is removed in getContent().
+    // A non-empty value ("1") is required — CKEditor GHS may discard attributes whose
+    // value is an empty string, which would cause the span to be silently dropped.
+    const contentForEditor = this.latestContent.replace(/<span\s*>/gi, '<span data-gjs-span="1">');
+    ckeditor.data.set(contentForEditor);
     this.latestContent = null;
     el.innerHTML = '';
 
@@ -615,6 +622,8 @@ export const editorLifecycleMixin = {
     const ckeditor = this.ckeditor;
     let ckeditorContent = ckeditor?.data ? ckeditor.data.get() : '';
     if (typeof ckeditorContent !== "string") ckeditorContent = "";
+    // Remove the placeholder injected in mountEditorUi() to preserve plain <span> elements.
+    ckeditorContent = ckeditorContent.replace(/ data-gjs-span="1"/g, '');
     const baseContent = this.resolveBaseContent(ckeditorContent);
 
     return this.normalizeWordInlineStyles(
@@ -649,8 +658,184 @@ export const editorLifecycleMixin = {
     originalDocument.body.innerHTML = originalContent;
 
     this.reconcileElementAttributes(originalDocument.body, currentDocument.body);
+    this.restoreMissingDataSpanWrappers(originalDocument.body, currentDocument.body);
 
     return currentDocument.body.innerHTML;
+  },
+
+  restoreMissingDataSpanWrappers(originalRoot, currentRoot) {
+    if (!originalRoot || !currentRoot) {
+      return;
+    }
+
+    const originalText = this.normalizeComparableText(originalRoot.textContent);
+    const currentText = this.normalizeComparableText(currentRoot.textContent);
+    if (!originalText || originalText !== currentText) {
+      return;
+    }
+
+    const spanDescriptors = this.collectDataSpanDescriptors(originalRoot);
+    if (!spanDescriptors.length) {
+      return;
+    }
+
+    this.applyMissingDataSpansByOffsets(currentRoot, spanDescriptors);
+  },
+
+  normalizeComparableText(value) {
+    if (typeof value !== 'string') {
+      return '';
+    }
+
+    return value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+  },
+
+  collectDataSpanDescriptors(root) {
+    if (!root || typeof Node === 'undefined') {
+      return [];
+    }
+
+    const descriptors = [];
+    let offset = 0;
+
+    const walk = (node) => {
+      if (!node) {
+        return;
+      }
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        offset += (node.nodeValue || '').length;
+        return;
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+
+      const tagName = `${node.tagName || ''}`.toLowerCase();
+      const isDataSpan = tagName === 'span' && this.elementHasDataAttributes(node);
+      const start = offset;
+
+      Array.from(node.childNodes || []).forEach(walk);
+
+      if (!isDataSpan) {
+        return;
+      }
+
+      const end = offset;
+      if (end <= start) {
+        return;
+      }
+
+      descriptors.push({
+        start,
+        end,
+        attributes: Array.from(node.attributes || []).map(attribute => ({
+          name: attribute.name,
+          value: attribute.value || ''
+        }))
+      });
+    };
+
+    Array.from(root.childNodes || []).forEach(walk);
+
+    return descriptors;
+  },
+
+  elementHasDataAttributes(element) {
+    if (!element) {
+      return false;
+    }
+
+    return Array.from(element.attributes || []).some(attribute => {
+      const name = `${attribute?.name || ''}`.toLowerCase();
+      return name.startsWith('data-');
+    });
+  },
+
+  applyMissingDataSpansByOffsets(root, descriptors) {
+    if (!root || !Array.isArray(descriptors) || !descriptors.length) {
+      return;
+    }
+
+    descriptors.forEach(descriptor => {
+      const startPoint = this.resolveTextOffset(root, descriptor.start);
+      const endPoint = this.resolveTextOffset(root, descriptor.end);
+      if (!startPoint || !endPoint) {
+        return;
+      }
+
+      const range = root.ownerDocument.createRange();
+      range.setStart(startPoint.node, startPoint.offset);
+      range.setEnd(endPoint.node, endPoint.offset);
+
+      if (range.collapsed || this.rangeContainsDataSpan(range)) {
+        return;
+      }
+
+      const span = root.ownerDocument.createElement('span');
+      (descriptor.attributes || []).forEach(attribute => {
+        if (!attribute?.name) {
+          return;
+        }
+
+        span.setAttribute(attribute.name, attribute.value || '');
+      });
+
+      try {
+        const fragment = range.extractContents();
+        span.appendChild(fragment);
+        range.insertNode(span);
+      } catch (error) {
+        // Ignore restoration errors and preserve edited content.
+      }
+    });
+  },
+
+  resolveTextOffset(root, targetOffset) {
+    if (!root || typeof NodeFilter === 'undefined') {
+      return null;
+    }
+
+    const normalizedTarget = Math.max(0, Number.isFinite(targetOffset) ? targetOffset : 0);
+    const walker = root.ownerDocument.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+
+    let consumed = 0;
+    let currentNode = walker.nextNode();
+
+    while (currentNode) {
+      const length = (currentNode.nodeValue || '').length;
+      const nextConsumed = consumed + length;
+
+      if (normalizedTarget <= nextConsumed) {
+        return {
+          node: currentNode,
+          offset: Math.max(0, Math.min(length, normalizedTarget - consumed))
+        };
+      }
+
+      consumed = nextConsumed;
+      currentNode = walker.nextNode();
+    }
+
+    return null;
+  },
+
+  rangeContainsDataSpan(range) {
+    if (!range) {
+      return false;
+    }
+
+    const clonedContent = range.cloneContents();
+    if (!clonedContent || typeof clonedContent.querySelectorAll !== 'function') {
+      return false;
+    }
+
+    return Array.from(clonedContent.querySelectorAll('span')).some(element => this.elementHasDataAttributes(element));
   },
 
   reconcileElementAttributes(originalRoot, currentRoot) {
