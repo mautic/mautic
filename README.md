@@ -366,6 +366,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://bareit.tech"><img src="https://avatars.githubusercontent.com/u/267231336?v=4?s=100" width="100px;" alt="Ross Young"/><br /><sub><b>Ross Young</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=theyoungrossco" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tarunswamy-Muralidharan"><img src="https://avatars.githubusercontent.com/u/95178341?v=4?s=100" width="100px;" alt="thor_finn"/><br /><sub><b>thor_finn</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Tarunswamy-Muralidharan" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/fujijin"><img src="https://avatars.githubusercontent.com/u/11382759?v=4?s=100" width="100px;" alt="fujijin"/><br /><sub><b>fujijin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=fujijin" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/msoukhomlinov"><img src="https://avatars.githubusercontent.com/u/12015350?v=4?s=100" width="100px;" alt="Max Soukhomlinov"/><br /><sub><b>Max Soukhomlinov</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=msoukhomlinov" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
