@@ -1586,8 +1586,14 @@ export default class BuilderService {
 
     const tagName = `${component.get('tagName') || ''}`.toLowerCase();
     const headingTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+    const inlineHeadingTags = ['span'];
 
     if (headingTags.includes(tagName)) {
+      this.wrapHeadingComponentWithDiv(component, tagName);
+      return;
+    }
+
+    if (inlineHeadingTags.includes(tagName)) {
       this.wrapHeadingComponentWithDiv(component, tagName);
       return;
     }
