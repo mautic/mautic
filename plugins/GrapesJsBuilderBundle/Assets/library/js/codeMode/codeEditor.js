@@ -18,7 +18,6 @@ class CodeEditor {
     this.codeEditor = this.buildCodeEditor();
     this.codePopup = this.buildCodePopup();
   }
-
   // Build codeEditor (CodeMirror instance)
   buildCodeEditor() {
     const codeEditor = this.editor.CodeManager.getViewer('CodeMirror').clone();
@@ -92,7 +91,17 @@ class CodeEditor {
     try {
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim())
+
+      let components = code.trim();
+
+      // For HTML mode (page/email-html), extract body content if the code
+      // contains a complete HTML document with head/body tags.
+      // This prevents head content from being duplicated into the body.
+      // See: https://github.com/mautic/mautic/issues/14409
+      if (!ContentService.isMjmlMode(this.editor)) {
+        components = this.extractBodyContent(components);
+      }
+      this.editor.setComponents(components);
 
       // Reinitialize the content after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
@@ -123,6 +132,29 @@ class CodeEditor {
       content = ContentService.getEditorHtmlContent(this.editor);
     }
     this.codeEditor.setContent(content);
+  }
+
+  /**
+   * Extract body content from a full HTML document string.
+   * If the input is not a complete HTML document, return it as-is.
+   *
+  * @param {string} html - The HTML string to parse
+   * @returns {string} - The body innerHTML or the original string
+   */
+  extractBodyContent(html) {
+    // Check if this looks like a complete HTML document
+    const hasHtmlTag = /<html[\s>]/i.test(html);
+    const hasBodyTag = /<body[\s>]/i.test(html);
+    const hasHeadTag = /<head[\s>]/i.test(html);
+    // Only extract body if we have a complete document structure
+    if (!hasHtmlTag && !hasBodyTag && !hasHeadTag) {
+      return html;
+    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Return body innerHTML, or original if no body found
+    return doc.body ? doc.body.innerHTML.trim() : html;
   }
 }
 
