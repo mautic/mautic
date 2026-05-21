@@ -35,8 +35,9 @@ export const editorLifecycleMixin = {
     }
 
     const headingConfig = this.mergeHeadingOptions(compiledOptions.heading);
-    if (headingConfig) {
-      compiledOptions.heading = headingConfig;
+    const headingConfigWithTargetClasses = this.extendHeadingOptionsFromTarget(headingConfig, target);
+    if (headingConfigWithTargetClasses) {
+      compiledOptions.heading = headingConfigWithTargetClasses;
     }
 
     const styleConfig = this.mergeStyleDefinitions(compiledOptions.style);
@@ -45,6 +46,129 @@ export const editorLifecycleMixin = {
     }
 
     return compiledOptions;
+  },
+
+  extendHeadingOptionsFromTarget(headingConfig, target) {
+    const variants = this.collectHeadingClassVariants(target);
+    if (!variants.length) {
+      return headingConfig;
+    }
+
+    const resolvedHeadingConfig = headingConfig && typeof headingConfig === 'object' ? { ...headingConfig } : {};
+    const options = Array.isArray(resolvedHeadingConfig.options) ? [...resolvedHeadingConfig.options] : [];
+
+    const knownViews = new Set();
+    const knownModels = new Set();
+    options.forEach(option => {
+      const view = option?.view;
+      const viewName = typeof view === 'string' ? view.toLowerCase() : (typeof view?.name === 'string' ? view.name.toLowerCase() : '');
+      const viewClasses = Array.isArray(view?.classes)
+        ? [...view.classes]
+        : (typeof view?.classes === 'string' ? view.classes.split(/\s+/) : []);
+      const normalizedClasses = viewClasses
+        .map(item => `${item || ''}`.trim())
+        .filter(Boolean)
+        .sort()
+        .join(' ');
+
+      if (viewName) {
+        knownViews.add(`${viewName}|${normalizedClasses}`);
+      }
+
+      if (typeof option?.model === 'string' && option.model.trim()) {
+        knownModels.add(option.model.trim().toLowerCase());
+      }
+    });
+
+    variants.forEach((variant, index) => {
+      const viewKey = `${variant.name}|${variant.classes.join(' ')}`;
+      if (knownViews.has(viewKey)) {
+        return;
+      }
+
+      const model = this.generateHeadingVariantModel(variant, knownModels, index);
+      knownModels.add(model.toLowerCase());
+      knownViews.add(viewKey);
+
+      options.push({
+        model,
+        title: `${variant.name.toUpperCase()} (${variant.classes.join(' ')})`,
+        class: `ck-heading_${variant.name}_${model.replace(/[^a-z0-9_-]/gi, '_').toLowerCase()}`,
+        view: {
+          name: variant.name,
+          classes: variant.classes
+        },
+        converterPriority: 'high'
+      });
+    });
+
+    resolvedHeadingConfig.options = options;
+
+    return resolvedHeadingConfig;
+  },
+
+  collectHeadingClassVariants(target) {
+    const html = typeof target?.innerHTML === 'string' ? target.innerHTML : '';
+    if (!html.trim()) {
+      return [];
+    }
+
+    const implementation = (this.frameDoc && this.frameDoc.implementation)
+      || (typeof document !== 'undefined' ? document.implementation : null);
+    if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
+      return [];
+    }
+
+    const workingDocument = implementation.createHTMLDocument('');
+    workingDocument.body.innerHTML = html;
+
+    const variantsByKey = new Map();
+    const selector = 'h1[class], h2[class], h3[class], h4[class], h5[class], h6[class]';
+
+    workingDocument.body.querySelectorAll(selector).forEach(element => {
+      const name = `${element.tagName || ''}`.toLowerCase();
+      if (!name) {
+        return;
+      }
+
+      const classes = Array.from(element.classList || [])
+        .map(item => item.trim())
+        .filter(item => item && !item.startsWith('ck-'))
+        .sort();
+
+      if (!classes.length) {
+        return;
+      }
+
+      const key = `${name}|${classes.join(' ')}`;
+      if (!variantsByKey.has(key)) {
+        variantsByKey.set(key, { name, classes });
+      }
+    });
+
+    return Array.from(variantsByKey.values());
+  },
+
+  generateHeadingVariantModel(variant, knownModels, index) {
+    const levelMatch = variant.name.match(/^h([1-6])$/);
+    const baseModel = levelMatch ? `heading${levelMatch[1]}` : `heading_${variant.name}`;
+    const classSlug = variant.classes
+      .join('_')
+      .replace(/[^a-z0-9_-]/gi, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toLowerCase();
+
+    const suffix = classSlug || `variant_${index}`;
+    let candidate = `${baseModel}_${suffix}`;
+    let attempt = 1;
+
+    while (knownModels.has(candidate.toLowerCase())) {
+      candidate = `${baseModel}_${suffix}_${attempt}`;
+      attempt += 1;
+    }
+
+    return candidate;
   },
 
   /**
@@ -64,7 +188,8 @@ export const editorLifecycleMixin = {
       return rte;
     }
 
-    this.latestContent = el.innerHTML;
+    this.originalContent = typeof el?.innerHTML === 'string' ? el.innerHTML : '';
+    this.latestContent = this.originalContent;
 
     const selectedComponent = typeof this.editor?.getSelected === 'function'
       ? this.editor.getSelected()
@@ -175,6 +300,44 @@ export const editorLifecycleMixin = {
     return null;
   },
 
+  detachEditableClassObserver() {
+    const observer = this._Ck5ForGrapesJsData?.editableClassObserver;
+    if (!observer || typeof observer.disconnect !== 'function') {
+      this._Ck5ForGrapesJsData.editableClassObserver = null;
+      return;
+    }
+
+    observer.disconnect();
+    this._Ck5ForGrapesJsData.editableClassObserver = null;
+  },
+
+  stripEditableClasses(editableEl) {
+    if (!editableEl || typeof editableEl.removeAttribute !== 'function') {
+      return;
+    }
+
+    const removeClasses = () => {
+      if (editableEl.getAttribute('class')) {
+        editableEl.removeAttribute('class');
+      }
+    };
+
+    removeClasses();
+    this.detachEditableClassObserver();
+
+    if (typeof MutationObserver !== 'function') {
+      return;
+    }
+
+    const observer = new MutationObserver(() => removeClasses());
+    observer.observe(editableEl, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    this._Ck5ForGrapesJsData.editableClassObserver = observer;
+  },
+
   ensureBodyWrapperHandlers() {
     if (!this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler) {
       this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler = e => {
@@ -215,6 +378,7 @@ export const editorLifecycleMixin = {
 
     const editableEl = this.getEditorEditableElement(ckeditor);
     if (editableEl) {
+      this.stripEditableClasses(editableEl);
       el.appendChild(editableEl);
     }
 
@@ -462,6 +626,136 @@ export const editorLifecycleMixin = {
     );
   },
 
+  restoreOriginalElementAttributes(content) {
+    if (typeof content !== 'string') {
+      return '';
+    }
+
+    const originalContent = typeof this.originalContent === 'string' ? this.originalContent : '';
+    if (!originalContent.trim()) {
+      return content;
+    }
+
+    const implementation = (this.frameDoc && this.frameDoc.implementation)
+      || (typeof document !== 'undefined' ? document.implementation : null);
+    if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
+      return content;
+    }
+
+    const currentDocument = implementation.createHTMLDocument('');
+    const originalDocument = implementation.createHTMLDocument('');
+
+    currentDocument.body.innerHTML = content;
+    originalDocument.body.innerHTML = originalContent;
+
+    this.reconcileElementAttributes(originalDocument.body, currentDocument.body);
+
+    return currentDocument.body.innerHTML;
+  },
+
+  reconcileElementAttributes(originalRoot, currentRoot) {
+    if (!originalRoot || !currentRoot) {
+      return;
+    }
+
+    const originalChildren = Array.from(originalRoot.children || []);
+    const currentChildren = Array.from(currentRoot.children || []);
+    const length = Math.min(originalChildren.length, currentChildren.length);
+
+    for (let index = 0; index < length; index += 1) {
+      const originalElement = originalChildren[index];
+      const currentElement = currentChildren[index];
+      if (!originalElement || !currentElement) {
+        continue;
+      }
+
+      if (`${originalElement.tagName || ''}`.toLowerCase() !== `${currentElement.tagName || ''}`.toLowerCase()) {
+        continue;
+      }
+
+      this.reconcileSingleElementAttributes(originalElement, currentElement);
+      this.reconcileElementAttributes(originalElement, currentElement);
+    }
+  },
+
+  reconcileSingleElementAttributes(originalElement, currentElement) {
+    if (!originalElement || !currentElement) {
+      return;
+    }
+
+    this.reconcileClassAttribute(originalElement, currentElement);
+    this.reconcileStyleAttribute(originalElement, currentElement);
+
+    if (originalElement.id && !currentElement.id) {
+      currentElement.id = originalElement.id;
+    }
+
+    Array.from(originalElement.attributes || []).forEach(attribute => {
+      const name = `${attribute?.name || ''}`.toLowerCase();
+      if (!name || name === 'class' || name === 'style' || name === 'id') {
+        return;
+      }
+
+      if (!name.startsWith('data-') && !name.startsWith('aria-')) {
+        return;
+      }
+
+      if (!currentElement.hasAttribute(name)) {
+        currentElement.setAttribute(name, attribute.value || '');
+      }
+    });
+  },
+
+  reconcileClassAttribute(originalElement, currentElement) {
+    const originalClasses = Array.from(originalElement.classList || []).map(item => item.trim()).filter(Boolean);
+    if (!originalClasses.length) {
+      return;
+    }
+
+    const currentClasses = Array.from(currentElement.classList || []).map(item => item.trim()).filter(Boolean);
+    const mergedClasses = [...currentClasses];
+
+    originalClasses.forEach(className => {
+      if (!mergedClasses.includes(className)) {
+        mergedClasses.push(className);
+      }
+    });
+
+    if (!mergedClasses.length) {
+      return;
+    }
+
+    currentElement.setAttribute('class', mergedClasses.join(' '));
+  },
+
+  reconcileStyleAttribute(originalElement, currentElement) {
+    const originalStyle = originalElement.style;
+    const currentStyle = currentElement.style;
+    if (!originalStyle || !currentStyle) {
+      return;
+    }
+
+    for (let index = 0; index < originalStyle.length; index += 1) {
+      const property = originalStyle[index];
+      if (!property) {
+        continue;
+      }
+
+      const currentValue = currentStyle.getPropertyValue(property);
+      if (currentValue) {
+        continue;
+      }
+
+      const value = originalStyle.getPropertyValue(property);
+      if (!value) {
+        continue;
+      }
+
+      const priority = originalStyle.getPropertyPriority(property) || '';
+      currentStyle.setProperty(property, value, priority);
+    }
+  },
+
   resolveBaseContent(ckeditorContent) {
     if (this.latestContent !== null) {
       return this.latestContent;
@@ -471,7 +765,51 @@ export const editorLifecycleMixin = {
       return ckeditorContent;
     }
 
-    return ckeditorContent.replace(/^<p>/, '').replace(/<\/p>$/, '');
+    return this.unwrapInlineParagraphRoot(ckeditorContent);
+  },
+
+  unwrapInlineParagraphRoot(ckeditorContent) {
+    if (typeof ckeditorContent !== 'string') {
+      return '';
+    }
+
+    const content = ckeditorContent.trim();
+    if (!content) {
+      return '';
+    }
+
+    const originalContent = typeof this.originalContent === 'string' ? this.originalContent.trim() : '';
+    const originalStartsWithParagraph = /^<p(\s|>)/i.test(originalContent);
+    const originalEndsWithParagraph = /<\/p>$/i.test(originalContent);
+    if (originalStartsWithParagraph && originalEndsWithParagraph) {
+      return ckeditorContent;
+    }
+
+    const implementation = (this.frameDoc && this.frameDoc.implementation)
+      || (typeof document !== 'undefined' ? document.implementation : null);
+    if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
+      return ckeditorContent;
+    }
+
+    const workingDocument = implementation.createHTMLDocument('');
+    workingDocument.body.innerHTML = content;
+
+    const elementChildren = Array.from(workingDocument.body.children || []);
+    if (elementChildren.length !== 1) {
+      return ckeditorContent;
+    }
+
+    const rootElement = elementChildren[0];
+    if (`${rootElement.tagName || ''}`.toLowerCase() !== 'p') {
+      return ckeditorContent;
+    }
+
+    const hasOnlyOneBlock = workingDocument.body.childNodes.length === 1;
+    if (!hasOnlyOneBlock) {
+      return ckeditorContent;
+    }
+
+    return rootElement.innerHTML || '';
   },
 
   /**
@@ -573,6 +911,8 @@ export const editorLifecycleMixin = {
   },
 
   finalizeDisableCleanup(content, reuseEditor, toolbarContainer) {
+    this.detachEditableClassObserver();
+
     if (this.inFrameData) {
       if (!reuseEditor) {
         this.inFrameData.editor = null;
@@ -585,13 +925,15 @@ export const editorLifecycleMixin = {
     this.inlineStyles = null;
     this._Ck5ForGrapesJsData.frameBodyEl = null;
     this._Ck5ForGrapesJsData.bodyWrapperEl = null;
-    this.el.innerHTML = content;
+    const restoredContent = this.restoreOriginalElementAttributes(content);
+    this.el.innerHTML = restoredContent;
     this.el.style.display = this.display;
     this.el.contentEditable = false;
     this.el = null;
     this.editorContainer?.remove();
     this.editorContainer = null;
     this.latestContent = null;
+    this.originalContent = null;
     this.display = undefined;
     this.latestClickEvent = null;
   },

@@ -652,6 +652,9 @@ export default class BuilderService {
     this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
 
     this.editor.on('load', () => this.setupTypographySectorVisibility());
+    this.editor.on('load', () => this.normalizeTextComponentContainers());
+    this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
+    this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
     this.setupTypographySectorVisibility();
 
     // add offset to flashes container for better UI visibility when builder is on
@@ -921,7 +924,7 @@ export default class BuilderService {
   }
 
   static getInlineElements() {
-    return ['span', 'a', 'button', 'label', 'strong', 'em', 'small', 'sup', 'sub', 'h1', 'h2', 'h3', 'h4', 'h5'];
+    return ['div', 'span', 'a', 'button', 'label', 'strong', 'em', 'small', 'sup', 'sub', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
   }
 
   static buildInlineCkeConf(baseOptions) {
@@ -1569,6 +1572,125 @@ export default class BuilderService {
     }
 
     return null;
+  }
+
+  normalizeTextComponentContainer(component) {
+    if (!component || typeof component.get !== 'function' || typeof component.set !== 'function') {
+      return;
+    }
+
+    const type = component.get('type');
+    if (type !== 'text') {
+      return;
+    }
+
+    const tagName = `${component.get('tagName') || ''}`.toLowerCase();
+    const headingTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+    if (headingTags.includes(tagName)) {
+      this.wrapHeadingComponentWithDiv(component, tagName);
+      return;
+    }
+
+    if (tagName !== 'p') {
+      return;
+    }
+
+    component.set('tagName', 'div');
+  }
+
+  normalizeTextComponentContainers(rootComponent = null) {
+    if (!this.editor || typeof this.editor.getWrapper !== 'function') {
+      return;
+    }
+
+    const resolvedRoot = this.resolveComponentFromTarget(rootComponent);
+    const startComponent = resolvedRoot || rootComponent || this.editor.getWrapper();
+    this.walkComponentTree(startComponent, (component) => {
+      this.normalizeTextComponentContainer(component);
+    });
+  }
+
+  wrapHeadingComponentWithDiv(component, headingTag) {
+    if (!component || !headingTag || typeof component.parent !== 'function') {
+      return;
+    }
+
+    const parent = component.parent();
+    if (!parent || typeof parent.components !== 'function') {
+      return;
+    }
+
+    if (this.isHeadingWrapper(parent, headingTag)) {
+      return;
+    }
+
+    const index = typeof component.index === 'function'
+      ? component.index()
+      : parent.components().indexOf(component);
+
+    const createdWrapper = parent.components().add({
+      type: 'text',
+      tagName: 'div',
+      classes: ['gjs-heading-wrapper', `gjs-heading-wrapper-${headingTag}`],
+    }, {
+      at: index,
+      action: 'component:wrap-heading',
+    });
+
+    const wrapper = Array.isArray(createdWrapper) ? createdWrapper[0] : createdWrapper;
+    if (!wrapper || typeof wrapper.append !== 'function') {
+      return;
+    }
+
+    const isSelected = this.editor
+      && typeof this.editor.getSelected === 'function'
+      && this.editor.getSelected() === component;
+
+    wrapper.append(component, { action: 'component:wrap-heading' });
+
+    if (isSelected && this.editor && typeof this.editor.select === 'function') {
+      this.editor.select(component);
+    }
+  }
+
+  isHeadingWrapper(component, headingTag) {
+    if (!component || typeof component.get !== 'function') {
+      return false;
+    }
+
+    const tagName = `${component.get('tagName') || ''}`.toLowerCase();
+    if (tagName !== 'div') {
+      return false;
+    }
+
+    const classes = typeof component.getClasses === 'function' ? component.getClasses() : [];
+    if (!Array.isArray(classes)) {
+      return false;
+    }
+
+    return classes.includes('gjs-heading-wrapper')
+      && classes.includes(`gjs-heading-wrapper-${headingTag}`);
+  }
+
+  walkComponentTree(component, visitor) {
+    if (!component || typeof visitor !== 'function') {
+      return;
+    }
+
+    visitor(component);
+
+    const children = typeof component.components === 'function'
+      ? component.components()
+      : null;
+
+    if (!children || typeof children.forEach !== 'function') {
+      return;
+    }
+
+    children.forEach((childComponent) => {
+      this.walkComponentTree(childComponent, visitor);
+    });
   }
 
   shouldHideTypographySector(component) {
