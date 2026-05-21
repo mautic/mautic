@@ -147,15 +147,30 @@
 
 .jtk-surface-nopan {
     overflow: scroll !important;
-    cursor:default;
+    cursor: default;
 }
 
-.list-campaign-event, .list-campaign-source {
+.builder-content.pan-mode {
+    cursor: grab !important;
+    cursor: -moz-grab !important;
+    cursor: -webkit-grab !important;
+}
+
+.builder-content.pan-mode.panning {
+    cursor: grabbing !important;
+    cursor: -moz-grabbing !important;
+    cursor: -webkit-grabbing !important;
+}
+
+
+.list-campaign-event,
+.list-campaign-source {
     min-width: 260px;
     position: absolute;
     z-index: 1010;
     transition: border var(--duration-productive) var(--easing-standard-productive), box-shadow var(--duration-productive) var(--easing-standard-productive);
 }
+
 .list-campaign-event {
     background: var(--background);
     color: var(--text-primary);
@@ -171,6 +186,7 @@
     border-radius: 20px;
     line-height: 1em;
 }
+
 .list-campaign-leadsource .campaign-event-icon {
     font-size: 16px;
 }
@@ -184,7 +200,9 @@
     white-space: nowrap;
 }
 
-.live .list-campaign-event:hover, .live .list-campaign-source:hover, .live .list-campaign-event:active {
+.live .list-campaign-event:hover,
+.live .list-campaign-source:hover,
+.live .list-campaign-event:active {
     box-shadow: rgba(26, 17, 17, 0.05) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
 }
 
@@ -260,7 +278,9 @@
     background-color: var(--background);
 }
 
-.list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
+.list-campaign-action {
+    border-radius: clamp(4px, var(--border-radius-md), 8px);
+}
 
 .list-campaign-action .campaign-event-content {
     background-color: var(--background-brand);
@@ -270,6 +290,7 @@
     padding: 0 var(--spacing-05) 0 0;
     color: var(--text-on-color);
 }
+
 .list-campaign-action .campaign-event-icon {
     background-color: var(--background);
     color: var(--icon-interactive);
@@ -280,6 +301,7 @@
     justify-content: center;
     border-radius: clamp(0px, var(--border-radius-md), 6px);
 }
+
 .list-campaign-condition .campaign-event-icon,
 .list-campaign-decision .campaign-event-icon {
     color: var(--text-inverse);
@@ -288,9 +310,11 @@
     align-items: center;
     justify-content: center;
 }
+
 .list-campaign-condition .campaign-event-icon {
     color: var(--support-warning);
 }
+
 .list-campaign-decision .campaign-event-icon {
     color: var(--support-info);
 }
@@ -409,22 +433,21 @@
 }
 
 #EventJumpOverlay {
-  display: none;
-  background: rgba(0, 0, 0, 0.5);
-  width: 10000px;
-  height: 10000px;
-  z-index: 2000;
-  position: absolute;
-  top: 0;
-  left: 0;
+    display: none;
+    background: rgba(0, 0, 0, 0.5);
+    width: 10000px;
+    height: 10000px;
+    z-index: 2000;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 #leads-container .spinner,
 #decisions-container .spinner,
 #actions-container .spinner,
 #conditions-container .spinner,
-#campaign-graph-div .spinner
-{
+#campaign-graph-div .spinner {
     text-align: center;
     line-height: 250px;
     font-size: 24px;
@@ -485,16 +508,18 @@
 
 #campaignEventDeleteRedirect.error {
     border-color: #a94442;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
 }
 
 .list-campaign-event.event-details-visible {
     z-index: 1011;
     cursor: pointer;
 }
+
 .list-campaign-event .campaign-event-details {
     display: none;
 }
+
 .list-campaign-event.event-details-visible .campaign-event-details {
     display: block;
     position: absolute;

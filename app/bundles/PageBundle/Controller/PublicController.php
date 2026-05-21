@@ -297,10 +297,10 @@ class PublicController extends AbstractFormController
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
+            $isHitTrackable = $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
 
             $response = new Response($content);
-            if ($request->cookies->has('Blocked-Tracking')) {
+            if (!$isHitTrackable || $request->cookies->has('Blocked-Tracking')) {
                 $deviceTrackingService->clearTrackingCookies();
             }
 
