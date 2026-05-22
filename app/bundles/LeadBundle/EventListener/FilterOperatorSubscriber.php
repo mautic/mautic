@@ -56,8 +56,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             OperatorOptions::CONTAINS,
         ],
         'lead_email_received' => [
-            OperatorOptions::IN,
-            OperatorOptions::NOT_IN,
+            OperatorOptions::INCLUDING_ANY,
+            OperatorOptions::EXCLUDING_ANY,
         ],
     ];
 
