@@ -499,8 +499,6 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-<<<<<<< HEAD
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
@@ -800,14 +798,12 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
-=======
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
             ],
             $choices['behaviors']['hit_url_count']
         );
