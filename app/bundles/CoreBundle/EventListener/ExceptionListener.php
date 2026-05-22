@@ -101,7 +101,7 @@ class ExceptionListener extends ErrorListener
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
 
             $event->setResponse($response);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logException(
                 $e,
                 sprintf(
@@ -121,7 +121,12 @@ class ExceptionListener extends ErrorListener
                 }
             }
 
-            $prev = new \ReflectionProperty('Exception', 'previous');
+            // \Exception and \Error each declare their own private $previous,
+            // so reflect on whichever base class the wrapper actually extends.
+            // Using a subclass name (e.g. \TypeError) here would throw
+            // "Property X::$previous does not exist" because private props
+            // are not visible through a subclass reflection.
+            $prev = new \ReflectionProperty($wrapper instanceof \Error ? \Error::class : \Exception::class, 'previous');
             $prev->setValue($wrapper, $exception);
 
             throw $e;
