@@ -130,7 +130,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface, TypeO
             $fieldType
         );
 
-        $this->dispatcher->dispatch(LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE);
 
         return $event->getTypeOperatorsChoices();
     }

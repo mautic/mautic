@@ -12,29 +12,14 @@ use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
-<<<<<<< HEAD
-=======
 use PHPUnit\Framework\TestCase;
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
+final class TypeOperatorProviderTest extends TestCase
 {
-<<<<<<< HEAD
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
-
-    /**
-     * @var MockObject|FilterOperatorProviderInterface
-     */
-    private MockObject $filterOperatorPovider;
-=======
     private MockObject|EventDispatcherInterface $dispatcher;
 
     private MockObject|FilterOperatorProviderInterface $filterOperatorProvider;
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
 
     private TypeOperatorProvider $provider;
 
@@ -42,17 +27,17 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
-        $this->filterOperatorPovider = $this->createMock(FilterOperatorProviderInterface::class);
-        $this->provider              = new TypeOperatorProvider(
+        $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->provider               = new TypeOperatorProvider(
             $this->dispatcher,
-            $this->filterOperatorPovider
+            $this->filterOperatorProvider
         );
     }
 
     public function testGetOperatorsIncluding(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorProvider->expects($this->any())
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -75,7 +60,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsExcluding(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorProvider->expects($this->any())
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -98,7 +83,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsForFieldType(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorProvider->expects($this->any())
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -118,44 +103,29 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('dispatch')
-<<<<<<< HEAD
-            ->with(
-                $this->callback(function (TypeOperatorsEvent $event) {
-                    // Emulate a subscriber.
-                    $event->setOperatorsForFieldType('text', [
-                        'include' => [
-                            OperatorOptions::EQUAL_TO,
-                            OperatorOptions::NOT_EQUAL_TO,
-                        ],
-                    ]);
+        $matcher = $this->exactly(2);
 
-                    return true;
-                }),
-                LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE
-=======
-            ->withConsecutive(
-                [
-                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
-                    $this->callback(function (TypeOperatorsEvent $event) {
-                        // Emulate a subscriber.
+        $this->dispatcher->expects($matcher)
+            ->method('dispatch')
+            ->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $callback = function (TypeOperatorsEvent $event) {
                         $event->setOperatorsForFieldType('text', [
                             'include' => [
                                 OperatorOptions::EQUAL_TO,
                                 OperatorOptions::NOT_EQUAL_TO,
                             ],
                         ]);
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE, $parameters[1]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE, $parameters[1]);
+                }
 
-                        return true;
-                    }),
-                ],
-                [
-                    LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE,
-                    $this->isInstanceOf(OverrideOperatorLabelEvent::class),
-                ],
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
-            );
+                return $parameters[0];
+            });
 
         $this->assertSame(
             [
@@ -168,7 +138,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsForSpecificField(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorProvider->expects($this->any())
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -187,68 +157,37 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                     'negagte_expr' => 'notStartsWith',
                 ],
             ]);
-        $matcher = $this->exactly(2);
+        $matcher = $this->exactly(3);
 
-<<<<<<< HEAD
         $this->dispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (TypeOperatorsEvent $event) {
-=======
-        $this->dispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                [
-                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
-                    $this->callback(function (TypeOperatorsEvent $event) {
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
-                        // Emulate a subscriber.
                         $event->setOperatorsForFieldType('text', [
                             'include' => [
                                 OperatorOptions::EQUAL_TO,
                                 OperatorOptions::NOT_EQUAL_TO,
                             ],
                         ]);
-<<<<<<< HEAD
                     };
                     $callback($parameters[0]);
                     $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE, $parameters[1]);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
                     $callback = function (FieldOperatorsEvent $event) {
-=======
-
-                        return true;
-                    }),
-                ],
-                [
-                    LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE,
-                    $this->isInstanceOf(OverrideOperatorLabelEvent::class),
-                ],
-                [
-                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD,
-                    $this->callback(function (FieldOperatorsEvent $event) {
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
-                        // Emulate a subscriber.
                         $this->assertSame('text', $event->getType());
                         $this->assertSame('email', $event->getField());
-
-                        // This is the important stuff. The Starts with opearator will be added.
                         $event->addOperator(OperatorOptions::STARTS_WITH);
                     };
                     $callback($parameters[0]);
                     $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD, $parameters[1]);
                 }
 
-<<<<<<< HEAD
                 return $parameters[0];
             });
-=======
-                        return true;
-                    }),
-                ],
-            );
->>>>>>> b6a6112223 (Merge pull request #2190 from acquia/MAUT-11442)
 
         $this->assertSame(
             [
@@ -287,13 +226,13 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->dispatcher->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+
+        $this->dispatcher->expects($matcher)
             ->method('dispatch')
-            ->withConsecutive(
-                [
-                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
-                    $this->callback(function (TypeOperatorsEvent $event) {
-                        // Emulate a subscriber.
+            ->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $callback = function (TypeOperatorsEvent $event) {
                         $event->setOperatorsForFieldType('date', [
                             'include' => [
                                 OperatorOptions::GREATER_THAN,
@@ -302,14 +241,12 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                                 OperatorOptions::LESS_THAN_OR_EQUAL,
                             ],
                         ]);
-
-                        return true;
-                    }),
-                ],
-                [
-                    LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE,
-                    $this->callback(function (OverrideOperatorLabelEvent $event) {
-                        // Emulate a subscriber.
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE, $parameters[1]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $callback = function (OverrideOperatorLabelEvent $event) {
                         $event->setTypeOperatorsChoices(
                             [
                                 'After'                  => OperatorOptions::GREATER_THAN,
@@ -318,11 +255,13 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                                 'Before (Including day)' => OperatorOptions::LESS_THAN_OR_EQUAL,
                             ]
                         );
+                    };
+                    $callback($parameters[0]);
+                    $this->assertSame(LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE, $parameters[1]);
+                }
 
-                        return true;
-                    }),
-                ],
-            );
+                return $parameters[0];
+            });
 
         $this->assertSame(
             [
@@ -365,9 +304,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE,
                 $this->callback(function (OverrideOperatorLabelEvent $event) {
-                    // Emulate a subscriber.
                     $event->setTypeOperatorsChoices(
                         [
                             'After'                  => OperatorOptions::GREATER_THAN,
@@ -379,6 +316,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }),
+                LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE
             );
 
         $this->assertSame(
