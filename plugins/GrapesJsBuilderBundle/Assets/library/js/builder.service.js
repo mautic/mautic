@@ -1179,6 +1179,14 @@ export default class BuilderService {
     // Tell plugin initial content is ready: strip defaults for existing tokenized nodes + enable defaults for new drops
     this.editor.trigger('mjml-theme-tokens:content:ready');
 
+
+    // Maintain backward compatibility for plugins that relied on the side-effect
+    // of BlockManager.get('mj-button').set(...) firing a block:update event.
+    const mjButtonBlock = this.editor.BlockManager.get('mj-button');
+    if (mjButtonBlock) {
+      this.editor.trigger('block:update', mjButtonBlock);
+    }
+
     this.removeSelectedElementsEmailMjml();
 
     return this.editor;
