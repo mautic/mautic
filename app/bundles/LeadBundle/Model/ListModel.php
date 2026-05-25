@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -166,16 +171,27 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function deleteEntities($ids): array
     {
-        $entities = [];
-        foreach ($ids as $listId) {
-            $leadList = $this->getEntity($listId);
-            if ($leadList) {
-                $entities[$listId] = $leadList;
-                $this->deleteEntity($leadList);
+        $deleted        = [];
+        $unableToDelete = [];
+
+        foreach ($ids as $id) {
+            $entity = $this->getEntity($id);
+
+            if ($entity) {
+                try {
+                    $this->deleteEntity($entity);
+                    $deleted[$id] = $entity;
+                } catch (DeleteEntityDependencyException) {
+                    $unableToDelete[$id] = $entity;
+                }
             }
         }
 
-        return $entities;
+        if ($unableToDelete) {
+            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
+        }
+
+        return $deleted;
     }
 
     /**
@@ -184,11 +200,16 @@ class ListModel extends FormModel implements GlobalSearchInterface
     public function deleteEntity($entity): void
     {
         $id    = $entity->getId();
-        $this->dispatchEvent('pre_delete', $entity);
+        $event = $this->dispatchEvent('pre_delete', $entity);
+
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
+        }
+
         $this->getRepository()->setSegmentAsDeleted($id);
 
         $entity->deletedId = $id;
-        $this->dispatcher->dispatch(new LeadListEvent($entity), LeadEvents::ON_LIST_DELETE);
+        $this->dispatchEvent('on_list_delete', $entity);
         $entity->setId(null);
     }
 
@@ -259,6 +280,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 break;
             case 'pre_unpublish':
                 $name = LeadEvents::LIST_PRE_UNPUBLISH;
+                break;
+            case 'on_list_delete':
+                $name = LeadEvents::ON_LIST_DELETE;
                 break;
             default:
                 return null;
@@ -1388,7 +1412,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             } else {
                 $count               = $this->getRepository()->getLeadCount($listId);
                 $leadCounts[$listId] = $count;
-                $this->segmentCountCacheHelper->setSegmentContactCount($listId, $count);
+                $this->segmentCountCacheHelper->setSegmentContactCount($listId, (int) $count);
             }
         }
 
