@@ -62,7 +62,7 @@ return [
         ],
         'public' => [
             'mautic_campaign_share_download' => [
-                'path'         => '/s/campaign-share/{token}',
+                'path'         => '/campaign-share/{token}',
                 'controller'   => 'Mautic\CampaignBundle\Controller\CampaignShareDownloadController::downloadAction',
                 'method'       => 'GET',
                 'requirements' => [

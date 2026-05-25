@@ -147,7 +147,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
 
     public function testShareDownloadEndpointRejectsUnknownToken(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/campaign-share/'.str_repeat('a', 32));
+        $this->client->request(Request::METHOD_GET, '/campaign-share/'.str_repeat('a', 32));
 
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
     }
@@ -179,7 +179,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $zip->close();
         $this->assertFileExists($zipPath);
 
-        $this->client->request(Request::METHOD_GET, '/s/campaign-share/'.$token);
+        $this->client->request(Request::METHOD_GET, '/campaign-share/'.$token);
 
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -209,7 +209,7 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $staleTime = time() - (CampaignShareService::SHARE_TTL_SECONDS + 60);
         touch($zipPath, $staleTime);
 
-        $this->client->request(Request::METHOD_GET, '/s/campaign-share/'.$token);
+        $this->client->request(Request::METHOD_GET, '/campaign-share/'.$token);
 
         $this->assertEquals(Response::HTTP_GONE, $this->client->getResponse()->getStatusCode());
         // Expired files are unlinked on access.
