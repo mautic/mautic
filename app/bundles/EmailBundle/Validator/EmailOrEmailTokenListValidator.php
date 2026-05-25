@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Validator;
 use Mautic\CoreBundle\Exception\InvalidValueException;
 use Mautic\CoreBundle\Exception\RecordException;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\EmailBundle\Event\EmailOrEmailTokenValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\ContactFieldToken;
@@ -15,16 +16,16 @@ use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class EmailOrEmailTokenListValidator extends ConstraintValidator
 {
-    private ArrayStringTransformer $transformer;
-
     public function __construct(
         private EmailValidator $emailValidator,
         private CustomFieldValidator $customFieldValidator,
+        private EventDispatcherInterface $dispatcher,
+        private ArrayStringTransformer $transformer,
     ) {
-        $this->transformer = new ArrayStringTransformer();
     }
 
     public function validate(mixed $csv, Constraint $constraint): void
@@ -55,6 +56,14 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
                 $this->emailValidator->validate($emailOrToken);
             } catch (InvalidEmailException) {
                 try {
+                    $event = new EmailOrEmailTokenValidationEvent($emailOrToken);
+
+                    $this->dispatcher->dispatch($event);
+
+                    if ($event->isValid()) {
+                        return;
+                    }
+
                     // The token syntax is validated during creation of new ContactFieldToken object.
                     $contactFieldToken = new ContactFieldToken($emailOrToken);
 

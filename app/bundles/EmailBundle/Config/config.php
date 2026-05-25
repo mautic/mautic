@@ -246,6 +246,7 @@ return [
                 'arguments' => [
                     'mautic.validator.email',
                     'mautic.lead.validator.custom_field',
+                    'event_dispatcher',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
