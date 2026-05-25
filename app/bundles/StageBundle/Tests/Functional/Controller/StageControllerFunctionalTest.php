@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\StageBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -43,5 +45,73 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedStage = $this->em->find(Stage::class, $stage->getId());
         Assert::assertSame($project->getId(), $savedStage->getProjects()->first()->getId());
+    }
+
+    public function testStageMergeMovesContactsAndStageLogs(): void
+    {
+        $primaryStage = $this->createStage('Primary stage');
+        $mergedStage  = $this->createStage('Merged stage');
+
+        $contact = new Lead();
+        $contact->setEmail('stage-merge-test@example.com');
+        $contact->setStage($mergedStage);
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $primaryStageId = $primaryStage->getId();
+        $mergedStageId  = $mergedStage->getId();
+        $contactId      = $contact->getId();
+
+        $connection = $this->em->getConnection();
+        $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
+            'stage_id'   => $mergedStageId,
+            'lead_id'    => $contactId,
+            'date_fired' => '2026-01-01 00:00:00',
+        ]);
+        $connection->insert(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', [
+            'lead_id'     => $contactId,
+            'stage_id'    => $mergedStageId,
+            'event_name'  => 'Stage changed',
+            'action_name' => 'Merged stage',
+            'date_added'  => '2026-01-01 00:00:00',
+        ]);
+
+        /** @var StageModel $stageModel */
+        $stageModel = static::getContainer()->get('mautic.stage.model.stage');
+        $stageModel->stageMerge($primaryStage, $mergedStage);
+        $this->em->clear();
+
+        $savedContact = $this->em->find(Lead::class, $contactId);
+        Assert::assertNotNull($savedContact);
+        $savedContactStage = $savedContact->getStage();
+        Assert::assertNotNull($savedContactStage);
+        Assert::assertSame($primaryStageId, $savedContactStage->getId());
+        Assert::assertNull($this->em->find(Stage::class, $mergedStageId));
+        Assert::assertSame(1, (int) $connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
+            [$primaryStageId, $contactId]
+        ));
+        Assert::assertSame(1, (int) $connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ? AND lead_id = ?',
+            [$primaryStageId, $contactId]
+        ));
+        Assert::assertSame(0, (int) $connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ?',
+            [$mergedStageId]
+        ));
+        Assert::assertSame(0, (int) $connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ?',
+            [$mergedStageId]
+        ));
+    }
+
+    private function createStage(string $name): Stage
+    {
+        $stage = new Stage();
+        $stage->setName($name);
+        $this->em->persist($stage);
+
+        return $stage;
     }
 }
