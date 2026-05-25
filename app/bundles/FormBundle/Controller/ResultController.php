@@ -417,12 +417,7 @@ class ResultController extends CommonFormController
                 $domain = $submission->getEmailDomain();
 
                 if ($domain) {
-                    $formatted   = '*@'.$domain;
-                    $domains     = $this->coreParametersHelper->get('do_not_submit_emails', []);
-                    $isNewDomain = !in_array($formatted, $domains, true);
-
-                    if ($isNewDomain) {
-                        $this->saveBlockedDomains($configurator, array_merge($domains, [$formatted]));
+                    if ($this->saveNewBlockedDomains($configurator, ['*@'.$domain])) {
                         $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
                     }
 
@@ -440,22 +435,7 @@ class ResultController extends CommonFormController
             }
         }
 
-        $viewParameters = [
-            'objectId' => $formId,
-            'page'     => $page,
-        ];
-
-        return $this->postActionRedirect(
-            [
-                'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
-                'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'Mautic\\FormBundle\\Controller\\ResultController::indexAction',
-                'passthroughVars' => [
-                    'mauticContent' => 'formresult',
-                ],
-                'flashes' => $flashes,
-            ]
-        );
+        return $this->getFormResultRedirectResponse($formId, $page, $flashes);
     }
 
     public function batchMarkSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -490,12 +470,9 @@ class ResultController extends CommonFormController
                     'msg'  => 'mautic.form.result.markspam.batch.none',
                 ];
             } else {
-                $existingDomains = $this->coreParametersHelper->get('do_not_submit_emails', []);
-                $newDomains      = array_keys($domainsToSave);
-                $mergedDomains   = array_values(array_unique(array_merge($existingDomains, $newDomains)));
-
-                $this->saveBlockedDomains($configurator, $mergedDomains);
-                $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
+                if ($this->saveNewBlockedDomains($configurator, array_keys($domainsToSave))) {
+                    $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
+                }
 
                 $flashes[] = [
                     'type' => 'notice',
@@ -504,6 +481,38 @@ class ResultController extends CommonFormController
             }
         }
 
+        return $this->getFormResultRedirectResponse($formId, $page, $flashes);
+    }
+
+    /**
+     * @param array<string> $domains
+     */
+    private function saveNewBlockedDomains(Configurator $configurator, array $domains): bool
+    {
+        $existingDomains = $this->coreParametersHelper->get('do_not_submit_emails', []);
+        $mergedDomains   = array_values(array_unique(array_merge($existingDomains, $domains)));
+
+        if ($existingDomains === $mergedDomains) {
+            return false;
+        }
+
+        $configurator->mergeParameters(['do_not_submit_emails' => $mergedDomains]);
+        $configurator->write();
+
+        return true;
+    }
+
+    private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
+    {
+        $fieldsToUpdate = $formModel->findEmailFieldsWithMissingDonotSubmitValidation();
+        $formModel->enableDonotSubmitValidationOnEmailFields($fieldsToUpdate);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $flashes
+     */
+    private function getFormResultRedirectResponse(int|string $formId, int $page, array $flashes): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    {
         $viewParameters = [
             'objectId' => $formId,
             'page'     => $page,
@@ -520,21 +529,6 @@ class ResultController extends CommonFormController
                 'flashes' => $flashes,
             ]
         );
-    }
-
-    /**
-     * @param array<string> $domains
-     */
-    private function saveBlockedDomains(Configurator $configurator, array $domains): void
-    {
-        $configurator->mergeParameters(['do_not_submit_emails' => $domains]);
-        $configurator->write();
-    }
-
-    private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
-    {
-        $fieldsToUpdate = $formModel->findEmailFieldsWithMissingDonotSubmitValidation();
-        $formModel->enableDonotSubmitValidationOnEmailFields($fieldsToUpdate);
     }
 
     /**

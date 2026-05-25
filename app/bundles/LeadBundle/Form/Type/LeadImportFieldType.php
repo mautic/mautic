@@ -101,17 +101,19 @@ class LeadImportFieldType extends AbstractType
             );
         }
 
-        $builder->add(
-            'skip_if_exists',
-            YesNoButtonGroupType::class,
-            [
-                'label'       => 'mautic.lead.import.skip_if_exists',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'required'    => false,
-                'data'        => false,
-            ]
-        );
+        if (in_array($options['object'], ['lead', 'company'])) {
+            $builder->add(
+                'skip_if_exists',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => 'mautic.lead.import.skip_if_exists',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                    'data'       => false,
+                ]
+            );
+        }
 
         $buttons = ['cancel_icon' => 'ri-close-line'];
 

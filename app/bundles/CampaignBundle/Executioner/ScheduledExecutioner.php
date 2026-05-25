@@ -109,7 +109,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null)
     {
-        $now           = $now ?? $this->now ?? new \DateTime();
+        $now ??= $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
@@ -298,9 +298,8 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                     $toReschedule = $this->addForReschedule($toReschedule, $log, $log->getTriggerDate());
 
                     continue;
-                } else {
-                    $this->repo->saveEntity($log);
                 }
+                $this->repo->saveEntity($log);
             }
 
             $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);

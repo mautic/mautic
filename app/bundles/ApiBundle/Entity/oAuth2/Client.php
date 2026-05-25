@@ -48,7 +48,7 @@ class Client extends BaseClient
      */
     protected array $allowedGrantTypes;
 
-    protected ?Role $role;
+    protected ?Role $role = null;
 
     public function __construct()
     {

@@ -91,7 +91,7 @@ class DncReportService
             if (!empty($row['dnc_preferences'])) {
                 $dncEntries = explode(',', $row['dnc_preferences']);
                 $dncText    = array_map(function ($entry) {
-                    list($reason, $channel) = explode(':', $entry);
+                    [$reason, $channel] = explode(':', $entry);
 
                     return $this->dncFormatterHelper->printReasonWithChannel((int) $reason, $channel);
                 }, $dncEntries);

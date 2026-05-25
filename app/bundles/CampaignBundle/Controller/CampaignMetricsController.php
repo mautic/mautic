@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Stats\EmailPeriodMetrics;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class CampaignMetricsController extends AbstractController
@@ -103,5 +107,24 @@ class CampaignMetricsController extends AbstractController
                 'chartHeight' => 300,
             ]
         );
+    }
+
+    public function eventDetailsAction(
+        EventDispatcherInterface $eventDispatcher,
+        EventModel $eventModel,
+        int $objectId,
+    ): JsonResponse {
+        $event    = $eventModel->getEntity($objectId);
+
+        if (!$event) {
+            return $this->json([
+                'message' => $this->translator->trans('mautic.core.error.notfound', [], 'flashes'),
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $eventDetailsAction = new EventPreview($event);
+        $eventDispatcher->dispatch($eventDetailsAction);
+
+        return $this->json($eventDetailsAction->eventStats);
     }
 }

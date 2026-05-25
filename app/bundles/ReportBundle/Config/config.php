@@ -55,7 +55,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'reports',
                 'path'            => '/reports',
-                'controller'      => 'Mautic\ReportBundle\Controller\Api\ReportApiController',
+                'controller'      => Mautic\ReportBundle\Controller\Api\ReportApiController::class,
             ],
         ],
     ],
