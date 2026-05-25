@@ -6,7 +6,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
+use Mautic\ApiBundle\Model\ApiEntityLockTrait;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -76,12 +77,13 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface, ApiLockAwareInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
     use FilterTrait;
+    use ApiEntityLockTrait;
 
     /**
      * @var bool
@@ -350,9 +352,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -1285,9 +1287,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
-        $emailType           = ArrayHelper::getValue('email_type', $options, '');
-        $isMarketing         = (in_array($emailType, [MailHelper::EMAIL_TYPE_MARKETING]) || !empty($listId));
-        $emailAttempts       = ArrayHelper::getValue('email_attempts', $options, 3);
         $emailPriority       = ArrayHelper::getValue('email_priority', $options, MessageQueue::PRIORITY_NORMAL);
         $messageQueue        = ArrayHelper::getValue('resend_message_queue', $options);
         $returnErrorMessages = ArrayHelper::getValue('return_errors', $options, false);
@@ -1338,7 +1337,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if (!$email->getSendToDnc() && count($sendTo)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
 
@@ -1347,7 +1346,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 'email',
                 $email->getId(),
                 $campaignEventId,
-                $emailAttempts,
+                ArrayHelper::getValue('email_attempts', $options, 3),
                 $emailPriority,
                 $messageQueue
             );
@@ -1429,7 +1428,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $emailType)
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {

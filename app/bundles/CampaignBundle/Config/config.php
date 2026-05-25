@@ -355,6 +355,9 @@ return [
         'peak_interaction_timer_fetch_limit'                                                    => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_LIMIT,
         'peak_interaction_timer_max_optimal_days'                                               => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_MAX_OPTIMAL_DAYS,
         'import_campaigns_dir'                                                                  => '%kernel.project_dir%/var/import',
+        'campaigns_resume_stuck_records_after'                                                  => '2025-10-01 00:00:00',
         'campaign_republish_behavior'                                                           => Mautic\CampaignBundle\Enum\RepublishBehavior::COUNT_ALL_TIME->value,
+        'campaign_contact_count_cache_ttl'                                                      => 43200, // 12 hours in seconds
+        'campaign_event_cache_ttl'                                                              => 600, // seconds
     ],
 ];

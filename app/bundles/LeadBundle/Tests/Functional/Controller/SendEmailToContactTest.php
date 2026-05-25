@@ -227,4 +227,56 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         Assert::assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe'));
         Assert::assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe-Post'));
     }
+
+    public function testEmailSendWhenSubjectOrBodyIsMissing(): void
+    {
+        $lead = new Lead();
+        $lead->setEmail('lead@email.com');
+        $lead->setFirstname('Lead1');
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $content     = json_decode($this->client->getResponse()->getContent())->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $form        = $crawler->filter('form')->form();
+
+        $subjectErrorMessage = 'A subject is required.';
+        $bodyErrorMessage    = 'A message is required.';
+
+        $form->setValues([
+            'lead_quickemail[fromname]'  => 'Admin',
+            'lead_quickemail[from]'      => 'admin@yoursite.com',
+            'lead_quickemail[body]'      => '<html><body><p>Hello</p></body></html>',
+        ]);
+        $this->client->submit($form);
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($subjectErrorMessage, $responseContent, 'The missing subject line should show an error');
+        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error about the email body');
+
+        $form->setValues([
+            'lead_quickemail[fromname]'  => 'Admin',
+            'lead_quickemail[from]'      => 'admin@yoursite.com',
+            'lead_quickemail[subject]'   => 'Subject',
+            'lead_quickemail[body]'      => '<html><body></body></html>',
+        ]);
+        $this->client->submit($form);
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($bodyErrorMessage, $responseContent, 'The missing body should show an error');
+        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error about the subject line');
+
+        $form->setValues([
+            'lead_quickemail[fromname]'  => 'Admin',
+            'lead_quickemail[from]'      => 'admin@yoursite.com',
+            'lead_quickemail[subject]'   => 'Subject',
+            'lead_quickemail[body]'      => '<html><body><p>Hello</p></body></html>',
+        ]);
+        $this->client->submit($form);
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error after adding the subject line');
+        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error after adding the body');
+    }
 }

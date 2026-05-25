@@ -242,7 +242,7 @@ class Mailbox
      */
     public function isGmail()
     {
-        return $this->isGmail();
+        return $this->isGmail;
     }
 
     /**

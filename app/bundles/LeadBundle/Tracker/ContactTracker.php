@@ -202,6 +202,10 @@ class ContactTracker
             return $contact;
         }
 
+        if ($event->isSkipContactLastActiveLogged()) {
+            $this->contactLastActiveLogged = true;
+        }
+
         if ($lead = $this->getContactByTrackedDevice()) {
             return $lead;
         }
