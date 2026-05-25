@@ -223,7 +223,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($mappingForm);
 
         Assert::assertStringContainsString(
-            'Import process was successfully created. But it will not be processed as you do not have permission to publish.',
+            'The import process was successfully created. But it will not be processed as you do not have permission to publish.',
             $crawler->html()
         );
 
@@ -323,12 +323,15 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertEquals($fields, $importEntity->getProperties()['fields']);
         Assert::assertEquals(array_keys($fields), $importEntity->getProperties()['headers']);
 
-        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
+        $importId = $importEntity->getId();
+        Assert::assertNotNull($importId);
+
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME, ['--id' => $importId]);
 
         $this->em->clear();
 
         /** @var Import $importEntity */
-        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-with-custom-field.csv']);
+        $importEntity = $importRepository->find($importId);
 
         Assert::assertNotNull($importEntity);
         Assert::assertSame(2, $importEntity->getLineCount());

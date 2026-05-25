@@ -23,6 +23,8 @@ class FieldDeleteDispatcher
     }
 
     /**
+     * @deprecated Use regular call of `$this->dispatchEvent(LeadEvents::FIELD_PRE_DELETE, $entity)` instead
+     *
      * @throws NoListenerException
      * @throws AbortColumnUpdateException
      */

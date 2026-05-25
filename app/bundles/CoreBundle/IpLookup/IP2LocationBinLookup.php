@@ -36,9 +36,8 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             $queryString .= '&filename=/ip2locaion.zip';
 
             return 'https://www.ip2location.com/download?'.$queryString;
-        } else {
-            $this->logger->warning('Both username and password are required');
         }
+        $this->logger->warning('Both username and password are required');
     }
 
     /**

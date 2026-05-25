@@ -16,6 +16,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
@@ -1120,5 +1121,81 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $campaignLead->setDateAdded(new \DateTime());
         $this->em->persist($campaignLead);
         $campaign->addLead($lead->getId(), $campaignLead);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
+    public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
+    {
+        $this->useCleanupRollback = false;
+
+        // Create the custom date field
+        $this->createField([
+            'type'        => 'date',
+            'alias'       => 'test_date',
+            'label'       => 'Test Date',
+            'isPublished' => true,
+        ]);
+
+        // Create a contact and set the custom field value
+        $contact   = $this->createContact('john.doe@example.com');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel->setFieldValues($contact, ['test_date' => $fieldValue]);
+        $leadModel->saveEntity($contact);
+
+        $this->em->flush();
+        $this->em->clear();
+        $contact = $this->contactRepository->getEntity($contact->getId());
+
+        $eventArgs = [
+            'lead'  => $contact,
+            'event' => [
+                'type'       => 'lead.field_value',
+                'eventType'  => 'condition',
+                'properties' => [
+                    'field'    => 'test_date',
+                    'value'    => $regex,
+                    'operator' => $operator,
+                ],
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+        // Required: CampaignSubscriber::onCampaignTriggerCondition only supports CampaignExecutionEvent (deprecated)
+        // @phpstan-ignore-next-line new.deprecated
+        $event = new CampaignExecutionEvent($eventArgs, true);
+
+        $dispatcher = static::getContainer()->get('event_dispatcher');
+
+        // The test passes if no exception is thrown and the result is as expected
+        $dispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
+
+        $this->assertSame($expectedResult, $event->getResult(), 'Regex operator should not cause exception and should match as expected.');
+
+        // Clean up
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $field      = $fieldModel->getEntityByAlias('test_date');
+        if ($field) {
+            $fieldModel->deleteEntity($field);
+        }
+    }
+
+    /**
+     * @return array<int, array{string, string, string, bool}>
+     */
+    public static function regexOperatorProvider(): array
+    {
+        return [
+            // [operator, regex, fieldValue, expectedResult]
+            [OperatorOptions::REGEXP, "^\d{4}-03-24$", '2026-03-24', true],
+            [OperatorOptions::REGEXP, "^\d{4}-12-31$", '2026-03-24', false],
+            [OperatorOptions::REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', true],
+            [OperatorOptions::REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', false],
+            [OperatorOptions::NOT_REGEXP, "^\d{4}-12-31$", '2026-03-24', true],
+            [OperatorOptions::NOT_REGEXP, "^\d{4}-03-24$", '2026-03-24', false],
+            [OperatorOptions::NOT_REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', true],
+            [OperatorOptions::NOT_REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', false],
+        ];
     }
 }

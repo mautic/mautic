@@ -249,6 +249,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->leadDeviceRepository     = $this->createMock(LeadDeviceRepository::class);
         $this->botRatioHelperMock       = $this->createMock(BotRatioHelper::class);
 
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
             $this->themeHelper,
@@ -851,7 +853,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass($contactDevice);
         $prop       = $reflection->getProperty('id');
-        $prop->setAccessible(true);
         $prop->setValue($contactDevice, 1);
 
         $stat->setLead($contact);

@@ -73,30 +73,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        if (empty($this->inConversion)) {
-            $alias = $entity->getAlias();
-            if (empty($alias)) {
-                $alias = $entity->getTitle();
-            }
-            $alias = $this->cleanAlias($alias, '', 0, '-');
-
-            // make sure alias is not already taken
-            $repo      = $this->getRepository();
-            $testAlias = $alias;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias.$aliasTag;
-                $count     = $repo->checkUniqueAlias($testAlias, $entity);
-                ++$aliasTag;
-            }
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
-            $entity->setAlias($alias);
-        }
-
         if (!$entity->isNew()) {
             // increase the revision
             $revision = $entity->getRevision();
@@ -124,7 +100,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        if (!($request instanceof Request)) {
+        if (!$request instanceof Request) {
             // likely this download came via a cron (no request), do not bother logging the download.
             // https://github.com/mautic/mautic/issues/13577
             return;
@@ -137,6 +113,13 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmMedium($request->get('utm_medium'));
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
+
+        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
+            return;
+        }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Download triggered by lead
         if (empty($systemEntry)) {
@@ -277,9 +260,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         } catch (\Exception $e) {
             if (MAUTIC_ENV === 'dev') {
                 throw $e;
-            } else {
-                error_log($e);
             }
+            error_log($e);
         }
 
         $this->em->detach($download);
@@ -389,9 +371,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -431,11 +413,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      */
     public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
-        $entityId  = $entity->getId();
-        $alias     = $entity->getAlias();
-        $assetSlug = $entityId.':'.$alias;
-
-        $routeParams = ['slug' => $assetSlug];
+        $routeParams = ['slug' => $entity->getSlug()];
         if (!is_null($stream)) {
             $routeParams['stream'] = $stream;
         }
@@ -628,5 +606,37 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $chartQuery->applyDateFilters($q, 'date_added');
 
         return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Asset-specific override for legacy public asset URLs.
+     *
+     * Backward compatibility rules:
+     * - Supports `{id}:{alias}` without validating the alias value
+     * - Allows `{id}:` and `{id}:<any>` only for assets that already have a
+     *   non-null alias, for BC
+     *
+     * @note The alias portion of the slug is no longer used for matching or validation.
+     */
+    public function getEntityBySlugs($slug): Asset|bool
+    {
+        if (!is_string($slug) || !str_contains($slug, ':')) {
+            return false;
+        }
+
+        [$id] = array_pad(explode(':', $slug, 2), 1, null);
+
+        if (empty($id) || !ctype_digit((string) $id)) {
+            return false;
+        }
+
+        $entity = $this->getEntity((int) $id);
+        if ($entity && null !== $entity->getAlias()) {
+            return $entity;
+        }
+
+        return false;
     }
 }

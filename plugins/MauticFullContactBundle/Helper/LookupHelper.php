@@ -46,7 +46,7 @@ class LookupHelper
 
         /** @var FullContact_Person $fullcontact */
         if ($fullcontact = $this->getFullContact()) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
@@ -92,7 +92,7 @@ class LookupHelper
 
         /** @var FullContact_Company $fullcontact */
         if ($fullcontact = $this->getFullContact(false)) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($website);
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
@@ -179,7 +179,6 @@ class LookupHelper
 
     protected function getCache($entity, $notify): array
     {
-        /** @var User $user */
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
         $cacheId   = sprintf('fullcontact%s%s#', $entity instanceof Company ? 'comp' : '', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');

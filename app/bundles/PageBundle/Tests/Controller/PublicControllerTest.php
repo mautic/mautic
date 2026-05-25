@@ -418,18 +418,18 @@ class PublicControllerTest extends TestCase
     public static function provideRedirectUrls(): \Generator
     {
         yield 'No query parameters' => [
-            'https://some.test.url/asset/1:examplefilejpg',
-            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+            'redirectUrl' => 'https://some.test.url/asset/1:examplefilejpg',
+            'targetUrl'   => 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
         ];
 
         yield 'With query parameter' => [
-            'https://some.test.url/asset/1:examplefilejpg?param=value',
-            'https://some.test.url/asset/1:examplefilejpg?param=value&ct=dummy_click_through',
+            'redirectUrl' => 'https://some.test.url/asset/1:examplefilejpg?param=value',
+            'targetUrl'   => 'https://some.test.url/asset/1:examplefilejpg?param=value&ct=dummy_click_through',
         ];
 
         yield 'With click-through parameter' => [
-            'https://some.test.url/asset/1:examplefilejpg?ct=parameter',
-            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+            'redirectUrl' => 'https://some.test.url/asset/1:examplefilejpg?ct=parameter',
+            'targetUrl'   => 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
         ];
     }
 

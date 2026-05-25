@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 
 class SegmentInUse extends Constraint
 {
-    public $message = 'mautic.lead_list.is_in_use';
+    public $message = 'mautic.lead_list.is_in_use.unpublish';
 
     public function validatedBy(): string
     {

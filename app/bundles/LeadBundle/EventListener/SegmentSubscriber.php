@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
@@ -19,6 +24,8 @@ class SegmentSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private ListModel $listModel,
         private SegmentUsedInCampaignsValidator $segmentUsedInCampaignsValidator,
+        private CoreParametersHelper $coreParametersHelper,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
         private TranslatorInterface $translator,
     ) {
     }
@@ -27,10 +34,16 @@ class SegmentSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
-            LeadEvents::LIST_POST_DELETE   => ['onSegmentDelete', 0],
+            LeadEvents::ON_LIST_DELETE     => ['onSegmentDelete', 0],
+            LeadEvents::LIST_POST_DELETE   => [
+                ['onSegmentPostDelete', 0],
+                ['clearSegmentCountCache', 0],
+            ],
+            LeadEvents::LIST_PRE_DELETE   => [
+                ['onSegmentPreDelete', 0],
+            ],
             LeadEvents::LIST_PRE_UNPUBLISH => [
-                ['validateSegmentFilters', 0],
-                ['validateSegmentsUsedInCampaigns', 0],
+                ['onSegmentPreUnpublish', 0],
             ],
         ];
     }
@@ -55,22 +68,68 @@ class SegmentSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws RecordNotUnpublishedException
+     * @throws RecordCanNotUnpublishException
      */
-    public function validateSegmentFilters(SegmentEvent $event): void
+    public function onSegmentPreUnpublish(SegmentEvent $event): void
     {
         $leadList = $event->getList();
-        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
+        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId());
         if (count($lists)) {
-            $message = $this->translator->trans('mautic.lead_list.is_in_use', ['%segments%' => implode(',', $lists)], 'validators');
-            throw new RecordNotUnpublishedException($message);
+            $message = $this->translator->trans(
+                'mautic.lead_list.is_in_use.unpublish',
+                [
+                    '%segments%'     => implode(',', $lists),
+                    '%segmentNames%' => $leadList->getName(),
+                ],
+                'validators');
+            throw new RecordCanNotUnpublishException($message);
         }
+
+        if ($this->validateSegmentsUsedInCampaigns($event, 'unpublish')) {
+            throw new RecordCanNotUnpublishException($this->segmentUsedInCampaignsValidator->getErrorMessage());
+        }
+    }
+
+    /**
+     * @throws DeleteEntityDependencyException
+     */
+    public function onSegmentPreDelete(SegmentEvent $event): void
+    {
+        $leadList = $event->getList();
+        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId());
+
+        if (count($lists)) {
+            $message = $this->translator->trans(
+                'mautic.lead_list.is_in_use.delete',
+                [
+                    '%segments%'     => implode(',', $lists),
+                    '%segmentNames%' => $leadList->getName(),
+                ],
+                'validators');
+            $event->addDependencyError($message);
+        }
+
+        if ($this->validateSegmentsUsedInCampaigns($event, 'delete')) {
+            $event->addDependencyError($this->segmentUsedInCampaignsValidator->getErrorMessage());
+        }
+    }
+
+    public function onSegmentDelete(SegmentEvent $event): void
+    {
+        if ($this->coreParametersHelper->get('delete_segment_in_background', false)) {
+            return;
+        }
+
+        $list = $event->getList();
+
+        $this->listModel->removeLeadsByListId($list->getId());
+        $this->listModel->hardDeleteEntity($list);
     }
 
     /**
      * Add a segment delete entry to the audit log.
      */
-    public function onSegmentDelete(SegmentEvent $event): void
+    public function onSegmentPostDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
         $log     = [
@@ -84,11 +143,14 @@ class SegmentSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @throws RecordNotUnpublishedException
-     */
-    public function validateSegmentsUsedInCampaigns(SegmentEvent $event): void
+    public function clearSegmentCountCache(SegmentEvent $event): void
     {
-        $this->segmentUsedInCampaignsValidator->validate($event->getList());
+        $segment = $event->getList();
+        $this->segmentCountCacheHelper->deleteSegmentContactCount($segment->deletedId);
+    }
+
+    private function validateSegmentsUsedInCampaigns(SegmentEvent $event, string $action): bool
+    {
+        return $this->segmentUsedInCampaignsValidator->validate($event->getList(), $action);
     }
 }
