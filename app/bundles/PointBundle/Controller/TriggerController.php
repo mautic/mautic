@@ -167,7 +167,7 @@ class TriggerController extends FormController
         /** @var TriggerModel $model */
         $model = $this->getModel('point.trigger');
 
-        if (!($entity instanceof Trigger)) {
+        if (!$entity instanceof Trigger) {
             /** @var Trigger $entity */
             $entity = $model->getEntity();
         }

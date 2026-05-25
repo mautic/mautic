@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\EventListener;
 
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
@@ -45,7 +44,9 @@ class FormValidationSubscriber implements EventSubscriberInterface
             ]
         );
 
-        if (!empty($this->coreParametersHelper->get('do_not_submit_emails'))) {
+        if (!empty($this->coreParametersHelper->get('do_not_submit_emails'))
+            || !empty($this->coreParametersHelper->get('blocked_free_email_providers'))
+        ) {
             $event->addValidator(
                 'email.validation',
                 [
@@ -85,12 +86,27 @@ class FormValidationSubscriber implements EventSubscriberInterface
     {
         $field = $event->getField();
         $value = $event->getValue();
-        if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
+
+        if ('email' !== $field->getType()) {
+            return;
+        }
+
+        if (!empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
             $donotSubmitFilter  = fn ($doNotSubmitArray): bool => fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
             if (array_filter($notNotSubmitEmails, $donotSubmitFilter)) {
-                $event->failedValidation(ArrayHelper::getValue('donotsubmit_validationmsg', $field->getValidation()));
+                $validationMsg = $field->getValidation()['donotsubmit_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.donotsubmit.invalid', [], 'validators');
+                $event->failedValidation($validationMsg);
+            }
+        }
+
+        if (!empty($field->getValidation()['blockfreeemail'])) {
+            $blockedProviders = $this->coreParametersHelper->get('blocked_free_email_providers') ?? [];
+            $domain           = strtolower((string) substr(strrchr($value, '@'), 1));
+            if ($domain && in_array($domain, $blockedProviders, true)) {
+                $validationMsg = $field->getValidation()['blockfreeemail_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.freeproviders.invalid', [], 'validators');
+                $event->failedValidation($validationMsg);
             }
         }
     }
@@ -98,35 +114,63 @@ class FormValidationSubscriber implements EventSubscriberInterface
     private function fieldTelValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
-        $value = $event->getValue();
 
-        if ('tel' === $field->getType()) {
-            $validation = $field->getValidation();
+        if ('tel' !== $field->getType()) {
+            return;
+        }
 
-            if (!empty($validation['country'])) {
-                $country     = $validation['country'];
-                $countryCode = PhoneCountryValidationHelper::getCountryCodeFromName($country);
+        $validation = $field->getValidation();
 
-                if ($countryCode && !PhoneCountryValidationHelper::isValidForCountry($value, $countryCode)) {
-                    $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => $country], 'validators');
-                    $event->failedValidation($message);
+        if ($this->validatePhoneCountry($event, $validation)) {
+            return;
+        }
 
-                    return;
-                }
+        $this->validateInternationalPhone($event, $validation);
+    }
+
+    /**
+     * @param array<string, mixed> $validation
+     */
+    private function validatePhoneCountry(Events\ValidationEvent $event, array $validation): bool
+    {
+        if (empty($validation['country'])) {
+            return false;
+        }
+
+        $country     = (string) $validation['country'];
+        $countryCode = PhoneCountryValidationHelper::getCountryCodeFromName($country);
+
+        if (!$countryCode || PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)) {
+            return false;
+        }
+
+        $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => $country], 'validators');
+        $event->failedValidation($message);
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $validation
+     */
+    private function validateInternationalPhone(Events\ValidationEvent $event, array $validation): void
+    {
+        if (empty($validation['international'])) {
+            return;
+        }
+
+        $phoneUtil = PhoneNumberUtil::getInstance();
+
+        try {
+            $phoneUtil->parse((string) $event->getValue(), PhoneNumberUtil::UNKNOWN_REGION);
+        } catch (NumberParseException) {
+            if (!empty($validation['international_validationmsg'])) {
+                $event->failedValidation($validation['international_validationmsg']);
+
+                return;
             }
 
-            if (!empty($validation['international'])) {
-                $phoneUtil = PhoneNumberUtil::getInstance();
-                try {
-                    $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-                } catch (NumberParseException) {
-                    if (!empty($validation['international_validationmsg'])) {
-                        $event->failedValidation($validation['international_validationmsg']);
-                    } else {
-                        $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
-                    }
-                }
-            }
+            $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
         }
     }
 

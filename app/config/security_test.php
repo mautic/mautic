@@ -1,6 +1,6 @@
 <?php
 
-$this->import('security.php');
+$loader->import('security.php');
 
 // Support HTTP basic auth for test logins
 $container->loadFromExtension('security',

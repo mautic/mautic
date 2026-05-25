@@ -20,21 +20,20 @@ class DefaultController extends CommonController
 
         if (empty($root)) {
             return $this->redirectToRoute('mautic_dashboard_index');
-        } else {
-            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel = $this->getModel('page');
-            $page      = $pageModel->getEntity($root);
-
-            if (empty($page)) {
-                return $this->notFound();
-            }
-
-            $slug = $pageModel->generateSlug($page);
-
-            $request->attributes->set('ignore_mismatch', true);
-
-            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel = $this->getModel('page');
+        $page      = $pageModel->getEntity($root);
+
+        if (empty($page)) {
+            return $this->notFound();
+        }
+
+        $slug = $pageModel->generateSlug($page);
+
+        $request->attributes->set('ignore_mismatch', true);
+
+        return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
     }
 
     public function globalSearchAction(Request $request): \Symfony\Component\HttpFoundation\Response

@@ -174,6 +174,7 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
         ];
 
@@ -190,16 +191,16 @@ class EventController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
@@ -315,6 +316,7 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => !$cancelled && $valid,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
             'modifiedEvents'=> $modifiedEvents,
             'eventId'       => $event['id'] ?? '',

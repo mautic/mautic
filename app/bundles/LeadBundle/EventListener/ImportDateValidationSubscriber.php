@@ -60,13 +60,13 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
      */
     private function validateDateTimeField(array $mappedData, array $rowData, string $alias, string $type): void
     {
-        $new_alias = array_search($alias, $mappedData, true);
+        $newAlias = array_search($alias, $mappedData, true);
 
-        if (false === $new_alias) {
+        if (false === $newAlias) {
             return;
         }
 
-        $value = trim((string) $rowData[$new_alias]);
+        $value = trim((string) ($rowData[$newAlias] ?? ''));
 
         if ('' === $value) {
             return;

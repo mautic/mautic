@@ -3,6 +3,8 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 class TagApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -113,5 +115,30 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(500);
+    }
+
+    public function testSearchMatchesTagDescription(): void
+    {
+        $tagRepository = $this->em->getRepository(Tag::class);
+        \assert($tagRepository instanceof TagRepository);
+
+        $matchingTag = (new Tag('alpha_tag'))->setDescription('Contains the test keyword.');
+        $otherTag    = (new Tag('beta_tag'))->setDescription('No relevant text here.');
+
+        $tagRepository->saveEntity($matchingTag, false);
+        $tagRepository->saveEntity($otherTag);
+
+        $this->client->request('GET', '/api/tags?limit=1&search=test');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertSame(1, (int) $response['total']);
+        $this->assertCount(1, $response['tags']);
+        $returnedTag = reset($response['tags']);
+
+        $this->assertIsArray($returnedTag);
+        $this->assertSame($matchingTag->getId(), $returnedTag['id']);
+        $this->assertSame($matchingTag->getTag(), $returnedTag['tag']);
     }
 }

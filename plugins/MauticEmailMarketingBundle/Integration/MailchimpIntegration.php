@@ -65,9 +65,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
             $data = $this->makeRequest('https://login.mailchimp.com/oauth2/metadata');
 
             return $this->extractAuthKeys($data, 'dc');
-        } else {
-            return $error;
         }
+
+        return $error;
     }
 
     /**
