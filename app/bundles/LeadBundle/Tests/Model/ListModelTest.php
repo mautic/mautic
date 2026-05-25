@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -18,6 +19,7 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -27,10 +29,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ListModelTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    protected $fixture;
+    protected ListModel|MockObject $fixture;
 
     private ListModel $model;
 
@@ -67,7 +66,7 @@ class ListModelTest extends TestCase
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
         $requestStackMock                      = $this->createMock(RequestStack::class);
         $categoryModelMock                     = $this->createMock(CategoryModel::class);
-        $doNotContactRepositoryMock            = $this->createMock(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
+        $doNotContactRepositoryMock            = $this->createMock(DoNotContactRepository::class);
 
         $this->model = new ListModel(
             $categoryModelMock,
@@ -87,11 +86,8 @@ class ListModelTest extends TestCase
         );
     }
 
-    /**
-     * @param string|null $sourceType
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('sourceTypeTestDataProvider')]
-    public function testGetSourceLists(array $getLookupResultsReturn, $sourceType, array $expected): void
+    #[DataProvider('sourceTypeTestDataProvider')]
+    public function testGetSourceLists(array $getLookupResultsReturn, ?string $sourceType, array $expected): void
     {
         $this->prepareMockForTestGetSourcesLists($getLookupResultsReturn);
         $result = $this->fixture->getSourceLists($sourceType);
@@ -107,7 +103,7 @@ class ListModelTest extends TestCase
         $categoryModel            = $this->createMock(CategoryModel::class);
         $categoryModel->expects($this->once())->method('getLookupResults')->willReturn($getLookupResultsReturn);
         $segmentCountCacheHelperMock = $this->createMock(SegmentCountCacheHelper::class);
-        $doNotContactRepositoryMock  = $this->createMock(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
+        $doNotContactRepositoryMock  = $this->createMock(DoNotContactRepository::class);
 
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->setConstructorArgs([
@@ -141,26 +137,46 @@ class ListModelTest extends TestCase
             ],
             [
                 [
-                    0 => ['id' => 1, 'title' => 'Segment Test Category 1', 'bundle' => 'segment'],
-                    1 => ['id' => 2, 'title' => 'Segment Test Category 2', 'bundle' => 'segment'],
+                    0 => [
+                        'id'     => 1,
+                        'title'  => 'Segment Test Category 1',
+                        'alias'  => 'Alias Test Category 1',
+                        'bundle' => 'segment',
+                    ],
+                    1 => [
+                        'id'     => 2,
+                        'title'  => 'Segment Test Category 2',
+                        'alias'  => 'Alias Test Category 2',
+                        'bundle' => 'segment',
+                    ],
                 ],
                 null,
                 [
                     'categories' => [
-                        1 => 'Segment Test Category 1',
-                        2 => 'Segment Test Category 2',
+                        'Alias Test Category 1' => 'Segment Test Category 1',
+                        'Alias Test Category 2' => 'Segment Test Category 2',
                     ],
                 ],
             ],
             [
                 [
-                    0 => ['id' => 1, 'title' => 'Segment Test Category 1', 'bundle' => 'segment'],
-                    1 => ['id' => 2, 'title' => 'Segment Test Category 2', 'bundle' => 'segment'],
+                    0 => [
+                        'id'     => 1,
+                        'title'  => 'Segment Test Category 1',
+                        'alias'  => 'Alias Test Category 1',
+                        'bundle' => 'segment',
+                    ],
+                    1 => [
+                        'id'     => 2,
+                        'title'  => 'Segment Test Category 2',
+                        'alias'  => 'Alias Test Category 2',
+                        'bundle' => 'segment',
+                    ],
                 ],
                 'categories',
                 [
-                    1 => 'Segment Test Category 1',
-                    2 => 'Segment Test Category 2',
+                    'Alias Test Category 1' => 'Segment Test Category 1',
+                    'Alias Test Category 2' => 'Segment Test Category 2',
                 ],
             ],
             [
@@ -340,7 +356,7 @@ class ListModelTest extends TestCase
             ->with($segmentId)
             ->willReturn($total);
 
-        $doNotContactRepository = $this->createMock(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
+        $doNotContactRepository = $this->createMock(DoNotContactRepository::class);
         $doNotContactRepository
             ->expects(self::once())
             ->method('getCount')
@@ -349,7 +365,6 @@ class ListModelTest extends TestCase
 
         $reflection = new \ReflectionClass($this->model);
         $property   = $reflection->getProperty('doNotContactRepository');
-        $property->setAccessible(true);
         $property->setValue($this->model, $doNotContactRepository);
 
         $active = $this->model->getActiveSegmentContactCount($segmentId);

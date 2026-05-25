@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -43,6 +44,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
+    use TranslationModelTrait;
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
@@ -80,6 +83,13 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     public function getPermissionBase(): string
     {
         return 'sms:smses';
+    }
+
+    public function saveEntity($entity, $unlock = true): void
+    {
+        parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
     }
 
     /**
@@ -281,6 +291,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         continue;
                     }
 
+                    [$ignore, $sms] = $this->getTranslatedEntity($sms, $lead);
+                    \assert($sms instanceof Sms);
+
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
                     $smsEvent->setSmsId($sms->getId());
                     $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
@@ -411,9 +424,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -429,10 +442,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * Get line chart data of hits.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFormat
+     * @param array   $filter
+     * @param bool    $canViewOthers
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
@@ -521,7 +534,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['sms_type'] ?? null
+                    $options['sms_type'] ?? null,
+                    $options['top_level'] ?? '',
+                    $options['ignore_ids'] ?? [],
                 );
 
                 foreach ($entities as $entity) {

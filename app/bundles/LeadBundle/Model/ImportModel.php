@@ -409,7 +409,8 @@ class ImportModel extends FormModel
             }
         }
 
-        if ($import->getLastLineImported() < $import->getLineCount()) {
+        $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
+        if ($isPublished && $import->getLastLineImported() < $import->getLineCount()) {
             $import->setStatus($import::DELAYED);
             $this->saveEntity($import);
         }
@@ -641,9 +642,9 @@ class ImportModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

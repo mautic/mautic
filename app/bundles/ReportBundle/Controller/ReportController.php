@@ -445,7 +445,7 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        if (!($entity instanceof Report)) {
+        if (!$entity instanceof Report) {
             $entity = $model->getEntity();
         }
 
@@ -627,6 +627,32 @@ class ReportController extends FormController
             $filterSettings[$filterDefinitions->definitions[$filter['column']]['alias']] = $filter['value'];
         }
 
+        foreach ($entity->getFilters() as $filter) {
+            if (!isset($filter['dynamic']) || 1 !== $filter['dynamic']) {
+                continue;
+            }
+
+            $column     = $filter['column'] ?? null;
+            $definition = (null !== $column) ? ($filterDefinitions->definitions[$column] ?? []) : [];
+            $alias      = $definition['alias'] ?? null;
+
+            if (null === $alias || isset($filterSettings[$alias])) {
+                continue;
+            }
+
+            $value = $filter['value'] ?? null;
+            if ('' === $value || null === $value) {
+                $default = $definition['defaultValue'] ?? null;
+                if ('' !== $default && null !== $default) {
+                    $value = $default;
+                }
+            }
+
+            if ('' !== $value && null !== $value) {
+                $filterSettings[$alias] = $value;
+            }
+        }
+
         $dynamicFilterForm = $this->formFactory->create(
             DynamicFiltersType::class,
             $filterSettings,
@@ -680,6 +706,13 @@ class ReportController extends FormController
                     'dateRangeForm'          => $dateRangeForm->createView(),
                     'dynamicFilterForm'      => $dynamicFilterForm->createView(),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
+                    'baseUrl'                => $this->generateUrl(
+                        'mautic_report_view',
+                        [
+                            'objectId'   => $objectId,
+                            'reportPage' => $reportPage,
+                        ]
+                    ),
                 ],
                 'contentTemplate' => $reportData['contentTemplate'],
                 'passthroughVars' => [

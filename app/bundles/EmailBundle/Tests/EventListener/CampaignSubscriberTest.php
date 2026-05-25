@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -62,13 +63,15 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $leadModel                 = $this->createMock(LeadModel::class);
+        $statRepository            = $this->createMock(StatRepository::class);
 
         $this->subscriber = new CampaignSubscriber(
             $this->emailModel,
             $this->realTimeExecutioner,
             $this->sendEmailToUser,
             $this->translator,
-            $leadModel
+            $leadModel,
+            $statRepository
         );
     }
 

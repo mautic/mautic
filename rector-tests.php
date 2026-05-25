@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\PHPUnit\PHPUnit100\Rector\Class_\ParentTestClassConstructorRector;
 use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector;
 use Rector\PHPUnit\PHPUnit60\Rector\MethodCall\GetMockBuilderGetMockToCreateMockRector;
 use Rector\PHPUnit\PHPUnit80\Rector\MethodCall\SpecificAssertContainsRector;
@@ -27,4 +28,5 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         AddDoesNotPerformAssertionToNonAssertingTestRector::class, // Adds annotation where it does not belong to.
+        ParentTestClassConstructorRector::class, // Adds unnecessary constructors to test classes without custom logic.
     ]);

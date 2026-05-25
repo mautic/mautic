@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DynamicContentBundle\Entity\Stat as StatDC;
 use Mautic\EmailBundle\Entity\Stat as StatEmail;
-use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -23,6 +26,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     protected function setUp(): void
     {
         // Disable API just for specific test.
@@ -68,10 +73,217 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('maxPages', json_decode($this->client->getResponse()->getContent(), true));
     }
 
+    public function testSingleEndpointCanHandleMergedContactsPost(): void
+    {
+        $this->doTestSingleEndpointCanHandleMergedContacts(
+            'POST',
+            'batchemail202-updated@email.com',
+            Response::HTTP_CREATED,
+            function (Response $clientResponse, int $contactId1, int $contactId2) {
+                $responseArray = json_decode($clientResponse->getContent(), true);
+
+                // POST should not update by ID but always create new contact.
+                // It would merge with existing contact by email if those would be the same.
+                $this->assertNotEquals($contactId1, $responseArray['contact']['id'], $clientResponse->getContent());
+                $this->assertNotEquals($contactId2, $responseArray['contact']['id'], $clientResponse->getContent());
+                $this->assertEquals(null, $responseArray['contact']['fields']['all']['firstname'], $clientResponse->getContent());
+                $this->assertEquals('batchemail202-updated@email.com', $responseArray['contact']['fields']['all']['email'], $clientResponse->getContent());
+                $this->assertEquals('Prčice', $responseArray['contact']['fields']['all']['city'], $clientResponse->getContent());
+            }
+        );
+    }
+
+    public function testSingleEndpointCanHandleMergedContactsPostSameEmail(): void
+    {
+        $this->doTestSingleEndpointCanHandleMergedContacts(
+            'POST',
+            'batchemail202@email.com',
+            Response::HTTP_OK,
+            function (Response $clientResponse, int $contactId1) {
+                $responseArray = json_decode($clientResponse->getContent(), true);
+
+                // POST should not update by ID but always create new contact.
+                // But in this case it will merge by email which is unique identifier.
+                $this->assertEquals($contactId1, $responseArray['contact']['id'], $clientResponse->getContent());
+                $this->assertEquals('BatchUpdate2', $responseArray['contact']['fields']['all']['firstname'], $clientResponse->getContent());
+                $this->assertEquals('batchemail202@email.com', $responseArray['contact']['fields']['all']['email'], $clientResponse->getContent());
+                $this->assertEquals('Prčice', $responseArray['contact']['fields']['all']['city'], $clientResponse->getContent());
+            }
+        );
+    }
+
+    public function testSingleEndpointCanHandleMergedContactsPut(): void
+    {
+        $this->doTestSingleEndpointCanHandleMergedContacts(
+            'PUT',
+            'batchemail202-updated@email.com',
+            Response::HTTP_OK,
+            function (Response $clientResponse, int $contactId1) {
+                $responseArray = json_decode($clientResponse->getContent(), true);
+
+                // PUT should update by ID and overwrite the original contact values.
+                $this->assertEquals($contactId1, $responseArray['contact']['id'], $clientResponse->getContent());
+                $this->assertEquals(null, $responseArray['contact']['fields']['all']['firstname'], $clientResponse->getContent());
+                $this->assertEquals('batchemail202-updated@email.com', $responseArray['contact']['fields']['all']['email'], $clientResponse->getContent());
+                $this->assertEquals('Prčice', $responseArray['contact']['fields']['all']['city'], $clientResponse->getContent());
+            }
+        );
+    }
+
+    public function testSingleEndpointCanHandleMergedContactsPatch(): void
+    {
+        $this->doTestSingleEndpointCanHandleMergedContacts(
+            'PATCH',
+            'batchemail202-updated@email.com',
+            Response::HTTP_OK,
+            function (Response $clientResponse, int $contactId1) {
+                $responseArray = json_decode($clientResponse->getContent(), true);
+
+                // PATCH should update by ID and leave the original contact values.
+                $this->assertEquals($contactId1, $responseArray['contact']['id'], $clientResponse->getContent());
+                $this->assertEquals('BatchUpdate2', $responseArray['contact']['fields']['all']['firstname'], $clientResponse->getContent());
+                $this->assertEquals('batchemail202-updated@email.com', $responseArray['contact']['fields']['all']['email'], $clientResponse->getContent());
+                $this->assertEquals('Prčice', $responseArray['contact']['fields']['all']['city'], $clientResponse->getContent());
+            }
+        );
+    }
+
+    private function doTestSingleEndpointCanHandleMergedContacts(string $method, string $email, int $expectedStatusCode, callable $assertResponse): void
+    {
+        $contact1 = new Lead();
+        $contact1->setEmail('batchemail201@email.com');
+        $contact1->setFirstname('BatchUpdate1');
+
+        $contact2 = new Lead();
+        $contact2->setEmail('batchemail202@email.com');
+        $contact2->setFirstname('BatchUpdate2');
+
+        $this->em->persist($contact1);
+        $this->em->persist($contact2);
+        $this->em->flush();
+
+        /** @var ContactMerger $contactMerger */
+        $contactMerger = static::getContainer()->get('mautic.lead.merger');
+
+        $contactMerger->merge($contact1, $contact2);
+
+        // Update the contact 202 that was merged into 201.
+        $payload = [
+            'id'    => $contact2->deletedId,
+            'email' => $email,
+            'city'  => 'Prčice',
+        ];
+
+        $route = 'POST' === $method ? '/api/contacts/new' : "/api/contacts/{$contact2->deletedId}/edit";
+
+        $this->client->request($method, $route, $payload);
+
+        $this->assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $assertResponse($this->client->getResponse(), $contact1->getId(), $contact2->deletedId);
+    }
+
+    public function testBatchPutEndpointCanHandleMergedContacts(): void
+    {
+        // Create contacts.
+        $payload = [
+            [
+                'email'     => 'batchemail101@email.com',
+                'firstname' => 'BatchUpdate1',
+                'lastname'  => '101',
+            ],
+            [
+                'email'     => 'batchemail102@email.com',
+                'firstname' => 'BatchUpdate2',
+                'lastname'  => '102',
+            ],
+            [
+                'email'     => 'batchemail103@email.com',
+                'firstname' => 'BatchUpdate3',
+                'lastname'  => '103',
+            ],
+            [
+                'email'     => 'batchemail104@email.com',
+                'firstname' => 'BatchUpdate4',
+                'lastname'  => '104',
+            ],
+        ];
+
+        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
+        $contactId1Created = $response['contacts'][0]['id'];
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1]);
+        $contactId2Created = $response['contacts'][1]['id'];
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2]);
+        $contactId3Created = $response['contacts'][2]['id'];
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][3]);
+        $contactId4Created = $response['contacts'][3]['id'];
+
+        /** @var ContactMerger $contactMerger */
+        $contactMerger = static::getContainer()->get('mautic.lead.merger');
+
+        // Merge contact 102 into 101.
+        $contactMerger->merge(
+            $this->em->find(Lead::class, $contactId1Created),
+            $this->em->find(Lead::class, $contactId2Created)
+        );
+
+        // Merge contact 104 into 103.
+        $contactMerger->merge(
+            $this->em->find(Lead::class, $contactId3Created),
+            $this->em->find(Lead::class, $contactId4Created)
+        );
+
+        // Update both contacts created above without knowing they were merged afterwards.
+        $payload = [
+            // This will update contact 101.
+            [
+                'id'    => $contactId1Created,
+                'email' => 'batchemail101-updated@email.com',
+                'city'  => 'Prčice',
+            ],
+            // This will update contact 103 because contact 104 was merged into 103.
+            [
+                'id'    => $contactId4Created,
+                'email' => 'batchemail104-updated@email.com',
+                'city'  => 'Brno',
+            ],
+            // But it will be overwritten by this contact update that was merged into 101.
+            [
+                'id'    => $contactId2Created,
+                'email' => 'batchemail102-updated@email.com',
+                'city'  => 'Pičín',
+            ],
+        ];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertCount(3, $response['contacts']);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
+        $this->assertEquals($contactId1Created, $response['contacts'][0]['id']);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][1]);
+        $this->assertEquals($contactId3Created, $response['contacts'][1]['id']);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][2]);
+        $this->assertEquals($contactId1Created, $response['contacts'][2]['id']);
+
+        $this->assertEquals('batchemail102-updated@email.com', $response['contacts'][0]['fields']['all']['email']);
+    }
+
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
-        $companyA = $this->createCompany('CompanyA corp');
-        $companyB = $this->createCompany('CompanyB corp');
+        $companyA = $this->createCompany('CompanyA corp', 'contact@companya.corp');
+        $companyB = $this->createCompany('CompanyB corp', 'contact@companya.corp');
+        $this->em->flush();
         $payload  = [
             [
                 'email'            => 'batchemail1@email.com',
@@ -985,6 +1197,12 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testGetAllActivityDownload(): void
     {
+        $asset = new Asset();
+        $asset->setTitle('Initial Title');
+        $asset->setAlias('initial-alias');
+        $asset->setIsPublished(true);
+        $this->em->persist($asset);
+
         $expectedActivites = 0;
         for ($i = 0; $i < 10; ++$i) {
             $contact = new Lead();
@@ -997,6 +1215,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 $ipAddress->setIpAddress('13.13.13.13');
                 $this->em->persist($ipAddress);
                 $assetDownload = new Download();
+                $assetDownload->setAsset($asset);
                 $assetDownload->setLead($contact);
                 $assetDownload->setDateDownload(date_create('2013-03-15'));
                 $assetDownload->setCode(13);
@@ -1092,14 +1311,77 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedDatesOrder, $resultOrder);
     }
 
-    private function createCompany(string $name): Company
+    public function testGetContactsByCampaign(): void
     {
-        $company = new Company();
-        $company->setName($name);
+        // Create campaigns
+        $campaign1 = new Campaign();
+        $campaign1->setName('Campaign A');
+        $this->em->persist($campaign1);
 
-        $this->em->persist($company);
+        $campaign2 = new Campaign();
+        $campaign2->setName('Campaign B');
+        $this->em->persist($campaign2);
+
+        // Create contacts
+        $contact1 = new Lead();
+        $contact1->setEmail('contact1@test.com');
+        $this->em->persist($contact1);
+
+        $contact2 = new Lead();
+        $contact2->setEmail('contact2@test.com');
+        $this->em->persist($contact2);
+
+        $contact3 = new Lead();
+        $contact3->setEmail('contact3@test.com');
+        $this->em->persist($contact3);
+
+        $contact4 = new Lead();
+        $contact4->setEmail('contact4@test.com');
+        $this->em->persist($contact4);
+
+        // Assign contacts to campaigns
+        $this->addContactToCampaign($contact1, $campaign1);
+        $this->addContactToCampaign($contact2, $campaign2);
+        $this->addContactToCampaign($contact3, $campaign1);
+        $this->addContactToCampaign($contact3, $campaign2);
+
+        // Manually remove contact 4 from campaign 1 for a test
+        $this->addContactToCampaign($contact4, $campaign1, true);
+
         $this->em->flush();
+        $this->em->clear();
 
-        return $company;
+        // Test API endpoint for campaign 1
+        $this->client->request('GET', '/api/contacts', ['search' => 'campaign:'.$campaign1->getId()]);
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertArrayHasKey($contact1->getId(), $response['contacts']);
+        $this->assertArrayHasKey($contact3->getId(), $response['contacts']);
+        $this->assertArrayNotHasKey($contact2->getId(), $response['contacts']);
+        $this->assertArrayNotHasKey($contact4->getId(), $response['contacts']);
+
+        // Test API endpoint for campaign 2
+        $this->client->request('GET', '/api/contacts', ['search' => 'campaign:'.$campaign2->getId()]);
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertArrayHasKey($contact2->getId(), $response['contacts']);
+        $this->assertArrayHasKey($contact3->getId(), $response['contacts']);
+        $this->assertArrayNotHasKey($contact1->getId(), $response['contacts']);
+    }
+
+    private function addContactToCampaign(Lead $contact, Campaign $campaign, bool $manuallyRemoved = false): void
+    {
+        $campaignLead = new CampaignLead();
+        $campaignLead->setCampaign($campaign);
+        $campaignLead->setLead($contact);
+        $campaignLead->setDateAdded(new \DateTime());
+        $campaignLead->setManuallyRemoved($manuallyRemoved);
+        $this->em->persist($campaignLead);
     }
 }

@@ -172,17 +172,19 @@ class DashboardController extends AbstractFormController
                 $passthroughVars['widgetId']     = $widget->getId();
                 $passthroughVars['widgetWidth']  = $widget->getWidth();
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
+                $this->addFlashMessage('mautic.dashboard.widget.created');
             }
+            $passthroughVars['flashes'] = $this->getFlashContent();
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
-            ]);
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
+        ]);
     }
 
     /**
@@ -236,14 +238,14 @@ class DashboardController extends AbstractFormController
             }
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
-            ]);
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
+        ]);
     }
 
     /**

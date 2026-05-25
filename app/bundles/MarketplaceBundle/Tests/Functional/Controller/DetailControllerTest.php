@@ -6,6 +6,7 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
@@ -13,11 +14,13 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
 {
+    use ClientMockTrait;
+
     #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         /** @var MockHandler $handlerStack */
-        $handlerStack = static::getContainer()->get(MockHandler::class);
+        $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.

@@ -17,8 +17,12 @@
         {% set operatorKey = 'mautic.lead.lead.submitaction.operator_' ~ action.properties.operator %}
         {% set operatorLabel = operatorKey|trans %}
 
-        {% set pointGroup = getEntity('Mautic\\PointBundle\\Entity\\Group', action.properties.group) %}
-        {% set groupName = pointGroup ? pointGroup.name : '' %}
+        {% if action.properties.group is defined %}
+            {% set pointGroup = getEntity('Mautic\\PointBundle\\Entity\\Group', action.properties.group) %}
+            {% set groupName = pointGroup ? pointGroup.name : '' %}
+        {% else %}
+            {% set groupName = '' %}
+        {% endif %}
 
         {% set label = 'mautic.form.field.points.operation'|trans({
             '%operator%': operatorLabel,

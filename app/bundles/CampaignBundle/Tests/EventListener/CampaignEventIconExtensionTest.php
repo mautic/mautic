@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CampaignBundle\Tests\Twig\Extension;
+namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Twig\Extension\CampaignEventIconExtension;
 use PHPUnit\Framework\TestCase;

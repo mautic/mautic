@@ -25,8 +25,10 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -154,6 +156,7 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                    new Callback([$this, 'validateImagePath']),
                 ],
             ]
         );
@@ -199,8 +202,54 @@ class ConfigType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.trusted.hosts.tooltip',
                     ],
-                    'help'       => 'mautic.core.config.form.trusted_hosts.help',
-                    'required'   => false,
+                    'help'        => 'mautic.core.config.form.trusted_hosts.help',
+                    'required'    => false,
+                    'constraints' => [
+                        new Callback(static function (?array $values, ExecutionContextInterface $context): void {
+                            if (null === $values) {
+                                return;
+                            }
+
+                            if ([] === $values) {
+                                return;
+                            }
+
+                            foreach ($values as $value) {
+                                // Valid domain name. @see https://stackoverflow.com/questions/10306690/what-is-a-regular-expression-which-will-match-a-valid-domain-name-without-a-subd
+                                if (0 !== preg_match('/^(((?!-))(xn--|_)?[a-z0-9-]{0,61}[a-z0-9]{1,1}\.)*(xn--)?([a-z0-9][a-z0-9\-]{0,60}|[a-z0-9-]{1,30}\.[a-z]{2,})$/', $value)) {
+                                    continue;
+                                }
+
+                                // Allowed characters are a-z, 0-9 and "-".
+                                if (0 === preg_match('/^[a-z0-9\-.]+$/i', $value)) {
+                                    // Regexp given
+
+                                    // In environments, which set the `error_reporting` to ALL the code need to be executed without warnings.
+                                    $regexpError = false;
+                                    set_error_handler(static function (int $errorNo, string $errorString) use (&$regexpError): bool {
+                                        $regexpError = str_contains($errorString, 'preg_match');
+
+                                        return true;
+                                    });
+
+                                    // There is no way Mautic can validate rexep better than PCRE library.
+                                    $pregMatchResult = @preg_match('/'.$value.'/', '');
+
+                                    restore_error_handler();
+
+                                    if (false === $pregMatchResult || $regexpError) {
+                                        $context->buildViolation('mautic.core.config.form.trusted_hosts.invalid.regexp')->atPath('trusted_hosts')->addViolation();
+
+                                        break;
+                                    }
+                                } else {
+                                    $context->buildViolation('mautic.core.config.form.trusted_hosts.invalid.domain')->atPath('trusted_hosts')->addViolation();
+
+                                    break;
+                                }
+                            }
+                        }),
+                    ],
                 ]
             )->addViewTransformer($arrayStringTransformer)
         );
@@ -635,6 +684,25 @@ class ConfigType extends AbstractType
             )->addViewTransformer($arrayLinebreakTransformer)
         );
 
+        if ($this->coreParametersHelper->get('validate_remote_domains')) {
+            $builder->add(
+                $builder->create(
+                    'allowed_remote_domains',
+                    TextareaType::class,
+                    [
+                        'label'      => 'mautic.core.config.allowed.remote.domains',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.core.config.allowed.remote.domains.tooltip',
+                            'rows'    => 8,
+                        ],
+                        'required'   => false,
+                    ]
+                )->addViewTransformer($arrayLinebreakTransformer)
+            );
+        }
+
         $builder->add(
             'headers_sts',
             YesNoButtonGroupType::class,
@@ -689,6 +757,37 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+    }
+
+    // Validate $value to check ../ and denied system folders
+    public function validateImagePath(?string $value, ExecutionContextInterface $context): void
+    {
+        $isValid = true;
+
+        $normalizedValue = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $value);
+
+        if (
+            empty($normalizedValue)
+            || str_contains($normalizedValue, '..')
+            || str_contains($normalizedValue, '.'.DIRECTORY_SEPARATOR)
+            || DIRECTORY_SEPARATOR === $normalizedValue
+        ) {
+            $isValid = false;
+        }
+
+        $mediaFile = substr($value, 0, 6);
+
+        if ('media/' !== $mediaFile) {
+            $isValid = false;
+        }
+
+        if (!is_dir($value)) {
+            $isValid = false;
+        }
+
+        if (!$isValid) {
+            $context->buildViolation('mautic.core.config.form.image.path.invalid')->atPath('image_path')->addViolation();
+        }
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void

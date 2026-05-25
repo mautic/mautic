@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\EmailBundle\Model\EmailModel;
@@ -135,9 +137,9 @@ trait FrequencyRuleTrait
             }
         }
 
-        $data['global_categories'] = $frequencyRules['global_categories'] ?? $model->getLeadCategories(
-            $lead
-        );
+        $data['global_categories'] = $frequencyRules['global_categories'] ?? $model->getSubscribedAndNewCategoryIds(
+            $lead, ['global', 'email']);
+
         $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {

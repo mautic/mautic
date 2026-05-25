@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -88,6 +90,7 @@ class DynamicContentType extends AbstractType
         private TranslatorInterface $translator,
         private LeadModel $leadModel,
         private TypeList $typeList,
+        private RelativeDate $relativeDate,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -233,6 +236,8 @@ class DynamicContentType extends AbstractType
             ['bundle' => 'dynamicContent']
         );
 
+        $builder->add('projects', ProjectType::class);
+
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
@@ -255,7 +260,7 @@ class DynamicContentType extends AbstractType
             );
         }
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate);
         $builder->add(
             $builder->create(
                 'filters',
@@ -373,6 +378,7 @@ class DynamicContentType extends AbstractType
                 'data-editor-class'    => $editorClass,
                 'data-token-callback'  => 'email:getBuilderTokens',
                 'data-token-activator' => '{',
+                'allow-full-html'      => true,
             ],
             'required' => false,
         ]);

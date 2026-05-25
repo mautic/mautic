@@ -167,7 +167,7 @@ class TriggerController extends FormController
         /** @var TriggerModel $model */
         $model = $this->getModel('point.trigger');
 
-        if (!($entity instanceof Trigger)) {
+        if (!$entity instanceof Trigger) {
             /** @var Trigger $entity */
             $entity = $model->getEntity();
         }
@@ -413,12 +413,13 @@ class TriggerController extends FormController
             $model->lockEntity($entity);
         }
 
+        $triggerEvents   = [];
+
         if ($cleanSlate) {
             // clean slate
             $this->clearSessionComponents($request, $objectId);
 
             // load existing events into session
-            $triggerEvents   = [];
             $existingActions = $entity->getEvents()->toArray();
             foreach ($existingActions as $a) {
                 $id     = $a->getId();

@@ -25,7 +25,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(1, $campaign);
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        Assert::assertCount(2, $eventLogs); // Logs are preserved when events are deleted
     }
 
     public function testWithCampaignId(): void

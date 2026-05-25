@@ -269,6 +269,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $groupScores;
 
+    private int $previousId = 0;
+
     private $primaryCompany;
 
     /**
@@ -767,9 +769,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             return $socialIdentity;
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips->first()->getIpAddress();
-        } else {
-            return 'mautic.lead.lead.anonymous';
         }
+
+        return 'mautic.lead.lead.anonymous';
     }
 
     /**
@@ -1073,10 +1075,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             if ($id->getPushID() === $identifier) {
                 if ($id->isEnabled() === $enabled) {
                     return $this;
-                } else {
-                    $entity = $id;
-                    $this->removePushID($id);
                 }
+                $entity = $id;
+                $this->removePushID($id);
             }
         }
 
@@ -1979,19 +1980,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                         }
 
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
-                    } else {
-                        $convertToMonth = fn ($number, $unit) => match ($unit) {
-                            FrequencyRule::TIME_MONTH => (int) $number,
-                            FrequencyRule::TIME_WEEK  => $number * 4,
-                            FrequencyRule::TIME_DAY   => $number * 30,
-                            default                   => $number,
-                        };
-
-                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
-                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
-
-                        return $bFrequency <=> $aFrequency;
                     }
+                    $convertToMonth = fn ($number, $unit) => match ($unit) {
+                        FrequencyRule::TIME_MONTH => (int) $number,
+                        FrequencyRule::TIME_WEEK  => $number * 4,
+                        FrequencyRule::TIME_DAY   => $number * 30,
+                        default                   => $number,
+                    };
+
+                    $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
+                    $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
+
+                    return $bFrequency <=> $aFrequency;
                 }
 
                 return ($a['preferred_channel'] > $b['preferred_channel']) ? -1 : 1;
@@ -2016,6 +2016,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
 
         return $rules;
+    }
+
+    public function setPreviousId(int $id): void
+    {
+        $this->previousId = $id;
+    }
+
+    public function getPreviousId(): int
+    {
+        return $this->previousId;
     }
 
     /**

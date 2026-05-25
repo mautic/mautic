@@ -20,6 +20,7 @@ use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
@@ -37,9 +38,9 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     protected $triggers = [];
 
     /**
-     * @var array<string,array<string,mixed>>
+     * @var array<string, mixed[]>
      */
-    private static array $events;
+    private $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
@@ -276,15 +277,13 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getEvents()
     {
-        if (empty(self::$events)) {
-            // build them
-            self::$events = [];
-            $event        = new Events\TriggerBuilderEvent($this->translator);
+        if (empty($this->cachedEvents)) {
+            $event = new TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
-            self::$events = $event->getEvents();
+            $this->cachedEvents = $event->getEvents();
         }
 
-        return self::$events;
+        return $this->cachedEvents;
     }
 
     /**
@@ -344,16 +343,15 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
             return $this->invokeCallback($event, $lead, $settings);
-        } else {
-            /** @var TriggerEvent $triggerEvent */
-            $triggerEvent = $this->getEventRepository()->find($event['id']);
-
-            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-
-            $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
-
-            return $triggerExecutedEvent->getResult();
         }
+        /** @var TriggerEvent $triggerEvent */
+        $triggerEvent = $this->getEventRepository()->find($event['id']);
+
+        $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+
+        $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
+
+        return $triggerExecutedEvent->getResult();
     }
 
     private function invokeCallback($event, Lead $lead, array $settings): mixed

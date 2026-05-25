@@ -97,7 +97,7 @@ class UserRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
 
-        $q->select('partial u.{id, firstName, lastName}')
+        $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
             ->from(User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');
@@ -324,5 +324,17 @@ class UserRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return 'u';
+    }
+
+    /**
+     * @return User[]
+     */
+    public function getAllAdminUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->join('u.role', 'r')
+            ->where('r.isAdmin = 1')
+            ->getQuery()
+            ->getResult();
     }
 }

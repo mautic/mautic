@@ -172,7 +172,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             ],
             'url with encoded GET parameters' => [
                 'http://example.com/search?q=hello+world&lang=en',
-                '<a href="http://example.com/search?q=hello+world&lang=en" target="_blank">http://example.com/search?q=hello+world&lang=en</a>',
+                '<a href="http://example.com/search?q=hello%20world&lang=en" target="_blank">http://example.com/search?q=hello%20world&lang=en</a>',
             ],
             'url with special characters in GET parameters' => [
                 'http://example.com/path?param=value&special=!@#$%^&*()',

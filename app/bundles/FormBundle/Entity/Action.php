@@ -44,43 +44,43 @@ class Action implements UuidInterface
     /**
      * @var int
      */
-    #[Groups(['action:read'])]
+    #[Groups(['action:read', 'form:read'])]
     private $id;
 
     /**
      * @var string
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $name;
 
     /**
      * @var string|null
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $description;
 
     /**
      * @var string
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $type;
 
     /**
      * @var int
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $order = 0;
 
     /**
      * @var array
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $properties = [];
 
     /**
      * @var Form|null
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $form;
 
     /**
@@ -88,9 +88,6 @@ class Action implements UuidInterface
      */
     private $changes;
 
-    /**
-     * Reset properties on clone.
-     */
     public function __clone()
     {
         $this->id   = null;

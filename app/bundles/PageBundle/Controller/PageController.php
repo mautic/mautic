@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
+use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -369,7 +370,7 @@ class PageController extends FormController
      */
     public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null)
     {
-        if (!($entity instanceof Page)) {
+        if (!$entity instanceof Page) {
             $entity = $model->getEntity();
         }
 
@@ -395,28 +396,33 @@ class PageController extends FormController
                     $entity->setCustomHtml($content);
                     $entity->setDateModified(new \DateTime());
 
-                    // form is valid so process the data
-                    $model->saveEntity($entity);
+                    try {
+                        // form is valid so process the data
+                        $model->saveEntity($entity);
 
-                    $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $entity->getTitle(),
-                        '%menu_link%' => 'mautic_page_index',
-                        '%url%'       => $this->generateUrl('mautic_page_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]),
-                    ]);
+                        $this->addFlashMessage('mautic.core.notice.created', [
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_page_index',
+                            '%url%'       => $this->generateUrl('mautic_page_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]),
+                        ]);
 
-                    if ($this->isButtonClicked($form, 'save')) {
-                        $viewParameters = [
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId(),
-                        ];
-                        $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
-                        $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
-                    } else {
-                        // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
+                        if ($this->isButtonClicked($form, 'save')) {
+                            $viewParameters = [
+                                'objectAction' => 'view',
+                                'objectId'     => $entity->getId(),
+                            ];
+                            $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
+                            $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
+                        } else {
+                            // return edit view so that all the session stuff is loaded
+                            return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
+                        }
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid = false;
+                        $this->addFlash('error', $e->getMessage());
                     }
                 }
             } else {
@@ -526,41 +532,47 @@ class PageController extends FormController
         }
 
         // Create the form
-        $action       = $this->generateUrl('mautic_page_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form         = $model->createForm($entity, $this->formFactory, $action);
+        $action = $this->generateUrl('mautic_page_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $this->setOptimisticLockVersion($entity, $form);
         $existingPage = clone $entity;
         $this->restoreNullifiedFieldsDuringClone($existingPage, $entity);
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($valid = ($this->isFormValid($form) && $this->checkOptimisticLockVersion($entity, $form, false))) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    // form is valid so process the data
-                    $model->saveEntity($entity, $this->isButtonClicked($form, 'save'));
+                    try {
+                        // form is valid so process the data
+                        $model->saveEntity($entity, $this->isButtonClicked($form, 'save'));
 
-                    if ($pageConfig->isDraftEnabled() && !empty($entity->getId())) {
-                        $this->dispatcher->dispatch(new PageEditSubmitEvent(
-                            $existingPage,
-                            $entity,
-                            $this->isButtonClicked($form, 'save'),
-                            $this->isButtonClicked($form, 'apply'),
-                            $this->isButtonClicked($form, 'save_draft'),
-                            $this->isButtonClicked($form, 'apply_draft'),
-                            $this->isButtonClicked($form, 'discard_draft'),
-                        ));
+                        if ($pageConfig->isDraftEnabled() && !empty($entity->getId())) {
+                            $this->dispatcher->dispatch(new PageEditSubmitEvent(
+                                $existingPage,
+                                $entity,
+                                $this->isButtonClicked($form, 'save'),
+                                $this->isButtonClicked($form, 'apply'),
+                                $this->isButtonClicked($form, 'save_draft'),
+                                $this->isButtonClicked($form, 'apply_draft'),
+                                $this->isButtonClicked($form, 'discard_draft'),
+                            ));
+                        }
+
+                        $this->addFlashMessage('mautic.core.notice.updated', [
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_page_index',
+                            '%url%'       => $this->generateUrl('mautic_page_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]),
+                        ]);
+                    } catch (InvalidRenderedHtmlException $e) {
+                        $valid = false;
+                        $this->addFlash('error', $e->getMessage());
                     }
-
-                    $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $entity->getTitle(),
-                        '%menu_link%' => 'mautic_page_index',
-                        '%url%'       => $this->generateUrl('mautic_page_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]),
-                    ]);
                 }
             } else {
                 // clear any modified content
@@ -582,9 +594,10 @@ class PageController extends FormController
                         'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
-            } elseif ($valid && $this->isButtonClicked($form, 'apply')) {
+            } elseif ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action);
+                $this->setOptimisticLockVersion($entity, $form);
             }
         } else {
             // lock the entity
@@ -618,6 +631,17 @@ class PageController extends FormController
             );
         }
 
+        $route = $this->generateUrl('mautic_page_action', [
+            'objectAction' => 'edit',
+            'objectId'     => $entity->getId(),
+        ]);
+        $error = $this->getFormErrorForBuilder($form);
+        $data  = ['version' => $error ? $form['version']->getData() : $entity->getVersion()];
+
+        if ($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_page_index', 'page', $route, $data)) {
+            return $optimizedResponse;
+        }
+
         return $this->delegateView([
             'viewParameters' => [
                 'form'            => $form->createView(),
@@ -644,7 +668,7 @@ class PageController extends FormController
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId(),
                 ]),
-                'validationError' => $this->getFormErrorForBuilder($form),
+                'validationError' => $error,
             ],
         ]);
     }

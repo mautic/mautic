@@ -47,4 +47,20 @@ class PluginControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($form);
         Assert::assertStringContainsString('A value is required.', $crawler->filter('#integration_details_apiKeys div')->html());
     }
+
+    public function testReturnPluginVersion(): void
+    {
+        $this->testSymfonyCommand('mautic:plugins:install');
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/plugins/info/MauticFocusBundle');
+
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk());
+
+        $content = $response->getContent();
+        Assert::assertJson($content);
+
+        $data = json_decode($content, true);
+        Assert::assertArrayHasKey('pluginVersion', $data);
+        Assert::assertSame('1.0', $data['pluginVersion']);
+    }
 }

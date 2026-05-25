@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Tests\Functional\Controller\CampaignControllerTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 
@@ -30,15 +31,19 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
     public function testCampaignWithOrphanEventsShouldFailValidation(): void
     {
         $campaign = $this->setupCampaignWithOrphanEvent();
+        $version  = $campaign->getVersion();
 
-        $this->submitFormAndExpectValidationError($campaign);
+        // Submit the form and expect validation to prevent save (version should not increment)
+        $this->submitFormExpectingValidationFailure($campaign, $version);
     }
 
     public function testCampaignWithMixedConnectedAndOrphanEventsShouldFailValidation(): void
     {
         $campaign = $this->setupCampaignWithMixedEvents();
+        $version  = $campaign->getVersion();
 
-        $this->submitFormAndExpectValidationError($campaign);
+        // Submit the form and expect validation to prevent save
+        $this->submitFormExpectingValidationFailure($campaign, $version);
     }
 
     public function testCampaignWithChainedEventsShouldSaveSuccessfully(): void
@@ -50,25 +55,28 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         $this->refreshAndSubmitForm($campaign, ++$version);
     }
 
+    public function testCampaignWithFormAsSourceShouldSaveSuccessfully(): void
+    {
+        $campaign = $this->setupCampaignWithFormAsSource();
+        $version  = $campaign->getVersion();
+
+        // Campaign with form as source and properly connected events should save without validation errors
+        $this->refreshAndSubmitForm($campaign, ++$version);
+    }
+
+    public function testCampaignWithFormAsSourceAndOrphanEventsShouldFailValidation(): void
+    {
+        $campaign = $this->setupCampaignWithFormAsSourceAndOrphanEvents();
+        $version  = $campaign->getVersion();
+
+        // Submit the form and expect validation to prevent save due to orphan events
+        $this->submitFormExpectingValidationFailure($campaign, $version);
+    }
+
     private function setupCampaignWithConnectedEvent(): Campaign
     {
         $campaign = $this->createBaseCampaign();
-
-        $event = new Event();
-        $event->setCampaign($campaign);
-        $event->setName('Send Welcome Email');
-        $event->setType('email.send');
-        $event->setEventType('action');
-        $event->setProperties([]);
-        $this->em->persist($event);
-        $this->em->flush();
-
-        // Connect the event properly to prevent orphan validation
-        $canvasSettings = $this->createCanvasSettings($event->getId());
-        $campaign->setCanvasSettings($canvasSettings);
-        $this->em->persist($campaign);
-        $this->em->flush();
-        $this->em->clear();
+        $this->addConnectedEventToCampaign($campaign);
 
         return $campaign;
     }
@@ -78,14 +86,7 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         $campaign = $this->createBaseCampaign();
 
         // Create an event but don't connect it via canvas settings (orphan)
-        $orphanEvent = new Event();
-        $orphanEvent->setCampaign($campaign);
-        $orphanEvent->setName('Orphan Email');
-        $orphanEvent->setType('email.send');
-        $orphanEvent->setEventType('action');
-        $orphanEvent->setProperties([]);
-        $this->em->persist($orphanEvent);
-        $this->em->flush();
+        $orphanEvent = $this->createOrphanEvent($campaign);
 
         // Set up canvas settings with the orphan event in nodes but not in connections
         $canvasSettings = [
@@ -125,47 +126,19 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($connectedEvent);
 
         // Create an orphan event
-        $orphanEvent = new Event();
-        $orphanEvent->setCampaign($campaign);
-        $orphanEvent->setName('Orphan Email');
-        $orphanEvent->setType('email.send');
-        $orphanEvent->setEventType('action');
-        $orphanEvent->setProperties([]);
-        $this->em->persist($orphanEvent);
+        $orphanEvent = $this->createOrphanEvent($campaign);
 
-        $this->em->flush();
+        // Create canvas settings where only the first event is connected (second is orphan)
+        $baseSettings = $this->createCanvasSettings($connectedEvent->getId());
 
-        // Set up canvas settings with both events in nodes but only one in connections
-        $canvasSettings = [
-            'nodes' => [
-                [
-                    'id'        => 'lists',
-                    'positionX' => 100,
-                    'positionY' => 100,
-                ],
-                [
-                    'id'        => $connectedEvent->getId(),
-                    'positionX' => 300,
-                    'positionY' => 100,
-                ],
-                [
-                    'id'        => $orphanEvent->getId(),
-                    'positionX' => 500,
-                    'positionY' => 100,
-                ],
-            ],
-            'connections' => [
-                [
-                    'sourceId' => 'lists',
-                    'targetId' => $connectedEvent->getId(),
-                    'anchors'  => [
-                        'source' => 'leadsource',
-                        'target' => 'top',
-                    ],
-                ],
-                // Note: orphanEvent is not connected, making it an orphan
-            ],
+        // Add the orphan event to nodes but don't connect it
+        $canvasSettings            = $baseSettings;
+        $canvasSettings['nodes'][] = [
+            'id'        => $orphanEvent->getId(),
+            'positionX' => 500,
+            'positionY' => 100,
         ];
+
         $campaign->setCanvasSettings($canvasSettings);
         $this->em->persist($campaign);
         $this->em->flush();
@@ -216,6 +189,40 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         return $campaign;
     }
 
+    private function setupCampaignWithFormAsSource(): Campaign
+    {
+        $campaign = $this->createBaseCampaignWithForm();
+        $this->addConnectedEventToCampaign($campaign, 'forms');
+
+        return $campaign;
+    }
+
+    private function setupCampaignWithFormAsSourceAndOrphanEvents(): Campaign
+    {
+        $campaign = $this->createBaseCampaignWithForm();
+        $this->addConnectedEventToCampaign($campaign, 'forms');
+
+        // Reload campaign after addConnectedEventToCampaign() clears the entity manager
+        $campaign = $this->em->find(Campaign::class, $campaign->getId());
+
+        // Create an orphan event
+        $orphanEvent = $this->createOrphanEvent($campaign);
+
+        // Add orphan event to canvas settings without connections
+        $canvasSettings            = $campaign->getCanvasSettings();
+        $canvasSettings['nodes'][] = [
+            'id'        => $orphanEvent->getId(),
+            'positionX' => 500,
+            'positionY' => 100,
+        ];
+        $campaign->setCanvasSettings($canvasSettings);
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        return $campaign;
+    }
+
     private function createBaseCampaign(): Campaign
     {
         $leadList = new LeadList();
@@ -234,10 +241,25 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         return $campaign;
     }
 
-    private function submitFormAndExpectValidationError(Campaign $campaign): void
+    private function createBaseCampaignWithForm(): Campaign
     {
-        $version = $campaign->getVersion();
+        $form = new Form();
+        $form->setName('Test form');
+        $form->setAlias('test-form');
+        $this->em->persist($form);
 
+        $campaign = new Campaign();
+        $campaign->setName('Test campaign with form');
+        $campaign->setIsPublished(true);
+        $campaign->setPublishUp(new \DateTime());
+        $campaign->addForm($form);
+        $this->em->persist($campaign);
+
+        return $campaign;
+    }
+
+    private function submitFormExpectingValidationFailure(Campaign $campaign, int $originalVersion): void
+    {
         // Submit the form and expect validation to prevent save (version should not increment)
         $crawler    = $this->refreshPage($campaign);
         $form       = $crawler->selectButton('Save')->form();
@@ -254,6 +276,39 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         // Verify the campaign version was not incremented (save was prevented)
         $this->em->clear();
         $campaign = $this->em->find(Campaign::class, $campaign->getId());
-        Assert::assertSame($version, $campaign->getVersion());
+        Assert::assertSame($originalVersion, $campaign->getVersion());
+    }
+
+    private function addConnectedEventToCampaign(Campaign $campaign, string $sourceType = 'lists'): void
+    {
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Send Welcome Email');
+        $event->setType('email.send');
+        $event->setEventType('action');
+        $event->setProperties([]);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        // Connect the event to source via canvas settings
+        $canvasSettings = $this->createCanvasSettings($event->getId(), $sourceType);
+        $campaign->setCanvasSettings($canvasSettings);
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+    }
+
+    private function createOrphanEvent(Campaign $campaign): Event
+    {
+        $orphanEvent = new Event();
+        $orphanEvent->setCampaign($campaign);
+        $orphanEvent->setName('Orphan Email');
+        $orphanEvent->setType('email.send');
+        $orphanEvent->setEventType('action');
+        $orphanEvent->setProperties([]);
+        $this->em->persist($orphanEvent);
+        $this->em->flush();
+
+        return $orphanEvent;
     }
 }

@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;

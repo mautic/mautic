@@ -25,25 +25,44 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
     {
         $fields = [
             'analyse_field_one' => [
-                'label' => 'Field one',
-                'alias' => 'analyse_field_one',
-                'type'  => 'text',
-                'limit' => 191,
-                'value' => $this->getText(180),
+                'label'    => 'Field one',
+                'alias'    => 'analyse_field_one',
+                'type'     => 'text',
+                'limit'    => 191,
+                'value'    => $this->getText(180),
+                'expected' => 191,
             ],
             'analyse_field_two' => [
-                'label' => 'Field two',
-                'alias' => 'analyse_field_two',
-                'type'  => 'text',
-                'limit' => 50,
-                'value' => $this->getText(10),
+                'label'    => 'Field two',
+                'alias'    => 'analyse_field_two',
+                'type'     => 'text',
+                'limit'    => 50,
+                'value'    => $field2Val = $this->getText(10),
+                'expected' => strlen($field2Val) * 2,
             ],
             'analyse_field_country' => [
-                'label' => 'Field country',
-                'alias' => 'analyse_field_country',
-                'type'  => 'country',
-                'limit' => 255,
-                'value' => '',
+                'label'    => 'Field country',
+                'alias'    => 'analyse_field_country',
+                'type'     => 'country',
+                'limit'    => 255,
+                'value'    => '',
+                'expected' => 191,
+            ],
+            'analyse_field_text_greater_than_191' => [
+                'label'    => 'Text greater than 191',
+                'alias'    => 'analyse_field_text_greater_than_191',
+                'type'     => 'text',
+                'limit'    => 255,
+                'value'    => $this->getText(240),
+                'expected' => 255,
+            ],
+            'range' => [
+                'label'    => 'Range',
+                'alias'    => 'range',
+                'type'     => 'text',
+                'limit'    => 64,
+                'value'    => '',
+                'expected' => 64,
             ],
         ];
 
@@ -54,7 +73,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         $this->createLead($fields);
 
         // Add long text.
-        $extraField =  [
+        $extraField = [
             'label' => 'Field three',
             'alias' => 'analyse_field_three',
             'type'  => 'html',
@@ -67,6 +86,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
             $this->assertStringContainsString($alias, $output->getDisplay());
             $this->assertStringContainsString($field['label'], $output->getDisplay());
             $this->assertStringContainsString((string) $field['limit'], $output->getDisplay());
+            $this->assertStringContainsString((string) $field['expected'], $output->getDisplay());
         }
 
         $this->assertStringNotContainsString($extraField['label'], $output->getDisplay());
@@ -77,6 +97,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
             $this->assertStringContainsString($alias, $output->getDisplay());
             $this->assertStringContainsString($field['label'], $output->getDisplay());
             $this->assertStringContainsString((string) $field['limit'], $output->getDisplay());
+            $this->assertStringContainsString((string) $field['expected'], $output->getDisplay());
         }
     }
 
@@ -146,8 +167,8 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
 
     private function getText(int $chars = 191): string
     {
-        $dummyText  = 'Aenean consectetur efficitur congue Aliquam faucibus tempor nisi ut dignissim Ut non metus enim Maecenas mattis quam a hendrerit condimentum elit leo bibendum';
-        $words      = explode(' ', $dummyText);
+        $dummyText = 'Aenean consectetur efficitur congue Aliquam faucibus tempor nisi ut dignissim Ut non metus enim Maecenas mattis quam a hendrerit condimentum elit leo bibendum';
+        $words     = explode(' ', $dummyText);
 
         $text = [];
         $size = 0;

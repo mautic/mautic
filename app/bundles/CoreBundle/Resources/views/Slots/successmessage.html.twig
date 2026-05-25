@@ -1,1 +1,3 @@
-<span>{{ 'mautic.core.slot.label.successmessage.insert'|trans }}</span>
+<div class="pref-successmessage" {% if not (successMessage is defined and successMessage) %}style="display:none"{% endif %}>
+    <span>{{ successMessage|default('mautic.core.slot.label.successmessage.insert'|trans) }}</span>
+</div>

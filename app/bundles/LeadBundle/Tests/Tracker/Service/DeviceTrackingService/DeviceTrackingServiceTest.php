@@ -270,7 +270,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->with($uniqueTrackingIdentifier)
             ->willReturn($leadDeviceMock);
 
-        $leadDeviceMock->expects($this->exactly(2))
+        $leadDeviceMock->expects($this->once())
             ->method('getLead')
             ->willReturn(new Lead());
         $matcher = $this->any();
@@ -329,7 +329,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->with($uniqueTrackingIdentifier)
             ->willReturn($leadDeviceMock);
 
-        $leadDeviceMock->expects($this->exactly(2))
+        $leadDeviceMock->expects($this->once())
             ->method('getLead')
             ->willReturn(new Lead());
 

@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
@@ -190,5 +191,43 @@ class ListControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
         self::assertStringContainsString('Segment clone', $clientResponse->getContent());
+    }
+
+    public function testSegmentSearchFilters(): void
+    {
+        $this->createCustomField();
+        $segment = $this->createList('filter');
+        $segment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'custom_field_test',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'operator'   => '!empty',
+                'properties' => [
+                    'filter' => null,
+                ],
+            ],
+        ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $this->client->request('GET', '/api/segments?search=filters_field:custom_field_test');
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertStringContainsString('Segment filter', $clientResponse->getContent());
+    }
+
+    private function createCustomField(): LeadField
+    {
+        $field = new LeadField();
+        $field->setType('text');
+        $field->setObject('lead');
+        $field->setGroup('core');
+        $field->setLabel('Test field');
+        $field->setAlias('custom_field_test');
+        $field->setCharLengthLimit(64);
+
+        return $field;
     }
 }

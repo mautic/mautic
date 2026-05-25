@@ -663,7 +663,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'unsubscribed',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
@@ -676,7 +676,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'bounced',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',

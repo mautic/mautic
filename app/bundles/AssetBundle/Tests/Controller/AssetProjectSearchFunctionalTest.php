@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\ProjectBundle\Tests\Functional\AbstratctProjectSearchTestCase;
+use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 
-final class AssetProjectSearchFunctionalTest extends AbstratctProjectSearchTestCase
+final class AssetProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void

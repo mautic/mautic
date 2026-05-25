@@ -175,11 +175,10 @@ class MessageQueueModel extends FormModel
         return true;
     }
 
-    public function sendMessages($channel = null, $channelId = null): int
+    public function sendMessages($channel = null, $channelId = null, int $limit = 50): int
     {
         // Note when the process started for batch purposes
         $processStarted = new \DateTime();
-        $limit          = 50;
         $counter        = 0;
 
         foreach ($this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId) as $queue) {
@@ -231,7 +230,7 @@ class MessageQueueModel extends FormModel
                 continue;
             }
 
-            $messageChannel   = $message->getChannel();
+            $messageChannel   = $message->getChannel() ?? '';
             $messageChannelId = $message->getChannelId();
             if (!$messageChannelId) {
                 $messageChannelId = 0;
@@ -350,8 +349,8 @@ class MessageQueueModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

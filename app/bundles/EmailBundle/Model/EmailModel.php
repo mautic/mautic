@@ -6,7 +6,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
+use Mautic\ApiBundle\Model\ApiEntityLockTrait;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -76,12 +77,13 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface, ApiLockAwareInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
     use FilterTrait;
+    use ApiEntityLockTrait;
 
     /**
      * @var bool
@@ -290,6 +292,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $entity = parent::getEntity($id);
             if (null !== $entity) {
                 $entity->setSessionId($entity->getId());
+                $this->setCachedCount($entity);
             }
         }
 
@@ -308,16 +311,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $entities = parent::getEntities($args);
 
         foreach ($entities as $entity) {
-            $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
-            $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
-
-            if (false !== $queued) {
-                $entity->setQueuedCount($queued);
-            }
-
-            if (false !== $pending) {
-                $entity->setPendingCount($pending);
-            }
+            $this->setCachedCount($entity);
         }
 
         return $entities;
@@ -358,9 +352,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -387,10 +381,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $readDateTime = new DateTimeHelper($hitDateTime);
         $userAgent    = $request->server->get('HTTP_USER_AGENT');
@@ -671,7 +666,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $this->translator->trans('mautic.email.sent'),
                 $this->translator->trans('mautic.email.read'),
                 $this->translator->trans('mautic.email.failed'),
-                $this->translator->trans('mautic.email.clicked'),
+                $this->translator->trans('mautic.email.unique_clicked'),
                 $this->translator->trans('mautic.email.unsubscribed'),
                 $this->translator->trans('mautic.email.bounced'),
             ]
@@ -886,7 +881,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         );
 
         $chart->setDataset(
-            $this->translator->trans('mautic.email.clicked'),
+            $this->translator->trans('mautic.email.unique_clicked'),
             $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
@@ -939,6 +934,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         ?int $threadId = null,
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
+
         $total      = $this->getRepository()->getEmailPendingLeads(
             $email->getId(),
             $variantIds,
@@ -949,7 +945,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $maxContactId,
             $countWithMaxMin,
             $maxThreads,
-            $threadId
+            $threadId,
+            $email->isSegmentEmail() && !$email->getContinueSending() ? $email->getPublishUp() : null,
         );
 
         if ($storeToCache) {
@@ -1290,9 +1287,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
-        $emailType           = ArrayHelper::getValue('email_type', $options, '');
-        $isMarketing         = (in_array($emailType, [MailHelper::EMAIL_TYPE_MARKETING]) || !empty($listId));
-        $emailAttempts       = ArrayHelper::getValue('email_attempts', $options, 3);
         $emailPriority       = ArrayHelper::getValue('email_priority', $options, MessageQueue::PRIORITY_NORMAL);
         $messageQueue        = ArrayHelper::getValue('resend_message_queue', $options);
         $returnErrorMessages = ArrayHelper::getValue('return_errors', $options, false);
@@ -1343,15 +1337,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if (!$email->getSendToDnc() && count($sendTo)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
+
             $this->messageQueueModel->processFrequencyRules(
                 $sendTo,
                 'email',
                 $email->getId(),
                 $campaignEventId,
-                $emailAttempts,
+                ArrayHelper::getValue('email_attempts', $options, 3),
                 $emailPriority,
                 $messageQueue
             );
@@ -1433,7 +1428,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $emailType)
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
@@ -1480,11 +1475,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         // Update sent counts
         foreach ($sentCounts as $emailId => $count) {
+            $isVariant = $this->isEmailVariant($emailId, $emailSettings);
+
             // Retry a few times in case of deadlock errors
             $strikes = 3;
             while ($strikes >= 0) {
                 try {
-                    $this->getRepository()->upCountSent($emailId, (int) $count, (bool) $emailSettings[$emailId]['isVariant']);
+                    $this->getRepository()->upCountSent($emailId, (int) $count, $isVariant);
                     break;
                 } catch (\Exception $exception) {
                     error_log($exception);
@@ -2349,5 +2346,47 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $context->setScheme($original_scheme);
 
         return $url;
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function setCachedCount(mixed $entity): void
+    {
+        $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
+        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+
+        if (false !== $queued) {
+            $entity->setQueuedCount($queued);
+        }
+
+        if (false !== $pending) {
+            $entity->setPendingCount($pending);
+        }
+    }
+
+    /**
+     * Check if an email is a variant by looking it up in emailSettings.
+     * Handles both parent emails and translations (translations inherit variant status from parent).
+     *
+     * @param array<int, array<string, mixed>> $emailSettings
+     */
+    private function isEmailVariant(int $emailId, array $emailSettings): bool
+    {
+        // Check if it's a parent email in emailSettings
+        if (isset($emailSettings[$emailId])) {
+            return (bool) $emailSettings[$emailId]['isVariant'];
+        }
+
+        // It's likely a translation - find it in translations and check if the parent is a variant
+        foreach ($emailSettings as $settings) {
+            if (isset($settings['translations'][$emailId])) {
+                // Check the parent's variant status (translations inherit variant status from parent)
+                return (bool) $settings['isVariant'];
+            }
+        }
+
+        // Default to false if not found (shouldn't happen in normal operation)
+        return false;
     }
 }

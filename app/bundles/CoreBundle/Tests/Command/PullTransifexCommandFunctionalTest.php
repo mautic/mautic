@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Command;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Command\PullTransifexCommand;
 use Mautic\CoreBundle\Helper\Filesystem;
+use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
+    use ClientMockTrait;
+
     private const FAKE_TRANSLATION_DIR = __DIR__.'/../Fixtures/Transifex/Translations';
 
     private Filesystem $filesystem;
@@ -35,7 +37,7 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
         // Using the same translation for both file as we don't know which response will be processed first.
         $someTranslation = 'some.translation="Some translation"';
 
-        $handlerStack = static::getContainer()->get(MockHandler::class);
+        $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             // Fetches all languages for webhook's messages.ini
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/language-stats.json')),

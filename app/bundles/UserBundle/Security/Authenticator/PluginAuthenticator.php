@@ -78,9 +78,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 // Return passport with the token set in the event, if the event set a different token.
                 if ($eventToken !== $token) {
                     return new SelfValidatingPassport(
-                        new UserBadge($eventToken->getUserIdentifier(), function () use ($eventToken): UserInterface {
-                            return $eventToken->getUser();
-                        }),
+                        new UserBadge($eventToken->getUserIdentifier(), fn (): UserInterface => $eventToken->getUser()),
                         [new PluginBadge($eventToken, null, $authenticatingService)]
                     );
                 }
