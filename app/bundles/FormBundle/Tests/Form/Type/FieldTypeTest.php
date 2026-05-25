@@ -12,6 +12,7 @@ use Mautic\FormBundle\Collector\ObjectCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Form\Type\FieldType;
+use Mautic\FormBundle\Form\Type\FormFieldBooleanType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -41,8 +42,14 @@ class FieldTypeTest extends TypeTestCase
         // Set up expected behavior for fieldCollector
         $fieldCollection = new FieldCollection([
             new FieldCrate('1', 'email', 'text', []),
+            new FieldCrate('2', 'boolean', 'boolean', []),
         ]);
         $this->fieldCollector->method('getFields')->willReturn($fieldCollection);
+        $this->translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
+            'mautic.core.form.yes' => 'Yes',
+            'mautic.core.form.no'  => 'No',
+            default                => $id,
+        });
 
         parent::setUp();
     }
@@ -61,6 +68,7 @@ class FieldTypeTest extends TypeTestCase
                     $this->fieldCollector,
                     $this->mappedFieldCollector
                 ),
+                FormFieldBooleanType::class => new FormFieldBooleanType(),
             ], []),
         ];
     }
@@ -124,5 +132,34 @@ class FieldTypeTest extends TypeTestCase
         $form       = $this->factory->create(FieldType::class, $formData);
         $fieldWidth = $form->get('fieldWidth');
         $this->assertEquals('75%', $fieldWidth->getData());
+    }
+
+    public function testBooleanFieldUsesBooleanPropertiesAndNoDefaultValue(): void
+    {
+        $form = $this->factory->create(FieldType::class, [
+            'type'   => 'boolean',
+            'formId' => 1,
+        ]);
+
+        $this->assertFalse($form->has('defaultValue'));
+        $this->assertTrue($form->has('properties'));
+        $this->assertSame('Yes', $form->get('properties')->get('yes')->getData());
+        $this->assertSame('No', $form->get('properties')->get('no')->getData());
+    }
+
+    public function testBooleanFieldUsesExistingPropertiesAndDefaultMappedField(): void
+    {
+        $form = $this->factory->create(FieldType::class, [
+            'type'       => 'boolean',
+            'formId'     => 1,
+            'properties' => [
+                'yes' => 'Accept',
+                'no'  => '',
+            ],
+        ]);
+
+        $this->assertSame('Accept', $form->get('properties')->get('yes')->getData());
+        $this->assertSame('', $form->get('properties')->get('no')->getData());
+        $this->assertSame('boolean', $form->get('mappedField')->getData());
     }
 }

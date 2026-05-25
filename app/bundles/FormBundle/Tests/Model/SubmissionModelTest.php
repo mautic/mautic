@@ -394,6 +394,34 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $method->invokeArgs($this->submissionModel, ['', $field]));
         $this->assertEquals('First', $method->invokeArgs($this->submissionModel, [1, $field]));
         $this->assertEquals('First, Second', $method->invokeArgs($this->submissionModel, [[1, 2], $field]));
+
+        $field = new Field();
+        $field->setType('boolean');
+        $this->assertFalse($method->invokeArgs($this->submissionModel, ['', $field]));
+        $this->assertFalse($method->invokeArgs($this->submissionModel, [null, $field]));
+        $this->assertTrue($method->invokeArgs($this->submissionModel, ['0', $field]));
+        $this->assertTrue($method->invokeArgs($this->submissionModel, ['1', $field]));
+        $this->assertTrue($method->invokeArgs($this->submissionModel, [['1'], $field]));
+    }
+
+    public function testSaveSubmissionMapsUncheckedBooleanWithOnlyYesLabelToFalse(): void
+    {
+        $submissionEvent = $this->saveBooleanSubmission([
+            'yes' => 'Subscribe me',
+            'no'  => '',
+        ]);
+
+        $this->assertSame(['boolean' => false], $submissionEvent->getContactFieldMatches());
+    }
+
+    public function testSaveSubmissionMapsUncheckedBooleanWithOnlyNoLabelToTrue(): void
+    {
+        $submissionEvent = $this->saveBooleanSubmission([
+            'yes' => '',
+            'no'  => 'Do not subscribe me',
+        ]);
+
+        $this->assertSame(['boolean' => true], $submissionEvent->getContactFieldMatches());
     }
 
     /**
@@ -427,6 +455,57 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         ];
 
         return $fields;
+    }
+
+    /**
+     * @param array<string,string> $properties
+     */
+    private function saveBooleanSubmission(array $properties): SubmissionEvent
+    {
+        $request = new Request();
+        $request->setMethod('POST');
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress('127.0.0.1'));
+        $userRepository       = $this->createMock(UserRepository::class);
+        $submissionRepository = $this->createMock(SubmissionRepository::class);
+        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
+            User::class       => $userRepository,
+            Submission::class => $submissionRepository,
+        });
+
+        $post = [
+            'formId'   => 1,
+            'return'   => '',
+            'formName' => 'testform',
+            'formid'   => 1,
+        ];
+
+        $form   = new Form();
+        $fields = [
+            'boolean' => [
+                'label'        => 'Boolean',
+                'showLabel'    => 1,
+                'saveResult'   => 1,
+                'defaultValue' => false,
+                'alias'        => 'boolean',
+                'type'         => 'boolean',
+                'mappedField'  => 'boolean',
+                'mappedObject' => 'contact',
+                'properties'   => $properties,
+                'id'           => 'boolean',
+            ],
+        ];
+
+        $formModel = new class extends FormModel {
+            public function __construct()
+            {
+            }
+        };
+        $formModel->setFields($form, $fields);
+
+        $submissionEvent = $this->submissionModel->saveSubmission($post, $request->server->all(), $form, $request, true)['submission'];
+        $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
+
+        return $submissionEvent;
     }
 
     private function setUpExport(): void
