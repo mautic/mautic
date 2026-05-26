@@ -137,6 +137,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                 case 'zip' == $tempExt:
                     file_put_contents($tempTarget, $data->getBody());
 
+                    if ('' !== $localTargetExt) {
+                        $localTarget = dirname($localTarget);
+                    }
+
                     $zipper = new \ZipArchive();
 
                     $zipper->open($tempTarget);
@@ -146,7 +150,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     break;
             }
         } catch (\Throwable $exception) {
-            error_log($exception);
+            $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
 
             $success = false;
         }
@@ -186,9 +190,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $url .= '?'.http_build_query($query);
         }
 
-        $url .= '#'.$urlParts['fragment'];
-
-        return $url;
+        return $url.('#'.$urlParts['fragment']);
     }
 
     /**

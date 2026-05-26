@@ -40,11 +40,11 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
     private function getLicenceKey(): ?string
     {
         if (null === $this->auth) {
-            return '';
+            return null;
         }
 
-        if (0 === preg_match('/[a-z0-9]+:[a-z0-9]+/i', $this->auth)) {
-            return null;
+        if (1 !== preg_match('/^\d+:[a-z0-9]+$/i', $this->auth)) {
+            return '';
         }
 
         return $this->auth;
