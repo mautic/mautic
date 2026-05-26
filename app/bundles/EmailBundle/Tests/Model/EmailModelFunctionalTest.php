@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use PHPUnit\Framework\Assert;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -60,8 +61,6 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
-        \assert($emailModel instanceof EmailModel);
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 7);
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
