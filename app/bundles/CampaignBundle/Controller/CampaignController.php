@@ -286,14 +286,18 @@ class CampaignController extends AbstractStandardFormController
         \assert($publishButton instanceof \Symfony\Component\Form\SubmitButton);
 
         if ($publishButton->isClicked()) {
-            $assetUrl    = $shareService->share($campaign, $data, $assetList, $metadata);
-            $redirectUrl = $shareService->getMarketplaceUrl().'/publish?asset_url='.urlencode($assetUrl);
+            // The transient ZIP is fetched same-origin by the browser, then forwarded to the
+            // marketplace popup via postMessage. The marketplace never sees the Mautic URL,
+            // which sidesteps SSRF and firewall concerns of the previous pull-based flow.
+            $archiveUrl   = $shareService->share($campaign, $data, $assetList, $metadata);
+            $marketplace  = $shareService->getMarketplaceUrl();
 
             return $this->delegateView([
                 'viewParameters' => [
-                    'redirectUrl'  => $redirectUrl,
-                    'campaignName' => $campaign->getName(),
-                    'campaignId'   => $campaign->getId(),
+                    'archiveUrl'      => $archiveUrl,
+                    'marketplaceUrl'  => $marketplace,
+                    'campaignName'    => $campaign->getName(),
+                    'campaignId'      => $campaign->getId(),
                 ],
                 'contentTemplate' => '@MauticCampaign/Campaign/share_redirect.html.twig',
                 'passthroughVars' => ['mauticContent' => 'campaign'],

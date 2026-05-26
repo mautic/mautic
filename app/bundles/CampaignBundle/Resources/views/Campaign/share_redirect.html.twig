@@ -1,20 +1,23 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
-{% block headerTitle %}{{ 'mautic.campaign.share.redirecting'|trans }}{% endblock %}
+{% block headerTitle %}{{ 'mautic.campaign.share.publishing'|trans }}{% endblock %}
 
 {% block content %}
 <div class="box-layout">
     <div class="col-md-6 col-md-offset-3 height-auto">
         <div class="pa-lg text-center">
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="campaign-share-publish"
+                 data-archive-url="{{ archiveUrl|e('html_attr') }}"
+                 data-marketplace-url="{{ marketplaceUrl|e('html_attr') }}"
+                 data-campaign-id="{{ campaignId }}">
                 <div class="panel-body pa-lg">
                     <i class="ri-share-line ri-3x text-primary mb-md"></i>
-                    <h3>{{ 'mautic.campaign.share.opening_marketplace'|trans }}</h3>
-                    <p class="text-muted">{{ 'mautic.campaign.share.opening_marketplace.desc'|trans }}</p>
-                    <a href="{{ redirectUrl }}" target="_blank" class="btn btn-primary btn-lg mt-md" id="marketplace-link">
-                        {{ 'mautic.campaign.share.open_marketplace'|trans }}
-                    </a>
-                    <div class="mt-md">
+                    <h3 id="campaign-share-status">{{ 'mautic.campaign.share.publishing'|trans }}</h3>
+                    <p class="text-muted" id="campaign-share-detail">
+                        {{ 'mautic.campaign.share.opening_marketplace.desc'|trans }}
+                    </p>
+                    <div id="campaign-share-error" class="alert alert-danger mt-md" style="display:none"></div>
+                    <div id="campaign-share-actions" class="mt-md">
                         <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaignId}) }}">
                             {{ 'mautic.campaign.share.back_to_campaign'|trans }}
                         </a>
@@ -25,6 +28,81 @@
     </div>
 </div>
 <script>
-    window.open('{{ redirectUrl|e('js') }}', '_blank');
+(function () {
+    var root          = document.getElementById('campaign-share-publish');
+    var statusEl      = document.getElementById('campaign-share-status');
+    var detailEl      = document.getElementById('campaign-share-detail');
+    var errorEl       = document.getElementById('campaign-share-error');
+    var archiveUrl    = root.getAttribute('data-archive-url');
+    var marketplace   = root.getAttribute('data-marketplace-url').replace(/\/$/, '');
+    var marketplaceUploadUrl = marketplace + '/publish/upload';
+
+    var popup = window.open(marketplaceUploadUrl, 'mautic-marketplace-publish');
+    if (!popup) {
+        showError('{{ 'mautic.campaign.share.popup_blocked'|trans|e('js') }}');
+        return;
+    }
+
+    var sent = false;
+    var done = false;
+
+    window.addEventListener('message', function (event) {
+        if (event.source !== popup) {
+            return;
+        }
+        if (!event.data || typeof event.data !== 'object') {
+            return;
+        }
+
+        if (event.data.type === 'marketplace:ready' && !sent) {
+            sent = true;
+            sendArchiveToPopup(event.origin);
+        }
+
+        if (event.data.type === 'marketplace:done') {
+            done = true;
+            statusEl.textContent = '{{ 'mautic.campaign.share.publish_success'|trans|e('js') }}';
+            detailEl.textContent = event.data.package_name + ' (' + event.data.version + ')';
+        }
+    });
+
+    // If user closes the popup before completion, surface that.
+    var poll = setInterval(function () {
+        if (popup.closed) {
+            clearInterval(poll);
+            if (!done) {
+                showError('{{ 'mautic.campaign.share.popup_closed'|trans|e('js') }}');
+            }
+        }
+    }, 800);
+
+    function sendArchiveToPopup(targetOrigin) {
+        statusEl.textContent = '{{ 'mautic.campaign.share.sending_archive'|trans|e('js') }}';
+        fetch(archiveUrl, { credentials: 'same-origin' })
+            .then(function (resp) {
+                if (!resp.ok) {
+                    throw new Error('HTTP ' + resp.status);
+                }
+                return resp.blob();
+            })
+            .then(function (blob) {
+                popup.postMessage({
+                    type:     'mautic:upload',
+                    archive:  blob,
+                    filename: 'campaign.zip',
+                }, targetOrigin);
+                statusEl.textContent = '{{ 'mautic.campaign.share.waiting_for_marketplace'|trans|e('js') }}';
+            })
+            .catch(function (err) {
+                showError('{{ 'mautic.campaign.share.archive_fetch_failed'|trans|e('js') }} (' + err.message + ')');
+            });
+    }
+
+    function showError(msg) {
+        statusEl.textContent = '{{ 'mautic.campaign.share.publish_failed'|trans|e('js') }}';
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+    }
+})();
 </script>
 {% endblock %}
