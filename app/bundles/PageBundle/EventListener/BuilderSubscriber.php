@@ -324,7 +324,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             '@MauticCore/Slots/channelfrequency.html.twig',
             $params,
-            '<div class="pref-channelfrequency">{templateContent}</div>'
+            '<div class="pref-channelfrequency"%s>{templateContent}</div>',
+            static::firstSlotAttribute
         );
     }
 

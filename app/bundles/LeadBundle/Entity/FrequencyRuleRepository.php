@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\EmailBundle\Entity\Stat;
 
 /**
  * @extends CommonRepository<FrequencyRule>
@@ -133,6 +134,11 @@ class FrequencyRuleRepository extends CommonRepository
           ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
           ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.$statContactColumn = fr.lead_id");
 
+        if (Stat::TABLE_NAME === $statTable) {
+            $q->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
+                ->andWhere('e.send_to_dnc = 0');
+        }
+
         if (null !== $channel && '' !== $channel) {
             $q->andWhere('fr.channel = :channel')
               ->setParameter('channel', $channel);
@@ -203,6 +209,11 @@ class FrequencyRuleRepository extends CommonRepository
 
         $query->select("ch.$statContactColumn")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
+
+        if (Stat::TABLE_NAME === $statTable) {
+            $query->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
+                ->andWhere('e.send_to_dnc = 0');
+        }
 
         switch ($defaultFrequencyTime) {
             case 'MONTH':

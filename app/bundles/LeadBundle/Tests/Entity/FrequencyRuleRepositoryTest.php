@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
@@ -49,7 +50,16 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 
         $this->em->persist($frequencyRule);
 
+        $email = new Email();
+        $email->setName('Test');
+        $email->setSubject('Test');
+        $email->setCustomHTML('test EN');
+        $email->setEmailType('template');
+        $email->setLanguage('en');
+        $this->em->persist($email);
+
         $emailStats1 = new Stat();
+        $emailStats1->setEmail($email);
         $emailStats1->setLead($lead);
         $emailStats1->setEmailAddress('testemail@test.test');
         $emailStats1->setDateSent(new \DateTime());
@@ -58,6 +68,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $emailStats1->setViewedInBrowser(false);
 
         $emailStats2 = new Stat();
+        $emailStats2->setEmail($email);
         $emailStats2->setLead($lead);
         $emailStats2->setEmailAddress('testemail@test.test');
         $emailStats2->setDateSent(new \DateTime());
