@@ -64,9 +64,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
-                ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
 
@@ -80,9 +78,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
-                ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
 
@@ -100,9 +96,7 @@ class ConfigType extends AbstractType
                 // Symfony's MultiplierRetryStrategy throws
                 // InvalidArgumentException for any multiplier < 1, which would
                 // otherwise crash the queue worker after the form is saved.
-                'constraints' => [
-                    new GreaterThanOrEqual(['value' => 1]),
-                ],
+                'constraints' => $this->greaterThanOrEqualConstraint(1),
             ]
         );
 
@@ -116,11 +110,17 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
-                ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
+    }
+
+    /**
+     * @return list<GreaterThanOrEqual>
+     */
+    private function greaterThanOrEqualConstraint(int|float $value): array
+    {
+        return [new GreaterThanOrEqual(['value' => $value])];
     }
 
     public function getBlockPrefix(): string

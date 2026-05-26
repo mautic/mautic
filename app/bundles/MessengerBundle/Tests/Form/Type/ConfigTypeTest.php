@@ -10,9 +10,10 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\MessengerBundle\Form\Type\ConfigType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
@@ -78,9 +79,7 @@ final class ConfigTypeTest extends TypeTestCase
         self::assertSame(1, $greaterThan->value, 'multiplier minimum must be 1 to match Symfony\'s MultiplierRetryStrategy');
     }
 
-    /**
-     * @dataProvider nonNegativeNumericFieldProvider
-     */
+    #[DataProvider('nonNegativeNumericFieldProvider')]
     public function testNumericRetryStrategyFieldsRejectNegativeValues(string $field): void
     {
         $constraints = $this->getFieldConstraints($field);
@@ -106,10 +105,10 @@ final class ConfigTypeTest extends TypeTestCase
     private function getFieldConstraints(string $fieldName): array
     {
         $form = $this->factory->create(ConfigType::class);
-        \assert($form instanceof Form);
+        self::assertInstanceOf(FormInterface::class, $form);
 
         $field = $form->get($fieldName);
-        \assert($field instanceof Form);
+        self::assertInstanceOf(FormInterface::class, $field);
 
         return $field->getConfig()->getOption('constraints') ?? [];
     }
