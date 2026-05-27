@@ -334,11 +334,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $server    = $request->server->all();
         $form      = new Form();
         $fields    = $this->getTestFormFields();
-        $formModel = new class extends FormModel {
-            public function __construct()
-            {
-            }
-        };
+        $formModel = $this->createFormModelWithoutConstructor();
         $formModel->setFields($form, $fields);
 
         $submissionEvent = $this->submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
@@ -496,17 +492,21 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $formModel = new class extends FormModel {
-            public function __construct()
-            {
-            }
-        };
+        $formModel = $this->createFormModelWithoutConstructor();
         $formModel->setFields($form, $fields);
 
         $submissionEvent = $this->submissionModel->saveSubmission($post, $request->server->all(), $form, $request, true)['submission'];
         $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
 
         return $submissionEvent;
+    }
+
+    private function createFormModelWithoutConstructor(): FormModel
+    {
+        return $this->getMockBuilder(FormModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([])
+            ->getMock();
     }
 
     private function setUpExport(): void
