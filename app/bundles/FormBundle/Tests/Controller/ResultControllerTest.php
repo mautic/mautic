@@ -78,7 +78,7 @@ final class ResultControllerTest extends TestCase
         $configurator = $this->createMock(Configurator::class);
         $configurator->expects($this->once())
             ->method('mergeParameters')
-            ->with(['do_not_submit_emails' => ['*@example.com']]);
+            ->with(['do_not_submit_emails' => ['example.com']]);
         $configurator->expects($this->once())->method('write');
 
         $security = $this->createMock(CorePermissions::class);
@@ -190,7 +190,7 @@ final class ResultControllerTest extends TestCase
         $coreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_submit_emails', [])
-            ->willReturn(['*@example.com']);
+            ->willReturn(['example.com']);
 
         $configurator = $this->createMock(Configurator::class);
         $configurator->expects($this->never())->method('mergeParameters');
@@ -256,12 +256,12 @@ final class ResultControllerTest extends TestCase
         $coreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_submit_emails', [])
-            ->willReturn(['*@existing.com']);
+            ->willReturn(['existing.com']);
 
         $configurator = $this->createMock(Configurator::class);
         $configurator->expects($this->once())
             ->method('mergeParameters')
-            ->with(['do_not_submit_emails' => ['*@existing.com', '*@example.com', '*@test.com']]);
+            ->with(['do_not_submit_emails' => ['existing.com', 'example.com', 'test.com']]);
         $configurator->expects($this->once())->method('write');
 
         $security = $this->createMock(CorePermissions::class);

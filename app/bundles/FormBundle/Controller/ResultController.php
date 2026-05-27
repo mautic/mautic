@@ -418,7 +418,7 @@ class ResultController extends CommonFormController
                 $domain = $submission->getEmailDomain();
 
                 if ($domain) {
-                    if ($this->saveNewBlockedDomains($configurator, ['*@'.$domain])) {
+                    if ($this->saveNewBlockedDomains($configurator, [$domain])) {
                         $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
                     }
 
@@ -497,7 +497,7 @@ class ResultController extends CommonFormController
 
             $domain = $submission->getEmailDomain();
             if ($domain) {
-                $domainsToSave['*@'.$domain] = true;
+                $domainsToSave[$domain] = true;
             }
         }
 
