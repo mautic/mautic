@@ -68,6 +68,18 @@ class TokenHelper
         return $replace ? $content : $tokenList;
     }
 
+    public static function validToken(string $content): bool
+    {
+        return (bool) preg_match(self::CONTACT_FIELD_REGEX, $content);
+    }
+
+    public static function getTokenFieldAlias(string $content): string
+    {
+        $foundMatches = preg_match(self::CONTACT_FIELD_REGEX, $content, $matches);
+
+        return $foundMatches ? self::getFieldAlias($matches[2]) : '';
+    }
+
     /**
      * Returns correct token value from provided list of tokens and the concrete token.
      *

@@ -503,6 +503,79 @@ class MailHelperTest extends TestCase
         $this->assertEquals(['owner 1', 'No Body\'s Business', 'owner 2'], $fromNames);
     }
 
+    public function testQueuedAdvancedFromUsesResolvedMetadataFromAddressOnFlush(): void
+    {
+        $this->coreParametersHelper->method('get')->willReturnMap(
+            [
+                ['mailer_return_path', false, null],
+                ['mailer_from_email', null, 'nobody@nowhere.com'],
+                ['mailer_from_name', null, 'No Body'],
+                ['mailer_address_length_limit', null, 320],
+                ['brand_name', null, null],
+                ['mailer_convert_embed_images', null, false],
+            ]
+        );
+
+        $transport = new BatchTransport();
+        $mailer    = new MailHelper(
+            new Mailer($transport),
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+            $this->sMimeHelper,
+            $this->emailStatModel
+        );
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(false);
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
+        $mailer->setFrom('{contactfield=other_email}', '{contactfield=other_name}');
+
+        $contacts = [
+            [
+                'id'          => 1,
+                'email'       => 'contact1@somewhere.com',
+                'other_email' => 'sender1@somewhere.com',
+                'other_name'  => 'Sender 1',
+                'owner_id'    => 0,
+            ],
+            [
+                'id'          => 2,
+                'email'       => 'contact2@somewhere.com',
+                'other_email' => 'sender2@somewhere.com',
+                'other_name'  => 'Sender 2',
+                'owner_id'    => 0,
+            ],
+        ];
+
+        foreach ($contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $this->assertSame(['sender1@somewhere.com', 'sender2@somewhere.com'], $transport->getFromAddresses());
+        $this->assertSame(['Sender 1', 'Sender 2'], $transport->getFromNames());
+    }
+
     public function testBatchIsEnabledWithBcTokenInterface(): void
     {
         $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);

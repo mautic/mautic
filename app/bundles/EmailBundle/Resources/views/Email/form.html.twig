@@ -22,6 +22,17 @@
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
 {% set draftPreviewUrl = draftPreviewUrl|default('') %}
+{% set advancedTabHasErrors =
+    formContainsErrors(form.fromName)
+    or formContainsErrors(form.fromAddress)
+    or formContainsErrors(form.replyToAddress)
+    or formContainsErrors(form.bccAddress)
+    or formContainsErrors(form.assetAttachments)
+    or formContainsErrors(form.headers)
+    or formContainsErrors(form.useOwnerAsMailer)
+    or formContainsErrors(form.customHtml)
+    or formContainsErrors(form.plainText)
+%}
 {% block headerTitle %}
   {% if email.id is not empty %}
     {{ 'mautic.email.header.edit'|trans({'%name%': email.name}) }}
@@ -47,7 +58,14 @@
                             <a href="#email-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                         </li>
                         <li>
-                            <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
+                            <a href="#advanced-container" role="tab" data-toggle="tab">
+                                {% if advancedTabHasErrors %}
+                                <span class="text-danger">
+                                    <i class="ri-alert-line" aria-hidden="true"></i> {{ 'mautic.core.advanced'|trans }}
+                                </span>{% else %}
+                                {{ 'mautic.core.advanced'|trans }}
+                                {% endif %}
+                            </a>
                         </li>
                         <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
                             <a href="#dynamic-content-container" role="tab" data-toggle="tab">{{ 'mautic.core.dynamicContent'|trans }}</a>
