@@ -137,12 +137,12 @@ class CampaignShareControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $content  = $response->getContent();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('Redirecting to Marketplace', $content);
+        $this->assertStringContainsString('Publishing to Marketplace', $content);
         // The publish flow should hand the marketplace a token URL pointing back at the share
         // download endpoint — not a Mautic Asset URL — so the marketplace can fetch the ZIP
-        // without depending on the Asset table. The redirect URL is url-encoded inside an
-        // `asset_url=` query param, so look for the encoded slashes.
-        $this->assertMatchesRegularExpression('#campaign-share%2F[a-f0-9]{32}#', $content);
+        // without depending on the Asset table. The URL is rendered into the
+        // `data-archive-url` attribute via Twig's `html_attr` escaper, which turns `/` into `&#x2F;`.
+        $this->assertMatchesRegularExpression('#campaign-share&\#x2F;[a-f0-9]{32}#', $content);
     }
 
     public function testShareDownloadEndpointRejectsUnknownToken(): void
