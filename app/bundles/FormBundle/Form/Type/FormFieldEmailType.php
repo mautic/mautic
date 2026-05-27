@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,6 +16,7 @@ class FormFieldEmailType extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -25,7 +27,7 @@ class FormFieldEmailType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.field.type.donotsubmit',
-                'data'  => $options['data']['donotsubmit'] ?? false,
+                'data'  => $options['data']['donotsubmit'] ?? !empty($this->coreParametersHelper->get('do_not_submit_emails')),
             ]
         );
 

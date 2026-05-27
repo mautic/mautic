@@ -200,6 +200,57 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         self::assertSame('Cannot be sent with this email', $event->getInvalidReason());
     }
 
+    public function testEmailDonotSubmitPlainDomainTriggersFailure(): void
+    {
+        $field = new Field();
+        $field->setType('email');
+        $field->setValidation([
+            'donotsubmit'               => 1,
+            'donotsubmit_validationmsg' => 'Cannot be sent with this email',
+        ]);
+
+        $this->coreParametersHelper
+            ->method('get')
+            ->willReturnCallback(function (string $key) {
+                return match ($key) {
+                    'do_not_submit_emails'         => ['blocked.com'],
+                    'blocked_free_email_providers' => [],
+                    default                        => [],
+                };
+            });
+
+        $event = new ValidationEvent($field, 'user@blocked.com');
+        $this->subscriber->onFormValidate($event);
+
+        self::assertFalse($event->isValid());
+        self::assertSame('Cannot be sent with this email', $event->getInvalidReason());
+    }
+
+    public function testEmailDonotSubmitPlainDomainAllowsDifferentDomain(): void
+    {
+        $field = new Field();
+        $field->setType('email');
+        $field->setValidation([
+            'donotsubmit'               => 1,
+            'donotsubmit_validationmsg' => 'Cannot be sent with this email',
+        ]);
+
+        $this->coreParametersHelper
+            ->method('get')
+            ->willReturnCallback(function (string $key) {
+                return match ($key) {
+                    'do_not_submit_emails'         => ['blocked.com'],
+                    'blocked_free_email_providers' => [],
+                    default                        => [],
+                };
+            });
+
+        $event = new ValidationEvent($field, 'user@allowed.com');
+        $this->subscriber->onFormValidate($event);
+
+        self::assertTrue($event->isValid());
+    }
+
     public function testEmailBlockedFreeProviderTriggersFailure(): void
     {
         $field = new Field();
