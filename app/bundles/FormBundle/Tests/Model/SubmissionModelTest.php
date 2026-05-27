@@ -470,6 +470,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
             User::class       => $userRepository,
             Submission::class => $submissionRepository,
+            default           => $submissionRepository,
         });
 
         $post = [
