@@ -43,7 +43,6 @@
         return;
     }
 
-    var sent = false;
     var done = false;
 
     window.addEventListener('message', function (event) {
@@ -54,8 +53,11 @@
             return;
         }
 
-        if (event.data.type === 'marketplace:ready' && !sent) {
-            sent = true;
+        // Re-send the archive every time the popup signals it's ready. The popup
+        // re-emits 'marketplace:ready' after an Auth0 round-trip (logged-out user
+        // gets bounced to login and back), at which point it has lost its in-memory
+        // Blob and needs us to push it again.
+        if (event.data.type === 'marketplace:ready' && !done) {
             sendArchiveToPopup(event.origin);
         }
 
