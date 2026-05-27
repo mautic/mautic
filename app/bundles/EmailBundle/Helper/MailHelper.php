@@ -455,6 +455,8 @@ class MailHelper
             foreach ($this->queuedRecipients as $email => $name) {
                 $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
                 $fromAddress = $from->getEmail();
+                // Use composite key (email + name) to ensure contacts with same email but different from names are grouped separately
+                $metadataKey = $fromAddress.'|'.($from->getName() ?? '');
                 $tokens      = $this->getTokens();
 
                 $tokens['{signature}'] = '';
@@ -463,14 +465,14 @@ class MailHelper
                     $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
                 }
 
-                if (!isset($this->metadata[$fromAddress])) {
-                    $this->metadata[$fromAddress] = [
+                if (!isset($this->metadata[$metadataKey])) {
+                    $this->metadata[$metadataKey] = [
                         'from'     => $from,
                         'contacts' => [],
                     ];
                 }
 
-                $this->metadata[$fromAddress]['contacts'][$email] = $this->buildMetadata($name, $tokens);
+                $this->metadata[$metadataKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
             }
 
             // Reset recipients
@@ -540,14 +542,7 @@ class MailHelper
                 $this->message->to();
                 $this->errors = [];
 
-                $email = $this->getEmail();
-
-                if ($email && $email->getUseOwnerAsMailer()) {
-                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
-                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
-                } else {
-                    $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
-                }
+                $this->setMessageFrom($metadatum['from']);
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
                     $this->message->addMetadata($email, $contact);

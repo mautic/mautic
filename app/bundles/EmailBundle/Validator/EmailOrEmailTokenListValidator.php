@@ -41,9 +41,13 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
             throw new UnexpectedTypeException($csv, 'string');
         }
 
+        $values = $constraint->allowMultiple
+            ? $this->transformer->reverseTransform($csv)
+            : [trim($csv)];
+
         array_map(
             $this->makeEmailOrEmailTokenValidator(),
-            $this->transformer->reverseTransform($csv)
+            $values
         );
     }
 

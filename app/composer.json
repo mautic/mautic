@@ -136,7 +136,6 @@
         "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
         "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
         "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
-        "[project-root]/patches/studio-42-elfinder-php85-float-cast.patch": "assets/scaffold/files/patches/studio-42-elfinder-php85-float-cast.patch",
         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
         "[web-root]/index.php": "assets/scaffold/files/index.php",
         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",

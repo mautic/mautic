@@ -11,9 +11,12 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Validator\DsnValidator;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator;
+use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\PageBundle\Model\PageModel;
@@ -30,6 +33,12 @@ final class ConfigTypeTest extends TypeTestCase
 {
     protected function getExtensions(): array
     {
+        // Some local environments do not have ext-imap loaded, but Mailbox uses these
+        // constants in method signatures and class loading fails without them.
+        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
+        defined('SE_UID') or define('SE_UID', 1);
+        defined('FT_PEEK') or define('FT_PEEK', 2);
+
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
@@ -46,14 +55,18 @@ final class ConfigTypeTest extends TypeTestCase
             $this->createMock(DsnTransformerFactory::class),
             $this->createMock(CoreParametersHelper::class),
         );
-        $configType               = new ConfigType($translator);
-        $preferenceCenterList     = new PreferenceCenterListType($pageModelMock, $permsMock);
-        $configMonitoredEmail     = new ConfigMonitoredEmailType(new EventDispatcher());
-        $configMonitoredMailboxes = new ConfigMonitoredMailboxesType($this->createMock(Mailbox::class));
-        $dsnValidator             = new DsnValidator($this->createMock(TransportFactory::class));
-        $validator                = Validation::createValidatorBuilder()
+        $configType                     = new ConfigType($translator);
+        $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
+        $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
+        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createMock(Mailbox::class));
+        $dsnValidator                   = new DsnValidator($this->createMock(TransportFactory::class));
+        $emailValidator                 = $this->createMock(EmailValidator::class);
+        $customFieldValidator           = $this->createMock(CustomFieldValidator::class);
+        $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($emailValidator, $customFieldValidator);
+        $validator                      = Validation::createValidatorBuilder()
             ->setConstraintValidatorFactory(new ConstraintValidatorFactory([
-                DsnValidator::class => $dsnValidator,
+                DsnValidator::class                   => $dsnValidator,
+                EmailOrEmailTokenListValidator::class => $emailOrEmailTokenListValidator,
             ]))
             ->getValidator();
 

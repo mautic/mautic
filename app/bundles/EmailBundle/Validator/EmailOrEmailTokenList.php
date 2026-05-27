@@ -8,4 +8,5 @@ use Symfony\Component\Validator\Constraint;
 
 final class EmailOrEmailTokenList extends Constraint
 {
+    public bool $allowMultiple = true;
 }
