@@ -725,9 +725,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $connection = $this->em->getConnection();
 
         $fieldsToUpdate = $connection->executeQuery(
-            'SELECT ff.id, ff.form_id, ff.validation 
-             FROM form_fields ff 
-             WHERE ff.type = ? 
+            'SELECT ff.id, ff.form_id, ff.validation
+             FROM form_fields ff
+             WHERE ff.type = ?
              AND (ff.validation IS NULL OR ff.validation = ? OR ff.validation = ?)',
             ['email', '[]', '{}']
         )->fetchAllAssociative();
@@ -753,8 +753,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
 
         $connection->executeStatement(
-            "UPDATE form_fields 
-             SET validation = JSON_SET(COALESCE(validation, '{}'), '$.donotsubmit', true) 
+            "UPDATE form_fields
+             SET validation = JSON_SET(COALESCE(validation, '{}'), '$.donotsubmit', true)
              WHERE id IN ($placeholders)",
             $fieldIds
         );

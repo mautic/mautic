@@ -33,6 +33,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
+    private const FORM_RESULT_PAGE_SUFFIX = '.page';
+
     public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->setStandardParameters(
@@ -343,8 +345,7 @@ class ResultController extends CommonFormController
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
-        $session  = $request->getSession();
-        $page     = $session->get('mautic.formresult.'.$formId.'.page', 1);
+        $page     = $this->getFormResultPage($request, $formId);
         $flashes  = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -398,7 +399,7 @@ class ResultController extends CommonFormController
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
-        $page     = $request->getSession()->get('mautic.formresult.'.$formId.'.page', 1);
+        $page     = $this->getFormResultPage($request, $formId);
         $flashes  = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -441,30 +442,16 @@ class ResultController extends CommonFormController
     public function batchMarkSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $formId  = $this->getFormIdFromRequest();
-        $page    = $request->getSession()->get('mautic.formresult.'.$formId.'.page', 1);
+        $page    = $this->getFormResultPage($request, $formId);
         $flashes = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $ids           = json_decode($request->query->get('ids', '[]'), true);
-            $domainsToSave = [];
+            [$domainsToSave, $flashes] = $this->getBlockedDomainsFromSubmissionIds(
+                $model,
+                json_decode($request->query->get('ids', '[]'), true)
+            );
 
-            foreach ($ids as $id) {
-                /** @var Submission|null $submission */
-                $submission = $model->getEntity($id);
-                if (null === $submission) {
-                    continue;
-                }
-                if (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
-                    $flashes[] = $this->accessDenied(true);
-                    continue;
-                }
-                $domain = $submission->getEmailDomain();
-                if ($domain) {
-                    $domainsToSave['*@'.$domain] = true;
-                }
-            }
-
-            if (!$domainsToSave) {
+            if ([] === $domainsToSave) {
                 $flashes[] = [
                     'type' => 'notice',
                     'msg'  => 'mautic.form.result.markspam.batch.none',
@@ -482,6 +469,39 @@ class ResultController extends CommonFormController
         }
 
         return $this->getFormResultRedirectResponse($formId, $page, $flashes);
+    }
+
+    /**
+     * @return array{0: array<string, true>, 1: array<int, mixed>}
+     */
+    private function getBlockedDomainsFromSubmissionIds(SubmissionModel $model, mixed $ids): array
+    {
+        $domainsToSave = [];
+        $flashes       = [];
+
+        if (!is_array($ids)) {
+            return [$domainsToSave, $flashes];
+        }
+
+        foreach ($ids as $id) {
+            /** @var Submission|null $submission */
+            $submission = $model->getEntity($id);
+            if (null === $submission) {
+                continue;
+            }
+
+            if (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
+                $flashes[] = $this->accessDenied(true);
+                continue;
+            }
+
+            $domain = $submission->getEmailDomain();
+            if ($domain) {
+                $domainsToSave['*@'.$domain] = true;
+            }
+        }
+
+        return [$domainsToSave, $flashes];
     }
 
     /**
@@ -529,6 +549,11 @@ class ResultController extends CommonFormController
                 'flashes' => $flashes,
             ]
         );
+    }
+
+    private function getFormResultPage(Request $request, int|string $formId): int
+    {
+        return (int) $request->getSession()->get('mautic.formresult.'.$formId.self::FORM_RESULT_PAGE_SUFFIX, 1);
     }
 
     /**
