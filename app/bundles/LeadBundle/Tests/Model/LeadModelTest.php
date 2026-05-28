@@ -475,17 +475,21 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with($lead->getId())
             ->willReturn(null);
 
-        $stageRepositoryMock = new class {
-            /** @var Stage|mixed|null */
-            public $returnValue;
+        $stageRepositoryMock = new class(1, $stageMock) {
+            public function __construct(
+                private int|string $expectedValue,
+                private ?Stage $returnValue,
+            ) {
+            }
 
             public function findByIdOrName(int|string $value): ?Stage
             {
+                \PHPUnit\Framework\Assert::assertSame($this->expectedValue, $value);
+
                 return $this->returnValue;
             }
         };
-        $stageRepositoryMock->returnValue = $stageMock;
-        $matcher                          = $this->exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->entityManagerMock->expects($matcher)
             ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
@@ -520,17 +524,21 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with($lead->getId())
             ->willReturn(null);
 
-        $stageRepositoryMock = new class {
-            /** @var Stage|mixed|null */
-            public $returnValue;
+        $stageRepositoryMock = new class($data['stage'], null) {
+            public function __construct(
+                private int|string $expectedValue,
+                private ?Stage $returnValue,
+            ) {
+            }
 
             public function findByIdOrName(int|string $value): ?Stage
             {
+                \PHPUnit\Framework\Assert::assertSame($this->expectedValue, $value);
+
                 return $this->returnValue;
             }
         };
-        $stageRepositoryMock->returnValue = null;
-        $matcher                          = $this->exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->entityManagerMock->expects($matcher)
             ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
@@ -650,7 +658,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private function setProperty($object, $class, $property, $value): void
     {
         $reflectedProp = new \ReflectionProperty($class, $property);
-        $reflectedProp->setAccessible(true);
         $reflectedProp->setValue($object, $value);
     }
 
@@ -790,7 +797,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass($companyModel);
         $property   = $reflection->getProperty('security');
-        $property->setAccessible(true);
         $property->setValue($companyModel, $security);
     }
 

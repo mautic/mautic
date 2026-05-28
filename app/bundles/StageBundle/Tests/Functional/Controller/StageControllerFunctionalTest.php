@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const COUNT_SQL_PREFIX = 'SELECT COUNT(*) FROM ';
+
     public function testStageMenuString(): void
     {
         $stage = $this->client->request(Request::METHOD_GET, '/s/stages');
@@ -89,19 +91,19 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($primaryStageId, $savedContactStage->getId());
         Assert::assertNull($this->em->find(Stage::class, $mergedStageId));
         Assert::assertSame(1, (int) $connection->fetchOne(
-            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
+            self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
             [$primaryStageId, $contactId]
         ));
         Assert::assertSame(1, (int) $connection->fetchOne(
-            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ? AND lead_id = ?',
+            self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ? AND lead_id = ?',
             [$primaryStageId, $contactId]
         ));
         Assert::assertSame(0, (int) $connection->fetchOne(
-            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ?',
+            self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ?',
             [$mergedStageId]
         ));
         Assert::assertSame(0, (int) $connection->fetchOne(
-            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ?',
+            self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ?',
             [$mergedStageId]
         ));
     }
