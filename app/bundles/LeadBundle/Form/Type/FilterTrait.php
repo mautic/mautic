@@ -51,7 +51,7 @@ trait FilterTrait
         }
 
         $fieldType   = $data['type'];
-        $fieldName   = $data['field'];
+        $fieldName   = $data['field'] ?? '';
         $type        = TextType::class;
         $attr        = ['class' => 'form-control filter-value'];
         $displayType = HiddenType::class;
@@ -61,8 +61,8 @@ trait FilterTrait
 
         if (isset($options['fields']['behaviors'][$fieldName])) {
             $field = $options['fields']['behaviors'][$fieldName];
-        } elseif (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
-            $field = $options['fields'][$data['object']][$fieldName];
+        } elseif (isset($data['object']) && isset($options['fields'][$data['object'] ?? ''][$fieldName])) {
+            $field = $options['fields'][$data['object'] ?? ''][$fieldName];
         }
 
         $customOptions = [];

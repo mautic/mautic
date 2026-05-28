@@ -343,16 +343,15 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
             return $this->invokeCallback($event, $lead, $settings);
-        } else {
-            /** @var TriggerEvent $triggerEvent */
-            $triggerEvent = $this->getEventRepository()->find($event['id']);
-
-            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-
-            $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
-
-            return $triggerExecutedEvent->getResult();
         }
+        /** @var TriggerEvent $triggerEvent */
+        $triggerEvent = $this->getEventRepository()->find($event['id']);
+
+        $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+
+        $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
+
+        return $triggerExecutedEvent->getResult();
     }
 
     private function invokeCallback($event, Lead $lead, array $settings): mixed

@@ -66,7 +66,7 @@ class IntegrationSyncProcess
                             'Integration to Mautic; skipping sync for the %s object because object IDs have been explicitly specified for other objects',
                             $integrationObjectName
                         ),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                     continue;
                 }

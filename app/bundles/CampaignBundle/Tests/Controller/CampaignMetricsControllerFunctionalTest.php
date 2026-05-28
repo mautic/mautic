@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -133,5 +136,198 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
             Assert::assertEquals($expectedHoursData[$index]['label'], $dataset['label']);
             Assert::assertEquals($expectedHoursData[$index]['data'], $dataset['data']);
         }
+    }
+
+    public function testEventDetailsAction(): void
+    {
+        /** @var array<int, Lead> $contacts */
+        $contacts = [
+            $this->campaignFixturesHelper->createContact('john@example.com'),
+            $this->campaignFixturesHelper->createContact('paul@example.com'),
+            $this->campaignFixturesHelper->createContact('mawka@example.com'),
+            $this->campaignFixturesHelper->createContact('heksa@example.com'),
+        ];
+        $contacts[0]->setPoints(1);
+        $contacts[2]->setPoints(1);
+        $contacts[3]->setPoints(1);
+        $this->em->persist($contacts[0]);
+        $this->em->persist($contacts[2]);
+        $this->em->persist($contacts[3]);
+        $this->em->flush();
+
+        $email = $this->emailFixturesHelper->createEmail('Test Email');
+        $this->em->flush();
+        $emailId = $email->getId();
+
+        $emailLinks = [
+            $this->emailFixturesHelper->createEmailLink('https://example.com/1', $emailId),
+            $this->emailFixturesHelper->createEmailLink('https://example.com/2', $emailId),
+        ];
+        $this->em->flush();
+
+        $campaign      = $this->campaignFixturesHelper->createCampaignWithConditionalEmail($emailId, allowRestart: true);
+        foreach ($contacts as $contact) {
+            $this->campaignFixturesHelper->addContactToCampaign($contact, $campaign);
+        }
+        $this->em->flush();
+        $this->em->clear();
+
+        $events         = $campaign->getEvents();
+        $conditionEvent = $events->first();
+        $emailEvent     = $events->last();
+
+        // check condition event details before running the campaign
+        $conditionEventDetails = $this->getEventDetails($conditionEvent->getId());
+        $this->assertEventDetails(
+            actual: $conditionEventDetails,
+            expected: [
+                'total_executions'     => ['value' => 0, 'tooltip' => null],
+                'unique_executions'    => ['value' => 0, 'tooltip' => null],
+                'max_rotations'        => ['value' => 0, 'tooltip' => null],
+                'pending_executions'   => ['value' => 0, 'tooltip' => null],
+                'negative_path_count'  => ['value' => 0, 'tooltip' => null],
+                'positive_path_count'  => ['value' => 0, 'tooltip' => null],
+            ]
+        );
+
+        // check email event details before running the campaign
+        $emailEventDetails = $this->getEventDetails($emailEvent->getId());
+        $this->assertEventDetails(
+            actual: $emailEventDetails,
+            expected: [
+                'total_executions'          => ['value' => 0, 'tooltip' => null],
+                'unique_executions'         => ['value' => 0, 'tooltip' => null],
+                'max_rotations'             => ['value' => 0, 'tooltip' => null],
+                'pending_executions'        => ['value' => 0, 'tooltip' => null],
+                'sent_count'                => ['value' => 0, 'tooltip' => null],
+                'read_count'                => ['value' => 0, 'tooltip' => null],
+                'clicked_count'             => ['value' => 0, 'tooltip' => null],
+                'open_rate'                 => ['value' => '0%', 'tooltip' => null],
+                'click_through_rate'        => ['value' => '0%', 'tooltip' => null],
+                'click_through_open_rate'   => ['value' => '0%', 'tooltip' => null],
+            ]
+        );
+
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        Assert::assertStringContainsString('7 total events were executed', $commandResult->getDisplay());
+
+        // check condition event details after running the campaign
+        $conditionEventDetails = $this->getEventDetails($conditionEvent->getId());
+        $this->assertEventDetails(
+            actual: $conditionEventDetails,
+            expected: [
+                'total_executions'     => ['value' => 4, 'tooltip' => null],
+                'unique_executions'    => ['value' => 4, 'tooltip' => null],
+                'max_rotations'        => ['value' => 1, 'tooltip' => null],
+                'pending_executions'   => ['value' => 0, 'tooltip' => null],
+                'negative_path_count'  => ['value' => 1, 'tooltip' => null],
+                'positive_path_count'  => ['value' => 3, 'tooltip' => null],
+            ],
+            notEmptyFields: ['first_execution_date', 'last_execution_date']
+        );
+
+        // check email event details after running the campaign
+        $emailEventDetails = $this->getEventDetails($emailEvent->getId());
+        $this->assertEventDetails(
+            actual: $emailEventDetails,
+            expected: [
+                'total_executions'          => ['value' => 3, 'tooltip' => null],
+                'unique_executions'         => ['value' => 3, 'tooltip' => null],
+                'max_rotations'             => ['value' => 1, 'tooltip' => null],
+                'pending_executions'        => ['value' => 0, 'tooltip' => null],
+                'sent_count'                => ['value' => 3, 'tooltip' => null],
+                'read_count'                => ['value' => 0, 'tooltip' => null],
+                'clicked_count'             => ['value' => 0, 'tooltip' => null],
+                'open_rate'                 => ['value' => '0%', 'tooltip' => null],
+                'click_through_rate'        => ['value' => '0%', 'tooltip' => null],
+                'click_through_open_rate'   => ['value' => '0%', 'tooltip' => null],
+            ],
+            notEmptyFields: ['first_execution_date', 'last_execution_date']
+        );
+
+        // emulate email read and link click
+        $emailStats = $this->em->getRepository(Stat::class)->findBy(['email' => $email]);
+        $email      = $emailStats[0]->getEmail();
+        Assert::assertCount(3, $emailStats);
+        $this->emailFixturesHelper->emulateEmailRead($emailStats[0], $email);
+        $this->emailFixturesHelper->emulateEmailRead($emailStats[1], $email);
+        $this->em->flush();
+
+        $this->emailFixturesHelper->emulateLinkClick($email, $emailLinks[0], $emailStats[0]->getLead());
+        $this->em->flush();
+
+        // check email event details after emulating read and click
+        $emailEventDetails = $this->getEventDetails($emailEvent->getId());
+        $this->assertEventDetails(
+            actual: $emailEventDetails,
+            expected: [
+                'total_executions'          => ['value' => 3, 'tooltip' => null],
+                'unique_executions'         => ['value' => 3, 'tooltip' => null],
+                'max_rotations'             => ['value' => 1, 'tooltip' => null],
+                'pending_executions'        => ['value' => 0, 'tooltip' => null],
+                'sent_count'                => ['value' => 3, 'tooltip' => null],
+                'read_count'                => ['value' => 2, 'tooltip' => null],
+                'clicked_count'             => ['value' => 1, 'tooltip' => null],
+                'open_rate'                 => ['value' => '66.67%', 'tooltip' => null],
+                'click_through_rate'        => ['value' => '33.33%', 'tooltip' => null],
+                'click_through_open_rate'   => ['value' => '50%', 'tooltip' => null],
+            ],
+            notEmptyFields: ['first_execution_date', 'last_execution_date']
+        );
+
+        // increment rotation for one of the leads and run the campaign again
+        $campaignLead = $this->em->getRepository(CampaignLead::class)->findOneBy([
+            'campaign' => $campaign->getId(),
+            'lead'     => $contacts[1]->getId(),
+        ]);
+        $campaignLead->setRotation(2);
+        $this->em->persist($campaignLead);
+        $this->em->flush();
+
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        Assert::assertStringContainsString('1 total event was executed', $commandResult->getDisplay());
+
+        // check condition event details after second rotation for the lead
+        $conditionEventDetails = $this->getEventDetails($conditionEvent->getId());
+        $this->assertEventDetails(
+            actual: $conditionEventDetails,
+            expected: [
+                'total_executions'     => ['value' => 5, 'tooltip' => null],
+                'unique_executions'    => ['value' => 4, 'tooltip' => null],
+                'max_rotations'        => ['value' => 2, 'tooltip' => null],
+                'pending_executions'   => ['value' => 0, 'tooltip' => null],
+                'negative_path_count'  => ['value' => 2, 'tooltip' => null],
+                'positive_path_count'  => ['value' => 3, 'tooltip' => null],
+            ],
+            notEmptyFields: ['first_execution_date', 'last_execution_date']
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $actual
+     * @param array<string, mixed> $expected
+     * @param array<int, string>   $notEmptyFields
+     */
+    private function assertEventDetails(array $actual, array $expected, array $notEmptyFields = []): void
+    {
+        foreach ($notEmptyFields as $field) {
+            $this->assertNotEmpty($actual[$field]['value'], "$field value should not be empty");
+            $this->assertNotEmpty($actual[$field]['tooltip'], "$field tooltip should not be empty");
+        }
+        foreach ($expected as $key => $value) {
+            $this->assertEquals($value, $actual[$key]);
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getEventDetails(int $eventId): array
+    {
+        $this->client->request(Request::METHOD_GET, "/s/campaign/metrics/event-details/{$eventId}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
+
+        return json_decode($clientResponse->getContent(), true);
     }
 }

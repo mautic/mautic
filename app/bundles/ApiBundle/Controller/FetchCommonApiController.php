@@ -123,11 +123,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $serializerGroups = [];
 
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
     protected ContainerBagInterface $parametersContainer;
 
     /**
@@ -135,7 +130,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     public function __construct(
         protected CorePermissions $security,
-        Translator $translator,
+        protected Translator $translator,
         protected EntityResultHelper $entityResultHelper,
         private AppVersion $appVersion,
         private RequestStack $requestStack,
@@ -144,8 +139,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected EventDispatcherInterface $dispatcher,
         protected CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->translator           = $translator;
-
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
         }

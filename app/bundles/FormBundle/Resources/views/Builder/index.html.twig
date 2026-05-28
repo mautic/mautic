@@ -135,22 +135,11 @@
                                       <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.submitactions'|trans }}">
                                           <option value=""></option>
                                           {% for group, groupActions in actions %}
-                                                  {% set campaignActionFound = false %}
-                                                  {% for k, e in groupActions %}
-                                                      {% if e.allowCampaignForm is defined and e.allowCampaignForm is not empty %}
-                                                          {% set campaignActionFound = true %}
-                                                      {% endif %}
-                                                  {% endfor %}
-                                                  {% set class = campaignActionFound is empty ? 'action-standalone-only' : '' %}
-                                                  {% if not campaignActionFound and not activeForm.isStandalone %}
-                                                      {% set class = class ~ ' hide' %}
-                                                  {% endif %}
-                                                  <optgroup class="{{ class }}" label="{{ group|trans }}"></optgroup>
+                                                  <optgroup label="{{ group|trans }}"></optgroup>
                                                   {% for k, e in groupActions %}
                                                       {{ include('@MauticForm/Action/_option.html.twig', {
                                                               'action': e,
                                                               'type': k,
-                                                              'isStandalone': activeForm.isStandalone,
                                                               'formId': form['sessionId'].vars['data'],
                                                       }, with_context=false) }}
                                                   {% endfor %}
@@ -209,31 +198,6 @@
   </div>
   {{ form_end(form) }}
 
-  {% set typeOneDifferences = ['mautic.form.type.one.differences.1st', 'mautic.form.type.one.differences.2nd', 'mautic.form.type.one.differences.3rd'] %}
-  {% set typeTwoDifferences = ['mautic.form.type.two.differences.1st', 'mautic.form.type.two.differences.2nd', 'mautic.form.type.two.differences.3rd'] %}
-
-  {% if activeForm.formType is null or (forceTypeSelection is defined and forceTypeSelection is not empty) %}
-      {{ include('@MauticCore/Helper/form_selecttype.html.twig', {
-              'item': activeForm,
-              'mauticLang': {
-                  'newStandaloneForm': 'mautic.form.type.standalone.header',
-                  'newCampaignForm': 'mautic.form.type.campaign.header',
-              },
-              'typePrefix': 'form',
-              'cancelUrl': 'mautic_form_index',
-              'header': 'mautic.form.type.header',
-              'typeOneHeader': 'mautic.form.type.campaign.header',
-              'typeOneDifferences': typeOneDifferences,
-              'typeOnePictogram': 'process--automation',
-              'typeOneTag': 'mautic.form.type.campaign.tag',
-              'typeOneOnClick': "Mautic.selectFormType('campaign');",
-              'typeTwoHeader': 'mautic.form.type.standalone.header',
-              'typeTwoDifferences': typeTwoDifferences,
-              'typeTwoPictogram': 'flexible',
-              'typeTwoTag': 'mautic.form.type.standalone.tag',
-              'typeTwoOnClick': "Mautic.selectFormType('standalone');",
-      }, with_context=false) }}
-  {% endif %}
 {% endblock %}
 
 {% block modal %}

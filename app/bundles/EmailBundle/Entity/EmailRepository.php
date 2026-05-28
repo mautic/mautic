@@ -353,7 +353,7 @@ class EmailRepository extends CommonRepository
             $sendStopDate
         );
 
-        if (!($q instanceof QueryBuilder)) {
+        if (!$q instanceof QueryBuilder) {
             return $q;
         }
 
@@ -364,14 +364,13 @@ class EmailRepository extends CommonRepository
             return $results[0];
         } elseif ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
-        } else {
-            $leads = [];
-            foreach ($results as $r) {
-                $leads[$r['id']] = $r;
-            }
-
-            return $leads;
         }
+        $leads = [];
+        foreach ($results as $r) {
+            $leads[$r['id']] = $r;
+        }
+
+        return $leads;
     }
 
     /**
@@ -407,10 +406,19 @@ class EmailRepository extends CommonRepository
         }
 
         if ($topLevel) {
-            if (true === $topLevel || 'variant' == $topLevel) {
-                $q->andWhere($q->expr()->isNull('e.variantParent'));
-            } elseif ('translation' == $topLevel) {
-                $q->andWhere($q->expr()->isNull('e.translationParent'));
+            // BC layer
+            if (true === $topLevel || '1' === $topLevel) {
+                $topLevel = ['variant', 'translation'];
+            } elseif (is_string($topLevel)) {
+                $topLevel = [$topLevel];
+            }
+
+            foreach ($topLevel as $type) {
+                match ($type) {
+                    'variant'     => $q->andWhere($q->expr()->isNull('e.variantParent')),
+                    'translation' => $q->andWhere($q->expr()->isNull('e.translationParent')),
+                    default       => null, // BC: ignore unknown values
+                };
             }
         }
 

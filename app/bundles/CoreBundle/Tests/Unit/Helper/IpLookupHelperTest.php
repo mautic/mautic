@@ -2,24 +2,55 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(IpLookupHelper::class)]
 class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function __construct($name = null)
-    {
-        parent::__construct($name);
-    }
+    /**
+     * @var DeviceDetector|(DeviceDetector&object&\PHPUnit\Framework\MockObject\MockObject)|(DeviceDetector&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private DeviceDetector|\PHPUnit\Framework\MockObject\MockObject $deviceDetector;
+
+    private DeviceDetectorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
 
     protected function setUp(): void
     {
+        $this->deviceDetectorFactory = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $this->deviceDetector        = $this->createMock(DeviceDetector::class);
+
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
+
+    public function testDeviceDetectorBotsDetectionTrue(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(true);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertFalse($ip->getIpAddress()->isTrackable());
+    }
+
+    public function testDeviceDetectorBotsDetectionFalse(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(false);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertTrue($ip->getIpAddress()->isTrackable());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Check if IP outside a request that local IP is returned')]
@@ -72,6 +103,80 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('192.168.0.1', $ip->getIpAddress());
     }
 
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that prefetch requests are not trackable')]
+    public function testIsRequestTrackableWithPrefetchHeader(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Purpose', 'prefetch');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable();
+
+        $this->assertFalse($result);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that prerender requests are not trackable')]
+    public function testIsRequestTrackableWithSecPurposePrerenderHeader(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-Purpose', 'prerender');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable();
+
+        $this->assertFalse($result);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that GPC requests are not trackable')]
+    public function testIsRequestTrackableWithGpcHeader(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-GPC', '1');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable();
+
+        $this->assertFalse($result);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that DNT requests are not trackable')]
+    public function testIsRequestTrackableWithDntHeader(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('DNT', '1');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable();
+
+        $this->assertFalse($result);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that HEAD requests are not trackable')]
+    public function testIsRequestTrackableWithHeadMethod(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->setMethod('HEAD');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable();
+
+        $this->assertFalse($result);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that normal requests are trackable')]
+    public function testIsRequestTrackableReturnsTrueForNormalRequest(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+
+        $result = $this->getIpHelper($request)->isRequestTrackable();
+
+        $this->assertTrue($result);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that requests without request context fall back to IP trackability')]
+    public function testIsRequestTrackableWithoutRequest(): void
+    {
+        $result = $this->getIpHelper(null)->isRequestTrackable();
+
+        // Returns true since there's no request to check and the IP (127.0.0.1) is trackable
+        $this->assertTrue($result);
+    }
+
     /**
      * @return IpLookupHelper
      */
@@ -101,6 +206,17 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(null);
         }
 
-        return new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper);
+        $this->deviceDetectorFactory->expects($this->any())
+            ->method('create')
+            ->willReturnCallback(
+                function () {
+                    return $this->deviceDetector;
+                }
+            );
+
+        $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory, null);
+        $helper->reset();
+
+        return $helper;
     }
 }

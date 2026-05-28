@@ -121,6 +121,10 @@ return [
                     'objectId' => '\d+',
                 ],
             ],
+            'mautic_company_graph'     => [
+                'path'       => '/company/graph/{objectId}',
+                'controller' => 'Mautic\LeadBundle\Controller\CompanyController::graphAction',
+            ],
             'mautic_company_action' => [
                 'path'       => '/companies/{objectAction}/{objectId}',
                 'controller' => 'Mautic\LeadBundle\Controller\CompanyController::executeAction',
@@ -892,6 +896,8 @@ return [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
         'contact_api_count_cache_ttl'         => 5, // in seconds, set null to disable.
+        'delete_segment_in_background'        => false,
+        'segment_api_count_cache_ttl'         => 43200, // 12 hours in seconds
         'contact_columns'                     => [
             '0' => 'name',
             '1' => 'email',

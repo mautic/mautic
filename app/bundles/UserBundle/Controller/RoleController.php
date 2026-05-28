@@ -15,6 +15,22 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 class RoleController extends FormController
 {
     /**
+     * @param int|string|null $objectId
+     *
+     * @return string
+     */
+    protected function getSessionBase($objectId = null)
+    {
+        $base = 'role';
+
+        if (null !== $objectId) {
+            $base .= '.'.$objectId;
+        }
+
+        return $base;
+    }
+
+    /**
      * Generate's default role list view.
      *
      * @param int $page
@@ -71,18 +87,11 @@ class RoleController extends FormController
             ]);
         }
 
-        $roleIds = [];
-
-        foreach ($items as $role) {
-            $roleIds[] = $role->getId();
-        }
-
         $pageHelper->rememberPage($page);
 
         return $this->delegateView([
             'viewParameters'  => [
                 'items'       => $items,
-                'userCounts'  => (!empty($roleIds)) ? $model->getRepository()->getUserCount($roleIds) : [],
                 'searchValue' => $filter,
                 'page'        => $page,
                 'limit'       => $limit,
@@ -224,7 +233,7 @@ class RoleController extends FormController
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.user.role.error.notfound',
-                            'msgVars' => ['%id' => $objectId],
+                            'msgVars' => ['%id%' => $objectId],
                         ],
                     ],
                 ])
@@ -268,11 +277,10 @@ class RoleController extends FormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
-            } else {
-                // the form has to be rebuilt because the permissions were updated
-                $permissionsConfig = $this->getPermissionsConfig($entity);
-                $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
             }
+            // the form has to be rebuilt because the permissions were updated
+            $permissionsConfig = $this->getPermissionsConfig($entity);
+            $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
         } else {
             // lock the entity
             $model->lockEntity($entity);
