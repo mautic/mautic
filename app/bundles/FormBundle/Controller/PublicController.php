@@ -253,11 +253,11 @@ class PublicController extends CommonFormController
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
 
-        return $this->render($logicalName, [
+        return new Response($this->factory->getHelper('theme')->renderThemeTemplate($logicalName, [
             'message'  => $msg,
             'type'     => $msgType,
             'template' => $this->coreParametersHelper->get('theme'),
-        ]);
+        ]));
     }
 
     /**
@@ -333,7 +333,7 @@ class PublicController extends CommonFormController
                 $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
-            return $this->render($logicalName, $viewParams);
+            return new Response($this->factory->getHelper('theme')->renderThemeTemplate($logicalName, $viewParams));
         }
 
         return $this->render('@MauticForm/form.html.twig', $viewParams);

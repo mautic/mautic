@@ -1171,7 +1171,7 @@ class EmailController extends FormController
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-        return $this->render(
+        return new Response($this->factory->getHelper('theme')->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'    => $isNew,
@@ -1181,7 +1181,7 @@ class EmailController extends FormController
                 'template' => $template,
                 'basePath' => $request->getBasePath(),
             ]
-        );
+        ));
     }
 
     /**

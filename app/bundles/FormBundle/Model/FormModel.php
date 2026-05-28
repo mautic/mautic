@@ -64,7 +64,7 @@ class FormModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -155,9 +155,9 @@ class FormModel extends CommonFormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function setFields(Form $entity, $sessionFields): void
@@ -430,7 +430,7 @@ class FormModel extends CommonFormModel
 
         if ($entity->getRenderStyle()) {
             $styleTheme = $styleToRender;
-            $style      = $this->twig->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $style      = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleTheme), []);
         }
 
         // Determine pages
@@ -442,7 +442,7 @@ class FormModel extends CommonFormModel
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
-        $html               = $this->twig->render(
+        $html               = $this->themeHelper->renderThemeTemplate(
             $formToRender,
             [
                 'fieldSettings'          => $this->getCustomComponents()['fields'],
@@ -691,7 +691,7 @@ class FormModel extends CommonFormModel
             }
         }
 
-        $script = $this->twig->render(
+        $script = $this->themeHelper->renderThemeTemplate(
             $scriptToRender,
             [
                 'form'  => $form,
@@ -888,10 +888,10 @@ class FormModel extends CommonFormModel
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
-        } else {
-            // remove DOCTYPE, <html>, and <body> tags for old libxml
-            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
         }
+
+        // remove DOCTYPE, <html>, and <body> tags for old libxml
+        return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
     }
 
     /**
