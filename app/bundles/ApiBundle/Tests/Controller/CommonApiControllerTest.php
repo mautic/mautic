@@ -16,11 +16,11 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
@@ -99,7 +99,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
             $this->createMock(EntityResultHelper::class),
-            $this->createMock(Router::class),
+            $this->createMock(RouterInterface::class),
             $this->createMock(FormFactoryInterface::class),
             $this->createMock(AppVersion::class),
             $this->createMock(RequestStack::class),
@@ -107,6 +107,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(ModelFactory::class),
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(CoreParametersHelper::class),
+            // @phpstan-ignore-next-line
             $this->createMock(MauticFactory::class)
         );
 
@@ -117,9 +118,149 @@ class CommonApiControllerTest extends CampaignTestAbstract
         return $method->invokeArgs($controller, $args);
     }
 
+    /**
+     * Top-level 'internal' entries must be stripped from the where clause.
+     */
+    public function testSanitizeWhereClauseRemovesTopLevelInternalFlag(): void
+    {
+        $where = [
+            ['col' => 'id', 'expr' => 'eq', 'val' => 1],
+            ['internal' => true, 'expr' => 'formula', 'val' => '1=1'],
+        ];
+
+        $this->invokeProtectedSanitize($where);
+
+        $this->assertCount(1, $where);
+        $this->assertSame('eq', array_values($where)[0]['expr']);
+    }
+
+    /**
+     * SECURITY: 'internal' entries nested inside andX must be stripped.
+     * Before the fix, the copy-by-value bug in foreach allowed these to survive
+     * sanitization, enabling SQL injection via the formula expression type.
+     */
+    public function testSanitizeWhereClauseRemovesNestedInternalFlagInsideAndX(): void
+    {
+        $where = [
+            [
+                'expr' => 'andX',
+                'val'  => [
+                    ['internal' => true, 'expr' => 'formula', 'val' => '1=1 UNION SELECT password FROM users--'],
+                    ['col' => 'firstname', 'expr' => 'eq', 'val' => 'test'],
+                ],
+            ],
+        ];
+
+        $this->invokeProtectedSanitize($where);
+
+        $nested = $where[0]['val'];
+        $this->assertCount(1, $nested, 'Internal formula entry must be removed from nested andX group');
+        $this->assertSame('eq', array_values($nested)[0]['expr']);
+    }
+
+    /**
+     * SECURITY: 'internal' entries nested inside orX must also be stripped.
+     */
+    public function testSanitizeWhereClauseRemovesNestedInternalFlagInsideOrX(): void
+    {
+        $where = [
+            [
+                'expr' => 'orX',
+                'val'  => [
+                    ['internal' => true, 'expr' => 'formula', 'val' => 'injected SQL'],
+                    ['col' => 'email', 'expr' => 'like', 'val' => '%@example.com'],
+                ],
+            ],
+        ];
+
+        $this->invokeProtectedSanitize($where);
+
+        $nested = $where[0]['val'];
+        $this->assertCount(1, $nested, 'Internal formula entry must be removed from nested orX group');
+        $this->assertSame('like', array_values($nested)[0]['expr']);
+    }
+
+    /**
+     * SECURITY: 'internal' entries must be stripped at arbitrary nesting depth.
+     */
+    public function testSanitizeWhereClauseRemovesDeeplyNestedInternalFlag(): void
+    {
+        $where = [
+            [
+                'expr' => 'andX',
+                'val'  => [
+                    [
+                        'expr' => 'orX',
+                        'val'  => [
+                            ['internal' => true, 'expr' => 'formula', 'val' => 'injected SQL'],
+                            ['col' => 'id', 'expr' => 'gt', 'val' => 0],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->invokeProtectedSanitize($where);
+
+        $inner = $where[0]['val'][0]['val'];
+        $this->assertCount(1, $inner, 'Internal formula entry must be removed at depth > 1');
+        $this->assertSame('gt', array_values($inner)[0]['expr']);
+    }
+
+    /**
+     * Normal (non-internal) clauses at any level must be left untouched.
+     */
+    public function testSanitizeWhereClausePreservesNonInternalClauses(): void
+    {
+        $where = [
+            ['col' => 'id', 'expr' => 'eq', 'val' => 5],
+            [
+                'expr' => 'andX',
+                'val'  => [
+                    ['col' => 'firstname', 'expr' => 'eq', 'val' => 'John'],
+                ],
+            ],
+        ];
+
+        $original = $where;
+        $this->invokeProtectedSanitize($where);
+
+        $this->assertSame($original, $where);
+    }
+
+    /**
+     * Helper: invoke the protected sanitizeWhereClauseArrayFromRequest method,
+     * passing $where by reference so mutations are visible to the caller.
+     *
+     * @param array<mixed> $where
+     */
+    private function invokeProtectedSanitize(array &$where): void
+    {
+        $controller = new CommonApiController(
+            $this->createMock(CorePermissions::class),
+            $this->createMock(Translator::class),
+            $this->createMock(EntityResultHelper::class),
+            $this->createMock(RouterInterface::class),
+            $this->createMock(FormFactoryInterface::class),
+            $this->createMock(AppVersion::class),
+            $this->createMock(RequestStack::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(ModelFactory::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(CoreParametersHelper::class),
+            // @phpstan-ignore-next-line
+            $this->createMock(MauticFactory::class)
+        );
+
+        $reflection = new \ReflectionClass(CommonApiController::class);
+        $method     = $reflection->getMethod('sanitizeWhereClauseArrayFromRequest');
+        $method->invokeArgs($controller, [&$where]);
+    }
+
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $this->createMock(MauticFactory::class)) extends CommonApiController {
+        // @phpstan-ignore-next-line
+        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(RouterInterface::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $this->createMock(MauticFactory::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors
@@ -127,7 +268,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
              *
              * @return mixed[]
              */
-            public function testGetBatchEntities(array $parameters, array $errors, AbstractCommonModel $model): ?array
+            public function testGetBatchEntities(array $parameters, array $errors, AbstractCommonModel $model): array
             {
                 return $this->getBatchEntities($parameters, $errors, false, 'id', $model);
             }
