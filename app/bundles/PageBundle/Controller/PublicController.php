@@ -264,7 +264,7 @@ class PublicController extends AbstractFormController
 
                 $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-                $response = $this->render(
+                $content = $themeHelper->renderThemeTemplate(
                     $logicalName,
                     [
                         'content'  => $content,
@@ -273,8 +273,6 @@ class PublicController extends AbstractFormController
                         'public'   => true,
                     ]
                 );
-
-                $content = $response->getContent();
             } else {
                 if (!empty($analytics)) {
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
@@ -375,7 +373,7 @@ class PublicController extends AbstractFormController
 
             $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-            $response = $this->render(
+            $content = $themeHelper->renderThemeTemplate(
                 $logicalName,
                 [
                     'content'  => $content,
@@ -384,8 +382,6 @@ class PublicController extends AbstractFormController
                     'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
-
-            $content = $response->getContent();
         } else {
             $content = str_replace('</head>', $analytics."\n</head>", $content);
         }

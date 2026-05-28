@@ -981,7 +981,8 @@ class FormController extends CommonFormController
                 $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
-            return $this->render($logicalName, $viewParams);
+            // GHSA-9fx4-7cmj-47vg: render via sandboxed environment to prevent SSTI/RCE
+            return new Response($themeHelper->renderThemeTemplate($logicalName, $viewParams));
         }
 
         return $this->render('@MauticForm/form.html.twig', $viewParams);

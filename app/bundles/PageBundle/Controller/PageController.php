@@ -832,14 +832,18 @@ class PageController extends FormController
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-        return $this->render($logicalName, [
-            'isNew'       => $isNew,
-            'formFactory' => $this->formFactory,
-            'content'     => $entity->getContent(),
-            'page'        => $entity,
-            'template'    => $template,
-            'basePath'    => $request->getBasePath(),
-        ]);
+        // GHSA-9fx4-7cmj-47vg: render via sandboxed environment to prevent SSTI/RCE
+        return new Response($themeHelper->renderThemeTemplate(
+            $logicalName,
+            [
+                'isNew'       => $isNew,
+                'formFactory' => $this->formFactory,
+                'content'     => $entity->getContent(),
+                'page'        => $entity,
+                'template'    => $template,
+                'basePath'    => $request->getBasePath(),
+            ]
+        ));
     }
 
     /**
