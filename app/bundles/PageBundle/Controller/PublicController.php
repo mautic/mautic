@@ -256,7 +256,7 @@ class PublicController extends AbstractFormController
 
                 $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-                $response = $this->render(
+                $content = $this->factory->getHelper('theme')->renderThemeTemplate(
                     $logicalName,
                     [
                         'slots'    => $slots,
@@ -266,8 +266,6 @@ class PublicController extends AbstractFormController
                         'public'   => true,
                     ]
                 );
-
-                $content = $response->getContent();
             } else {
                 if (!empty($analytics)) {
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
@@ -365,7 +363,7 @@ class PublicController extends AbstractFormController
 
             $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-            $response = $this->render(
+            $content = $this->factory->getHelper('theme')->renderThemeTemplate(
                 $logicalName,
                 [
                     'slots'    => $slots,
@@ -375,8 +373,6 @@ class PublicController extends AbstractFormController
                     'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
-
-            $content = $response->getContent();
         } else {
             $content = str_replace('</head>', $analytics.$this->renderView('@MauticPage/Page/preview_header.html.twig')."\n</head>", $content);
         }

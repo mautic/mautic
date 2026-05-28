@@ -1279,12 +1279,11 @@ class MailHelper
 
             $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-            $customHtml = $this->setTemplate($logicalName, [
-                'slots'    => $slots,
+            $customHtml = $this->factory->getHelper('theme')->renderThemeTemplate($logicalName, [
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
-            ], true);
+            ]);
         }
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);

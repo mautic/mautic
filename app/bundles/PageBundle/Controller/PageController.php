@@ -865,15 +865,18 @@ class PageController extends FormController
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-        return $this->render($logicalName, [
-            'isNew'       => $isNew,
-            'slots'       => $slots,
-            'formFactory' => $this->formFactory,
-            'content'     => $content,
-            'page'        => $entity,
-            'template'    => $template,
-            'basePath'    => $request->getBasePath(),
-        ]);
+        return new Response($this->factory->getHelper('theme')->renderThemeTemplate(
+            $logicalName,
+            [
+                'isNew'       => $isNew,
+                'slots'       => $slots,
+                'formFactory' => $this->formFactory,
+                'content'     => $content,
+                'page'        => $entity,
+                'template'    => $template,
+                'basePath'    => $request->getBasePath(),
+            ]
+        ));
     }
 
     /**
