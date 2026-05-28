@@ -6,6 +6,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
@@ -13,6 +14,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
@@ -20,6 +22,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         private MembershipManager $membershipManager,
         private CampaignModel $campaignModel,
         private InfiniteLoopValidator $infiniteLoopValidator,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -79,6 +82,11 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
                     $event->getContactsKeyedById(),
                     $campaign,
                     true
+                );
+
+                $this->eventDispatcher->dispatch(
+                    new CampaignEvent($campaign),
+                    CampaignEvents::ON_AFTER_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP
                 );
             }
         }

@@ -228,6 +228,15 @@ final class CampaignEvents
     public const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
 
     /**
+     * The mautic.lead.on_after_campaign_action_change_membership event is dispatched after campaign action to change a contact's membership is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignEvent
+     *
+     * @var string
+     */
+    public const ON_AFTER_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP = 'mautic.lead.on_after_campaign_action_change_membership';
+
+    /**
      * The mautic.campaign_failure_notify event is dispatched after campaign event is failed for a contact.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfFailureEvent
