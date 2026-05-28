@@ -1,0 +1,15 @@
+<form method="post" action="{{ actionUrl }}" role="form">
+    <div class="modal-body">
+        <div class="well mt-lg">
+            <h4>{{ 'mautic.email.resend_nonopeners'|trans }}</h4>
+            <p>{{ 'mautic.email.resend_nonopeners.confirm'|trans({'%name%': email.getName()}) }}</p>
+            <p class="text-muted small">{{ 'mautic.email.resend_nonopeners.note'|trans }}</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-tertiary" data-dismiss="modal">{{ 'mautic.core.form.cancel'|trans }}</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-mail-send-line"></i> {{ 'mautic.email.resend_nonopeners'|trans }}
+        </button>
+    </div>
+</form>

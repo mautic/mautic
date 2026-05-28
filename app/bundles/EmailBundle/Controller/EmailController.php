@@ -23,6 +23,7 @@ use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Service\NonOpenersService;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -1787,6 +1788,92 @@ class EmailController extends FormController
         $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
         $clonedEmail->setEmailType($cloningEmail->getEmailType());
         $clonedEmail->setDraft($cloningEmail->getDraft());
+    }
+
+    public function resendNonOpenersAction(
+        CorePermissions $security,
+        EmailModel $model,
+        NonOpenersService $nonOpenersService,
+        Request $request,
+        int $objectId,
+    ): JsonResponse|Response {
+        $entity = $model->getEntity($objectId);
+
+        if (null === $entity
+            || !$security->hasEntityAccess(
+                'email:emails:editown',
+                'email:emails:editother',
+                $entity->getCreatedBy()
+            )
+        ) {
+            return $this->postActionRedirect([
+                'passthroughVars' => [
+                    'closeModal' => 1,
+                    'route'      => false,
+                ],
+            ]);
+        }
+
+        if (!$nonOpenersService->canResend($entity)) {
+            $this->addFlashMessage('mautic.email.resend_nonopeners.error.not_sent');
+
+            return $this->postActionRedirect([
+                'passthroughVars' => [
+                    'closeModal' => 1,
+                    'route'      => false,
+                ],
+            ]);
+        }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'email'     => $entity,
+                'actionUrl' => $this->generateUrl('mautic_email_resend_nonopeners_execute', ['objectId' => $objectId]),
+            ],
+            'contentTemplate' => '@MauticEmail/Email/resend_nonopeners_modal.html.twig',
+        ]);
+    }
+
+    public function resendNonOpenersExecuteAction(
+        CorePermissions $security,
+        EmailModel $model,
+        NonOpenersService $nonOpenersService,
+        Request $request,
+        int $objectId,
+    ): JsonResponse|Response {
+        $entity = $model->getEntity($objectId);
+
+        if (null === $entity
+            || !$security->hasEntityAccess(
+                'email:emails:editown',
+                'email:emails:editother',
+                $entity->getCreatedBy()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        try {
+            $nonOpenersService->resend($objectId);
+            $this->addFlashMessage('mautic.email.resend_nonopeners.success');
+        } catch (\LogicException|\InvalidArgumentException $e) {
+            $this->addFlashMessage($e->getMessage(), [], 'error');
+        }
+
+        $viewParameters = [
+            'objectAction' => 'view',
+            'objectId'     => $objectId,
+        ];
+
+        return $this->postActionRedirect([
+            'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
+            'viewParameters'  => $viewParameters,
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::viewAction',
+            'passthroughVars' => [
+                'mauticContent' => 'email',
+                'closeModal'    => 1,
+            ],
+        ]);
     }
 
     private function unpublishIfLackingPermission(Email $entity, CorePermissions $corePermissions): Email
