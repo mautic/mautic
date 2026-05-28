@@ -15,6 +15,7 @@
     "errorRecovery": true
   },
   "scripts": {
+    "test": "jest",
     "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-source-maps",
     "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize",
     "remove-build": "rm -rf ./Assets/library/js/dist/* && rm -rf .parcel-cache/*",
@@ -62,12 +63,20 @@
     "grapesjs-tui-image-editor": "^1.0.2",
     "grapesjs-typed": "^2.0.1"
   },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
+  },
   "devDependencies": {
     "@babel/cli": "^7.16.8",
     "@babel/core": "^7.16.7",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-transform-modules-commonjs": "^7.16.7",
     "@babel/plugin-transform-runtime": "^7.16.8",
     "babel-eslint": "^10.1.0",
+    "babel-jest": "^29.7.0",
     "buffer": "^6.0.3",
     "eslint": "^8.7.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -78,6 +87,8 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#5.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "parcel": "^2.11.0",
     "prettier": "^2.5.1",
     "process": "^0.11.10",
