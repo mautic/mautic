@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\PagePreviewPdfGenerationEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\PageBundle\Helper\PageConfig;
@@ -37,6 +38,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -393,6 +395,119 @@ class PublicController extends AbstractFormController
         }
 
         return new Response($content);
+    }
+
+    public function previewDownloadAction(
+        Request $request,
+        PageConfig $pageConfig,
+        CorePermissions $security,
+        AnalyticsHelper $analyticsHelper,
+        AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
+        PageModel $model,
+        LeadModel $leadModel,
+        int $id,
+        ?string $objectType = null,
+        string $downloadType = 'pdf',
+    ): Response {
+        if ('pdf' !== strtolower($downloadType)) {
+            return $this->notFound();
+        }
+
+        $page = $model->getEntity($id);
+        if (!$page || !$page->getId()) {
+            return $this->notFound();
+        }
+
+        $contact   = null;
+        $contactId = (int) $request->query->get('contactId');
+        if ($contactId) {
+            $contact = $leadModel->getEntity($contactId);
+        }
+
+        $draftEnabled = $pageConfig->isDraftEnabled();
+        $analytics    = $analyticsHelper->getCode();
+
+        $BCcontent     = $page->getContent();
+        $content       = $page->getCustomHtml();
+        $publicPreview = $page->isPublicPreview();
+
+        if ('draft' === $objectType && $draftEnabled && $page->hasDraft()) {
+            $content       = $page->getDraftContent();
+            $publicPreview = $page->getDraft()->isPublicPreview();
+        }
+
+        if (($security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$security->isAnonymous(
+        ) && !$security->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $page->getCreatedBy()
+        ))) {
+            return $this->accessDenied();
+        }
+
+        if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother'
+        ))) {
+            return $this->accessDenied();
+        }
+
+        if (empty($content) && !empty($BCcontent)) {
+            $template = $page->getTemplate();
+            $content  = $page->getContent();
+
+            if (!empty($analytics)) {
+                $assetsHelper->addCustomDeclaration($analytics);
+            }
+
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+
+            $content = $themeHelper->renderThemeTemplate(
+                $logicalName,
+                [
+                    'content'  => $content,
+                    'page'     => $page,
+                    'template' => $template,
+                    'public'   => true, // @deprecated Remove in 2.0
+                ]
+            );
+        } else {
+            $content = str_replace('</head>', $analytics."\n</head>", $content);
+        }
+
+        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
+            $event = new PageDisplayEvent($content, $page, $this->getPreferenceCenterConfig());
+            if (isset($contact) && $contact instanceof Lead) {
+                $event->setLead($contact);
+            }
+            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+            $content = $event->getContent();
+        }
+
+        $fileName = strtolower(trim(preg_replace('/[^A-Za-z0-9._-]+/', '-', (string) $page->getTitle()) ?? '', '-'));
+        if ('' === $fileName) {
+            $fileName = 'page-preview';
+        }
+        $fileName .= '.pdf';
+
+        $pdfEvent = new PagePreviewPdfGenerationEvent($content, $page, $contact, $request, $fileName);
+        $this->dispatcher->dispatch($pdfEvent, PageEvents::PAGE_PREVIEW_GENERATE_PDF);
+
+        if (!$pdfEvent->hasPdfContent()) {
+            return new Response('PDF generation failed', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $pdfContent = $pdfEvent->getPdfContent();
+        $response   = new Response($pdfContent);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Length', (string) strlen($pdfContent));
+        $response->headers->set(
+            'Content-Disposition',
+            sprintf('%s; filename="%s"', ResponseHeaderBag::DISPOSITION_ATTACHMENT, $pdfEvent->getFileName())
+        );
+
+        return $response;
     }
 
     public function trackingImageAction(Request $request, PageModel $model): Response

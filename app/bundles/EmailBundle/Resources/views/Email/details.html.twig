@@ -578,6 +578,17 @@
                                                 'type': 'button'
                                             },
                                             onclick: 'window.open("' ~ previewUrl ~ '", "_blank");'
+                                        },
+                                        {
+                                            label: 'mautic.core.download',
+                                            variant: 'ghost',
+                                            icon_only: true,
+                                            icon: 'ri-download-line',
+                                            attributes: {
+                                                'id': 'content_preview_pdf_url_button',
+                                                'type': 'button'
+                                            },
+                                            onclick: 'window.open("' ~ previewUrl ~ '/download/pdf", "_blank");'
                                         }
                                     ]
                                 } %}
@@ -609,9 +620,12 @@
                              readonly
                              value="{{ draftPreviewUrl|escape }}"/>
                       <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                                                <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
                             <i class="fa fa-external-link"></i>
                         </button>
+                                                <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}/download/pdf', '_blank');">
+                                                        <i class="fa fa-download"></i>
+                                                </button>
                     </span>
                   </div>
               </div>

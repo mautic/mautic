@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Functional test ensuring that malicious Twig constructs in theme templates
@@ -92,6 +93,28 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
             'Hello Mautic',
             (string) $response->getContent()
         );
+    }
+
+    public function testPreviewPageCanBeDownloadedAsPdf(): void
+    {
+        $page = new Page();
+        $page->setTitle('PDF Test Page');
+        $page->setAlias('pdf-test-'.uniqid());
+        $page->setIsPublished(true);
+        $page->setPublicPreview(true);
+        $page->setCustomHtml('<html><body>Page PDF content</body></html>');
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/page/preview/'.$page->getId().'/download/pdf');
+        $response = $this->client->getResponse();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringStartsWith('application/pdf', (string) $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('attachment;', (string) $response->headers->get('Content-Disposition'));
+        $this->assertStringStartsWith('%PDF', (string) $response->getContent());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
     private function createMaliciousTheme(string $pageContent): string

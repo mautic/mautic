@@ -96,6 +96,21 @@ return [
                     'objectType'    => null,
                 ],
             ],
+            'mautic_email_preview_download' => [
+                'path'       => '/email/preview/{objectId}/download/{downloadType}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewDownloadAction',
+                'defaults'   => [
+                    'downloadType' => 'pdf',
+                ],
+            ],
+            'mautic_email_preview_download_draft' => [
+                'path'       => '/email/preview/{objectId}/draft/download/{downloadType}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewDownloadAction',
+                'defaults'   => [
+                    'objectType'   => 'draft',
+                    'downloadType' => 'pdf',
+                ],
+            ],
         ],
     ],
     'menu' => [

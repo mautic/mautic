@@ -237,6 +237,22 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
     }
 
+    public function testPreviewEmailCanBeDownloadedAsPdf(): void
+    {
+        $email = $this->createEmail();
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, sprintf('/email/preview/%d/download/pdf', $email->getId()));
+        self::assertResponseIsSuccessful();
+
+        $response    = $this->client->getResponse();
+        $contentType = (string) $response->headers->get('Content-Type');
+
+        self::assertStringStartsWith('application/pdf', $contentType);
+        self::assertStringContainsString('attachment;', (string) $response->headers->get('Content-Disposition'));
+        self::assertStringStartsWith('%PDF', (string) $response->getContent());
+    }
+
     private function createSegment(string $name = 'Segment 1'): LeadList
     {
         $segment = new LeadList();

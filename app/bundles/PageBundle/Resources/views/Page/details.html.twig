@@ -333,6 +333,17 @@
                                                 'id': 'content_preview_url_button',
                                                 'class': 'btn-nospin'
                                             }
+                                        },
+                                        {
+                                            label: 'mautic.core.download',
+                                            variant: 'ghost',
+                                            icon_only: true,
+                                            icon: 'ri-download-line',
+                                            onclick: 'window.open("' ~ previewUrl ~ '/download/pdf", "_blank");',
+                                            attributes: {
+                                                'id': 'content_preview_pdf_url_button',
+                                                'class': 'btn-nospin'
+                                            }
                                         }
                                     ]
                                 } %}
@@ -358,6 +369,10 @@
                     <button class="btn btn-default btn-nospin"
                             onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
                         <i class="fa fa-external-link"></i>
+                    </button>
+                    <button class="btn btn-default btn-nospin"
+                            onclick="window.open('{{ draftPreviewUrl }}/download/pdf', '_blank');">
+                        <i class="fa fa-download"></i>
                     </button>
                 </span>
                       </div>

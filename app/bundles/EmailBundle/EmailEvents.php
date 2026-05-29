@@ -68,6 +68,16 @@ final class EmailEvents
     public const EMAIL_ON_DISPLAY = 'mautic.email_on_display';
 
     /**
+     * The mautic.email_preview_generate_pdf event is dispatched when an email preview is downloaded as PDF.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailPreviewPdfGenerationEvent instance.
+     *
+     * @var string
+     */
+    public const EMAIL_PREVIEW_GENERATE_PDF = 'mautic.email_preview_generate_pdf';
+
+    /**
      * The mautic.email_on_build event is dispatched before displaying the email builder form to allow adding of tokens.
      *
      * The event listener receives a

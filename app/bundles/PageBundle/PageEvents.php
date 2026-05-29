@@ -154,4 +154,12 @@ final class PageEvents
      * @var string
      */
     public const ON_URL_TOKEN_REPLACE = 'mautic.page.on_url_token_replace';
+
+    /**
+     * The mautic.page_preview_generate_pdf event is dispatched to generate a PDF from page preview HTML.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\PagePreviewPdfGenerationEvent
+     */
+    public const PAGE_PREVIEW_GENERATE_PDF = 'mautic.page_preview_generate_pdf';
 }

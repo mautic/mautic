@@ -49,6 +49,21 @@ return [
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
                 'defaults'   => ['objectType' => null],
             ],
+            'mautic_page_preview_download' => [
+                'path'       => '/page/preview/{id}/download/{downloadType}',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::previewDownloadAction',
+                'defaults'   => [
+                    'downloadType' => 'pdf',
+                ],
+            ],
+            'mautic_page_preview_download_draft' => [
+                'path'       => '/page/preview/{id}/draft/download/{downloadType}',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::previewDownloadAction',
+                'defaults'   => [
+                    'objectType'   => 'draft',
+                    'downloadType' => 'pdf',
+                ],
+            ],
         ],
         'api' => [
             'mautic_api_pagesstandard' => [

@@ -88,6 +88,11 @@ Mautic.contentPreviewUrlGenerator = {
         mQuery('#content_preview_url').val(previewUrl);
         // Update URL in preview button
         mQuery('#content_preview_url_button').attr('onClick', "window.open('" + previewUrl + "', '_blank');");
+
+        const pdfPreviewUrl = previewUrl + '/download/pdf';
+        if (mQuery('#content_preview_pdf_url_button').length) {
+            mQuery('#content_preview_pdf_url_button').attr('onClick', "window.open('" + pdfPreviewUrl + "', '_blank');");
+        }
     }
 }
 

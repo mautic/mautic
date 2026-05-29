@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailPreviewPdfGenerationEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\EmailConfig;
@@ -33,6 +34,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -526,6 +528,132 @@ class PublicController extends CommonFormController
         }
 
         return new Response($content);
+    }
+
+    public function previewDownloadAction(
+        ThemeHelper $themeHelper,
+        AssetsHelper $assetsHelper,
+        EmailConfig $emailConfig,
+        EmailModel $model,
+        Request $request,
+        LeadModel $leadModel,
+        FakeContactHelper $fakeLeadHelper,
+        string $objectId,
+        ?string $objectType = null,
+        string $downloadType = 'pdf',
+    ): Response {
+        if ('pdf' !== strtolower($downloadType)) {
+            return $this->notFound();
+        }
+
+        $contactId   = (int) $request->query->get('contactId');
+        $emailEntity = $model->getEntity($objectId);
+
+        if (null === $emailEntity) {
+            return $this->notFound();
+        }
+
+        $publicPreview = $emailEntity->isPublicPreview();
+        $draftEnabled  = $emailConfig->isDraftEnabled();
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $publicPreview = $emailEntity->getDraft()->isPublicPreview();
+        }
+
+        if (
+            ($this->security->isAnonymous() && !$publicPreview)
+            || (!$this->security->isAnonymous()
+                && !$this->security->hasEntityAccess(
+                    'email:emails:viewown',
+                    'email:emails:viewother',
+                    $emailEntity->getCreatedBy()
+                ))
+        ) {
+            return $this->accessDenied();
+        }
+
+        if ($contactId && (
+            !$this->security->isAdmin()
+            && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+        )
+        ) {
+            $contactId = null;
+        }
+
+        $idHash = 'xxxxxxxxxxxxxx';
+
+        $BCcontent = $emailEntity->getContent();
+        $content   = $emailEntity->getCustomHtml();
+
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $content = $emailEntity->getDraftContent();
+        }
+
+        if (empty($content) && !empty($BCcontent)) {
+            $template = $emailEntity->getTemplate();
+
+            $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
+
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+
+            $content = $themeHelper->renderThemeTemplate(
+                $logicalName,
+                [
+                    'inBrowser' => true,
+                    'content'   => $emailEntity->getContent(),
+                    'email'     => $emailEntity,
+                    'lead'      => null,
+                    'template'  => $template,
+                ]
+            );
+        }
+
+        $tokens = ['{tracking_pixel}' => ''];
+
+        if ($contactId) {
+            $contact = $leadModel->getRepository()->getLead($contactId);
+            $contact = $model->enrichedContactWithCompanies($contact);
+        } else {
+            $contact = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+        }
+
+        $event = new EmailSendEvent(
+            null,
+            [
+                'content'      => $content,
+                'email'        => $emailEntity,
+                'idHash'       => $idHash,
+                'tokens'       => $tokens,
+                'internalSend' => true,
+                'lead'         => $contact,
+            ]
+        );
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
+
+        $content = $event->getContent(true);
+
+        $fileName = strtolower(trim(preg_replace('/[^A-Za-z0-9._-]+/', '-', (string) $emailEntity->getName()) ?? '', '-'));
+        if ('' === $fileName) {
+            $fileName = 'email-preview';
+        }
+        $fileName .= '.pdf';
+
+        $pdfEvent = new EmailPreviewPdfGenerationEvent($content, $emailEntity, $contact, $request, $fileName);
+        $this->dispatcher->dispatch($pdfEvent, EmailEvents::EMAIL_PREVIEW_GENERATE_PDF);
+
+        if (!$pdfEvent->hasPdfContent()) {
+            return new Response('PDF generation failed', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $pdfContent = $pdfEvent->getPdfContent();
+        $response   = new Response($pdfContent);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Length', (string) strlen($pdfContent));
+        $response->headers->set(
+            'Content-Disposition',
+            sprintf('%s; filename="%s"', ResponseHeaderBag::DISPOSITION_ATTACHMENT, $pdfEvent->getFileName())
+        );
+
+        return $response;
     }
 
     /**
