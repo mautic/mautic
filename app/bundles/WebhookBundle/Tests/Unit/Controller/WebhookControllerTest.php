@@ -159,7 +159,17 @@ class WebhookControllerTest extends TestCase
             ->method('post')
             ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
                 Assert::assertSame($url, $callUrl);
-                Assert::assertEquals($realTestPayload, $callPayload); // Changed from assertSame (works on all DBs)
+
+                Assert::assertArrayHasKey($eventUnderTest, $callPayload);
+                Assert::assertArrayHasKey(0, $callPayload[$eventUnderTest]);
+                Assert::assertArrayHasKey('timestamp', $callPayload[$eventUnderTest][0]);
+
+                // Timestamp is created when queue item is built and can differ by a second.
+                $normalizedPayload                                      = $realTestPayload;
+                $normalizedPayload[$eventUnderTest][0]['timestamp']     = $callPayload[$eventUnderTest][0]['timestamp'];
+
+                Assert::assertEquals($normalizedPayload, $callPayload); // Changed from assertSame (works on all DBs)
+
                 Assert::assertSame($secret, $callSecret);
 
                 return $clientResponse;
