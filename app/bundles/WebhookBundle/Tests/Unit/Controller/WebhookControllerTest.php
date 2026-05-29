@@ -157,9 +157,8 @@ class WebhookControllerTest extends TestCase
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
             ->method('post')
-            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
+            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($eventUnderTest, $realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
                 Assert::assertSame($url, $callUrl);
-
                 Assert::assertArrayHasKey($eventUnderTest, $callPayload);
                 Assert::assertArrayHasKey(0, $callPayload[$eventUnderTest]);
                 Assert::assertArrayHasKey('timestamp', $callPayload[$eventUnderTest][0]);
