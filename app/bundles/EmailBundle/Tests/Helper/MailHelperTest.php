@@ -399,6 +399,7 @@ class MailHelperTest extends TestCase
         $mailer    = $this->createMailHelperWithTransport($transport);
         $email     = new Email();
         $email->setUseOwnerAsMailer(true);
+        $email->setCustomHtml('content');
 
         $mailer->setEmail($email);
         $mailer->enableQueue();
@@ -963,12 +964,29 @@ class MailHelperTest extends TestCase
         $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with('mautic_email_unsubscribe',
-                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
-                UrlGeneratorInterface::ABSOLUTE_URL)
-            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+        $this->router->method('generate')
+            ->willReturnCallback(
+                static function (string $route, array $parameters, int $referenceType) use ($emailSecret): string {
+                    if ('mautic_email_unsubscribe' === $route) {
+                        TestCase::assertSame(
+                            ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
+                            $parameters
+                        );
+                        TestCase::assertSame(UrlGeneratorInterface::ABSOLUTE_URL, $referenceType);
+
+                        return 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret;
+                    }
+
+                    if ('mautic_email_tracker' === $route) {
+                        TestCase::assertSame(['idHash' => 'hash'], $parameters);
+                        TestCase::assertSame(UrlGeneratorInterface::ABSOLUTE_URL, $referenceType);
+
+                        return 'http://www.somedomain.cz/email/tracker/hash';
+                    }
+
+                    throw new \RuntimeException(sprintf('Unexpected route "%s"', $route));
+                }
+            );
 
         $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
         $mailer->setIdHash('hash');

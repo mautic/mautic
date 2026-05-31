@@ -544,7 +544,7 @@ class MailHelper
 
                 $email = $this->getEmail();
 
-                if ($email && $email->getUseOwnerAsMailer()) {
+                if (!empty($metadatum['from'])) {
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
                     $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
                 } else {
