@@ -226,6 +226,40 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($tokenList[$token]);
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataValidateToken')]
+    public function testValidToken(string $content, bool $expected): void
+    {
+        $this->assertSame($expected, TokenHelper::validToken($content));
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public static function dataValidateToken(): iterable
+    {
+        yield ['{contactfield=firstname}', true];
+        yield ['{contactfield=lastname}', true];
+        yield ['{contactfield}', false];
+        yield ['firstname', false];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetTokenFieldAlias')]
+    public function testGetTokenFieldAlias(string $content, string $expected): void
+    {
+        $this->assertSame($expected, TokenHelper::getTokenFieldAlias($content));
+    }
+
+    /**
+     * @return iterable<string[]>
+     */
+    public static function dataGetTokenFieldAlias(): iterable
+    {
+        yield ['{random}', ''];
+        yield ['{contactfield=firstname}', 'firstname'];
+        yield ['{contact_field=firstname}', ''];
+        yield ['{contactfield=randomField}', 'randomField'];
+    }
+
     /**
      * @param string|int $result
      */

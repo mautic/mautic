@@ -79,4 +79,67 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected->choices, $actual->choices);
         $this->assertEquals($expected->definitions, $actual->definitions);
     }
+
+    public function testFormulaColumnOrderUsesFormulaExpression(): void
+    {
+        $allowedColumns              = new \stdClass();
+        $allowedColumns->choices     = ['read_ratio' => 'Read ratio'];
+        $allowedColumns->definitions = [
+            'read_ratio' => [
+                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+        ];
+
+        $result = $this->invokeGetOrderBySanitized(['read_ratio DESC'], $allowedColumns);
+
+        $this->assertTrue($result['hasOrderBy']);
+        $this->assertSame(
+            ['(IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')) + 0 DESC'],
+            $result['orderBy']
+        );
+    }
+
+    public function testInvalidOrderColumnIsRemoved(): void
+    {
+        $allowedColumns              = new \stdClass();
+        $allowedColumns->choices     = ['read_ratio' => 'Read ratio'];
+        $allowedColumns->definitions = [
+            'read_ratio' => [
+                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+        ];
+
+        $result = $this->invokeGetOrderBySanitized(['CONCAT(read_ratio, "%") ASC'], $allowedColumns);
+
+        $this->assertFalse($result['hasOrderBy']);
+        $this->assertSame([''], $result['orderBy']);
+    }
+
+    public function testEmptyOrderColumnIsRemoved(): void
+    {
+        $allowedColumns          = new \stdClass();
+        $allowedColumns->choices = ['read_ratio' => 'Read ratio'];
+
+        $result = $this->invokeGetOrderBySanitized(['   '], $allowedColumns);
+
+        $this->assertFalse($result['hasOrderBy']);
+        $this->assertSame([''], $result['orderBy']);
+    }
+
+    /**
+     * @param array<int, string> $orderBys
+     *
+     * @return array{orderBy: array<int, string>, hasOrderBy: bool}
+     */
+    private function invokeGetOrderBySanitized(array $orderBys, \stdClass $allowedColumns): array
+    {
+        $method = new \ReflectionMethod($this->reportModel, 'getOrderBySanitized');
+
+        $result = $method->invoke($this->reportModel, $orderBys, $allowedColumns);
+        \assert(is_array($result));
+
+        return $result;
+    }
 }

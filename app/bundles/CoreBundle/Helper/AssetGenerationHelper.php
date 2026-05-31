@@ -12,7 +12,6 @@ class AssetGenerationHelper
     private const NODE_MODULES = [
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
-        'js-cookie/src/js.cookie.js', // Needed for cookies.
         'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'moment/min/moment.min.js', // Needed for date/time formatting.

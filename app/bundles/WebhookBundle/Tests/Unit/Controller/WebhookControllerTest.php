@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Controller\AjaxController;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
+use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
@@ -156,9 +157,17 @@ class WebhookControllerTest extends TestCase
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
             ->method('post')
-            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
+            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($eventUnderTest, $realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
                 Assert::assertSame($url, $callUrl);
-                Assert::assertSame($realTestPayload, $callPayload);
+                Assert::assertArrayHasKey($eventUnderTest, $callPayload);
+                Assert::assertArrayHasKey(0, $callPayload[$eventUnderTest]);
+                Assert::assertArrayHasKey('timestamp', $callPayload[$eventUnderTest][0]);
+
+                // Timestamp is created when queue item is built and can differ by a second.
+                $normalizedPayload                                      = $realTestPayload;
+                $normalizedPayload[$eventUnderTest][0]['timestamp']     = $callPayload[$eventUnderTest][0]['timestamp'];
+
+                Assert::assertSame($normalizedPayload, $callPayload);
 
                 Assert::assertSame($secret, $callSecret);
 
@@ -198,12 +207,12 @@ class WebhookControllerTest extends TestCase
             ->method('getSuccessVsErrorStatusCodeRatio');
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->exactly(3))
-            ->method('getRepository')
+        $em->method('getRepository')
             ->willReturnMap([
                 [Event::class, $webhookEventRepository],
                 [WebhookQueue::class, $webhookQueueRepository],
                 [Webhook::class, $webhookRepository],
+                [Log::class, $logRepository],
             ]);
 
         $serializer = $this->createMock(SerializerInterface::class);

@@ -116,9 +116,9 @@ class ProcessWebhookQueuesCommand extends Command
         }
 
         if (!count($webhooks)) {
-            $output->writeln('<error>No published/Healthy webhooks found. Try again later.</error>');
+            $output->writeln('There are no published webhooks to process.');
 
-            return Command::FAILURE;
+            return Command::SUCCESS;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');

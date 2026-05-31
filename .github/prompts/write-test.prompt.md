@@ -28,9 +28,9 @@ Suggestions for AI:
 
 You can take an inspiration of existing functional tests. They all extend the `MauticMysqlTestCase` class and are located in the app/bundles or plugins directories under Tests folders. The tests are written in PHPUNIT. You can read the version in the `composer.json` file.
 
-When testing commands, use the `runCommand()` method inherited from `MauticMysqlTestCase`:
+When testing commands, use the `testSymfonyCommand()` method inherited from `MauticMysqlTestCase`:
 - Always call `$this->em->clear()` before running commands to ensure clean entity state
-- Example: `$output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $id]);`
+- Example: `$output = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $id]);`
 - Check the output string for errors or expected messages
 - Do not use Application/ArrayInput/BufferedOutput manually
 

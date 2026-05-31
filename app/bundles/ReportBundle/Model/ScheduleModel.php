@@ -24,6 +24,14 @@ class ScheduleModel
     }
 
     /**
+     * Avoid the default AbstractCommonModel::getRepository() as it caches it to a static property.
+     */
+    public function getRepository(): SchedulerRepository
+    {
+        return $this->schedulerRepository;
+    }
+
+    /**
      * @return Scheduler[]
      */
     public function getScheduledReportsForExport(ExportOption $exportOption)

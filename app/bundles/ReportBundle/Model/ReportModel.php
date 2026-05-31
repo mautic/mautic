@@ -674,12 +674,18 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
     {
-        $hasOrderBy = false;
+        $hasOrderBy  = false;
+        $definitions = $allowedColumns->definitions ?? [];
+
         foreach ($orderBys as $key => $orderBy) {
-            if ($this->orderByIsValid($orderBy, $allowedColumns->choices)) {
-                $hasOrderBy = true;
+            $order = $this->parseOrderBy((string) $orderBy);
+
+            if (null !== $order && $this->orderByIsValid($order['column'], $order['direction'], $allowedColumns->choices)) {
+                $orderBys[$key] = $this->getOrderByExpression($order['column'], $order['direction'], $definitions);
+                $hasOrderBy     = true;
                 continue;
             }
+
             $orderBys[$key] = '';
         }
 
@@ -690,30 +696,59 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @return array{column: string, direction: string}|null
+     */
+    private function parseOrderBy(string $order): ?array
+    {
+        $order = trim($order);
+
+        if (empty($order)) {
+            return null;
+        }
+
+        $direction = '';
+
+        if (preg_match('/\s+(ASC|DESC)$/i', $order, $matches)) {
+            $direction = strtoupper($matches[1]);
+            $order     = trim(substr($order, 0, -strlen($matches[0])));
+        }
+
+        return [
+            'column'    => trim($order, '`'),
+            'direction' => $direction,
+        ];
+    }
+
+    /**
      * Check if order by is valid.
      *
      * @param array<string, string> $allowedColumns
      */
-    private function orderByIsValid(string $order, array $allowedColumns): bool
+    private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        if (empty($order)) {
-            return false;
-        }
-
-        $orderBy         = $order;
-        $oderByDirection = '';
-
-        if (str_contains($order, ' ')) {
-            $orderTemp       = explode(' ', $order);
-            $orderBy         = $orderTemp[0];
-            $oderByDirection = $orderTemp[1];
-        }
-
-        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
+        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($orderByDirection, ['ASC', 'DESC', ''], true)) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $definitions
+     */
+    private function getOrderByExpression(string $orderBy, string $orderByDirection, array $definitions): string
+    {
+        $expression = $orderBy;
+
+        if (!empty($definitions[$orderBy]['formula'])) {
+            $expression = $definitions[$orderBy]['formula'];
+
+            if (!empty($definitions[$orderBy]['prefix']) || !empty($definitions[$orderBy]['suffix'])) {
+                $expression = sprintf('(%s) + 0', $expression);
+            }
+        }
+
+        return trim($expression.' '.$orderByDirection);
     }
 
     /**
