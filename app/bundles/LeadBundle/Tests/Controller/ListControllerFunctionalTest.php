@@ -821,6 +821,9 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+
+        Assert::assertStringContainsString('leadlist_buttons_apply', $this->client->getResponse()->getContent());
+
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());

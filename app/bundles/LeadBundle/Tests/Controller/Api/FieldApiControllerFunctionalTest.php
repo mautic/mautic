@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -15,9 +14,6 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @IgnoreAnnotation("covers")
- */
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
