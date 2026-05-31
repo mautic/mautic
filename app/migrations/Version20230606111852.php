@@ -31,7 +31,7 @@ final class Version20230606111852 extends PreUpAssertionMigration
         $results        = $this->connection->executeQuery($sql)->fetchAllAssociative();
         $updatedRecords = 0;
         foreach ($results as $row) {
-            $propertiesArray                            = unserialize($row['properties']);
+            $propertiesArray                            = unserialize($row['properties'], ['allowed_classes' => false]);
             $propertiesArray['settings']['description'] = str_replace(self::OLD_STRING, self::NEW_STRING, $propertiesArray['settings']['description']);
             $propertiesString                           = serialize($propertiesArray);
 

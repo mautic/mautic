@@ -19,7 +19,7 @@ final class Version20231110103625 extends AbstractMauticMigration
 
         $addPermissions = [];
         foreach ($results as $row) {
-            $permissionsArray = unserialize($row['readable_permissions']);
+            $permissionsArray = unserialize($row['readable_permissions'], ['allowed_classes' => false]);
             // Add permissions if not exists
             $permissionsToAdd = ['lead:export', 'form:export', 'report:export'];
 

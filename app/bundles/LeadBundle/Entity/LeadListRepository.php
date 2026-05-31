@@ -772,7 +772,7 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = unserialize($property['properties']);
+            $property       = unserialize($property['properties'], ['allowed_classes' => false]);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
@@ -795,7 +795,7 @@ SQL;
 
         foreach ($query->getResult() as $rowFilters) {
             $segmentMembershipFilters = array_filter(
-                unserialize($rowFilters['filters']),
+                unserialize($rowFilters['filters'], ['allowed_classes' => false]),
                 fn (array $filter) => 'leadlist' === $filter['type']
             );
 
@@ -874,7 +874,7 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = unserialize($property['properties']);
+            $property       = unserialize($property['properties'], ['allowed_classes' => false]);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
