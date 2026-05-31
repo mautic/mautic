@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Test\PhpUnitConfigCommand;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,5 +22,6 @@ final class TestPass implements CompilerPassInterface
         $container->removeAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class);
         $container->register(\Symfony\Component\HttpClient\MockHttpClient::class, \Symfony\Component\HttpClient\MockHttpClient::class)->setAutowired(true)->setPublic(true);
         $container->setAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class, \Symfony\Component\HttpClient\MockHttpClient::class);
+        $container->register(PhpUnitConfigCommand::class, PhpUnitConfigCommand::class)->addTag('console.command');
     }
 }

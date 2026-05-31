@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header {% if type is defined and type == 'expressive' %}pr-32 pl-32 pt-32 pb-0{% endif %}">
                 <button type="button" aria-label="{{ closeButtonLabel|default('mautic.core.close'|trans) }}" class="modal-close-button close" data-dismiss="modal" data-toggle="tooltip" data-placement="left" title="{{ closeButtonLabel|default('mautic.core.close'|trans) }}"><span>&times;</span></button>
-                
+
                 {% if modalLabel is defined %}
                     <div class="modal-header__label type-label-01">{{ modalLabel|trans }}</div>
                 {% endif %}

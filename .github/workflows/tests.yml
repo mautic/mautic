@@ -282,7 +282,7 @@ jobs:
             exit 1
           fi
         elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
-          if [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
+          if [[ -n "${{ github.base_ref }}" ]] && [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
             stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
             echo $stat
             regex="[0-9]+[[:space:]]insertion"
