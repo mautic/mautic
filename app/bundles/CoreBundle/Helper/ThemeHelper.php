@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
+use Mautic\CoreBundle\Twig\Sandbox\ThemeSandboxPolicy;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -13,6 +14,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use Twig\Extension\SandboxExtension;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -45,6 +47,7 @@ class ThemeHelper implements ThemeHelperInterface
     private Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
+    private ?Environment $sandboxEnv         = null;
 
     /**
      * Default themes which cannot be deleted.
@@ -395,6 +398,47 @@ class ThemeHelper implements ThemeHelperInterface
     }
 
     /**
+     * Renders a theme template in an isolated sandboxed Twig environment.
+     *
+     * Theme templates are user-uploaded and must not execute in the global
+     * Twig environment. This method creates a separate Environment instance
+     * that shares the same loader and extensions but applies a denylist
+     * policy via ThemeSandboxPolicy — blocking only dangerous functions
+     * and filters (map, reduce, filter, configGetParameter, etc.) while
+     * allowing all legitimate Mautic and plugin Twig functions.
+     *
+     * @param string  $template Twig logical name (e.g. @themes/mytheme/html/page.html.twig)
+     * @param mixed[] $params   Variables passed to the template
+     */
+    public function renderThemeTemplate(string $template, array $params): string
+    {
+        // Only sandbox user-uploadable theme templates; core templates are safe
+        if (!str_contains($template, '@themes/')) {
+            return $this->twig->render($template, $params);
+        }
+
+        if (null === $this->sandboxEnv) {
+            $this->sandboxEnv = new Environment($this->twig->getLoader(), [
+                'debug'            => $this->twig->isDebug(),
+                'strict_variables' => $this->twig->isStrictVariables(),
+                'autoescape'       => 'html',
+                'cache'            => $this->twig->getCache(),
+                'auto_reload'      => true,
+            ]);
+
+            foreach ($this->twig->getExtensions() as $extension) {
+                if (!$this->sandboxEnv->hasExtension($extension::class)) {
+                    $this->sandboxEnv->addExtension($extension);
+                }
+            }
+
+            $this->sandboxEnv->addExtension(new SandboxExtension(new ThemeSandboxPolicy(), true));
+        }
+
+        return $this->sandboxEnv->render($template, $params);
+    }
+
+    /**
      * @param \ZipArchive::ER_* $archive
      */
     public function getExtractError(int $archive): string
@@ -408,7 +452,7 @@ class ThemeHelper implements ThemeHelperInterface
         };
     }
 
-    public function zip($themeName)
+    public function zip($themeName): string
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $tmpPath   = $this->pathsHelper->getSystemPath('tmp', true).'/tmp_'.$themeName.'.zip';

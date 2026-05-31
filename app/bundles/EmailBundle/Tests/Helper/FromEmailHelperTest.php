@@ -474,6 +474,32 @@ class FromEmailHelperTest extends TestCase
         $this->assertEquals(['someone@somewhere.com' => 'Default Name'], $from->getAddressArray());
     }
 
+    public function testTokenizedEmailFallsBackToTokenizedSystemDefault(): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, '{contactfield=default_email|fallback@somewhere.com}'],
+                    ['mailer_from_name', null, '{contactfield=default_name|Fallback Name}'],
+                ]
+            );
+
+        $this->leadRepository->expects($this->never())
+            ->method('getLeadOwner');
+
+        $defaultFrom = new AddressDTO('{contactfield=other_email}', '{contactfield=other_name}');
+        $contact     = [
+            'other_email'   => '',
+            'other_name'    => '',
+            'default_email' => 'default-token@somewhere.com',
+            'default_name'  => 'Default Token Name',
+        ];
+
+        $from = $this->getHelper()->getFromAddressDto($defaultFrom, $contact);
+
+        $this->assertEquals(['default-token@somewhere.com' => 'Default Token Name'], $from->getAddressArray());
+    }
+
     public function testNullContactReturnsDefaultAddress(): void
     {
         $this->coreParametersHelper->expects($this->never())
