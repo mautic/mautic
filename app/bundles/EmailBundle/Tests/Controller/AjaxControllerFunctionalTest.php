@@ -22,6 +22,56 @@ use Symfony\Component\Mime\Email as EmailMime;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideSendToDncStatus')]
+    public function testGetEmailSendToDncStatusAction(bool $sendToDnc, string $expectedTranslationKey): void
+    {
+        $email = $this->createEmailWithParams(
+            'Email DNC Status',
+            'Email DNC Subject',
+            'list',
+            'beefree-empty',
+            'Test html'
+        );
+        $email->setSendToDnc($sendToDnc);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'email:getEmailSendToDncStatus',
+            'id'     => $email->getId(),
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($content);
+        $this->assertArrayHasKey('sendToDncStatus', $content);
+        $this->assertSame($sendToDnc, $content['sendToDncStatus']);
+        $this->assertSame(
+            static::getContainer()->get('translator')->trans($expectedTranslationKey),
+            $content['sendToDncText']
+        );
+    }
+
+    /**
+     * @return iterable<string, array{bool, string}>
+     */
+    public static function provideSendToDncStatus(): iterable
+    {
+        yield 'send to dnc enabled' => [true, 'mautic.core.form.yes'];
+        yield 'send to dnc disabled' => [false, 'mautic.core.form.no'];
+    }
+
+    public function testGetEmailSendToDncStatusActionWithoutIdReturnsEmptyResponse(): void
+    {
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', ['action' => 'email:getEmailSendToDncStatus']);
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertSame([], $content);
+    }
+
     public function testSendTestEmailAction(): void
     {
         /** @var CoreParametersHelper $parameters */

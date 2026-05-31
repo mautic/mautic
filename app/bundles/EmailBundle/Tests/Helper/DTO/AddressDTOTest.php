@@ -92,4 +92,11 @@ class AddressDTOTest extends TestCase
         $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
         $this->assertEquals("No Body's Business", $addressDTO->getName());
     }
+
+    public function testTokenDefaultPreservesSurroundingTextWithoutContact(): void
+    {
+        $addressDTO = new AddressDTO('someone@somewhere.com', 'Sales - {contactfield=companyname|Default Name}');
+
+        $this->assertEquals('Sales - Default Name', $addressDTO->getNameTokenValue());
+    }
 }

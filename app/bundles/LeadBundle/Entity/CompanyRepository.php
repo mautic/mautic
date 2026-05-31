@@ -361,7 +361,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
-            ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
+            ->addOrderBy('l.date_added', 'DESC') // primary should be [0]
+            ->addOrderBy('l.company_id', 'DESC');
 
         $companies = $qb->executeQuery()->fetchAllAssociative();
 
