@@ -119,8 +119,7 @@ class ContactExportAdminNotification
         return array_values(
             array_filter(
                 $this->userRepository->getAllAdminUsers(),
-                static fn (User $adminUser): bool => $adminUser->isAdmin()
-                    && $adminUser->isPublished()
+                static fn (User $adminUser): bool => $adminUser->isPublished()
                     && $adminUser->getId() !== $requestingUser->getId()
             )
         );

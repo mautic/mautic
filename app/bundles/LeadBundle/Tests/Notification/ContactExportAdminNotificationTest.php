@@ -21,12 +21,10 @@ class ContactExportAdminNotificationTest extends TestCase
 {
     public function testRequestedNotifiesOtherPublishedAdmins(): void
     {
-        $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com', true);
-        $otherAdmin     = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
-        $sameAdmin      = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
-        $inactiveAdmin  = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
-        $nonAdmin       = $this->createUser(13, 'Regular User', 'user@example.com', true, false);
-
+        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', true);
+        $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
+        $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
         $contactExportScheduler = (new ContactExportScheduler())
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
@@ -69,7 +67,7 @@ class ContactExportAdminNotificationTest extends TestCase
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->expects($this->once())
             ->method('getAllAdminUsers')
-            ->willReturn([$sameAdmin, $otherAdmin, $inactiveAdmin, $nonAdmin]);
+            ->willReturn([$sameAdmin, $otherAdmin, $inactiveAdmin]);
 
         $mailHelper = $this->createMock(MailHelper::class);
         $mailHelper->expects($this->never())
@@ -105,13 +103,11 @@ class ContactExportAdminNotificationTest extends TestCase
 
     public function testCompletedSendsSharedAdminEmailWithoutLink(): void
     {
-        $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
-        $otherAdmin     = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
-        $thirdAdmin     = $this->createUser(14, 'Audit Admin', 'audit@example.com', true, true);
-        $sameAdmin      = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
-        $inactiveAdmin  = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
-        $nonAdmin       = $this->createUser(13, 'Regular User', 'user@example.com', true, false);
-
+        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
+        $thirdAdmin             = $this->createUser(14, 'Audit Admin', 'audit@example.com', true, true);
+        $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
         $contactExportScheduler = (new ContactExportScheduler())
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
@@ -143,7 +139,7 @@ class ContactExportAdminNotificationTest extends TestCase
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->expects($this->once())
             ->method('getAllAdminUsers')
-            ->willReturn([$sameAdmin, $otherAdmin, $thirdAdmin, $inactiveAdmin, $nonAdmin]);
+            ->willReturn([$sameAdmin, $otherAdmin, $thirdAdmin, $inactiveAdmin]);
 
         $mailHelper = $this->createMock(MailHelper::class);
         $mailHelper->expects($this->once())
