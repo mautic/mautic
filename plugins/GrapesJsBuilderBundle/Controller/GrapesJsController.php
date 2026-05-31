@@ -165,7 +165,7 @@ class GrapesJsController extends CommonController
         // Replace short codes to emoji
         $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
-        $renderedTemplate =  $this->renderView(
+        $renderedTemplate =  $themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'     => $isNew,
