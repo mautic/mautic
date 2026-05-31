@@ -80,7 +80,7 @@ class ContactExportAdminNotification
                 '%requesting_user_email%' => $requestingUser->getEmail(),
                 '%requested_at%'          => $this->formatForDisplay($requestedAt),
                 '%completed_at%'          => $this->formatForDisplay($completedAt),
-                '%status%'                => 'Completed',
+                '%status%'                => $this->translator->trans('mautic.lead.export.status.completed'),
                 '%file_type%'             => $fileType,
             ]
         );

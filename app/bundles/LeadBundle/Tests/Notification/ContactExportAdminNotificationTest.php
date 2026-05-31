@@ -125,6 +125,7 @@ class ContactExportAdminNotificationTest extends TestCase
                 static function (string $key, array $parameters = []): string {
                     return match ($key) {
                         'mautic.lead.export.admin.email_subject' => 'Contact export completed',
+                        'mautic.lead.export.status.completed'    => 'Completed',
                         'mautic.lead.export.admin.email'         => sprintf(
                             'Hi, Initiated by: %s <%s> Requested at: %s Completed at: %s Status: %s Export type: %s This notification is for security awareness only. The export download link is not included. {signature}',
                             $parameters['%requesting_user_name%'],
