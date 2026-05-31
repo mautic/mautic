@@ -975,7 +975,7 @@ class FormController extends CommonFormController
                 $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
-            return $this->render($logicalName, $viewParams);
+            return new Response($themeHelper->renderThemeTemplate($logicalName, $viewParams));
         }
 
         return $this->render('@MauticForm/form.html.twig', $viewParams);
